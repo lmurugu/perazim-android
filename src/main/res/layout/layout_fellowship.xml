@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fellowship_scroll" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:fillViewport="true"
+    android:background="@color/bg_soft">
+    <LinearLayout android:id="@+id/fellowship_content"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp"
+        android:animateLayoutChanges="true">
+        <TextView android:id="@+id/fellowship_title"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="PRAYER &amp; FELLOWSHIP" android:textSize="12sp"
+            android:textStyle="bold" android:textColor="#581665"
+            android:fontFamily="sans-serif-black" android:letterSpacing="0.1" />
+        <!-- Prayer request card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_prayer"
+            style="@style/UiCard" android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" app:cardElevation="3dp"
+            app:cardCornerRadius="16dp" app:contentPadding="16dp">
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView android:id="@+id/prayer_label"
+                    android:text="🙏 SUBMIT A PRAYER REQUEST"
+                    android:textSize="13sp" android:textStyle="bold"
+                    android:textColor="#581665" android:fontFamily="sans-serif-black" />
+                <EditText android:id="@+id/prayer_input"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:hint="Share your burden or praise..."
+                    android:background="@drawable/pill_purple_tint_bg"
+                    android:padding="12dp" android:layout_marginTop="6dp"
+                    android:textSize="14sp" android:textColor="#140319"
+                    android:fontFamily="sans-serif-medium" />
+                <Button android:id="@+id/btn_submit"
+                    android:layout_width="match_parent" android:layout_height="48dp"
+                    android:layout_marginTop="8dp" android:text="Submit Prayer Request"
+                    android:textColor="#FFFFFF" android:textSize="14sp"
+                    android:fontFamily="sans-serif-black"
+                    android:background="@drawable/pill_purple_bg" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <!-- Riddle card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_riddle"
+            style="@style/UiCard" android:layout_marginBottom="8dp"
+            app:cardElevation="2dp" app:cardCornerRadius="16dp"
+            app:contentPadding="16dp">
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView android:id="@+id/riddle_tag"
+                    android:text="⚡ BIBLICAL RIDDLE"
+                    android:textSize="11sp" android:textStyle="bold"
+                    android:textColor="#E17D2F" android:fontFamily="sans-serif-black"
+                    android:letterSpacing="0.06" />
+                <TextView android:id="@+id/riddle_q"
+                    android:text="What broke out when the waters broke out? (2 Samuel 5:20)"
+                    android:textSize="15sp" android:textStyle="bold"
+                    android:textColor="#140319" android:fontFamily="sans-serif-black"
+                    android:layout_marginTop="6dp" />
+                <TextView android:id="@+id/riddle_answer"
+                    android:text="The LORD broke out — Baal Perazim: the God of the Breakthrough."
+                    android:textSize="13sp" android:textColor="#725B78"
+                    android:fontFamily="serif" android:textStyle="italic"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
+                <Button android:id="@+id/btn_reveal_riddle"
+                    android:layout_width="wrap_content" android:layout_height="36dp"
+                    android:layout_marginTop="8dp" android:text="Reveal Answer (+20 XP)"
+                    android:textSize="12sp" android:textColor="#FFFFFF"
+                    android:fontFamily="sans-serif-medium"
+                    android:background="@drawable/pill_orange_bg" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</ScrollView>
