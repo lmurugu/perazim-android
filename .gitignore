@@ -25,3 +25,6 @@ gradle-8.5-bin.zip
 *.bak
 *.tmp
 *~
+*.db
+*.db-*
+*.png

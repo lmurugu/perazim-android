@@ -144,6 +144,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         // Phase 1: Master Verification Gate (Foundation)
         Phase1MasterVerificationHelper.runVerification(this);
 
+        // Phase 2.1: MVVM & State Architecture Layer Verification Gate
+        com.example.app.presentation.viewmodel.MvvmVerificationHelper.runVerification(this);
+
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
         rootLayout.setBackgroundColor(COLOR_BG_NEUTRAL);

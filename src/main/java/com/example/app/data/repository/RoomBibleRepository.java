@@ -129,6 +129,15 @@ public class RoomBibleRepository implements BibleRepository {
     }
 
     @Override
+    public List<BibleVerse> getBookmarkedVerses() {
+        List<BibleVerseEntity> entities = bibleDao.getBookmarkedVerses();
+        if (entities == null || entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return BibleMapper.toDomainVerseList(entities, resolveDefaultTranslationId());
+    }
+
+    @Override
     public void bookmarkVerse(String verseId, boolean isFavorite) {
         if (verseId == null || verseId.trim().isEmpty()) {
             return;

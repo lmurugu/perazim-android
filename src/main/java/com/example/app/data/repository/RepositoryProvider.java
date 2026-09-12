@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.example.app.data.local.PerazimDatabase;
 import com.example.app.domain.repository.AnnouncementRepository;
 import com.example.app.domain.repository.BibleRepository;
+import com.example.app.domain.repository.DownloadedContentRepository;
 import com.example.app.domain.repository.EventRepository;
 import com.example.app.domain.repository.HymnRepository;
 import com.example.app.domain.repository.MessageRepository;
@@ -15,7 +16,7 @@ import com.example.app.domain.repository.UserRepository;
 
 /**
  * Thread-safe singleton service locator that instantiates and provides
- * all 9 domain repositories backed by {@link PerazimDatabase}.
+ * all domain repositories backed by {@link PerazimDatabase}.
  */
 public class RepositoryProvider {
     private static volatile RepositoryProvider instance;
@@ -28,6 +29,7 @@ public class RepositoryProvider {
     private final AnnouncementRepository announcementRepository;
     private final ReflectionRepository reflectionRepository;
     private final BibleRepository bibleRepository;
+    private final DownloadedContentRepository downloadedContentRepository;
 
     private RepositoryProvider(@NonNull Context context) {
         Context appContext = context.getApplicationContext();
@@ -41,6 +43,7 @@ public class RepositoryProvider {
         this.announcementRepository = new RoomAnnouncementRepository(db.announcementDao());
         this.reflectionRepository = new RoomReflectionRepository(db.reflectionDao());
         this.bibleRepository = new RoomBibleRepository(db.bibleDao());
+        this.downloadedContentRepository = new RoomDownloadedContentRepository(db.downloadedContentDao());
     }
 
     public static RepositoryProvider getInstance(@NonNull Context context) {
@@ -63,4 +66,5 @@ public class RepositoryProvider {
     public AnnouncementRepository getAnnouncementRepository() { return announcementRepository; }
     public ReflectionRepository getReflectionRepository() { return reflectionRepository; }
     public BibleRepository getBibleRepository() { return bibleRepository; }
+    public DownloadedContentRepository getDownloadedContentRepository() { return downloadedContentRepository; }
 }

@@ -15,6 +15,7 @@ public interface BibleRepository {
     List<BibleVerse> getVersesForChapter(String translationId, String bookId, int chapterNumber);
     BibleVerse getVerse(String translationId, String bookId, int chapterNumber, int verseNumber);
     List<BibleVerse> searchScripture(String translationId, String query);
+    List<BibleVerse> getBookmarkedVerses();
     void bookmarkVerse(String verseId, boolean isFavorite);
     void saveVerseNote(String verseId, String note);
 }

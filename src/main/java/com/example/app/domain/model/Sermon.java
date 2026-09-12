@@ -57,6 +57,7 @@ public class Sermon implements Serializable {
     public void setScriptureReference(String scriptureReference) { this.scriptureReference = scriptureReference; }
 
     public String getSeriesName() { return seriesName; }
+    public String getSeries() { return seriesName; }
     public void setSeriesName(String seriesName) { this.seriesName = seriesName; }
 
     public String getAudioUrl() { return audioUrl; }

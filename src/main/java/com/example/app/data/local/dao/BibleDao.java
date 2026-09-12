@@ -84,6 +84,9 @@ public interface BibleDao {
     @Query("SELECT * FROM bible_verses WHERE text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
     List<BibleVerseEntity> searchVerses(String query);
 
+    @Query("SELECT * FROM bible_verses WHERE isFavorite = 1 ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC")
+    List<BibleVerseEntity> getBookmarkedVerses();
+
     @Query("UPDATE bible_verses SET isFavorite = :isFavorite WHERE id = :id")
     void updateBookmark(String id, boolean isFavorite);
 
