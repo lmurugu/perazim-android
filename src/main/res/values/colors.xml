@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Core palette -->
+    <color name="bg_soft">#F8FAFC</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="purple_primary">#581665</color>
+    <color name="primary_purple">#681A7D</color>
+    <color name="purple_dark_start">#3A0E45</color>
+    <color name="purple_dark_end">#581665</color>
+    <color name="orange_accent">#DE6F26</color>
+    <color name="grey_inactive">#94A3B8</color>
+    <color name="border_grey">#E2E8F0</color>
+    <color name="white">#FFFFFF</color>
+    <color name="cream_light">#FFFBEB</color>
+    <color name="yellow_amber">#FFEB3B</color>
+    <!-- Bottom navigation colors -->
+    <color name="bottom_nav_active">#581665</color>
+    <color name="bottom_nav_inactive">#94A3B8</color>
+    <!-- Existing colors (preserve) -->
+    <color name="color_bg_neutral">#F8FAFC</color>
+    <color name="color_white">#FFFFFF</color>
+    <color name="color_accent_orange">#DE6F26</color>
+    <color name="root_bg">#FAF7FB</color>
+</resources>

@@ -1,0 +1,27 @@
+# Build and cache
+.gradle/
+build/
+bin/
+out/
+.idea/
+*.iml
+local.properties
+.DS_Store
+
+# Large Archives and Distributables (CRITICAL: Do not upload to GitHub!)
+*.zip
+*.tar.gz
+*.tar
+gradle-8.5-all/
+jdk-21.tar.gz
+gradle-8.5-all.zip
+gradle-8.5-bin.zip
+
+# APKs and keystores (except reproducible debug keystore if desired, or ignore *.apk)
+*.apk
+*.aab
+
+# Temp files
+*.bak
+*.tmp
+*~

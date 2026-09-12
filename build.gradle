@@ -1,4 +1,4 @@
-plugins { id 'com.android.application' version '8.7.3' }
+plugins { id 'com.android.application' version '8.2.2' }
 android {
     namespace 'com.example.app'
     compileSdk 34
