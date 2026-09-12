@@ -20,7 +20,7 @@ public final class HymnMapper {
         if (entity == null) {
             return null;
         }
-        return new Hymn(
+        Hymn hymn = new Hymn(
                 entity.getId(),
                 entity.getNumber(),
                 entity.getTitle(),
@@ -32,6 +32,8 @@ public final class HymnMapper {
                 entity.getCategory(),
                 entity.isFavorite()
         );
+        hymn.setTimeSignature(entity.getTimeSignature());
+        return hymn;
     }
 
     public static HymnEntity toEntity(Hymn domain) {

@@ -43,6 +43,21 @@ import com.example.app.data.local.PersistenceVerificationHelper;
 import com.example.app.data.local.Phase1MasterVerificationHelper;
 import com.example.app.data.repository.RepositoryVerificationHelper;
 import com.example.app.navigation.NavigationContract;
+import com.example.app.presentation.Phase2MasterVerificationHelper;
+import com.example.app.presentation.ui.BibleReaderDialog;
+import com.example.app.presentation.ui.FellowshipUiBinder;
+import com.example.app.presentation.ui.HomeUiBinder;
+import com.example.app.presentation.ui.OnboardingDialog;
+import com.example.app.presentation.ui.ProfileUiBinder;
+import com.example.app.presentation.ui.SermonsUiBinder;
+import com.example.app.presentation.ui.WorshipUiBinder;
+import com.example.app.presentation.viewmodel.BibleViewModel;
+import com.example.app.presentation.viewmodel.FellowshipViewModel;
+import com.example.app.presentation.viewmodel.HomeViewModel;
+import com.example.app.presentation.viewmodel.ProfileViewModel;
+import com.example.app.presentation.viewmodel.SermonsViewModel;
+import com.example.app.presentation.viewmodel.ViewModelFactory;
+import com.example.app.presentation.viewmodel.WorshipViewModel;
 import com.example.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -134,8 +149,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     };
     private final String[] themeNames = {"Obsidian Royal", "Breakthrough Sunrise", "Burgundy Sunset"};
 
-    // Sermons Tab Views
+    // Phase 2 UI Binders & ViewModels
     private Button btnWatchLiveSermon;
+    private ViewModelFactory factory;
+    private BibleViewModel bibleViewModel;
+    private HomeUiBinder homeUiBinder;
+    private SermonsUiBinder sermonsUiBinder;
+    private WorshipUiBinder worshipUiBinder;
+    private FellowshipUiBinder fellowshipUiBinder;
+    private ProfileUiBinder profileUiBinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,8 +166,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         // Phase 1: Master Verification Gate (Foundation)
         Phase1MasterVerificationHelper.runVerification(this);
 
-        // Phase 2.1: MVVM & State Architecture Layer Verification Gate
-        com.example.app.presentation.viewmodel.MvvmVerificationHelper.runVerification(this);
+        // Phase 2: Master Verification Gate (Architecture, UI Binders & Hardware Event Propagation)
+        Phase2MasterVerificationHelper.runVerification(this);
+
+        // Trigger first-launch onboarding
+        OnboardingDialog.showIfNeeded(this);
+
+        factory = ViewModelFactory.getInstance(this);
+        bibleViewModel = factory.createBibleViewModel();
 
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
@@ -518,6 +546,45 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private ScrollView buildHomeScreen() {
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        if (bibleViewModel == null) {
+            bibleViewModel = factory.createBibleViewModel();
+        }
+        homeUiBinder = new HomeUiBinder(
+                this,
+                factory.createHomeViewModel(),
+                bibleViewModel,
+                new HomeUiBinder.HomeUiListener() {
+                    @Override
+                    public void onStreakUpdated(int streak) {
+                        streakCount = streak;
+                        updateHud();
+                    }
+
+                    @Override
+                    public void onXpAwarded(int xpAwarded, int totalXp) {
+                        xpCount = totalXp;
+                        updateHud();
+                    }
+
+                    @Override
+                    public void onPlaySermon(com.example.app.domain.model.Sermon sermon) {
+                        if (tvMiniTrackTitle != null) tvMiniTrackTitle.setText(sermon.getTitle());
+                        if (tvMiniTrackSub != null) tvMiniTrackSub.setText(sermon.getPreacher());
+                    }
+
+                    @Override
+                    public void onOpenScripture(String bookId, int chapter) {
+                        showFullScriptureDialog();
+                    }
+                }
+        );
+        return homeUiBinder.bind();
+    }
+
+    private ScrollView buildLegacyHomeScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
         scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
@@ -1236,6 +1303,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showFullScriptureDialog() {
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        if (bibleViewModel == null) {
+            bibleViewModel = factory.createBibleViewModel();
+        }
+        new BibleReaderDialog(this, bibleViewModel).show();
+    }
+
+    private void showLegacyFullScriptureDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         ScrollView sv = new ScrollView(this);
         LinearLayout container = new LinearLayout(this);
@@ -1597,6 +1674,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private ScrollView buildSermonsScreen() {
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        sermonsUiBinder = new SermonsUiBinder(this, factory.createSermonsViewModel());
+        ScrollView sv = sermonsUiBinder.bind();
+        btnWatchLiveSermon = sermonsUiBinder.getWatchLiveButton();
+        return sv;
+    }
+
+    private ScrollView buildLegacySermonsScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
         scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
@@ -1740,6 +1827,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private ScrollView buildWorshipScreen() {
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        worshipUiBinder = new WorshipUiBinder(this, factory.createWorshipViewModel());
+        return worshipUiBinder.bind();
+    }
+
+    private ScrollView buildLegacyWorshipScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
         scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
@@ -1892,6 +1987,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private ScrollView buildFellowshipScreen() {
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        fellowshipUiBinder = new FellowshipUiBinder(this, factory.createFellowshipViewModel());
+        return fellowshipUiBinder.bind();
+    }
+
+    private ScrollView buildLegacyFellowshipScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
         scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
@@ -2260,6 +2363,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private ScrollView buildProfileScreen() {
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        profileUiBinder = new ProfileUiBinder(this, factory.createProfileViewModel());
+        return profileUiBinder.bind();
+    }
+
+    private ScrollView buildLegacyProfileScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
         scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);

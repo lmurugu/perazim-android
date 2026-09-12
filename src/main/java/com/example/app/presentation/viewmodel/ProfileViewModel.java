@@ -119,6 +119,26 @@ public class ProfileViewModel extends ViewModel {
     }
 
     /**
+     * Updates user streak freeze status.
+     */
+    public void setStreakFreeze(boolean frozen, @Nullable Runnable onDone) {
+        executor.execute(() -> {
+            try {
+                User user = userRepo.getCurrentUser();
+                if (user != null) {
+                    userRepo.updateStreak(user.getStreakCount(), frozen);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating streak freeze", e);
+            } finally {
+                if (onDone != null) {
+                    postCallback(onDone);
+                }
+            }
+        });
+    }
+
+    /**
      * Aggregates downloaded sermons, favorite hymns, and bookmarked verses into {@link SavedContentData}.
      */
     public void loadSavedContent(@Nullable Consumer<SavedContentData> callback) {

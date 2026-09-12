@@ -18,6 +18,7 @@ public class Hymn implements Serializable {
     private String lyrics;
     private String category;
     private boolean isFavorite;
+    private String timeSignature;
 
     public Hymn() {
     }
@@ -65,4 +66,10 @@ public class Hymn implements Serializable {
 
     public boolean isFavorite() { return isFavorite; }
     public void setFavorite(boolean favorite) { isFavorite = favorite; }
+
+    public String getTimeSignature() { return timeSignature != null && !timeSignature.isEmpty() ? timeSignature : "4/4"; }
+    public void setTimeSignature(String timeSignature) { this.timeSignature = timeSignature; }
+
+    public String getKeySignature() { return key != null && !key.isEmpty() ? key : "C Major"; }
+    public void setKeySignature(String keySignature) { this.key = keySignature; }
 }

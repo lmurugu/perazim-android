@@ -84,8 +84,15 @@ public class WorshipViewModel extends ViewModel {
                     all = Collections.emptyList();
                 }
                 List<Hymn> filtered;
-                if (category == null || category.trim().isEmpty()) {
+                if (category == null || category.trim().isEmpty() || "All".equalsIgnoreCase(category.trim())) {
                     filtered = all;
+                } else if ("Favorites".equalsIgnoreCase(category.trim())) {
+                    filtered = new ArrayList<>();
+                    for (Hymn h : all) {
+                        if (h.isFavorite()) {
+                            filtered.add(h);
+                        }
+                    }
                 } else {
                     filtered = new ArrayList<>();
                     for (Hymn h : all) {

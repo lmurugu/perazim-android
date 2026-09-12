@@ -111,12 +111,21 @@ public class SermonsViewModel extends ViewModel {
                     all = Collections.emptyList();
                 }
                 List<Sermon> filtered;
-                if (series == null || series.trim().isEmpty()) {
+                if (series == null || series.trim().isEmpty() || "All".equalsIgnoreCase(series.trim())) {
                     filtered = all;
                 } else {
                     filtered = new ArrayList<>();
+                    String target = series.trim().toLowerCase();
                     for (Sermon s : all) {
-                        if (s.getSeries() != null && s.getSeries().equalsIgnoreCase(series.trim())) {
+                        String sSeries = s.getSeries() != null ? s.getSeries().trim().toLowerCase() : "";
+                        String sTitle = s.getTitle() != null ? s.getTitle().trim().toLowerCase() : "";
+                        String sDesc = s.getDescription() != null ? s.getDescription().trim().toLowerCase() : "";
+                        boolean matches = sSeries.equalsIgnoreCase(target)
+                                || (!sSeries.isEmpty() && (sSeries.contains(target) || target.contains(sSeries)))
+                                || (target.contains("breakthrough") && (sSeries.contains("breakthrough") || sTitle.contains("breakthrough")))
+                                || (target.contains("faith") && (sSeries.contains("faith") || sTitle.contains("faith")))
+                                || (target.contains("deliverance") && (sSeries.contains("covenant") || sTitle.contains("deliverance") || sDesc.contains("deliverance")));
+                        if (matches) {
                             filtered.add(s);
                         }
                     }

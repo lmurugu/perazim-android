@@ -27,7 +27,15 @@ public class RoomBibleRepository implements BibleRepository {
     public RoomBibleRepository(BibleDao bibleDao) {
         this.bibleDao = bibleDao;
         if (bibleDao != null) {
-            BibleDataSeeder.seedIfNeeded(null, bibleDao);
+            if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+                java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+                    try {
+                        BibleDataSeeder.seedIfNeeded(null, bibleDao);
+                    } catch (Throwable ignored) {}
+                });
+            } else {
+                BibleDataSeeder.seedIfNeeded(null, bibleDao);
+            }
         }
     }
 
@@ -38,7 +46,15 @@ public class RoomBibleRepository implements BibleRepository {
     public RoomBibleRepository(android.content.Context context, PerazimDatabase database) {
         this.bibleDao = database != null ? database.bibleDao() : null;
         if (database != null) {
-            BibleDataSeeder.seedIfNeeded(context, database);
+            if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+                java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+                    try {
+                        BibleDataSeeder.seedIfNeeded(context, database);
+                    } catch (Throwable ignored) {}
+                });
+            } else {
+                BibleDataSeeder.seedIfNeeded(context, database);
+            }
         }
     }
 
