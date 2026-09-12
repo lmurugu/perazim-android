@@ -39,6 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.app.data.local.PersistenceVerificationHelper;
 import com.example.app.navigation.NavigationContract;
 import com.example.app.ui.theme.PerazimTheme;
 
@@ -137,6 +138,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Phase 1.1: Persistence Foundation Verification Gate
+        PersistenceVerificationHelper.runVerification(this);
 
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
