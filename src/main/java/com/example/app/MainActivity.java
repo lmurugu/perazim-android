@@ -73,7 +73,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private boolean streakFrozen = false;
     private int progressPercent = 80;
     private boolean questClaimed = false;
-    private String selectedCampus = "Central Campus (Embu)";
+    private String selectedCampus = "Perazim Mission Church";
 
     // Top Header Views
     private TextView topStreakBadge;
@@ -214,7 +214,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         campusSpinner = new Spinner(this);
         List<String> campuses = new ArrayList<>();
-        campuses.add("Central (Embu)");
+        campuses.add("Perazim Mission Church");
         campuses.add("Mwea Campus");
         campuses.add("Rombo Campus");
         campuses.add("Online Campus");
@@ -524,7 +524,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(tvChurchHeader);
 
         TextView tvSubGreeting = new TextView(this);
-        tvSubGreeting.setText("“The Place of Great Breakthrough”\n“A place where everybody is somebody, and no body is a nobody”\nBaal-Perazim Breakthrough Walk · Embu Headquarters");
+        tvSubGreeting.setText("“The Place of Great Breakthrough”\n“A place where everybody is somebody, and no body is a nobody”\nPerazim Mission Church · Embu Headquarters");
         tvSubGreeting.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvSubGreeting.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         tvSubGreeting.setTextColor(COLOR_PRIMARY_PURPLE);

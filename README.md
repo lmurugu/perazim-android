@@ -37,7 +37,7 @@
 
 ## 📱 Visual Showcase
 
-| Home & Breakthrough Walk | Lipa na M-Pesa Giving | Scripture Reader (2 Sam 5) |
+| Home & Perazim Mission Church | Lipa na M-Pesa Giving | Scripture Reader (2 Sam 5) |
 | :---: | :---: | :---: |
 | <a href="docs/screenshots/live_screen_home.png"><img src="docs/screenshots/live_screen_home.png" width="240" alt="Home Screen"/></a> | <a href="docs/screenshots/live_screen_giving_modal.png"><img src="docs/screenshots/live_screen_giving_modal.png" width="240" alt="Giving Modal"/></a> | <a href="docs/screenshots/live_screen_passage.png"><img src="docs/screenshots/live_screen_passage.png" width="240" alt="Scripture Reader"/></a> |
 
