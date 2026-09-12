@@ -48,7 +48,12 @@ public class AccountIsolationVerificationHelper {
      * @param context Application context.
      */
     public static void runVerification(@NonNull Context context) {
-        runVerification(context, null);
+        runVerification(context, (VerificationCallback) null);
+    }
+
+    public static void runVerification(@NonNull Context context, @NonNull PerazimDatabase db) {
+        SessionManager sessionManager = SessionManager.getInstance(context, db.userDao());
+        verifyInternal(context, db, sessionManager);
     }
 
     /**

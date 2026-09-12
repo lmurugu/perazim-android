@@ -37,7 +37,20 @@ public class MediaVerificationHelper {
     }
 
     public static void runVerification(Context context) {
-        runVerification(context, null);
+        runVerification(context, (VerificationCallback) null);
+    }
+
+    public static void runVerification(Context context, PerazimDatabase db) {
+        try {
+            DownloadedContentDao downloadDao = db.downloadedContentDao();
+            SermonDao sermonDao = db.sermonDao();
+            DownloadManager downloadManager = new DownloadManager(context, downloadDao, sermonDao);
+            verifyInternal(context, downloadManager, downloadDao, sermonDao);
+            Log.i(TAG, "[PERAZIM-MEDIA-DOWNLOAD-GATE-1.8: SUCCESS]");
+        } catch (Exception e) {
+            Log.e(TAG, "[PERAZIM-MEDIA-DOWNLOAD-GATE-1.8: FAILED] " + e.getMessage(), e);
+            throw new RuntimeException("Media verification failed: " + e.getMessage(), e);
+        }
     }
 
     public static void runVerification(Context context, VerificationCallback callback) {

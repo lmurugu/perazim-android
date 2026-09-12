@@ -157,11 +157,11 @@ public class RepositoryVerificationHelper {
                 }
                 Log.d(TAG, "SermonRepository verified successfully.");
 
-                // 3. HymnRepository: insert test HymnEntity via hymnDao(), call getAllHymns(), getHymnByNumber(1), toggleFavorite(), verify
+                // 3. HymnRepository: insert test HymnEntity via hymnDao(), call getAllHymns(), getHymnByNumber(999), toggleFavorite(), verify
                 String hymnId = "test_hymn_1";
                 HymnEntity testHymn = new HymnEntity(
                         hymnId,
-                        1,
+                        999,
                         "Holy, Holy, Holy! Lord God Almighty",
                         "Holy, Holy, Holy! Lord God Almighty! Early in the morning our song shall rise to Thee...",
                         "D - Bm - G - A",
@@ -185,9 +185,9 @@ public class RepositoryVerificationHelper {
                     throw new IllegalStateException("HymnRepository.getAllHymns() failed to return test hymn");
                 }
 
-                Hymn hymnByNum = hymnRepo.getHymnByNumber(1);
+                Hymn hymnByNum = hymnRepo.getHymnByNumber(999);
                 if (hymnByNum == null || !hymnId.equals(hymnByNum.getId())) {
-                    throw new IllegalStateException("HymnRepository.getHymnByNumber(1) failed: " + (hymnByNum == null ? "null" : hymnByNum.getId()));
+                    throw new IllegalStateException("HymnRepository.getHymnByNumber(999) failed: " + (hymnByNum == null ? "null" : hymnByNum.getId()));
                 }
 
                 hymnRepo.toggleFavorite(hymnId, true);

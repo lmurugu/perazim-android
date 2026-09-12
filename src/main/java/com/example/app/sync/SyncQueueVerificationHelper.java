@@ -29,7 +29,13 @@ public class SyncQueueVerificationHelper {
     }
 
     public static void runVerification(Context context) {
-        runVerification(context, null);
+        runVerification(context, (VerificationCallback) null);
+    }
+
+    public static void runVerification(Context context, PerazimDatabase db) {
+        SyncQueueManager manager = new SyncQueueManager(db.syncQueueDao());
+        verifyInternal(manager);
+        Log.i(TAG, "[PERAZIM-SYNC-QUEUE-GATE-1.6: SUCCESS]");
     }
 
     public static void runVerification(Context context, VerificationCallback callback) {
