@@ -514,18 +514,21 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             content.addView(ivHero);
         }
 
-        // Welcome Header
-        TextView tvWelcome = new TextView(this);
-        tvWelcome.setText("Welcome back, Disciple");
-        tvWelcome.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        tvWelcome.setTypeface(Typeface.DEFAULT_BOLD);
-        tvWelcome.setTextColor(COLOR_TEXT_DARK);
-        content.addView(tvWelcome);
+        // Canonical Church Identity & Welcome Header
+        TextView tvChurchHeader = new TextView(this);
+        tvChurchHeader.setText("PERAZIM MISSION CHURCH");
+        tvChurchHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        tvChurchHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        tvChurchHeader.setTextColor(COLOR_PURPLE_DARK);
+        tvChurchHeader.setPadding(0, 0, 0, dp(2));
+        content.addView(tvChurchHeader);
 
         TextView tvSubGreeting = new TextView(this);
-        tvSubGreeting.setText("Baal-Perazim Breakthrough Walk · Embu Headquarters");
-        tvSubGreeting.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvSubGreeting.setTextColor(COLOR_TEXT_MUTED);
+        tvSubGreeting.setText("“The Place of Great Breakthrough”\n“A place where everybody is somebody, and no body is a nobody”\nBaal-Perazim Breakthrough Walk · Embu Headquarters");
+        tvSubGreeting.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvSubGreeting.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+        tvSubGreeting.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvSubGreeting.setLineSpacing(dp(2), 1.15f);
         tvSubGreeting.setPadding(0, dp(2), 0, dp(12));
         content.addView(tvSubGreeting);
 
@@ -1381,7 +1384,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         previewCard.addView(verseQuote);
 
         TextView pastorAttribution = new TextView(this);
-        pastorAttribution.setText("Bishop Dr. David Mutweri · Embu, Kenya\n📞 (+254) 0710 772 227 · ✉️ bishop@perazimchurch.org\n#GodOfTheBreakthrough");
+        pastorAttribution.setText("PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nBishop Dr. David Mutweri · Embu, Kenya\n📞 (+254) 0710 772 227 · ✉️ bishop@perazimchurch.org\n#GodOfTheBreakthrough");
         pastorAttribution.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         pastorAttribution.setTextColor(COLOR_ORANGE_BORDER);
         pastorAttribution.setGravity(Gravity.CENTER);
@@ -1432,14 +1435,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         btnShareWA.setOnClickListener(v -> {
             try {
                 Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                String shareBody = "✨ *PERAZIM MISSION CHURCH — VERSE OF THE DAY* ✨\n\n"
+                String shareBody = "✨ *PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”* ✨\n\n"
                         + "“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.”\n\n"
                         + "— *2 Samuel 5:20*\n\n"
-                        + "Bishop Dr. David Mutweri · Embu, Kenya\n"
+                        + "PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\n"
+                        + "“A place where everybody is somebody, and no body is a nobody”\n\n"
+                        + "Presiding Bishop Dr. David Mutweri · Embu, Kenya\n"
                         + "📞 Phone: (+254) 0710 772 227\n"
                         + "✉️ Church: info@perazimchurch.org\n"
                         + "✉️ Bishop: bishop@perazimchurch.org\n"
-                        + "💚 Paybill: 4069983\n\n"
+                        + "💚 Safaricom Paybill: 4069983\n\n"
                         + "Theme: Baal-Perazim / God of the Breakthrough\n\n"
                         + "#BaalPerazim #GodOfTheBreakthrough #PerazimMissionChurch";
                 sendIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
@@ -1448,7 +1453,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 startActivity(sendIntent);
             } catch (Exception e) {
                 Intent chooser = new Intent(Intent.ACTION_SEND);
-                chooser.putExtra(Intent.EXTRA_TEXT, "“As waters break out, the LORD has broken out against my enemies before me.” — 2 Samuel 5:20\nBishop Dr. David Mutweri | Perazim Mission Church\nPhone: (+254) 0710 772 227 | Paybill: 4069983");
+                chooser.putExtra(Intent.EXTRA_TEXT, "“As waters break out, the LORD has broken out against my enemies before me.” — 2 Samuel 5:20\nPERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nPresiding Bishop Dr. David Mutweri | Phone: (+254) 0710 772 227 | Paybill: 4069983");
                 chooser.setType("text/plain");
                 startActivity(Intent.createChooser(chooser, "Share Breakthrough Verse"));
             }
@@ -1469,7 +1474,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText(
                     "Breakthrough Verse",
-                    "“As waters break out, the LORD has broken out against my enemies before me.” — 2 Samuel 5:20 (Perazim Mission Church)"
+                    "“As waters break out, the LORD has broken out against my enemies before me.” — 2 Samuel 5:20 (PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”)"
             );
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, "Scripture copied to clipboard! Ready to paste on WhatsApp.", Toast.LENGTH_SHORT).show();
@@ -2047,12 +2052,94 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         });
         content.addView(humorCard);
 
+        // 6. CHURCH FOUNDATION & IDENTITY CARD
+        LinearLayout identityCard = createCard(COLOR_WHITE, dp(16), COLOR_PRIMARY_PURPLE, dp(1));
+        identityCard.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpIdentity = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpIdentity.setMargins(0, dp(14), 0, dp(6));
+        identityCard.setLayoutParams(lpIdentity);
+
+        TextView tvIdTag = new TextView(this);
+        tvIdTag.setText("🏛️ CHURCH FOUNDATION & IDENTITY");
+        tvIdTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvIdTag.setTypeface(Typeface.DEFAULT_BOLD);
+        tvIdTag.setTextColor(COLOR_PRIMARY_PURPLE);
+        identityCard.addView(tvIdTag);
+
+        TextView tvIdTitle = new TextView(this);
+        tvIdTitle.setText("PERAZIM MISSION CHURCH");
+        tvIdTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        tvIdTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvIdTitle.setTextColor(COLOR_PURPLE_DARK);
+        tvIdTitle.setPadding(0, dp(4), 0, dp(2));
+        identityCard.addView(tvIdTitle);
+
+        TextView tvMotto = new TextView(this);
+        tvMotto.setText("Motto: “The Place of Great Breakthrough”");
+        tvMotto.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvMotto.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);
+        tvMotto.setTextColor(COLOR_ACCENT_ORANGE);
+        tvMotto.setPadding(0, 0, 0, dp(2));
+        identityCard.addView(tvMotto);
+
+        TextView tvSlogan = new TextView(this);
+        tvSlogan.setText("Slogan: “A place where everybody is somebody, and no body is a nobody”");
+        tvSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvSlogan.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+        tvSlogan.setTextColor(COLOR_TEXT_DARK);
+        tvSlogan.setPadding(0, 0, 0, dp(8));
+        identityCard.addView(tvSlogan);
+
+        View sepId = new View(this);
+        sepId.setBackgroundColor(COLOR_BORDER_GREY);
+        LinearLayout.LayoutParams lpSepId = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(1));
+        lpSepId.setMargins(0, dp(2), 0, dp(8));
+        sepId.setLayoutParams(lpSepId);
+        identityCard.addView(sepId);
+
+        TextView tvVision = new TextView(this);
+        tvVision.setText("Vision: “To be a Center for Missions”");
+        tvVision.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvVision.setTypeface(Typeface.DEFAULT_BOLD);
+        tvVision.setTextColor(COLOR_PURPLE_DARK);
+        tvVision.setPadding(0, 0, 0, dp(4));
+        identityCard.addView(tvVision);
+
+        TextView tvMission = new TextView(this);
+        tvMission.setText("Mission: “Perazim exists to draw people to Christ, to disciple them to belong to His family, and to have them glorify GOD with their lives and their services.”");
+        tvMission.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvMission.setTextColor(COLOR_TEXT_DARK);
+        tvMission.setLineSpacing(dp(2), 1.15f);
+        tvMission.setPadding(0, 0, 0, dp(8));
+        identityCard.addView(tvMission);
+
+        TextView tvValuesLabel = new TextView(this);
+        tvValuesLabel.setText("Core Values:");
+        tvValuesLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvValuesLabel.setTypeface(Typeface.DEFAULT_BOLD);
+        tvValuesLabel.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvValuesLabel.setPadding(0, 0, 0, dp(4));
+        identityCard.addView(tvValuesLabel);
+
+        TextView tvValues = new TextView(this);
+        tvValues.setText("Evangelism • Discipleship • Fellowship • Worship • Ministry");
+        tvValues.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvValues.setTypeface(Typeface.DEFAULT_BOLD);
+        tvValues.setTextColor(COLOR_PURPLE_DARK);
+        tvValues.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        tvValues.setPadding(dp(8), dp(6), dp(8), dp(6));
+        identityCard.addView(tvValues);
+
+        content.addView(identityCard);
+
         // 7. CHURCH CONTACT & PASTORAL CARE SECTION
         LinearLayout contactCard = createCard(COLOR_WHITE, dp(16), COLOR_PRIMARY_PURPLE, dp(1));
         contactCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpContact = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpContact.setMargins(0, dp(14), 0, dp(10));
+        lpContact.setMargins(0, dp(10), 0, dp(10));
         contactCard.setLayoutParams(lpContact);
 
         // Section Tag
@@ -2114,6 +2201,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         LinearLayout rowBishopEmail = createInteractiveContactRow("✉️", "Bishop's Direct Email", "bishop@perazimchurch.org", v -> sendEmail("bishop@perazimchurch.org", "Pastoral Care / Counseling"));
         contactCard.addView(rowBishopEmail);
+
+        LinearLayout rowPaybill = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "4069983 (Tap to Give)", v -> showGivingDialog());
+        contactCard.addView(rowPaybill);
 
         // Quick Action Buttons
         LinearLayout contactButtonsRow = new LinearLayout(this);

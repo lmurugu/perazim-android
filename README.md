@@ -1,4 +1,4 @@
-# Perazim Mission Church — Official Android Application
+# PERAZIM MISSION CHURCH — Official Android Application
 
 [![Build Status](https://github.com/lmurugu/perazim-android/actions/workflows/build.yml/badge.svg)](https://github.com/lmurugu/perazim-android/actions)
 [![Platform](https://img.shields.io/badge/Platform-Android%20API%2026--34-brightgreen.svg)](https://developer.android.com)
@@ -6,13 +6,31 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Architecture](https://img.shields.io/badge/Architecture-Native%20Android-blue.svg)](https://developer.android.com)
 
-> *"Experience the Baal-Perazim Breakthrough Walk, stream sermons in data-saver mode, intercede on the Community Prayer Wall, access chorded church hymns, and give securely via M-Pesa."*
+> **Motto**: *“The Place of Great Breakthrough”*  
+> **Slogan**: *“A place where everybody is somebody, and no body is a nobody”*
 
 ---
 
-### Leadership Attribution
-**Presiding Bishop Dr. David Mutweri**  
-Central Campus Embu, Kenya  
+## 🏛️ Church Foundation & Canonical Identity
+
+**PERAZIM MISSION CHURCH** is established on the covenant foundation of David's breakthrough at Baal-Perazim (*“As waters break out, the LORD has broken out against my enemies before me” — 2 Samuel 5:20*), headquartered in Embu, Kenya, and reaching the global community.
+
+- **Church Name**: **PERAZIM MISSION CHURCH**
+- **Motto**: *“The Place of Great Breakthrough”*
+- **Slogan**: *“A place where everybody is somebody, and no body is a nobody”*
+- **Vision**: *“To be a Center for Missions”*
+- **Mission Statement**: *“Perazim exists to draw people to Christ, to disciple them to belong to His family, and to have them glorify GOD with their lives and their services.”*
+- **Core Values**: `Evangelism` • `Discipleship` • `Fellowship` • `Worship` • `Ministry`
+
+---
+
+### Leadership & Secretariat Attribution
+- **Presiding Bishop**: **Dr. David Mutweri**  
+- **Bishop Direct Phone**: `(+254) 0710 772 227`  
+- **Bishop Direct Email**: `bishop@perazimchurch.org`  
+- **Church Secretariat Email**: `info@perazimchurch.org`  
+- **Central Headquarters**: Embu, Kenya  
+- **Safaricom Paybill**: `4069983`  
 *Perazim Mission Church Global Ministries*
 
 ---
