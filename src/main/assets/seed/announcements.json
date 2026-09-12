@@ -1,0 +1,47 @@
+[
+  {
+    "id": "announcement_pastoral_bulletin_fasting",
+    "title": "Pastoral Bulletin: 21 Days of Breakthrough Fasting & Prayer",
+    "body": "Bishop Dr. David Mutweri calls the entire Perazim Mission Church family across Embu Headquarters and all campus outreaches to our annual 21 Days of Fasting and Prayer. Daily corporate prayer takes place in the sanctuary at 6:00 AM and 5:30 PM. Fasting devotional guides are available at the church office and online.",
+    "priority": "HIGH",
+    "publishedMillis": 1789200000000,
+    "expiresMillis": 1791878400000,
+    "campusId": "campus_central"
+  },
+  {
+    "id": "announcement_sanctuary_expansion",
+    "title": "Sanctuary Expansion & Development Giving Campaign",
+    "body": "We thank God for the explosive growth in our congregations! The church council has commenced the second phase of our Sanctuary Gallery Expansion to seat an additional 1,500 believers. Contributions can be channeled via M-Pesa Paybill 247247, Account: BUILD.",
+    "priority": "URGENT",
+    "publishedMillis": 1789200000000,
+    "expiresMillis": 1792483200000,
+    "campusId": "campus_central"
+  },
+  {
+    "id": "announcement_baptismal_class",
+    "title": "Baptismal Class & New Believers Orientation",
+    "body": "All newly saved believers and candidates desiring water baptism by immersion are invited to register for the 4-week foundational discipleship class starting this Saturday at 9:00 AM in Classroom 2.",
+    "priority": "NORMAL",
+    "publishedMillis": 1789200000000,
+    "expiresMillis": 1791273600000,
+    "campusId": "campus_central"
+  },
+  {
+    "id": "announcement_youth_ignite",
+    "title": "Youth Ignite Weekend Camp Registration Open",
+    "body": "Registration for the annual High School and Campus Youth Leadership Retreat at Mount Kenya Bandas is now officially open. Early bird registration fee of KSh 2,500 covers transport, accommodation, and retreat materials.",
+    "priority": "NORMAL",
+    "publishedMillis": 1789200000000,
+    "expiresMillis": 1791532800000,
+    "campusId": "campus_central"
+  },
+  {
+    "id": "announcement_mercy_medical_outreach",
+    "title": "Outreach Ministry: Free Medical Camp at Mwea Sub-county",
+    "body": "In partnership with Christian healthcare professionals, Perazim Mission Church will host a free community medical screening and pharmacy camp at the Mwea Outreach Center. Medical personnel and general volunteers are requested to sign up with the missions committee.",
+    "priority": "HIGH",
+    "publishedMillis": 1789200000000,
+    "expiresMillis": 1791878400000,
+    "campusId": "campus_mwea"
+  }
+]

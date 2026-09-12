@@ -1,0 +1,68 @@
+[
+  {
+    "id": "event_sunday_breakthrough",
+    "title": "Sunday Breakthrough Service",
+    "description": "A dynamic Sunday celebration of apostolic worship, powerful Word, and prophetic deliverance led by Bishop Dr. David Mutweri. Experience the breakthrough anointing that shifts every dry season into supernatural overflow.",
+    "startTimeMillis": 1789369200000,
+    "endTimeMillis": 1789378200000,
+    "location": "Main Sanctuary, Embu Headquarters",
+    "campusId": "campus_central",
+    "imageUrl": "sanctuary.jpg",
+    "category": "Worship"
+  },
+  {
+    "id": "event_midweek_deliverance",
+    "title": "Mid-week Deliverance",
+    "description": "Mid-week gathering for prevailing prayer, targeted spiritual warfare, healing ministry, and breaking cycles of delay. Bring family prayer requests and expectant faith.",
+    "startTimeMillis": 1789578000000,
+    "endTimeMillis": 1789585200000,
+    "location": "Sanctuary & Livestream, Embu Headquarters",
+    "campusId": "campus_central",
+    "imageUrl": "stage.jpg",
+    "category": "Intercession"
+  },
+  {
+    "id": "event_youth_explosion",
+    "title": "Youth Explosion",
+    "description": "Empowering the next generation with divine purpose, kingdom entrepreneurship, vibrant worship, and holy living. Featuring guest gospel ministers, talent showcases, and keynote breakout sessions.",
+    "startTimeMillis": 1789747200000,
+    "endTimeMillis": 1789758000000,
+    "location": "Youth Chapel & Amphitheater, Embu Headquarters",
+    "campusId": "campus_central",
+    "imageUrl": "fellowship.jpg",
+    "category": "Youth"
+  },
+  {
+    "id": "event_prayer_vigil",
+    "title": "Prayer Vigil",
+    "description": "All-night prevailing intercession from 9:00 PM to dawn. Crying out for campus revivals, missionary expansion, family restoration, and personal breakthroughs in the Valley of Rephaim.",
+    "startTimeMillis": 1789844400000,
+    "endTimeMillis": 1789873200000,
+    "location": "Main Sanctuary, Embu Headquarters",
+    "campusId": "campus_central",
+    "imageUrl": "candle.jpg",
+    "category": "Prayer"
+  },
+  {
+    "id": "event_mwea_mission_outreach",
+    "title": "Mwea Mission Outreach & Medical Camp",
+    "description": "Medical clinic, gospel literature distribution, and open-air crusade reaching agricultural communities across Mwea rice plains. Teams depart from Embu Headquarters.",
+    "startTimeMillis": 1790082000000,
+    "endTimeMillis": 1790107200000,
+    "location": "Mwea Mission Grounds, Kirinyaga County",
+    "campusId": "campus_mwea",
+    "imageUrl": "campus_mwea.jpg",
+    "category": "Outreach"
+  },
+  {
+    "id": "event_rombo_cross_border_revival",
+    "title": "Rombo Mission Outreach & Revival",
+    "description": "Cross-border evangelical outreach and leadership discipleship training at the slopes of Mount Kilimanjaro. Evangelism teams and pastor training seminar.",
+    "startTimeMillis": 1790686800000,
+    "endTimeMillis": 1790712000000,
+    "location": "Rombo Campus Sanctuary, Kajiado South",
+    "campusId": "campus_rombo",
+    "imageUrl": "campus_rombo.jpg",
+    "category": "Outreach"
+  }
+]

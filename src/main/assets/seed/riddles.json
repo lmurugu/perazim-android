@@ -1,0 +1,66 @@
+[
+  {
+    "id": "riddle_1",
+    "question": "I lived longer than any mortal man recorded in Scripture, yet I died before my father did. Who am I?",
+    "answer": "Methuselah",
+    "explanation": "Methuselah lived 969 years (Genesis 5:27). His father Enoch walked with God and did not experience death, for God took him directly to heaven (Genesis 5:24).",
+    "scriptureRef": "Genesis 5:24-27",
+    "difficulty": "MEDIUM"
+  },
+  {
+    "id": "riddle_2",
+    "question": "Out of the eater came something to eat; out of the strong came something sweet. What is this riddle and what is its answer?",
+    "answer": "A lion's carcass with honey inside",
+    "explanation": "Samson posed this famous riddle to the thirty Philistine companions after discovering a swarm of bees and sweet honey in the carcass of a lion he had slain.",
+    "scriptureRef": "Judges 14:14",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "riddle_3",
+    "question": "I had no earthly father, no earthly mother, and was never born as a baby; yet God fashioned me from the virgin soil of Eden. Who am I?",
+    "answer": "Adam",
+    "explanation": "God formed man of the dust of the ground and breathed into his nostrils the breath of life, making Adam the first living soul without human parentage.",
+    "scriptureRef": "Genesis 2:7",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "riddle_4",
+    "question": "I was neither a prophet, priest, nor king, yet God opened my mouth to speak with a human voice to rebuke a wayward prophet who was blind to the Angel of the Lord. Who am I?",
+    "answer": "Balaam's Donkey",
+    "explanation": "The Lord opened the mouth of Balaam's donkey when Balaam struck her three times, warning him of the Angel with a drawn sword.",
+    "scriptureRef": "Numbers 22:28-30",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "riddle_5",
+    "question": "King David named a battlefield after me when God broke through his enemies like a rushing torrent of bursting waters. What is the name of this place of Great Breakthrough?",
+    "answer": "Baal-Perazim",
+    "explanation": "David declared, 'As waters break out, the Lord has broken out against my enemies before me.' Therefore, he called that place Baal-Perazim, the foundational name of Perazim Mission Church.",
+    "scriptureRef": "2 Samuel 5:20",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "riddle_6",
+    "question": "I was King of Salem and priest of God Most High, without genealogy, without beginning of days or end of life, foreshadowing the eternal priesthood of Jesus Christ. Who am I?",
+    "answer": "Melchizedek",
+    "explanation": "Melchizedek met Abraham after the slaughter of the kings, bringing bread and wine. Abraham honored him by giving him a tithe of all the spoils.",
+    "scriptureRef": "Genesis 14:18-20, Hebrews 7:1-3",
+    "difficulty": "HARD"
+  },
+  {
+    "id": "riddle_7",
+    "question": "I was short in physical stature and despised as a tax collector, but I climbed a sycamore fig tree to catch a glimpse of Jesus in Jericho. Who am I?",
+    "answer": "Zacchaeus",
+    "explanation": "Zacchaeus climbed the tree, and Jesus looked up and told him, 'Zacchaeus, hurry and come down; for today I must stay at your house.'",
+    "scriptureRef": "Luke 19:1-10",
+    "difficulty": "EASY"
+  },
+  {
+    "id": "riddle_8",
+    "question": "I offered only five barley loaves and two small fish from my lunch, yet in the hands of the Lord, my meal satisfied five thousand men with twelve baskets of leftovers. Who was I?",
+    "answer": "The Boy with the Loaves and Fish",
+    "explanation": "Andrew brought the young boy to Jesus with the modest lunch, demonstrating that small offerings yield supernatural multiplication in the hands of God.",
+    "scriptureRef": "John 6:9-13",
+    "difficulty": "MEDIUM"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "joke_1",
+    "text": "Who was the greatest financier in the Bible? Noah — he floated his stock while everyone else was in complete liquidation!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Fellowship"
+  },
+  {
+    "id": "joke_2",
+    "text": "Who was the greatest babysitter in Scripture? David — because he rocked Goliath fast to sleep!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Fellowship"
+  },
+  {
+    "id": "joke_3",
+    "text": "Why didn't Noah go fishing very often on the ark? Because he only had two worms!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Sunday School"
+  },
+  {
+    "id": "joke_4",
+    "text": "At what time of day was Adam created? Just a little before Eve!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Fellowship"
+  },
+  {
+    "id": "joke_5",
+    "text": "Why did the pioneer Sunday School class cross the desert? To get to the Promised Land on time!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Sunday School"
+  },
+  {
+    "id": "joke_6",
+    "text": "Who was the smartest businessman in the Old Testament? Abraham — because he knew a Lot!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Bible Trivia"
+  },
+  {
+    "id": "joke_7",
+    "text": "What kind of lighting did Noah install on the Ark? Floodlights!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Sunday School"
+  },
+  {
+    "id": "joke_8",
+    "text": "Why couldn't the prophet Jonah trust the ocean? Because he knew there was something fishy about it!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Pulpit"
+  },
+  {
+    "id": "joke_9",
+    "text": "Which biblical character was the best bowler? Peter — because he was always on the roll at Pentecost!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Fellowship"
+  },
+  {
+    "id": "joke_10",
+    "text": "How do we know tennis was played in biblical times? Because Joseph served in Pharaoh's court!",
+    "cleanRating": "FAMILY_SAFE",
+    "category": "Bible Trivia"
+  }
+]

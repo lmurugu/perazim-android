@@ -5,6 +5,7 @@ import com.example.app.data.local.dao.BibleDao;
 import com.example.app.data.local.entity.BibleBookEntity;
 import com.example.app.data.local.entity.BibleTranslationEntity;
 import com.example.app.data.local.entity.BibleVerseEntity;
+import com.example.app.data.local.seeder.BibleDataSeeder;
 import com.example.app.data.mapper.BibleMapper;
 import com.example.app.domain.model.BibleBook;
 import com.example.app.domain.model.BibleTranslation;
@@ -25,15 +26,29 @@ public class RoomBibleRepository implements BibleRepository {
 
     public RoomBibleRepository(BibleDao bibleDao) {
         this.bibleDao = bibleDao;
+        if (bibleDao != null) {
+            BibleDataSeeder.seedIfNeeded(null, bibleDao);
+        }
     }
 
     public RoomBibleRepository(PerazimDatabase database) {
-        this(database.bibleDao());
+        this(database != null ? database.bibleDao() : null);
+    }
+
+    public RoomBibleRepository(android.content.Context context, PerazimDatabase database) {
+        this.bibleDao = database != null ? database.bibleDao() : null;
+        if (database != null) {
+            BibleDataSeeder.seedIfNeeded(context, database);
+        }
     }
 
     @Override
     public List<BibleTranslation> getAvailableTranslations() {
         List<BibleTranslationEntity> entities = bibleDao.getTranslations();
+        if (entities == null || entities.isEmpty()) {
+            BibleDataSeeder.seedIfNeeded(null, bibleDao);
+            entities = bibleDao.getTranslations();
+        }
         return BibleMapper.toDomainTranslationList(entities);
     }
 
@@ -45,6 +60,13 @@ public class RoomBibleRepository implements BibleRepository {
             // Fallback to KJV if default translation returned no books
             bookEntities = bibleDao.getBooksByTranslation("KJV");
         }
+        if (bookEntities == null || bookEntities.isEmpty()) {
+            BibleDataSeeder.seedIfNeeded(null, bibleDao);
+            bookEntities = bibleDao.getBooksByTranslation(translationId);
+            if ((bookEntities == null || bookEntities.isEmpty()) && !"KJV".equalsIgnoreCase(translationId)) {
+                bookEntities = bibleDao.getBooksByTranslation("KJV");
+            }
+        }
         return BibleMapper.toDomainBookList(bookEntities);
     }
 
@@ -52,6 +74,10 @@ public class RoomBibleRepository implements BibleRepository {
     public List<BibleVerse> getVersesForChapter(String translationId, String bookId, int chapterNumber) {
         int bookNumber = resolveBookNumber(translationId, bookId);
         List<BibleVerseEntity> entities = bibleDao.getVerses(bookNumber, chapterNumber);
+        if (entities == null || entities.isEmpty()) {
+            BibleDataSeeder.seedIfNeeded(null, bibleDao);
+            entities = bibleDao.getVerses(bookNumber, chapterNumber);
+        }
         String resolvedTranslation = (translationId != null && !translationId.isEmpty())
                 ? translationId
                 : resolveDefaultTranslationId();
@@ -62,6 +88,10 @@ public class RoomBibleRepository implements BibleRepository {
     public BibleVerse getVerse(String translationId, String bookId, int chapterNumber, int verseNumber) {
         int bookNumber = resolveBookNumber(translationId, bookId);
         BibleVerseEntity entity = bibleDao.getVerse(bookNumber, chapterNumber, verseNumber);
+        if (entity == null) {
+            BibleDataSeeder.seedIfNeeded(null, bibleDao);
+            entity = bibleDao.getVerse(bookNumber, chapterNumber, verseNumber);
+        }
         if (entity == null) {
             return null;
         }
@@ -76,7 +106,22 @@ public class RoomBibleRepository implements BibleRepository {
         if (query == null || query.trim().isEmpty()) {
             return Collections.emptyList();
         }
-        List<BibleVerseEntity> entities = bibleDao.searchVerses(query.trim());
+        String cleanQuery = query.trim();
+        List<BibleVerseEntity> entities = bibleDao.searchVerses(cleanQuery);
+        if ((entities == null || entities.isEmpty()) && cleanQuery.contains("-")) {
+            entities = bibleDao.searchVerses(cleanQuery.replace("-", " ").trim());
+        } else if ((entities == null || entities.isEmpty()) && cleanQuery.contains(" ")) {
+            entities = bibleDao.searchVerses(cleanQuery.replace(" ", "-").trim());
+        }
+        if (entities == null || entities.isEmpty()) {
+            BibleDataSeeder.seedIfNeeded(null, bibleDao);
+            entities = bibleDao.searchVerses(cleanQuery);
+            if ((entities == null || entities.isEmpty()) && cleanQuery.contains("-")) {
+                entities = bibleDao.searchVerses(cleanQuery.replace("-", " ").trim());
+            } else if ((entities == null || entities.isEmpty()) && cleanQuery.contains(" ")) {
+                entities = bibleDao.searchVerses(cleanQuery.replace(" ", "-").trim());
+            }
+        }
         String resolvedTranslation = (translationId != null && !translationId.isEmpty())
                 ? translationId
                 : resolveDefaultTranslationId();
@@ -94,13 +139,25 @@ public class RoomBibleRepository implements BibleRepository {
             entity.setFavorite(isFavorite);
             bibleDao.updateVerse(entity);
         } else {
-            // Fallback resolution for identifiers like "book.chapter.verse" or "2SA.5.20"
+            // Fallback resolution for identifiers like "book.chapter.verse" or "2SA.5.20" or "KJV.2SA.5.20"
             String[] parts = verseId.split("\\.");
             if (parts.length == 3) {
                 try {
                     int bNum = resolveBookNumber(null, parts[0]);
                     int cNum = Integer.parseInt(parts[1]);
                     int vNum = Integer.parseInt(parts[2]);
+                    BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
+                    if (verseEntity != null) {
+                        verseEntity.setFavorite(isFavorite);
+                        bibleDao.updateVerse(verseEntity);
+                    }
+                } catch (Exception ignored) {
+                }
+            } else if (parts.length == 4) {
+                try {
+                    int bNum = resolveBookNumber(parts[0], parts[1]);
+                    int cNum = Integer.parseInt(parts[2]);
+                    int vNum = Integer.parseInt(parts[3]);
                     BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
                     if (verseEntity != null) {
                         verseEntity.setFavorite(isFavorite);
@@ -123,13 +180,25 @@ public class RoomBibleRepository implements BibleRepository {
             entity.setNote(note);
             bibleDao.updateVerse(entity);
         } else {
-            // Fallback resolution for identifiers like "book.chapter.verse" or "2SA.5.20"
+            // Fallback resolution for identifiers like "book.chapter.verse" or "2SA.5.20" or "KJV.2SA.5.20"
             String[] parts = verseId.split("\\.");
             if (parts.length == 3) {
                 try {
                     int bNum = resolveBookNumber(null, parts[0]);
                     int cNum = Integer.parseInt(parts[1]);
                     int vNum = Integer.parseInt(parts[2]);
+                    BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
+                    if (verseEntity != null) {
+                        verseEntity.setNote(note);
+                        bibleDao.updateVerse(verseEntity);
+                    }
+                } catch (Exception ignored) {
+                }
+            } else if (parts.length == 4) {
+                try {
+                    int bNum = resolveBookNumber(parts[0], parts[1]);
+                    int cNum = Integer.parseInt(parts[2]);
+                    int vNum = Integer.parseInt(parts[3]);
                     BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
                     if (verseEntity != null) {
                         verseEntity.setNote(note);

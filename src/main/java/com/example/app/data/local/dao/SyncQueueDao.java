@@ -38,6 +38,18 @@ public interface SyncQueueDao {
     @Query("SELECT COUNT(*) FROM sync_queue WHERE status = 'PENDING'")
     int getPendingCount();
 
+    @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' ORDER BY timestampMillis ASC LIMIT :limit")
+    List<SyncQueueEntity> getPendingOperations(int limit);
+
+    @Query("SELECT * FROM sync_queue WHERE entityType = :entityType AND entityId = :entityId AND operationType = :operationType AND status IN ('PENDING', 'SYNCING') LIMIT 1")
+    SyncQueueEntity findPendingOrSyncing(String entityType, String entityId, String operationType);
+
+    @Query("DELETE FROM sync_queue WHERE status IN ('SYNCED', 'CANCELLED') AND timestampMillis <= :olderThanMillis")
+    void purgeCompleted(long olderThanMillis);
+
+    @Query("DELETE FROM sync_queue WHERE status IN ('SYNCED', 'CANCELLED')")
+    void purgeAllCompleted();
+
     @Query("DELETE FROM sync_queue WHERE id = :id")
     void deleteById(String id);
 

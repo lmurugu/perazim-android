@@ -1,0 +1,464 @@
+[
+  {
+    "bookNumber": 1,
+    "id": "GEN",
+    "name": "Genesis",
+    "testament": "OLD",
+    "chapterCount": 50
+  },
+  {
+    "bookNumber": 2,
+    "id": "EXO",
+    "name": "Exodus",
+    "testament": "OLD",
+    "chapterCount": 40
+  },
+  {
+    "bookNumber": 3,
+    "id": "LEV",
+    "name": "Leviticus",
+    "testament": "OLD",
+    "chapterCount": 27
+  },
+  {
+    "bookNumber": 4,
+    "id": "NUM",
+    "name": "Numbers",
+    "testament": "OLD",
+    "chapterCount": 36
+  },
+  {
+    "bookNumber": 5,
+    "id": "DEU",
+    "name": "Deuteronomy",
+    "testament": "OLD",
+    "chapterCount": 34
+  },
+  {
+    "bookNumber": 6,
+    "id": "JOS",
+    "name": "Joshua",
+    "testament": "OLD",
+    "chapterCount": 24
+  },
+  {
+    "bookNumber": 7,
+    "id": "JDG",
+    "name": "Judges",
+    "testament": "OLD",
+    "chapterCount": 21
+  },
+  {
+    "bookNumber": 8,
+    "id": "RUT",
+    "name": "Ruth",
+    "testament": "OLD",
+    "chapterCount": 4
+  },
+  {
+    "bookNumber": 9,
+    "id": "1SA",
+    "name": "1 Samuel",
+    "testament": "OLD",
+    "chapterCount": 31
+  },
+  {
+    "bookNumber": 10,
+    "id": "2SA",
+    "name": "2 Samuel",
+    "testament": "OLD",
+    "chapterCount": 24
+  },
+  {
+    "bookNumber": 11,
+    "id": "1KI",
+    "name": "1 Kings",
+    "testament": "OLD",
+    "chapterCount": 22
+  },
+  {
+    "bookNumber": 12,
+    "id": "2KI",
+    "name": "2 Kings",
+    "testament": "OLD",
+    "chapterCount": 25
+  },
+  {
+    "bookNumber": 13,
+    "id": "1CH",
+    "name": "1 Chronicles",
+    "testament": "OLD",
+    "chapterCount": 29
+  },
+  {
+    "bookNumber": 14,
+    "id": "2CH",
+    "name": "2 Chronicles",
+    "testament": "OLD",
+    "chapterCount": 36
+  },
+  {
+    "bookNumber": 15,
+    "id": "EZR",
+    "name": "Ezra",
+    "testament": "OLD",
+    "chapterCount": 10
+  },
+  {
+    "bookNumber": 16,
+    "id": "NEH",
+    "name": "Nehemiah",
+    "testament": "OLD",
+    "chapterCount": 13
+  },
+  {
+    "bookNumber": 17,
+    "id": "EST",
+    "name": "Esther",
+    "testament": "OLD",
+    "chapterCount": 10
+  },
+  {
+    "bookNumber": 18,
+    "id": "JOB",
+    "name": "Job",
+    "testament": "OLD",
+    "chapterCount": 42
+  },
+  {
+    "bookNumber": 19,
+    "id": "PSA",
+    "name": "Psalms",
+    "testament": "OLD",
+    "chapterCount": 150
+  },
+  {
+    "bookNumber": 20,
+    "id": "PRO",
+    "name": "Proverbs",
+    "testament": "OLD",
+    "chapterCount": 31
+  },
+  {
+    "bookNumber": 21,
+    "id": "ECC",
+    "name": "Ecclesiastes",
+    "testament": "OLD",
+    "chapterCount": 12
+  },
+  {
+    "bookNumber": 22,
+    "id": "SNG",
+    "name": "Song of Solomon",
+    "testament": "OLD",
+    "chapterCount": 8
+  },
+  {
+    "bookNumber": 23,
+    "id": "ISA",
+    "name": "Isaiah",
+    "testament": "OLD",
+    "chapterCount": 66
+  },
+  {
+    "bookNumber": 24,
+    "id": "JER",
+    "name": "Jeremiah",
+    "testament": "OLD",
+    "chapterCount": 52
+  },
+  {
+    "bookNumber": 25,
+    "id": "LAM",
+    "name": "Lamentations",
+    "testament": "OLD",
+    "chapterCount": 5
+  },
+  {
+    "bookNumber": 26,
+    "id": "EZK",
+    "name": "Ezekiel",
+    "testament": "OLD",
+    "chapterCount": 48
+  },
+  {
+    "bookNumber": 27,
+    "id": "DAN",
+    "name": "Daniel",
+    "testament": "OLD",
+    "chapterCount": 12
+  },
+  {
+    "bookNumber": 28,
+    "id": "HOS",
+    "name": "Hosea",
+    "testament": "OLD",
+    "chapterCount": 14
+  },
+  {
+    "bookNumber": 29,
+    "id": "JOL",
+    "name": "Joel",
+    "testament": "OLD",
+    "chapterCount": 3
+  },
+  {
+    "bookNumber": 30,
+    "id": "AMO",
+    "name": "Amos",
+    "testament": "OLD",
+    "chapterCount": 9
+  },
+  {
+    "bookNumber": 31,
+    "id": "OBA",
+    "name": "Obadiah",
+    "testament": "OLD",
+    "chapterCount": 1
+  },
+  {
+    "bookNumber": 32,
+    "id": "JON",
+    "name": "Jonah",
+    "testament": "OLD",
+    "chapterCount": 4
+  },
+  {
+    "bookNumber": 33,
+    "id": "MIC",
+    "name": "Micah",
+    "testament": "OLD",
+    "chapterCount": 7
+  },
+  {
+    "bookNumber": 34,
+    "id": "NAM",
+    "name": "Nahum",
+    "testament": "OLD",
+    "chapterCount": 3
+  },
+  {
+    "bookNumber": 35,
+    "id": "HAB",
+    "name": "Habakkuk",
+    "testament": "OLD",
+    "chapterCount": 3
+  },
+  {
+    "bookNumber": 36,
+    "id": "ZEP",
+    "name": "Zephaniah",
+    "testament": "OLD",
+    "chapterCount": 3
+  },
+  {
+    "bookNumber": 37,
+    "id": "HAG",
+    "name": "Haggai",
+    "testament": "OLD",
+    "chapterCount": 2
+  },
+  {
+    "bookNumber": 38,
+    "id": "ZEC",
+    "name": "Zechariah",
+    "testament": "OLD",
+    "chapterCount": 14
+  },
+  {
+    "bookNumber": 39,
+    "id": "MAL",
+    "name": "Malachi",
+    "testament": "OLD",
+    "chapterCount": 4
+  },
+  {
+    "bookNumber": 40,
+    "id": "MAT",
+    "name": "Matthew",
+    "testament": "NEW",
+    "chapterCount": 28
+  },
+  {
+    "bookNumber": 41,
+    "id": "MRK",
+    "name": "Mark",
+    "testament": "NEW",
+    "chapterCount": 16
+  },
+  {
+    "bookNumber": 42,
+    "id": "LUK",
+    "name": "Luke",
+    "testament": "NEW",
+    "chapterCount": 24
+  },
+  {
+    "bookNumber": 43,
+    "id": "JHN",
+    "name": "John",
+    "testament": "NEW",
+    "chapterCount": 21
+  },
+  {
+    "bookNumber": 44,
+    "id": "ACT",
+    "name": "Acts",
+    "testament": "NEW",
+    "chapterCount": 28
+  },
+  {
+    "bookNumber": 45,
+    "id": "ROM",
+    "name": "Romans",
+    "testament": "NEW",
+    "chapterCount": 16
+  },
+  {
+    "bookNumber": 46,
+    "id": "1CO",
+    "name": "1 Corinthians",
+    "testament": "NEW",
+    "chapterCount": 16
+  },
+  {
+    "bookNumber": 47,
+    "id": "2CO",
+    "name": "2 Corinthians",
+    "testament": "NEW",
+    "chapterCount": 13
+  },
+  {
+    "bookNumber": 48,
+    "id": "GAL",
+    "name": "Galatians",
+    "testament": "NEW",
+    "chapterCount": 6
+  },
+  {
+    "bookNumber": 49,
+    "id": "EPH",
+    "name": "Ephesians",
+    "testament": "NEW",
+    "chapterCount": 6
+  },
+  {
+    "bookNumber": 50,
+    "id": "PHP",
+    "name": "Philippians",
+    "testament": "NEW",
+    "chapterCount": 4
+  },
+  {
+    "bookNumber": 51,
+    "id": "COL",
+    "name": "Colossians",
+    "testament": "NEW",
+    "chapterCount": 4
+  },
+  {
+    "bookNumber": 52,
+    "id": "1TH",
+    "name": "1 Thessalonians",
+    "testament": "NEW",
+    "chapterCount": 5
+  },
+  {
+    "bookNumber": 53,
+    "id": "2TH",
+    "name": "2 Thessalonians",
+    "testament": "NEW",
+    "chapterCount": 3
+  },
+  {
+    "bookNumber": 54,
+    "id": "1TI",
+    "name": "1 Timothy",
+    "testament": "NEW",
+    "chapterCount": 6
+  },
+  {
+    "bookNumber": 55,
+    "id": "2TI",
+    "name": "2 Timothy",
+    "testament": "NEW",
+    "chapterCount": 4
+  },
+  {
+    "bookNumber": 56,
+    "id": "TIT",
+    "name": "Titus",
+    "testament": "NEW",
+    "chapterCount": 3
+  },
+  {
+    "bookNumber": 57,
+    "id": "PHM",
+    "name": "Philemon",
+    "testament": "NEW",
+    "chapterCount": 1
+  },
+  {
+    "bookNumber": 58,
+    "id": "HEB",
+    "name": "Hebrews",
+    "testament": "NEW",
+    "chapterCount": 13
+  },
+  {
+    "bookNumber": 59,
+    "id": "JAS",
+    "name": "James",
+    "testament": "NEW",
+    "chapterCount": 5
+  },
+  {
+    "bookNumber": 60,
+    "id": "1PE",
+    "name": "1 Peter",
+    "testament": "NEW",
+    "chapterCount": 5
+  },
+  {
+    "bookNumber": 61,
+    "id": "2PE",
+    "name": "2 Peter",
+    "testament": "NEW",
+    "chapterCount": 3
+  },
+  {
+    "bookNumber": 62,
+    "id": "1JN",
+    "name": "1 John",
+    "testament": "NEW",
+    "chapterCount": 5
+  },
+  {
+    "bookNumber": 63,
+    "id": "2JN",
+    "name": "2 John",
+    "testament": "NEW",
+    "chapterCount": 1
+  },
+  {
+    "bookNumber": 64,
+    "id": "3JN",
+    "name": "3 John",
+    "testament": "NEW",
+    "chapterCount": 1
+  },
+  {
+    "bookNumber": 65,
+    "id": "JUD",
+    "name": "Jude",
+    "testament": "NEW",
+    "chapterCount": 1
+  },
+  {
+    "bookNumber": 66,
+    "id": "REV",
+    "name": "Revelation",
+    "testament": "NEW",
+    "chapterCount": 22
+  }
+]
