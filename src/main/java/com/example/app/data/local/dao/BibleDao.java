@@ -72,6 +72,9 @@ public interface BibleDao {
     @Delete
     void deleteVerse(BibleVerseEntity verse);
 
+    @Query("SELECT * FROM bible_verses WHERE id = :id LIMIT 1")
+    BibleVerseEntity getVerseById(String id);
+
     @Query("SELECT * FROM bible_verses WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber ORDER BY verseNumber ASC")
     List<BibleVerseEntity> getVerses(int bookNumber, int chapterNumber);
 
@@ -80,6 +83,12 @@ public interface BibleDao {
 
     @Query("SELECT * FROM bible_verses WHERE text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
     List<BibleVerseEntity> searchVerses(String query);
+
+    @Query("UPDATE bible_verses SET isFavorite = :isFavorite WHERE id = :id")
+    void updateBookmark(String id, boolean isFavorite);
+
+    @Query("UPDATE bible_verses SET note = :note WHERE id = :id")
+    void updateVerseNote(String id, String note);
 
     @Query("DELETE FROM bible_verses WHERE id = :id")
     void deleteVerseById(String id);
