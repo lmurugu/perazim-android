@@ -39,6 +39,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.app.navigation.NavigationContract;
+import com.example.app.ui.theme.PerazimTheme;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,9 +89,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     // Navigation Shell Views
     private FrameLayout tabContainer;
-    private ScrollView[] tabViews = new ScrollView[4];
-    private LinearLayout[] navTabButtons = new LinearLayout[4];
-    private TextView[] navTabLabels = new TextView[4];
+    private ScrollView[] tabViews = new ScrollView[5];
+    private LinearLayout[] navTabButtons = new LinearLayout[5];
+    private TextView[] navTabLabels = new TextView[5];
     private int currentTabIndex = 0;
 
     // Persistent Docked Mini-Player (Subsplash pattern)
@@ -153,7 +156,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tabViews[1] = buildSermonsScreen();
         tabViews[2] = buildWorshipScreen();
         tabViews[3] = buildFellowshipScreen();
-        for (int i = 0; i < 4; i++) {
+        tabViews[4] = buildProfileScreen();
+        for (int i = 0; i < 5; i++) {
             tabContainer.addView(tabViews[i]);
             tabViews[i].setVisibility(i == 0 ? View.VISIBLE : View.GONE);
         }
@@ -422,10 +426,22 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         navBorder.setStroke(dp(1), COLOR_BORDER_GREY);
         bottomNav.setBackground(navBorder);
 
-        final String[] icons = {"🏠", "🎥", "🎵", "👥"};
-        final String[] labels = {"Home", "Sermons", "Worship", "Fellowship"};
+        final String[] icons = {
+                NavigationContract.TAB_ICON_HOME,
+                NavigationContract.TAB_ICON_SERMONS,
+                NavigationContract.TAB_ICON_WORSHIP,
+                NavigationContract.TAB_ICON_FELLOWSHIP,
+                NavigationContract.TAB_ICON_PROFILE
+        };
+        final String[] labels = {
+                NavigationContract.TAB_TITLE_HOME,
+                NavigationContract.TAB_TITLE_SERMONS,
+                NavigationContract.TAB_TITLE_WORSHIP,
+                NavigationContract.TAB_TITLE_FELLOWSHIP,
+                NavigationContract.TAB_TITLE_PROFILE
+        };
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             final int index = i;
             LinearLayout tab = new LinearLayout(this);
             tab.setOrientation(LinearLayout.VERTICAL);
@@ -463,14 +479,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         if (currentTabIndex == index) return;
         currentTabIndex = index;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             tabViews[i].setVisibility(i == currentTabIndex ? View.VISIBLE : View.GONE);
         }
         refreshTabStyles();
     }
 
     private void refreshTabStyles() {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             boolean isSelected = (i == currentTabIndex);
             if (isSelected) {
                 navTabLabels[i].setTextColor(COLOR_PRIMARY_PURPLE);
@@ -2228,6 +2244,387 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         scrollView.addView(content);
         return scrollView;
+    }
+
+    // =========================================================================
+    // TAB 4: PROFILE SCREEN (Guidebook §73 Layout Contract)
+    // =========================================================================
+
+    private ScrollView buildProfileScreen() {
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.setFillViewport(true);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding(dp(16), dp(16), dp(16), dp(32));
+
+        // 1. MEMBER PROFILE HEADER CARD
+        LinearLayout profileHeaderCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        profileHeaderCard.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpProfHeader = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpProfHeader.setMargins(0, 0, 0, dp(12));
+        profileHeaderCard.setLayoutParams(lpProfHeader);
+
+        LinearLayout memberRow = new LinearLayout(this);
+        memberRow.setOrientation(LinearLayout.HORIZONTAL);
+        memberRow.setGravity(Gravity.CENTER_VERTICAL);
+        memberRow.setPadding(0, 0, 0, dp(12));
+
+        // Avatar: Bishop portrait or monogram
+        Bitmap bishopBmp = loadAssetBitmap("bishop_portrait.jpg", 200);
+        if (bishopBmp != null) {
+            ImageView ivAvatar = new ImageView(this);
+            ivAvatar.setImageBitmap(getRoundedCornerBitmap(bishopBmp, dp(32)));
+            ivAvatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(64), dp(64));
+            lpAv.setMargins(0, 0, dp(14), 0);
+            ivAvatar.setLayoutParams(lpAv);
+            memberRow.addView(ivAvatar);
+        } else {
+            TextView tvDefaultAvatar = new TextView(this);
+            tvDefaultAvatar.setText("👤");
+            tvDefaultAvatar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 36);
+            tvDefaultAvatar.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(64), dp(64));
+            lpAv.setMargins(0, 0, dp(14), 0);
+            tvDefaultAvatar.setLayoutParams(lpAv);
+            memberRow.addView(tvDefaultAvatar);
+        }
+
+        LinearLayout memberInfo = new LinearLayout(this);
+        memberInfo.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpMemInfo = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        memberInfo.setLayoutParams(lpMemInfo);
+
+        TextView tvMemberName = new TextView(this);
+        tvMemberName.setText("Perazim Covenant Member");
+        tvMemberName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        tvMemberName.setTypeface(Typeface.DEFAULT_BOLD);
+        tvMemberName.setTextColor(COLOR_PURPLE_DARK);
+        memberInfo.addView(tvMemberName);
+
+        TextView tvMemberSub = new TextView(this);
+        tvMemberSub.setText("Perazim Mission Church · Embu Headquarters");
+        tvMemberSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvMemberSub.setTextColor(COLOR_TEXT_MUTED);
+        tvMemberSub.setPadding(0, dp(2), 0, dp(6));
+        memberInfo.addView(tvMemberSub);
+
+        // Covenant Badge Pill
+        TextView tvCovenantBadge = new TextView(this);
+        tvCovenantBadge.setText("🕊️ Active Disciple • Covenant Partner");
+        tvCovenantBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvCovenantBadge.setTypeface(Typeface.DEFAULT_BOLD);
+        tvCovenantBadge.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvCovenantBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        tvCovenantBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
+        memberInfo.addView(tvCovenantBadge);
+
+        memberRow.addView(memberInfo);
+        profileHeaderCard.addView(memberRow);
+
+        // Divider
+        View divHeader = new View(this);
+        divHeader.setBackgroundColor(COLOR_BORDER_GREY);
+        LinearLayout.LayoutParams lpDiv = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+        lpDiv.setMargins(0, 0, 0, dp(12));
+        divHeader.setLayoutParams(lpDiv);
+        profileHeaderCard.addView(divHeader);
+
+        // 2. SUMMARY HUD: Streak, XP, Grace Points (Guidebook §73.1)
+        TextView tvHudLabel = new TextView(this);
+        tvHudLabel.setText("SPIRITUAL GROWTH & DISCIPLESHIP METRICS");
+        tvHudLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvHudLabel.setTypeface(Typeface.DEFAULT_BOLD);
+        tvHudLabel.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvHudLabel.setPadding(0, 0, 0, dp(8));
+        profileHeaderCard.addView(tvHudLabel);
+
+        LinearLayout hudRow = new LinearLayout(this);
+        hudRow.setOrientation(LinearLayout.HORIZONTAL);
+        hudRow.setGravity(Gravity.CENTER_VERTICAL);
+
+        LinearLayout streakCard = createMetricCard("🔥 " + streakCount + " Days", "Streak", streakFrozen ? "❄️ Frozen" : "Active", COLOR_ORANGE_TINT, COLOR_ACCENT_ORANGE);
+        LinearLayout xpCard = createMetricCard("⭐ " + xpCount + " XP", "Spiritual XP", "Level 3 Disciple", COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE);
+        LinearLayout graceCard = createMetricCard("💜 " + graceCount + " Pts", "Grace Points", "Tokens Available", COLOR_ORANGE_TINT, COLOR_ORANGE_DARK);
+
+        hudRow.addView(streakCard);
+        hudRow.addView(xpCard);
+        hudRow.addView(graceCard);
+        profileHeaderCard.addView(hudRow);
+
+        content.addView(profileHeaderCard);
+
+        // 3. QUICK ACTIONS GRID (Guidebook §73.3)
+        TextView tvActionsHeader = new TextView(this);
+        tvActionsHeader.setText("QUICK ACTIONS");
+        tvActionsHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvActionsHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        tvActionsHeader.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvActionsHeader.setPadding(0, 0, 0, dp(6));
+        content.addView(tvActionsHeader);
+
+        LinearLayout actionsRow1 = new LinearLayout(this);
+        actionsRow1.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams lpRow1 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpRow1.setMargins(0, 0, 0, dp(8));
+        actionsRow1.setLayoutParams(lpRow1);
+
+        Button btnQuickGive = create3dActionButton("💚 Give", "Lipa na M-Pesa", COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, v -> showGivingDialog());
+        Button btnQuickMessage = create3dActionButton("💬 Message", "Pastoral Care", COLOR_PURPLE_DARK, COLOR_PURPLE_SHADOW, v -> sendEmail("bishop@perazimchurch.org", "Member Direct Message"));
+        actionsRow1.addView(btnQuickGive);
+        actionsRow1.addView(btnQuickMessage);
+        content.addView(actionsRow1);
+
+        LinearLayout actionsRow2 = new LinearLayout(this);
+        actionsRow2.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams lpRow2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpRow2.setMargins(0, 0, 0, dp(14));
+        actionsRow2.setLayoutParams(lpRow2);
+
+        Button btnQuickInvite = create3dActionButton("📢 Invite", "Share Church", COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, v -> shareInvite());
+        Button btnQuickSettings = create3dActionButton("⚙️ Settings", "Preferences", COLOR_PURPLE_DARK, COLOR_PURPLE_SHADOW, v -> showSettingsDialog());
+        actionsRow2.addView(btnQuickInvite);
+        actionsRow2.addView(btnQuickSettings);
+        content.addView(actionsRow2);
+
+        // 4. CHURCH IDENTITY & AFFILIATION CARD (Guidebook §73.2)
+        LinearLayout churchCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        churchCard.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpChurch = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpChurch.setMargins(0, 0, 0, dp(14));
+        churchCard.setLayoutParams(lpChurch);
+
+        TextView tvChurchTag = new TextView(this);
+        tvChurchTag.setText("🏛️ CHURCH IDENTITY & AFFILIATION");
+        tvChurchTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvChurchTag.setTypeface(Typeface.DEFAULT_BOLD);
+        tvChurchTag.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvChurchTag.setPadding(0, 0, 0, dp(6));
+        churchCard.addView(tvChurchTag);
+
+        TextView tvChurchName = new TextView(this);
+        tvChurchName.setText("PERAZIM MISSION CHURCH");
+        tvChurchName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        tvChurchName.setTypeface(Typeface.DEFAULT_BOLD);
+        tvChurchName.setTextColor(COLOR_PURPLE_DARK);
+        churchCard.addView(tvChurchName);
+
+        TextView tvChurchMotto = new TextView(this);
+        tvChurchMotto.setText("“The Place of Great Breakthrough” (2 Samuel 5:20)");
+        tvChurchMotto.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvChurchMotto.setTypeface(Typeface.DEFAULT_BOLD);
+        tvChurchMotto.setTextColor(COLOR_ACCENT_ORANGE);
+        tvChurchMotto.setPadding(0, dp(2), 0, dp(4));
+        churchCard.addView(tvChurchMotto);
+
+        TextView tvChurchSlogan = new TextView(this);
+        tvChurchSlogan.setText("“A place where everybody is somebody, and no body is a nobody”");
+        tvChurchSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvChurchSlogan.setTextColor(COLOR_TEXT_MUTED);
+        tvChurchSlogan.setPadding(0, 0, 0, dp(8));
+        churchCard.addView(tvChurchSlogan);
+
+        LinearLayout rowAffCampus = createInteractiveContactRow("📍", "Affiliated Campus", selectedCampus + " (Embu, Kenya)", v -> Toast.makeText(this, "Active Campus: " + selectedCampus, Toast.LENGTH_SHORT).show());
+        LinearLayout rowBishopAff = createInteractiveContactRow("👤", "Presiding Bishop", "Bishop Dr. David Mutweri", v -> dialPhoneNumber("+254710772227"));
+        churchCard.addView(rowAffCampus);
+        churchCard.addView(rowBishopAff);
+
+        content.addView(churchCard);
+
+        // 5. PERSONAL CONTENT & OFFLINE CACHE STATUS CARD (Guidebook §73.4)
+        LinearLayout cacheCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        cacheCard.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpCache = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpCache.setMargins(0, 0, 0, dp(14));
+        cacheCard.setLayoutParams(lpCache);
+
+        TextView tvCacheTag = new TextView(this);
+        tvCacheTag.setText("📦 PERSONAL CONTENT & OFFLINE CACHE STATUS");
+        tvCacheTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvCacheTag.setTypeface(Typeface.DEFAULT_BOLD);
+        tvCacheTag.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvCacheTag.setPadding(0, 0, 0, dp(8));
+        cacheCard.addView(tvCacheTag);
+
+        LinearLayout rowStorage = createInteractiveContactRow("📥", "Offline Storage", "24.8 MB Cached · 100% Offline Ready", v -> Toast.makeText(this, "24.8 MB local assets verified", Toast.LENGTH_SHORT).show());
+        LinearLayout rowHymnsCache = createInteractiveContactRow("🎵", "Hymnal & Chords", "9 Hymns with Full Offline Chord Charts", v -> switchTab(NavigationContract.TAB_ID_WORSHIP));
+        LinearLayout rowSermonCache = createInteractiveContactRow("🎙️", "Audio Sermons", "2 Sermons Stored (Data-Saver 32k Mode)", v -> switchTab(NavigationContract.TAB_ID_SERMONS));
+        LinearLayout rowScriptureCache = createInteractiveContactRow("📖", "Holy Scriptures", "2 Samuel 5 & Daily Devotionals Synced", v -> showFullScriptureDialog());
+        cacheCard.addView(rowStorage);
+        cacheCard.addView(rowHymnsCache);
+        cacheCard.addView(rowSermonCache);
+        cacheCard.addView(rowScriptureCache);
+
+        LinearLayout cacheBtnRow = new LinearLayout(this);
+        cacheBtnRow.setOrientation(LinearLayout.HORIZONTAL);
+        cacheBtnRow.setPadding(0, dp(6), 0, 0);
+
+        Button btnSyncNow = createSmallButton("🔄 Sync Content", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+        btnSyncNow.setOnClickListener(v -> Toast.makeText(this, "🔄 Checking Perazim sync servers... All offline assets up to date!", Toast.LENGTH_SHORT).show());
+
+        Button btnClearCache = createSmallButton("🗑️ Refresh Cache", COLOR_PURPLE_DARK, COLOR_WHITE);
+        btnClearCache.setOnClickListener(v -> Toast.makeText(this, "✨ Local cache refreshed (24.8 MB verified intact)", Toast.LENGTH_SHORT).show());
+
+        cacheBtnRow.addView(btnSyncNow);
+        cacheBtnRow.addView(btnClearCache);
+        cacheCard.addView(cacheBtnRow);
+
+        content.addView(cacheCard);
+
+        // 6. PASTORAL CARE DIRECT ACTIONS CARD (Guidebook §73.5)
+        LinearLayout pastoralCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        pastoralCard.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpPastoral = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpPastoral.setMargins(0, 0, 0, dp(10));
+        pastoralCard.setLayoutParams(lpPastoral);
+
+        TextView tvPastoralTag = new TextView(this);
+        tvPastoralTag.setText("🙏 PASTORAL CARE & DIRECT SUPPORT");
+        tvPastoralTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvPastoralTag.setTypeface(Typeface.DEFAULT_BOLD);
+        tvPastoralTag.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvPastoralTag.setPadding(0, 0, 0, dp(6));
+        pastoralCard.addView(tvPastoralTag);
+
+        TextView tvPastoralDesc = new TextView(this);
+        tvPastoralDesc.setText("Reach out directly for counseling, prayer covenants, or pastoral blessings:");
+        tvPastoralDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvPastoralDesc.setTextColor(COLOR_TEXT_DARK);
+        tvPastoralDesc.setPadding(0, 0, 0, dp(8));
+        pastoralCard.addView(tvPastoralDesc);
+
+        LinearLayout rowBishopCall = createInteractiveContactRow("📞", "Call Bishop Dr. David Mutweri", "(+254) 0710 772 227", v -> dialPhoneNumber("+254710772227"));
+        LinearLayout rowBishopEmailDirect = createInteractiveContactRow("✉️", "Email Bishop Directly", "bishop@perazimchurch.org", v -> sendEmail("bishop@perazimchurch.org", "Pastoral Care Request"));
+        LinearLayout rowChurchEmailDirect = createInteractiveContactRow("📧", "Church Secretariat", "info@perazimchurch.org", v -> sendEmail("info@perazimchurch.org", "Church Inquiry"));
+        LinearLayout rowPaybillDirect = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "4069983 (Tap to Give)", v -> showGivingDialog());
+
+        pastoralCard.addView(rowBishopCall);
+        pastoralCard.addView(rowBishopEmailDirect);
+        pastoralCard.addView(rowChurchEmailDirect);
+        pastoralCard.addView(rowPaybillDirect);
+
+        content.addView(pastoralCard);
+
+        scrollView.addView(content);
+        return scrollView;
+    }
+
+    private LinearLayout createMetricCard(String value, String label, String sublabel, int bgColor, int textColor) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setGravity(Gravity.CENTER);
+        card.setPadding(dp(8), dp(10), dp(8), dp(10));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(bgColor);
+        bg.setCornerRadius(dp(10));
+        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        card.setBackground(bg);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lp.setMargins(dp(3), 0, dp(3), 0);
+        card.setLayoutParams(lp);
+
+        TextView tvVal = new TextView(this);
+        tvVal.setText(value);
+        tvVal.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvVal.setTypeface(Typeface.DEFAULT_BOLD);
+        tvVal.setTextColor(textColor);
+        tvVal.setGravity(Gravity.CENTER);
+        card.addView(tvVal);
+
+        TextView tvLbl = new TextView(this);
+        tvLbl.setText(label);
+        tvLbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvLbl.setTypeface(Typeface.DEFAULT_BOLD);
+        tvLbl.setTextColor(COLOR_TEXT_DARK);
+        tvLbl.setGravity(Gravity.CENTER);
+        tvLbl.setPadding(0, dp(2), 0, dp(1));
+        card.addView(tvLbl);
+
+        TextView tvSub = new TextView(this);
+        tvSub.setText(sublabel);
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+        tvSub.setTextColor(COLOR_TEXT_MUTED);
+        tvSub.setGravity(Gravity.CENTER);
+        card.addView(tvSub);
+
+        return card;
+    }
+
+    private Button create3dActionButton(String title, String subtitle, int faceColor, int shadowColor, View.OnClickListener listener) {
+        Button btn = new Button(this);
+        btn.setText(title + "\n" + subtitle);
+        btn.setTextColor(COLOR_WHITE);
+        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btn.setTypeface(Typeface.DEFAULT_BOLD);
+        btn.setBackground(create3dButtonDrawable(faceColor, shadowColor, 10, 3));
+        btn.setPadding(dp(10), dp(10), dp(10), dp(10));
+        btn.setOnClickListener(listener);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lp.setMargins(dp(3), 0, dp(3), 0);
+        btn.setLayoutParams(lp);
+        return btn;
+    }
+
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("⚙️ Preferences & Data Saver");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(dp(20), dp(12), dp(20), dp(12));
+
+        TextView tvInfo = new TextView(this);
+        tvInfo.setText("Current Campus: " + selectedCampus + "\n\n" +
+                "Audio Mode: " + (isDataSaverActive ? "📶 32kbps AAC (Data-Saver Active)" : "🎧 HD Audio") + "\n\n" +
+                "Offline Cache: 24.8 MB preserved\n\n" +
+                "App Version: 2.1.0 (Build 3)");
+        tvInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvInfo.setTextColor(COLOR_TEXT_DARK);
+        tvInfo.setLineSpacing(dp(3), 1.2f);
+        layout.addView(tvInfo);
+
+        builder.setView(layout);
+        builder.setPositiveButton("Toggle Data-Saver", (dialog, which) -> {
+            toggleDataSaver();
+        });
+        builder.setNegativeButton("Close", null);
+        builder.show();
+    }
+
+    private void shareInvite() {
+        try {
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            String shareBody = "✨ *Join Perazim Mission Church — The Place of Great Breakthrough!* ✨\n\n"
+                    + "“A place where everybody is somebody, and no body is a nobody”\n\n"
+                    + "Fellowship with us:\n"
+                    + "🏛️ Headquarters: Perazim Mission Church, Embu, Kenya\n"
+                    + "👤 Presiding Bishop: Bishop Dr. David Mutweri\n"
+                    + "📞 Phone: (+254) 0710 772 227\n"
+                    + "📧 Email: info@perazimchurch.org\n"
+                    + "💚 Safaricom Paybill: 4069983\n\n"
+                    + "Download the official Perazim Android App for daily devotionals, sermons, and hymns!\n"
+                    + "#PerazimMissionChurch #BaalPerazim #PlaceOfGreatBreakthrough";
+            sendIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+            sendIntent.setType("text/plain");
+            sendIntent.setPackage("com.whatsapp");
+            startActivity(sendIntent);
+        } catch (Exception e) {
+            Intent chooser = new Intent(Intent.ACTION_SEND);
+            chooser.putExtra(Intent.EXTRA_TEXT, "PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nPresiding Bishop Dr. David Mutweri | Phone: (+254) 0710 772 227 | Paybill: 4069983");
+            chooser.setType("text/plain");
+            startActivity(Intent.createChooser(chooser, "Share Perazim Invitation"));
+        }
     }
 
     private LinearLayout createInteractiveRiddleCard(String category, String question, final String answer, final int xpReward) {

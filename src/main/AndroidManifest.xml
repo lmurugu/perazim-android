@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.app"
     android:installLocation="auto"
-    android:versionCode="2"
-    android:versionName="2.0.0">
+    android:versionCode="3"
+    android:versionName="2.1.0">
 
     <uses-sdk
         android:minSdkVersion="24"
@@ -31,31 +31,31 @@
         <activity
             android:name=".ReflectionsActivity"
             android:label="Reflections"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".SermonsActivity"
             android:label="Sermons"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".HymnsActivity"
             android:label="Hymns"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".RiddlesActivity"
             android:label="Riddles"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
             android:name=".JokesActivity"
             android:label="Jokes"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait" />
     </application>
 </manifest>

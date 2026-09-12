@@ -1,24 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Core palette -->
-    <color name="bg_soft">#F8FAFC</color>
-    <color name="card_bg">#FFFFFF</color>
-    <color name="purple_primary">#581665</color>
+    <!-- Canonical Brand Palette (Phase 0.3 Contract) -->
     <color name="primary_purple">#681A7D</color>
-    <color name="purple_dark_start">#3A0E45</color>
-    <color name="purple_dark_end">#581665</color>
-    <color name="orange_accent">#DE6F26</color>
-    <color name="grey_inactive">#94A3B8</color>
-    <color name="border_grey">#E2E8F0</color>
-    <color name="white">#FFFFFF</color>
-    <color name="cream_light">#FFFBEB</color>
-    <color name="yellow_amber">#FFEB3B</color>
-    <!-- Bottom navigation colors -->
-    <color name="bottom_nav_active">#581665</color>
-    <color name="bottom_nav_inactive">#94A3B8</color>
-    <!-- Existing colors (preserve) -->
-    <color name="color_bg_neutral">#F8FAFC</color>
+    <color name="purple_primary">#681A7D</color>
+    <color name="color_accent_orange">#E17D2F</color>
+    <color name="orange_accent">#E17D2F</color>
+    <color name="color_warm_cream">#FAF6EE</color>
+    <color name="cream_light">#FAF6EE</color>
+    <color name="color_purple_deep">#2D0938</color>
+    <color name="purple_dark_start">#2D0938</color>
+    <color name="purple_dark_end">#681A7D</color>
+    <color name="color_obsidian">#140319</color>
     <color name="color_white">#FFFFFF</color>
-    <color name="color_accent_orange">#DE6F26</color>
+    <color name="white">#FFFFFF</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="color_text_dark">#1A1A1A</color>
+    <color name="color_text_muted">#666666</color>
+    
+    <!-- Supporting & UI State Colors -->
+    <color name="border_grey">#E7D5EC</color>
+    <color name="color_bg_neutral">#FAF7FB</color>
+    <color name="bg_soft">#FAF7FB</color>
     <color name="root_bg">#FAF7FB</color>
+    <color name="purple_tint">#F5ECF7</color>
+    <color name="color_purple_shadow">#450E53</color>
+    <color name="color_purple_soft">#C896D8</color>
+    <color name="color_orange_shadow">#98450B</color>
+    <color name="grey_inactive">#666666</color>
+    <color name="yellow_amber">#E17D2F</color>
+
+    <!-- Bottom navigation colors -->
+    <color name="bottom_nav_active">#681A7D</color>
+    <color name="bottom_nav_inactive">#666666</color>
 </resources>
