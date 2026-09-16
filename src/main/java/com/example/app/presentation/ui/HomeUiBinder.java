@@ -509,10 +509,12 @@ public class HomeUiBinder {
     private void advanceReflectionStep() {
         if (routineStep == 1) {
             routineStep = 2;
+            saveRoutineState(new android.os.Bundle());
             updateRoutineView();
             Toast.makeText(context, "Step 1 complete! Now meditate on today's breakthrough message.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 2) {
             routineStep = 3;
+            saveRoutineState(new android.os.Bundle());
             updateRoutineView();
             Toast.makeText(context, "Step 2 complete! Stand in agreement in prayer.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 3) {
@@ -553,6 +555,9 @@ public class HomeUiBinder {
     }
 
     private void updateRoutineView() {
+        // Restore persisted routine state before applying view
+        restoreRoutineState(new android.os.Bundle());  // NOTE: correct lifecycle integration needs Activity onSave/onRestore; this at minimum applies current saved state if present via instance backup
+
         Reflection refl = (cachedHomeData != null) ? cachedHomeData.getTodayReflection() : null;
 
         if (routineStep == 1) {
