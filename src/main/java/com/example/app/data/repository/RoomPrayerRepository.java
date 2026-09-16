@@ -96,6 +96,34 @@ public class RoomPrayerRepository implements PrayerRepository {
     }
 
     @Override
+    public List<Prayer> getAnsweredPrayers() {
+        List<PrayerEntity> entities = prayerDao.getAnsweredPrayers();
+        if (entities == null || entities.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return PrayerMapper.toDomainList(entities);
+    }
+
+    @Override
+    public void markAnsweredWithTestimony(String prayerId, String testimonyText) {
+        if (prayerId == null) {
+            return;
+        }
+        PrayerEntity entity = prayerDao.getPrayerById(prayerId);
+        if (entity != null) {
+            entity.setAnswered(true);
+            if (testimonyText != null && !testimonyText.trim().isEmpty()) {
+                String existing = entity.getContent();
+                String updatedContent = (existing != null && !existing.isEmpty())
+                        ? existing + "\n\n[Testimony]: " + testimonyText.trim()
+                        : "[Testimony]: " + testimonyText.trim();
+                entity.setContent(updatedContent);
+            }
+            prayerDao.update(entity);
+        }
+    }
+
+    @Override
     public void deletePrayer(String prayerId) {
         if (prayerId == null) {
             return;

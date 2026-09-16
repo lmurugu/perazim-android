@@ -41,7 +41,7 @@ import android.widget.Toast;
 
 import com.example.app.data.local.PersistenceVerificationHelper;
 import com.example.app.data.local.Phase1MasterVerificationHelper;
-import com.example.app.data.repository.RepositoryVerificationHelper;
+import com.example.app.community.CommunityPhase3VerificationHelper;
 import com.example.app.navigation.NavigationContract;
 import com.example.app.presentation.Phase2MasterVerificationHelper;
 import com.example.app.presentation.ui.BibleReaderDialog;
@@ -168,6 +168,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         // Phase 2: Master Verification Gate (Architecture, UI Binders & Hardware Event Propagation)
         Phase2MasterVerificationHelper.runVerification(this);
+
+        // Phase 3: Community & Fellowship Master Verification Gate
+        CommunityPhase3VerificationHelper.runVerification(this);
 
         // Trigger first-launch onboarding
         OnboardingDialog.showIfNeeded(this);

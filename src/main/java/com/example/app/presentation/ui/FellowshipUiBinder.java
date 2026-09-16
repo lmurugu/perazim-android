@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -38,6 +39,9 @@ import androidx.annotation.Nullable;
 
 import com.example.app.data.local.entity.JokeEntity;
 import com.example.app.data.local.entity.RiddleEntity;
+import com.example.app.data.local.entity.UserEntity;
+import com.example.app.data.local.session.SessionManager;
+import com.example.app.data.repository.RepositoryProvider;
 import com.example.app.domain.model.Prayer;
 import com.example.app.presentation.state.UiState;
 import com.example.app.presentation.viewmodel.FellowshipViewModel;
@@ -54,26 +58,55 @@ import java.util.Set;
  * <p>
  * Binds directly to {@link FellowshipViewModel} and manages:
  * <ul>
- *     <li>Community Prayer Wall with reactive listing and offline persistence.</li>
- *     <li>Interactive "Amen" counters with immediate local feedback and database sync.</li>
- *     <li>Submit Prayer dialog with anonymous toggle, saving to Room and enqueuing to {@code SyncQueueManager}.</li>
- *     <li>Devotional riddles with reveal toggle and sequential progression.</li>
- *     <li>Christian humor viewer with punchline reveal and next-joke navigation.</li>
+ *     <li>Community sub-navigation bar: Prayer Wall, Praise Reports, Connections, Direct Chat, Notifications.</li>
+ *     <li>Community Prayer Wall with reactive listing, offline persistence, and amen interactions.</li>
+ *     <li>Answered Prayers / Praise Reports with celebratory gold badges and spiritual XP reward (+50 XP).</li>
+ *     <li>Member Connections modal via {@link QrConnectionDialog}.</li>
+ *     <li>Direct 1-on-1 Fellowship Messaging modal via {@link ChatDialog}.</li>
+ *     <li>In-App Notifications modal via {@link NotificationDialog} with unread badge counter.</li>
+ *     <li>Devotional riddles with reveal toggle and progression.</li>
+ *     <li>Christian humor viewer with punchline reveal.</li>
  * </ul>
  */
 public class FellowshipUiBinder {
+
+    public enum FellowshipSubTab {
+        PRAYER_WALL,
+        PRAISE_REPORTS
+    }
 
     private final Context context;
     private final Activity activity;
     private final FellowshipViewModel viewModel;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    private String activeUserId = "user_active";
+    private String activeUserName = "Fellow Saint";
+
+    // Sub-Navigation UI State
+    private FellowshipSubTab currentSubTab = FellowshipSubTab.PRAYER_WALL;
+    private Button btnNavPrayerWall;
+    private Button btnNavPraiseReports;
+    private Button btnNavConnections;
+    private Button btnNavChat;
+    private Button btnNavNotifications;
+    private int unreadNotificationCount = 0;
+
     // Prayer Wall UI state
-    private final List<Prayer> displayedPrayers = new ArrayList<>();
-    private final Set<String> amenedPrayerIds = new HashSet<>();
+    private LinearLayout prayerWallSection;
     private LinearLayout prayersContainer;
     private ProgressBar prayersLoadingSpinner;
     private TextView tvPrayersEmptyState;
+    private final List<Prayer> displayedPrayers = new ArrayList<>();
+    private final Set<String> amenedPrayerIds = new HashSet<>();
+
+    // Praise Reports / Testimonies UI state
+    private LinearLayout praiseReportsSection;
+    private LinearLayout praiseReportsContainer;
+    private ProgressBar praiseReportsLoadingSpinner;
+    private TextView tvPraiseReportsEmptyState;
+    private final List<Prayer> displayedAnsweredPrayers = new ArrayList<>();
+    private final Set<String> celebratedTestimonyIds = new HashSet<>();
 
     // Riddles UI state
     private final List<RiddleEntity> riddlesList = new ArrayList<>();
@@ -94,12 +127,29 @@ public class FellowshipUiBinder {
         this.activity = activity;
         this.context = activity;
         this.viewModel = viewModel;
+        resolveActiveUser();
     }
 
     public FellowshipUiBinder(@NonNull Context context, @NonNull FellowshipViewModel viewModel) {
         this.context = context;
         this.activity = context instanceof Activity ? (Activity) context : null;
         this.viewModel = viewModel;
+        resolveActiveUser();
+    }
+
+    private void resolveActiveUser() {
+        try {
+            UserEntity user = SessionManager.getInstance(context).getCurrentUser();
+            if (user != null) {
+                if (user.getId() != null && !user.getId().trim().isEmpty()) {
+                    activeUserId = user.getId().trim();
+                }
+                if (user.getName() != null && !user.getName().trim().isEmpty()) {
+                    activeUserName = user.getName().trim();
+                }
+            }
+        } catch (Throwable ignored) {
+        }
     }
 
     /**
@@ -139,50 +189,35 @@ public class FellowshipUiBinder {
             rootContainer.addView(banner);
         }
 
-        // 2. Community Prayer Wall Section Header & Submit Action
-        View prayerHeaderSection = createPrayerWallHeaderSection();
-        rootContainer.addView(prayerHeaderSection);
+        // 2. Community Sub-Navigation Bar
+        View subNavBar = createCommunitySubNavigationBar();
+        rootContainer.addView(subNavBar);
 
-        // 3. Prayer Wall List Container
-        prayersContainer = new LinearLayout(context);
-        prayersContainer.setOrientation(LinearLayout.VERTICAL);
-        prayersContainer.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        // 3. Community Prayer Wall Section
+        prayerWallSection = createPrayerWallSection();
+        rootContainer.addView(prayerWallSection);
 
-        prayersLoadingSpinner = new ProgressBar(context);
-        prayersLoadingSpinner.setVisibility(View.GONE);
-        LinearLayout.LayoutParams lpSpinner = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpSpinner.gravity = Gravity.CENTER_HORIZONTAL;
-        lpSpinner.setMargins(0, dp(12), 0, dp(12));
-        prayersLoadingSpinner.setLayoutParams(lpSpinner);
-        prayersContainer.addView(prayersLoadingSpinner);
+        // 4. Praise Reports / Testimonies Section (initially hidden if tab is Prayer Wall)
+        praiseReportsSection = createPraiseReportsSection();
+        praiseReportsSection.setVisibility(currentSubTab == FellowshipSubTab.PRAISE_REPORTS ? View.VISIBLE : View.GONE);
+        rootContainer.addView(praiseReportsSection);
 
-        tvPrayersEmptyState = new TextView(context);
-        tvPrayersEmptyState.setText("No prayer petitions yet. Be the first to lift a petition on the Wall!");
-        tvPrayersEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
-        tvPrayersEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
-        tvPrayersEmptyState.setGravity(Gravity.CENTER);
-        tvPrayersEmptyState.setPadding(dp(16), dp(20), dp(16), dp(20));
-        tvPrayersEmptyState.setVisibility(View.GONE);
-        prayersContainer.addView(tvPrayersEmptyState);
-
-        rootContainer.addView(prayersContainer);
-
-        // 4. Fellowship Devotional Riddles Card
+        // 5. Fellowship Devotional Riddles Card
         View riddlesCard = createRiddlesCard();
         rootContainer.addView(riddlesCard);
 
-        // 5. Christian Joy & Humor Card
+        // 6. Christian Joy & Humor Card
         View humorCard = createHumorCard();
         rootContainer.addView(humorCard);
 
-        // 6. Foundation & Identity Card
+        // 7. Foundation & Identity Card
         View identityCard = createIdentityCard();
         rootContainer.addView(identityCard);
 
-        // Initial Data Load
+        // Initial Data Loads
         refreshPrayers();
+        refreshAnsweredPrayers();
+        updateNotificationBadge();
         loadRiddles();
         loadJokes();
     }
@@ -200,7 +235,7 @@ public class FellowshipUiBinder {
             iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, dp(140));
-            lp.setMargins(0, 0, 0, dp(14));
+            lp.setMargins(0, 0, 0, dp(12));
             iv.setLayoutParams(lp);
             return iv;
         }
@@ -209,7 +244,7 @@ public class FellowshipUiBinder {
         LinearLayout banner = new LinearLayout(context);
         banner.setOrientation(LinearLayout.VERTICAL);
         banner.setGravity(Gravity.CENTER);
-        banner.setPadding(dp(16), dp(24), dp(16), dp(24));
+        banner.setPadding(dp(16), dp(20), dp(16), dp(20));
         GradientDrawable g = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
                 new int[]{PerazimTheme.COLOR_PRIMARY_PURPLE, PerazimTheme.COLOR_ACCENT_ORANGE}
@@ -236,17 +271,216 @@ public class FellowshipUiBinder {
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(14));
+        lp.setMargins(0, 0, 0, dp(12));
         banner.setLayoutParams(lp);
         return banner;
     }
 
-    private View createPrayerWallHeaderSection() {
+    // =========================================================================
+    // 2. COMMUNITY SUB-NAVIGATION BAR
+    // =========================================================================
+
+    @NonNull
+    private View createCommunitySubNavigationBar() {
+        HorizontalScrollView hsv = new HorizontalScrollView(context);
+        hsv.setHorizontalScrollBarEnabled(false);
+        LinearLayout.LayoutParams lpHsv = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpHsv.setMargins(0, 0, 0, dp(14));
+        hsv.setLayoutParams(lpHsv);
+
+        LinearLayout navRow = new LinearLayout(context);
+        navRow.setOrientation(LinearLayout.HORIZONTAL);
+        navRow.setGravity(Gravity.CENTER_VERTICAL);
+        navRow.setPadding(0, dp(2), 0, dp(4));
+
+        // Button 1: "🙏 Prayer Wall"
+        btnNavPrayerWall = new Button(context);
+        btnNavPrayerWall.setText("🙏 Prayer Wall");
+        btnNavPrayerWall.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        btnNavPrayerWall.setTypeface(Typeface.DEFAULT_BOLD);
+        btnNavPrayerWall.setPadding(dp(12), dp(8), dp(12), dp(8));
+        LinearLayout.LayoutParams lp1 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp1.setMargins(0, 0, dp(8), 0);
+        btnNavPrayerWall.setLayoutParams(lp1);
+        btnNavPrayerWall.setOnClickListener(v -> selectSubTab(FellowshipSubTab.PRAYER_WALL));
+        navRow.addView(btnNavPrayerWall);
+
+        // Button 2: "🌟 Praise Reports / Testimonies"
+        btnNavPraiseReports = new Button(context);
+        btnNavPraiseReports.setText("🌟 Praise Reports");
+        btnNavPraiseReports.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        btnNavPraiseReports.setTypeface(Typeface.DEFAULT_BOLD);
+        btnNavPraiseReports.setPadding(dp(12), dp(8), dp(12), dp(8));
+        LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp2.setMargins(0, 0, dp(8), 0);
+        btnNavPraiseReports.setLayoutParams(lp2);
+        btnNavPraiseReports.setOnClickListener(v -> selectSubTab(FellowshipSubTab.PRAISE_REPORTS));
+        navRow.addView(btnNavPraiseReports);
+
+        // Button 3: "🤝 Member Connections"
+        btnNavConnections = new Button(context);
+        btnNavConnections.setText("🤝 Connections");
+        btnNavConnections.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        btnNavConnections.setTypeface(Typeface.DEFAULT_BOLD);
+        btnNavConnections.setPadding(dp(12), dp(8), dp(12), dp(8));
+        LinearLayout.LayoutParams lp3 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp3.setMargins(0, 0, dp(8), 0);
+        btnNavConnections.setLayoutParams(lp3);
+        btnNavConnections.setBackground(createCardBackground(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        btnNavConnections.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        btnNavConnections.setOnClickListener(v -> openQrConnectionDialog());
+        navRow.addView(btnNavConnections);
+
+        // Button 4: "💬 Direct Chat"
+        btnNavChat = new Button(context);
+        btnNavChat.setText("💬 Direct Chat");
+        btnNavChat.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        btnNavChat.setTypeface(Typeface.DEFAULT_BOLD);
+        btnNavChat.setPadding(dp(12), dp(8), dp(12), dp(8));
+        LinearLayout.LayoutParams lp4 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp4.setMargins(0, 0, dp(8), 0);
+        btnNavChat.setLayoutParams(lp4);
+        btnNavChat.setBackground(createCardBackground(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        btnNavChat.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        btnNavChat.setOnClickListener(v -> openChatDialog());
+        navRow.addView(btnNavChat);
+
+        // Button 5: "🔔 Notifications"
+        btnNavNotifications = new Button(context);
+        btnNavNotifications.setText("🔔 Notifications");
+        btnNavNotifications.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        btnNavNotifications.setTypeface(Typeface.DEFAULT_BOLD);
+        btnNavNotifications.setPadding(dp(12), dp(8), dp(12), dp(8));
+        LinearLayout.LayoutParams lp5 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        btnNavNotifications.setLayoutParams(lp5);
+        btnNavNotifications.setBackground(createCardBackground(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        btnNavNotifications.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        btnNavNotifications.setOnClickListener(v -> openNotificationDialog());
+        navRow.addView(btnNavNotifications);
+
+        hsv.addView(navRow);
+        updateSubNavStyles();
+
+        return hsv;
+    }
+
+    private void selectSubTab(FellowshipSubTab tab) {
+        currentSubTab = tab;
+        updateSubNavStyles();
+
+        if (tab == FellowshipSubTab.PRAYER_WALL) {
+            if (prayerWallSection != null) prayerWallSection.setVisibility(View.VISIBLE);
+            if (praiseReportsSection != null) praiseReportsSection.setVisibility(View.GONE);
+            refreshPrayers();
+        } else {
+            if (prayerWallSection != null) prayerWallSection.setVisibility(View.GONE);
+            if (praiseReportsSection != null) praiseReportsSection.setVisibility(View.VISIBLE);
+            refreshAnsweredPrayers();
+        }
+    }
+
+    private void updateSubNavStyles() {
+        if (btnNavPrayerWall == null || btnNavPraiseReports == null) return;
+
+        if (currentSubTab == FellowshipSubTab.PRAYER_WALL) {
+            btnNavPrayerWall.setBackground(create3dButtonDrawable(
+                    PerazimTheme.COLOR_PRIMARY_PURPLE,
+                    PerazimTheme.COLOR_PURPLE_SHADOW,
+                    PerazimTheme.RADIUS_MD,
+                    2
+            ));
+            btnNavPrayerWall.setTextColor(PerazimTheme.COLOR_WHITE);
+
+            btnNavPraiseReports.setBackground(createCardBackground(
+                    PerazimTheme.COLOR_WHITE,
+                    PerazimTheme.RADIUS_MD,
+                    PerazimTheme.COLOR_BORDER_GREY,
+                    1
+            ));
+            btnNavPraiseReports.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        } else {
+            btnNavPraiseReports.setBackground(create3dButtonDrawable(
+                    PerazimTheme.COLOR_ACCENT_ORANGE,
+                    PerazimTheme.COLOR_ORANGE_SHADOW,
+                    PerazimTheme.RADIUS_MD,
+                    2
+            ));
+            btnNavPraiseReports.setTextColor(PerazimTheme.COLOR_WHITE);
+
+            btnNavPrayerWall.setBackground(createCardBackground(
+                    PerazimTheme.COLOR_WHITE,
+                    PerazimTheme.RADIUS_MD,
+                    PerazimTheme.COLOR_BORDER_GREY,
+                    1
+            ));
+            btnNavPrayerWall.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        }
+    }
+
+    public void updateNotificationBadge() {
+        viewModel.getUnreadNotificationCount(activeUserId, count -> {
+            unreadNotificationCount = count != null ? count : 0;
+            postToMain(() -> {
+                if (btnNavNotifications != null) {
+                    if (unreadNotificationCount > 0) {
+                        btnNavNotifications.setText("🔔 Notifications (" + unreadNotificationCount + ")");
+                        btnNavNotifications.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
+                    } else {
+                        btnNavNotifications.setText("🔔 Notifications");
+                        btnNavNotifications.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+                    }
+                }
+            });
+        });
+    }
+
+    public void openQrConnectionDialog() {
+        QrConnectionDialog dialog = new QrConnectionDialog(
+                context,
+                viewModel.getConnectionRepo() != null
+                        ? viewModel.getConnectionRepo()
+                        : RepositoryProvider.getInstance(context).getConnectionRepository(),
+                activeUserId,
+                activeUserName,
+                "Perazim Central"
+        );
+        dialog.show();
+    }
+
+    public void openChatDialog() {
+        ChatDialog dialog = new ChatDialog(context, "elder_gitonga", "Elder Gitonga", "Online");
+        dialog.show();
+    }
+
+    public void openNotificationDialog() {
+        NotificationDialog dialog = new NotificationDialog(
+                context,
+                viewModel.getNotificationRepo() != null
+                        ? viewModel.getNotificationRepo()
+                        : RepositoryProvider.getInstance(context).getNotificationRepository(),
+                activeUserId,
+                this::updateNotificationBadge
+        );
+        dialog.show();
+    }
+
+    // =========================================================================
+    // 3. COMMUNITY PRAYER WALL SECTION
+    // =========================================================================
+
+    private LinearLayout createPrayerWallSection() {
         LinearLayout section = new LinearLayout(context);
         section.setOrientation(LinearLayout.VERTICAL);
         section.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
+        // Header & Submit Button
         TextView tvSection = new TextView(context);
         tvSection.setText("COMMUNITY PRAYER WALL");
         tvSection.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
@@ -267,7 +501,6 @@ public class FellowshipUiBinder {
                 3
         ));
         btnSubmit.setPadding(dp(12), dp(8), dp(12), dp(8));
-
         LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpBtn.setMargins(0, 0, 0, dp(12));
@@ -275,12 +508,33 @@ public class FellowshipUiBinder {
         btnSubmit.setOnClickListener(v -> showSubmitPrayerDialog());
         section.addView(btnSubmit);
 
+        // Prayers Cards Container
+        prayersContainer = new LinearLayout(context);
+        prayersContainer.setOrientation(LinearLayout.VERTICAL);
+        prayersContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        prayersLoadingSpinner = new ProgressBar(context);
+        prayersLoadingSpinner.setVisibility(View.GONE);
+        LinearLayout.LayoutParams lpSpinner = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpSpinner.gravity = Gravity.CENTER_HORIZONTAL;
+        lpSpinner.setMargins(0, dp(12), 0, dp(12));
+        prayersLoadingSpinner.setLayoutParams(lpSpinner);
+        prayersContainer.addView(prayersLoadingSpinner);
+
+        tvPrayersEmptyState = new TextView(context);
+        tvPrayersEmptyState.setText("No prayer petitions yet. Be the first to lift a petition on the Wall!");
+        tvPrayersEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        tvPrayersEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        tvPrayersEmptyState.setGravity(Gravity.CENTER);
+        tvPrayersEmptyState.setPadding(dp(16), dp(20), dp(16), dp(20));
+        tvPrayersEmptyState.setVisibility(View.GONE);
+        prayersContainer.addView(tvPrayersEmptyState);
+
+        section.addView(prayersContainer);
         return section;
     }
-
-    // =========================================================================
-    // 2. COMMUNITY PRAYER WALL & AMEN INTERACTION
-    // =========================================================================
 
     /**
      * Loads public prayers from {@link FellowshipViewModel}.
@@ -313,7 +567,6 @@ public class FellowshipUiBinder {
         displayedPrayers.clear();
 
         if (prayers == null || prayers.isEmpty()) {
-            // Populate fallback prayers if empty so wall feels active
             List<Prayer> fallbacks = getFallbackPrayers();
             displayedPrayers.addAll(fallbacks);
         } else {
@@ -366,11 +619,19 @@ public class FellowshipUiBinder {
         tvBody.setPadding(0, 0, 0, dp(10));
         card.addView(tvBody);
 
+        // Actions row: Amen button + Mark as Answered button
+        LinearLayout actionsRow = new LinearLayout(context);
+        actionsRow.setOrientation(LinearLayout.HORIZONTAL);
+        actionsRow.setGravity(Gravity.CENTER_VERTICAL);
+
         // Amen Interactive Button
         final int[] amenCount = {prayer.getAmenCount()};
         final boolean[] hasAmened = {amenedPrayerIds.contains(prayer.getId()) || prayer.isUserHasAmened()};
 
         Button btnAmen = new Button(context);
+        LinearLayout.LayoutParams lpAmen = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lpAmen.setMargins(0, 0, dp(8), 0);
+        btnAmen.setLayoutParams(lpAmen);
         updateAmenButton(btnAmen, amenCount[0], hasAmened[0]);
 
         btnAmen.setOnClickListener(v -> {
@@ -382,9 +643,7 @@ public class FellowshipUiBinder {
                 prayer.setUserHasAmened(true);
 
                 updateAmenButton(btnAmen, amenCount[0], true);
-
-                // Call ViewModel to persist Amen to Room and Sync queue
-                viewModel.amenPrayer(prayer.getId(), "active_user", null);
+                viewModel.amenPrayer(prayer.getId(), activeUserId, null);
 
                 Toast.makeText(
                         context,
@@ -395,8 +654,20 @@ public class FellowshipUiBinder {
                 Toast.makeText(context, "You have already joined in prayer for this petition! 🙏", Toast.LENGTH_SHORT).show();
             }
         });
+        actionsRow.addView(btnAmen);
 
-        card.addView(btnAmen);
+        // Mark Answered Button
+        Button btnTestify = new Button(context);
+        btnTestify.setText("🌟 Testify (+50 XP)");
+        btnTestify.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        btnTestify.setTypeface(Typeface.DEFAULT_BOLD);
+        btnTestify.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
+        btnTestify.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_BORDER_GREY));
+        btnTestify.setPadding(dp(10), dp(6), dp(10), dp(6));
+        btnTestify.setOnClickListener(v -> promptMarkAnswered(prayer));
+        actionsRow.addView(btnTestify);
+
+        card.addView(actionsRow);
         return card;
     }
 
@@ -425,10 +696,6 @@ public class FellowshipUiBinder {
         }
     }
 
-    // =========================================================================
-    // 3. SUBMIT PRAYER DIALOG
-    // =========================================================================
-
     /**
      * Displays a dialog allowing the member to submit a prayer petition to Room & SyncQueue.
      */
@@ -447,7 +714,6 @@ public class FellowshipUiBinder {
         tvPrompt.setPadding(0, 0, 0, dp(12));
         layout.addView(tvPrompt);
 
-        // Title Input
         final EditText etTitle = new EditText(context);
         etTitle.setHint("Prayer Title (e.g., Healing, Family, Exams)");
         etTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY);
@@ -460,7 +726,6 @@ public class FellowshipUiBinder {
         etTitle.setLayoutParams(lpTitle);
         layout.addView(etTitle);
 
-        // Content Input
         final EditText etContent = new EditText(context);
         etContent.setHint("Describe your petition or praise report in detail...");
         etContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
@@ -475,7 +740,6 @@ public class FellowshipUiBinder {
         etContent.setLayoutParams(lpContent);
         layout.addView(etContent);
 
-        // Anonymous Toggle
         final CheckBox cbAnonymous = new CheckBox(context);
         cbAnonymous.setText("Post Anonymously (Hide my name on the Wall)");
         cbAnonymous.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
@@ -498,13 +762,12 @@ public class FellowshipUiBinder {
                 return;
             }
 
-            // Submit prayer via ViewModel (Room + SyncQueueManager PENDING)
             viewModel.submitPrayer(
                     title,
                     content,
                     isAnonymous,
-                    "user_active",
-                    isAnonymous ? "Anonymous Saint" : "Perazim Saint",
+                    activeUserId,
+                    isAnonymous ? "Anonymous Saint" : activeUserName,
                     () -> postToMain(() -> {
                         Toast.makeText(context, "🙏 Prayer petition submitted to the Wall! (+15 XP)", Toast.LENGTH_LONG).show();
                         refreshPrayers();
@@ -517,7 +780,345 @@ public class FellowshipUiBinder {
     }
 
     // =========================================================================
-    // 4. DEVOTIONAL RIDDLES CARD
+    // 4. PRAISE REPORTS & TESTIMONIES SECTION (Answered Prayers with Gold Badge)
+    // =========================================================================
+
+    private LinearLayout createPraiseReportsSection() {
+        LinearLayout section = new LinearLayout(context);
+        section.setOrientation(LinearLayout.VERTICAL);
+        section.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        TextView tvSection = new TextView(context);
+        tvSection.setText("🌟 PRAISE REPORTS & TESTIMONIES");
+        tvSection.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        tvSection.setTypeface(Typeface.DEFAULT_BOLD);
+        tvSection.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
+        tvSection.setPadding(0, 0, 0, dp(4));
+        section.addView(tvSection);
+
+        TextView tvSub = new TextView(context);
+        tvSub.setText("“They overcame him by the blood of the Lamb, and by the word of their testimony.” (Rev 12:11)");
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        tvSub.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        tvSub.setTypeface(Typeface.SERIF, Typeface.ITALIC);
+        tvSub.setPadding(0, 0, 0, dp(8));
+        section.addView(tvSub);
+
+        Button btnShareTestimony = new Button(context);
+        btnShareTestimony.setText("✍️ Share Praise Report / Testimony (+50 XP)");
+        btnShareTestimony.setTextColor(PerazimTheme.COLOR_WHITE);
+        btnShareTestimony.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        btnShareTestimony.setTypeface(Typeface.DEFAULT_BOLD);
+        btnShareTestimony.setBackground(create3dButtonDrawable(
+                PerazimTheme.COLOR_ACCENT_ORANGE,
+                PerazimTheme.COLOR_ORANGE_SHADOW,
+                PerazimTheme.RADIUS_MD,
+                3
+        ));
+        btnShareTestimony.setPadding(dp(12), dp(8), dp(12), dp(8));
+        LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpBtn.setMargins(0, 0, 0, dp(12));
+        btnShareTestimony.setLayoutParams(lpBtn);
+        btnShareTestimony.setOnClickListener(v -> showShareTestimonyModal());
+        section.addView(btnShareTestimony);
+
+        // Container
+        praiseReportsContainer = new LinearLayout(context);
+        praiseReportsContainer.setOrientation(LinearLayout.VERTICAL);
+        praiseReportsContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        praiseReportsLoadingSpinner = new ProgressBar(context);
+        praiseReportsLoadingSpinner.setVisibility(View.GONE);
+        LinearLayout.LayoutParams lpSpinner = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpSpinner.gravity = Gravity.CENTER_HORIZONTAL;
+        lpSpinner.setMargins(0, dp(12), 0, dp(12));
+        praiseReportsLoadingSpinner.setLayoutParams(lpSpinner);
+        praiseReportsContainer.addView(praiseReportsLoadingSpinner);
+
+        tvPraiseReportsEmptyState = new TextView(context);
+        tvPraiseReportsEmptyState.setText("No praise reports published yet. Be the first to testify of God's great breakthrough!");
+        tvPraiseReportsEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        tvPraiseReportsEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        tvPraiseReportsEmptyState.setGravity(Gravity.CENTER);
+        tvPraiseReportsEmptyState.setPadding(dp(16), dp(20), dp(16), dp(20));
+        tvPraiseReportsEmptyState.setVisibility(View.GONE);
+        praiseReportsContainer.addView(tvPraiseReportsEmptyState);
+
+        section.addView(praiseReportsContainer);
+        return section;
+    }
+
+    public void refreshAnsweredPrayers() {
+        if (praiseReportsLoadingSpinner != null) {
+            praiseReportsLoadingSpinner.setVisibility(View.VISIBLE);
+        }
+        viewModel.loadAnsweredPrayers(answered -> {
+            postToMain(() -> {
+                if (praiseReportsLoadingSpinner != null) {
+                    praiseReportsLoadingSpinner.setVisibility(View.GONE);
+                }
+                updatePraiseReportsList(answered);
+            });
+        });
+    }
+
+    private void updatePraiseReportsList(@Nullable List<Prayer> answeredList) {
+        if (praiseReportsContainer == null) return;
+
+        for (int i = praiseReportsContainer.getChildCount() - 1; i >= 0; i--) {
+            View child = praiseReportsContainer.getChildAt(i);
+            if (child != praiseReportsLoadingSpinner && child != tvPraiseReportsEmptyState) {
+                praiseReportsContainer.removeViewAt(i);
+            }
+        }
+
+        displayedAnsweredPrayers.clear();
+
+        if (answeredList == null || answeredList.isEmpty()) {
+            List<Prayer> fallbacks = getFallbackAnsweredPrayers();
+            displayedAnsweredPrayers.addAll(fallbacks);
+        } else {
+            displayedAnsweredPrayers.addAll(answeredList);
+        }
+
+        if (displayedAnsweredPrayers.isEmpty()) {
+            if (tvPraiseReportsEmptyState != null) tvPraiseReportsEmptyState.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        if (tvPraiseReportsEmptyState != null) tvPraiseReportsEmptyState.setVisibility(View.GONE);
+
+        for (Prayer prayer : displayedAnsweredPrayers) {
+            View card = createPraiseReportCard(prayer);
+            praiseReportsContainer.addView(card);
+        }
+    }
+
+    @NonNull
+    private View createPraiseReportCard(@NonNull Prayer prayer) {
+        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_ACCENT_ORANGE, 2);
+        card.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpCard.setMargins(0, 0, 0, dp(12));
+        card.setLayoutParams(lpCard);
+
+        // Celebratory Gold Badge Header Row
+        LinearLayout badgeRow = new LinearLayout(context);
+        badgeRow.setOrientation(LinearLayout.HORIZONTAL);
+        badgeRow.setGravity(Gravity.CENTER_VERTICAL);
+        badgeRow.setPadding(0, 0, 0, dp(6));
+
+        TextView tvGoldBadge = new TextView(context);
+        tvGoldBadge.setText("🌟 ANSWERED PRAYER · PRAISE REPORT");
+        tvGoldBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
+        tvGoldBadge.setTypeface(Typeface.DEFAULT_BOLD);
+        tvGoldBadge.setTextColor(PerazimTheme.COLOR_ORANGE_DARK);
+        tvGoldBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ORANGE_BORDER));
+        tvGoldBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
+        badgeRow.addView(tvGoldBadge);
+
+        card.addView(badgeRow);
+
+        // Prayer / Testimony Title
+        TextView tvTitle = new TextView(context);
+        tvTitle.setText(prayer.getTitle() != null ? prayer.getTitle() : "Answered Prayer");
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        card.addView(tvTitle);
+
+        // Author
+        TextView tvAuthor = new TextView(context);
+        String author = prayer.getAuthorName() != null ? prayer.getAuthorName() : "Fellow Saint";
+        tvAuthor.setText("Testimony by: " + author + " · Embu Community");
+        tvAuthor.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        tvAuthor.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        tvAuthor.setPadding(0, dp(2), 0, dp(6));
+        card.addView(tvAuthor);
+
+        // Body / Testimony
+        TextView tvBody = new TextView(context);
+        tvBody.setText(prayer.getBody() != null ? prayer.getBody() : "");
+        tvBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        tvBody.setTextColor(PerazimTheme.COLOR_TEXT_DARK);
+        tvBody.setLineSpacing(dp(2), 1.15f);
+        tvBody.setPadding(0, 0, 0, dp(10));
+        card.addView(tvBody);
+
+        // Celebration Action
+        final boolean[] isCelebrated = {celebratedTestimonyIds.contains(prayer.getId())};
+        final int[] praiseCount = {Math.max(prayer.getAmenCount(), 12)};
+
+        Button btnCelebrate = new Button(context);
+        btnCelebrate.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        btnCelebrate.setTypeface(Typeface.DEFAULT_BOLD);
+        btnCelebrate.setTextColor(PerazimTheme.COLOR_WHITE);
+        btnCelebrate.setPadding(dp(12), dp(8), dp(12), dp(8));
+        updateCelebrateButton(btnCelebrate, praiseCount[0], isCelebrated[0]);
+
+        btnCelebrate.setOnClickListener(v -> {
+            if (!isCelebrated[0]) {
+                isCelebrated[0] = true;
+                praiseCount[0]++;
+                celebratedTestimonyIds.add(prayer.getId());
+                prayer.setAmenCount(praiseCount[0]);
+                updateCelebrateButton(btnCelebrate, praiseCount[0], true);
+                viewModel.amenPrayer(prayer.getId(), activeUserId, null);
+                Toast.makeText(context, "🙌 Glory to God! You joined in celebrating this praise report!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "You have already celebrated this testimony! 🙌", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        card.addView(btnCelebrate);
+        return card;
+    }
+
+    private void updateCelebrateButton(Button btn, int count, boolean celebrated) {
+        if (celebrated) {
+            btn.setText("✓ Praise God! (" + count + ")");
+            btn.setBackground(create3dButtonDrawable(
+                    PerazimTheme.COLOR_PRIMARY_PURPLE,
+                    PerazimTheme.COLOR_PURPLE_SHADOW,
+                    PerazimTheme.RADIUS_MD,
+                    2
+            ));
+        } else {
+            btn.setText("🙌 Praise God! (" + count + ")");
+            btn.setBackground(create3dButtonDrawable(
+                    PerazimTheme.COLOR_ACCENT_ORANGE,
+                    PerazimTheme.COLOR_ORANGE_SHADOW,
+                    PerazimTheme.RADIUS_MD,
+                    2
+            ));
+        }
+    }
+
+    private void promptMarkAnswered(@NonNull Prayer prayer) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("🌟 Mark Prayer as Answered");
+
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(dp(20), dp(14), dp(20), dp(10));
+
+        TextView tvInfo = new TextView(context);
+        tvInfo.setText("Praising God for answered prayer: \"" + prayer.getTitle() + "\"\nShare how God brought the breakthrough!");
+        tvInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        tvInfo.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        tvInfo.setPadding(0, 0, 0, dp(12));
+        layout.addView(tvInfo);
+
+        final EditText etTestimony = new EditText(context);
+        etTestimony.setHint("Write your praise testimony here...");
+        etTestimony.setMinLines(3);
+        etTestimony.setGravity(Gravity.TOP | Gravity.START);
+        etTestimony.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        etTestimony.setBackground(createCardBackground(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        etTestimony.setPadding(dp(12), dp(10), dp(12), dp(10));
+        layout.addView(etTestimony);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Celebrate (+50 XP)", (dialog, which) -> {
+            String testimony = etTestimony.getText().toString().trim();
+            viewModel.markAnsweredWithTestimony(prayer.getId(), testimony, () -> postToMain(() -> {
+                Toast.makeText(context, "🌟 Praise report celebrated! +50 Spiritual XP awarded!", Toast.LENGTH_LONG).show();
+                refreshPrayers();
+                refreshAnsweredPrayers();
+            }));
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    private void showShareTestimonyModal() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("🌟 Share Praise Report / Testimony");
+
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(dp(20), dp(14), dp(20), dp(10));
+
+        TextView tvPrompt = new TextView(context);
+        tvPrompt.setText("Encourage the body of Christ by sharing your breakthrough testimony (+50 XP).");
+        tvPrompt.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        tvPrompt.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        tvPrompt.setPadding(0, 0, 0, dp(12));
+        layout.addView(tvPrompt);
+
+        final EditText etTitle = new EditText(context);
+        etTitle.setHint("Breakthrough Title (e.g. Divine Healing, Open Doors)");
+        etTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY);
+        etTitle.setSingleLine(true);
+        etTitle.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.COLOR_BORDER_GREY));
+        etTitle.setPadding(dp(12), dp(10), dp(12), dp(10));
+        LinearLayout.LayoutParams lpTitle = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpTitle.setMargins(0, 0, 0, dp(10));
+        etTitle.setLayoutParams(lpTitle);
+        layout.addView(etTitle);
+
+        final EditText etTestimony = new EditText(context);
+        etTestimony.setHint("Write the details of God's breakthrough in your life...");
+        etTestimony.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        etTestimony.setMinLines(4);
+        etTestimony.setGravity(Gravity.TOP | Gravity.START);
+        etTestimony.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        etTestimony.setBackground(createCardBackground(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        etTestimony.setPadding(dp(12), dp(10), dp(12), dp(10));
+        layout.addView(etTestimony);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("Publish Testimony (+50 XP)", (dialog, which) -> {
+            String title = etTitle.getText().toString().trim();
+            String testimony = etTestimony.getText().toString().trim();
+
+            if (title.isEmpty()) {
+                Toast.makeText(context, "Please enter a breakthrough title", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (testimony.isEmpty()) {
+                Toast.makeText(context, "Please write your testimony details", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Submit prayer marked as answered directly
+            viewModel.submitPrayer(
+                    title,
+                    testimony,
+                    false,
+                    activeUserId,
+                    activeUserName,
+                    () -> {
+                        viewModel.loadPublicPrayers(prayers -> {
+                            if (prayers != null && !prayers.isEmpty()) {
+                                Prayer first = prayers.get(0);
+                                viewModel.markAnsweredWithTestimony(first.getId(), testimony, () -> postToMain(() -> {
+                                    Toast.makeText(context, "🌟 Praise report published! +50 Spiritual XP awarded!", Toast.LENGTH_LONG).show();
+                                    refreshPrayers();
+                                    refreshAnsweredPrayers();
+                                }));
+                            }
+                        });
+                    }
+            );
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+
+    // =========================================================================
+    // 5. DEVOTIONAL RIDDLES CARD
     // =========================================================================
 
     private View createRiddlesCard() {
@@ -654,7 +1255,7 @@ public class FellowshipUiBinder {
     }
 
     // =========================================================================
-    // 5. CHRISTIAN JOY & HUMOR CARD
+    // 6. CHRISTIAN JOY & HUMOR CARD
     // =========================================================================
 
     private View createHumorCard() {
@@ -750,7 +1351,6 @@ public class FellowshipUiBinder {
         JokeEntity joke = jokesList.get(currentJokeIndex % jokesList.size());
         String fullText = joke.getText() != null ? joke.getText() : "";
 
-        // Parse Question and Answer if formatted with Q: and A:
         if (fullText.contains("A:") || fullText.contains("Answer:")) {
             int splitIdx = fullText.contains("A:") ? fullText.indexOf("A:") : fullText.indexOf("Answer:");
             String q = fullText.substring(0, splitIdx).trim();
@@ -791,7 +1391,7 @@ public class FellowshipUiBinder {
     }
 
     // =========================================================================
-    // 6. FOUNDATION & IDENTITY CARD
+    // 7. FOUNDATION & IDENTITY CARD
     // =========================================================================
 
     private View createIdentityCard() {
@@ -886,6 +1486,47 @@ public class FellowshipUiBinder {
                 19,
                 System.currentTimeMillis(),
                 false,
+                false
+        ));
+        return list;
+    }
+
+    private List<Prayer> getFallbackAnsweredPrayers() {
+        List<Prayer> list = new ArrayList<>();
+        list.add(new Prayer(
+                "answered_1",
+                "Divine Healing Testimony (Mama Sarah)",
+                "Praise the Lord! Mama Sarah has been discharged from Embu General Hospital and walked home unaided today! Doctor called it miraculous.",
+                "user_elder",
+                "Elder Gitonga",
+                Prayer.Visibility.PUBLIC,
+                48,
+                System.currentTimeMillis() - 86400000L,
+                true,
+                false
+        ));
+        list.add(new Prayer(
+                "answered_2",
+                "Sanctuary Lighting & Sound System Breakthrough",
+                "Glory to God in the highest! A fellowship donor cleared the remaining balance for our sanctuary audio mixers and stage lights!",
+                "user_deacon",
+                "Deacon Board",
+                Prayer.Visibility.PUBLIC,
+                65,
+                System.currentTimeMillis() - 172800000L,
+                true,
+                false
+        ));
+        list.add(new Prayer(
+                "answered_3",
+                "Employment Breakthrough in Nairobi",
+                "After 8 months of prayer on the Wall, God opened doors for a Senior Accounting post at an international mission firm. Hallelujah!",
+                "user_youth_leader",
+                "Brother Dennis",
+                Prayer.Visibility.PUBLIC,
+                33,
+                System.currentTimeMillis() - 259200000L,
+                true,
                 false
         ));
         return list;
@@ -1009,5 +1650,9 @@ public class FellowshipUiBinder {
 
     public List<Prayer> getDisplayedPrayers() {
         return displayedPrayers;
+    }
+
+    public List<Prayer> getDisplayedAnsweredPrayers() {
+        return displayedAnsweredPrayers;
     }
 }

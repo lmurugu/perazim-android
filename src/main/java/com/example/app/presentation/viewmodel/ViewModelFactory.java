@@ -104,6 +104,9 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     public FellowshipViewModel createFellowshipViewModel() {
         return new FellowshipViewModel(
                 repositoryProvider.getPrayerRepository(),
+                repositoryProvider.getConnectionRepository(),
+                repositoryProvider.getNotificationRepository(),
+                repositoryProvider.getUserRepository(),
                 syncQueueManager,
                 riddleDao,
                 jokeDao
