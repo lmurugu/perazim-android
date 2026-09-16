@@ -245,11 +245,14 @@ public class BibleReaderDialog extends Dialog {
 
         // Empty / Status TextView
         tvEmptyState = new TextView(getContext());
-        tvEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        tvEmptyState.setTextColor(COLOR_TEXT_MUTED);
+        tvEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvEmptyState.setTextColor(COLOR_PURPLE_DARK);
+        tvEmptyState.setTypeface(Typeface.DEFAULT_BOLD);
         tvEmptyState.setGravity(Gravity.CENTER);
+        tvEmptyState.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        tvEmptyState.setPadding(dp(16), dp(20), dp(16), dp(20));
+        tvEmptyState.setLineSpacing(dp(4), 1.2f);
         tvEmptyState.setVisibility(View.GONE);
-        tvEmptyState.setPadding(dp(20), dp(30), dp(20), dp(20));
         versesContainer.addView(tvEmptyState);
 
         versesScrollView.addView(versesContainer);
@@ -275,12 +278,19 @@ public class BibleReaderDialog extends Dialog {
         topRow.setGravity(Gravity.CENTER_VERTICAL);
 
         tvTranslationBadge = new TextView(getContext());
-        tvTranslationBadge.setText("KJV · King James Version");
+        tvTranslationBadge.setText("KJV (66-Book Catalog & Core Starter Verses)");
         tvTranslationBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvTranslationBadge.setTypeface(Typeface.DEFAULT_BOLD);
         tvTranslationBadge.setTextColor(COLOR_PRIMARY_PURPLE);
         tvTranslationBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
         tvTranslationBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
+        tvTranslationBadge.setOnClickListener(v -> {
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Bible Translation")
+                    .setMessage("Active: KJV (66-Book Catalog & Core Starter Verses)\n\nCanonical 66-book catalog with core starter verses offline. The complete 31,102-verse corpus syncs in Phase 4.")
+                    .setPositiveButton("OK", null)
+                    .show();
+        });
         topRow.addView(tvTranslationBadge);
 
         View space = new View(getContext());
@@ -512,7 +522,7 @@ public class BibleReaderDialog extends Dialog {
                 if ("2SA".equals(bookId) && chapter == 5) {
                     load2Samuel5Fallback();
                 } else {
-                    tvEmptyState.setText("No verses found for " + currentBookName + " " + currentChapter);
+                    tvEmptyState.setText("📖 Canonical Catalog: " + currentBookName + " Chapter " + currentChapter + "\n(Chapter text staged for offline sync. Complete 31,102-verse corpus syncs in Phase 4)");
                     tvEmptyState.setVisibility(View.VISIBLE);
                 }
             }
@@ -905,7 +915,7 @@ public class BibleReaderDialog extends Dialog {
         container.addView(tvTitle);
 
         TextView tvSub = new TextView(getContext());
-        tvSub.setText("Canonical 66 Books · King James Version");
+        tvSub.setText("Canonical 66 Books · KJV (66-Book Catalog & Core Starter Verses)");
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvSub.setTextColor(COLOR_TEXT_MUTED);
         tvSub.setPadding(0, dp(2), 0, dp(12));

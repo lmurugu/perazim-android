@@ -20,7 +20,7 @@ public final class SermonMapper {
         if (entity == null) {
             return null;
         }
-        return new Sermon(
+        Sermon sermon = new Sermon(
                 entity.getId(),
                 entity.getTitle(),
                 entity.getPreacher(),
@@ -35,6 +35,8 @@ public final class SermonMapper {
                 entity.isDownloaded(),
                 0L
         );
+        sermon.setLocalAudioPath(entity.getLocalAudioPath());
+        return sermon;
     }
 
     public static SermonEntity toEntity(Sermon domain) {
@@ -61,7 +63,7 @@ public final class SermonMapper {
                 domain.getDescription(),
                 "",
                 domain.isDownloaded(),
-                ""
+                domain.getLocalAudioPath() != null ? domain.getLocalAudioPath() : ""
         );
     }
 

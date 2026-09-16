@@ -21,6 +21,7 @@ public class Sermon implements Serializable {
     private String description;
     private boolean isDownloaded;
     private long playCount;
+    private String localAudioPath;
 
     public Sermon() {
     }
@@ -85,4 +86,7 @@ public class Sermon implements Serializable {
 
     public long getPlayCount() { return playCount; }
     public void setPlayCount(long playCount) { this.playCount = playCount; }
+
+    public String getLocalAudioPath() { return localAudioPath; }
+    public void setLocalAudioPath(String localAudioPath) { this.localAudioPath = localAudioPath; }
 }

@@ -39,6 +39,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.app.data.local.preference.GamificationStore;
+import com.example.app.data.mapper.UserMapper;
 import com.example.app.data.local.PersistenceVerificationHelper;
 import com.example.app.data.local.Phase1MasterVerificationHelper;
 import com.example.app.community.CommunityPhase3VerificationHelper;
@@ -164,6 +166,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Initialize gamification persistence
+        UserMapper.init(this);
+        streakCount = GamificationStore.getStreak(this, "user_me", 7);
+        xpCount = GamificationStore.getSpiritualXp(this, "user_me", 450);
+        graceCount = GamificationStore.getGracePoints(this, "user_me", 5);
+        streakFrozen = GamificationStore.isStreakFrozen(this, "user_me", false);
+
         // Phase 3 Master Verification Gate (Foundation, Core UX & Community/Fellowship)
         Phase3MasterVerificationHelper.runVerification(this);
 
@@ -207,6 +216,25 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         rootLayout.addView(bottomBar);
 
         setContentView(rootLayout);
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(android.content.Intent intent) {
+        if (intent == null) return;
+        int tab = intent.getIntExtra("tab_index", -1);
+        if (tab >= 0 && tab < 5) {
+            switchTab(tab);
+        }
+        if (intent.getBooleanExtra("show_qr", false) && fellowshipUiBinder != null) {
+            fellowshipUiBinder.openQrConnectionDialog();
+        }
     }
 
     // =========================================================================
@@ -328,6 +356,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         return header;
     }
 
+    private void persistGamification() {
+        GamificationStore.saveStreak(this, "user_me", streakCount, streakFrozen);
+        GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
+        GamificationStore.saveGracePoints(this, "user_me", graceCount);
+    }
+
     private void updateHud() {
         if (topStreakBadge != null) {
             topStreakBadge.setText((streakFrozen ? "🛡️ " : "🔥 ") + streakCount);
@@ -338,6 +372,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         if (topGraceBadge != null) {
             topGraceBadge.setText("💜 " + graceCount);
         }
+        persistGamification();
     }
 
     // =========================================================================
@@ -558,12 +593,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     @Override
                     public void onStreakUpdated(int streak) {
                         streakCount = streak;
+                        GamificationStore.saveStreak(MainActivity.this, "user_me", streakCount, streakFrozen);
                         updateHud();
                     }
 
                     @Override
                     public void onXpAwarded(int xpAwarded, int totalXp) {
                         xpCount = totalXp;
+                        GamificationStore.saveSpiritualXp(MainActivity.this, "user_me", xpCount);
                         updateHud();
                     }
 
@@ -896,6 +933,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             btnRsvp.setPadding(dp(8), dp(4), dp(8), dp(4));
             btnRsvp.setOnClickListener(v -> {
                 xpCount += 5;
+                GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
                 updateHud();
                 btnRsvp.setText("✓ RSVP Confirmed!");
                 btnRsvp.setEnabled(false);
@@ -970,6 +1008,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             questClaimed = true;
             streakCount += 1;
             xpCount += 50;
+            GamificationStore.saveStreak(this, "user_me", streakCount, streakFrozen);
+            GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
             progressPercent = 100;
             updateHud();
             progressBar.setProgress(progressPercent);
@@ -1227,6 +1267,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             String amt = etAmount.getText().toString().trim();
             if (amt.isEmpty()) amt = "1000";
             xpCount += 20;
+            GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
             updateHud();
             Toast.makeText(this, "🙏 Giving recorded for KES " + amt + " to Paybill 4069983! May God open the windows of heaven upon you! (+20 XP)", Toast.LENGTH_LONG).show();
             dlg.dismiss();
@@ -1408,6 +1449,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         builder.setView(sv);
         builder.setPositiveButton("Amen! Receive Breakthrough", (d, w) -> {
             xpCount += 10;
+            GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
             updateHud();
             Toast.makeText(this, "Scripture passage meditated! (+10 XP)", Toast.LENGTH_SHORT).show();
         });
@@ -1634,6 +1676,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             } else if (graceCount >= 2) {
                 graceCount -= 2;
                 streakFrozen = true;
+                GamificationStore.saveGracePoints(this, "user_me", graceCount);
+                GamificationStore.saveStreak(this, "user_me", streakCount, streakFrozen);
                 updateHud();
                 balance.setText("Current Balance: " + graceCount + " Grace Points 💜 (🛡️ Shield Active)");
                 Toast.makeText(this, "🛡️ Streak Freeze Activated! Your " + streakCount + "-day streak is protected for 48 hours.", Toast.LENGTH_LONG).show();
@@ -1653,6 +1697,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             if (graceCount >= 3) {
                 graceCount -= 3;
                 streakCount += 1;
+                GamificationStore.saveGracePoints(this, "user_me", graceCount);
+                GamificationStore.saveStreak(this, "user_me", streakCount, streakFrozen);
                 updateHud();
                 balance.setText("Current Balance: " + graceCount + " Grace Points 💜");
                 Toast.makeText(this, "🎁 Missed day restored through Grace! Streak is now " + streakCount + " days.", Toast.LENGTH_LONG).show();
@@ -2096,6 +2142,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     btnAmen.setText("✓ Amen (" + countHolder[0] + ")");
                     btnAmen.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 3));
                     xpCount += 5;
+                    GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
                     updateHud();
                     Toast.makeText(this, "🙏 Amen! You joined in prayer for " + prayerTitle + "! (+5 XP)", Toast.LENGTH_SHORT).show();
                 } else {
@@ -2168,6 +2215,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 if (!humorClaimed[0]) {
                     humorClaimed[0] = true;
                     xpCount += 5;
+                    GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
                     updateHud();
                     Toast.makeText(this, "A merry heart doeth good like a medicine! (Prov 17:22) +5 XP", Toast.LENGTH_SHORT).show();
                 }
@@ -2830,6 +2878,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 if (!claimed[0]) {
                     claimed[0] = true;
                     xpCount += xpReward;
+                    GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
                     updateHud();
                     xpBadge.setText("✓ +" + xpReward + " XP");
                     xpBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE));
@@ -2861,6 +2910,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             String text = prayerInputDialog.getText().toString().trim();
             if (!text.isEmpty()) {
                 xpCount += 15;
+                GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
                 updateHud();
                 Toast.makeText(this, "🙏 Prayer request submitted! (+15 XP)", Toast.LENGTH_LONG).show();
             } else {
@@ -2936,6 +2986,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public void onClick(View v) {
         if (v == btnPray) {
             xpCount += 10;
+            GamificationStore.saveSpiritualXp(this, "user_me", xpCount);
             updateHud();
             Toast.makeText(this, "+10 XP for spending time in prayer!", Toast.LENGTH_SHORT).show();
             new AlertDialog.Builder(this)

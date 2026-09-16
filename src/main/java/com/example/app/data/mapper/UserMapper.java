@@ -1,8 +1,11 @@
 package com.example.app.data.mapper;
 
+import android.content.Context;
+
 import androidx.annotation.Nullable;
 
 import com.example.app.data.local.entity.UserEntity;
+import com.example.app.data.local.preference.GamificationStore;
 import com.example.app.domain.model.User;
 
 import java.util.ArrayList;
@@ -14,10 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mapper for converting between Room {@link UserEntity} and domain {@link User}.
- * Handles name &lt;-&gt; fullName, phone &lt;-&gt; phoneNumber, and gamification metrics.
+ * Handles name &lt;-&gt; fullName, phone &lt;-&gt; phoneNumber, and gamification metrics backed
+ * by in-memory cache and persistent {@link GamificationStore}.
  */
 public final class UserMapper {
 
+    private static volatile Context appContext;
     private static final Map<String, GamificationStats> STATS_CACHE = new ConcurrentHashMap<>();
 
     private static class GamificationStats {
@@ -39,8 +44,26 @@ public final class UserMapper {
     }
 
     /**
+     * Initializes the application context for persistent gamification storage.
+     */
+    public static void init(Context context) {
+        if (context != null) {
+            appContext = context.getApplicationContext();
+        }
+    }
+
+    /**
+     * Returns the initialized application context, or null if not yet initialized.
+     */
+    @Nullable
+    public static Context getAppContext() {
+        return appContext;
+    }
+
+    /**
      * Maps a {@link UserEntity} to a domain {@link User}.
-     * Handles name -&gt; fullName, phone -&gt; phoneNumber, and restores gamification stats.
+     * Handles name -&gt; fullName, phone -&gt; phoneNumber, and restores gamification stats
+     * from STATS_CACHE or GamificationStore before falling back to defaults.
      */
     @Nullable
     public static User toDomain(@Nullable UserEntity entity) {
@@ -59,6 +82,16 @@ public final class UserMapper {
         user.setUpdatedAt(entity.getUpdatedAt());
 
         GamificationStats stats = STATS_CACHE.get(entity.getId());
+        if (stats == null && appContext != null) {
+            String uid = entity.getId();
+            int streak = GamificationStore.getStreak(appContext, uid, 7);
+            boolean frozen = GamificationStore.isStreakFrozen(appContext, uid, false);
+            int xp = GamificationStore.getSpiritualXp(appContext, uid, 100);
+            int grace = GamificationStore.getGracePoints(appContext, uid, 50);
+            stats = new GamificationStats(streak, xp, grace, frozen);
+            STATS_CACHE.put(uid, stats);
+        }
+
         if (stats != null) {
             user.setStreakCount(stats.streakCount);
             user.setSpiritualXp(stats.spiritualXp);
@@ -77,7 +110,8 @@ public final class UserMapper {
 
     /**
      * Maps a domain {@link User} to a Room {@link UserEntity}.
-     * Handles fullName -&gt; name, phoneNumber -&gt; phone, and updates cached gamification stats.
+     * Handles fullName -&gt; name, phoneNumber -&gt; phone, updates cached gamification stats,
+     * and persists them to GamificationStore.
      */
     @Nullable
     public static UserEntity toEntity(@Nullable User domain) {
@@ -98,6 +132,13 @@ public final class UserMapper {
                 domain.isStreakFrozen()
         ));
 
+        // Persist to SharedPreferences store if context is available
+        if (appContext != null) {
+            GamificationStore.saveStreak(appContext, id, domain.getStreakCount(), domain.isStreakFrozen());
+            GamificationStore.saveSpiritualXp(appContext, id, domain.getSpiritualXp());
+            GamificationStore.saveGracePoints(appContext, id, domain.getGracePoints());
+        }
+
         return new UserEntity(
                 id,
                 domain.getFullName(),
@@ -113,11 +154,16 @@ public final class UserMapper {
     }
 
     /**
-     * Updates gamification stats in cache for a given user id.
+     * Updates gamification stats in cache and GamificationStore for a given user id.
      */
     public static void updateGamificationStats(String userId, int streakCount, int spiritualXp, int gracePoints, boolean streakFrozen) {
         if (userId != null) {
             STATS_CACHE.put(userId, new GamificationStats(streakCount, spiritualXp, gracePoints, streakFrozen));
+            if (appContext != null) {
+                GamificationStore.saveStreak(appContext, userId, streakCount, streakFrozen);
+                GamificationStore.saveSpiritualXp(appContext, userId, spiritualXp);
+                GamificationStore.saveGracePoints(appContext, userId, gracePoints);
+            }
         }
     }
 

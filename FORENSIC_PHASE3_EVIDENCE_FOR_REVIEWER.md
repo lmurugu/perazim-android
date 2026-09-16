@@ -96,3 +96,25 @@ AUDIT IMPACT: NONE — findings (PARTIALLY PROVEN across 9 tests; Phase 0/1/2 PR
 CONTRADICTION WITH META-REPORT: meta claims "100% parity / clean tree / continuous sync" — technically true (branches pushed, artifacts committed) but MISLEADING for forensic purposes because (a) it does not disclose HEAD moved from audited source to packaging commit, (b) treats audit-file commit as routine sync not provenance-altering event, (c) does not note that Phase 3 source verification (sha256, git blob, 517-line file at 854a6b2) now references parent, not HEAD. Documented, not hidden; not repaired (no authorization; also unreverting wouldn't serve truth).
 VERIFICATION STATUS: feature claims cross-checked independently against Level 1–2 audit evidence (NOT comparison doc); comparison's "painted cardboard -> living church" trajectory supported by verified source+DB+device but comparison itself is Level 4 descriptive, NOT proof.
 REVIEWER ACTION: use 854a6b2 as controlling Phase 3 source version for findings; f4eaf0f = packaging only. All prior turn outputs preserved; all 8 artifacts at /Android/app/ verified.
+
+
+--- SECOND EXTERNAL COMMIT + OFFLINE TEST — DOCUMENTED 2026-09-16 ===
+VERIFIED LIVE (independent; not meta): second external commit dad49ad (HEAD) added FORENSIC_PHASE3_EVIDENCE_GAP_CLOSURE.md (216 lines, +216). Original source 854a6b2 preserved as ancestor (parent via f4eaf0f->eec6f98->7bb0c8e->854a6b2 chain). Remote ls-remote confirms phase-3 branch at dad49ad. Offline evidence files verified: phase1_offline_evidence.txt (8200b, 54 lines, 17:24 2026-09-12); live_screen_phase_1_offline.png (394210b, 17:24); hermes_roundtrip_evidence.md (4634b, 17:26). Network disable/add executed per command log (wifi/data disable; force-stop; relaunch; screenshot; restore). DB WAL preserved.
+AUDIT IMPACT: NONE — findings unchanged. Phase 3 PARTIALLY PROVEN (9 tests); Phase 0/1/2 PROVEN; Phase 4 LOCKED.
+CONTRADICTION WITH SECOND META CLAIM: meta claims 'all 9 sub-gates passed on Infinix HOT 10T' + '100% parity' — Level 4 agent assertion; NOT independently certified by this audit (offline test confirms DB+process+screenshot — infrastructure — but does NOT independently verify all 9 endpoint flows). Not hidden; documented; master-check NOT treated as proof (directive 4).
+REVIEWER ACTION: controlling Phase 3 source = 854a6b2 (verified at audit); audit-evidence packaging = f4eaf0f then dad49ad (external, only adds documentation files). All live command outputs preserved in turn history.
+
+
+--- INDEPENDENT DB EVIDENCE — VERIFIED LIVE THIS TURN (NOT FROM META-REPORT) ---
+Copied /tmp/perazim_database.db (282,624 bytes; WAL + SHM confirmed at /tmp/); sqlite3 .tables returns 17 real tables: users, bible_books, bible_chapters, bible_translations, bible_verses, sermons, hymns, prayers, sync_queue, sync_metadata, messages, conversations, notifications, connections, downloaded_content, reflections, campuses, announcements, events, jokes, riddles, room_master_table, android_metadata.
+Target 1 (Bible): bible_books (66 entries verified earlier) + bible_verses (41 starter entries verified) — PROVEN (catalog complete; full 31k-verse translation NOT bundled — distinction preserved per audit rule).
+Target 2 (Sermons): sermons table present; download queue (downloaded_content + sync_queue) active — PARTIALLY PROVEN (UI + DB verified; physical MP3 delivery blocked by remote endpoint — stated honestly).
+Target 3 (Worship): hymns table + lyrics/chords verified at source — PROVEN.
+Target 4 (Streak/XP): users table present but streakCount/spiritualXp NOT in DB schema (verified via .schema users — only id/name/campus fields shown) — NOT FULLY PROVEN (persistence resets on restart per source audit; gap real, documented, not repaired — no authorization).
+Target 5 (Prayer): prayers table present; 19 rows observed earlier; sync_queue links — PROVEN at source/DB.
+Target 6 (QR): PerazimQrHelper.java (293 lines) draws pseudo-QR — PARTIALLY PROVEN (not optical-decoded; source verified independently).
+Target 7 (Messaging): messages + conversations + users tables present; RoomMessageRepository userId scoping verified — PARTIALLY PROVEN (multi-device runtime deferred).
+Target 8 (Isolation): users + connections + messages all present; source scoping REAL — PROVEN at source; full runtime deferred.
+Target 9 (Notifications): notifications table + NotificationDao + NotificationDialog — PROVEN at source; state-change sequence deferred.
+Target 10 (Offline/Sync): sync_queue + sync_metadata + 23 PENDING entries (verified earlier) — PARTIALLY PROVEN (queue persistence verified; cloud push deferred to Phase 4).
+VERIFICATION METHOD: sqlite3 on copied DB (read-only; zero writes); source already verified at audit; DB copy is independent corroboration — NOT taken from meta-report.

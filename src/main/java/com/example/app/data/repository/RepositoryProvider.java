@@ -38,7 +38,7 @@ public class RepositoryProvider {
     private RepositoryProvider(@NonNull Context context) {
         Context appContext = context.getApplicationContext();
         PerazimDatabase db = PerazimDatabase.getInstance(appContext);
-        this.userRepository = new RoomUserRepository(db.userDao(), db.campusDao());
+        this.userRepository = new RoomUserRepository(db.userDao(), db.campusDao(), appContext);
         this.prayerRepository = new RoomPrayerRepository(db.prayerDao());
         this.messageRepository = new RoomMessageRepository(db.messageDao(), db.conversationDao());
         this.sermonRepository = new RoomSermonRepository(db.sermonDao());

@@ -1,10 +1,14 @@
 package com.example.app.data.repository;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.app.data.local.dao.CampusDao;
 import com.example.app.data.local.dao.UserDao;
 import com.example.app.data.local.entity.UserEntity;
+import com.example.app.data.local.preference.GamificationStore;
 import com.example.app.data.mapper.UserMapper;
 import com.example.app.domain.model.User;
 import com.example.app.domain.repository.UserRepository;
@@ -14,16 +18,26 @@ import java.util.List;
 /**
  * Room implementation of {@link UserRepository}.
  * Manages user profile persistence, active user resolution, streak tracking,
- * spiritual XP, grace points, and campus switching.
+ * spiritual XP, grace points, and campus switching. Backed by Room and {@link GamificationStore}.
  */
 public class RoomUserRepository implements UserRepository {
 
     private final UserDao userDao;
     private final CampusDao campusDao;
+    private final Context context;
 
     public RoomUserRepository(@NonNull UserDao userDao, @NonNull CampusDao campusDao) {
+        this(userDao, campusDao, UserMapper.getAppContext());
+    }
+
+    public RoomUserRepository(@NonNull UserDao userDao, @NonNull CampusDao campusDao, @Nullable Context context) {
         this.userDao = userDao;
         this.campusDao = campusDao;
+        this.context = context != null ? context.getApplicationContext() : UserMapper.getAppContext();
+    }
+
+    private Context getEffectiveContext() {
+        return context != null ? context : UserMapper.getAppContext();
     }
 
     @Override
@@ -42,6 +56,12 @@ public class RoomUserRepository implements UserRepository {
         }
 
         // Fallback to default guest user
+        Context ctx = getEffectiveContext();
+        int defaultStreak = GamificationStore.getStreak(ctx, "guest_user", 7);
+        boolean defaultFrozen = GamificationStore.isStreakFrozen(ctx, "guest_user", false);
+        int defaultXp = GamificationStore.getSpiritualXp(ctx, "guest_user", 100);
+        int defaultGrace = GamificationStore.getGracePoints(ctx, "guest_user", 50);
+
         User guestUser = new User(
                 "guest_user",
                 "Guest Pilgrim",
@@ -49,10 +69,10 @@ public class RoomUserRepository implements UserRepository {
                 "+254700000000",
                 "campus_central",
                 "MEMBER",
-                7,
-                100,
-                50,
-                false,
+                defaultStreak,
+                defaultXp,
+                defaultGrace,
+                defaultFrozen,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -103,6 +123,11 @@ public class RoomUserRepository implements UserRepository {
             activeUser.setStreakFrozen(frozen);
             activeUser.setUpdatedAt(System.currentTimeMillis());
             updateUser(activeUser);
+
+            Context ctx = getEffectiveContext();
+            if (ctx != null) {
+                GamificationStore.saveStreak(ctx, activeUser.getId(), newStreak, frozen);
+            }
         }
     }
 
@@ -110,9 +135,15 @@ public class RoomUserRepository implements UserRepository {
     public void addSpiritualXp(int xpPoints) {
         User activeUser = getCurrentUser();
         if (activeUser != null) {
-            activeUser.setSpiritualXp(activeUser.getSpiritualXp() + xpPoints);
+            int newXp = activeUser.getSpiritualXp() + xpPoints;
+            activeUser.setSpiritualXp(newXp);
             activeUser.setUpdatedAt(System.currentTimeMillis());
             updateUser(activeUser);
+
+            Context ctx = getEffectiveContext();
+            if (ctx != null) {
+                GamificationStore.saveSpiritualXp(ctx, activeUser.getId(), newXp);
+            }
         }
     }
 
@@ -123,6 +154,11 @@ public class RoomUserRepository implements UserRepository {
             activeUser.setGracePoints(gracePoints);
             activeUser.setUpdatedAt(System.currentTimeMillis());
             updateUser(activeUser);
+
+            Context ctx = getEffectiveContext();
+            if (ctx != null) {
+                GamificationStore.saveGracePoints(ctx, activeUser.getId(), gracePoints);
+            }
         }
     }
 

@@ -3,9 +3,15 @@ package com.example.app.presentation.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.os.Build;
+import android.util.Log;
+import java.io.File;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -115,6 +121,7 @@ public class SermonsUiBinder {
 
     // Audio Player State
     private Sermon activeSermon;
+    private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
     private float playbackSpeed = 1.0f; // 1.0f, 1.25f, 1.5f
     private int currentPositionSeconds = 0;
@@ -236,13 +243,29 @@ public class SermonsUiBinder {
             @Override
             public void run() {
                 if (isPlaying) {
-                    currentPositionSeconds++;
-                    if (currentPositionSeconds > totalDurationSeconds) {
+                    if (mediaPlayer != null) {
+                        try {
+                            if (mediaPlayer.isPlaying()) {
+                                int posMs = mediaPlayer.getCurrentPosition();
+                                currentPositionSeconds = posMs / 1000;
+                            } else {
+                                currentPositionSeconds++;
+                            }
+                        } catch (Exception e) {
+                            currentPositionSeconds++;
+                        }
+                    } else {
+                        currentPositionSeconds++;
+                    }
+
+                    if (currentPositionSeconds >= totalDurationSeconds) {
                         currentPositionSeconds = totalDurationSeconds;
+                        if (audioSeekBar != null) audioSeekBar.setProgress(currentPositionSeconds);
+                        if (tvCurrentPos != null) tvCurrentPos.setText(formatDuration(currentPositionSeconds));
                         pausePlayback();
                     } else {
-                        audioSeekBar.setProgress(currentPositionSeconds);
-                        tvCurrentPos.setText(formatDuration(currentPositionSeconds));
+                        if (audioSeekBar != null) audioSeekBar.setProgress(currentPositionSeconds);
+                        if (tvCurrentPos != null) tvCurrentPos.setText(formatDuration(currentPositionSeconds));
                         long delay = (long) (1000 / playbackSpeed);
                         playerHandler.postDelayed(this, Math.max(200, delay));
                     }
@@ -392,6 +415,11 @@ public class SermonsUiBinder {
                 if (fromUser) {
                     currentPositionSeconds = progress;
                     tvCurrentPos.setText(formatDuration(currentPositionSeconds));
+                    if (mediaPlayer != null) {
+                        try {
+                            mediaPlayer.seekTo(progress * 1000);
+                        } catch (Exception ignored) {}
+                    }
                 }
             }
 
@@ -458,6 +486,11 @@ public class SermonsUiBinder {
             currentPositionSeconds = Math.max(0, currentPositionSeconds - 15);
             audioSeekBar.setProgress(currentPositionSeconds);
             tvCurrentPos.setText(formatDuration(currentPositionSeconds));
+            if (mediaPlayer != null) {
+                try {
+                    mediaPlayer.seekTo(currentPositionSeconds * 1000);
+                } catch (Exception ignored) {}
+            }
         });
         ctrlRow.addView(btnRewind);
 
@@ -472,6 +505,11 @@ public class SermonsUiBinder {
             currentPositionSeconds = Math.min(totalDurationSeconds, currentPositionSeconds + 30);
             audioSeekBar.setProgress(currentPositionSeconds);
             tvCurrentPos.setText(formatDuration(currentPositionSeconds));
+            if (mediaPlayer != null) {
+                try {
+                    mediaPlayer.seekTo(currentPositionSeconds * 1000);
+                } catch (Exception ignored) {}
+            }
         });
         ctrlRow.addView(btnForward);
 
@@ -813,7 +851,7 @@ public class SermonsUiBinder {
             downloadStatusMap.put(sermon.getId(), "DOWNLOADING");
             updateDownloadBadgeView(badge, "DOWNLOADING");
             updateDownloadActionButton(btn, "DOWNLOADING");
-            Toast.makeText(activity, "Enqueuing offline download: " + sermon.getTitle(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Offline Queue: Download staged. Remote media delivery unlocks in Phase 4.", Toast.LENGTH_SHORT).show();
 
             viewModel.requestDownload(sermon.getId(), success -> activity.runOnUiThread(() -> {
                 if (Boolean.TRUE.equals(success)) {
@@ -821,7 +859,7 @@ public class SermonsUiBinder {
                     sermon.setDownloaded(true);
                     updateDownloadBadgeView(badge, "DOWNLOADED");
                     updateDownloadActionButton(btn, "DOWNLOADED");
-                    Toast.makeText(activity, "Download complete! Offline ready: " + sermon.getTitle(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Offline Queue: Download staged. Remote media delivery unlocks in Phase 4.", Toast.LENGTH_SHORT).show();
                 } else {
                     downloadStatusMap.put(sermon.getId(), "STREAMING");
                     updateDownloadBadgeView(badge, "STREAMING");
@@ -862,6 +900,19 @@ public class SermonsUiBinder {
     }
 
     private void loadSermonIntoPlayer(Sermon sermon, boolean autoPlay) {
+        if (mediaPlayer != null) {
+            try {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+                mediaPlayer.reset();
+                mediaPlayer.release();
+            } catch (Exception ignored) {}
+            mediaPlayer = null;
+        }
+        isPlaying = false;
+        playerHandler.removeCallbacks(playerRunnable);
+
         activeSermon = sermon;
         tvPlayerTitle.setText(sermon.getTitle() != null ? sermon.getTitle() : "Untitled Sermon");
         String preacher = sermon.getPreacher() != null ? sermon.getPreacher() : "Bishop Dr. David Mutweri";
@@ -892,6 +943,75 @@ public class SermonsUiBinder {
         isPlaying = true;
         btnPlayPause.setText("⏸ Pause Sermon");
         btnPlayPause.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 3));
+
+        try {
+            if (mediaPlayer == null) {
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+                boolean sourceSet = false;
+                String localPath = activeSermon != null ? activeSermon.getLocalAudioPath() : null;
+                if (localPath != null && !localPath.isEmpty()) {
+                    File file = new File(localPath);
+                    if (file.exists() && file.isFile()) {
+                        try {
+                            mediaPlayer.setDataSource(localPath);
+                            sourceSet = true;
+                        } catch (Exception e) {
+                            Log.w("SermonsUiBinder", "Failed to set data source from local path: " + localPath, e);
+                        }
+                    }
+                }
+
+                if (!sourceSet) {
+                    try {
+                        AssetFileDescriptor afd = activity.getAssets().openFd("audio/sample_sermon.mp3");
+                        mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                        afd.close();
+                        sourceSet = true;
+                    } catch (Exception e) {
+                        Log.w("SermonsUiBinder", "Failed to load audio/sample_sermon.mp3 asset", e);
+                    }
+                }
+
+                if (sourceSet) {
+                    mediaPlayer.setOnCompletionListener(mp -> activity.runOnUiThread(() -> {
+                        pausePlayback();
+                        currentPositionSeconds = 0;
+                        if (audioSeekBar != null) audioSeekBar.setProgress(0);
+                        if (tvCurrentPos != null) tvCurrentPos.setText("00:00");
+                    }));
+                    mediaPlayer.setOnErrorListener((mp, what, extra) -> {
+                        Log.w("SermonsUiBinder", "MediaPlayer error: what=" + what + ", extra=" + extra);
+                        return true;
+                    });
+                    mediaPlayer.prepare();
+                    if (currentPositionSeconds > 0) {
+                        mediaPlayer.seekTo(currentPositionSeconds * 1000);
+                    }
+                    mediaPlayer.start();
+                    int durationMs = mediaPlayer.getDuration();
+                    if (durationMs > 0) {
+                        totalDurationSeconds = durationMs / 1000;
+                        if (audioSeekBar != null) audioSeekBar.setMax(totalDurationSeconds);
+                        if (tvTotalDuration != null) tvTotalDuration.setText(formatDuration(totalDurationSeconds));
+                    }
+                }
+            } else {
+                mediaPlayer.start();
+            }
+
+            if (mediaPlayer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                try {
+                    mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(playbackSpeed));
+                } catch (Exception e) {
+                    Log.w("SermonsUiBinder", "Could not set playback speed on MediaPlayer", e);
+                }
+            }
+        } catch (Throwable t) {
+            Log.w("SermonsUiBinder", "MediaPlayer playback initialization warning", t);
+        }
+
         playerHandler.removeCallbacks(playerRunnable);
         playerHandler.post(playerRunnable);
     }
@@ -900,6 +1020,15 @@ public class SermonsUiBinder {
         isPlaying = false;
         btnPlayPause.setText("▶ Play Sermon");
         btnPlayPause.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
+        if (mediaPlayer != null) {
+            try {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                }
+            } catch (Exception e) {
+                Log.w("SermonsUiBinder", "Error pausing MediaPlayer", e);
+            }
+        }
         playerHandler.removeCallbacks(playerRunnable);
     }
 
@@ -912,7 +1041,27 @@ public class SermonsUiBinder {
             playbackSpeed = 1.0f;
         }
         btnSpeedToggle.setText(String.format(Locale.US, "⚡ %.2f×", playbackSpeed).replace(".00", ".0"));
+        if (mediaPlayer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            try {
+                mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(playbackSpeed));
+            } catch (Exception ignored) {}
+        }
         Toast.makeText(activity, "Playback speed: " + btnSpeedToggle.getText(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void release() {
+        isPlaying = false;
+        playerHandler.removeCallbacks(playerRunnable);
+        if (mediaPlayer != null) {
+            try {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+                mediaPlayer.reset();
+                mediaPlayer.release();
+            } catch (Exception ignored) {}
+            mediaPlayer = null;
+        }
     }
 
     // =========================================================================

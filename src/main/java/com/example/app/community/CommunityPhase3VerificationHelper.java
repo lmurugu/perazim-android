@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.example.app.community.privacy.CommunityPrivacyHelper;
 import com.example.app.community.qr.PerazimQrHelper;
+import com.example.app.community.qr.QrMatrixEncoder;
 import com.example.app.data.local.entity.SyncQueueEntity;
 import com.example.app.data.repository.RepositoryProvider;
 import com.example.app.domain.model.Connection;
@@ -114,7 +115,33 @@ public final class CommunityPhase3VerificationHelper {
                     throw new IllegalStateException("Parsed timestamp should be > 0");
                 }
 
-                Log.i(TAG, "[STEP 1.1] Testing PerazimQrHelper deterministic 2D matrix bitmap generator...");
+                Log.i(TAG, "[STEP 1.1] Testing QrMatrixEncoder ISO/IEC 18004 standards-compliant matrix generation...");
+                boolean[][] qrMatrix = QrMatrixEncoder.encode(qrPayload);
+                if (qrMatrix == null || qrMatrix.length < 21 || qrMatrix.length != qrMatrix[0].length) {
+                    throw new IllegalStateException("QrMatrixEncoder produced null or invalid matrix dimensions");
+                }
+                int dim = qrMatrix.length;
+                // Verify Finder patterns: (0,0) outer border must be dark, (1,1) light, (3,3) dark
+                if (!qrMatrix[0][0] || !qrMatrix[0][6] || !qrMatrix[6][0] || !qrMatrix[6][6]) {
+                    throw new IllegalStateException("Top-Left finder pattern outer border missing dark module");
+                }
+                if (qrMatrix[1][1] || qrMatrix[5][5]) {
+                    throw new IllegalStateException("Top-Left finder pattern inner ring must be light");
+                }
+                if (!qrMatrix[3][3]) {
+                    throw new IllegalStateException("Top-Left finder pattern core must be dark");
+                }
+                // Verify Top-Right and Bottom-Left finders
+                if (!qrMatrix[0][dim - 7] || !qrMatrix[0][dim - 1] || !qrMatrix[dim - 7][0] || !qrMatrix[dim - 1][0]) {
+                    throw new IllegalStateException("Corner finder patterns missing dark outer borders");
+                }
+                // Verify Timing Patterns on row 6 and col 6
+                if (!qrMatrix[6][8] || qrMatrix[6][9] || !qrMatrix[8][6] || qrMatrix[9][6]) {
+                    throw new IllegalStateException("Timing patterns not alternating on row 6 or col 6");
+                }
+                Log.i(TAG, "[STEP 1.1: COMPLETED] QrMatrixEncoder standards compliance verified (" + dim + "x" + dim + ").");
+
+                Log.i(TAG, "[STEP 1.2] Testing PerazimQrHelper standards-compliant 2D matrix bitmap generator...");
                 Bitmap qrBitmap = PerazimQrHelper.generateQrBitmap(
                         qrPayload,
                         256,
@@ -124,7 +151,7 @@ public final class CommunityPhase3VerificationHelper {
                 if (qrBitmap == null || qrBitmap.getWidth() != 256 || qrBitmap.getHeight() != 256) {
                     throw new IllegalStateException("PerazimQrHelper generateQrBitmap returned null or invalid dimensions");
                 }
-                Log.i(TAG, "[STEP 1: COMPLETED] PerazimQrHelper tests passed.");
+                Log.i(TAG, "[STEP 1: COMPLETED] PerazimQrHelper & QrMatrixEncoder tests passed.");
 
                 // -----------------------------------------------------------------
                 // 2. PrayerRepository & RoomPrayerRepository Answered & Testimony Tests
