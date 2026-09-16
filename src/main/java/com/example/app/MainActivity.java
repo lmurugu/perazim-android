@@ -44,6 +44,7 @@ import com.example.app.data.local.Phase1MasterVerificationHelper;
 import com.example.app.community.CommunityPhase3VerificationHelper;
 import com.example.app.navigation.NavigationContract;
 import com.example.app.presentation.Phase2MasterVerificationHelper;
+import com.example.app.presentation.Phase3MasterVerificationHelper;
 import com.example.app.presentation.ui.BibleReaderDialog;
 import com.example.app.presentation.ui.FellowshipUiBinder;
 import com.example.app.presentation.ui.HomeUiBinder;
@@ -163,14 +164,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Phase 1: Master Verification Gate (Foundation)
-        Phase1MasterVerificationHelper.runVerification(this);
-
-        // Phase 2: Master Verification Gate (Architecture, UI Binders & Hardware Event Propagation)
-        Phase2MasterVerificationHelper.runVerification(this);
-
-        // Phase 3: Community & Fellowship Master Verification Gate
-        CommunityPhase3VerificationHelper.runVerification(this);
+        // Phase 3 Master Verification Gate (Foundation, Core UX & Community/Fellowship)
+        Phase3MasterVerificationHelper.runVerification(this);
 
         // Trigger first-launch onboarding
         OnboardingDialog.showIfNeeded(this);
