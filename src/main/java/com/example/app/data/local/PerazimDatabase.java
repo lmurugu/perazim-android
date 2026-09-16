@@ -78,7 +78,7 @@ import com.example.app.data.local.entity.UserEntity;
         SyncMetadataEntity.class,
         DownloadedContentEntity.class
     },
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters({Converters.class})

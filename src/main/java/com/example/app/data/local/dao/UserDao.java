@@ -35,6 +35,15 @@ public interface UserDao {
     @Query("SELECT * FROM users ORDER BY name ASC")
     List<UserEntity> getAllUsers();
 
+    @Query("UPDATE users SET streakCount = :streak, streakFrozen = :frozen WHERE id = :userId")
+    void updateStreak(String userId, int streak, boolean frozen);
+
+    @Query("UPDATE users SET spiritualXp = spiritualXp + :xpPoints WHERE id = :userId")
+    void addSpiritualXp(String userId, int xpPoints);
+
+    @Query("UPDATE users SET gracePoints = :gracePoints WHERE id = :userId")
+    void updateGracePoints(String userId, int gracePoints);
+
     @Query("DELETE FROM users WHERE id = :id")
     void deleteById(String id);
 

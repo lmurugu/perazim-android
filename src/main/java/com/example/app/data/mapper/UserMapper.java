@@ -84,10 +84,10 @@ public final class UserMapper {
         GamificationStats stats = STATS_CACHE.get(entity.getId());
         if (stats == null && appContext != null) {
             String uid = entity.getId();
-            int streak = GamificationStore.getStreak(appContext, uid, 7);
-            boolean frozen = GamificationStore.isStreakFrozen(appContext, uid, false);
-            int xp = GamificationStore.getSpiritualXp(appContext, uid, 100);
-            int grace = GamificationStore.getGracePoints(appContext, uid, 50);
+            int streak = GamificationStore.getStreak(appContext, uid, entity.getStreakCount() > 0 ? entity.getStreakCount() : 7);
+            boolean frozen = GamificationStore.isStreakFrozen(appContext, uid, entity.isStreakFrozen());
+            int xp = GamificationStore.getSpiritualXp(appContext, uid, entity.getSpiritualXp() > 0 ? entity.getSpiritualXp() : 100);
+            int grace = GamificationStore.getGracePoints(appContext, uid, entity.getGracePoints() > 0 ? entity.getGracePoints() : 50);
             stats = new GamificationStats(streak, xp, grace, frozen);
             STATS_CACHE.put(uid, stats);
         }
@@ -98,11 +98,11 @@ public final class UserMapper {
             user.setGracePoints(stats.gracePoints);
             user.setStreakFrozen(stats.streakFrozen);
         } else {
-            // Default gamification values
-            user.setStreakCount(7);
-            user.setSpiritualXp(100);
-            user.setGracePoints(50);
-            user.setStreakFrozen(false);
+            // Default gamification values from entity or fallback
+            user.setStreakCount(entity.getStreakCount() > 0 ? entity.getStreakCount() : 7);
+            user.setSpiritualXp(entity.getSpiritualXp() > 0 ? entity.getSpiritualXp() : 100);
+            user.setGracePoints(entity.getGracePoints() > 0 ? entity.getGracePoints() : 50);
+            user.setStreakFrozen(entity.isStreakFrozen());
         }
 
         return user;
@@ -149,7 +149,11 @@ public final class UserMapper {
                 "",
                 createdAt,
                 updatedAt,
-                true
+                true,
+                domain.getStreakCount(),
+                domain.getSpiritualXp(),
+                domain.getGracePoints(),
+                domain.isStreakFrozen()
         );
     }
 

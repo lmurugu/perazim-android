@@ -2,10 +2,12 @@ package com.example.app.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
  * Room Entity for table "users".
+ * Persists member identity, account details, and gamification state (streak, XP, grace points).
  */
 @Entity(tableName = "users")
 public class UserEntity {
@@ -23,8 +25,14 @@ public class UserEntity {
     private long updatedAt;
     private boolean isActive;
 
+    private int streakCount;
+    private int spiritualXp;
+    private int gracePoints;
+    private boolean streakFrozen;
+
     public UserEntity(@NonNull String id, String name, String email, String phone, String role,
-                      String campusId, String avatarUrl, long createdAt, long updatedAt, boolean isActive) {
+                      String campusId, String avatarUrl, long createdAt, long updatedAt, boolean isActive,
+                      int streakCount, int spiritualXp, int gracePoints, boolean streakFrozen) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -35,6 +43,16 @@ public class UserEntity {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.isActive = isActive;
+        this.streakCount = streakCount;
+        this.spiritualXp = spiritualXp;
+        this.gracePoints = gracePoints;
+        this.streakFrozen = streakFrozen;
+    }
+
+    @Ignore
+    public UserEntity(@NonNull String id, String name, String email, String phone, String role,
+                      String campusId, String avatarUrl, long createdAt, long updatedAt, boolean isActive) {
+        this(id, name, email, phone, role, campusId, avatarUrl, createdAt, updatedAt, isActive, 7, 100, 50, false);
     }
 
     @NonNull
@@ -67,4 +85,16 @@ public class UserEntity {
 
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+
+    public int getStreakCount() { return streakCount; }
+    public void setStreakCount(int streakCount) { this.streakCount = streakCount; }
+
+    public int getSpiritualXp() { return spiritualXp; }
+    public void setSpiritualXp(int spiritualXp) { this.spiritualXp = spiritualXp; }
+
+    public int getGracePoints() { return gracePoints; }
+    public void setGracePoints(int gracePoints) { this.gracePoints = gracePoints; }
+
+    public boolean isStreakFrozen() { return streakFrozen; }
+    public void setStreakFrozen(boolean streakFrozen) { this.streakFrozen = streakFrozen; }
 }

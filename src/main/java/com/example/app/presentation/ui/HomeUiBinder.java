@@ -509,12 +509,12 @@ public class HomeUiBinder {
     private void advanceReflectionStep() {
         if (routineStep == 1) {
             routineStep = 2;
-            saveRoutineState(new android.os.Bundle());
+            saveRoutineState(null);
             updateRoutineView();
             Toast.makeText(context, "Step 1 complete! Now meditate on today's breakthrough message.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 2) {
             routineStep = 3;
-            saveRoutineState(new android.os.Bundle());
+            saveRoutineState(null);
             updateRoutineView();
             Toast.makeText(context, "Step 2 complete! Stand in agreement in prayer.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 3) {
@@ -556,7 +556,7 @@ public class HomeUiBinder {
 
     private void updateRoutineView() {
         // Restore persisted routine state before applying view
-        restoreRoutineState(new android.os.Bundle());  // NOTE: correct lifecycle integration needs Activity onSave/onRestore; this at minimum applies current saved state if present via instance backup
+        restoreRoutineState(null);  // NOTE: correct lifecycle integration needs Activity onSave/onRestore; this at minimum applies current saved state if present via instance backup
 
         Reflection refl = (cachedHomeData != null) ? cachedHomeData.getTodayReflection() : null;
 
@@ -1448,8 +1448,14 @@ public class HomeUiBinder {
 
     public void saveRoutineState(android.os.Bundle outState) {
         if (outState != null) outState.putInt(KEY_ROUTINE_STEP, routineStep);
+        // Durable persistence for process-death survival: also save to SP (small, correct for user-progress state)
+        if (context != null) { try { context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE).edit().putInt(KEY_ROUTINE_STEP, routineStep).apply(); } catch (Exception e) { /* ignore */ } }
     }
     public void restoreRoutineState(android.os.Bundle savedInstanceState) {
         if (savedInstanceState != null) routineStep = savedInstanceState.getInt(KEY_ROUTINE_STEP, 1);
+        else {
+            // Restore from durable SP if Bundle not present (process death, fresh start with preserved state)
+            try { if (context != null) routineStep = context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1); } catch (Exception e) { /* ignore */ }
+        }
     }
 }
