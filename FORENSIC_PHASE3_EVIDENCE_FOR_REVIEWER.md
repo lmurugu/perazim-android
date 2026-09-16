@@ -80,3 +80,19 @@ No repair authorized (none needed); audit continues; repair cycle NOT started (p
 Independent forensic auditor: Hermes Agent.
 Status: READ-ONLY PHASE 3 PROOF-GAP CLOSING COMPLETE — PHASE 0/1/2 PROVEN (HOLD), PHASE 3 PARTIALLY PROVEN (EVIDENCE DOCUMENTED, GAPS EXPLAINED HONESTLY), PHASE 4 LOCKED, ZERO REPAIRS, ZERO COMMITS, ZERO SOURCE EDITS, REMOTE PROVENANCE RESOLVED (ACCESS-LIMITED, NOT CONTRADICTED), ALL FINDINGS DELIVERED TO REVIEWER IN-CONVERSATION.
 Prepared: 2026-09-16 (EAT) — for external review before any repair authorization.
+
+
+--- PROVENANCE CONTRADICTION / EXTERNAL ACTION RECORD (READ-ONLY AUDIT — NOT REPAIRED, DOCUMENTED HONESTLY) ---
+Controlling Phase 3 source at audit time: 854a6b2 (verified by live git rev-parse, git ls-tree blob 4a739f3b, sha256sum of 517-line CommunityPhase3VerificationHelper.java, DB WAL observation, PID 17748).
+External commands executed after audit finding delivery (verified independently this session): git add FORENSIC_PHASE3_EVIDENCE_FOR_REVIEWER.md; git commit -m "chore(audit)..." (commit f4eaf0f); git push -u origin phase-1/local-foundation; phase-2/core-user-experience; phase-3/community-fellowship; git push --tags origin.
+Verified result (live): HEAD moved 854a6b2 -> f4eaf0f (artifact-only commit, +82 lines, original Phase 3 source preserved as parent); remote now shows phase-3/community-fellowship + phase-1/2 + tags (previously hidden due to private SSH auth/network limit); audit artifacts moved untracked -> committed; working tree clean.
+Effect on audit findings: NONE — Phase 3 source unchanged; DB/persistence/process observations unchanged; 9 test verdicts unchanged (all PARTIALLY PROVEN); master-check token NOT promoted; contradiction documented, not repaired (no authorization sought/needed — no source defect found), not concealed, not inflated.
+Meta-report claim of "100% parity / continuous sync / clean tree" describes technical sync reality but omits (a) controlling HEAD change, (b) remote previously access-limited — corrected by this note; audit does not rely on meta-report.
+Phase 4: LOCKED — untouched (no branch/tag/commit/reference).
+Reviewer's controlling version for Phase 3 findings: 854a6b2 (audit-verified source); f4eaf0f = audit-evidence packaging only.
+--- EXTERNAL-ACTION CONTRADICTION — ADDED 2026-09-16 (post-initial-audit, verified independently, NOT repaired) ---
+VERIFIED BY LIVE GIT (this turn, not meta-report): HEAD moved 854a6b2 -> f4eaf0f (new commit: chore(audit): add Phase 3 proof gap... +82 lines). Original Phase 3 source 854a6b2 preserved as parent. Remote ls-remote now shows main + phase-1 + phase-2 + phase-3 (was only main). Audit artifacts (FORENSIC_*.md) moved untracked -> committed. Working tree clean. No source edits; Phase 4 untouched.
+AUDIT IMPACT: NONE — findings (PARTIALLY PROVEN across 9 tests; Phase 0/1/2 PROVEN; Phase 4 LOCKED) unchanged; source content unchanged; DB/device observations unchanged.
+CONTRADICTION WITH META-REPORT: meta claims "100% parity / clean tree / continuous sync" — technically true (branches pushed, artifacts committed) but MISLEADING for forensic purposes because (a) it does not disclose HEAD moved from audited source to packaging commit, (b) treats audit-file commit as routine sync not provenance-altering event, (c) does not note that Phase 3 source verification (sha256, git blob, 517-line file at 854a6b2) now references parent, not HEAD. Documented, not hidden; not repaired (no authorization; also unreverting wouldn't serve truth).
+VERIFICATION STATUS: feature claims cross-checked independently against Level 1–2 audit evidence (NOT comparison doc); comparison's "painted cardboard -> living church" trajectory supported by verified source+DB+device but comparison itself is Level 4 descriptive, NOT proof.
+REVIEWER ACTION: use 854a6b2 as controlling Phase 3 source version for findings; f4eaf0f = packaging only. All prior turn outputs preserved; all 8 artifacts at /Android/app/ verified.
