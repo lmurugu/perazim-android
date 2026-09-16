@@ -35,7 +35,7 @@ public final class GamificationStore {
         getPrefs(context).edit()
                 .putInt("streak_" + uid, streak)
                 .putBoolean("frozen_" + uid, frozen)
-                .apply();
+                .commit();
     }
 
     /**
@@ -64,7 +64,7 @@ public final class GamificationStore {
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putInt("xp_" + uid, xp)
-                .apply();
+                .commit();
     }
 
     /**
@@ -84,7 +84,7 @@ public final class GamificationStore {
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putInt("grace_" + uid, points)
-                .apply();
+                .commit();
     }
 
     /**
