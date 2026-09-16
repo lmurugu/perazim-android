@@ -38,6 +38,9 @@ public interface NotificationDao {
     @Query("UPDATE notifications SET isRead = 1 WHERE userId = :userId")
     void markAllAsRead(String userId);
 
+    @Query("UPDATE notifications SET isRead = 1 WHERE id = :id")
+    void markAsRead(String id);
+
     @Query("DELETE FROM notifications WHERE id = :id")
     void deleteById(String id);
 

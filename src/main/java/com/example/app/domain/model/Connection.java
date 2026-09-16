@@ -18,6 +18,7 @@ public class Connection implements Serializable {
     private String id;
     private String requesterId;
     private String recipientId;
+    private String peerName;
     private Status status;
     private long requestedAt;
     private long respondedAt;
@@ -28,9 +29,15 @@ public class Connection implements Serializable {
 
     public Connection(String id, String requesterId, String recipientId,
                       Status status, long requestedAt, long respondedAt) {
+        this(id, requesterId, recipientId, null, status, requestedAt, respondedAt);
+    }
+
+    public Connection(String id, String requesterId, String recipientId,
+                      String peerName, Status status, long requestedAt, long respondedAt) {
         this.id = id;
         this.requesterId = requesterId;
         this.recipientId = recipientId;
+        this.peerName = peerName;
         this.status = status != null ? status : Status.PENDING;
         this.requestedAt = requestedAt;
         this.respondedAt = respondedAt;
@@ -44,6 +51,15 @@ public class Connection implements Serializable {
 
     public String getRecipientId() { return recipientId; }
     public void setRecipientId(String recipientId) { this.recipientId = recipientId; }
+
+    public String getPeerName() { return peerName; }
+    public void setPeerName(String peerName) { this.peerName = peerName; }
+
+    public String getUserId() { return requesterId; }
+    public void setUserId(String userId) { this.requesterId = userId; }
+
+    public String getPeerId() { return recipientId; }
+    public void setPeerId(String peerId) { this.recipientId = peerId; }
 
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }

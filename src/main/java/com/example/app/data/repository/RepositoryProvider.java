@@ -5,10 +5,12 @@ import androidx.annotation.NonNull;
 import com.example.app.data.local.PerazimDatabase;
 import com.example.app.domain.repository.AnnouncementRepository;
 import com.example.app.domain.repository.BibleRepository;
+import com.example.app.domain.repository.ConnectionRepository;
 import com.example.app.domain.repository.DownloadedContentRepository;
 import com.example.app.domain.repository.EventRepository;
 import com.example.app.domain.repository.HymnRepository;
 import com.example.app.domain.repository.MessageRepository;
+import com.example.app.domain.repository.NotificationRepository;
 import com.example.app.domain.repository.PrayerRepository;
 import com.example.app.domain.repository.ReflectionRepository;
 import com.example.app.domain.repository.SermonRepository;
@@ -30,6 +32,8 @@ public class RepositoryProvider {
     private final ReflectionRepository reflectionRepository;
     private final BibleRepository bibleRepository;
     private final DownloadedContentRepository downloadedContentRepository;
+    private final ConnectionRepository connectionRepository;
+    private final NotificationRepository notificationRepository;
 
     private RepositoryProvider(@NonNull Context context) {
         Context appContext = context.getApplicationContext();
@@ -44,6 +48,8 @@ public class RepositoryProvider {
         this.reflectionRepository = new RoomReflectionRepository(db.reflectionDao());
         this.bibleRepository = new RoomBibleRepository(db.bibleDao());
         this.downloadedContentRepository = new RoomDownloadedContentRepository(db.downloadedContentDao());
+        this.connectionRepository = new RoomConnectionRepository(db.connectionDao());
+        this.notificationRepository = new RoomNotificationRepository(db.notificationDao());
     }
 
     public static RepositoryProvider getInstance(@NonNull Context context) {
@@ -67,4 +73,6 @@ public class RepositoryProvider {
     public ReflectionRepository getReflectionRepository() { return reflectionRepository; }
     public BibleRepository getBibleRepository() { return bibleRepository; }
     public DownloadedContentRepository getDownloadedContentRepository() { return downloadedContentRepository; }
+    public ConnectionRepository getConnectionRepository() { return connectionRepository; }
+    public NotificationRepository getNotificationRepository() { return notificationRepository; }
 }

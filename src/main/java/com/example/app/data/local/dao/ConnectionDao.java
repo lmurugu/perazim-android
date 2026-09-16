@@ -32,6 +32,18 @@ public interface ConnectionDao {
     @Query("SELECT * FROM connections WHERE userId = :userId ORDER BY createdMillis DESC")
     List<ConnectionEntity> getConnectionsForUser(String userId);
 
+    @Query("SELECT * FROM connections WHERE (userId = :userId OR peerId = :userId) AND (status = 'ACCEPTED' OR status IS NULL) ORDER BY createdMillis DESC")
+    List<ConnectionEntity> getAcceptedConnections(String userId);
+
+    @Query("SELECT * FROM connections WHERE (peerId = :userId OR userId = :userId) AND status = 'PENDING' ORDER BY createdMillis DESC")
+    List<ConnectionEntity> getPendingRequests(String userId);
+
+    @Query("SELECT * FROM connections WHERE (userId = :userId AND peerId = :peerId) OR (userId = :peerId AND peerId = :userId) LIMIT 1")
+    ConnectionEntity getConnectionBetween(String userId, String peerId);
+
+    @Query("SELECT * FROM connections WHERE ((userId = :userId AND peerId = :peerId) OR (userId = :peerId AND peerId = :userId)) AND status = 'BLOCKED' LIMIT 1")
+    ConnectionEntity getBlockedConnection(String userId, String peerId);
+
     @Query("DELETE FROM connections WHERE id = :id")
     void deleteById(String id);
 

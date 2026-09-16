@@ -44,11 +44,17 @@ public class Notification implements Serializable {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
+    public String getBody() { return message; }
+    public void setBody(String body) { this.message = body; }
+
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 
     public String getTargetRoute() { return targetRoute; }
     public void setTargetRoute(String targetRoute) { this.targetRoute = targetRoute; }
+
+    public String getActionTarget() { return targetRoute; }
+    public void setActionTarget(String actionTarget) { this.targetRoute = actionTarget; }
 
     public boolean isRead() { return isRead; }
     public void setRead(boolean read) { isRead = read; }
