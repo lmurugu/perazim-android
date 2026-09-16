@@ -103,6 +103,8 @@ public class HomeUiBinder {
     private LinearLayout contentContainer;
 
     // Routine State
+    private static final String KEY_ROUTINE_STEP = "routine_step";
+
     private int routineStep = 1; // 1 = Read, 2 = Reflect, 3 = Pray, 4 = Done
     private TextView stepIndicatorRead;
     private TextView stepIndicatorReflect;
@@ -1437,5 +1439,12 @@ public class HomeUiBinder {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
         return output;
+    }
+
+    public void saveRoutineState(android.os.Bundle outState) {
+        if (outState != null) outState.putInt(KEY_ROUTINE_STEP, routineStep);
+    }
+    public void restoreRoutineState(android.os.Bundle savedInstanceState) {
+        if (savedInstanceState != null) routineStep = savedInstanceState.getInt(KEY_ROUTINE_STEP, 1);
     }
 }
