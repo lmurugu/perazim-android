@@ -88,7 +88,11 @@ public class RepositoryVerificationHelper {
                 if (currentUser == null) {
                     throw new IllegalStateException("UserRepository.getCurrentUser() returned null");
                 }
-                int initialXp = currentUser.getSpiritualXp();
+                int origStreak = currentUser.getStreakCount();
+                boolean origFrozen = currentUser.isStreakFrozen();
+                int origXp = currentUser.getSpiritualXp();
+                int origGrace = currentUser.getGracePoints();
+
                 userRepo.updateStreak(5, false);
                 userRepo.addSpiritualXp(20);
                 User updatedUser = userRepo.getCurrentUser();
@@ -101,10 +105,14 @@ public class RepositoryVerificationHelper {
                 if (updatedUser.isStreakFrozen()) {
                     throw new IllegalStateException("UserRepository streakFrozen verification failed: expected false, got true");
                 }
-                if (updatedUser.getSpiritualXp() != initialXp + 20) {
-                    throw new IllegalStateException("UserRepository spiritualXp verification failed: expected " + (initialXp + 20) + ", got " + updatedUser.getSpiritualXp());
+                if (updatedUser.getSpiritualXp() != origXp + 20) {
+                    throw new IllegalStateException("UserRepository spiritualXp verification failed: expected " + (origXp + 20) + ", got " + updatedUser.getSpiritualXp());
                 }
-                Log.d(TAG, "UserRepository verified successfully.");
+                // Restore active user metrics to original state to avoid corrupting runtime user state
+                userRepo.updateStreak(origStreak, origFrozen);
+                userRepo.addSpiritualXp(-20);
+                userRepo.updateGracePoints(origGrace);
+                Log.d(TAG, "UserRepository verified successfully and user metrics restored.");
 
                 // 2. SermonRepository: insert test SermonEntity via sermonDao(), call getRecentSermons(), searchSermons(), markAsDownloaded(), verify
                 String sermonId = "test_sermon_1";

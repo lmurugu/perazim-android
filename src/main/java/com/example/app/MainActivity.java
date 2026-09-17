@@ -221,6 +221,25 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        String uid = resolveGamificationUserId();
+        streakCount = GamificationStore.getStreak(this, uid, streakCount);
+        xpCount = GamificationStore.getSpiritualXp(this, uid, xpCount);
+        graceCount = GamificationStore.getGracePoints(this, uid, graceCount);
+        streakFrozen = GamificationStore.isStreakFrozen(this, uid, streakFrozen);
+        if (topStreakBadge != null) {
+            topStreakBadge.setText((streakFrozen ? "🛡️ " : "🔥 ") + streakCount);
+        }
+        if (topXpBadge != null) {
+            topXpBadge.setText("⭐ " + xpCount);
+        }
+        if (topGraceBadge != null) {
+            topGraceBadge.setText("💜 " + graceCount);
+        }
+    }
+
+    @Override
     protected void onNewIntent(android.content.Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
@@ -610,6 +629,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     @Override
                     public void onXpAwarded(int xpAwarded, int totalXp) {
                         xpCount = totalXp;
+                        streakCount = GamificationStore.getStreak(MainActivity.this, resolveGamificationUserId(), streakCount);
                         GamificationStore.saveSpiritualXp(MainActivity.this, resolveGamificationUserId(), xpCount);
                         updateHud();
                     }

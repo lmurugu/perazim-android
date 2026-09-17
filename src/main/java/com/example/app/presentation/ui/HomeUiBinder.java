@@ -148,6 +148,18 @@ public class HomeUiBinder {
                 ? bibleViewModel
                 : ViewModelFactory.getInstance(context).createBibleViewModel();
         this.listener = listener;
+        if (this.context != null) {
+            String uid = "user_me";
+            try {
+                com.example.app.data.local.session.SessionManager sm = com.example.app.data.local.session.SessionManager.getInstance(this.context);
+                if (sm != null && sm.getActiveUserId() != null) uid = sm.getActiveUserId();
+            } catch (Exception ignored) {}
+            this.streakCount = com.example.app.data.local.preference.GamificationStore.getStreak(this.context, uid, 7);
+            this.xpCount = com.example.app.data.local.preference.GamificationStore.getSpiritualXp(this.context, uid, 450);
+            try {
+                this.routineStep = this.context.getSharedPreferences("perazim_routine", Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1);
+            } catch (Exception ignored) {}
+        }
     }
 
     public static View createView(@NonNull Context context,
@@ -520,16 +532,17 @@ public class HomeUiBinder {
         } else if (routineStep == 3) {
             // Complete Reflection Routine
             routineStep = 4;
+            saveRoutineState(null);
             String reflectionId = (cachedHomeData != null && cachedHomeData.getTodayReflection() != null)
                     ? cachedHomeData.getTodayReflection().getId()
                     : "refl_day_1";
 
             homeViewModel.completeDailyReflection(reflectionId, () -> {
-                awardXp(20);
                 streakCount += 1;
                 if (listener != null) {
                     listener.onStreakUpdated(streakCount);
                 }
+                awardXp(20);
                 progressPercent = 100;
                 if (progressBarDaily != null) {
                     progressBarDaily.setProgress(progressPercent);
