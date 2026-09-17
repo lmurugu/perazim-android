@@ -146,7 +146,12 @@ public class HomeViewModel extends ViewModel {
      * Marks the daily reflection completed, awards 20 spiritual XP, and updates the user streak.
      */
     public void completeDailyReflection(@Nullable String reflectionId, @Nullable Runnable onComplete) {
+        completeDailyReflection(reflectionId, onComplete, null);
+    }
+
+    public void completeDailyReflection(@Nullable String reflectionId, @Nullable Runnable onSuccess, @Nullable java.util.function.Consumer<Exception> onError) {
         executor.execute(() -> {
+            boolean success = false;
             try {
                 if (reflectionId != null) {
                     reflectionRepo.markReflectionCompleted(reflectionId);
@@ -156,12 +161,15 @@ public class HomeViewModel extends ViewModel {
                 int currentStreak = (currentUser != null) ? currentUser.getStreakCount() : 0;
                 boolean isFrozen = (currentUser != null) && currentUser.isStreakFrozen();
                 userRepo.updateStreak(currentStreak + 1, isFrozen);
+                success = true;
             } catch (Exception e) {
                 Log.e(TAG, "Error completing daily reflection", e);
-            } finally {
-                if (onComplete != null) {
-                    postCallback(onComplete);
+                if (onError != null) {
+                    postCallback(() -> onError.accept(e));
                 }
+            }
+            if (success && onSuccess != null) {
+                postCallback(onSuccess);
             }
         });
     }

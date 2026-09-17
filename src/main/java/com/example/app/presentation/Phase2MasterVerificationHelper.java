@@ -281,26 +281,28 @@ public final class Phase2MasterVerificationHelper {
                 int gracePrior = activeUser != null ? activeUser.getGracePoints() : 50;
                 boolean frozenPrior = activeUser != null && activeUser.isStreakFrozen();
 
-                CountDownLatch latchReflection = new CountDownLatch(1);
-                homeVM.completeDailyReflection(null, latchReflection::countDown);
-                if (!latchReflection.await(5, TimeUnit.SECONDS)) {
-                    throw new IllegalStateException("Event Propagation failed: HomeViewModel.completeDailyReflection timed out");
-                }
-                User postUser = repoProvider.getUserRepository().getCurrentUser();
-                if (postUser == null || postUser.getSpiritualXp() < xpPrior + 20 || postUser.getStreakCount() < streakPrior + 1) {
-                    throw new IllegalStateException("Event Propagation failed: User streak or XP did not increment");
-                }
-
-                // Restore active user metrics to prevent test pollution of runtime state
-                if (activeUser != null) {
-                    activeUser.setStreakCount(streakPrior);
-                    activeUser.setSpiritualXp(xpPrior);
-                    activeUser.setGracePoints(gracePrior);
-                    activeUser.setStreakFrozen(frozenPrior);
-                    repoProvider.getUserRepository().updateUser(activeUser);
-                    GamificationStore.saveStreak(appContext, activeUser.getId(), streakPrior, frozenPrior);
-                    GamificationStore.saveSpiritualXp(appContext, activeUser.getId(), xpPrior);
-                    GamificationStore.saveGracePoints(appContext, activeUser.getId(), gracePrior);
+                try {
+                    CountDownLatch latchReflection = new CountDownLatch(1);
+                    homeVM.completeDailyReflection(null, latchReflection::countDown);
+                    if (!latchReflection.await(5, TimeUnit.SECONDS)) {
+                        throw new IllegalStateException("Event Propagation failed: HomeViewModel.completeDailyReflection timed out");
+                    }
+                    User postUser = repoProvider.getUserRepository().getCurrentUser();
+                    if (postUser == null || postUser.getSpiritualXp() < xpPrior + 20 || postUser.getStreakCount() < streakPrior + 1) {
+                        throw new IllegalStateException("Event Propagation failed: User streak or XP did not increment");
+                    }
+                } finally {
+                    // Restore active user metrics to prevent test pollution of runtime state
+                    if (activeUser != null) {
+                        activeUser.setStreakCount(streakPrior);
+                        activeUser.setSpiritualXp(xpPrior);
+                        activeUser.setGracePoints(gracePrior);
+                        activeUser.setStreakFrozen(frozenPrior);
+                        repoProvider.getUserRepository().updateUser(activeUser);
+                        GamificationStore.saveStreak(appContext, activeUser.getId(), streakPrior, frozenPrior);
+                        GamificationStore.saveSpiritualXp(appContext, activeUser.getId(), xpPrior);
+                        GamificationStore.saveGracePoints(appContext, activeUser.getId(), gracePrior);
+                    }
                 }
                 Log.i(TAG, "[MASTER STEP 5.5] Daily reflection completion, streak & XP increment verified and user metrics preserved.");
                 Log.i(TAG, "[MASTER STEP 5: COMPLETED] All interactive event propagation tests passed.");

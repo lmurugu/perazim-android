@@ -143,22 +143,24 @@ public final class MvvmVerificationHelper {
                 int origGrace = activeUser != null ? activeUser.getGracePoints() : 50;
                 boolean origFrozen = activeUser != null && activeUser.isStreakFrozen();
 
-                CountDownLatch latchReflection = new CountDownLatch(1);
-                homeVM.completeDailyReflection("refl_day_1", latchReflection::countDown);
-                if (!latchReflection.await(5, TimeUnit.SECONDS)) {
-                    throw new IllegalStateException("HomeViewModel.completeDailyReflection() timed out");
-                }
-
-                // Restore active user metrics to prevent test pollution of runtime state
-                if (activeUser != null) {
-                    activeUser.setStreakCount(origStreak);
-                    activeUser.setSpiritualXp(origXp);
-                    activeUser.setGracePoints(origGrace);
-                    activeUser.setStreakFrozen(origFrozen);
-                    repoProvider.getUserRepository().updateUser(activeUser);
-                    GamificationStore.saveStreak(appContext, activeUser.getId(), origStreak, origFrozen);
-                    GamificationStore.saveSpiritualXp(appContext, activeUser.getId(), origXp);
-                    GamificationStore.saveGracePoints(appContext, activeUser.getId(), origGrace);
+                try {
+                    CountDownLatch latchReflection = new CountDownLatch(1);
+                    homeVM.completeDailyReflection("refl_day_1", latchReflection::countDown);
+                    if (!latchReflection.await(5, TimeUnit.SECONDS)) {
+                        throw new IllegalStateException("HomeViewModel.completeDailyReflection() timed out");
+                    }
+                } finally {
+                    // Restore active user metrics to prevent test pollution of runtime state
+                    if (activeUser != null) {
+                        activeUser.setStreakCount(origStreak);
+                        activeUser.setSpiritualXp(origXp);
+                        activeUser.setGracePoints(origGrace);
+                        activeUser.setStreakFrozen(origFrozen);
+                        repoProvider.getUserRepository().updateUser(activeUser);
+                        GamificationStore.saveStreak(appContext, activeUser.getId(), origStreak, origFrozen);
+                        GamificationStore.saveSpiritualXp(appContext, activeUser.getId(), origXp);
+                        GamificationStore.saveGracePoints(appContext, activeUser.getId(), origGrace);
+                    }
                 }
                 Log.i(TAG, "[MVVM STEP 3: COMPLETED] HomeViewModel validated and user metrics preserved.");
 

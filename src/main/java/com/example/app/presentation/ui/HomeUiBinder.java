@@ -530,14 +530,17 @@ public class HomeUiBinder {
             updateRoutineView();
             Toast.makeText(context, "Step 2 complete! Stand in agreement in prayer.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 3) {
-            // Complete Reflection Routine
-            routineStep = 4;
-            saveRoutineState(null);
+            // Disable button temporarily during mutation
+            btnRoutineNext.setEnabled(false);
+            btnRoutineNext.setText("Saving Breakthrough Reflection...");
+
             String reflectionId = (cachedHomeData != null && cachedHomeData.getTodayReflection() != null)
                     ? cachedHomeData.getTodayReflection().getId()
                     : "refl_day_1";
 
             homeViewModel.completeDailyReflection(reflectionId, () -> {
+                routineStep = 4;
+                saveRoutineState(null);
                 streakCount += 1;
                 if (listener != null) {
                     listener.onStreakUpdated(streakCount);
@@ -563,6 +566,10 @@ public class HomeUiBinder {
                                 + "“The LORD will make you the head and not the tail; you shall be above only and not beneath.” — Deuteronomy 28:13")
                         .setPositiveButton("Amen! Receive Breakthrough", null)
                         .show();
+            }, error -> {
+                btnRoutineNext.setEnabled(true);
+                btnRoutineNext.setText("🙏 Complete Reflection (+20 XP)");
+                Toast.makeText(context, "Could not complete reflection: " + (error != null ? error.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
             });
         }
     }
@@ -1461,8 +1468,16 @@ public class HomeUiBinder {
 
     public void saveRoutineState(android.os.Bundle outState) {
         if (outState != null) outState.putInt(KEY_ROUTINE_STEP, routineStep);
-        // Durable persistence for process-death survival: also save to SP (small, correct for user-progress state)
-        if (context != null) { try { context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE).edit().putInt(KEY_ROUTINE_STEP, routineStep).apply(); } catch (Exception e) { /* ignore */ } }
+        if (context != null) {
+            try {
+                context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE)
+                        .edit()
+                        .putInt(KEY_ROUTINE_STEP, routineStep)
+                        .commit();
+            } catch (Exception e) {
+                android.util.Log.e("HomeUiBinder", "Failed to save routine state", e);
+            }
+        }
     }
     public void restoreRoutineState(android.os.Bundle savedInstanceState) {
         if (savedInstanceState != null) routineStep = savedInstanceState.getInt(KEY_ROUTINE_STEP, 1);

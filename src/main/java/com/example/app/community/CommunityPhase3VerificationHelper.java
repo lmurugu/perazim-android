@@ -377,23 +377,25 @@ public final class CommunityPhase3VerificationHelper {
                 prayerRepo.submitPrayer(pTestimony);
 
                 int xpBefore = userRepo.getCurrentUser() != null ? userRepo.getCurrentUser().getSpiritualXp() : 0;
-                CountDownLatch testimonyLatch = new CountDownLatch(1);
-                fellowshipVM.markAnsweredWithTestimony(testimonyPrayerId, "Full scholarship awarded by chancellor! Glory to God!", testimonyLatch::countDown);
-                if (!testimonyLatch.await(5, TimeUnit.SECONDS)) {
-                    throw new IllegalStateException("FellowshipViewModel.markAnsweredWithTestimony timed out");
-                }
-                int xpAfter = userRepo.getCurrentUser() != null ? userRepo.getCurrentUser().getSpiritualXp() : 0;
-                if (userRepo.getCurrentUser() != null && xpAfter < xpBefore + 50) {
-                    throw new IllegalStateException("markAnsweredWithTestimony did not award +50 Spiritual XP (before=" + xpBefore + ", after=" + xpAfter + ")");
-                }
-                prayerRepo.deletePrayer(testimonyPrayerId);
-
-                // Restore active user XP to prevent test pollution of runtime state
-                User curUser = userRepo.getCurrentUser();
-                if (curUser != null) {
-                    curUser.setSpiritualXp(xpBefore);
-                    userRepo.updateUser(curUser);
-                    GamificationStore.saveSpiritualXp(appContext, curUser.getId(), xpBefore);
+                try {
+                    CountDownLatch testimonyLatch = new CountDownLatch(1);
+                    fellowshipVM.markAnsweredWithTestimony(testimonyPrayerId, "Full scholarship awarded by chancellor! Glory to God!", testimonyLatch::countDown);
+                    if (!testimonyLatch.await(5, TimeUnit.SECONDS)) {
+                        throw new IllegalStateException("FellowshipViewModel.markAnsweredWithTestimony timed out");
+                    }
+                    int xpAfter = userRepo.getCurrentUser() != null ? userRepo.getCurrentUser().getSpiritualXp() : 0;
+                    if (userRepo.getCurrentUser() != null && xpAfter < xpBefore + 50) {
+                        throw new IllegalStateException("markAnsweredWithTestimony did not award +50 Spiritual XP (before=" + xpBefore + ", after=" + xpAfter + ")");
+                    }
+                } finally {
+                    prayerRepo.deletePrayer(testimonyPrayerId);
+                    // Restore active user XP to prevent test pollution of runtime state
+                    User curUser = userRepo.getCurrentUser();
+                    if (curUser != null) {
+                        curUser.setSpiritualXp(xpBefore);
+                        userRepo.updateUser(curUser);
+                        GamificationStore.saveSpiritualXp(appContext, curUser.getId(), xpBefore);
+                    }
                 }
 
                 // Test loadPendingRequests & sendConnectionRequest & acceptConnection
