@@ -14,11 +14,13 @@ import com.example.app.community.privacy.CommunityPrivacyHelper;
 import com.example.app.community.qr.PerazimQrHelper;
 import com.example.app.community.qr.QrMatrixEncoder;
 import com.example.app.data.local.entity.SyncQueueEntity;
+import com.example.app.data.local.preference.GamificationStore;
 import com.example.app.data.repository.RepositoryProvider;
 import com.example.app.domain.model.Connection;
 import com.example.app.domain.model.Message;
 import com.example.app.domain.model.Notification;
 import com.example.app.domain.model.Prayer;
+import com.example.app.domain.model.User;
 import com.example.app.domain.repository.ConnectionRepository;
 import com.example.app.domain.repository.MessageRepository;
 import com.example.app.domain.repository.NotificationRepository;
@@ -385,6 +387,14 @@ public final class CommunityPhase3VerificationHelper {
                     throw new IllegalStateException("markAnsweredWithTestimony did not award +50 Spiritual XP (before=" + xpBefore + ", after=" + xpAfter + ")");
                 }
                 prayerRepo.deletePrayer(testimonyPrayerId);
+
+                // Restore active user XP to prevent test pollution of runtime state
+                User curUser = userRepo.getCurrentUser();
+                if (curUser != null) {
+                    curUser.setSpiritualXp(xpBefore);
+                    userRepo.updateUser(curUser);
+                    GamificationStore.saveSpiritualXp(appContext, curUser.getId(), xpBefore);
+                }
 
                 // Test loadPendingRequests & sendConnectionRequest & acceptConnection
                 String userTest1 = "user_fvm_1_" + UUID.randomUUID().toString().substring(0, 8);

@@ -11,6 +11,8 @@ import com.example.app.data.local.entity.JokeEntity;
 import com.example.app.data.local.entity.RiddleEntity;
 import com.example.app.data.local.seeder.BibleDataSeeder;
 import com.example.app.data.local.seeder.ContentDataSeeder;
+import com.example.app.data.local.preference.GamificationStore;
+import com.example.app.data.repository.RepositoryProvider;
 import com.example.app.domain.model.BibleBook;
 import com.example.app.domain.model.BibleVerse;
 import com.example.app.domain.model.Hymn;
@@ -134,12 +136,31 @@ public final class MvvmVerificationHelper {
                         + ", Events=" + homeData.getUpcomingEvents().size()
                         + ", Streak=" + homeData.getStreak());
 
+                RepositoryProvider repoProvider = RepositoryProvider.getInstance(appContext);
+                User activeUser = repoProvider.getUserRepository().getCurrentUser();
+                int origStreak = activeUser != null ? activeUser.getStreakCount() : 7;
+                int origXp = activeUser != null ? activeUser.getSpiritualXp() : 450;
+                int origGrace = activeUser != null ? activeUser.getGracePoints() : 50;
+                boolean origFrozen = activeUser != null && activeUser.isStreakFrozen();
+
                 CountDownLatch latchReflection = new CountDownLatch(1);
                 homeVM.completeDailyReflection("refl_day_1", latchReflection::countDown);
                 if (!latchReflection.await(5, TimeUnit.SECONDS)) {
                     throw new IllegalStateException("HomeViewModel.completeDailyReflection() timed out");
                 }
-                Log.i(TAG, "[MVVM STEP 3: COMPLETED] HomeViewModel validated.");
+
+                // Restore active user metrics to prevent test pollution of runtime state
+                if (activeUser != null) {
+                    activeUser.setStreakCount(origStreak);
+                    activeUser.setSpiritualXp(origXp);
+                    activeUser.setGracePoints(origGrace);
+                    activeUser.setStreakFrozen(origFrozen);
+                    repoProvider.getUserRepository().updateUser(activeUser);
+                    GamificationStore.saveStreak(appContext, activeUser.getId(), origStreak, origFrozen);
+                    GamificationStore.saveSpiritualXp(appContext, activeUser.getId(), origXp);
+                    GamificationStore.saveGracePoints(appContext, activeUser.getId(), origGrace);
+                }
+                Log.i(TAG, "[MVVM STEP 3: COMPLETED] HomeViewModel validated and user metrics preserved.");
 
                 // -----------------------------------------------------------------
                 // 4. BibleViewModel Validation
@@ -296,10 +317,17 @@ public final class MvvmVerificationHelper {
                     throw new IllegalStateException("ProfileViewModel.loadProfile() failed");
                 }
 
+                String origCampus = userRef.get().getCampusId();
                 CountDownLatch latchSwitchCampus = new CountDownLatch(1);
                 profileVM.switchCampus("campus_mwea", latchSwitchCampus::countDown);
                 if (!latchSwitchCampus.await(5, TimeUnit.SECONDS)) {
                     throw new IllegalStateException("ProfileViewModel.switchCampus() timed out");
+                }
+                // Restore original campus
+                if (origCampus != null) {
+                    CountDownLatch latchRestoreCampus = new CountDownLatch(1);
+                    profileVM.switchCampus(origCampus, latchRestoreCampus::countDown);
+                    latchRestoreCampus.await(5, TimeUnit.SECONDS);
                 }
 
                 CountDownLatch latchSavedContent = new CountDownLatch(1);
