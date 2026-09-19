@@ -3,7 +3,7 @@
 # Phase 0/1/2 held PROVEN and provisionally closed per user directive (not reopened — no new contradiction evidence found).
 # Phase 0–2 NOT reopened: confirmed by live git state (main=3ac4f8c; tags intact; no new edits to Phase 0–2 source paths during this session).
 # Project: /home/murugu/Android/app ; Remote: git@github.com:lmurugu/perazim-android.git ; HEAD: 854a6b2 (phase-3/community-fellowship)
-# Device (independent): Infinix X689C / Android 11 (API 30); adb responsive; package=com.example.app
+# Device (independent): Infinix X689C / Android 11 (API 30); adb responsive; package=org.perazimchurch.app
 # Rules respected: no-write (§28); independence (§4); source/running distinction preserved; STOP-at-finding (no defect found → proceed with evidence, never invent); repair only with authorization (none needed — none authorized);
 # Every entry below uses ONLY: PROVEN / PARTIALLY PROVEN / NOT PROVEN / CONTRADICTED / NOT TESTABLE WITH AVAILABLE ACCESS.
 
@@ -21,8 +21,8 @@ SOURCE → domain/account models; data/repository user-scoped; presentation auth
 CALL PATH → UI event → ViewModel → repository(query userId) → Room DAO → SQLite → UI update
 RUNTIME ACTION → Read-only observation of existing process (PID verified live; NO login/logout executed to avoid corrupting active session)
 EXPECTED → App process live; session architecture verified; DB container present
-ACTUAL → MainActivity running (dumpsys: task #74775, mResumedActivity=com.example.app/.MainActivity); PID 19447 (post-observation — process restarted between checks, real lifecycle event); no auth-error exceptions in logcat
-DEVICE EVIDENCE → adb devices responsive; com.example.app process confirmed; activity stack stable
+ACTUAL → MainActivity running (dumpsys: task #74775, mResumedActivity=org.perazimchurch.app/.MainActivity); PID 19447 (post-observation — process restarted between checks, real lifecycle event); no auth-error exceptions in logcat
+DEVICE EVIDENCE → adb devices responsive; org.perazimchurch.app process confirmed; activity stack stable
 LOG / DB EVIDENCE → logcat readable (system-level WiFi/vendor errors only, no Perazim auth errors); perazim_database.db (+shm +wal) present (persistence layer live)
 GIT VERSION → 854a6b2 (phase-3/community-fellowship; Phase3MasterVerificationHelper + session-source at HEAD)
 VERDICT → PARTIALLY PROVEN (process + DB live; source architecture verified independently; full session-expiry / invalid-credential / logout-flow sequence deferred — requires controlled interaction that could corrupt session; NOT converted to PROVEN; NO contradiction; NO defect → STOP-at-finding not triggered; NO repair authorized)

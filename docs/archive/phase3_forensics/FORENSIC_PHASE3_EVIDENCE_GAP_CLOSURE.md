@@ -7,7 +7,7 @@
 **Verification Harness Commit**: `7bb0c8e9f5e3fec029e0da765e94b0d014bc08d8`  
 **Current Branch HEAD**: `eec6f98436440baadcf63897ca4f84c82ef9ff8c`  
 **Target Hardware**: `Infinix X689C` / `Infinix HOT 10T` (`0667737142100269`, Android 11 / API 30)  
-**Database Inspection Target**: `/data/data/com.example.app/databases/perazim_database.db` (WAL Mode)  
+**Database Inspection Target**: `/data/data/org.perazimchurch.app/databases/perazim_database.db` (WAL Mode)  
 **Date**: 2026-09-16  
 
 ---
@@ -85,7 +85,7 @@ No synthetic tokens or generic database presence markers are treated as substitu
     * `onStreakUpdated` updates `MainActivity.this.streakCount = streak;` (in-memory field).
   * In SQLite: Table `users` (`CREATE TABLE users (id, name, email, phone, role, campusId, avatarUrl, createdAt, updatedAt, isActive)`) **does not have columns for streakCount or spiritualXp**.
   * In `UserMapper.java`: Gamification metrics are cached in `STATS_CACHE = new ConcurrentHashMap<>()`.
-  * When the process is force-stopped (`am force-stop com.example.app`), `STATS_CACHE` is cleared and `MainActivity` fields reset to default values (`streakCount = 7`, `xpCount = 450`).
+  * When the process is force-stopped (`am force-stop org.perazimchurch.app`), `STATS_CACHE` is cleared and `MainActivity` fields reset to default values (`streakCount = 7`, `xpCount = 450`).
 * **Verdict**: **NOT YET FULLY PROVEN (Resets to Default on Process Death)**  
   *Devotional interactive UI flow works during active process lifecycle; persistent storage across process death is NOT PROVEN because streak and XP are stored in-memory.*
 

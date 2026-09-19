@@ -1,9 +1,9 @@
 plugins { id 'com.android.application' version '8.2.2' }
 android {
-    namespace 'com.example.app'
+    namespace 'org.perazimchurch.app'
     compileSdk 34
     compileOptions { sourceCompatibility JavaVersion.VERSION_11; targetCompatibility JavaVersion.VERSION_11 }
-    defaultConfig { applicationId "com.example.app"; minSdk 24; targetSdk 34; versionCode 3; versionName "2.1.0" }
+    defaultConfig { applicationId "org.perazimchurch.app"; minSdk 24; targetSdk 34; versionCode 3; versionName "2.1.0" }
     buildTypes { release { minifyEnabled false; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' } }
 }
 dependencies {

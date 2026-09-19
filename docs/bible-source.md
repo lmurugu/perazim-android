@@ -4,7 +4,7 @@
 **Verification Date:** 2026-09-12  
 **Workstream:** Phase 1.3 — Bible Local Engine  
 **Custodian:** Bible Engine Lead (`bible_engine_lead`)  
-**Application:** Perazim Android Application (`com.example.app`)  
+**Application:** Perazim Android Application (`org.perazimchurch.app`)  
 **Repository:** https://github.com/lmurugu/perazim-android  
 **Branch:** `phase-1/local-foundation`
 

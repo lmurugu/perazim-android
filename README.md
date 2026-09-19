@@ -142,7 +142,7 @@ adb devices
 adb install -r build/outputs/apk/debug/app-debug.apk
 
 # Launch MainActivity directly via ADB
-adb shell am start -n com.example.app/.MainActivity
+adb shell am start -n org.perazimchurch.app/.MainActivity
 ```
 
 ---
@@ -176,7 +176,7 @@ perazim-android/
 │       ├── AndroidManifest.xml
 │       ├── assets/              # Offline church banners, campus art, hymns
 │       ├── java/
-│       │   └── com/example/app/
+│       │   └── org/perazimchurch/app/
 │       │       ├── MainActivity.java
 │       │       ├── SermonsActivity.java
 │       │       ├── HymnsActivity.java

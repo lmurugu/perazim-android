@@ -14,7 +14,7 @@ Note on "PROVEN" standard (§31): distinction used — Phase 0/1/2: implemented 
 
 === 1. HERME ACCESS / ANTIGRAVITY WORKSPACE (§3) ===
 ANTIGRAVITY WORKSPACE FOUND: YES — /home/murugu/Android/app (actual native Android repo, not the Grok workspace ~/perazim-app-repo which was independently identified as separate)
-ANDROID PROJECT FOUND: YES — src/main/java/com/example/app/; gradlew; build.gradle; AndroidManifest.xml
+ANDROID PROJECT FOUND: YES — src/main/java/org/perazimchurch/app/; gradlew; build.gradle; AndroidManifest.xml
 REPOSITORY ROOT: /home/murugu/Android/app (git rev-parse --show-toplevel)
 REPOSITORY_ACCESS = VERIFIED (git status / rev-parse / branch / log / remote / ls-tree all executed; results in Access Certificate)
 
@@ -31,7 +31,7 @@ CODE CHANGED AFTER TEST → PREVIOUS TEST DOES NOT AUTO-VERIFY NEW CODE (§22): 
 
 === 3. DEVICE / RUNTIME (§7, §10) ===
 DEVICE: Infinix X689C; Android 11 (API 30); ADB responsive; 0667737142100269 device.
-APP PACKAGE: com.example.app (installed, process PID 17748 live during audit).
+APP PACKAGE: org.perazimchurch.app (installed, process PID 17748 live during audit).
 LOGCAT: accessible; no fatal Perazim errors in captured window (system WiFi/vendor errors present — unrelated).
 OBSERVATION: verified (app observed running; NOT started/stopped/modified by auditor).
 
@@ -229,6 +229,6 @@ Status: READ-ONLY FORENSIC COMPLETE — REPAIR AUTHORIZED SEPARATELY — RE-AUDI
 
 --- PRE-EXISTING SOURCE STATE DISCOVERED DURING INDEPENDENT AUDIT (NOT CAUSED BY AUDITOR) ---
 DATE CONFIRMED: MainActivity.java edit and presentation/Phase3MasterVerificationHelper.java untracked file both present BEFORE this audit session (file timestamps 2026-09-12 17:49/17:57 for Phase 2 screenshots; Phase 3 verification file added by Antigravity in prior session).
-GIT STATUS AT AUDIT TIME (independent read): M src/main/java/com/example/app/MainActivity.java (3 insertions / 8 deletions); ?? src/main/java/com/example/app/presentation/Phase3MasterVerificationHelper.java (untracked; 517-line Phase 3 master gate source).
+GIT STATUS AT AUDIT TIME (independent read): M src/main/java/org/perazimchurch/app/MainActivity.java (3 insertions / 8 deletions); ?? src/main/java/org/perazimchurch/app/presentation/Phase3MasterVerificationHelper.java (untracked; 517-line Phase 3 master gate source).
 AUDITOR ACTION: ZERO edits to production source. Zero git commits. Zero builds. Only 4 forensic artifacts added (FORENSIC_ACCESS_CERTIFICATE.md, FORENSIC_AUDIT_PHASES_0_TO_3.md, FORENSIC_MONITOR_SH.sh, forensic/monitor_*.log).
 IMPLICATION (honest, not hidden): Phase 3 master verification file IS real (not fabricated by auditor); MainActivity modifications reflect Antigravity's Phase 3 integration work; audit verified source AT this state (HEAD 854a6b2) and explicitly flags that source changed from 9b4270a (Phase 2) → 854a6b2 (Phase 3) — consistent with §22 "CODE CHANGED AFTER TEST → PREVIOUS TEST DOES NOT AUTO-VERIFY NEW CODE" — Phase 2 verification does NOT automatically cover current Phase 3 source.

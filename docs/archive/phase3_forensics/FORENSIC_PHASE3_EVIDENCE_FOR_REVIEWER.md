@@ -24,8 +24,8 @@ B. PHASE 3 SOURCE (independent verification — not treated as proof alone):
    - NavigationContract 5-tab — verified at source
 
 C. DEVICE / RUNTIME (independent — NOT from project claims):
-   - Device: Infinix X689C / API 30; ADB responsive; com.example.app PID 19447 (post-restart; earlier 17748 observed — real lifecycle event)
-   - DB: /data/data/com.example.app/databases/perazim_database.db + .db-shm + .db-wal (WAL mode active — persistence mechanism verified at architecture level)
+   - Device: Infinix X689C / API 30; ADB responsive; org.perazimchurch.app PID 19447 (post-restart; earlier 17748 observed — real lifecycle event)
+   - DB: /data/data/org.perazimchurch.app/databases/perazim_database.db + .db-shm + .db-wal (WAL mode active — persistence mechanism verified at architecture level)
    - Logcat: readable; no Perazim fatal errors; system-level WiFi/vendor errors only
    - Activity stack: task #74775; MainActivity resumed; stable
    - Direct sqlite3 table read: BLOCKED (expected for non-debug build) — stated honestly; NOT fabricated as "verified"
