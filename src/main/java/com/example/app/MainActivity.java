@@ -42,12 +42,7 @@ import android.widget.Toast;
 import com.example.app.data.local.preference.GamificationStore;
 import com.example.app.data.mapper.UserMapper;
 import com.example.app.data.local.session.SessionManager;
-import com.example.app.data.local.PersistenceVerificationHelper;
-import com.example.app.data.local.Phase1MasterVerificationHelper;
-import com.example.app.community.CommunityPhase3VerificationHelper;
 import com.example.app.navigation.NavigationContract;
-import com.example.app.presentation.Phase2MasterVerificationHelper;
-import com.example.app.presentation.Phase3MasterVerificationHelper;
 import com.example.app.presentation.ui.BibleReaderDialog;
 import com.example.app.presentation.ui.FellowshipUiBinder;
 import com.example.app.presentation.ui.HomeUiBinder;
@@ -173,9 +168,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         xpCount = GamificationStore.getSpiritualXp(this, resolveGamificationUserId(), 450);
         graceCount = GamificationStore.getGracePoints(this, resolveGamificationUserId(), 5);
         streakFrozen = GamificationStore.isStreakFrozen(this, resolveGamificationUserId(), false);
-
-        // Phase 3 Master Verification Gate (Foundation, Core UX & Community/Fellowship)
-        Phase3MasterVerificationHelper.runVerification(this);
 
         // Trigger first-launch onboarding
         OnboardingDialog.showIfNeeded(this);

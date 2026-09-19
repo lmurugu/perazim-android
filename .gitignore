@@ -23,8 +23,25 @@ gradle-8.5-bin.zip
 
 # Temp files
 *.bak
+*.backup
 *.tmp
 *~
 *.db
 *.db-*
 *.png
+FORENSIC_*.md
+forensic/
+
+# Secret/config hygiene
+*secret*
+*credential*.json
+daraja_config.properties
+secrets.properties
+*.keystore
+*.jks
+*.pem
+.env
+
+# Firebase client config may contain project identifiers/API keys.
+# If required for build in later milestones, provide via CI secret or local-only file.
+google-services.json
