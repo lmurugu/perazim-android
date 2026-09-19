@@ -1,5 +1,7 @@
 package com.example.app.presentation;
 
+import com.example.app.data.local.session.SessionManager;
+
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -281,9 +283,14 @@ public final class Phase2MasterVerificationHelper {
                 int gracePrior = activeUser != null ? activeUser.getGracePoints() : 50;
                 boolean frozenPrior = activeUser != null && activeUser.isStreakFrozen();
 
+                SessionManager sessionManager = SessionManager.getInstance(appContext);
                 try {
                     CountDownLatch latchReflection = new CountDownLatch(1);
-                    homeVM.completeDailyReflection(null, latchReflection::countDown);
+                    String _vOrig = sessionManager.getActiveUserId();
+                    sessionManager.setActiveUserId("TEST_USER_DETERMINISTIC");
+                    try {
+                        homeVM.completeDailyReflection(null, latchReflection::countDown);
+                    } finally { sessionManager.setActiveUserId(_vOrig); }
                     if (!latchReflection.await(5, TimeUnit.SECONDS)) {
                         throw new IllegalStateException("Event Propagation failed: HomeViewModel.completeDailyReflection timed out");
                     }
