@@ -89,4 +89,51 @@ public class Sermon implements Serializable {
 
     public String getLocalAudioPath() { return localAudioPath; }
     public void setLocalAudioPath(String localAudioPath) { this.localAudioPath = localAudioPath; }
+
+    private String pdfUrl;
+    private String notes;
+
+    public String getPdfUrl() {
+        if (pdfUrl != null && !pdfUrl.trim().isEmpty()) {
+            return pdfUrl.trim();
+        }
+        if (notes != null && (notes.startsWith("http://") || notes.startsWith("https://")) && notes.toLowerCase().contains(".pdf")) {
+            return notes.trim();
+        }
+        return null;
+    }
+
+    public void setPdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public boolean hasVideo() {
+        return videoUrl != null && !videoUrl.trim().isEmpty();
+    }
+
+    public boolean hasPdf() {
+        return getPdfUrl() != null;
+    }
+
+    public String getYouTubeVideoId() {
+        if (videoUrl == null) return null;
+        if (videoUrl.contains("v=")) {
+            int idx = videoUrl.indexOf("v=");
+            int end = videoUrl.indexOf("&", idx);
+            return end != -1 ? videoUrl.substring(idx + 2, end) : videoUrl.substring(idx + 2);
+        } else if (videoUrl.contains("youtu.be/")) {
+            int idx = videoUrl.indexOf("youtu.be/");
+            int end = videoUrl.indexOf("?", idx);
+            return end != -1 ? videoUrl.substring(idx + 9, end) : videoUrl.substring(idx + 9);
+        }
+        return null;
+    }
 }

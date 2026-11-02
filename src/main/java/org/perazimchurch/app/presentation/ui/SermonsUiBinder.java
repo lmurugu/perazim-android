@@ -3,6 +3,8 @@ package org.perazimchurch.app.presentation.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -45,6 +47,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.perazimchurch.app.data.repository.YouTubeFeedRepository;
 import org.perazimchurch.app.domain.model.Sermon;
 import org.perazimchurch.app.presentation.viewmodel.SermonsViewModel;
 
@@ -59,10 +62,12 @@ import java.util.Map;
  * SermonsUiBinder binds the Sermons Tab UI to {@link SermonsViewModel}.
  * Features:
  * - Search bar for filtering sermons by title, preacher, or keyword.
- * - Series filter chips ("All", "Breakthrough 2026", "Walking in Faith", "Deliverance").
+ * - Series filter chips ("All", "Breakthrough 2026", "Walking in Faith", "Deliverance", "Perazim Live & Video").
  * - Sermon card list displaying preacher, passage, duration, series badge, download status.
  * - Audio Player Controller with play/pause, seekbar progress, and speed toggle (1.0x, 1.25x, 1.5x).
  * - Download action button handling requestDownload (STREAMING -> DOWNLOADING -> DOWNLOADED) and deleteDownload.
+ * - Live YouTube Channel broadcast integration (@perazimchurchembu).
+ * - WhatsApp fellowship sharing and PDF study notes viewing.
  */
 public class SermonsUiBinder {
 
@@ -93,7 +98,7 @@ public class SermonsUiBinder {
 
     // Predefined series filter chips
     public static final String[] SERIES_CHIPS = {
-            "All", "Breakthrough 2026", "Walking in Faith", "Deliverance"
+            "All", "Breakthrough 2026", "Walking in Faith", "Deliverance", "Perazim Live & Video"
     };
 
     private final Activity activity;
@@ -338,12 +343,8 @@ public class SermonsUiBinder {
         btnWatchLiveBroadcast.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 12, 4));
         btnWatchLiveBroadcast.setPadding(dp(14), dp(10), dp(14), dp(10));
         btnWatchLiveBroadcast.setOnClickListener(v -> {
-            if (activeSermon == null && !currentSermons.isEmpty()) {
-                startPlayback(currentSermons.get(0));
-            } else if (activeSermon != null) {
-                togglePlayPause();
-            }
-            Toast.makeText(activity, "Broadcasting Live: Walking in Faith", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Connecting to Perazim Live Broadcast...", Toast.LENGTH_SHORT).show();
+            YouTubeFeedRepository.openLiveBroadcast(activity);
         });
         liveCard.addView(btnWatchLiveBroadcast);
 
@@ -623,6 +624,15 @@ public class SermonsUiBinder {
         selectedSeries = series;
         updateChipStyles();
         loadingBar.setVisibility(View.VISIBLE);
+
+        if ("Perazim Live & Video".equalsIgnoreCase(series)) {
+            YouTubeFeedRepository.fetchRecentVideos(videos -> activity.runOnUiThread(() -> {
+                loadingBar.setVisibility(View.GONE);
+                renderSermonCards(videos);
+            }));
+            return;
+        }
+
         viewModel.filterBySeries(series, sermons -> activity.runOnUiThread(() -> {
             loadingBar.setVisibility(View.GONE);
             renderSermonCards(sermons);
@@ -654,6 +664,10 @@ public class SermonsUiBinder {
             if (sermons != null && !sermons.isEmpty() && activeSermon == null) {
                 loadSermonIntoPlayer(sermons.get(0), false);
             }
+            // Prefetch live YouTube videos in background so videos are cached
+            YouTubeFeedRepository.fetchRecentVideos(videos -> {
+                Log.d("SermonsUiBinder", "Prefetched " + (videos != null ? videos.size() : 0) + " YouTube broadcasts");
+            });
         }));
     }
 
@@ -754,49 +768,169 @@ public class SermonsUiBinder {
         tvSeriesBadge.setLayoutParams(lpSeries);
         badgeRow.addView(tvSeriesBadge);
 
-        // Download status badge
+        if (sermon.hasVideo()) {
+            TextView tvVideoBadge = new TextView(activity);
+            tvVideoBadge.setText("🎥 Video");
+            tvVideoBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            tvVideoBadge.setTypeface(Typeface.DEFAULT_BOLD);
+            tvVideoBadge.setTextColor(COLOR_ACCENT_ORANGE);
+            tvVideoBadge.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ORANGE_BORDER));
+            tvVideoBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
+            LinearLayout.LayoutParams lpVid = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lpVid.setMargins(0, 0, dp(6), 0);
+            tvVideoBadge.setLayoutParams(lpVid);
+            badgeRow.addView(tvVideoBadge);
+        }
+
+        if (sermon.hasPdf()) {
+            TextView tvPdfBadge = new TextView(activity);
+            tvPdfBadge.setText("📄 Study Notes");
+            tvPdfBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            tvPdfBadge.setTypeface(Typeface.DEFAULT_BOLD);
+            tvPdfBadge.setTextColor(COLOR_PRIMARY_PURPLE);
+            tvPdfBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+            tvPdfBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
+            LinearLayout.LayoutParams lpPdf = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lpPdf.setMargins(0, 0, dp(6), 0);
+            tvPdfBadge.setLayoutParams(lpPdf);
+            badgeRow.addView(tvPdfBadge);
+        }
+
+        // Download status badge (for downloadable audio sermons)
         final TextView tvDownloadBadge = new TextView(activity);
-        String initialStatus = downloadStatusMap.containsKey(sermon.getId())
-                ? downloadStatusMap.get(sermon.getId())
-                : (sermon.isDownloaded() ? "DOWNLOADED" : "STREAMING");
-        updateDownloadBadgeView(tvDownloadBadge, initialStatus);
-        badgeRow.addView(tvDownloadBadge);
+        boolean isLocalAudio = sermon.getAudioUrl() != null && !sermon.getAudioUrl().isEmpty() && !sermon.getId().startsWith("yt_");
+        if (isLocalAudio) {
+            String initialStatus = downloadStatusMap.containsKey(sermon.getId())
+                    ? downloadStatusMap.get(sermon.getId())
+                    : (sermon.isDownloaded() ? "DOWNLOADED" : "STREAMING");
+            updateDownloadBadgeView(tvDownloadBadge, initialStatus);
+            badgeRow.addView(tvDownloadBadge);
+        }
 
         card.addView(badgeRow);
 
-        // Bottom Row: Play Button & Download Action Button
-        LinearLayout actionRow = new LinearLayout(activity);
-        actionRow.setOrientation(LinearLayout.HORIZONTAL);
-        actionRow.setGravity(Gravity.CENTER_VERTICAL);
+        // Actions Row 1: Primary playback (Watch Video and/or Play Audio)
+        LinearLayout primaryActionRow = new LinearLayout(activity);
+        primaryActionRow.setOrientation(LinearLayout.HORIZONTAL);
+        primaryActionRow.setGravity(Gravity.CENTER_VERTICAL);
+        primaryActionRow.setPadding(0, 0, 0, dp(6));
 
-        Button btnPlay = new Button(activity);
-        btnPlay.setText("▶ Play Message");
-        btnPlay.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnPlay.setTypeface(Typeface.DEFAULT_BOLD);
-        btnPlay.setTextColor(COLOR_WHITE);
-        btnPlay.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 8, 2));
-        btnPlay.setPadding(dp(12), dp(6), dp(12), dp(6));
-        LinearLayout.LayoutParams lpBtnPlay = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lpBtnPlay.setMargins(0, 0, dp(6), 0);
-        btnPlay.setLayoutParams(lpBtnPlay);
-        btnPlay.setOnClickListener(v -> startPlayback(sermon));
-        actionRow.addView(btnPlay);
+        if (sermon.hasVideo()) {
+            Button btnWatch = new Button(activity);
+            btnWatch.setText("🎥 Watch Video");
+            btnWatch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            btnWatch.setTypeface(Typeface.DEFAULT_BOLD);
+            btnWatch.setTextColor(COLOR_WHITE);
+            btnWatch.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 8, 2));
+            btnWatch.setPadding(dp(10), dp(6), dp(10), dp(6));
+            LinearLayout.LayoutParams lpWatch = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+            lpWatch.setMargins(0, 0, dp(6), 0);
+            btnWatch.setLayoutParams(lpWatch);
+            btnWatch.setOnClickListener(v -> YouTubeFeedRepository.openVideo(activity, sermon.getVideoUrl()));
+            primaryActionRow.addView(btnWatch);
+        }
 
-        final Button btnDownload = new Button(activity);
-        updateDownloadActionButton(btnDownload, initialStatus);
-        LinearLayout.LayoutParams lpBtnDl = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lpBtnDl.setMargins(dp(6), 0, 0, 0);
-        btnDownload.setLayoutParams(lpBtnDl);
+        if (isLocalAudio || !sermon.hasVideo()) {
+            Button btnPlay = new Button(activity);
+            btnPlay.setText("▶ Play Audio");
+            btnPlay.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            btnPlay.setTypeface(Typeface.DEFAULT_BOLD);
+            btnPlay.setTextColor(COLOR_WHITE);
+            btnPlay.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 8, 2));
+            btnPlay.setPadding(dp(10), dp(6), dp(10), dp(6));
+            LinearLayout.LayoutParams lpPlay = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+            lpPlay.setMargins(0, 0, dp(6), 0);
+            btnPlay.setLayoutParams(lpPlay);
+            btnPlay.setOnClickListener(v -> startPlayback(sermon));
+            primaryActionRow.addView(btnPlay);
+        }
 
-        btnDownload.setOnClickListener(v -> handleDownloadAction(sermon, tvDownloadBadge, btnDownload));
-        actionRow.addView(btnDownload);
+        card.addView(primaryActionRow);
 
-        card.addView(actionRow);
+        // Actions Row 2: Secondary utilities (PDF Notes, WhatsApp Share, Offline Download)
+        LinearLayout secondaryActionRow = new LinearLayout(activity);
+        secondaryActionRow.setOrientation(LinearLayout.HORIZONTAL);
+        secondaryActionRow.setGravity(Gravity.CENTER_VERTICAL);
 
-        // Tapping card loads sermon into player
-        card.setOnClickListener(v -> startPlayback(sermon));
+        if (sermon.hasPdf()) {
+            Button btnNotes = new Button(activity);
+            btnNotes.setText("📄 Notes (PDF)");
+            btnNotes.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            btnNotes.setTypeface(Typeface.DEFAULT_BOLD);
+            btnNotes.setTextColor(COLOR_PRIMARY_PURPLE);
+            btnNotes.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+            btnNotes.setPadding(dp(8), dp(6), dp(8), dp(6));
+            LinearLayout.LayoutParams lpNotes = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+            lpNotes.setMargins(0, 0, dp(4), 0);
+            btnNotes.setLayoutParams(lpNotes);
+            btnNotes.setOnClickListener(v -> openPdfNotes(activity, sermon.getPdfUrl()));
+            secondaryActionRow.addView(btnNotes);
+        }
+
+        Button btnShare = new Button(activity);
+        btnShare.setText("💬 Share");
+        btnShare.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnShare.setTypeface(Typeface.DEFAULT_BOLD);
+        btnShare.setTextColor(COLOR_PRIMARY_PURPLE);
+        btnShare.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        btnShare.setPadding(dp(8), dp(6), dp(8), dp(6));
+        LinearLayout.LayoutParams lpShare = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lpShare.setMargins(0, 0, dp(4), 0);
+        btnShare.setLayoutParams(lpShare);
+        btnShare.setOnClickListener(v -> YouTubeFeedRepository.shareSermonToWhatsApp(activity, sermon));
+        secondaryActionRow.addView(btnShare);
+
+        if (isLocalAudio) {
+            final Button btnDownload = new Button(activity);
+            String initialStatus = downloadStatusMap.containsKey(sermon.getId())
+                    ? downloadStatusMap.get(sermon.getId())
+                    : (sermon.isDownloaded() ? "DOWNLOADED" : "STREAMING");
+            updateDownloadActionButton(btnDownload, initialStatus);
+            LinearLayout.LayoutParams lpBtnDl = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+            btnDownload.setLayoutParams(lpBtnDl);
+            btnDownload.setOnClickListener(v -> handleDownloadAction(sermon, tvDownloadBadge, btnDownload));
+            secondaryActionRow.addView(btnDownload);
+        }
+
+        card.addView(secondaryActionRow);
+
+        // Tapping card opens video if video-only, else loads sermon into player
+        card.setOnClickListener(v -> {
+            if (sermon.hasVideo() && !isLocalAudio) {
+                YouTubeFeedRepository.openVideo(activity, sermon.getVideoUrl());
+            } else {
+                startPlayback(sermon);
+            }
+        });
 
         return card;
+    }
+
+    /**
+     * Opens PDF study notes in an external viewer or browser.
+     */
+    public static void openPdfNotes(@NonNull Context context, @Nullable String pdfUrl) {
+        if (pdfUrl == null || pdfUrl.trim().isEmpty()) {
+            Toast.makeText(context, "No PDF study notes available for this sermon.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            Uri uri = Uri.parse(pdfUrl);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            try {
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(pdfUrl));
+                webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(webIntent);
+            } catch (Exception ex) {
+                Toast.makeText(context, "Unable to open PDF notes: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void updateDownloadBadgeView(TextView badge, String status) {

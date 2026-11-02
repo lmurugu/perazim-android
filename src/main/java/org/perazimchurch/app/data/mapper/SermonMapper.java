@@ -36,6 +36,7 @@ public final class SermonMapper {
                 0L
         );
         sermon.setLocalAudioPath(entity.getLocalAudioPath());
+        sermon.setNotes(entity.getNotes());
         return sermon;
     }
 
@@ -50,6 +51,8 @@ public final class SermonMapper {
             } catch (NumberFormatException ignored) {
             }
         }
+        String notesValue = domain.getNotes() != null ? domain.getNotes()
+                : (domain.getPdfUrl() != null ? domain.getPdfUrl() : "");
         return new SermonEntity(
                 domain.getId() != null ? domain.getId() : "",
                 domain.getTitle(),
@@ -61,7 +64,7 @@ public final class SermonMapper {
                 dateMillis,
                 (int) domain.getDurationSeconds(),
                 domain.getDescription(),
-                "",
+                notesValue,
                 domain.isDownloaded(),
                 domain.getLocalAudioPath() != null ? domain.getLocalAudioPath() : ""
         );
