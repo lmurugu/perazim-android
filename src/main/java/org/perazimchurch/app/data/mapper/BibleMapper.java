@@ -291,7 +291,9 @@ public final class BibleMapper {
         if (entity == null) {
             return null;
         }
-        String resolvedTransId = (translationId != null && !translationId.isEmpty()) ? translationId : "KJV";
+        String resolvedTransId = (translationId != null && !translationId.isEmpty())
+                ? translationId
+                : (entity.getTranslationId() != null && !entity.getTranslationId().isEmpty() ? entity.getTranslationId() : "KJV");
         String resolvedBookId = bookId;
         if (resolvedBookId == null || resolvedBookId.isEmpty()) {
             resolvedBookId = extractBookId(entity);
@@ -313,14 +315,18 @@ public final class BibleMapper {
             return null;
         }
         String bId = domain.getBookId() != null ? domain.getBookId() : "GEN";
+        String transId = domain.getTranslationId() != null && !domain.getTranslationId().trim().isEmpty()
+                ? domain.getTranslationId().trim().toUpperCase(Locale.US)
+                : "KJV";
         String id = domain.getId();
         if (id == null || id.trim().isEmpty()) {
-            id = bId + "." + domain.getChapterNumber() + "." + domain.getVerseNumber();
+            id = transId + "." + bId + "." + domain.getChapterNumber() + "." + domain.getVerseNumber();
         }
         String chapterId = bId + "." + domain.getChapterNumber();
         int bookNumber = resolveBookNumber(bId);
         return new BibleVerseEntity(
                 id,
+                transId,
                 chapterId,
                 bookNumber,
                 domain.getChapterNumber(),

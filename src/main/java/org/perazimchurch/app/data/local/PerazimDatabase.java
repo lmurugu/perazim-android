@@ -78,7 +78,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         SyncMetadataEntity.class,
         DownloadedContentEntity.class
     },
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters({Converters.class})
@@ -115,6 +115,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
                             PerazimDatabase.class,
                             DATABASE_NAME
                     )
+                    .createFromAsset("database/perazim_database.db")
                     .fallbackToDestructiveMigration()
                     .build();
                 }

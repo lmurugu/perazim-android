@@ -328,6 +328,39 @@ public final class BibleDataSeeder {
                 "Public Domain"
         );
         bibleDao.insertTranslation(suv);
+
+        BibleTranslationEntity niv = new BibleTranslationEntity(
+                "NIV",
+                "NIV",
+                "New International Version",
+                "en",
+                "New International Version",
+                false,
+                "Biblica"
+        );
+        bibleDao.insertTranslation(niv);
+
+        BibleTranslationEntity esv = new BibleTranslationEntity(
+                "ESV",
+                "ESV",
+                "English Standard Version",
+                "en",
+                "English Standard Version",
+                false,
+                "Crossway"
+        );
+        bibleDao.insertTranslation(esv);
+
+        BibleTranslationEntity nkjv = new BibleTranslationEntity(
+                "NKJV",
+                "NKJV",
+                "New King James Version",
+                "en",
+                "New King James Version",
+                false,
+                "Thomas Nelson"
+        );
+        bibleDao.insertTranslation(nkjv);
     }
 
     private static void seedBooks(@Nullable Context context, BibleDao bibleDao) {

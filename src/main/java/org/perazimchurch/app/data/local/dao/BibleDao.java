@@ -75,13 +75,22 @@ public interface BibleDao {
     @Query("SELECT * FROM bible_verses WHERE id = :id LIMIT 1")
     BibleVerseEntity getVerseById(String id);
 
-    @Query("SELECT * FROM bible_verses WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber ORDER BY verseNumber ASC")
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber ORDER BY verseNumber ASC")
+    List<BibleVerseEntity> getVerses(String translationId, int bookNumber, int chapterNumber);
+
+    @Query("SELECT * FROM bible_verses WHERE (translationId = 'KJV' OR translationId IS NULL) AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber ORDER BY verseNumber ASC")
     List<BibleVerseEntity> getVerses(int bookNumber, int chapterNumber);
 
-    @Query("SELECT * FROM bible_verses WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
+    BibleVerseEntity getVerse(String translationId, int bookNumber, int chapterNumber, int verseNumber);
+
+    @Query("SELECT * FROM bible_verses WHERE (translationId = 'KJV' OR translationId IS NULL) AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
     BibleVerseEntity getVerse(int bookNumber, int chapterNumber, int verseNumber);
 
-    @Query("SELECT * FROM bible_verses WHERE text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
+    List<BibleVerseEntity> searchVerses(String translationId, String query);
+
+    @Query("SELECT * FROM bible_verses WHERE (translationId = 'KJV' OR translationId IS NULL) AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
     List<BibleVerseEntity> searchVerses(String query);
 
     @Query("SELECT * FROM bible_verses WHERE isFavorite = 1 ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC")

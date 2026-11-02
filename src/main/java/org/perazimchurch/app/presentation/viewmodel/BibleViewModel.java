@@ -80,13 +80,21 @@ public class BibleViewModel extends ViewModel {
     }
 
     /**
-     * Loads chapter verses for a specific book and chapter number.
+     * Loads chapter verses for a specific book and chapter number with default KJV translation.
      */
     public void loadVerses(@NonNull String bookId, int chapter, @Nullable Consumer<List<BibleVerse>> callback) {
+        loadVerses("KJV", bookId, chapter, callback);
+    }
+
+    /**
+     * Loads chapter verses for a specific translation, book, and chapter number.
+     */
+    public void loadVerses(@NonNull String translationId, @NonNull String bookId, int chapter, @Nullable Consumer<List<BibleVerse>> callback) {
         versesState.postValue(UiState.loading());
         executor.execute(() -> {
             try {
-                List<BibleVerse> verses = bibleRepo.getVersesForChapter("KJV", bookId, chapter);
+                String trans = (translationId != null && !translationId.trim().isEmpty()) ? translationId.trim() : "KJV";
+                List<BibleVerse> verses = bibleRepo.getVersesForChapter(trans, bookId, chapter);
                 if (verses == null || verses.isEmpty()) {
                     versesState.postValue(UiState.empty());
                 } else {
@@ -97,7 +105,7 @@ public class BibleViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading verses for book: " + bookId + " ch: " + chapter, e);
+                Log.e(TAG, "Error loading verses for trans: " + translationId + " book: " + bookId + " ch: " + chapter, e);
                 versesState.postValue(UiState.error(e.getMessage() != null ? e.getMessage() : "Failed to load verses"));
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
@@ -107,18 +115,26 @@ public class BibleViewModel extends ViewModel {
     }
 
     /**
-     * Searches Holy Scripture across canonical verses for matching keywords.
+     * Searches Holy Scripture across canonical verses for matching keywords using default KJV.
      */
     public void searchScripture(@NonNull String query, @Nullable Consumer<List<BibleVerse>> callback) {
+        searchScripture("KJV", query, callback);
+    }
+
+    /**
+     * Searches Holy Scripture for matching keywords in a specific translation.
+     */
+    public void searchScripture(@NonNull String translationId, @NonNull String query, @Nullable Consumer<List<BibleVerse>> callback) {
         executor.execute(() -> {
             try {
-                List<BibleVerse> results = bibleRepo.searchScripture("KJV", query);
+                String trans = (translationId != null && !translationId.trim().isEmpty()) ? translationId.trim() : "KJV";
+                List<BibleVerse> results = bibleRepo.searchScripture(trans, query);
                 if (callback != null) {
                     final List<BibleVerse> res = results != null ? results : Collections.emptyList();
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error searching scripture for query: " + query, e);
+                Log.e(TAG, "Error searching scripture for trans: " + translationId + " query: " + query, e);
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }

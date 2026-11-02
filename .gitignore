@@ -28,6 +28,7 @@ gradle-8.5-bin.zip
 *~
 *.db
 *.db-*
+!src/main/assets/database/*.db
 *.png
 FORENSIC_*.md
 forensic/

@@ -88,32 +88,30 @@ public class RoomBibleRepository implements BibleRepository {
 
     @Override
     public List<BibleVerse> getVersesForChapter(String translationId, String bookId, int chapterNumber) {
-        int bookNumber = resolveBookNumber(translationId, bookId);
-        List<BibleVerseEntity> entities = bibleDao.getVerses(bookNumber, chapterNumber);
-        if (entities == null || entities.isEmpty()) {
-            BibleDataSeeder.seedIfNeeded(null, bibleDao);
-            entities = bibleDao.getVerses(bookNumber, chapterNumber);
-        }
         String resolvedTranslation = (translationId != null && !translationId.isEmpty())
                 ? translationId
                 : resolveDefaultTranslationId();
+        int bookNumber = resolveBookNumber(resolvedTranslation, bookId);
+        List<BibleVerseEntity> entities = bibleDao.getVerses(resolvedTranslation, bookNumber, chapterNumber);
+        if (entities == null || entities.isEmpty()) {
+            entities = bibleDao.getVerses(bookNumber, chapterNumber);
+        }
         return BibleMapper.toDomainVerseList(entities, resolvedTranslation, bookId);
     }
 
     @Override
     public BibleVerse getVerse(String translationId, String bookId, int chapterNumber, int verseNumber) {
-        int bookNumber = resolveBookNumber(translationId, bookId);
-        BibleVerseEntity entity = bibleDao.getVerse(bookNumber, chapterNumber, verseNumber);
+        String resolvedTranslation = (translationId != null && !translationId.isEmpty())
+                ? translationId
+                : resolveDefaultTranslationId();
+        int bookNumber = resolveBookNumber(resolvedTranslation, bookId);
+        BibleVerseEntity entity = bibleDao.getVerse(resolvedTranslation, bookNumber, chapterNumber, verseNumber);
         if (entity == null) {
-            BibleDataSeeder.seedIfNeeded(null, bibleDao);
             entity = bibleDao.getVerse(bookNumber, chapterNumber, verseNumber);
         }
         if (entity == null) {
             return null;
         }
-        String resolvedTranslation = (translationId != null && !translationId.isEmpty())
-                ? translationId
-                : resolveDefaultTranslationId();
         return BibleMapper.toDomain(entity, resolvedTranslation, bookId);
     }
 
@@ -122,25 +120,19 @@ public class RoomBibleRepository implements BibleRepository {
         if (query == null || query.trim().isEmpty()) {
             return Collections.emptyList();
         }
-        String cleanQuery = query.trim();
-        List<BibleVerseEntity> entities = bibleDao.searchVerses(cleanQuery);
-        if ((entities == null || entities.isEmpty()) && cleanQuery.contains("-")) {
-            entities = bibleDao.searchVerses(cleanQuery.replace("-", " ").trim());
-        } else if ((entities == null || entities.isEmpty()) && cleanQuery.contains(" ")) {
-            entities = bibleDao.searchVerses(cleanQuery.replace(" ", "-").trim());
-        }
-        if (entities == null || entities.isEmpty()) {
-            BibleDataSeeder.seedIfNeeded(null, bibleDao);
-            entities = bibleDao.searchVerses(cleanQuery);
-            if ((entities == null || entities.isEmpty()) && cleanQuery.contains("-")) {
-                entities = bibleDao.searchVerses(cleanQuery.replace("-", " ").trim());
-            } else if ((entities == null || entities.isEmpty()) && cleanQuery.contains(" ")) {
-                entities = bibleDao.searchVerses(cleanQuery.replace(" ", "-").trim());
-            }
-        }
         String resolvedTranslation = (translationId != null && !translationId.isEmpty())
                 ? translationId
                 : resolveDefaultTranslationId();
+        String cleanQuery = query.trim();
+        List<BibleVerseEntity> entities = bibleDao.searchVerses(resolvedTranslation, cleanQuery);
+        if ((entities == null || entities.isEmpty()) && cleanQuery.contains("-")) {
+            entities = bibleDao.searchVerses(resolvedTranslation, cleanQuery.replace("-", " ").trim());
+        } else if ((entities == null || entities.isEmpty()) && cleanQuery.contains(" ")) {
+            entities = bibleDao.searchVerses(resolvedTranslation, cleanQuery.replace(" ", "-").trim());
+        }
+        if (entities == null || entities.isEmpty()) {
+            entities = bibleDao.searchVerses(cleanQuery);
+        }
         return BibleMapper.toDomainVerseList(entities, resolvedTranslation);
     }
 

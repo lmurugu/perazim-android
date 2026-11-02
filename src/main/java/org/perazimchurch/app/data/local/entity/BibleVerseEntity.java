@@ -12,6 +12,7 @@ import androidx.room.PrimaryKey;
 @Entity(
     tableName = "bible_verses",
     indices = {
+        @Index(value = {"translationId", "bookNumber", "chapterNumber", "verseNumber"}),
         @Index(value = {"bookNumber", "chapterNumber", "verseNumber"})
     }
 )
@@ -20,6 +21,7 @@ public class BibleVerseEntity {
     @PrimaryKey
     @NonNull
     private String id;
+    private String translationId;
     private String chapterId;
     private int bookNumber;
     private int chapterNumber;
@@ -31,13 +33,21 @@ public class BibleVerseEntity {
     @androidx.room.Ignore
     public BibleVerseEntity(@NonNull String id, String chapterId, int bookNumber,
                             int chapterNumber, int verseNumber, String text) {
-        this(id, chapterId, bookNumber, chapterNumber, verseNumber, text, false, null);
+        this(id, "KJV", chapterId, bookNumber, chapterNumber, verseNumber, text, false, null);
     }
 
+    @androidx.room.Ignore
     public BibleVerseEntity(@NonNull String id, String chapterId, int bookNumber,
                             int chapterNumber, int verseNumber, String text,
                             boolean isFavorite, String note) {
+        this(id, "KJV", chapterId, bookNumber, chapterNumber, verseNumber, text, isFavorite, note);
+    }
+
+    public BibleVerseEntity(@NonNull String id, String translationId, String chapterId, int bookNumber,
+                            int chapterNumber, int verseNumber, String text,
+                            boolean isFavorite, String note) {
         this.id = id;
+        this.translationId = (translationId != null && !translationId.trim().isEmpty()) ? translationId : "KJV";
         this.chapterId = chapterId;
         this.bookNumber = bookNumber;
         this.chapterNumber = chapterNumber;
@@ -50,6 +60,9 @@ public class BibleVerseEntity {
     @NonNull
     public String getId() { return id; }
     public void setId(@NonNull String id) { this.id = id; }
+
+    public String getTranslationId() { return translationId; }
+    public void setTranslationId(String translationId) { this.translationId = translationId; }
 
     public String getChapterId() { return chapterId; }
     public void setChapterId(String chapterId) { this.chapterId = chapterId; }

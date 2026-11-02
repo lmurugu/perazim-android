@@ -99,6 +99,7 @@ public class BibleReaderDialog extends Dialog {
     private final BibleViewModel bibleViewModel;
 
     // Active Reader State
+    private String currentTranslation = "KJV";
     private String currentBookId = "2SA";
     private String currentBookName = "2 Samuel";
     private int currentChapter = 5;
@@ -278,19 +279,13 @@ public class BibleReaderDialog extends Dialog {
         topRow.setGravity(Gravity.CENTER_VERTICAL);
 
         tvTranslationBadge = new TextView(getContext());
-        tvTranslationBadge.setText("KJV (66-Book Catalog & Core Starter Verses)");
+        updateTranslationBadge();
         tvTranslationBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvTranslationBadge.setTypeface(Typeface.DEFAULT_BOLD);
         tvTranslationBadge.setTextColor(COLOR_PRIMARY_PURPLE);
         tvTranslationBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
         tvTranslationBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
-        tvTranslationBadge.setOnClickListener(v -> {
-            new AlertDialog.Builder(getContext())
-                    .setTitle("Bible Translation")
-                    .setMessage("Active: KJV (66-Book Catalog & Core Starter Verses)\n\nCanonical 66-book catalog with core starter verses offline. The complete 31,102-verse corpus syncs in Phase 4.")
-                    .setPositiveButton("OK", null)
-                    .show();
-        });
+        tvTranslationBadge.setOnClickListener(v -> showTranslationSelectorDialog());
         topRow.addView(tvTranslationBadge);
 
         View space = new View(getContext());
@@ -466,6 +461,45 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
+    private void updateTranslationBadge() {
+        if (tvTranslationBadge != null) {
+            tvTranslationBadge.setText("📜 " + currentTranslation + " ▾");
+        }
+    }
+
+    private void showTranslationSelectorDialog() {
+        final String[] translationIds = {"KJV", "SUV", "NIV", "ESV", "NKJV"};
+        final String[] translationLabels = {
+                "King James Version (KJV)",
+                "Swahili Union Version (SUV)",
+                "New International Version (NIV)",
+                "English Standard Version (ESV)",
+                "New King James Version (NKJV)"
+        };
+
+        int selectedIndex = 0;
+        for (int i = 0; i < translationIds.length; i++) {
+            if (translationIds[i].equalsIgnoreCase(currentTranslation)) {
+                selectedIndex = i;
+                break;
+            }
+        }
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Select Translation / Chagua Tafsiri")
+                .setSingleChoiceItems(translationLabels, selectedIndex, (dialog, which) -> {
+                    String chosen = translationIds[which];
+                    dialog.dismiss();
+                    if (!chosen.equalsIgnoreCase(currentTranslation)) {
+                        currentTranslation = chosen;
+                        updateTranslationBadge();
+                        loadChapterVerses(currentBookId, currentChapter);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
     // =========================================================================
     // SCRIPTURE DATA LOADING & SEARCH
     // =========================================================================
@@ -511,7 +545,7 @@ public class BibleReaderDialog extends Dialog {
         tvEmptyState.setVisibility(View.GONE);
         clearVerseViews();
 
-        bibleViewModel.loadVerses(bookId, chapter, verses -> {
+        bibleViewModel.loadVerses(currentTranslation, bookId, chapter, verses -> {
             loadingProgress.setVisibility(View.GONE);
             if (verses != null && !verses.isEmpty()) {
                 currentVerses.clear();
@@ -574,7 +608,7 @@ public class BibleReaderDialog extends Dialog {
         tvEmptyState.setVisibility(View.GONE);
         clearVerseViews();
 
-        bibleViewModel.searchScripture(query, results -> {
+        bibleViewModel.searchScripture(currentTranslation, query, results -> {
             loadingProgress.setVisibility(View.GONE);
             searchResults.clear();
             if (results != null && !results.isEmpty()) {
