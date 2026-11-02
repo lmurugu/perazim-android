@@ -43,6 +43,7 @@ import org.perazimchurch.app.data.local.preference.GamificationStore;
 import org.perazimchurch.app.data.mapper.UserMapper;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.navigation.NavigationContract;
+import org.perazimchurch.app.presentation.ui.AiBreakthroughGuideDialog;
 import org.perazimchurch.app.presentation.ui.BibleReaderDialog;
 import org.perazimchurch.app.presentation.ui.FellowshipUiBinder;
 import org.perazimchurch.app.presentation.ui.HomeUiBinder;
@@ -364,6 +365,21 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         topGiveBtn.setLayoutParams(lpGive);
         topGiveBtn.setOnClickListener(v -> showGivingDialog());
         header.addView(topGiveBtn);
+
+        // AI Breakthrough Guide Chatbot Button
+        Button btnAiGuide = new Button(this);
+        btnAiGuide.setText("🤖 Guide");
+        btnAiGuide.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnAiGuide.setTypeface(Typeface.DEFAULT_BOLD);
+        btnAiGuide.setTextColor(COLOR_WHITE);
+        btnAiGuide.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 2));
+        btnAiGuide.setPadding(dp(8), dp(4), dp(8), dp(4));
+        LinearLayout.LayoutParams lpAi = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpAi.setMargins(dp(4), 0, 0, 0);
+        btnAiGuide.setLayoutParams(lpAi);
+        btnAiGuide.setOnClickListener(v -> showAiBreakthroughGuide());
+        header.addView(btnAiGuide);
 
         return header;
     }
@@ -1733,6 +1749,61 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         builder.setView(container);
         builder.setNegativeButton("Close", null);
         builder.show();
+    }
+
+    // =========================================================================
+    // 7B. PERAZIM BREAKTHROUGH GUIDE (ON-DEVICE AI CHATBOT)
+    // =========================================================================
+
+    private void showAiBreakthroughGuide() {
+        AiBreakthroughGuideDialog dialog = new AiBreakthroughGuideDialog(this, new AiBreakthroughGuideDialog.AiActionListener() {
+            @Override
+            public void onNavigateTab(int tabIndex) {
+                switchTab(tabIndex);
+            }
+
+            @Override
+            public void onOpenGiving() {
+                switchTab(0);
+                showGivingDialog();
+            }
+
+            @Override
+            public void onOpenLiveSermons() {
+                switchTab(1);
+            }
+
+            @Override
+            public void onOpenBible(String book) {
+                showFullScriptureDialog();
+            }
+
+            @Override
+            public void onLaunchRiddles() {
+                try {
+                    Intent intent = new Intent(MainActivity.this, RiddlesActivity.class);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Opening Riddles...", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onLaunchJokes() {
+                try {
+                    Intent intent = new Intent(MainActivity.this, JokesActivity.class);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Opening Jokes...", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onStartReflections() {
+                switchTab(0);
+            }
+        });
+        dialog.show();
     }
 
     // =========================================================================
