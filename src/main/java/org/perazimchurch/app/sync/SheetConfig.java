@@ -16,23 +16,29 @@ public final class SheetConfig {
     private static final String PREFS_NAME = "perazim_sheet_config";
 
     public enum Tab {
-        ANNOUNCEMENTS("sheet_url_announcements"),
-        EVENTS("sheet_url_events"),
-        HYMNS("sheet_url_hymns"),
-        RIDDLES("sheet_url_riddles"),
-        JOKES("sheet_url_jokes"),
-        SERMONS("sheet_url_sermons"),
-        VERSES("sheet_url_verses"),
-        CONFIG("sheet_url_config");
+        ANNOUNCEMENTS("sheet_url_announcements", org.perazimchurch.app.BuildConfig.SHEET_URL_ANNOUNCEMENTS),
+        EVENTS("sheet_url_events", org.perazimchurch.app.BuildConfig.SHEET_URL_EVENTS),
+        HYMNS("sheet_url_hymns", org.perazimchurch.app.BuildConfig.SHEET_URL_HYMNS),
+        RIDDLES("sheet_url_riddles", org.perazimchurch.app.BuildConfig.SHEET_URL_RIDDLES),
+        JOKES("sheet_url_jokes", org.perazimchurch.app.BuildConfig.SHEET_URL_JOKES),
+        SERMONS("sheet_url_sermons", org.perazimchurch.app.BuildConfig.SHEET_URL_SERMONS),
+        VERSES("sheet_url_verses", org.perazimchurch.app.BuildConfig.SHEET_URL_VERSES),
+        CONFIG("sheet_url_config", org.perazimchurch.app.BuildConfig.SHEET_URL_CONFIG);
 
         private final String prefKey;
+        private final String defaultUrl;
 
-        Tab(String prefKey) {
+        Tab(String prefKey, String defaultUrl) {
             this.prefKey = prefKey;
+            this.defaultUrl = (defaultUrl != null) ? defaultUrl : "";
         }
 
         public String getPrefKey() {
             return prefKey;
+        }
+
+        public String getDefaultUrl() {
+            return defaultUrl;
         }
     }
 
@@ -44,11 +50,16 @@ public final class SheetConfig {
 
     /**
      * Gets the configured published CSV URL for a specific tab.
-     * Returns empty string if not configured.
+     * Checks user SharedPreferences first; falls back to build-time BuildConfig default;
+     * returns empty string if unconfigured.
      */
     @NonNull
     public static String getTabUrl(@NonNull Context context, @NonNull Tab tab) {
-        return getPrefs(context).getString(tab.getPrefKey(), "");
+        String url = getPrefs(context).getString(tab.getPrefKey(), "");
+        if (url == null || url.trim().isEmpty()) {
+            url = tab.getDefaultUrl();
+        }
+        return url != null ? url.trim() : "";
     }
 
     /**

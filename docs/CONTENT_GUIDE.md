@@ -110,7 +110,7 @@ The Cornerstone Scripture shown at the top of the Home screen for each calendar 
 * **`reference`**: Bible reference (e.g. `Isaiah 40:31`).
 * **`text`**: The full scripture text.
 
-> **Fallback**: If the sheet has no verse specified for a certain day, the app automatically displays the church cornerstone verse: **2 Samuel 5:20** (*"Baal-perazim"*).
+> **Pilot Scope & Fallback**: The initial template covers 7 days (2026-11-03 to 2026-11-09). After the last row (or on any calendar date not listed in the sheet), the app automatically falls back to showing the church foundation scripture: **2 Samuel 5:20** (*"And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters."*).
 
 ---
 

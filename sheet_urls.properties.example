@@ -1,0 +1,14 @@
+# Google Sheet Published CSV Tab URLs for Perazim Church Content Master
+# Format: https://docs.google.com/spreadsheets/d/e/<SPREADSHEET_ID>/pub?gid=<TAB_GID>&single=true&output=csv
+#
+# Levi sends the 8 URLs in chat and Antigravity enters them.
+# If these properties are empty, the app gracefully falls back to local pre-seeded database content.
+
+sheet_url_announcements=
+sheet_url_events=
+sheet_url_hymns=
+sheet_url_riddles=
+sheet_url_jokes=
+sheet_url_sermons=
+sheet_url_verses=
+sheet_url_config=

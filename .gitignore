@@ -40,6 +40,7 @@ forensic/
 *credential*.json
 daraja_config.properties
 secrets.properties
+sheet_urls.properties
 keystore.properties
 *.keystore
 *.jks

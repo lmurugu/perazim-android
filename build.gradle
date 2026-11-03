@@ -6,16 +6,34 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def sheetPropertiesFile = file("sheet_urls.properties")
+def sheetProperties = new Properties()
+if (sheetPropertiesFile.exists()) {
+    sheetProperties.load(new FileInputStream(sheetPropertiesFile))
+}
+
 android {
     namespace 'org.perazimchurch.app'
     compileSdk 34
     compileOptions { sourceCompatibility JavaVersion.VERSION_11; targetCompatibility JavaVersion.VERSION_11 }
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId "org.perazimchurch.app"
         minSdk 24
         targetSdk 34
         versionCode 4
         versionName "2.2.0"
+
+        buildConfigField "String", "SHEET_URL_ANNOUNCEMENTS", "\"${sheetProperties.getProperty('sheet_url_announcements', '')}\""
+        buildConfigField "String", "SHEET_URL_EVENTS", "\"${sheetProperties.getProperty('sheet_url_events', '')}\""
+        buildConfigField "String", "SHEET_URL_HYMNS", "\"${sheetProperties.getProperty('sheet_url_hymns', '')}\""
+        buildConfigField "String", "SHEET_URL_RIDDLES", "\"${sheetProperties.getProperty('sheet_url_riddles', '')}\""
+        buildConfigField "String", "SHEET_URL_JOKES", "\"${sheetProperties.getProperty('sheet_url_jokes', '')}\""
+        buildConfigField "String", "SHEET_URL_SERMONS", "\"${sheetProperties.getProperty('sheet_url_sermons', '')}\""
+        buildConfigField "String", "SHEET_URL_VERSES", "\"${sheetProperties.getProperty('sheet_url_verses', '')}\""
+        buildConfigField "String", "SHEET_URL_CONFIG", "\"${sheetProperties.getProperty('sheet_url_config', '')}\""
     }
     signingConfigs {
         release {

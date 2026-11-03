@@ -57,9 +57,9 @@ To allow the Android app to read updates without authentication or API keys:
 
 ## 4. Configure the URLs in the App
 
-The app can either:
-- Store the published URLs in `SheetConfig` preferences via the app settings.
-- Or have the base document ID pre-baked as default fallback so all 8 `gid` tabs resolve automatically.
+Levi sends the 8 URLs in chat and Antigravity enters them. Levi does not run any commands or builds.
+
+Once Antigravity enters the URLs into `sheet_urls.properties` and builds the app, the endpoints are embedded directly into `SheetConfig`.
 
 ### Verifying the Setup:
 1. Open the Perazim App on your Android device.
