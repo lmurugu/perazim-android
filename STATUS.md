@@ -5,7 +5,7 @@
 > **Target Audience**: 100-Member Pilot (Embu Headquarters & Satellite Campuses)  
 > **Audit Date**: November 3, 2026  
 > **Audit Branch**: `feature/dynamic-community` (Stage 1: Google Sheet Dynamic Content)  
-> **Audit Commit**: `1d621ccd0cb55f214cfc832d86e07943e5080b14`  
+> **Audit Commit**: `7761f5d328c2174b9fb943c88200aa9f8f3ccb5c`  
 > **Policy**: Zero unsubstantiated claims. Every feature is strictly verified against actual implementation and backed by hardware screenshots and `uiautomator` text dumps.
 
 ---
