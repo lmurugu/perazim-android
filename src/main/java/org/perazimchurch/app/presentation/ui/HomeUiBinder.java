@@ -44,6 +44,8 @@ import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.data.local.entity.DailyVerseEntity;
+import org.perazimchurch.app.data.local.preference.GamificationStore;
+import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.model.Announcement;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.domain.model.BibleVerse;
@@ -160,16 +162,37 @@ public class HomeUiBinder {
                 : ViewModelFactory.getInstance(context).createBibleViewModel();
         this.listener = listener;
         if (this.context != null) {
-            String uid = "user_me";
-            try {
-                org.perazimchurch.app.data.local.session.SessionManager sm = org.perazimchurch.app.data.local.session.SessionManager.getInstance(this.context);
-                if (sm != null && sm.getActiveUserId() != null) uid = sm.getActiveUserId();
-            } catch (Exception ignored) {}
-            this.streakCount = org.perazimchurch.app.data.local.preference.GamificationStore.getStreak(this.context, uid, 0);
-            this.xpCount = org.perazimchurch.app.data.local.preference.GamificationStore.getSpiritualXp(this.context, uid, 0);
+            String uid = resolveUserId();
+            this.streakCount = GamificationStore.getStreak(this.context, uid, 0);
+            this.xpCount = GamificationStore.getSpiritualXp(this.context, uid, 0);
             try {
                 this.routineStep = this.context.getSharedPreferences("perazim_routine", Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1);
             } catch (Exception ignored) {}
+            syncRoutineStateWithGamificationStore();
+        }
+    }
+
+    private String resolveUserId() {
+        if (context == null) return "user_me";
+        try {
+            SessionManager sm = SessionManager.getInstance(context);
+            if (sm != null && sm.getActiveUserId() != null && !sm.getActiveUserId().trim().isEmpty()) {
+                return sm.getActiveUserId();
+            }
+        } catch (Exception ignored) {}
+        return "user_me";
+    }
+
+    private void syncRoutineStateWithGamificationStore() {
+        if (context == null) return;
+        String uid = resolveUserId();
+        boolean completedToday = GamificationStore.isRoutineCompletedToday(context, uid);
+        if (completedToday) {
+            routineStep = 4;
+            progressPercent = 100;
+        } else if (routineStep >= 4) {
+            routineStep = 1;
+            progressPercent = 0;
         }
     }
 
@@ -347,6 +370,8 @@ public class HomeUiBinder {
         header.setTypeface(Typeface.DEFAULT_BOLD);
         header.setTextColor(COLOR_PRIMARY_PURPLE);
         card.addView(header);
+
+        syncRoutineStateWithGamificationStore();
 
         if (routineStep >= 4) {
             progressPercent = 100;
@@ -574,11 +599,15 @@ public class HomeUiBinder {
             homeViewModel.completeDailyReflection(reflectionId, () -> {
                 routineStep = 4;
                 saveRoutineState(null);
-                streakCount += 1;
-                if (listener != null) {
-                    listener.onStreakUpdated(streakCount);
+                String uid = resolveUserId();
+                boolean isNewDay = GamificationStore.recordDailyRoutineCompleted(context, uid, streakCount + 1);
+                if (isNewDay) {
+                    streakCount += 1;
+                    if (listener != null) {
+                        listener.onStreakUpdated(streakCount);
+                    }
+                    awardXp(20);
                 }
-                awardXp(20);
                 progressPercent = 100;
                 if (progressBarDaily != null) {
                     progressBarDaily.setProgress(progressPercent);
@@ -589,16 +618,20 @@ public class HomeUiBinder {
                 updateRoutineView();
 
                 // Celebratory Toast & Modal
-                Toast.makeText(context, "🎉 3-Minute Daily Reflection Completed! +20 Spiritual XP awarded!", Toast.LENGTH_LONG).show();
+                if (isNewDay) {
+                    Toast.makeText(context, "🎉 3-Minute Daily Reflection Completed! +20 Spiritual XP awarded!", Toast.LENGTH_LONG).show();
 
-                new AlertDialog.Builder(context)
-                        .setTitle("🎉 Breakthrough Routine Completed!")
-                        .setMessage("Hallelujah! You completed today's 3-Minute Breakthrough Reflection!\n\n"
-                                + "• Spiritual XP: +20 XP (Total: " + xpCount + " ⭐)\n"
-                                + "• Active Streak: " + streakCount + " Days 🔥\n\n"
-                                + "“The LORD will make you the head and not the tail; you shall be above only and not beneath.” — Deuteronomy 28:13")
-                        .setPositiveButton("Amen! Receive Breakthrough", null)
-                        .show();
+                    new AlertDialog.Builder(context)
+                            .setTitle("🎉 Breakthrough Routine Completed!")
+                            .setMessage("Hallelujah! You completed today's 3-Minute Breakthrough Reflection!\n\n"
+                                    + "• Spiritual XP: +20 XP (Total: " + xpCount + " ⭐)\n"
+                                    + "• Active Streak: " + streakCount + " Days 🔥\n\n"
+                                    + "“The LORD will make you the head and not the tail; you shall be above only and not beneath.” — Deuteronomy 28:13")
+                            .setPositiveButton("Amen! Receive Breakthrough", null)
+                            .show();
+                } else {
+                    Toast.makeText(context, "🎉 You have already completed today's reflection! Keep the fire burning!", Toast.LENGTH_SHORT).show();
+                }
             }, error -> {
                 btnRoutineNext.setEnabled(true);
                 btnRoutineNext.setText("🙏 Complete Reflection (+20 XP)");
@@ -608,8 +641,7 @@ public class HomeUiBinder {
     }
 
     private void updateRoutineView() {
-        // Restore persisted routine state before applying view
-        restoreRoutineState(null);  // NOTE: correct lifecycle integration needs Activity onSave/onRestore; this at minimum applies current saved state if present via instance backup
+        syncRoutineStateWithGamificationStore();
 
         Reflection refl = (cachedHomeData != null) ? cachedHomeData.getTodayReflection() : null;
 
@@ -1364,10 +1396,16 @@ public class HomeUiBinder {
         }
     }
     public void restoreRoutineState(android.os.Bundle savedInstanceState) {
-        if (savedInstanceState != null) routineStep = savedInstanceState.getInt(KEY_ROUTINE_STEP, 1);
-        else {
+        if (savedInstanceState != null) {
+            routineStep = savedInstanceState.getInt(KEY_ROUTINE_STEP, 1);
+        } else {
             // Restore from durable SP if Bundle not present (process death, fresh start with preserved state)
-            try { if (context != null) routineStep = context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1); } catch (Exception e) { /* ignore */ }
+            try {
+                if (context != null) {
+                    routineStep = context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1);
+                }
+            } catch (Exception e) { /* ignore */ }
         }
+        syncRoutineStateWithGamificationStore();
     }
 }

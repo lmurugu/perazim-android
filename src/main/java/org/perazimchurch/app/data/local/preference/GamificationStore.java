@@ -31,12 +31,31 @@ public final class GamificationStore {
 
     public static final String TIMEZONE_NAIROBI = "Africa/Nairobi";
 
+    private static SharedPreferences sOverridePrefs = null;
+
+    /**
+     * Testing hook to inject an in-memory SharedPreferences instance during unit tests.
+     */
+    public static void setPreferencesForTesting(@Nullable SharedPreferences prefs) {
+        sOverridePrefs = prefs;
+    }
+
     private GamificationStore() {
         // Utility class
     }
 
-    private static SharedPreferences getPrefs(Context context) {
+    private static SharedPreferences getPrefs(@Nullable Context context) {
+        if (sOverridePrefs != null) {
+            return sOverridePrefs;
+        }
+        if (context == null) {
+            throw new IllegalArgumentException("Context cannot be null when no test preferences are provided");
+        }
         return context.getApplicationContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+    }
+
+    private static boolean isAvailable(@Nullable Context context) {
+        return context != null || sOverridePrefs != null;
     }
 
     private static String resolveUserId(@Nullable String userId) {
@@ -56,7 +75,7 @@ public final class GamificationStore {
      * Saves the devotional streak count and frozen status for a given user.
      */
     public static void saveStreak(Context context, String userId, int streak, boolean frozen) {
-        if (context == null) return;
+        if (!isAvailable(context)) return;
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putInt(KEY_PREFIX_STREAK + uid, streak)
@@ -68,7 +87,7 @@ public final class GamificationStore {
      * Retrieves the persisted devotional streak for a given user.
      */
     public static int getStreak(Context context, String userId, int defaultStreak) {
-        if (context == null) return defaultStreak;
+        if (!isAvailable(context)) return defaultStreak;
         String uid = resolveUserId(userId);
         return getPrefs(context).getInt(KEY_PREFIX_STREAK + uid, defaultStreak);
     }
@@ -77,7 +96,7 @@ public final class GamificationStore {
      * Retrieves whether the devotional streak is currently frozen/protected for a given user.
      */
     public static boolean isStreakFrozen(Context context, String userId, boolean defaultFrozen) {
-        if (context == null) return defaultFrozen;
+        if (!isAvailable(context)) return defaultFrozen;
         String uid = resolveUserId(userId);
         return getPrefs(context).getBoolean(KEY_PREFIX_FROZEN + uid, defaultFrozen);
     }
@@ -86,7 +105,7 @@ public final class GamificationStore {
      * Saves the total spiritual XP earned by a given user.
      */
     public static void saveSpiritualXp(Context context, String userId, int xp) {
-        if (context == null) return;
+        if (!isAvailable(context)) return;
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putInt(KEY_PREFIX_XP + uid, xp)
@@ -97,7 +116,7 @@ public final class GamificationStore {
      * Retrieves the total spiritual XP for a given user.
      */
     public static int getSpiritualXp(Context context, String userId, int defaultXp) {
-        if (context == null) return defaultXp;
+        if (!isAvailable(context)) return defaultXp;
         String uid = resolveUserId(userId);
         return getPrefs(context).getInt(KEY_PREFIX_XP + uid, defaultXp);
     }
@@ -106,7 +125,7 @@ public final class GamificationStore {
      * Saves the current Grace Points balance for a given user.
      */
     public static void saveGracePoints(Context context, String userId, int points) {
-        if (context == null) return;
+        if (!isAvailable(context)) return;
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putInt(KEY_PREFIX_GRACE + uid, points)
@@ -117,7 +136,7 @@ public final class GamificationStore {
      * Retrieves the current Grace Points balance for a given user.
      */
     public static int getGracePoints(Context context, String userId, int defaultPoints) {
-        if (context == null) return defaultPoints;
+        if (!isAvailable(context)) return defaultPoints;
         String uid = resolveUserId(userId);
         return getPrefs(context).getInt(KEY_PREFIX_GRACE + uid, defaultPoints);
     }
@@ -126,7 +145,7 @@ public final class GamificationStore {
      * Saves the last calendar date on which the daily routine was completed (yyyy-MM-dd).
      */
     public static void saveLastRoutineDate(Context context, String userId, String date) {
-        if (context == null) return;
+        if (!isAvailable(context)) return;
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putString(KEY_PREFIX_LAST_ROUTINE_DATE + uid, date)
@@ -137,7 +156,7 @@ public final class GamificationStore {
      * Retrieves the last routine completion date (yyyy-MM-dd) or defaultDate if not recorded.
      */
     public static String getLastRoutineDate(Context context, String userId, @Nullable String defaultDate) {
-        if (context == null) return defaultDate;
+        if (!isAvailable(context)) return defaultDate;
         String uid = resolveUserId(userId);
         return getPrefs(context).getString(KEY_PREFIX_LAST_ROUTINE_DATE + uid, defaultDate);
     }
@@ -159,7 +178,7 @@ public final class GamificationStore {
      * Checks if the user completed the routine on a specific date (yyyy-MM-dd).
      */
     public static boolean isRoutineCompletedForDate(Context context, String userId, String dateString) {
-        if (context == null || dateString == null) return false;
+        if (!isAvailable(context) || dateString == null) return false;
         String last = getLastRoutineDate(context, userId, null);
         return dateString.equals(last);
     }
@@ -168,7 +187,7 @@ public final class GamificationStore {
      * Saves the total lifetime routine days completed.
      */
     public static void saveLifetimeRoutineDays(Context context, String userId, int days) {
-        if (context == null) return;
+        if (!isAvailable(context)) return;
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putInt(KEY_PREFIX_LIFETIME_ROUTINE_DAYS + uid, days)
@@ -179,7 +198,7 @@ public final class GamificationStore {
      * Retrieves the total lifetime routine days completed.
      */
     public static int getLifetimeRoutineDays(Context context, String userId, int defaultDays) {
-        if (context == null) return defaultDays;
+        if (!isAvailable(context)) return defaultDays;
         String uid = resolveUserId(userId);
         return getPrefs(context).getInt(KEY_PREFIX_LIFETIME_ROUTINE_DAYS + uid, defaultDays);
     }
@@ -192,7 +211,7 @@ public final class GamificationStore {
      * Sets whether the user has earned the First Routine badge (one-shot).
      */
     public static void setBadgeFirstRoutine(Context context, String userId, boolean earned) {
-        if (context == null) return;
+        if (!isAvailable(context)) return;
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putBoolean(KEY_PREFIX_BADGE_FIRST_ROUTINE + uid, earned)
@@ -203,7 +222,7 @@ public final class GamificationStore {
      * Checks if the user has earned the First Routine badge.
      */
     public static boolean hasBadgeFirstRoutine(Context context, String userId) {
-        if (context == null) return false;
+        if (!isAvailable(context)) return false;
         String uid = resolveUserId(userId);
         return getPrefs(context).getBoolean(KEY_PREFIX_BADGE_FIRST_ROUTINE + uid, false);
     }
@@ -212,7 +231,7 @@ public final class GamificationStore {
      * Sets whether the user has earned the 7-Day Streak badge (one-shot).
      */
     public static void setBadgeStreak7(Context context, String userId, boolean earned) {
-        if (context == null) return;
+        if (!isAvailable(context)) return;
         String uid = resolveUserId(userId);
         getPrefs(context).edit()
                 .putBoolean(KEY_PREFIX_BADGE_STREAK_7 + uid, earned)
@@ -223,7 +242,7 @@ public final class GamificationStore {
      * Checks if the user has earned the 7-Day Streak badge.
      */
     public static boolean hasBadgeStreak7(Context context, String userId) {
-        if (context == null) return false;
+        if (!isAvailable(context)) return false;
         String uid = resolveUserId(userId);
         return getPrefs(context).getBoolean(KEY_PREFIX_BADGE_STREAK_7 + uid, false);
     }
@@ -253,7 +272,7 @@ public final class GamificationStore {
      * Core date-parameterized implementation allowing deterministic testing across date boundaries.
      */
     public static boolean recordDailyRoutineCompletedForDate(Context context, String userId, String dateString, int currentStreak) {
-        if (context == null || dateString == null || dateString.trim().isEmpty()) return false;
+        if (!isAvailable(context) || dateString == null || dateString.trim().isEmpty()) return false;
         String uid = resolveUserId(userId);
         String lastDate = getLastRoutineDate(context, uid, null);
         boolean isNewDay = !dateString.equals(lastDate);

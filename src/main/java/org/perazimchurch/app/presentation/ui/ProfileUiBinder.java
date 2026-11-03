@@ -85,6 +85,12 @@ public class ProfileUiBinder {
     private ProgressBar xpProgressBar;
     private TextView tvXpLevelLabel;
 
+    // Stats & Badges UI references
+    private TextView tvLifetimeDaysValue;
+    private TextView tvBadgesCountValue;
+    private TextView tvBadgeFirstRoutine;
+    private TextView tvBadgeStreak7;
+
     // Current State Cache
     private User currentUser;
     private SavedContentData currentSavedContent;
@@ -330,6 +336,78 @@ public class ProfileUiBinder {
         lpBar.setMargins(0, 0, 0, dp(12));
         xpProgressBar.setLayoutParams(lpBar);
         card.addView(xpProgressBar);
+
+        // Stats Row 2: Lifetime Routine Days & Badges Earned
+        int initialLifetimeDays = GamificationStore.getLifetimeRoutineDays(context, initialUid, 0);
+        boolean initialBadgeFirst = GamificationStore.hasBadgeFirstRoutine(context, initialUid);
+        boolean initialBadgeStreak7 = GamificationStore.hasBadgeStreak7(context, initialUid);
+        int initialBadgeCount = (initialBadgeFirst ? 1 : 0) + (initialBadgeStreak7 ? 1 : 0);
+
+        LinearLayout statsRow2 = new LinearLayout(context);
+        statsRow2.setOrientation(LinearLayout.HORIZONTAL);
+        statsRow2.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams lpStats2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpStats2.setMargins(0, 0, 0, dp(10));
+        statsRow2.setLayoutParams(lpStats2);
+
+        LinearLayout lifetimeBlock = createMetricBox("📅 " + initialLifetimeDays + " Days", "Lifetime Days", "Devotions", PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_PURPLE_DEEP);
+        tvLifetimeDaysValue = (TextView) lifetimeBlock.getChildAt(0);
+        statsRow2.addView(lifetimeBlock);
+
+        LinearLayout badgesBlock = createMetricBox("🏆 " + initialBadgeCount + " / 2", "Badges Earned", "Milestones", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ACCENT_ORANGE);
+        tvBadgesCountValue = (TextView) badgesBlock.getChildAt(0);
+        statsRow2.addView(badgesBlock);
+
+        card.addView(statsRow2);
+
+        // Milestone Badges Shelf
+        TextView tvBadgesHeader = new TextView(context);
+        tvBadgesHeader.setText("MILESTONE BADGES");
+        tvBadgesHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
+        tvBadgesHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        tvBadgesHeader.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        tvBadgesHeader.setPadding(0, 0, 0, dp(6));
+        card.addView(tvBadgesHeader);
+
+        LinearLayout badgesShelf = new LinearLayout(context);
+        badgesShelf.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams lpShelf = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpShelf.setMargins(0, 0, 0, dp(12));
+        badgesShelf.setLayoutParams(lpShelf);
+
+        tvBadgeFirstRoutine = new TextView(context);
+        tvBadgeFirstRoutine.setText(initialBadgeFirst ? "🌟 First Routine ✓" : "🔒 First Routine");
+        tvBadgeFirstRoutine.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        tvBadgeFirstRoutine.setTypeface(Typeface.DEFAULT_BOLD);
+        tvBadgeFirstRoutine.setTextColor(initialBadgeFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_TEXT_MUTED);
+        tvBadgeFirstRoutine.setBackground(createPillDrawable(
+                initialBadgeFirst ? PerazimTheme.COLOR_PURPLE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
+                initialBadgeFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_BORDER_GREY));
+        tvBadgeFirstRoutine.setPadding(dp(8), dp(6), dp(8), dp(6));
+        LinearLayout.LayoutParams lpB1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lpB1.setMargins(0, 0, dp(4), 0);
+        tvBadgeFirstRoutine.setLayoutParams(lpB1);
+        tvBadgeFirstRoutine.setGravity(Gravity.CENTER);
+        badgesShelf.addView(tvBadgeFirstRoutine);
+
+        tvBadgeStreak7 = new TextView(context);
+        tvBadgeStreak7.setText(initialBadgeStreak7 ? "🔥 7-Day Flame ✓" : "🔒 7-Day Flame");
+        tvBadgeStreak7.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
+        tvBadgeStreak7.setTypeface(Typeface.DEFAULT_BOLD);
+        tvBadgeStreak7.setTextColor(initialBadgeStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_TEXT_MUTED);
+        tvBadgeStreak7.setBackground(createPillDrawable(
+                initialBadgeStreak7 ? PerazimTheme.COLOR_ORANGE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
+                initialBadgeStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_BORDER_GREY));
+        tvBadgeStreak7.setPadding(dp(8), dp(6), dp(8), dp(6));
+        LinearLayout.LayoutParams lpB2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lpB2.setMargins(dp(4), 0, 0, 0);
+        tvBadgeStreak7.setLayoutParams(lpB2);
+        tvBadgeStreak7.setGravity(Gravity.CENTER);
+        badgesShelf.addView(tvBadgeStreak7);
+
+        card.addView(badgesShelf);
 
         // Streak Freeze Toggle Button
         btnStreakFreezeToggle = new Button(context);
@@ -977,6 +1055,32 @@ public class ProfileUiBinder {
                     }
                     if (tvGraceValue != null) {
                         tvGraceValue.setText("💜 " + liveGrace + " Pts");
+                    }
+
+                    int liveLifetime = GamificationStore.getLifetimeRoutineDays(context, uid, 0);
+                    boolean hasFirst = GamificationStore.hasBadgeFirstRoutine(context, uid);
+                    boolean hasStreak7 = GamificationStore.hasBadgeStreak7(context, uid);
+                    int badgeCount = (hasFirst ? 1 : 0) + (hasStreak7 ? 1 : 0);
+
+                    if (tvLifetimeDaysValue != null) {
+                        tvLifetimeDaysValue.setText("📅 " + liveLifetime + " Days");
+                    }
+                    if (tvBadgesCountValue != null) {
+                        tvBadgesCountValue.setText("🏆 " + badgeCount + " / 2");
+                    }
+                    if (tvBadgeFirstRoutine != null) {
+                        tvBadgeFirstRoutine.setText(hasFirst ? "🌟 First Routine ✓" : "🔒 First Routine");
+                        tvBadgeFirstRoutine.setTextColor(hasFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_TEXT_MUTED);
+                        tvBadgeFirstRoutine.setBackground(createPillDrawable(
+                                hasFirst ? PerazimTheme.COLOR_PURPLE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
+                                hasFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_BORDER_GREY));
+                    }
+                    if (tvBadgeStreak7 != null) {
+                        tvBadgeStreak7.setText(hasStreak7 ? "🔥 7-Day Flame ✓" : "🔒 7-Day Flame");
+                        tvBadgeStreak7.setTextColor(hasStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_TEXT_MUTED);
+                        tvBadgeStreak7.setBackground(createPillDrawable(
+                                hasStreak7 ? PerazimTheme.COLOR_ORANGE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
+                                hasStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_BORDER_GREY));
                     }
 
                     int level = (liveXp / 500) + 1;
