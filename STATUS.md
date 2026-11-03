@@ -54,6 +54,21 @@
   - If a row is malformed or missing required IDs, it is cleanly skipped while valid rows are saved.
 - **Secretary Workflow**: Managed via Google Sheets "Publish to the web" with zero server maintenance. Documented in `docs/CONTENT_GUIDE.md` and `docs/SETUP_FOR_LEVI.md`.
 
+### 2.2 In-Place Release Upgrade Migration Verification — `WORKING`
+- **Baseline Version**: Release APK of `v2.2.0-pilot-stable` (`versionCode 4`, `versionName 2.2.0`) signed with `perazim-release.jks`.
+- **Target Version**: Release APK of `feature/dynamic-community` (`versionCode 4`, `versionName 2.2.0`) signed with the same `perazim-release.jks`.
+- **Methodology**: In-place `adb install -r` upgrade performed without uninstalling.
+- **Verification Results**:
+  1. No signature collision or package manager error.
+  2. Room Database schema migration 4 -> 5 executed seamlessly on app startup without crash.
+  3. Pre-upgrade seeded test data survived intact:
+     - Member Spiritual XP: `⭐ 10 XP` (Level 1 Disciple).
+     - Favorited worship hymn: *How Great Thou Art* retained active heart icon (`❤️`).
+     - Fellowship prayer petitions and member identity: Intact.
+- **Hardware Proof Files**:
+  - Pre-upgrade state: [`migration-01-before.png`](docs/review/migration-01-before.png) and [`migration-01-before.txt`](docs/review/migration-01-before.txt)
+  - Post-upgrade state: [`migration-02-after.png`](docs/review/migration-02-after.png) and [`migration-02-after.txt`](docs/review/migration-02-after.txt)
+
 ---
 
 ## 3. How to Run the Automated Visual Audit
