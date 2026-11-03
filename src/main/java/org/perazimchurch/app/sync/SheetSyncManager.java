@@ -8,6 +8,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.data.local.PerazimDatabase;
+import org.perazimchurch.app.data.local.dao.AnnouncementDao;
+import org.perazimchurch.app.data.local.dao.AppConfigDao;
+import org.perazimchurch.app.data.local.dao.DailyVerseDao;
+import org.perazimchurch.app.data.local.dao.EventDao;
+import org.perazimchurch.app.data.local.dao.HymnDao;
+import org.perazimchurch.app.data.local.dao.JokeDao;
+import org.perazimchurch.app.data.local.dao.RiddleDao;
+import org.perazimchurch.app.data.local.dao.SermonDao;
 import org.perazimchurch.app.data.local.entity.AnnouncementEntity;
 import org.perazimchurch.app.data.local.entity.AppConfigEntity;
 import org.perazimchurch.app.data.local.entity.DailyVerseEntity;
@@ -60,6 +68,33 @@ public final class SheetSyncManager {
         void onSyncComplete(boolean success, int rowsSynced, int rowsSkipped, @NonNull String statusMessage);
     }
 
+    private static void logI(String msg) {
+        try {
+            Log.i(TAG, msg);
+        } catch (Throwable ignored) {
+            System.out.println(TAG + " [INFO]: " + msg);
+        }
+    }
+
+    private static void logD(String msg) {
+        try {
+            Log.d(TAG, msg);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void logW(String msg, @Nullable Throwable t) {
+        try {
+            if (t != null) {
+                Log.w(TAG, msg, t);
+            } else {
+                Log.w(TAG, msg);
+            }
+        } catch (Throwable ignored) {
+            System.err.println(TAG + " [WARN]: " + msg);
+        }
+    }
+
     private SheetSyncManager() {}
 
     private static SharedPreferences getPrefs(@NonNull Context context) {
@@ -88,10 +123,10 @@ public final class SheetSyncManager {
         long last = getLastSyncMillis(context);
         long now = System.currentTimeMillis();
         if ((now - last) >= SIX_HOURS_MILLIS) {
-            Log.i(TAG, "Triggering automatic 6-hour interval content sync...");
+            logI("Triggering automatic 6-hour interval content sync...");
             syncNow(context, null);
         } else {
-            Log.d(TAG, "Skipping auto-sync: last sync was " + ((now - last) / (1000 * 60)) + " minutes ago.");
+            logD("Skipping auto-sync: last sync was " + ((now - last) / (1000 * 60)) + " minutes ago.");
         }
     }
 
@@ -194,7 +229,7 @@ public final class SheetSyncManager {
                     callback.onSyncComplete(true, totalSynced, totalSkipped, status);
                 }
             } catch (Exception e) {
-                Log.w(TAG, "Content sync warning: " + e.getMessage(), e);
+                logW("Content sync warning: " + e.getMessage(), e);
                 String fallbackStatus = "Offline — using local content";
                 if (callback != null) {
                     callback.onSyncComplete(false, totalSynced, totalSkipped, fallbackStatus);
@@ -208,12 +243,15 @@ public final class SheetSyncManager {
     // -------------------------------------------------------------------------
 
     public static SyncStats syncAnnouncements(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processAnnouncementsRows(fetchCsv(url), db.announcementDao());
+    }
+
+    static SyncStats processAnnouncementsRows(List<List<String>> rows, AnnouncementDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("id") || !col.containsKey("title") || !col.containsKey("body")) {
-            Log.w(TAG, "Announcements CSV missing required headers. Skipping.");
+            logW("Announcements CSV missing required headers. Skipping.", null);
             return new SyncStats(0, 0);
         }
 
@@ -237,15 +275,18 @@ public final class SheetSyncManager {
 
             AnnouncementEntity entity = new AnnouncementEntity(
                     id, title, body, priority, dateMillis, dateMillis + (30L * 86400000L), campus, active);
-            db.announcementDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
     }
 
     public static SyncStats syncEvents(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processEventsRows(fetchCsv(url), db.eventDao());
+    }
+
+    static SyncStats processEventsRows(List<List<String>> rows, EventDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("id") || !col.containsKey("title")) {
@@ -273,15 +314,18 @@ public final class SheetSyncManager {
 
             EventEntity entity = new EventEntity(
                     id, title, desc, start, end, venue, campus, "sanctuary.jpg", "Worship", active);
-            db.eventDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
     }
 
     public static SyncStats syncHymns(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processHymnsRows(fetchCsv(url), db.hymnDao());
+    }
+
+    static SyncStats processHymnsRows(List<List<String>> rows, HymnDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("id") || !col.containsKey("title")) {
@@ -313,15 +357,18 @@ public final class SheetSyncManager {
 
             HymnEntity entity = new HymnEntity(
                     id, num, title, lyrics, chords, key, "4/4", tags, false, writer, year, bpm, tags, active);
-            db.hymnDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
     }
 
     public static SyncStats syncRiddles(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processRiddlesRows(fetchCsv(url), db.riddleDao());
+    }
+
+    static SyncStats processRiddlesRows(List<List<String>> rows, RiddleDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("id") || !col.containsKey("question") || !col.containsKey("answer")) {
@@ -347,15 +394,18 @@ public final class SheetSyncManager {
 
             RiddleEntity entity = new RiddleEntity(
                     id, question, answer, "", "", category, category, xp, active);
-            db.riddleDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
     }
 
     public static SyncStats syncJokes(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processJokesRows(fetchCsv(url), db.jokeDao());
+    }
+
+    static SyncStats processJokesRows(List<List<String>> rows, JokeDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("id") || !col.containsKey("text")) {
@@ -376,15 +426,18 @@ public final class SheetSyncManager {
 
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
             JokeEntity entity = new JokeEntity(id, text, "FAMILY_SAFE", "Fellowship", active);
-            db.jokeDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
     }
 
     public static SyncStats syncSermons(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processSermonsRows(fetchCsv(url), db.sermonDao());
+    }
+
+    static SyncStats processSermonsRows(List<List<String>> rows, SermonDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("id") || !col.containsKey("title")) {
@@ -414,15 +467,18 @@ public final class SheetSyncManager {
             SermonEntity entity = new SermonEntity(
                     id, title, speaker, series, scripture, audioUrl, ytUrl, dateMillis,
                     2700, "Sermon message", "", false, "", active);
-            db.sermonDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
     }
 
     public static SyncStats syncVerses(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processVersesRows(fetchCsv(url), db.dailyVerseDao());
+    }
+
+    static SyncStats processVersesRows(List<List<String>> rows, DailyVerseDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("date") || !col.containsKey("reference") || !col.containsKey("text")) {
@@ -443,15 +499,18 @@ public final class SheetSyncManager {
             }
 
             DailyVerseEntity entity = new DailyVerseEntity(date, ref, text, true);
-            db.dailyVerseDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
     }
 
     public static SyncStats syncConfig(@NonNull String url, @NonNull PerazimDatabase db) throws Exception {
-        List<List<String>> rows = fetchCsv(url);
-        if (rows.size() < 2) return new SyncStats(0, 0);
+        return processConfigRows(fetchCsv(url), db.appConfigDao());
+    }
+
+    static SyncStats processConfigRows(List<List<String>> rows, AppConfigDao dao) {
+        if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
         if (!col.containsKey("key") || !col.containsKey("value")) {
@@ -470,7 +529,7 @@ public final class SheetSyncManager {
                 continue;
             }
             AppConfigEntity entity = new AppConfigEntity(key, val);
-            db.appConfigDao().insert(entity);
+            dao.insert(entity);
             synced++;
         }
         return new SyncStats(synced, skipped);
@@ -501,7 +560,7 @@ public final class SheetSyncManager {
         }
     }
 
-    private static Map<String, Integer> mapHeaders(List<String> headerRow) {
+    static Map<String, Integer> mapHeaders(List<String> headerRow) {
         Map<String, Integer> map = new HashMap<>();
         for (int i = 0; i < headerRow.size(); i++) {
             map.put(headerRow.get(i).trim().toLowerCase(Locale.ROOT), i);
@@ -509,24 +568,24 @@ public final class SheetSyncManager {
         return map;
     }
 
-    private static String getCell(List<String> row, Map<String, Integer> col, String name) {
+    static String getCell(List<String> row, Map<String, Integer> col, String name) {
         Integer idx = col.get(name);
         if (idx == null || idx >= row.size()) return "";
         return row.get(idx).trim();
     }
 
-    private static String getCellOrDefault(List<String> row, Map<String, Integer> col, String name, String def) {
+    static String getCellOrDefault(List<String> row, Map<String, Integer> col, String name, String def) {
         String val = getCell(row, col, name);
         return val.isEmpty() ? def : val;
     }
 
-    private static boolean parseBool(String val) {
+    static boolean parseBool(String val) {
         if (val == null) return true;
         String s = val.trim().toLowerCase(Locale.ROOT);
         return !s.equals("false") && !s.equals("0") && !s.equals("no");
     }
 
-    private static int parseInt(String val, int def) {
+    static int parseInt(String val, int def) {
         try {
             return Integer.parseInt(val.trim());
         } catch (Exception e) {
@@ -534,7 +593,7 @@ public final class SheetSyncManager {
         }
     }
 
-    private static long parseDate(String val, long fallback) {
+    static long parseDate(String val, long fallback) {
         if (val == null || val.trim().isEmpty()) return fallback;
         val = val.trim();
         SimpleDateFormat sdf = new SimpleDateFormat(
