@@ -25,8 +25,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import org.perazimchurch.app.data.local.preference.GamificationStore;
-import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 
 import java.util.ArrayList;
@@ -224,7 +222,7 @@ public final class GivingDialog {
 
         // 5. Confirm Give Button
         Button btnConfirmGive = new Button(context);
-        btnConfirmGive.setText("💚 COMPLETE M-PESA GIVING (+20 XP)");
+        btnConfirmGive.setText("💚 Complete M-Pesa Giving (Paybill 4069983)");
         btnConfirmGive.setTextColor(COLOR_WHITE);
         btnConfirmGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         btnConfirmGive.setTypeface(Typeface.DEFAULT_BOLD);
@@ -247,13 +245,6 @@ public final class GivingDialog {
                 account = tvAccount.getText().toString().replace("Account: ", "").trim();
             }
             ChurchIntentManager.launchMpesaGiving(context, "4069983", account, amt);
-            try {
-                String uid = "user_me";
-                SessionManager sm = SessionManager.getInstance(context);
-                if (sm != null && sm.getActiveUserId() != null) uid = sm.getActiveUserId();
-                int currentXp = GamificationStore.getSpiritualXp(context, uid, 0);
-                GamificationStore.saveSpiritualXp(context, uid, currentXp + 20);
-            } catch (Exception ignored) {}
             dlg.dismiss();
         });
 
