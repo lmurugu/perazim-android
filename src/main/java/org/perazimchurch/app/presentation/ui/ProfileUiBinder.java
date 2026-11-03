@@ -44,6 +44,7 @@ import org.perazimchurch.app.domain.model.User;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.presentation.viewmodel.ProfileViewModel;
 import org.perazimchurch.app.presentation.viewmodel.SavedContentData;
+import org.perazimchurch.app.sync.SheetSyncManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -97,6 +98,9 @@ public class ProfileUiBinder {
     private Button btnTabHymns;
     private Button btnTabVerses;
     private int selectedSavedContentTab = 0; // 0 = Sermons, 1 = Hymns, 2 = Verses
+
+    // Content Synchronization UI reference
+    private TextView tvSyncStatusVal;
 
     public ProfileUiBinder(@NonNull Activity activity, @NonNull ProfileViewModel viewModel) {
         this.activity = activity;
@@ -785,7 +789,84 @@ public class ProfileUiBinder {
         );
         card.addView(rowBishop);
 
+        // Content Synchronization Row (Google Sheets)
+        LinearLayout rowSync = createContentSyncRow();
+        card.addView(rowSync);
+
         return card;
+    }
+
+    private LinearLayout createContentSyncRow() {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(8), dp(8), dp(8), dp(8));
+
+        GradientDrawable rowBg = new GradientDrawable();
+        rowBg.setColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        rowBg.setCornerRadius(dp(PerazimTheme.RADIUS_SM));
+        rowBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        row.setBackground(rowBg);
+
+        LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpRow.setMargins(0, 0, 0, dp(6));
+        row.setLayoutParams(lpRow);
+
+        TextView tvIcon = new TextView(context);
+        tvIcon.setText("🔄");
+        tvIcon.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f);
+        tvIcon.setPadding(0, 0, dp(8), 0);
+        row.addView(tvIcon);
+
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        textCol.setLayoutParams(lpText);
+
+        TextView tvLbl = new TextView(context);
+        tvLbl.setText("Refresh Content");
+        tvLbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
+        tvLbl.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        textCol.addView(tvLbl);
+
+        tvSyncStatusVal = new TextView(context);
+        tvSyncStatusVal.setText(SheetSyncManager.getLastSyncStatusText(context));
+        tvSyncStatusVal.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        tvSyncStatusVal.setTypeface(Typeface.DEFAULT_BOLD);
+        tvSyncStatusVal.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        textCol.addView(tvSyncStatusVal);
+
+        row.addView(textCol);
+
+        TextView tvHint = new TextView(context);
+        tvHint.setText("Tap to Sync ➔");
+        tvHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
+        tvHint.setTypeface(Typeface.DEFAULT_BOLD);
+        tvHint.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
+        row.addView(tvHint);
+
+        row.setOnClickListener(v -> triggerContentSync());
+        return row;
+    }
+
+    private void triggerContentSync() {
+        if (tvSyncStatusVal != null) {
+            tvSyncStatusVal.setText("Syncing church content...");
+        }
+        Toast.makeText(context, "🔄 Syncing church content from Google Sheets...", Toast.LENGTH_SHORT).show();
+        SheetSyncManager.syncNow(context, (success, synced, skipped, message) -> {
+            postToMain(() -> {
+                if (tvSyncStatusVal != null) {
+                    tvSyncStatusVal.setText(SheetSyncManager.getLastSyncStatusText(context));
+                }
+                if (success) {
+                    Toast.makeText(context, "✅ Church content updated (" + synced + " items synced)", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "⚠️ Offline or sync failed. Kept cached content.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     /**
@@ -906,6 +987,9 @@ public class ProfileUiBinder {
                     if (tvXpLevelLabel != null) {
                         tvXpLevelLabel.setText("Level " + level + " Disciple — " + progress + " / 500 XP to Level " + (level + 1));
                     }
+                }
+                if (tvSyncStatusVal != null) {
+                    tvSyncStatusVal.setText(SheetSyncManager.getLastSyncStatusText(context));
                 }
             });
         });

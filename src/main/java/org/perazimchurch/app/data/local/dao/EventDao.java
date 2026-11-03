@@ -35,10 +35,10 @@ public interface EventDao {
     @Query("SELECT * FROM events WHERE active = 1 ORDER BY startTimeMillis ASC")
     List<EventEntity> getActiveEvents();
 
-    @Query("SELECT * FROM events WHERE endTimeMillis >= :currentTimeMillis ORDER BY startTimeMillis ASC")
+    @Query("SELECT * FROM events WHERE active = 1 AND endTimeMillis >= :currentTimeMillis ORDER BY startTimeMillis ASC")
     List<EventEntity> getUpcomingEvents(long currentTimeMillis);
 
-    @Query("SELECT * FROM events WHERE campusId = :campusId ORDER BY startTimeMillis ASC")
+    @Query("SELECT * FROM events WHERE active = 1 AND campusId = :campusId ORDER BY startTimeMillis ASC")
     List<EventEntity> getEventsByCampus(String campusId);
 
     @Query("DELETE FROM events WHERE id = :id")

@@ -21,7 +21,7 @@ public class RoomHymnRepository implements HymnRepository {
 
     @Override
     public List<Hymn> getAllHymns() {
-        return HymnMapper.toDomainList(hymnDao.getAllHymns());
+        return HymnMapper.toDomainList(hymnDao.getActiveHymns());
     }
 
     @Override

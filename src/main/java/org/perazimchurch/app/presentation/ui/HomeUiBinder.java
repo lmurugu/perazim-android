@@ -42,6 +42,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.perazimchurch.app.data.local.PerazimDatabase;
+import org.perazimchurch.app.data.local.entity.DailyVerseEntity;
 import org.perazimchurch.app.domain.model.Announcement;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.domain.model.BibleVerse;
@@ -128,6 +130,14 @@ public class HomeUiBinder {
 
     // Cached Data
     private HomeData cachedHomeData;
+
+    // Daily Cornerstone Scripture Views
+    private TextView tvCornerstoneHeader;
+    private TextView tvCornerstoneBody;
+    private Button btnCornerstoneShare;
+    private Button btnCornerstoneReadPassage;
+    private String currentCornerstoneRef = "2 Samuel 5:20";
+    private String currentCornerstoneText = "And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters.";
 
     public HomeUiBinder(@NonNull Context context, @NonNull HomeViewModel homeViewModel) {
         this(context, homeViewModel, null, null);
@@ -409,21 +419,21 @@ public class HomeUiBinder {
             verseCard.addView(imgWaters);
         }
 
-        TextView tvHeader = new TextView(context);
-        tvHeader.setText("📖 CORNERSTONE SCRIPTURE · 2 SAMUEL 5:20");
-        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(COLOR_ACCENT_ORANGE);
-        verseCard.addView(tvHeader);
+        tvCornerstoneHeader = new TextView(context);
+        tvCornerstoneHeader.setText("📖 CORNERSTONE SCRIPTURE · 2 SAMUEL 5:20");
+        tvCornerstoneHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvCornerstoneHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        tvCornerstoneHeader.setTextColor(COLOR_ACCENT_ORANGE);
+        verseCard.addView(tvCornerstoneHeader);
 
-        TextView tvBody = new TextView(context);
-        tvBody.setText("“And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters. Therefore he called the name of that place Baal-perazim.”");
-        tvBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tvBody.setTypeface(Typeface.SERIF, Typeface.ITALIC);
-        tvBody.setTextColor(COLOR_WHITE);
-        tvBody.setPadding(0, dp(8), 0, dp(10));
-        tvBody.setLineSpacing(dp(3), 1.15f);
-        verseCard.addView(tvBody);
+        tvCornerstoneBody = new TextView(context);
+        tvCornerstoneBody.setText("“And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters. Therefore he called the name of that place Baal-perazim.”");
+        tvCornerstoneBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        tvCornerstoneBody.setTypeface(Typeface.SERIF, Typeface.ITALIC);
+        tvCornerstoneBody.setTextColor(COLOR_WHITE);
+        tvCornerstoneBody.setPadding(0, dp(8), 0, dp(10));
+        tvCornerstoneBody.setLineSpacing(dp(3), 1.15f);
+        verseCard.addView(tvCornerstoneBody);
 
         // Actions Row: Reflect, Pray (+10 XP), WhatsApp Story Share
         LinearLayout actionsRow = new LinearLayout(context);
@@ -438,27 +448,27 @@ public class HomeUiBinder {
             Toast.makeText(context, "🙏 Prayer lifted in agreement with Baal-perazim breakthrough! (+10 XP)", Toast.LENGTH_SHORT).show();
         });
 
-        Button btnShare = createSmallButton("📱 WhatsApp Story", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
-        btnShare.setOnClickListener(v -> sharePassageToWhatsApp("“And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters.” — 2 Samuel 5:20 (KJV)"));
+        btnCornerstoneShare = createSmallButton("📱 WhatsApp Story", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+        btnCornerstoneShare.setOnClickListener(v -> sharePassageToWhatsApp("“" + currentCornerstoneText.trim() + "” — " + currentCornerstoneRef + " (Perazim)"));
 
         actionsRow.addView(btnReflect);
         actionsRow.addView(btnPray);
-        actionsRow.addView(btnShare);
+        actionsRow.addView(btnCornerstoneShare);
         verseCard.addView(actionsRow);
 
         // Dedicated "Read Passage" Button: Opens BibleReaderDialog
-        Button btnReadPassage = new Button(context);
-        btnReadPassage.setText("📖 Read Passage (2 Samuel 5 · Baal-perazim)");
-        btnReadPassage.setTextColor(COLOR_WHITE);
-        btnReadPassage.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnReadPassage.setTypeface(Typeface.DEFAULT_BOLD);
-        btnReadPassage.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 2));
+        btnCornerstoneReadPassage = new Button(context);
+        btnCornerstoneReadPassage.setText("📖 Read Passage (2 Samuel 5 · Baal-perazim)");
+        btnCornerstoneReadPassage.setTextColor(COLOR_WHITE);
+        btnCornerstoneReadPassage.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnCornerstoneReadPassage.setTypeface(Typeface.DEFAULT_BOLD);
+        btnCornerstoneReadPassage.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 2));
         LinearLayout.LayoutParams lpRead = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpRead.setMargins(0, dp(8), 0, 0);
-        btnReadPassage.setLayoutParams(lpRead);
-        btnReadPassage.setOnClickListener(v -> openScriptureReader("2SA", 5));
-        verseCard.addView(btnReadPassage);
+        btnCornerstoneReadPassage.setLayoutParams(lpRead);
+        btnCornerstoneReadPassage.setOnClickListener(v -> parseAndOpenScripture(currentCornerstoneRef));
+        verseCard.addView(btnCornerstoneReadPassage);
 
         return verseCard;
     }
@@ -1002,6 +1012,7 @@ public class HomeUiBinder {
     // =========================================================================
 
     public void refreshFeed() {
+        loadDailyVerse();
         homeViewModel.loadHomeFeed(homeData -> {
             if (homeData != null) {
                 cachedHomeData = homeData;
@@ -1021,6 +1032,64 @@ public class HomeUiBinder {
             }
         });
     }
+
+    /**
+     * Queries Room for today's curated daily scripture (YYYY-MM-DD).
+     * If present and active, binds it to the cornerstone scripture card.
+     * If absent or inactive, retains the default 2 Samuel 5:20 scripture.
+     */
+    private void loadDailyVerse() {
+        new Thread(() -> {
+            try {
+                String todayStr = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(new Date());
+                PerazimDatabase db = PerazimDatabase.getInstance(context);
+                DailyVerseEntity verse = db.dailyVerseDao().getVerseForDate(todayStr);
+                if (verse != null && verse.isActive() && !TextUtils.isEmpty(verse.getText())) {
+                    if (rootScrollView != null) {
+                        rootScrollView.post(() -> applyDailyVerse(verse.getReference(), verse.getText()));
+                    }
+                }
+            } catch (Exception e) {
+                android.util.Log.w("HomeUiBinder", "Could not load daily verse from Room", e);
+            }
+        }).start();
+    }
+
+    private void applyDailyVerse(String ref, String text) {
+        currentCornerstoneRef = !TextUtils.isEmpty(ref) ? ref : "2 Samuel 5:20";
+        currentCornerstoneText = !TextUtils.isEmpty(text) ? text : "";
+        if (tvCornerstoneHeader != null) {
+            tvCornerstoneHeader.setText("📖 DAILY SCRIPTURE · " + currentCornerstoneRef.toUpperCase(Locale.ROOT));
+        }
+        if (tvCornerstoneBody != null) {
+            tvCornerstoneBody.setText("“" + currentCornerstoneText.trim() + "”");
+        }
+        if (btnCornerstoneShare != null) {
+            btnCornerstoneShare.setOnClickListener(v -> sharePassageToWhatsApp("“" + currentCornerstoneText.trim() + "” — " + currentCornerstoneRef + " (Perazim)"));
+        }
+        if (btnCornerstoneReadPassage != null) {
+            btnCornerstoneReadPassage.setText("📖 Read Passage (" + currentCornerstoneRef + ")");
+            btnCornerstoneReadPassage.setOnClickListener(v -> parseAndOpenScripture(currentCornerstoneRef));
+        }
+    }
+
+    private void parseAndOpenScripture(String ref) {
+        if (TextUtils.isEmpty(ref)) {
+            openScriptureReader("2SA", 5);
+            return;
+        }
+        String lower = ref.toLowerCase(Locale.ROOT);
+        if (lower.contains("2 samuel") || lower.contains("2sa")) {
+            openScriptureReader("2SA", 5);
+        } else if (lower.contains("john") || lower.contains("jhn")) {
+            openScriptureReader("JHN", 3);
+        } else if (lower.contains("psalm") || lower.contains("psa")) {
+            openScriptureReader("PSA", 23);
+        } else {
+            openScriptureReader("2SA", 5);
+        }
+    }
+
 
     // =========================================================================
     // MODAL DIALOGS: GIVING, PRAYER REQUEST, SERMON DETAILS & PLAYER

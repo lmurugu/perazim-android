@@ -453,7 +453,7 @@ public class FellowshipViewModel extends ViewModel {
     public void loadRiddles(@Nullable Consumer<List<RiddleEntity>> callback) {
         executor.execute(() -> {
             try {
-                List<RiddleEntity> riddles = riddleDao.getAllRiddles();
+                List<RiddleEntity> riddles = riddleDao.getActiveRiddles();
                 if (callback != null) {
                     final List<RiddleEntity> res = riddles != null ? riddles : Collections.emptyList();
                     postCallback(() -> callback.accept(res));
@@ -473,7 +473,7 @@ public class FellowshipViewModel extends ViewModel {
     public void loadJokes(@Nullable Consumer<List<JokeEntity>> callback) {
         executor.execute(() -> {
             try {
-                List<JokeEntity> jokes = jokeDao.getAllJokes();
+                List<JokeEntity> jokes = jokeDao.getActiveJokes();
                 if (callback != null) {
                     final List<JokeEntity> res = jokes != null ? jokes : Collections.emptyList();
                     postCallback(() -> callback.accept(res));

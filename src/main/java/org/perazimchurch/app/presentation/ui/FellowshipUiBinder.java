@@ -1311,7 +1311,12 @@ public class FellowshipUiBinder {
                 } else {
                     riddlesList.addAll(getFallbackRiddles());
                 }
-                currentRiddleIndex = 0;
+                if (!riddlesList.isEmpty()) {
+                    int dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR);
+                    currentRiddleIndex = dayOfYear % riddlesList.size();
+                } else {
+                    currentRiddleIndex = 0;
+                }
                 displayCurrentRiddle();
             });
         });

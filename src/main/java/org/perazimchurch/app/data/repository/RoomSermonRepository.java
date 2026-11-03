@@ -26,7 +26,7 @@ public class RoomSermonRepository implements SermonRepository {
 
     @Override
     public List<Sermon> getRecentSermons() {
-        List<SermonEntity> entities = sermonDao.getAllSermons();
+        List<SermonEntity> entities = sermonDao.getActiveSermons();
         List<Sermon> sermons = SermonMapper.toDomainList(entities);
         attachPlayCounts(sermons);
         return sermons;

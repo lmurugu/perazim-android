@@ -59,6 +59,7 @@ import org.perazimchurch.app.presentation.viewmodel.ProfileViewModel;
 import org.perazimchurch.app.presentation.viewmodel.SermonsViewModel;
 import org.perazimchurch.app.presentation.viewmodel.ViewModelFactory;
 import org.perazimchurch.app.presentation.viewmodel.WorshipViewModel;
+import org.perazimchurch.app.sync.SheetSyncManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -174,6 +175,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         // Trigger first-launch onboarding
         OnboardingDialog.showIfNeeded(this);
+
+        // Trigger automatic 6-hour interval content sync from Google Sheets (fail-soft, offline-first)
+        SheetSyncManager.syncOnAppStartIfNeeded(this);
 
         factory = ViewModelFactory.getInstance(this);
         bibleViewModel = factory.createBibleViewModel();

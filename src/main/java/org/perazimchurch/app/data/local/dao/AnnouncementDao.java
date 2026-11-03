@@ -29,7 +29,7 @@ public interface AnnouncementDao {
     @Query("SELECT * FROM announcements WHERE id = :id LIMIT 1")
     AnnouncementEntity getAnnouncementById(String id);
 
-    @Query("SELECT * FROM announcements WHERE expiresMillis >= :currentTimeMillis ORDER BY publishedMillis DESC")
+    @Query("SELECT * FROM announcements WHERE active = 1 AND expiresMillis >= :currentTimeMillis ORDER BY publishedMillis DESC")
     List<AnnouncementEntity> getActiveAnnouncements(long currentTimeMillis);
 
     @Query("SELECT * FROM announcements ORDER BY publishedMillis DESC")
