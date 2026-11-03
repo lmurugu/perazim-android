@@ -250,6 +250,25 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         if (intent.getBooleanExtra("show_qr", false) && fellowshipUiBinder != null) {
             fellowshipUiBinder.openQrConnectionDialog();
         }
+        if (intent.getBooleanExtra("open_giving", false)) {
+            showGivingDialog();
+        }
+        if (intent.getBooleanExtra("open_scripture", false)) {
+            showFullScriptureDialog();
+        }
+        if (intent.getBooleanExtra("open_ai_guide", false)) {
+            showAiBreakthroughGuide();
+        }
+        if (intent.getBooleanExtra("open_riddles", false)) {
+            try {
+                startActivity(new Intent(this, RiddlesActivity.class));
+            } catch (Exception ignored) {}
+        }
+        if (intent.getBooleanExtra("open_jokes", false)) {
+            try {
+                startActivity(new Intent(this, JokesActivity.class));
+            } catch (Exception ignored) {}
+        }
     }
 
     // =========================================================================

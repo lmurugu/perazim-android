@@ -1,0 +1,2 @@
+[android.widget.FrameLayout] (desc) Video player
+[android.widget.SeekBar] (desc) 1 hour 23 minutes 48 seconds of 14 hours 46 minutes 29 seconds

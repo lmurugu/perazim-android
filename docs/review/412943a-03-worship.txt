@@ -1,0 +1,19 @@
+[android.widget.TextView] 🏛️ PERAZIM MISSION CHURCH
+[android.widget.TextView] The Place of Great Breakthrough
+[android.widget.TextView] “The LORD hath broken forth upon mine enemies before me, as the breach of waters.” — 2 Samuel 5:20
+[android.widget.TextView] “A place where everybody is somebody, and nobody is a nobody.”
+[android.widget.TextView] ⚡ 100% OFFLINE-FIRST SPIRITUAL FOUNDATION
+[android.widget.TextView] Welcome beloved! Perazim is engineered so you can nourish your spirit anywhere across Kenya — without needing an internet connection:
+[android.widget.TextView] 📖
+[android.widget.TextView] Holy Scriptures (KJV & Swahili)
+[android.widget.TextView] Full 66 canonical books, chapter navigation, keyword search, and bookmarks available 100% offline.
+[android.widget.TextView] 🎵
+[android.widget.TextView] Church Hymnal & Chords
+[android.widget.TextView] Complete Perazim worship hymnal with full chord charts, lyrics, and category indexes with zero data needed.
+[android.widget.TextView] ☀️
+[android.widget.TextView] Daily Devotionals & Prayer Wall
+[android.widget.TextView] Start each morning with the 3-Minute Breakthrough routine and share petitions with the fellowship wall.
+[android.widget.TextView] 🎙️
+[android.widget.TextView] Audio Sermons & Media Cache
+[android.widget.TextView] Save teachings from Bishop Dr. David Mutweri in ultra-efficient 32kbps data-saver audio.
+[android.widget.Button] 🚀 ENTER SANCTUARY & GET STARTED

@@ -1,0 +1,16 @@
+[android.widget.TextView] 🤖
+[android.widget.TextView] Perazim Breakthrough Guide
+[android.widget.TextView] ⚡ Tiny Edge AI • 100% Offline • Perazim Guide
+[android.widget.Button] ✕
+[android.widget.TextView] 🔥 **Shalom & Welcome to Perazim Breakthrough Guide!**
+
+I am your personal in-app assistant. You currently have **⭐ 0 Spiritual XP** and an active **🔥 0-day streak**.
+
+How can I guide your spiritual walk or app navigation today?
+[android.widget.Button] ⭐ CHECK MY XP & LEVEL
+[android.widget.Button] 🔥 PROTECT MY 7-DAY STREAK
+[android.widget.Button] 🎥 WATCH YOUTUBE LIVE
+[android.widget.Button] 📖 READ SWAHILI BIBLE
+[android.widget.Button] 💚 GIVE TITHE VIA M-PESA
+[android.widget.EditText] Ask about XP, Bible, sermons, tithe...
+[android.widget.Button] ➤ SEND

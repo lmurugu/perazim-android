@@ -1,0 +1,6 @@
+[android.widget.ImageButton] (desc) Expand
+[android.widget.ImageButton] (desc) Go to background
+[android.widget.ImageButton] (desc) Pause video
+[android.widget.ImageButton] (desc) Next
+[android.widget.ImageButton] (desc) Settings
+[android.widget.ImageButton] (desc) Close
