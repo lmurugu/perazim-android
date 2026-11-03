@@ -309,14 +309,24 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            long start = parseDate(getCell(r, col, "start"), System.currentTimeMillis());
+            long start = System.currentTimeMillis();
+            if (col.containsKey("start") && !getCell(r, col, "start").isEmpty()) {
+                start = parseDate(getCell(r, col, "start"), start);
+            } else if (col.containsKey("date") && !getCell(r, col, "date").isEmpty()) {
+                String dStr = getCell(r, col, "date");
+                if (col.containsKey("time") && !getCell(r, col, "time").isEmpty()) {
+                    dStr += " " + getCell(r, col, "time");
+                }
+                start = parseDate(dStr, start);
+            }
+
             long end = parseDate(getCell(r, col, "end"), start + (2L * 3600000L));
-            String venue = getCellOrDefault(r, col, "venue", "Sanctuary");
+            String venue = getCellOrDefault(r, col, "venue", getCellOrDefault(r, col, "location", "Sanctuary"));
             String campus = getCellOrDefault(r, col, "campus", "all");
             String desc = getCellOrDefault(r, col, "description", "");
             String imageUrl = getCellOrDefault(r, col, "image_url", "sanctuary.jpg");
             String category = getCellOrDefault(r, col, "category", "Worship");
-            boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
+            boolean active = col.containsKey("active") ? parseBool(getCellOrDefault(r, col, "active", "true")) : true;
 
             EventEntity entity = new EventEntity(
                     id, title, desc, start, end, venue, campus, imageUrl, category, active);
@@ -357,12 +367,15 @@ public final class SheetSyncManager {
             String tags = getCellOrDefault(r, col, "tags", "Worship");
             String lyrics = getCellOrDefault(r, col, "lyrics", "");
             String chords = getCellOrDefault(r, col, "chords", "");
-            boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
+            // Default active=true if column is missing
+            boolean active = col.containsKey("active") ? parseBool(getCellOrDefault(r, col, "active", "true")) : true;
 
             int num = parseInt(id.replaceAll("\\D+", ""), i);
 
+            // Ignore sheet is_favorite for member state; strictly preserve local favorites
             HymnEntity existing = dao.getHymnById(id);
             boolean isFavorite = (existing != null) && existing.isFavorite();
+
             String timeSignature = (existing != null && existing.getTimeSignature() != null)
                     ? existing.getTimeSignature()
                     : "";
@@ -407,10 +420,10 @@ public final class SheetSyncManager {
 
             String category = getCellOrDefault(r, col, "category", "MEDIUM");
             String difficulty = getCellOrDefault(r, col, "difficulty", category);
-            int xp = parseInt(getCellOrDefault(r, col, "xp", "20"), 20);
+            int xp = parseInt(getCellOrDefault(r, col, "xp", getCellOrDefault(r, col, "xp_reward", "20")), 20);
             String explanation = getCellOrDefault(r, col, "explanation", "");
-            String scriptureRef = getCellOrDefault(r, col, "scripture_ref", "");
-            boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
+            String scriptureRef = getCellOrDefault(r, col, "scripture_ref", getCellOrDefault(r, col, "reference", ""));
+            boolean active = col.containsKey("active") ? parseBool(getCellOrDefault(r, col, "active", "true")) : true;
 
             RiddleEntity entity = new RiddleEntity(
                     id, question, answer, explanation, scriptureRef, difficulty, category, xp, active);
@@ -428,7 +441,8 @@ public final class SheetSyncManager {
         if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
-        if (!col.containsKey("id") || !col.containsKey("text")) {
+        boolean hasText = col.containsKey("text") || col.containsKey("joke");
+        if (!col.containsKey("id") || !hasText) {
             return new SyncStats(0, 0);
         }
 
@@ -438,7 +452,18 @@ public final class SheetSyncManager {
         for (int i = 1; i < rows.size(); i++) {
             List<String> r = rows.get(i);
             String id = getCell(r, col, "id");
-            String text = getCell(r, col, "text");
+            String text = "";
+            if (col.containsKey("text") && !getCell(r, col, "text").isEmpty()) {
+                text = getCell(r, col, "text");
+            } else if (col.containsKey("joke")) {
+                String jokePart = getCell(r, col, "joke");
+                String punchlinePart = col.containsKey("punchline") ? getCell(r, col, "punchline") : "";
+                if (!jokePart.isEmpty() && !punchlinePart.isEmpty()) {
+                    text = jokePart + "\nA: " + punchlinePart;
+                } else if (!jokePart.isEmpty()) {
+                    text = jokePart;
+                }
+            }
             if (id.isEmpty() || text.isEmpty()) {
                 skipped++;
                 continue;
@@ -446,7 +471,16 @@ public final class SheetSyncManager {
 
             String cleanRating = getCellOrDefault(r, col, "clean_rating", "FAMILY_SAFE");
             String category = getCellOrDefault(r, col, "category", "Fellowship");
-            boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
+
+            // Treat "approved" like active when "active" is missing
+            boolean active;
+            if (col.containsKey("active")) {
+                active = parseBool(getCellOrDefault(r, col, "active", "true"));
+            } else if (col.containsKey("approved")) {
+                active = parseBool(getCellOrDefault(r, col, "approved", "true"));
+            } else {
+                active = true;
+            }
 
             JokeEntity entity = new JokeEntity(id, text, cleanRating, category, active);
             dao.insert(entity);
@@ -479,13 +513,20 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            String speaker = getCellOrDefault(r, col, "speaker", "Bishop Dr. David Mutweri");
+            // Map "preacher" as speaker when "speaker" is absent
+            String speaker = "Bishop Dr. David Mutweri";
+            if (col.containsKey("speaker") && !getCell(r, col, "speaker").isEmpty()) {
+                speaker = getCell(r, col, "speaker");
+            } else if (col.containsKey("preacher") && !getCell(r, col, "preacher").isEmpty()) {
+                speaker = getCell(r, col, "preacher");
+            }
+
             long dateMillis = parseDate(getCell(r, col, "date"), System.currentTimeMillis());
             String series = getCellOrDefault(r, col, "series", "Breakthrough Series");
             String scripture = getCellOrDefault(r, col, "scripture", "2 Samuel 5:20");
             String ytUrl = getCellOrDefault(r, col, "youtube_url", "");
             String audioUrl = getCellOrDefault(r, col, "audio_url", "");
-            boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
+            boolean active = col.containsKey("active") ? parseBool(getCellOrDefault(r, col, "active", "true")) : true;
 
             SermonEntity existing = dao.getSermonById(id);
             boolean isDownloaded = (existing != null) && existing.isDownloaded();
@@ -495,7 +536,10 @@ public final class SheetSyncManager {
             int durationSeconds = (existing != null) ? existing.getDurationSeconds() : 0;
             if (col.containsKey("duration") && !getCell(r, col, "duration").isEmpty()) {
                 durationSeconds = parseInt(getCell(r, col, "duration"), durationSeconds);
+            } else if (col.containsKey("duration_seconds") && !getCell(r, col, "duration_seconds").isEmpty()) {
+                durationSeconds = parseInt(getCell(r, col, "duration_seconds"), durationSeconds);
             }
+
             String summary = (existing != null && existing.getSummary() != null) ? existing.getSummary() : "";
             if (col.containsKey("summary") && !getCell(r, col, "summary").isEmpty()) {
                 summary = getCell(r, col, "summary");
@@ -522,7 +566,10 @@ public final class SheetSyncManager {
         if (rows == null || rows.size() < 2) return new SyncStats(0, 0);
 
         Map<String, Integer> col = mapHeaders(rows.get(0));
-        if (!col.containsKey("date") || !col.containsKey("reference") || !col.containsKey("text")) {
+        boolean hasDate = col.containsKey("date") || col.containsKey("date_for");
+        boolean hasRef = col.containsKey("reference");
+        boolean hasText = col.containsKey("text") || col.containsKey("verse_text");
+        if (!hasDate || !hasRef || !hasText) {
             return new SyncStats(0, 0);
         }
 
@@ -531,9 +578,13 @@ public final class SheetSyncManager {
 
         for (int i = 1; i < rows.size(); i++) {
             List<String> r = rows.get(i);
-            String date = getCell(r, col, "date");
+            String date = col.containsKey("date") && !getCell(r, col, "date").isEmpty()
+                    ? getCell(r, col, "date")
+                    : getCell(r, col, "date_for");
             String ref = getCell(r, col, "reference");
-            String text = getCell(r, col, "text");
+            String text = col.containsKey("text") && !getCell(r, col, "text").isEmpty()
+                    ? getCell(r, col, "text")
+                    : getCell(r, col, "verse_text");
             if (date.isEmpty() || ref.isEmpty() || text.isEmpty()) {
                 skipped++;
                 continue;

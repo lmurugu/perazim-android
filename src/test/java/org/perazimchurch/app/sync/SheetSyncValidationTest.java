@@ -376,6 +376,100 @@ public class SheetSyncValidationTest {
         assertEquals("Fellowship", new2.getCategory());
     }
 
+    @Test
+    public void testJokeProcessingWithJokePunchlineAndApproved() throws IOException {
+        List<JokeEntity> list = new ArrayList<>();
+        DummyJokeDao mockDao = new DummyJokeDao(list);
+
+        String csv = "id,joke,punchline,author,approved\n" +
+                "jk-1,\"Who was the greatest financier in the Bible?\",\"Noah — he was floating his stock while everyone else was in liquidation!\",Sunday School,TRUE\n" +
+                "jk-2,\"Unapproved joke without punchline\",\"\",Fellowship,FALSE";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processJokesRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        JokeEntity j1 = mockDao.getJokeById("jk-1");
+        assertTrue("Joke must compose joke and punchline", j1.getText().contains("greatest financier"));
+        assertTrue("Joke must include punchline", j1.getText().contains("floating his stock"));
+        assertTrue("Approved TRUE must map to active = true", j1.isActive());
+
+        JokeEntity j2 = mockDao.getJokeById("jk-2");
+        assertEquals("Unapproved joke without punchline", j2.getText());
+        assertFalse("Approved FALSE must map to active = false", j2.isActive());
+    }
+
+    @Test
+    public void testVerseProcessingWithVerseTextAndDateFor() throws IOException {
+        List<DailyVerseEntity> list = new ArrayList<>();
+        DummyDailyVerseDao mockDao = new DummyDailyVerseDao(list);
+
+        String csv = "id,verse_text,reference,category,date_for\n" +
+                "v-1,\"The Lord shall fight for you, and ye shall hold your peace.\",\"Exodus 14:14\",faith,2026-11-03\n" +
+                "v-2,\"For I know the thoughts that I think toward you, saith the Lord.\",\"Jeremiah 29:11\",hope,2026-11-04";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processVersesRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        DailyVerseEntity v1 = mockDao.getVerseForDate("2026-11-03");
+        assertEquals("Exodus 14:14", v1.getReference());
+        assertEquals("The Lord shall fight for you, and ye shall hold your peace.", v1.getText());
+        assertTrue(v1.isActive());
+
+        DailyVerseEntity v2 = mockDao.getVerseForDate("2026-11-04");
+        assertEquals("Jeremiah 29:11", v2.getReference());
+    }
+
+    @Test
+    public void testSermonProcessingWithPreacherAndDurationSeconds() throws IOException {
+        List<SermonEntity> list = new ArrayList<>();
+        DummySermonDao mockDao = new DummySermonDao(list);
+
+        String csv = "id,title,preacher,series,date,scripture,summary,audio_url,duration_seconds\n" +
+                "sermon-1,\"Supernatural Breakthrough\",\"Bishop Dr. David Mutweri\",\"Breakthrough Power Series\",\"2026-11-01\",\"2 Samuel 5:17-21\",\"Divine enlargement\",\"https://audio.perazimchurch.org/sermons/breakthrough.mp3\",2820";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processSermonsRows(rows, mockDao);
+        assertEquals(1, stats.synced);
+
+        SermonEntity s1 = mockDao.getSermonById("sermon-1");
+        assertEquals("Supernatural Breakthrough", s1.getTitle());
+        assertEquals("Bishop Dr. David Mutweri", s1.getPreacher());
+        assertEquals("2 Samuel 5:17-21", s1.getPassage());
+        assertEquals(2820, s1.getDurationSeconds());
+        assertTrue("Sermon must default to active = true when active column is missing", s1.isActive());
+    }
+
+    @Test
+    public void testHymnProcessingIgnoresSheetIsFavoriteAndDefaultsActiveTrue() throws IOException {
+        List<HymnEntity> existingList = new ArrayList<>();
+        HymnEntity existingFavorite = new HymnEntity(
+                "hymn-1", 1, "Amazing Grace", "lyrics", "G", "G Major", "3/4",
+                "classic", true, "Traditional", "1779", 80, "Grace", true);
+        existingList.add(existingFavorite);
+
+        DummyHymnDao mockDao = new DummyHymnDao(existingList);
+
+        String csv = "id,number,title,key,time_signature,lyrics,category,is_favorite\n" +
+                "hymn-1,1,\"Amazing Grace (Sheet Update)\",G,3/4,\"Updated lyrics\",classic,FALSE\n" +
+                "hymn-2,2,\"How Great Thou Art\",Bb,4/4,\"O Lord my God\",classic,TRUE";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processHymnsRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        HymnEntity h1 = mockDao.getHymnById("hymn-1");
+        assertEquals("Amazing Grace (Sheet Update)", h1.getTitle());
+        assertTrue("Member's local favorite flag must be preserved regardless of sheet is_favorite FALSE", h1.isFavorite());
+        assertTrue("Hymn must default to active = true when active column is missing", h1.isActive());
+
+        HymnEntity h2 = mockDao.getHymnById("hymn-2");
+        assertEquals("How Great Thou Art", h2.getTitle());
+        assertFalse("New hymn must ignore sheet is_favorite TRUE to protect local member favorites", h2.isFavorite());
+        assertTrue("New hymn must default to active = true when active column is missing", h2.isActive());
+    }
+
     // -------------------------------------------------------------------------
     // Test Dummy DAOs (recording in-memory without database overhead)
     // -------------------------------------------------------------------------
@@ -570,11 +664,26 @@ public class SheetSyncValidationTest {
     private static class DummyDailyVerseDao implements DailyVerseDao {
         private final List<DailyVerseEntity> list;
         DummyDailyVerseDao(List<DailyVerseEntity> list) { this.list = list; }
-        @Override public void insert(DailyVerseEntity verse) { list.add(verse); }
-        @Override public void insertAll(List<DailyVerseEntity> verses) { list.addAll(verses); }
+        @Override public void insert(DailyVerseEntity verse) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getDate().equals(verse.getDate())) {
+                    list.set(i, verse);
+                    return;
+                }
+            }
+            list.add(verse);
+        }
+        @Override public void insertAll(List<DailyVerseEntity> verses) {
+            for (DailyVerseEntity v : verses) insert(v);
+        }
         @Override public void update(DailyVerseEntity verse) {}
         @Override public void delete(DailyVerseEntity verse) {}
-        @Override public DailyVerseEntity getVerseForDate(String date) { return null; }
+        @Override public DailyVerseEntity getVerseForDate(String date) {
+            for (DailyVerseEntity v : list) {
+                if (v.getDate().equals(date)) return v;
+            }
+            return null;
+        }
         @Override public List<DailyVerseEntity> getAllActiveVerses() { return list; }
         @Override public void deleteByDate(String date) {}
         @Override public void deleteAll() {}
