@@ -14,69 +14,67 @@ public final class PerazimTheme {
     }
 
     // =========================================================================
-    // CANONICAL BRAND COLORS (Phase 0.3 Contract)
+    // MANDATORY QUIET DARK COLOR SYSTEM (§1 Contract)
     // =========================================================================
 
-    /** Canonical Primary Royal Purple */
-    public static final int COLOR_PRIMARY_PURPLE = Color.parseColor("#681A7D");
+    // Purple Family
+    /** App Background Canvas (#2A0F33) */
+    public static final int COLOR_BG_DEEP       = Color.parseColor("#2A0F33");
+    /** Cards and Content Containers (#3D1749) */
+    public static final int COLOR_SURFACE       = Color.parseColor("#3D1749");
+    /** Elevated Surfaces, Text Inputs, Search Bars (#4F1E5C) */
+    public static final int COLOR_SURFACE_2     = Color.parseColor("#4F1E5C");
+    /** Inactive Nav, Secondary Icons, Outline Borders (#8B5A9A) */
+    public static final int COLOR_PURPLE_MUTED  = Color.parseColor("#8B5A9A");
+    /** Active Nav, Links, Selected Chips (#681A7D) */
+    public static final int COLOR_PURPLE_BRAND  = Color.parseColor("#681A7D");
+    /** Soft Labels and Supporting Text (#A67BB3) */
+    public static final int COLOR_PURPLE_SOFT   = Color.parseColor("#A67BB3");
+    /** Selection Wash with 20% alpha */
+    public static final int COLOR_PURPLE_GHOST  = Color.parseColor("#33681A7D");
 
-    /** Canonical Accent Warm Amber / Orange */
-    public static final int COLOR_ACCENT_ORANGE = Color.parseColor("#E17D2F");
+    // Orange Family
+    /** ONLY the Single Primary CTA on a screen (#E17D2F) */
+    public static final int COLOR_ORANGE_BRAND  = Color.parseColor("#E17D2F");
+    /** Rare Secondary Accent (#C4894F) */
+    public static final int COLOR_ORANGE_MUTED  = Color.parseColor("#C4894F");
+    /** Pressed / Focus on Orange CTA (#E8A86A) */
+    public static final int COLOR_ORANGE_SOFT   = Color.parseColor("#E8A86A");
+    /** Orange Selection Wash with 24% alpha */
+    public static final int COLOR_ORANGE_GHOST  = Color.parseColor("#3DE17D2F");
 
-    /** Canonical Warm Cream */
-    public static final int COLOR_WARM_CREAM = Color.parseColor("#FAF6EE");
-
-    /** Canonical Purple Deep */
-    public static final int COLOR_PURPLE_DEEP = Color.parseColor("#2D0938");
-
-    /** Canonical Obsidian Dark */
-    public static final int COLOR_OBSIDIAN = Color.parseColor("#140319");
-
-    /** Canonical Pure White */
-    public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-
-    /** Canonical Dark Text (High Contrast) */
-    public static final int COLOR_TEXT_DARK = Color.parseColor("#1A1A1A");
-
-    /** Canonical Muted Text (Secondary Content) */
-    public static final int COLOR_TEXT_MUTED = Color.parseColor("#666666");
+    // Neutrals
+    /** Primary High-Contrast Text on Dark Surfaces (#F5F0F7) */
+    public static final int COLOR_TEXT_PRIMARY   = Color.parseColor("#F5F0F7");
+    /** Secondary Subtitle / Metadata Text (#B9A8C0) */
+    public static final int COLOR_TEXT_SECONDARY = Color.parseColor("#B9A8C0");
+    /** Disabled Text and Placeholders (#6E5C78) */
+    public static final int COLOR_TEXT_DISABLED  = Color.parseColor("#6E5C78");
+    /** Card Borders and Structural Dividers (#4A3554) */
+    public static final int COLOR_STROKE         = Color.parseColor("#4A3554");
 
     // =========================================================================
-    // SUPPORTING BRAND & SYSTEM COLORS
+    // LEGACY ALIASES (Backwards Compatibility)
     // =========================================================================
 
-    /** 3D Bevel Shadow for Purple Surfaces */
-    public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
-
-    /** Soft Purple for Accents and Secondary Highlights */
-    public static final int COLOR_PURPLE_SOFT = Color.parseColor("#C896D8");
-
-    /** Pastel Purple Tint for Badges and Pill Backgrounds */
-    public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-
-    /** Card Border & Divider Grey */
-    public static final int COLOR_BORDER_GREY = Color.parseColor("#E7D5EC");
-
-    /** Neutral Canvas Background */
-    public static final int COLOR_BG_NEUTRAL = Color.parseColor("#FAF7FB");
-
-    /** Dark Amber for Contrast Text */
-    public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
-
-    /** 3D Bevel Shadow for Orange CTAs */
-    public static final int COLOR_ORANGE_SHADOW = Color.parseColor("#98450B");
-
-    /** Amber Pill Border */
-    public static final int COLOR_ORANGE_BORDER = Color.parseColor("#F9DFCC");
-
-    /** Amber Pastel Tint */
-    public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
-
-    /** Success Emerald Green */
-    public static final int COLOR_SUCCESS = Color.parseColor("#10B981");
-
-    /** Error / Warning Crimson */
-    public static final int COLOR_ERROR = Color.parseColor("#EF4444");
+    public static final int COLOR_PRIMARY_PURPLE = COLOR_PURPLE_BRAND;
+    public static final int COLOR_ACCENT_ORANGE  = COLOR_ORANGE_BRAND;
+    public static final int COLOR_WARM_CREAM     = Color.parseColor("#FAF6EE");
+    public static final int COLOR_PURPLE_DEEP    = COLOR_BG_DEEP;
+    public static final int COLOR_OBSIDIAN       = Color.parseColor("#140319");
+    public static final int COLOR_WHITE          = Color.parseColor("#FFFFFF");
+    public static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1A1A");
+    public static final int COLOR_TEXT_MUTED     = COLOR_TEXT_SECONDARY;
+    public static final int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
+    public static final int COLOR_PURPLE_TINT    = COLOR_PURPLE_GHOST;
+    public static final int COLOR_BORDER_GREY    = COLOR_STROKE;
+    public static final int COLOR_BG_NEUTRAL     = COLOR_BG_DEEP;
+    public static final int COLOR_ORANGE_DARK    = Color.parseColor("#78350A");
+    public static final int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
+    public static final int COLOR_ORANGE_BORDER  = COLOR_ORANGE_MUTED;
+    public static final int COLOR_ORANGE_TINT    = COLOR_ORANGE_GHOST;
+    public static final int COLOR_SUCCESS        = Color.parseColor("#10B981");
+    public static final int COLOR_ERROR          = Color.parseColor("#EF4444");
 
     // =========================================================================
     // SPACING GUIDELINES (dp)

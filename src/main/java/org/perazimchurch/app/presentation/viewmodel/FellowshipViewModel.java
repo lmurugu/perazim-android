@@ -180,6 +180,26 @@ public class FellowshipViewModel extends ViewModel {
     }
 
     /**
+     * Loads personal prayer petitions submitted by the current user.
+     */
+    public void loadUserPrayers(@NonNull String userId, @Nullable Consumer<List<Prayer>> callback) {
+        executor.execute(() -> {
+            try {
+                List<Prayer> userPrayers = prayerRepo.getUserPrayers(userId);
+                if (callback != null) {
+                    final List<Prayer> res = userPrayers != null ? userPrayers : Collections.emptyList();
+                    postCallback(() -> callback.accept(res));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading user prayers for " + userId, e);
+                if (callback != null) {
+                    postCallback(() -> callback.accept(Collections.emptyList()));
+                }
+            }
+        });
+    }
+
+    /**
      * Increments amen count and records user amen interaction.
      */
     public void amenPrayer(@NonNull String prayerId, @Nullable String userId, @Nullable Runnable onDone) {

@@ -127,7 +127,7 @@ public class ProfileUiBinder {
     public ScrollView buildView() {
         ScrollView scrollView = new ScrollView(context);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
 
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -155,21 +155,17 @@ public class ProfileUiBinder {
         View headerCard = createProfileHeaderCard();
         rootContainer.addView(headerCard);
 
-        // 2. Spiritual Journey Card
-        View journeyCard = createSpiritualJourneyCard();
-        rootContainer.addView(journeyCard);
+        // 2. Stats Row Card (Quiet Numbers)
+        View statsCard = createStatsRowCard();
+        rootContainer.addView(statsCard);
 
-        // 3. Saved Content Manager (Tabbed View)
-        View savedContentCard = createSavedContentManagerCard();
-        rootContainer.addView(savedContentCard);
+        // 3. Single Primary Action: Give with M-Pesa (Solid Orange)
+        View giveCard = createGiveButtonCard();
+        rootContainer.addView(giveCard);
 
-        // 4. Church Identity & Campus Switcher Card
-        View churchCard = createChurchIdentityCard();
-        rootContainer.addView(churchCard);
-
-        // 5. Pastoral Care & Support Card
-        View pastoralCard = createPastoralSupportCard();
-        rootContainer.addView(pastoralCard);
+        // 4. Settings / Deeper Options List (Card with Chevrons)
+        View optionsCard = createOptionsListCard();
+        rootContainer.addView(optionsCard);
 
         // Initial Data Load
         refreshProfile();
@@ -181,32 +177,28 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createProfileHeaderCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_BORDER_GREY, 1);
-        card.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpCard.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(lpCard);
-
-        LinearLayout memberRow = new LinearLayout(context);
-        memberRow.setOrientation(LinearLayout.HORIZONTAL);
-        memberRow.setGravity(Gravity.CENTER_VERTICAL);
-        memberRow.setPadding(0, 0, 0, dp(12));
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
 
         // Member Avatar
         Bitmap avatarBmp = loadAssetBitmap("bishop_portrait.jpg", 200);
         ivAvatar = new ImageView(context);
         if (avatarBmp != null) {
-            ivAvatar.setImageBitmap(getRoundedCornerBitmap(avatarBmp, dp(32)));
+            ivAvatar.setImageBitmap(getRoundedCornerBitmap(avatarBmp, dp(28)));
             ivAvatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
         } else {
-            // Draw placeholder monogram
-            ivAvatar.setImageBitmap(createMonogramBitmap("PM", dp(64)));
+            ivAvatar.setImageBitmap(createMonogramBitmap("PMC", dp(56)));
         }
-        LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(64), dp(64));
+        LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(56), dp(56));
         lpAv.setMargins(0, 0, dp(14), 0);
         ivAvatar.setLayoutParams(lpAv);
-        memberRow.addView(ivAvatar);
+        card.addView(ivAvatar);
 
         // Member Text Info
         LinearLayout memberInfo = new LinearLayout(context);
@@ -216,298 +208,502 @@ public class ProfileUiBinder {
 
         tvMemberName = new TextView(context);
         tvMemberName.setText("Perazim Covenant Member");
-        tvMemberName.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_SUBTITLE);
+        tvMemberName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         tvMemberName.setTypeface(Typeface.DEFAULT_BOLD);
-        tvMemberName.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
+        tvMemberName.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         memberInfo.addView(tvMemberName);
 
         tvMemberEmail = new TextView(context);
         tvMemberEmail.setText("member@perazimchurch.org");
-        tvMemberEmail.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
-        tvMemberEmail.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
-        tvMemberEmail.setPadding(0, dp(2), 0, dp(2));
+        tvMemberEmail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvMemberEmail.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvMemberEmail.setPadding(0, dp(2), 0, dp(4));
         memberInfo.addView(tvMemberEmail);
 
+        // Campus Selector Chip
         tvMemberCampus = new TextView(context);
-        tvMemberCampus.setText("Perazim Mission Church · Embu Headquarters");
-        tvMemberCampus.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
-        tvMemberCampus.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
+        tvMemberCampus.setText("Embu Headquarters · Switch ▾");
+        tvMemberCampus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvMemberCampus.setTypeface(Typeface.DEFAULT_BOLD);
-        tvMemberCampus.setPadding(0, 0, 0, dp(6));
+        tvMemberCampus.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvMemberCampus.setBackground(createPillDrawable(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
+        tvMemberCampus.setPadding(dp(8), dp(3), dp(8), dp(3));
+        LinearLayout.LayoutParams lpCampus = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        tvMemberCampus.setLayoutParams(lpCampus);
+        tvMemberCampus.setOnClickListener(v -> showCampusSwitcherDialog());
         memberInfo.addView(tvMemberCampus);
 
-        // Covenant Badge
-        tvCovenantBadge = new TextView(context);
-        tvCovenantBadge.setText("🕊️ Active Disciple • Covenant Partner");
-        tvCovenantBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
-        tvCovenantBadge.setTypeface(Typeface.DEFAULT_BOLD);
-        tvCovenantBadge.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
-        tvCovenantBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_BORDER_GREY));
-        tvCovenantBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
-        memberInfo.addView(tvCovenantBadge);
-
-        memberRow.addView(memberInfo);
-        card.addView(memberRow);
-
-        // Campus Switcher Button on Header
-        Button btnSwitchCampus = new Button(context);
-        btnSwitchCampus.setText("📍 Switch Church Campus");
-        btnSwitchCampus.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
-        btnSwitchCampus.setTypeface(Typeface.DEFAULT_BOLD);
-        btnSwitchCampus.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
-        btnSwitchCampus.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_BORDER_GREY));
-        btnSwitchCampus.setPadding(dp(12), dp(6), dp(12), dp(6));
-        btnSwitchCampus.setOnClickListener(v -> showCampusSwitcherDialog());
-        card.addView(btnSwitchCampus);
-
+        card.addView(memberInfo);
         return card;
     }
 
     // =========================================================================
-    // 2. SPIRITUAL JOURNEY CARD
+    // 2. STATS ROW (Quiet numbers, no neon pills)
     // =========================================================================
 
-    private View createSpiritualJourneyCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_BORDER_GREY, 1);
+    private View createStatsRowCard() {
+        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpCard.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(lpCard);
+        card.setPadding(dp(12), dp(12), dp(12), dp(12));
 
-        TextView tvHeader = new TextView(context);
-        tvHeader.setText("🔥 SPIRITUAL JOURNEY & GROWTH");
-        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
-        tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
-        tvHeader.setPadding(0, 0, 0, dp(10));
-        card.addView(tvHeader);
-
-        // 3-Metric Summary Row: Streak, XP, Grace
-        LinearLayout hudRow = new LinearLayout(context);
-        hudRow.setOrientation(LinearLayout.HORIZONTAL);
-        hudRow.setGravity(Gravity.CENTER_VERTICAL);
-        hudRow.setLayoutParams(new LinearLayout.LayoutParams(
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
-        String initialUid = "user_me";
-        try {
-            SessionManager sm = SessionManager.getInstance(context);
-            if (sm != null && sm.getActiveUserId() != null) initialUid = sm.getActiveUserId();
-        } catch (Exception ignored) {}
-        int currentStreak = GamificationStore.getStreak(context, initialUid, 0);
-        int currentXp = GamificationStore.getSpiritualXp(context, initialUid, 0);
-        int currentGrace = GamificationStore.getGracePoints(context, initialUid, 2);
-        int initialLevel = (currentXp / 500) + 1;
-        int initialProgress = currentXp % 500;
+        String uid = resolveGamificationUserId();
+        int currentStreak = GamificationStore.getStreak(context, uid, 0);
+        int currentXp = GamificationStore.getSpiritualXp(context, uid, 0);
+        int currentGrace = GamificationStore.getGracePoints(context, uid, 2);
+        int lifetimeDays = GamificationStore.getLifetimeRoutineDays(context, uid, 0);
 
-        // Streak Block
-        LinearLayout streakBlock = createMetricBox("🔥 " + currentStreak + " Days", "Daily Streak", "Active", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ACCENT_ORANGE);
-        tvStreakValue = (TextView) streakBlock.getChildAt(0);
-        tvStreakStatus = (TextView) streakBlock.getChildAt(2);
-        hudRow.addView(streakBlock);
+        LinearLayout c1 = createStatColumn(currentStreak + "d", "Streak");
+        tvStreakValue = (TextView) c1.getChildAt(0);
+        row.addView(c1);
 
-        // XP Block
-        LinearLayout xpBlock = createMetricBox("⭐ " + currentXp + " XP", "Spiritual XP", "Level " + initialLevel, PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_PRIMARY_PURPLE);
-        tvXpValue = (TextView) xpBlock.getChildAt(0);
-        hudRow.addView(xpBlock);
+        row.addView(createVerticalDivider());
 
-        // Grace Points Block
-        LinearLayout graceBlock = createMetricBox("💜 " + currentGrace + " Pts", "Grace Points", "Tokens", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ORANGE_DARK);
-        tvGraceValue = (TextView) graceBlock.getChildAt(0);
-        hudRow.addView(graceBlock);
+        LinearLayout c2 = createStatColumn(String.valueOf(currentXp), "Spiritual XP");
+        tvXpValue = (TextView) c2.getChildAt(0);
+        row.addView(c2);
 
-        card.addView(hudRow);
+        row.addView(createVerticalDivider());
 
-        // Spiritual XP Progress Bar
-        tvXpLevelLabel = new TextView(context);
-        tvXpLevelLabel.setText("Level " + initialLevel + " Disciple — " + initialProgress + " / 500 XP to Level " + (initialLevel + 1));
-        tvXpLevelLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
-        tvXpLevelLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        tvXpLevelLabel.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
-        tvXpLevelLabel.setPadding(0, dp(12), 0, dp(4));
-        card.addView(tvXpLevelLabel);
+        LinearLayout c3 = createStatColumn(String.valueOf(currentGrace), "Grace");
+        tvGraceValue = (TextView) c3.getChildAt(0);
+        row.addView(c3);
 
-        xpProgressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
-        xpProgressBar.setMax(500);
-        xpProgressBar.setProgress(initialProgress);
-        LinearLayout.LayoutParams lpBar = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(10));
-        lpBar.setMargins(0, 0, 0, dp(12));
-        xpProgressBar.setLayoutParams(lpBar);
-        card.addView(xpProgressBar);
+        row.addView(createVerticalDivider());
 
-        // Stats Row 2: Lifetime Routine Days & Badges Earned
-        int initialLifetimeDays = GamificationStore.getLifetimeRoutineDays(context, initialUid, 0);
-        boolean initialBadgeFirst = GamificationStore.hasBadgeFirstRoutine(context, initialUid);
-        boolean initialBadgeStreak7 = GamificationStore.hasBadgeStreak7(context, initialUid);
-        int initialBadgeCount = (initialBadgeFirst ? 1 : 0) + (initialBadgeStreak7 ? 1 : 0);
+        LinearLayout c4 = createStatColumn(lifetimeDays + "d", "Lifetime");
+        tvLifetimeDaysValue = (TextView) c4.getChildAt(0);
+        row.addView(c4);
 
-        LinearLayout statsRow2 = new LinearLayout(context);
-        statsRow2.setOrientation(LinearLayout.HORIZONTAL);
-        statsRow2.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams lpStats2 = new LinearLayout.LayoutParams(
+        card.addView(row);
+        return card;
+    }
+
+    private View createVerticalDivider() {
+        View v = new View(context);
+        v.setBackgroundColor(PerazimTheme.COLOR_STROKE);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(1), dp(24));
+        v.setLayoutParams(lp);
+        return v;
+    }
+
+    private LinearLayout createStatColumn(String value, String label) {
+        LinearLayout col = new LinearLayout(context);
+        col.setOrientation(LinearLayout.VERTICAL);
+        col.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        col.setLayoutParams(lp);
+
+        TextView tvVal = new TextView(context);
+        tvVal.setText(value);
+        tvVal.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        tvVal.setTypeface(Typeface.DEFAULT_BOLD);
+        tvVal.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        col.addView(tvVal);
+
+        TextView tvLbl = new TextView(context);
+        tvLbl.setText(label);
+        tvLbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvLbl.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvLbl.setPadding(0, dp(2), 0, 0);
+        col.addView(tvLbl);
+
+        return col;
+    }
+
+    // =========================================================================
+    // 3. SINGLE PRIMARY ACTION: GIVE WITH M-PESA
+    // =========================================================================
+
+    private View createGiveButtonCard() {
+        Button btnGive = new Button(context);
+        btnGive.setText("Give with M-Pesa");
+        btnGive.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        btnGive.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(PerazimTheme.COLOR_ORANGE_BRAND);
+        bg.setCornerRadius(dp(12));
+        btnGive.setBackground(bg);
+        btnGive.setPadding(dp(14), dp(12), dp(14), dp(12));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpStats2.setMargins(0, 0, 0, dp(10));
-        statsRow2.setLayoutParams(lpStats2);
+        lp.setMargins(0, 0, 0, dp(14));
+        btnGive.setLayoutParams(lp);
+        btnGive.setOnClickListener(v -> GivingDialog.show(context));
+        return btnGive;
+    }
 
-        LinearLayout lifetimeBlock = createMetricBox("📅 " + initialLifetimeDays + " Days", "Lifetime Days", "Devotions", PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_PURPLE_DEEP);
-        tvLifetimeDaysValue = (TextView) lifetimeBlock.getChildAt(0);
-        statsRow2.addView(lifetimeBlock);
+    // =========================================================================
+    // 4. SETTINGS & DEEPER LIST (Quiet card with chevrons)
+    // =========================================================================
 
-        LinearLayout badgesBlock = createMetricBox("🏆 " + initialBadgeCount + " / 2", "Badges Earned", "Milestones", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ACCENT_ORANGE);
-        tvBadgesCountValue = (TextView) badgesBlock.getChildAt(0);
-        statsRow2.addView(badgesBlock);
-
-        card.addView(statsRow2);
-
-        // Milestone Badges Shelf
-        TextView tvBadgesHeader = new TextView(context);
-        tvBadgesHeader.setText("MILESTONE BADGES");
-        tvBadgesHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
-        tvBadgesHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvBadgesHeader.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
-        tvBadgesHeader.setPadding(0, 0, 0, dp(6));
-        card.addView(tvBadgesHeader);
-
-        LinearLayout badgesShelf = new LinearLayout(context);
-        badgesShelf.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams lpShelf = new LinearLayout.LayoutParams(
+    private View createOptionsListCard() {
+        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
+        card.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpShelf.setMargins(0, 0, 0, dp(12));
-        badgesShelf.setLayoutParams(lpShelf);
+        lp.setMargins(0, 0, 0, dp(14));
+        card.setLayoutParams(lp);
+        card.setPadding(dp(4), dp(8), dp(4), dp(8));
 
-        tvBadgeFirstRoutine = new TextView(context);
-        tvBadgeFirstRoutine.setText(initialBadgeFirst ? "🌟 First Routine ✓" : "🔒 First Routine");
-        tvBadgeFirstRoutine.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
-        tvBadgeFirstRoutine.setTypeface(Typeface.DEFAULT_BOLD);
-        tvBadgeFirstRoutine.setTextColor(initialBadgeFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_TEXT_MUTED);
-        tvBadgeFirstRoutine.setBackground(createPillDrawable(
-                initialBadgeFirst ? PerazimTheme.COLOR_PURPLE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
-                initialBadgeFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_BORDER_GREY));
-        tvBadgeFirstRoutine.setPadding(dp(8), dp(6), dp(8), dp(6));
-        LinearLayout.LayoutParams lpB1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lpB1.setMargins(0, 0, dp(4), 0);
-        tvBadgeFirstRoutine.setLayoutParams(lpB1);
-        tvBadgeFirstRoutine.setGravity(Gravity.CENTER);
-        badgesShelf.addView(tvBadgeFirstRoutine);
+        TextView tvHeader = new TextView(context);
+        tvHeader.setText("CHURCH & RESOURCES");
+        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvHeader.setLetterSpacing(0.04f);
+        tvHeader.setPadding(dp(12), dp(4), 0, dp(8));
+        card.addView(tvHeader);
 
-        tvBadgeStreak7 = new TextView(context);
-        tvBadgeStreak7.setText(initialBadgeStreak7 ? "🔥 7-Day Flame ✓" : "🔒 7-Day Flame");
-        tvBadgeStreak7.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
-        tvBadgeStreak7.setTypeface(Typeface.DEFAULT_BOLD);
-        tvBadgeStreak7.setTextColor(initialBadgeStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_TEXT_MUTED);
-        tvBadgeStreak7.setBackground(createPillDrawable(
-                initialBadgeStreak7 ? PerazimTheme.COLOR_ORANGE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
-                initialBadgeStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_BORDER_GREY));
-        tvBadgeStreak7.setPadding(dp(8), dp(6), dp(8), dp(6));
-        LinearLayout.LayoutParams lpB2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lpB2.setMargins(dp(4), 0, 0, 0);
-        tvBadgeStreak7.setLayoutParams(lpB2);
-        tvBadgeStreak7.setGravity(Gravity.CENTER);
-        badgesShelf.addView(tvBadgeStreak7);
-
-        card.addView(badgesShelf);
-
-        // Streak Freeze Toggle Button
-        btnStreakFreezeToggle = new Button(context);
-        btnStreakFreezeToggle.setText("❄️ Streak Protection: Freeze Streak");
-        btnStreakFreezeToggle.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
-        btnStreakFreezeToggle.setTypeface(Typeface.DEFAULT_BOLD);
-        btnStreakFreezeToggle.setTextColor(PerazimTheme.COLOR_WHITE);
-        btnStreakFreezeToggle.setBackground(create3dButtonDrawable(
-                PerazimTheme.COLOR_PRIMARY_PURPLE,
-                PerazimTheme.COLOR_PURPLE_SHADOW,
-                PerazimTheme.RADIUS_MD,
-                3
+        // Row 1: Refresh Content
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_refresh,
+                "Refresh Content",
+                SheetSyncManager.getLastSyncStatusText(context),
+                v -> triggerContentSync()
         ));
-        btnStreakFreezeToggle.setPadding(dp(12), dp(8), dp(12), dp(8));
-        btnStreakFreezeToggle.setOnClickListener(v -> toggleStreakFreeze());
-        card.addView(btnStreakFreezeToggle);
+        card.addView(createHorizontalDivider());
+
+        // Row 2: Saved / Offline Content
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_door_sermons,
+                "Saved & Offline Content",
+                "Downloaded sermons, favorite hymns, bookmarked verses",
+                v -> showSavedContentDialog()
+        ));
+        card.addView(createHorizontalDivider());
+
+        // Row 3: Breakthrough Guide
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_door_bible,
+                "Breakthrough Guide",
+                "Available in next release",
+                v -> Toast.makeText(context, "Breakthrough Guide will arrive in next release.", Toast.LENGTH_SHORT).show()
+        ));
+        card.addView(createHorizontalDivider());
+
+        // Row 4: Fellowship Extras (Riddles & Jokes)
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_door_prayer,
+                "Fellowship Extras",
+                "Devotional riddles and Christian joy & humor",
+                v -> showFellowshipExtrasDialog()
+        ));
+        card.addView(createHorizontalDivider());
+
+        // Row 5: Pastoral Care
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_phone,
+                "Pastoral Care & Office",
+                "Call, WhatsApp, SMS, or directions to Embu Headquarters",
+                v -> showPastoralCareDialog()
+        ));
+        card.addView(createHorizontalDivider());
+
+        // Row 6: About Perazim
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_location,
+                "About Perazim Mission Church",
+                "Vision, leadership & version 2.2.0 (Build 4)",
+                v -> showAboutDialog()
+        ));
 
         return card;
     }
 
-    private LinearLayout createMetricBox(String value, String label, String sublabel, int bgColor, int textColor) {
-        LinearLayout box = new LinearLayout(context);
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setGravity(Gravity.CENTER);
-        box.setPadding(dp(8), dp(10), dp(8), dp(10));
+    private View createHorizontalDivider() {
+        View v = new View(context);
+        v.setBackgroundColor(PerazimTheme.COLOR_STROKE);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
+        lp.setMargins(dp(12), 0, dp(12), 0);
+        v.setLayoutParams(lp);
+        return v;
+    }
 
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(bgColor);
-        bg.setCornerRadius(dp(PerazimTheme.RADIUS_MD));
-        bg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
-        box.setBackground(bg);
+    private View createOptionRow(int iconRes, String title, String subtitle, View.OnClickListener onClickListener) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(12), dp(10), dp(12), dp(10));
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lp.setMargins(dp(3), 0, dp(3), 0);
-        box.setLayoutParams(lp);
+        ImageView icon = new ImageView(context);
+        icon.setImageResource(iconRes);
+        icon.setColorFilter(PerazimTheme.COLOR_PURPLE_SOFT, PorterDuff.Mode.SRC_IN);
+        LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(20), dp(20));
+        lpIcon.setMargins(0, 0, dp(12), 0);
+        icon.setLayoutParams(lpIcon);
+        row.addView(icon);
 
-        TextView tvVal = new TextView(context);
-        tvVal.setText(value);
-        tvVal.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY);
-        tvVal.setTypeface(Typeface.DEFAULT_BOLD);
-        tvVal.setTextColor(textColor);
-        tvVal.setGravity(Gravity.CENTER);
-        box.addView(tvVal);
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        textCol.setLayoutParams(lpText);
 
-        TextView tvLbl = new TextView(context);
-        tvLbl.setText(label);
-        tvLbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
-        tvLbl.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
-        tvLbl.setGravity(Gravity.CENTER);
-        tvLbl.setPadding(0, dp(2), 0, 0);
-        box.addView(tvLbl);
+        TextView tvTitle = new TextView(context);
+        tvTitle.setText(title);
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        textCol.addView(tvTitle);
 
         TextView tvSub = new TextView(context);
-        tvSub.setText(sublabel);
-        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 8f);
-        tvSub.setTextColor(textColor);
-        tvSub.setTypeface(Typeface.DEFAULT_BOLD);
-        tvSub.setGravity(Gravity.CENTER);
-        box.addView(tvSub);
+        tvSub.setText(subtitle);
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvSub.setMaxLines(1);
+        textCol.addView(tvSub);
+        row.addView(textCol);
 
-        return box;
+        ImageView chevron = new ImageView(context);
+        chevron.setImageResource(org.perazimchurch.app.R.drawable.ic_chevron_right);
+        chevron.setColorFilter(PerazimTheme.COLOR_PURPLE_MUTED, PorterDuff.Mode.SRC_IN);
+        LinearLayout.LayoutParams lpChev = new LinearLayout.LayoutParams(dp(14), dp(14));
+        chevron.setLayoutParams(lpChev);
+        row.addView(chevron);
+
+        row.setOnClickListener(onClickListener);
+        return row;
     }
 
-    private void toggleStreakFreeze() {
-        boolean newFrozenState = !isStreakFrozen;
-        viewModel.setStreakFreeze(newFrozenState, () -> {
-            postToMain(() -> {
-                isStreakFrozen = newFrozenState;
-                updateStreakFreezeUi(newFrozenState);
-                String msg = newFrozenState
-                        ? "❄️ Streak frozen! Your spiritual streak is shielded today."
-                        : "🔥 Streak unfrozen! Continue your daily devotions.";
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-            });
+    private void showSavedContentDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Saved & Offline Content");
+        ScrollView sv = new ScrollView(context);
+        sv.setFillViewport(true);
+        View view = createSavedContentManagerCard();
+        sv.addView(view);
+        builder.setView(sv);
+        builder.setPositiveButton("Close", null);
+        builder.show();
+    }
+
+    private void showPastoralCareDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Pastoral Care & Headquarters");
+        builder.setMessage("Bishop Dr. David Mutweri & Pastoral Team\n"
+                + "Perazim Mission Church · Embu Headquarters\n\n"
+                + "Office Line: (+254) 0710 772 227\n"
+                + "Email: info@perazimchurch.org");
+
+        builder.setPositiveButton("WhatsApp", (d, w) -> {
+            ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am reaching out for pastoral care / prayer support.");
         });
+        builder.setNegativeButton("Call", (d, w) -> {
+            ChurchIntentManager.dialPhone(context, "+254710772227");
+        });
+        builder.setNeutralButton("Directions", (d, w) -> {
+            ChurchIntentManager.openChurchMaps(context);
+        });
+        builder.show();
     }
 
-    private void updateStreakFreezeUi(boolean frozen) {
-        if (tvStreakStatus != null) {
-            tvStreakStatus.setText(frozen ? "❄️ Frozen" : "Active");
-        }
-        if (btnStreakFreezeToggle != null) {
-            if (frozen) {
-                btnStreakFreezeToggle.setText("🔥 Unfreeze Streak (Protected Today)");
-                btnStreakFreezeToggle.setBackground(create3dButtonDrawable(
-                        PerazimTheme.COLOR_ACCENT_ORANGE,
-                        PerazimTheme.COLOR_ORANGE_SHADOW,
-                        PerazimTheme.RADIUS_MD,
-                        3
-                ));
-            } else {
-                btnStreakFreezeToggle.setText("❄️ Streak Protection: Freeze Streak");
-                btnStreakFreezeToggle.setBackground(create3dButtonDrawable(
-                        PerazimTheme.COLOR_PRIMARY_PURPLE,
-                        PerazimTheme.COLOR_PURPLE_SHADOW,
-                        PerazimTheme.RADIUS_MD,
-                        3
-                ));
+    private void showAboutDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("About Perazim Mission Church");
+        builder.setMessage("“A place where everybody is somebody, and no body is a nobody.”\n\n"
+                + "Leadership: Bishop Dr. David Mutweri\n"
+                + "Embu Headquarters, Kenya\n"
+                + "Campuses: Embu Headquarters, Nairobi, Meru, Online\n\n"
+                + "App Version: 2.2.0 (Build 4)\n"
+                + "Faithful offline-first faith companion.");
+        builder.setPositiveButton("Close", null);
+        builder.show();
+    }
+
+    private void showFellowshipExtrasDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Fellowship Extras");
+
+        ScrollView sv = new ScrollView(context);
+        sv.setFillViewport(true);
+        LinearLayout content = new LinearLayout(context);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding(dp(16), dp(16), dp(16), dp(16));
+        content.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+
+        // Tab Row: Riddles | Jokes
+        LinearLayout tabRow = new LinearLayout(context);
+        tabRow.setOrientation(LinearLayout.HORIZONTAL);
+        tabRow.setPadding(0, 0, 0, dp(12));
+
+        Button btnTabRiddles = new Button(context);
+        btnTabRiddles.setText("Devotional Riddles");
+        btnTabRiddles.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnTabRiddles.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        GradientDrawable rBg = new GradientDrawable();
+        rBg.setColor(PerazimTheme.COLOR_PURPLE_BRAND);
+        rBg.setCornerRadius(dp(8));
+        btnTabRiddles.setBackground(rBg);
+        LinearLayout.LayoutParams lpTr = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lpTr.setMargins(0, 0, dp(4), 0);
+        btnTabRiddles.setLayoutParams(lpTr);
+        tabRow.addView(btnTabRiddles);
+
+        Button btnTabJokes = new Button(context);
+        btnTabJokes.setText("Christian Joy & Humor");
+        btnTabJokes.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnTabJokes.setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
+        GradientDrawable jBg = new GradientDrawable();
+        jBg.setColor(PerazimTheme.COLOR_SURFACE_2);
+        jBg.setCornerRadius(dp(8));
+        btnTabJokes.setBackground(jBg);
+        LinearLayout.LayoutParams lpTj = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lpTj.setMargins(dp(4), 0, 0, 0);
+        btnTabJokes.setLayoutParams(lpTj);
+        tabRow.addView(btnTabJokes);
+
+        content.addView(tabRow);
+
+        // Container for active tab items
+        LinearLayout listContainer = new LinearLayout(context);
+        listContainer.setOrientation(LinearLayout.VERTICAL);
+        content.addView(listContainer);
+
+        new Thread(() -> {
+            List<org.perazimchurch.app.data.local.entity.RiddleEntity> riddles = null;
+            List<org.perazimchurch.app.data.local.entity.JokeEntity> jokes = null;
+            try {
+                org.perazimchurch.app.data.local.PerazimDatabase db = org.perazimchurch.app.data.local.PerazimDatabase.getInstance(context);
+                riddles = db.riddleDao().getAllRiddles();
+                jokes = db.jokeDao().getAllJokes();
+            } catch (Exception ignored) {}
+
+            final List<org.perazimchurch.app.data.local.entity.RiddleEntity> fRiddles = riddles;
+            final List<org.perazimchurch.app.data.local.entity.JokeEntity> fJokes = jokes;
+
+            postToMain(() -> {
+                Runnable renderRiddles = () -> {
+                    listContainer.removeAllViews();
+                    btnTabRiddles.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                    ((GradientDrawable) btnTabRiddles.getBackground()).setColor(PerazimTheme.COLOR_PURPLE_BRAND);
+                    btnTabJokes.setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
+                    ((GradientDrawable) btnTabJokes.getBackground()).setColor(PerazimTheme.COLOR_SURFACE_2);
+
+                    if (fRiddles == null || fRiddles.isEmpty()) {
+                        TextView empty = new TextView(context);
+                        empty.setText("No riddles loaded. Sync sheets to load.");
+                        empty.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+                        listContainer.addView(empty);
+                        return;
+                    }
+
+                    for (org.perazimchurch.app.data.local.entity.RiddleEntity r : fRiddles) {
+                        LinearLayout item = new LinearLayout(context);
+                        item.setOrientation(LinearLayout.VERTICAL);
+                        item.setPadding(dp(12), dp(10), dp(12), dp(10));
+                        GradientDrawable ibg = new GradientDrawable();
+                        ibg.setColor(PerazimTheme.COLOR_SURFACE_2);
+                        ibg.setCornerRadius(dp(8));
+                        item.setBackground(ibg);
+                        LinearLayout.LayoutParams lpItem = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        lpItem.setMargins(0, 0, 0, dp(8));
+                        item.setLayoutParams(lpItem);
+
+                        TextView tvQ = new TextView(context);
+                        tvQ.setText(r.getQuestion());
+                        tvQ.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                        tvQ.setTypeface(Typeface.DEFAULT_BOLD);
+                        tvQ.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                        item.addView(tvQ);
+
+                        TextView tvAns = new TextView(context);
+                        tvAns.setText("Answer: " + r.getAnswer() + (r.getScriptureRef() != null ? " (" + r.getScriptureRef() + ")" : ""));
+                        tvAns.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                        tvAns.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+                        tvAns.setVisibility(View.GONE);
+                        tvAns.setPadding(0, dp(4), 0, dp(4));
+
+                        Button btnRev = new Button(context);
+                        btnRev.setText("Reveal Answer");
+                        btnRev.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                        btnRev.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                        GradientDrawable rbg2 = new GradientDrawable();
+                        rbg2.setColor(PerazimTheme.COLOR_PURPLE_GHOST);
+                        rbg2.setCornerRadius(dp(6));
+                        btnRev.setBackground(rbg2);
+                        btnRev.setPadding(dp(8), dp(4), dp(8), dp(4));
+                        btnRev.setOnClickListener(v -> {
+                            boolean isVis = (tvAns.getVisibility() == View.VISIBLE);
+                            tvAns.setVisibility(isVis ? View.GONE : View.VISIBLE);
+                            btnRev.setText(isVis ? "Reveal Answer" : "Hide Answer");
+                        });
+                        item.addView(tvAns);
+                        item.addView(btnRev);
+                        listContainer.addView(item);
+                    }
+                };
+
+                Runnable renderJokes = () -> {
+                    listContainer.removeAllViews();
+                    btnTabJokes.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                    ((GradientDrawable) btnTabJokes.getBackground()).setColor(PerazimTheme.COLOR_PURPLE_BRAND);
+                    btnTabRiddles.setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
+                    ((GradientDrawable) btnTabRiddles.getBackground()).setColor(PerazimTheme.COLOR_SURFACE_2);
+
+                    if (fJokes == null || fJokes.isEmpty()) {
+                        TextView empty = new TextView(context);
+                        empty.setText("No jokes loaded. Sync sheets to load.");
+                        empty.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+                        listContainer.addView(empty);
+                        return;
+                    }
+
+                    for (org.perazimchurch.app.data.local.entity.JokeEntity j : fJokes) {
+                        LinearLayout item = new LinearLayout(context);
+                        item.setOrientation(LinearLayout.VERTICAL);
+                        item.setPadding(dp(12), dp(10), dp(12), dp(10));
+                        GradientDrawable ibg = new GradientDrawable();
+                        ibg.setColor(PerazimTheme.COLOR_SURFACE_2);
+                        ibg.setCornerRadius(dp(8));
+                        item.setBackground(ibg);
+                        LinearLayout.LayoutParams lpItem = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                        lpItem.setMargins(0, 0, 0, dp(8));
+                        item.setLayoutParams(lpItem);
+
+                        TextView tvJoke = new TextView(context);
+                        tvJoke.setText(j.getText());
+                        tvJoke.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                        tvJoke.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                        item.addView(tvJoke);
+                        listContainer.addView(item);
+                    }
+                };
+
+                btnTabRiddles.setOnClickListener(v -> renderRiddles.run());
+                btnTabJokes.setOnClickListener(v -> renderJokes.run());
+                renderRiddles.run();
+            });
+        }).start();
+
+        sv.addView(content);
+        builder.setView(sv);
+        builder.setPositiveButton("Close", null);
+        builder.show();
+    }
+
+    private String resolveGamificationUserId() {
+        if (context == null) return "user_me";
+        try {
+            SessionManager sm = SessionManager.getInstance(context);
+            if (sm != null && sm.getActiveUserId() != null && !sm.getActiveUserId().trim().isEmpty()) {
+                return sm.getActiveUserId();
             }
-        }
+        } catch (Exception ignored) {}
+        return "user_me";
     }
 
     // =========================================================================
@@ -1048,7 +1244,6 @@ public class ProfileUiBinder {
                         tvStreakValue.setText("🔥 " + liveStreak + " Days");
                     }
                     isStreakFrozen = user.isStreakFrozen();
-                    updateStreakFreezeUi(isStreakFrozen);
 
                     if (tvXpValue != null) {
                         tvXpValue.setText("⭐ " + liveXp + " XP");

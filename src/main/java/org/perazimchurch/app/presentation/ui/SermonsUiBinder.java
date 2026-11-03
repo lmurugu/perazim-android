@@ -4,16 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.Build;
-import android.util.Log;
-import java.io.File;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,11 +17,15 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -50,7 +47,9 @@ import androidx.annotation.Nullable;
 import org.perazimchurch.app.data.repository.YouTubeFeedRepository;
 import org.perazimchurch.app.domain.model.Sermon;
 import org.perazimchurch.app.presentation.viewmodel.SermonsViewModel;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,45 +59,20 @@ import java.util.Map;
 
 /**
  * SermonsUiBinder binds the Sermons Tab UI to {@link SermonsViewModel}.
- * Features:
- * - Search bar for filtering sermons by title, preacher, or keyword.
- * - Series filter chips ("All", "Breakthrough 2026", "Walking in Faith", "Deliverance", "Perazim Live & Video").
- * - Sermon card list displaying preacher, passage, duration, series badge, download status.
- * - Audio Player Controller with play/pause, seekbar progress, and speed toggle (1.0x, 1.25x, 1.5x).
- * - Download action button handling requestDownload (STREAMING -> DOWNLOADING -> DOWNLOADED) and deleteDownload.
- * - Live YouTube Channel broadcast integration (@perazimchurchembu).
- * - WhatsApp fellowship sharing and PDF study notes viewing.
+ * Adheres strictly to the quiet dark contemplative theme:
+ * - Canvas: #2A0F33 (COLOR_BG_DEEP)
+ * - Search bar: quiet surface #4F1E5C with stroke #4A3554
+ * - Filter chips: All | Series | Downloaded. Outline pill; active is solid #681A7D
+ * - Sermon cards on surface #3D1749 with title (#F5F0F7), preacher/passage (#B9A8C0), duration/date (#8B5A9A)
+ * - Play affordance: quiet circle with play arrow (purple, NOT massive orange button)
+ * - Download affordance: quiet outline button
+ * - Audio controller: quiet surface #3D1749 with stroke #4A3554, scrub bar #E17D2F
  */
 public class SermonsUiBinder {
 
-    // --- CANONICAL PERAZIM PALETTE ---
-    public static final int COLOR_PRIMARY_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK    = Color.parseColor("#2D0938");
-    public static final int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_LIGHT   = Color.parseColor("#8E30A8");
-    public static final int COLOR_PURPLE_SOFT    = Color.parseColor("#C896D8");
-    public static final int COLOR_BORDER_GREY    = Color.parseColor("#E7D5EC");
-    public static final int COLOR_PURPLE_TINT    = Color.parseColor("#F5ECF7");
-    public static final int COLOR_TEXT_MUTED     = Color.parseColor("#725B78");
-    public static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1225");
-
-    public static final int COLOR_ACCENT_ORANGE  = Color.parseColor("#E17D2F");
-    public static final int COLOR_ORANGE_DARK    = Color.parseColor("#78350A");
-    public static final int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
-    public static final int COLOR_ORANGE_BORDER  = Color.parseColor("#F9DFCC");
-    public static final int COLOR_ORANGE_TINT    = Color.parseColor("#FDF5EF");
-
-    public static final int COLOR_WHITE          = Color.parseColor("#FFFFFF");
-    public static final int COLOR_BG_NEUTRAL     = Color.parseColor("#FAF7FB");
-
-    public static final int COLOR_GREEN_SUCCESS  = Color.parseColor("#15803D");
-    public static final int COLOR_GREEN_TINT     = Color.parseColor("#DCFCE7");
-    public static final int COLOR_AMBER_TINT     = Color.parseColor("#FEF3C7");
-    public static final int COLOR_AMBER_TEXT     = Color.parseColor("#B45309");
-
     // Predefined series filter chips
     public static final String[] SERIES_CHIPS = {
-            "All", "Breakthrough 2026", "Walking in Faith", "Deliverance", "Perazim Live & Video"
+            "All", "Series", "Downloaded", "Video"
     };
 
     private final Activity activity;
@@ -128,16 +102,16 @@ public class SermonsUiBinder {
     private Sermon activeSermon;
     private MediaPlayer mediaPlayer;
     private boolean isPlaying = false;
-    private float playbackSpeed = 1.0f; // 1.0f, 1.25f, 1.5f
+    private float playbackSpeed = 1.0f;
     private int currentPositionSeconds = 0;
-    private int totalDurationSeconds = 2700; // default 45 mins
+    private int totalDurationSeconds = 2700;
     private final Handler playerHandler = new Handler(Looper.getMainLooper());
     private Runnable playerRunnable;
 
     // Data State
-    private String selectedSeries = "All";
+    private String selectedChip = "All";
     private final List<Sermon> currentSermons = new ArrayList<>();
-    private final Map<String, String> downloadStatusMap = new HashMap<>(); // sermonId -> "STREAMING" | "DOWNLOADING" | "DOWNLOADED"
+    private final Map<String, String> downloadStatusMap = new HashMap<>();
     private final List<Button> chipButtons = new ArrayList<>();
 
     public SermonsUiBinder(@NonNull Activity activity, @NonNull SermonsViewModel viewModel) {
@@ -145,9 +119,6 @@ public class SermonsUiBinder {
         this.viewModel = viewModel;
     }
 
-    /**
-     * Builds and binds the complete Sermons Tab view.
-     */
     public ScrollView bind() {
         if (rootScrollView == null) {
             initViews();
@@ -156,9 +127,6 @@ public class SermonsUiBinder {
         return rootScrollView;
     }
 
-    /**
-     * Binds into an existing ViewGroup container.
-     */
     public void bind(@NonNull ViewGroup container) {
         ScrollView view = bind();
         container.removeAllViews();
@@ -184,38 +152,59 @@ public class SermonsUiBinder {
     private void initViews() {
         rootScrollView = new ScrollView(activity);
         rootScrollView.setFillViewport(true);
-        rootScrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        rootScrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
 
         contentLayout = new LinearLayout(activity);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
         contentLayout.setPadding(dp(16), dp(16), dp(16), dp(36));
 
-        // 1. Livestream Ready Card with Stage Photographic Banner
+        // 1. Title
+        LinearLayout headerRow = new LinearLayout(activity);
+        headerRow.setOrientation(LinearLayout.VERTICAL);
+        headerRow.setPadding(0, dp(4), 0, dp(12));
+
+        TextView tvTitle = new TextView(activity);
+        tvTitle.setText("Sermons");
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        headerRow.addView(tvTitle);
+
+        TextView tvSub = new TextView(activity);
+        tvSub.setText("Listen to messages and live worship from Perazim Mission Church");
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvSub.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvSub.setPadding(0, dp(2), 0, 0);
+        headerRow.addView(tvSub);
+
+        contentLayout.addView(headerRow);
+
+        // 2. Livestream Card (Quiet)
         View liveBanner = buildLiveStreamBanner();
         contentLayout.addView(liveBanner);
 
-        // 2. Audio Player Controller
+        // 3. Audio Player Controller
         playerCard = buildAudioPlayerCard();
         contentLayout.addView(playerCard);
 
-        // 3. Search Bar
+        // 4. Search Bar on #4F1E5C
         View searchBar = buildSearchBar();
         contentLayout.addView(searchBar);
 
-        // 4. Series Filter Chips
+        // 5. Filter Chips: All | Series | Downloaded
         View chipsRow = buildSeriesFilterChips();
         contentLayout.addView(chipsRow);
 
-        // 5. Section Header
+        // 6. Section Header
         TextView tvHeader = new TextView(activity);
-        tvHeader.setText("SERMON ARCHIVES & AUDIO MESSAGES");
-        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvHeader.setText("AUDIO MESSAGES & ARCHIVES");
+        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE);
-        tvHeader.setPadding(0, dp(16), 0, dp(10));
+        tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvHeader.setPadding(0, dp(10), 0, dp(8));
         contentLayout.addView(tvHeader);
 
-        // 6. Loading Indicator
+        // 7. Loading Indicator
         loadingBar = new ProgressBar(activity);
         loadingBar.setIndeterminate(true);
         loadingBar.setVisibility(View.GONE);
@@ -226,17 +215,17 @@ public class SermonsUiBinder {
         loadingBar.setLayoutParams(lpLoad);
         contentLayout.addView(loadingBar);
 
-        // 7. Empty State View
+        // 8. Empty State View
         tvEmptyState = new TextView(activity);
-        tvEmptyState.setText("No sermons found matching your filter.\nTry adjusting your search query or series.");
+        tvEmptyState.setText("No sermons found matching your filter.\nTry adjusting your search query or filter chip.");
         tvEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvEmptyState.setTextColor(COLOR_TEXT_MUTED);
+        tvEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         tvEmptyState.setGravity(Gravity.CENTER);
         tvEmptyState.setPadding(dp(16), dp(24), dp(16), dp(24));
         tvEmptyState.setVisibility(View.GONE);
         contentLayout.addView(tvEmptyState);
 
-        // 8. Sermon Cards Container
+        // 9. Sermon Cards Container
         cardsContainer = new LinearLayout(activity);
         cardsContainer.setOrientation(LinearLayout.VERTICAL);
         contentLayout.addView(cardsContainer);
@@ -280,11 +269,11 @@ public class SermonsUiBinder {
     }
 
     // =========================================================================
-    // 1. LIVESTREAM READY CARD
+    // 1. LIVESTREAM READY CARD (QUIET)
     // =========================================================================
 
     private View buildLiveStreamBanner() {
-        LinearLayout liveCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout liveCard = createCard(PerazimTheme.COLOR_SURFACE, 14, PerazimTheme.COLOR_STROKE, 1);
         liveCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -297,7 +286,7 @@ public class SermonsUiBinder {
             ivStage.setImageBitmap(getRoundedCornerBitmap(stageBmp, dp(10)));
             ivStage.setScaleType(ImageView.ScaleType.CENTER_CROP);
             LinearLayout.LayoutParams lpStage = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(130));
+                    LinearLayout.LayoutParams.MATCH_PARENT, dp(120));
             lpStage.setMargins(0, 0, 0, dp(10));
             ivStage.setLayoutParams(lpStage);
             liveCard.addView(ivStage);
@@ -307,41 +296,38 @@ public class SermonsUiBinder {
         liveBadgeRow.setOrientation(LinearLayout.HORIZONTAL);
         liveBadgeRow.setGravity(Gravity.CENTER_VERTICAL);
 
-        TextView redDot = new TextView(activity);
-        redDot.setText("🔴");
-        redDot.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        liveBadgeRow.addView(redDot);
-
         TextView liveTag = new TextView(activity);
-        liveTag.setText(" LIVESTREAM BROADCAST");
-        liveTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        liveTag.setText("LIVESTREAM BROADCAST");
+        liveTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         liveTag.setTypeface(Typeface.DEFAULT_BOLD);
-        liveTag.setTextColor(COLOR_ACCENT_ORANGE);
+        liveTag.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        liveTag.setBackground(createCardBackground(PerazimTheme.COLOR_PURPLE_GHOST, 6, PerazimTheme.COLOR_STROKE, 1));
+        liveTag.setPadding(dp(8), dp(3), dp(8), dp(3));
         liveBadgeRow.addView(liveTag);
         liveCard.addView(liveBadgeRow);
 
         TextView tvTitle = new TextView(activity);
         tvTitle.setText("Walking in Faith: Overcoming Fear in Difficult Times");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_TEXT_DARK);
-        tvTitle.setPadding(0, dp(8), 0, dp(4));
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvTitle.setPadding(0, dp(6), 0, dp(2));
         liveCard.addView(tvTitle);
 
         TextView tvSpeaker = new TextView(activity);
-        tvSpeaker.setText("Speaker: Bishop Dr. David Mutweri | Central Campus");
+        tvSpeaker.setText("Bishop Dr. David Mutweri · Central Campus");
         tvSpeaker.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvSpeaker.setTextColor(COLOR_TEXT_MUTED);
-        tvSpeaker.setPadding(0, 0, 0, dp(12));
+        tvSpeaker.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvSpeaker.setPadding(0, 0, 0, dp(10));
         liveCard.addView(tvSpeaker);
 
         btnWatchLiveBroadcast = new Button(activity);
-        btnWatchLiveBroadcast.setText("▶ Watch Live Broadcast");
-        btnWatchLiveBroadcast.setTextColor(COLOR_WHITE);
-        btnWatchLiveBroadcast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        btnWatchLiveBroadcast.setText("Watch Live Broadcast");
+        btnWatchLiveBroadcast.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnWatchLiveBroadcast.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         btnWatchLiveBroadcast.setTypeface(Typeface.DEFAULT_BOLD);
-        btnWatchLiveBroadcast.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 12, 4));
-        btnWatchLiveBroadcast.setPadding(dp(14), dp(10), dp(14), dp(10));
+        btnWatchLiveBroadcast.setBackground(createSolidPill(PerazimTheme.COLOR_PURPLE_BRAND, 10));
+        btnWatchLiveBroadcast.setPadding(dp(12), dp(8), dp(12), dp(8));
         btnWatchLiveBroadcast.setOnClickListener(v -> {
             Toast.makeText(activity, "Connecting to Perazim Live Broadcast...", Toast.LENGTH_SHORT).show();
             YouTubeFeedRepository.openLiveBroadcast(activity);
@@ -356,60 +342,65 @@ public class SermonsUiBinder {
     // =========================================================================
 
     private LinearLayout buildAudioPlayerCard() {
-        LinearLayout card = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, 14, PerazimTheme.COLOR_STROKE, 1);
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, 0, 0, dp(14));
         card.setLayoutParams(lp);
 
-        // Header with status indicator
+        // Header with speed toggle
         LinearLayout headerRow = new LinearLayout(activity);
         headerRow.setOrientation(LinearLayout.HORIZONTAL);
         headerRow.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView tvHeader = new TextView(activity);
-        tvHeader.setText("AUDIO PLAYER CONTROLLER");
-        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvHeader.setText("AUDIO CONTROLLER");
+        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
         LinearLayout.LayoutParams lpH = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
         tvHeader.setLayoutParams(lpH);
         headerRow.addView(tvHeader);
 
         btnSpeedToggle = new Button(activity);
-        btnSpeedToggle.setText("⚡ 1.0×");
+        btnSpeedToggle.setText("1.0×");
         btnSpeedToggle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnSpeedToggle.setTypeface(Typeface.DEFAULT_BOLD);
-        btnSpeedToggle.setTextColor(COLOR_PRIMARY_PURPLE);
-        btnSpeedToggle.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        btnSpeedToggle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnSpeedToggle.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
         btnSpeedToggle.setPadding(dp(10), dp(4), dp(10), dp(4));
         btnSpeedToggle.setOnClickListener(v -> cycleSpeed());
         headerRow.addView(btnSpeedToggle);
 
         card.addView(headerRow);
 
-        // Now Playing Sermon Info
+        // Title & Speaker
         tvPlayerTitle = new TextView(activity);
         tvPlayerTitle.setText("Supernatural Breakthrough");
         tvPlayerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tvPlayerTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvPlayerTitle.setTextColor(COLOR_TEXT_DARK);
-        tvPlayerTitle.setPadding(0, dp(8), 0, dp(2));
+        tvPlayerTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvPlayerTitle.setPadding(0, dp(6), 0, dp(2));
         card.addView(tvPlayerTitle);
 
         tvPlayerSpeaker = new TextView(activity);
         tvPlayerSpeaker.setText("Bishop Dr. David Mutweri • 2 Samuel 5:17-21");
         tvPlayerSpeaker.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvPlayerSpeaker.setTextColor(COLOR_TEXT_MUTED);
-        tvPlayerSpeaker.setPadding(0, 0, 0, dp(10));
+        tvPlayerSpeaker.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvPlayerSpeaker.setPadding(0, 0, 0, dp(8));
         card.addView(tvPlayerSpeaker);
 
-        // Seekbar
+        // Seekbar with Orange Scrub
         audioSeekBar = new SeekBar(activity);
         audioSeekBar.setMax(totalDurationSeconds);
         audioSeekBar.setProgress(currentPositionSeconds);
-        audioSeekBar.setPadding(dp(4), dp(8), dp(4), dp(8));
+        audioSeekBar.setPadding(dp(4), dp(6), dp(4), dp(6));
+        try {
+            audioSeekBar.setProgressTintList(android.content.res.ColorStateList.valueOf(PerazimTheme.COLOR_ORANGE_BRAND));
+            audioSeekBar.setThumbTintList(android.content.res.ColorStateList.valueOf(PerazimTheme.COLOR_ORANGE_BRAND));
+        } catch (Throwable ignored) {}
+
         audioSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -432,15 +423,15 @@ public class SermonsUiBinder {
         });
         card.addView(audioSeekBar);
 
-        // Duration Labels Row
+        // Duration Labels
         LinearLayout timeRow = new LinearLayout(activity);
         timeRow.setOrientation(LinearLayout.HORIZONTAL);
-        timeRow.setPadding(dp(4), 0, dp(4), dp(10));
+        timeRow.setPadding(dp(4), 0, dp(4), dp(8));
 
         tvCurrentPos = new TextView(activity);
         tvCurrentPos.setText(formatDuration(currentPositionSeconds));
         tvCurrentPos.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvCurrentPos.setTextColor(COLOR_TEXT_MUTED);
+        tvCurrentPos.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         LinearLayout.LayoutParams lpCur = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
         tvCurrentPos.setLayoutParams(lpCur);
         timeRow.addView(tvCurrentPos);
@@ -448,41 +439,24 @@ public class SermonsUiBinder {
         tvTotalDuration = new TextView(activity);
         tvTotalDuration.setText(formatDuration(totalDurationSeconds));
         tvTotalDuration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvTotalDuration.setTextColor(COLOR_TEXT_MUTED);
+        tvTotalDuration.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         tvTotalDuration.setGravity(Gravity.END);
         timeRow.addView(tvTotalDuration);
 
         card.addView(timeRow);
 
-        // Control Buttons Row
+        // Controls: Rewind, Play/Pause (#681A7D), Forward
         LinearLayout ctrlRow = new LinearLayout(activity);
         ctrlRow.setOrientation(LinearLayout.HORIZONTAL);
         ctrlRow.setGravity(Gravity.CENTER_VERTICAL);
 
-        btnPlayPause = new Button(activity);
-        btnPlayPause.setText("▶ Play Sermon");
-        btnPlayPause.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        btnPlayPause.setTypeface(Typeface.DEFAULT_BOLD);
-        btnPlayPause.setTextColor(COLOR_WHITE);
-        btnPlayPause.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
-        btnPlayPause.setPadding(dp(16), dp(8), dp(16), dp(8));
-        LinearLayout.LayoutParams lpPlay = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lpPlay.setMargins(0, 0, dp(8), 0);
-        btnPlayPause.setLayoutParams(lpPlay);
-        btnPlayPause.setOnClickListener(v -> togglePlayPause());
-        ctrlRow.addView(btnPlayPause);
-
         Button btnRewind = new Button(activity);
-        btnRewind.setText("⏪ -15s");
+        btnRewind.setText("-15s");
         btnRewind.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnRewind.setTypeface(Typeface.DEFAULT_BOLD);
-        btnRewind.setTextColor(COLOR_PRIMARY_PURPLE);
-        btnRewind.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        btnRewind.setPadding(dp(10), dp(8), dp(10), dp(8));
-        LinearLayout.LayoutParams lpRewind = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpRewind.setMargins(0, 0, dp(6), 0);
-        btnRewind.setLayoutParams(lpRewind);
+        btnRewind.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnRewind.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnRewind.setPadding(dp(12), dp(6), dp(12), dp(6));
         btnRewind.setOnClickListener(v -> {
             currentPositionSeconds = Math.max(0, currentPositionSeconds - 15);
             audioSeekBar.setProgress(currentPositionSeconds);
@@ -495,13 +469,26 @@ public class SermonsUiBinder {
         });
         ctrlRow.addView(btnRewind);
 
+        btnPlayPause = new Button(activity);
+        btnPlayPause.setText("Play Sermon");
+        btnPlayPause.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        btnPlayPause.setTypeface(Typeface.DEFAULT_BOLD);
+        btnPlayPause.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnPlayPause.setBackground(createSolidPill(PerazimTheme.COLOR_PURPLE_BRAND, 10));
+        btnPlayPause.setPadding(dp(16), dp(8), dp(16), dp(8));
+        LinearLayout.LayoutParams lpPlay = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        lpPlay.setMargins(dp(8), 0, dp(8), 0);
+        btnPlayPause.setLayoutParams(lpPlay);
+        btnPlayPause.setOnClickListener(v -> togglePlayPause());
+        ctrlRow.addView(btnPlayPause);
+
         Button btnForward = new Button(activity);
-        btnForward.setText("+30s ⏩");
+        btnForward.setText("+30s");
         btnForward.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnForward.setTypeface(Typeface.DEFAULT_BOLD);
-        btnForward.setTextColor(COLOR_PRIMARY_PURPLE);
-        btnForward.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        btnForward.setPadding(dp(10), dp(8), dp(10), dp(8));
+        btnForward.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnForward.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnForward.setPadding(dp(12), dp(6), dp(12), dp(6));
         btnForward.setOnClickListener(v -> {
             currentPositionSeconds = Math.min(totalDurationSeconds, currentPositionSeconds + 30);
             audioSeekBar.setProgress(currentPositionSeconds);
@@ -520,30 +507,31 @@ public class SermonsUiBinder {
     }
 
     // =========================================================================
-    // 3. SEARCH BAR
+    // 3. SEARCH BAR (QUIET SURFACE #4F1E5C)
     // =========================================================================
 
     private View buildSearchBar() {
         LinearLayout searchLayout = new LinearLayout(activity);
         searchLayout.setOrientation(LinearLayout.HORIZONTAL);
         searchLayout.setGravity(Gravity.CENTER_VERTICAL);
-        searchLayout.setBackground(createPillBg(COLOR_WHITE, COLOR_BORDER_GREY));
-        searchLayout.setPadding(dp(12), dp(2), dp(12), dp(2));
+        searchLayout.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 12, PerazimTheme.COLOR_STROKE, 1));
+        searchLayout.setPadding(dp(12), dp(4), dp(12), dp(4));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, 0, 0, dp(12));
         searchLayout.setLayoutParams(lp);
 
-        TextView searchIcon = new TextView(activity);
-        searchIcon.setText("🔍");
-        searchIcon.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        searchIcon.setPadding(0, 0, dp(8), 0);
-        searchLayout.addView(searchIcon);
+        ImageView ivSearch = new ImageView(activity);
+        ivSearch.setImageResource(org.perazimchurch.app.R.drawable.ic_search);
+        LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(18), dp(18));
+        lpIcon.setMargins(0, 0, dp(8), 0);
+        ivSearch.setLayoutParams(lpIcon);
+        searchLayout.addView(ivSearch);
 
         etSearch = new EditText(activity);
-        etSearch.setHint("Search by title, preacher, keyword...");
-        etSearch.setHintTextColor(COLOR_TEXT_MUTED);
-        etSearch.setTextColor(COLOR_TEXT_DARK);
+        etSearch.setHint("Search title, preacher, passage…");
+        etSearch.setHintTextColor(PerazimTheme.COLOR_TEXT_DISABLED);
+        etSearch.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         etSearch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         etSearch.setBackground(null);
         etSearch.setSingleLine(true);
@@ -558,7 +546,7 @@ public class SermonsUiBinder {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String q = s != null ? s.toString().trim() : "";
                 if (q.isEmpty()) {
-                    onChipSelected(selectedSeries);
+                    onChipSelected(selectedChip);
                 } else {
                     viewModel.searchSermons(q, sermons -> activity.runOnUiThread(() -> renderSermonCards(sermons)));
                 }
@@ -572,7 +560,7 @@ public class SermonsUiBinder {
         final Button btnClear = new Button(activity);
         btnClear.setText("✕");
         btnClear.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnClear.setTextColor(COLOR_TEXT_MUTED);
+        btnClear.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         btnClear.setBackground(null);
         btnClear.setPadding(dp(4), dp(4), dp(4), dp(4));
         btnClear.setOnClickListener(v -> etSearch.setText(""));
@@ -582,7 +570,7 @@ public class SermonsUiBinder {
     }
 
     // =========================================================================
-    // 4. SERIES FILTER CHIPS
+    // 4. FILTER CHIPS (All | Series | Downloaded)
     // =========================================================================
 
     private View buildSeriesFilterChips() {
@@ -598,19 +586,19 @@ public class SermonsUiBinder {
         chipsContainer.setPadding(0, dp(2), 0, dp(4));
 
         chipButtons.clear();
-        for (String series : SERIES_CHIPS) {
+        for (String chip : SERIES_CHIPS) {
             Button btn = new Button(activity);
-            btn.setText(series);
+            btn.setText(chip);
             btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
             btn.setTypeface(Typeface.DEFAULT_BOLD);
-            btn.setPadding(dp(14), dp(6), dp(14), dp(6));
+            btn.setPadding(dp(14), dp(4), dp(14), dp(4));
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, dp(34));
             lp.setMargins(0, 0, dp(8), 0);
             btn.setLayoutParams(lp);
 
-            btn.setOnClickListener(v -> onChipSelected(series));
+            btn.setOnClickListener(v -> onChipSelected(chip));
             chipButtons.add(btn);
             chipsContainer.addView(btn);
         }
@@ -620,12 +608,12 @@ public class SermonsUiBinder {
         return hsv;
     }
 
-    private void onChipSelected(String series) {
-        selectedSeries = series;
+    private void onChipSelected(String chip) {
+        selectedChip = chip;
         updateChipStyles();
         loadingBar.setVisibility(View.VISIBLE);
 
-        if ("Perazim Live & Video".equalsIgnoreCase(series)) {
+        if ("Video".equalsIgnoreCase(chip)) {
             YouTubeFeedRepository.fetchRecentVideos(videos -> activity.runOnUiThread(() -> {
                 loadingBar.setVisibility(View.GONE);
                 renderSermonCards(videos);
@@ -633,7 +621,23 @@ public class SermonsUiBinder {
             return;
         }
 
-        viewModel.filterBySeries(series, sermons -> activity.runOnUiThread(() -> {
+        if ("Downloaded".equalsIgnoreCase(chip)) {
+            viewModel.loadSermons(sermons -> activity.runOnUiThread(() -> {
+                loadingBar.setVisibility(View.GONE);
+                List<Sermon> downloadedOnly = new ArrayList<>();
+                if (sermons != null) {
+                    for (Sermon s : sermons) {
+                        if (s.isDownloaded() || "DOWNLOADED".equals(downloadStatusMap.get(s.getId()))) {
+                            downloadedOnly.add(s);
+                        }
+                    }
+                }
+                renderSermonCards(downloadedOnly);
+            }));
+            return;
+        }
+
+        viewModel.loadSermons(sermons -> activity.runOnUiThread(() -> {
             loadingBar.setVisibility(View.GONE);
             renderSermonCards(sermons);
         }));
@@ -641,13 +645,13 @@ public class SermonsUiBinder {
 
     private void updateChipStyles() {
         for (Button btn : chipButtons) {
-            boolean isSelected = btn.getText().toString().equalsIgnoreCase(selectedSeries);
+            boolean isSelected = btn.getText().toString().equalsIgnoreCase(selectedChip);
             if (isSelected) {
-                btn.setTextColor(COLOR_WHITE);
-                btn.setBackground(createPillBg(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW));
+                btn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                btn.setBackground(createSolidPill(PerazimTheme.COLOR_PURPLE_BRAND, 14));
             } else {
-                btn.setTextColor(COLOR_TEXT_DARK);
-                btn.setBackground(createPillBg(COLOR_WHITE, COLOR_BORDER_GREY));
+                btn.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+                btn.setBackground(createCardBackground(Color.TRANSPARENT, 14, PerazimTheme.COLOR_STROKE, 1));
             }
         }
     }
@@ -664,7 +668,6 @@ public class SermonsUiBinder {
             if (sermons != null && !sermons.isEmpty() && activeSermon == null) {
                 loadSermonIntoPlayer(sermons.get(0), false);
             }
-            // Prefetch live YouTube videos in background so videos are cached
             YouTubeFeedRepository.fetchRecentVideos(videos -> {
                 Log.d("SermonsUiBinder", "Prefetched " + (videos != null ? videos.size() : 0) + " YouTube broadcasts");
             });
@@ -690,213 +693,143 @@ public class SermonsUiBinder {
     }
 
     private View createSermonCard(final Sermon sermon) {
-        final LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        final LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, 14, PerazimTheme.COLOR_STROKE, 1);
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(lp);
 
-        // Top Row: Preacher avatar thumbnail + Details
+        // Top Row: Title & Play Circle Button
         LinearLayout topRow = new LinearLayout(activity);
         topRow.setOrientation(LinearLayout.HORIZONTAL);
         topRow.setGravity(Gravity.CENTER_VERTICAL);
 
-        Bitmap thumbBmp = loadAssetBitmap("bishop_portrait.jpg", 150);
-        if (thumbBmp != null) {
-            ImageView ivThumb = new ImageView(activity);
-            ivThumb.setImageBitmap(getCircularBitmap(thumbBmp));
-            LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(dp(46), dp(46));
-            lpImg.setMargins(0, 0, dp(10), 0);
-            ivThumb.setLayoutParams(lpImg);
-            topRow.addView(ivThumb);
-        }
-
-        LinearLayout infoCol = new LinearLayout(activity);
-        infoCol.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lpInfo = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        infoCol.setLayoutParams(lpInfo);
-
-        TextView tvPreacher = new TextView(activity);
-        tvPreacher.setText("🎙 " + (sermon.getPreacher() != null ? sermon.getPreacher() : "Bishop Dr. David Mutweri"));
-        tvPreacher.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvPreacher.setTypeface(Typeface.DEFAULT_BOLD);
-        tvPreacher.setTextColor(COLOR_PRIMARY_PURPLE);
-        infoCol.addView(tvPreacher);
+        LinearLayout titleCol = new LinearLayout(activity);
+        titleCol.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpCol = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        titleCol.setLayoutParams(lpCol);
 
         TextView tvTitle = new TextView(activity);
         tvTitle.setText(sermon.getTitle() != null ? sermon.getTitle() : "Untitled Sermon");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_TEXT_DARK);
-        tvTitle.setPadding(0, dp(2), 0, dp(2));
-        infoCol.addView(tvTitle);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        titleCol.addView(tvTitle);
 
+        TextView tvPreacher = new TextView(activity);
         String passage = sermon.getPassage() != null && !sermon.getPassage().isEmpty()
-                ? sermon.getPassage() : "2 Samuel 5:17-21";
-        long durationSec = sermon.getDurationSeconds() > 0 ? sermon.getDurationSeconds() : 2700;
-        String durationStr = (durationSec / 60) + " mins";
+                ? " • " + sermon.getPassage() : "";
+        String preacher = sermon.getPreacher() != null ? sermon.getPreacher() : "Bishop Dr. David Mutweri";
+        tvPreacher.setText(preacher + passage);
+        tvPreacher.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvPreacher.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvPreacher.setPadding(0, dp(2), 0, 0);
+        titleCol.addView(tvPreacher);
 
-        TextView tvMeta = new TextView(activity);
-        tvMeta.setText("📖 " + passage + "  •  ⏱ " + durationStr);
-        tvMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvMeta.setTextColor(COLOR_TEXT_MUTED);
-        infoCol.addView(tvMeta);
+        topRow.addView(titleCol);
 
-        topRow.addView(infoCol);
+        // Quiet Purple Play Circle (NOT massive orange button!)
+        Button btnPlayCircle = new Button(activity);
+        btnPlayCircle.setText("▶");
+        btnPlayCircle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        btnPlayCircle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnPlayCircle.setBackground(createSolidPill(PerazimTheme.COLOR_PURPLE_BRAND, 20));
+        LinearLayout.LayoutParams lpCircle = new LinearLayout.LayoutParams(dp(40), dp(40));
+        lpCircle.setMargins(dp(8), 0, 0, 0);
+        btnPlayCircle.setLayoutParams(lpCircle);
+        btnPlayCircle.setOnClickListener(v -> {
+            if (sermon.hasVideo() && (sermon.getAudioUrl() == null || sermon.getAudioUrl().isEmpty())) {
+                YouTubeFeedRepository.openVideo(activity, sermon.getVideoUrl());
+            } else {
+                startPlayback(sermon);
+            }
+        });
+        topRow.addView(btnPlayCircle);
+
         card.addView(topRow);
 
-        // Middle Row: Badges (Series badge + Download status badge)
-        LinearLayout badgeRow = new LinearLayout(activity);
-        badgeRow.setOrientation(LinearLayout.HORIZONTAL);
-        badgeRow.setGravity(Gravity.CENTER_VERTICAL);
-        badgeRow.setPadding(0, dp(8), 0, dp(10));
+        // Metadata Row: Duration chip, date chip, series chip
+        LinearLayout metaRow = new LinearLayout(activity);
+        metaRow.setOrientation(LinearLayout.HORIZONTAL);
+        metaRow.setGravity(Gravity.CENTER_VERTICAL);
+        metaRow.setPadding(0, dp(10), 0, dp(6));
 
-        // Series badge
-        String seriesName = sermon.getSeries() != null && !sermon.getSeries().isEmpty()
-                ? sermon.getSeries() : "Breakthrough Series";
-        TextView tvSeriesBadge = new TextView(activity);
-        tvSeriesBadge.setText("🏷 " + seriesName);
-        tvSeriesBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvSeriesBadge.setTypeface(Typeface.DEFAULT_BOLD);
-        tvSeriesBadge.setTextColor(COLOR_PRIMARY_PURPLE);
-        tvSeriesBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        tvSeriesBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
-        LinearLayout.LayoutParams lpSeries = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpSeries.setMargins(0, 0, dp(6), 0);
-        tvSeriesBadge.setLayoutParams(lpSeries);
-        badgeRow.addView(tvSeriesBadge);
+        long durationSec = sermon.getDurationSeconds() > 0 ? sermon.getDurationSeconds() : 2700;
+        String durationStr = (durationSec / 60) + " min";
+        TextView tvDuration = new TextView(activity);
+        tvDuration.setText(durationStr);
+        tvDuration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvDuration.setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
+        tvDuration.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 6, PerazimTheme.COLOR_STROKE, 1));
+        tvDuration.setPadding(dp(8), dp(3), dp(8), dp(3));
+        metaRow.addView(tvDuration);
 
-        if (sermon.hasVideo()) {
-            TextView tvVideoBadge = new TextView(activity);
-            tvVideoBadge.setText("🎥 Video");
-            tvVideoBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvVideoBadge.setTypeface(Typeface.DEFAULT_BOLD);
-            tvVideoBadge.setTextColor(COLOR_ACCENT_ORANGE);
-            tvVideoBadge.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ORANGE_BORDER));
-            tvVideoBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
-            LinearLayout.LayoutParams lpVid = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lpVid.setMargins(0, 0, dp(6), 0);
-            tvVideoBadge.setLayoutParams(lpVid);
-            badgeRow.addView(tvVideoBadge);
+        TextView tvDate = new TextView(activity);
+        tvDate.setText("Recorded");
+        tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvDate.setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
+        tvDate.setPadding(dp(8), 0, 0, 0);
+        metaRow.addView(tvDate);
+
+        if (sermon.getSeries() != null && !sermon.getSeries().isEmpty()) {
+            TextView tvSeries = new TextView(activity);
+            tvSeries.setText("· " + sermon.getSeries());
+            tvSeries.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            tvSeries.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+            tvSeries.setPadding(dp(6), 0, 0, 0);
+            metaRow.addView(tvSeries);
         }
 
-        if (sermon.hasPdf()) {
-            TextView tvPdfBadge = new TextView(activity);
-            tvPdfBadge.setText("📄 Study Notes");
-            tvPdfBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvPdfBadge.setTypeface(Typeface.DEFAULT_BOLD);
-            tvPdfBadge.setTextColor(COLOR_PRIMARY_PURPLE);
-            tvPdfBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-            tvPdfBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
-            LinearLayout.LayoutParams lpPdf = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lpPdf.setMargins(0, 0, dp(6), 0);
-            tvPdfBadge.setLayoutParams(lpPdf);
-            badgeRow.addView(tvPdfBadge);
-        }
+        card.addView(metaRow);
 
-        // Download status badge (for downloadable audio sermons)
-        final TextView tvDownloadBadge = new TextView(activity);
+        // Actions Row: Download affordance, Notes, Share
+        LinearLayout actionsRow = new LinearLayout(activity);
+        actionsRow.setOrientation(LinearLayout.HORIZONTAL);
+        actionsRow.setGravity(Gravity.CENTER_VERTICAL);
+        actionsRow.setPadding(0, dp(6), 0, 0);
+
         boolean isLocalAudio = sermon.getAudioUrl() != null && !sermon.getAudioUrl().isEmpty() && !sermon.getId().startsWith("yt_");
-        if (isLocalAudio) {
-            String initialStatus = downloadStatusMap.containsKey(sermon.getId())
-                    ? downloadStatusMap.get(sermon.getId())
-                    : (sermon.isDownloaded() ? "DOWNLOADED" : "STREAMING");
-            updateDownloadBadgeView(tvDownloadBadge, initialStatus);
-            badgeRow.addView(tvDownloadBadge);
-        }
-
-        card.addView(badgeRow);
-
-        // Actions Row 1: Primary playback (Watch Video and/or Play Audio)
-        LinearLayout primaryActionRow = new LinearLayout(activity);
-        primaryActionRow.setOrientation(LinearLayout.HORIZONTAL);
-        primaryActionRow.setGravity(Gravity.CENTER_VERTICAL);
-        primaryActionRow.setPadding(0, 0, 0, dp(6));
-
-        if (sermon.hasVideo()) {
-            Button btnWatch = new Button(activity);
-            btnWatch.setText("🎥 Watch Video");
-            btnWatch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            btnWatch.setTypeface(Typeface.DEFAULT_BOLD);
-            btnWatch.setTextColor(COLOR_WHITE);
-            btnWatch.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 8, 2));
-            btnWatch.setPadding(dp(10), dp(6), dp(10), dp(6));
-            LinearLayout.LayoutParams lpWatch = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-            lpWatch.setMargins(0, 0, dp(6), 0);
-            btnWatch.setLayoutParams(lpWatch);
-            btnWatch.setOnClickListener(v -> YouTubeFeedRepository.openVideo(activity, sermon.getVideoUrl()));
-            primaryActionRow.addView(btnWatch);
-        }
-
-        if (isLocalAudio || !sermon.hasVideo()) {
-            Button btnPlay = new Button(activity);
-            btnPlay.setText("▶ Play Audio");
-            btnPlay.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            btnPlay.setTypeface(Typeface.DEFAULT_BOLD);
-            btnPlay.setTextColor(COLOR_WHITE);
-            btnPlay.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 8, 2));
-            btnPlay.setPadding(dp(10), dp(6), dp(10), dp(6));
-            LinearLayout.LayoutParams lpPlay = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-            lpPlay.setMargins(0, 0, dp(6), 0);
-            btnPlay.setLayoutParams(lpPlay);
-            btnPlay.setOnClickListener(v -> startPlayback(sermon));
-            primaryActionRow.addView(btnPlay);
-        }
-
-        card.addView(primaryActionRow);
-
-        // Actions Row 2: Secondary utilities (PDF Notes, WhatsApp Share, Offline Download)
-        LinearLayout secondaryActionRow = new LinearLayout(activity);
-        secondaryActionRow.setOrientation(LinearLayout.HORIZONTAL);
-        secondaryActionRow.setGravity(Gravity.CENTER_VERTICAL);
-
-        if (sermon.hasPdf()) {
-            Button btnNotes = new Button(activity);
-            btnNotes.setText("📄 Notes (PDF)");
-            btnNotes.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            btnNotes.setTypeface(Typeface.DEFAULT_BOLD);
-            btnNotes.setTextColor(COLOR_PRIMARY_PURPLE);
-            btnNotes.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-            btnNotes.setPadding(dp(8), dp(6), dp(8), dp(6));
-            LinearLayout.LayoutParams lpNotes = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-            lpNotes.setMargins(0, 0, dp(4), 0);
-            btnNotes.setLayoutParams(lpNotes);
-            btnNotes.setOnClickListener(v -> openPdfNotes(activity, sermon.getPdfUrl()));
-            secondaryActionRow.addView(btnNotes);
-        }
-
-        Button btnShare = new Button(activity);
-        btnShare.setText("💬 Share");
-        btnShare.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnShare.setTypeface(Typeface.DEFAULT_BOLD);
-        btnShare.setTextColor(COLOR_PRIMARY_PURPLE);
-        btnShare.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        btnShare.setPadding(dp(8), dp(6), dp(8), dp(6));
-        LinearLayout.LayoutParams lpShare = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lpShare.setMargins(0, 0, dp(4), 0);
-        btnShare.setLayoutParams(lpShare);
-        btnShare.setOnClickListener(v -> YouTubeFeedRepository.shareSermonToWhatsApp(activity, sermon));
-        secondaryActionRow.addView(btnShare);
-
         if (isLocalAudio) {
             final Button btnDownload = new Button(activity);
             String initialStatus = downloadStatusMap.containsKey(sermon.getId())
                     ? downloadStatusMap.get(sermon.getId())
                     : (sermon.isDownloaded() ? "DOWNLOADED" : "STREAMING");
             updateDownloadActionButton(btnDownload, initialStatus);
-            LinearLayout.LayoutParams lpBtnDl = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-            btnDownload.setLayoutParams(lpBtnDl);
-            btnDownload.setOnClickListener(v -> handleDownloadAction(sermon, tvDownloadBadge, btnDownload));
-            secondaryActionRow.addView(btnDownload);
+            btnDownload.setOnClickListener(v -> handleDownloadAction(sermon, btnDownload));
+            actionsRow.addView(btnDownload);
         }
 
-        card.addView(secondaryActionRow);
+        if (sermon.hasPdf()) {
+            Button btnNotes = new Button(activity);
+            btnNotes.setText("Study Notes (PDF)");
+            btnNotes.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            btnNotes.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            btnNotes.setBackground(createCardBackground(Color.TRANSPARENT, 8, PerazimTheme.COLOR_STROKE, 1));
+            btnNotes.setPadding(dp(10), dp(5), dp(10), dp(5));
+            LinearLayout.LayoutParams lpNotes = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lpNotes.setMargins(dp(6), 0, 0, 0);
+            btnNotes.setLayoutParams(lpNotes);
+            btnNotes.setOnClickListener(v -> openPdfNotes(activity, sermon.getPdfUrl()));
+            actionsRow.addView(btnNotes);
+        }
 
-        // Tapping card opens video if video-only, else loads sermon into player
+        Button btnShare = new Button(activity);
+        btnShare.setText("Share");
+        btnShare.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnShare.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnShare.setBackground(createCardBackground(Color.TRANSPARENT, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnShare.setPadding(dp(10), dp(5), dp(10), dp(5));
+        LinearLayout.LayoutParams lpShare = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpShare.setMargins(dp(6), 0, 0, 0);
+        btnShare.setLayoutParams(lpShare);
+        btnShare.setOnClickListener(v -> YouTubeFeedRepository.shareSermonToWhatsApp(activity, sermon));
+        actionsRow.addView(btnShare);
+
+        card.addView(actionsRow);
+
         card.setOnClickListener(v -> {
             if (sermon.hasVideo() && !isLocalAudio) {
                 YouTubeFeedRepository.openVideo(activity, sermon.getVideoUrl());
@@ -908,9 +841,6 @@ public class SermonsUiBinder {
         return card;
     }
 
-    /**
-     * Opens PDF study notes in an external viewer or browser.
-     */
     public static void openPdfNotes(@NonNull Context context, @Nullable String pdfUrl) {
         if (pdfUrl == null || pdfUrl.trim().isEmpty()) {
             Toast.makeText(context, "No PDF study notes available for this sermon.", Toast.LENGTH_SHORT).show();
@@ -933,88 +863,57 @@ public class SermonsUiBinder {
         }
     }
 
-    private void updateDownloadBadgeView(TextView badge, String status) {
-        if ("DOWNLOADED".equals(status)) {
-            badge.setText("✅ Downloaded");
-            badge.setTextColor(COLOR_GREEN_SUCCESS);
-            badge.setBackground(createPillBg(COLOR_GREEN_TINT, COLOR_GREEN_SUCCESS));
-        } else if ("DOWNLOADING".equals(status)) {
-            badge.setText("⏳ DOWNLOADING...");
-            badge.setTextColor(COLOR_AMBER_TEXT);
-            badge.setBackground(createPillBg(COLOR_AMBER_TINT, COLOR_ACCENT_ORANGE));
-        } else {
-            badge.setText("☁️ Streaming");
-            badge.setTextColor(COLOR_PRIMARY_PURPLE);
-            badge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        }
-        badge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        badge.setTypeface(Typeface.DEFAULT_BOLD);
-        badge.setPadding(dp(8), dp(3), dp(8), dp(3));
-    }
-
     private void updateDownloadActionButton(Button btn, String status) {
         if ("DOWNLOADED".equals(status)) {
-            btn.setText("🗑 Delete Download");
-            btn.setTextColor(COLOR_TEXT_MUTED);
-            btn.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
+            btn.setText("✓ Downloaded");
+            btn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            btn.setBackground(createCardBackground(PerazimTheme.COLOR_PURPLE_GHOST, 8, PerazimTheme.COLOR_PURPLE_SOFT, 1));
         } else if ("DOWNLOADING".equals(status)) {
-            btn.setText("⏳ Downloading...");
-            btn.setTextColor(COLOR_AMBER_TEXT);
-            btn.setBackground(createPillBg(COLOR_AMBER_TINT, COLOR_ACCENT_ORANGE));
+            btn.setText("Downloading…");
+            btn.setTextColor(PerazimTheme.COLOR_ORANGE_SOFT);
+            btn.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
         } else {
-            btn.setText("📥 Download");
-            btn.setTextColor(COLOR_WHITE);
-            btn.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 8, 2));
+            btn.setText("Download");
+            btn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            btn.setBackground(createCardBackground(Color.TRANSPARENT, 8, PerazimTheme.COLOR_STROKE, 1));
         }
         btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btn.setTypeface(Typeface.DEFAULT_BOLD);
-        btn.setPadding(dp(10), dp(6), dp(10), dp(6));
+        btn.setPadding(dp(10), dp(5), dp(10), dp(5));
     }
 
-    // =========================================================================
-    // 6. DOWNLOAD ACTION HANDLER
-    // =========================================================================
-
-    private void handleDownloadAction(final Sermon sermon, final TextView badge, final Button btn) {
+    private void handleDownloadAction(final Sermon sermon, final Button btn) {
         String currentStatus = downloadStatusMap.containsKey(sermon.getId())
                 ? downloadStatusMap.get(sermon.getId())
                 : (sermon.isDownloaded() ? "DOWNLOADED" : "STREAMING");
 
         if ("STREAMING".equals(currentStatus)) {
-            // Transition: STREAMING -> DOWNLOADING -> DOWNLOADED
             downloadStatusMap.put(sermon.getId(), "DOWNLOADING");
-            updateDownloadBadgeView(badge, "DOWNLOADING");
             updateDownloadActionButton(btn, "DOWNLOADING");
-            Toast.makeText(activity, "Offline Queue: Download staged. Remote media delivery unlocks in Phase 4.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Download staged.", Toast.LENGTH_SHORT).show();
 
             viewModel.requestDownload(sermon.getId(), success -> activity.runOnUiThread(() -> {
                 if (Boolean.TRUE.equals(success)) {
                     downloadStatusMap.put(sermon.getId(), "DOWNLOADED");
                     sermon.setDownloaded(true);
-                    updateDownloadBadgeView(badge, "DOWNLOADED");
                     updateDownloadActionButton(btn, "DOWNLOADED");
-                    Toast.makeText(activity, "Offline Queue: Download staged. Remote media delivery unlocks in Phase 4.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Sermon downloaded for offline listening.", Toast.LENGTH_SHORT).show();
                 } else {
                     downloadStatusMap.put(sermon.getId(), "STREAMING");
-                    updateDownloadBadgeView(badge, "STREAMING");
                     updateDownloadActionButton(btn, "STREAMING");
-                    Toast.makeText(activity, "Download failed. Please try again.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Download failed.", Toast.LENGTH_SHORT).show();
                 }
             }));
         } else if ("DOWNLOADED".equals(currentStatus)) {
-            // Options: Play Offline or Delete
             new AlertDialog.Builder(activity)
                     .setTitle("Manage Download")
-                    .setMessage(sermon.getTitle() + " is saved offline. What would you like to do?")
-                    .setPositiveButton("▶ Play Offline", (dialog, which) -> {
+                    .setMessage(sermon.getTitle() + " is saved offline.")
+                    .setPositiveButton("Play Offline", (dialog, which) -> {
                         startPlayback(sermon);
-                        Toast.makeText(activity, "Playing from local storage", Toast.LENGTH_SHORT).show();
                     })
-                    .setNeutralButton("🗑 Delete Download", (dialog, which) -> {
+                    .setNeutralButton("Delete Download", (dialog, which) -> {
                         viewModel.deleteDownload(sermon.getId(), success -> activity.runOnUiThread(() -> {
                             downloadStatusMap.put(sermon.getId(), "STREAMING");
                             sermon.setDownloaded(false);
-                            updateDownloadBadgeView(badge, "STREAMING");
                             updateDownloadActionButton(btn, "STREAMING");
                             Toast.makeText(activity, "Download removed.", Toast.LENGTH_SHORT).show();
                         }));
@@ -1023,10 +922,6 @@ public class SermonsUiBinder {
                     .show();
         }
     }
-
-    // =========================================================================
-    // 7. AUDIO CONTROLLER OPERATIONS & PLAYBACK
-    // =========================================================================
 
     public void startPlayback(Sermon sermon) {
         if (sermon == null) return;
@@ -1075,8 +970,7 @@ public class SermonsUiBinder {
 
     public void resumePlayback() {
         isPlaying = true;
-        btnPlayPause.setText("⏸ Pause Sermon");
-        btnPlayPause.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 3));
+        btnPlayPause.setText("Pause Sermon");
 
         try {
             if (mediaPlayer == null) {
@@ -1152,8 +1046,7 @@ public class SermonsUiBinder {
 
     public void pausePlayback() {
         isPlaying = false;
-        btnPlayPause.setText("▶ Play Sermon");
-        btnPlayPause.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
+        btnPlayPause.setText("Play Sermon");
         if (mediaPlayer != null) {
             try {
                 if (mediaPlayer.isPlaying()) {
@@ -1174,7 +1067,7 @@ public class SermonsUiBinder {
         } else {
             playbackSpeed = 1.0f;
         }
-        btnSpeedToggle.setText(String.format(Locale.US, "⚡ %.2f×", playbackSpeed).replace(".00", ".0"));
+        btnSpeedToggle.setText(String.format(Locale.US, "%.2f×", playbackSpeed).replace(".00", ".0"));
         if (mediaPlayer != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(playbackSpeed));
@@ -1198,10 +1091,6 @@ public class SermonsUiBinder {
         }
     }
 
-    // =========================================================================
-    // 8. GRAPHICS & DRAWABLE UTILITIES
-    // =========================================================================
-
     private String formatDuration(long seconds) {
         long mins = seconds / 60;
         long secs = seconds % 60;
@@ -1216,38 +1105,26 @@ public class SermonsUiBinder {
         );
     }
 
-    private Drawable createPillBg(int bgColor, int strokeColor) {
-        GradientDrawable g = new GradientDrawable();
-        g.setColor(bgColor);
-        g.setCornerRadius(dp(14));
-        g.setStroke(dp(1), strokeColor);
-        return g;
-    }
-
     private LinearLayout createCard(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
         LinearLayout card = new LinearLayout(activity);
         card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(createCardBackground(bgColor, cornerRadiusDp, borderColor, borderWidthDp));
+        return card;
+    }
+
+    private Drawable createCardBackground(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));
         drawable.setStroke(dp(borderWidthDp), borderColor);
-        card.setBackground(drawable);
-        return card;
+        return drawable;
     }
 
-    private Drawable create3dButtonDrawable(int faceColor, int shadowColor, int radiusDp, int shadowDepthDp) {
-        GradientDrawable shadow = new GradientDrawable();
-        shadow.setColor(shadowColor);
-        shadow.setCornerRadius(dp(radiusDp));
-
-        GradientDrawable face = new GradientDrawable();
-        face.setColor(faceColor);
-        face.setCornerRadius(dp(radiusDp));
-
-        LayerDrawable layers = new LayerDrawable(new Drawable[]{shadow, face});
-        layers.setLayerInset(0, 0, dp(shadowDepthDp), 0, 0);
-        layers.setLayerInset(1, 0, 0, 0, dp(shadowDepthDp));
-        return layers;
+    private Drawable createSolidPill(int bgColor, int cornerRadiusDp) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(bgColor);
+        drawable.setCornerRadius(dp(cornerRadiusDp));
+        return drawable;
     }
 
     private Bitmap loadAssetBitmap(String name, int maxDim) {
@@ -1292,18 +1169,5 @@ public class SermonsUiBinder {
         } catch (Throwable t) {
             return bitmap;
         }
-    }
-
-    private Bitmap getCircularBitmap(Bitmap bitmap) {
-        if (bitmap == null) return null;
-        int size = Math.min(bitmap.getWidth(), bitmap.getHeight());
-        Bitmap output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, (size - bitmap.getWidth()) / 2f, (size - bitmap.getHeight()) / 2f, paint);
-        return output;
     }
 }

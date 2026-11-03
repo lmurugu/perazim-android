@@ -111,6 +111,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView[] tabViews = new ScrollView[5];
     private LinearLayout[] navTabButtons = new LinearLayout[5];
     private TextView[] navTabLabels = new TextView[5];
+    private ImageView[] navTabIcons = new ImageView[5];
     private int currentTabIndex = 0;
 
     // Persistent Docked Mini-Player (Subsplash pattern)
@@ -182,8 +183,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         bibleViewModel = factory.createBibleViewModel();
 
         LinearLayout rootLayout = new LinearLayout(this);
+        rootLayout.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         rootLayout.setOrientation(LinearLayout.VERTICAL);
-        rootLayout.setBackgroundColor(COLOR_BG_NEUTRAL);
+        rootLayout.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
 
         // 1. Top App Bar
         View topBar = createTopAppBar();
@@ -282,128 +285,63 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setBackgroundColor(COLOR_WHITE);
-        header.setPadding(dp(12), dp(8), dp(12), dp(8));
+        header.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        header.setPadding(dp(16), dp(10), dp(16), dp(10));
 
         GradientDrawable headerBg = new GradientDrawable();
-        headerBg.setColor(COLOR_WHITE);
-        headerBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        headerBg.setColor(PerazimTheme.COLOR_BG_DEEP);
+        headerBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         header.setBackground(headerBg);
 
-        // Church Crest Logo
-        Bitmap logoBmp = loadAssetBitmap("logo_crest.png", 150);
-        if (logoBmp != null) {
-            ImageView logoView = new ImageView(this);
-            logoView.setImageBitmap(logoBmp);
-            LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(32), dp(32));
-            lpLogo.setMargins(0, 0, dp(8), 0);
-            logoView.setLayoutParams(lpLogo);
-            header.addView(logoView);
-        }
+        // Wordmark "Perazim"
+        TextView wordmark = new TextView(this);
+        wordmark.setText("Perazim");
+        wordmark.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        wordmark.setTypeface(Typeface.DEFAULT_BOLD);
+        wordmark.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        wordmark.setLetterSpacing(0.04f);
+        header.addView(wordmark);
 
-        // Campus Dropdown
+        View spacer = new View(this);
+        LinearLayout.LayoutParams lpSpacer = new LinearLayout.LayoutParams(0, 0, 1.0f);
+        spacer.setLayoutParams(lpSpacer);
+        header.addView(spacer);
+
+        // Campus Selector Outline Chip
         LinearLayout spinnerPill = new LinearLayout(this);
         spinnerPill.setOrientation(LinearLayout.HORIZONTAL);
         spinnerPill.setGravity(Gravity.CENTER_VERTICAL);
         GradientDrawable pillBg = new GradientDrawable();
-        pillBg.setColor(COLOR_BG_NEUTRAL);
-        pillBg.setCornerRadius(dp(16));
-        pillBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        pillBg.setColor(PerazimTheme.COLOR_SURFACE);
+        pillBg.setCornerRadius(dp(12));
+        pillBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         spinnerPill.setBackground(pillBg);
-        spinnerPill.setPadding(dp(6), dp(2), dp(4), dp(2));
-
-        LinearLayout.LayoutParams lpPill = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lpPill.setMargins(0, 0, dp(6), 0);
-        spinnerPill.setLayoutParams(lpPill);
+        spinnerPill.setPadding(dp(8), dp(2), dp(6), dp(2));
 
         campusSpinner = new Spinner(this);
         List<String> campuses = new ArrayList<>();
-        campuses.add("Perazim Mission Church");
-        campuses.add("Mwea Campus");
-        campuses.add("Rombo Campus");
+        campuses.add("Embu Headquarters");
+        campuses.add("Nairobi Fellowship");
+        campuses.add("Meru Outreach");
         campuses.add("Online Campus");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, campuses);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, campuses) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                if (v instanceof TextView) {
+                    ((TextView) v).setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+                    ((TextView) v).setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+                }
+                return v;
+            }
+        };
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         campusSpinner.setAdapter(adapter);
         campusSpinner.setBackground(null);
         campusSpinner.setOnItemSelectedListener(this);
         spinnerPill.addView(campusSpinner);
         header.addView(spinnerPill);
-
-        // Streak HUD Badge (🔥 7 Days)
-        topStreakBadge = new TextView(this);
-        topStreakBadge.setText("🔥 " + streakCount);
-        topStreakBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        topStreakBadge.setTypeface(Typeface.DEFAULT_BOLD);
-        topStreakBadge.setTextColor(COLOR_ACCENT_ORANGE);
-        topStreakBadge.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ORANGE_BORDER));
-        topStreakBadge.setPadding(dp(7), dp(4), dp(7), dp(4));
-        LinearLayout.LayoutParams lpStreak = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpStreak.setMargins(0, 0, dp(4), 0);
-        topStreakBadge.setLayoutParams(lpStreak);
-        topStreakBadge.setOnClickListener(v -> Toast.makeText(this, "🔥 " + streakCount + "-Day Devotional Streak! Keep up your daily walk with Christ.", Toast.LENGTH_SHORT).show());
-        header.addView(topStreakBadge);
-
-        // XP HUD Badge (⭐ 450 XP)
-        topXpBadge = new TextView(this);
-        topXpBadge.setText("⭐ " + xpCount);
-        topXpBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        topXpBadge.setTypeface(Typeface.DEFAULT_BOLD);
-        topXpBadge.setTextColor(COLOR_PRIMARY_PURPLE);
-        topXpBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        topXpBadge.setPadding(dp(7), dp(4), dp(7), dp(4));
-        LinearLayout.LayoutParams lpXp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpXp.setMargins(0, 0, dp(4), 0);
-        topXpBadge.setLayoutParams(lpXp);
-        topXpBadge.setOnClickListener(v -> Toast.makeText(this, "⭐ " + xpCount + " Total XP Earned! Quests, prayers & reflections build your spiritual stature.", Toast.LENGTH_SHORT).show());
-        header.addView(topXpBadge);
-
-        // Grace HUD Badge (💜 5 Grace) - Duolingo pattern
-        topGraceBadge = new TextView(this);
-        topGraceBadge.setText("💜 " + graceCount);
-        topGraceBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        topGraceBadge.setTypeface(Typeface.DEFAULT_BOLD);
-        topGraceBadge.setTextColor(COLOR_PRIMARY_PURPLE);
-        topGraceBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE));
-        topGraceBadge.setPadding(dp(7), dp(4), dp(7), dp(4));
-        LinearLayout.LayoutParams lpGrace = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpGrace.setMargins(0, 0, dp(4), 0);
-        topGraceBadge.setLayoutParams(lpGrace);
-        topGraceBadge.setOnClickListener(v -> showGracePointDialog());
-        header.addView(topGraceBadge);
-
-        // M-Pesa Giving Pill in Top Bar
-        topGiveBtn = new Button(this);
-        topGiveBtn.setText("💚 Give");
-        topGiveBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        topGiveBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        topGiveBtn.setTextColor(COLOR_WHITE);
-        topGiveBtn.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 2));
-        topGiveBtn.setPadding(dp(8), dp(4), dp(8), dp(4));
-        LinearLayout.LayoutParams lpGive = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        topGiveBtn.setLayoutParams(lpGive);
-        topGiveBtn.setOnClickListener(v -> showGivingDialog());
-        header.addView(topGiveBtn);
-
-        // AI Breakthrough Guide Chatbot Button
-        Button btnAiGuide = new Button(this);
-        btnAiGuide.setText("🤖 Guide");
-        btnAiGuide.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnAiGuide.setTypeface(Typeface.DEFAULT_BOLD);
-        btnAiGuide.setTextColor(COLOR_WHITE);
-        btnAiGuide.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 2));
-        btnAiGuide.setPadding(dp(8), dp(4), dp(8), dp(4));
-        LinearLayout.LayoutParams lpAi = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpAi.setMargins(dp(4), 0, 0, 0);
-        btnAiGuide.setLayoutParams(lpAi);
-        btnAiGuide.setOnClickListener(v -> showAiBreakthroughGuide());
-        header.addView(btnAiGuide);
 
         return header;
     }
@@ -437,18 +375,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         player.setVisibility(View.GONE);
         player.setOrientation(LinearLayout.HORIZONTAL);
         player.setGravity(Gravity.CENTER_VERTICAL);
-        player.setBackgroundColor(COLOR_PURPLE_DARK);
         player.setPadding(dp(12), dp(8), dp(12), dp(8));
 
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_PURPLE_DARK);
-        bg.setStroke(dp(1), COLOR_PURPLE_SHADOW);
+        bg.setColor(PerazimTheme.COLOR_SURFACE);
+        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         player.setBackground(bg);
 
-        TextView icon = new TextView(this);
-        icon.setText("🎙️");
-        icon.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        icon.setPadding(0, 0, dp(10), 0);
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(R.drawable.ic_nav_sermons);
+        icon.setColorFilter(PerazimTheme.COLOR_PURPLE_SOFT, PorterDuff.Mode.SRC_IN);
+        LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(20), dp(20));
+        lpIcon.setMargins(0, 0, dp(10), 0);
+        icon.setLayoutParams(lpIcon);
         player.addView(icon);
 
         LinearLayout textCol = new LinearLayout(this);
@@ -460,14 +399,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvMiniTrackTitle.setText("No Audio Playing");
         tvMiniTrackTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvMiniTrackTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvMiniTrackTitle.setTextColor(COLOR_WHITE);
+        tvMiniTrackTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         tvMiniTrackTitle.setMaxLines(1);
         textCol.addView(tvMiniTrackTitle);
 
         tvMiniTrackSub = new TextView(this);
         tvMiniTrackSub.setText("Select a sermon to play audio");
         tvMiniTrackSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvMiniTrackSub.setTextColor(COLOR_PURPLE_SOFT);
+        tvMiniTrackSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         tvMiniTrackSub.setMaxLines(1);
         textCol.addView(tvMiniTrackSub);
 
@@ -481,16 +420,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         // Data Saver Switch Button
         btnMiniDataSaver = new Button(this);
-        btnMiniDataSaver.setText(isDataSaverActive ? "📶 32k" : "🎧 HD");
+        btnMiniDataSaver.setText(isDataSaverActive ? "32k" : "HD");
         btnMiniDataSaver.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        btnMiniDataSaver.setTextColor(COLOR_WHITE);
+        btnMiniDataSaver.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnMiniDataSaver.setTypeface(Typeface.DEFAULT_BOLD);
-        btnMiniDataSaver.setPadding(dp(6), dp(4), dp(6), dp(4));
+        btnMiniDataSaver.setPadding(dp(8), dp(4), dp(8), dp(4));
         GradientDrawable dsBg = new GradientDrawable();
-        dsBg.setColor(isDataSaverActive ? COLOR_ACCENT_ORANGE : COLOR_PURPLE_SHADOW);
+        dsBg.setColor(isDataSaverActive ? PerazimTheme.COLOR_SURFACE_2 : PerazimTheme.COLOR_SURFACE);
         dsBg.setCornerRadius(dp(12));
+        dsBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         btnMiniDataSaver.setBackground(dsBg);
-        LinearLayout.LayoutParams lpDs = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(30));
+        LinearLayout.LayoutParams lpDs = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, dp(28));
         lpDs.setMargins(0, 0, dp(6), 0);
         btnMiniDataSaver.setLayoutParams(lpDs);
         btnMiniDataSaver.setOnClickListener(v -> toggleDataSaver());
@@ -499,15 +439,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         // Play/Pause Button
         btnMiniPlayPause = new Button(this);
         btnMiniPlayPause.setText(isPlaying ? "⏸" : "▶");
-        btnMiniPlayPause.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        btnMiniPlayPause.setTextColor(COLOR_WHITE);
+        btnMiniPlayPause.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnMiniPlayPause.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnMiniPlayPause.setTypeface(Typeface.DEFAULT_BOLD);
-        btnMiniPlayPause.setPadding(dp(10), dp(4), dp(10), dp(4));
+        btnMiniPlayPause.setPadding(0, 0, 0, 0);
         GradientDrawable playBg = new GradientDrawable();
-        playBg.setColor(COLOR_ACCENT_ORANGE);
-        playBg.setCornerRadius(dp(15));
+        playBg.setColor(PerazimTheme.COLOR_PURPLE_BRAND);
+        playBg.setCornerRadius(dp(16));
         btnMiniPlayPause.setBackground(playBg);
-        LinearLayout.LayoutParams lpPlay = new LinearLayout.LayoutParams(dp(36), dp(36));
+        LinearLayout.LayoutParams lpPlay = new LinearLayout.LayoutParams(dp(32), dp(32));
         btnMiniPlayPause.setLayoutParams(lpPlay);
         btnMiniPlayPause.setOnClickListener(v -> togglePlayback());
         player.addView(btnMiniPlayPause);
@@ -545,29 +485,31 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     private View createBottomTabBar() {
         LinearLayout bottomNav = new LinearLayout(this);
+        LinearLayout.LayoutParams lpNav = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(58));
+        bottomNav.setLayoutParams(lpNav);
         bottomNav.setOrientation(LinearLayout.HORIZONTAL);
         bottomNav.setGravity(Gravity.CENTER_VERTICAL);
-        bottomNav.setBackgroundColor(COLOR_WHITE);
-        bottomNav.setPadding(0, dp(6), 0, dp(8));
+        bottomNav.setPadding(0, dp(4), 0, dp(4));
 
         GradientDrawable navBorder = new GradientDrawable();
-        navBorder.setColor(COLOR_WHITE);
-        navBorder.setStroke(dp(1), COLOR_BORDER_GREY);
+        navBorder.setColor(PerazimTheme.COLOR_BG_DEEP);
+        navBorder.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         bottomNav.setBackground(navBorder);
 
-        final String[] icons = {
-                NavigationContract.TAB_ICON_HOME,
-                NavigationContract.TAB_ICON_SERMONS,
-                NavigationContract.TAB_ICON_WORSHIP,
-                NavigationContract.TAB_ICON_FELLOWSHIP,
-                NavigationContract.TAB_ICON_PROFILE
+        final int[] iconResIds = {
+                NavigationContract.TAB_ICON_RES_HOME,
+                NavigationContract.TAB_ICON_RES_SERMONS,
+                NavigationContract.TAB_ICON_RES_WORSHIP,
+                NavigationContract.TAB_ICON_RES_PRAYER,
+                NavigationContract.TAB_ICON_RES_ME
         };
         final String[] labels = {
                 NavigationContract.TAB_TITLE_HOME,
                 NavigationContract.TAB_TITLE_SERMONS,
                 NavigationContract.TAB_TITLE_WORSHIP,
-                NavigationContract.TAB_TITLE_FELLOWSHIP,
-                NavigationContract.TAB_TITLE_PROFILE
+                NavigationContract.TAB_TITLE_PRAYER,
+                NavigationContract.TAB_TITLE_ME
         };
 
         for (int i = 0; i < 5; i++) {
@@ -577,12 +519,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             tab.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams lpTab = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
             tab.setLayoutParams(lpTab);
-            tab.setPadding(0, dp(4), 0, dp(4));
+            tab.setPadding(dp(4), dp(4), dp(4), dp(4));
 
-            TextView tvIcon = new TextView(this);
-            tvIcon.setText(icons[i]);
-            tvIcon.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            tvIcon.setGravity(Gravity.CENTER);
+            ImageView ivIcon = new ImageView(this);
+            LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(22), dp(22));
+            ivIcon.setLayoutParams(lpIcon);
+            ivIcon.setImageResource(iconResIds[i]);
 
             TextView tvLabel = new TextView(this);
             tvLabel.setText(labels[i]);
@@ -590,12 +532,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             tvLabel.setGravity(Gravity.CENTER);
             tvLabel.setPadding(0, dp(2), 0, 0);
 
-            tab.addView(tvIcon);
+            tab.addView(ivIcon);
             tab.addView(tvLabel);
             tab.setOnClickListener(v -> switchTab(index));
 
             navTabButtons[i] = tab;
             navTabLabels[i] = tvLabel;
+            navTabIcons[i] = ivIcon;
 
             bottomNav.addView(tab);
         }
@@ -618,17 +561,30 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         for (int i = 0; i < 5; i++) {
             boolean isSelected = (i == currentTabIndex);
             if (isSelected) {
-                navTabLabels[i].setTextColor(COLOR_PRIMARY_PURPLE);
-                navTabLabels[i].setTypeface(Typeface.DEFAULT_BOLD);
-
-                GradientDrawable activePill = new GradientDrawable();
-                activePill.setColor(COLOR_PURPLE_TINT);
-                activePill.setCornerRadius(dp(14));
-                navTabButtons[i].setBackground(activePill);
+                if (navTabLabels[i] != null) {
+                    navTabLabels[i].setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                    navTabLabels[i].setTypeface(Typeface.DEFAULT_BOLD);
+                }
+                if (navTabIcons[i] != null) {
+                    navTabIcons[i].setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
+                }
+                if (navTabButtons[i] != null) {
+                    GradientDrawable activePill = new GradientDrawable();
+                    activePill.setColor(PerazimTheme.COLOR_PURPLE_GHOST);
+                    activePill.setCornerRadius(dp(12));
+                    navTabButtons[i].setBackground(activePill);
+                }
             } else {
-                navTabLabels[i].setTextColor(COLOR_TEXT_MUTED);
-                navTabLabels[i].setTypeface(Typeface.DEFAULT);
-                navTabButtons[i].setBackground(null);
+                if (navTabLabels[i] != null) {
+                    navTabLabels[i].setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
+                    navTabLabels[i].setTypeface(Typeface.DEFAULT);
+                }
+                if (navTabIcons[i] != null) {
+                    navTabIcons[i].setColorFilter(PerazimTheme.COLOR_PURPLE_MUTED, PorterDuff.Mode.SRC_IN);
+                }
+                if (navTabButtons[i] != null) {
+                    navTabButtons[i].setBackground(null);
+                }
             }
         }
     }
@@ -682,6 +638,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     @Override
                     public void onOpenScripture(String bookId, int chapter) {
                         showFullScriptureDialog();
+                    }
+
+                    @Override
+                    public void onNavigateToTab(int tabIndex) {
+                        switchTab(tabIndex);
                     }
                 }
         );

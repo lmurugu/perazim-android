@@ -96,6 +96,7 @@ public class HomeUiBinder {
         void onXpAwarded(int xpAwarded, int totalXp);
         void onPlaySermon(@NonNull Sermon sermon);
         void onOpenScripture(@NonNull String bookId, int chapter);
+        default void onNavigateToTab(int tabIndex) {}
     }
 
     private final Context context;
@@ -117,6 +118,8 @@ public class HomeUiBinder {
     private TextView tvRoutineStepTitle;
     private TextView tvRoutineStepContent;
     private Button btnRoutineNext;
+    private LinearLayout routineInlineContainer;
+    private Button btnBeginRoutine;
 
     // Progress State
     private int streakCount = 0;
@@ -242,355 +245,285 @@ public class HomeUiBinder {
     private void initUi() {
         rootScrollView = new ScrollView(context);
         rootScrollView.setFillViewport(true);
-        rootScrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        rootScrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
 
         contentContainer = new LinearLayout(context);
         contentContainer.setOrientation(LinearLayout.VERTICAL);
         contentContainer.setPadding(dp(16), dp(16), dp(16), dp(32));
 
-        // 1. Hero Photographic Sanctuary Banner
-        Bitmap sanctuaryBmp = loadAssetBitmap("sanctuary.jpg", 600);
-        if (sanctuaryBmp != null) {
-            ImageView ivHero = new ImageView(context);
-            ivHero.setImageBitmap(getRoundedCornerBitmap(sanctuaryBmp, dp(14)));
-            ivHero.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpHero = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(150));
-            lpHero.setMargins(0, 0, 0, dp(14));
-            ivHero.setLayoutParams(lpHero);
-            contentContainer.addView(ivHero);
-        }
-
-        // 2. Canonical Church Identity & Welcome Header
+        // 1. Quiet Sanctuary Welcome Wordmark
         TextView tvChurchHeader = new TextView(context);
         tvChurchHeader.setText("PERAZIM MISSION CHURCH");
-        tvChurchHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        tvChurchHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         tvChurchHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvChurchHeader.setTextColor(COLOR_PURPLE_DARK);
+        tvChurchHeader.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvChurchHeader.setLetterSpacing(0.04f);
         tvChurchHeader.setPadding(0, 0, 0, dp(2));
         contentContainer.addView(tvChurchHeader);
 
         TextView tvSubGreeting = new TextView(context);
-        tvSubGreeting.setText("“The Place of Great Breakthrough”\n“A place where everybody is somebody, and no body is a nobody”\nPerazim Mission Church · Embu Headquarters");
+        tvSubGreeting.setText("The Place of Great Breakthrough · Embu Headquarters");
         tvSubGreeting.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvSubGreeting.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-        tvSubGreeting.setTextColor(COLOR_PRIMARY_PURPLE);
-        tvSubGreeting.setLineSpacing(dp(2), 1.15f);
-        tvSubGreeting.setPadding(0, dp(2), 0, dp(12));
+        tvSubGreeting.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvSubGreeting.setPadding(0, 0, 0, dp(16));
         contentContainer.addView(tvSubGreeting);
 
-        // 3. Quick Action Buttons Card (Giving, Full Passage, Prayer Request, Devotion)
-        View quickActions = createQuickActionsBar();
-        contentContainer.addView(quickActions);
+        // 2. Single "Today" Card (Surface #3D1749)
+        View todayCard = createTodayCard();
+        contentContainer.addView(todayCard);
 
-        // 4. Daily Devotion Progress Track Card
-        View progressCard = createProgressCard();
-        contentContainer.addView(progressCard);
+        // 3. Four Quiet Doors (2x2 Grid on Surface #3D1749)
+        View doorsGrid = createFourDoorsGrid();
+        contentContainer.addView(doorsGrid);
 
-        // 5. Daily Cornerstone Scripture Card: 2 Samuel 5:20 ("Baal-perazim")
-        View scriptureCard = createDailyCornerstoneScriptureCard();
-        contentContainer.addView(scriptureCard);
-
-        // 6. 3-Minute Daily Reflection Routine Card (Glorify Breakthrough Pattern)
-        View routineCard = create3MinuteReflectionRoutineCard();
-        contentContainer.addView(routineCard);
-
-        // 7. Bishop Sermons Carousel Shelf
-        View sermonsShelf = createBishopSermonsShelf();
-        contentContainer.addView(sermonsShelf);
-
-        // 8. Church Bulletins & Announcements Shelf
-        View announcementsShelf = createAnnouncementsShelf();
-        contentContainer.addView(announcementsShelf);
-
-        // 9. Upcoming Fellowship Events Shelf
-        View eventsShelf = createUpcomingEventsShelf();
-        contentContainer.addView(eventsShelf);
-
-        // 10. Quick Intercession Submission CTA
-        Button btnSubmitIntercession = new Button(context);
-        btnSubmitIntercession.setText("🙏 Submit Prayer Request to Intercessors");
-        btnSubmitIntercession.setTextColor(COLOR_WHITE);
-        btnSubmitIntercession.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        btnSubmitIntercession.setTypeface(Typeface.DEFAULT_BOLD);
-        btnSubmitIntercession.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 12, 4));
-        btnSubmitIntercession.setPadding(dp(14), dp(12), dp(14), dp(12));
-        LinearLayout.LayoutParams lpIntercession = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpIntercession.setMargins(0, dp(8), 0, dp(14));
-        btnSubmitIntercession.setLayoutParams(lpIntercession);
-        btnSubmitIntercession.setOnClickListener(v -> showPrayerRequestModal());
-        contentContainer.addView(btnSubmitIntercession);
+        // 4. Optional Single Announcement Line at bottom
+        announcementsContainer = new LinearLayout(context);
+        announcementsContainer.setOrientation(LinearLayout.VERTICAL);
+        announcementsContainer.setPadding(0, dp(8), 0, 0);
+        contentContainer.addView(announcementsContainer);
 
         rootScrollView.addView(contentContainer);
     }
 
-    // =========================================================================
-    // SECTION 1: QUICK ACTION BUTTONS
-    // =========================================================================
-
-    private View createQuickActionsBar() {
-        LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
-        card.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(14));
-        card.setLayoutParams(lp);
-
-        Button btnGive = createSmallButton("💚 GIVE / TITHE", COLOR_ACCENT_ORANGE, COLOR_WHITE);
-        btnGive.setOnClickListener(v -> showGivingModal());
-
-        Button btnFullPassage = createSmallButton("📖 HOLY SCRIPTURE", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
-        btnFullPassage.setOnClickListener(v -> openScriptureReader("2SA", 5));
-
-        Button btnIntercede = createSmallButton("🙏 INTERCEDE", COLOR_PURPLE_DARK, COLOR_WHITE);
-        btnIntercede.setOnClickListener(v -> showPrayerRequestModal());
-
-        card.addView(btnGive);
-        card.addView(btnFullPassage);
-        card.addView(btnIntercede);
-        return card;
-    }
-
-    // =========================================================================
-    // SECTION 2: DAILY DEVOTION PROGRESS CARD
-    // =========================================================================
-
-    private View createProgressCard() {
-        LinearLayout card = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+    private View createTodayCard() {
+        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, dp(16), PerazimTheme.COLOR_STROKE, dp(1));
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(14));
+        lp.setMargins(0, 0, 0, dp(16));
         card.setLayoutParams(lp);
 
-        TextView header = new TextView(context);
-        header.setText("DAILY DEVOTION PROGRESS");
-        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        header.setTypeface(Typeface.DEFAULT_BOLD);
-        header.setTextColor(COLOR_PRIMARY_PURPLE);
-        card.addView(header);
+        // Header: Date + "DAILY VERSE"
+        LinearLayout dateRow = new LinearLayout(context);
+        dateRow.setOrientation(LinearLayout.HORIZONTAL);
+        dateRow.setGravity(Gravity.CENTER_VERTICAL);
+        dateRow.setPadding(0, 0, 0, dp(6));
 
+        String dateStr = new SimpleDateFormat("EEEE, MMMM d", Locale.ROOT).format(new Date());
+        TextView tvDate = new TextView(context);
+        tvDate.setText(dateStr.toUpperCase(Locale.ROOT) + " · DAILY VERSE");
+        tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvDate.setTypeface(Typeface.DEFAULT_BOLD);
+        tvDate.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvDate.setLetterSpacing(0.04f);
+        dateRow.addView(tvDate);
+        card.addView(dateRow);
+
+        // Verse Reference (e.g. 2 Samuel 5:20)
+        tvCornerstoneHeader = new TextView(context);
+        tvCornerstoneHeader.setText(currentCornerstoneRef);
+        tvCornerstoneHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        tvCornerstoneHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        tvCornerstoneHeader.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvCornerstoneHeader.setPadding(0, 0, 0, dp(6));
+        card.addView(tvCornerstoneHeader);
+
+        // Verse Body (up to 3-4 lines with ellipsis)
+        tvCornerstoneBody = new TextView(context);
+        tvCornerstoneBody.setText("“" + currentCornerstoneText + "”");
+        tvCornerstoneBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvCornerstoneBody.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvCornerstoneBody.setMaxLines(4);
+        tvCornerstoneBody.setEllipsize(TextUtils.TruncateAt.END);
+        tvCornerstoneBody.setLineSpacing(dp(2), 1.15f);
+        tvCornerstoneBody.setPadding(0, 0, 0, dp(12));
+        card.addView(tvCornerstoneBody);
+
+        // Routine Inline Container (Surface 2 #4F1E5C)
+        routineInlineContainer = new LinearLayout(context);
+        routineInlineContainer.setOrientation(LinearLayout.VERTICAL);
+        routineInlineContainer.setPadding(dp(12), dp(10), dp(12), dp(10));
+        GradientDrawable rcBg = new GradientDrawable();
+        rcBg.setColor(PerazimTheme.COLOR_SURFACE_2);
+        rcBg.setCornerRadius(dp(10));
+        rcBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
+        routineInlineContainer.setBackground(rcBg);
+        routineInlineContainer.setVisibility(View.GONE);
+
+        tvRoutineStepTitle = new TextView(context);
+        tvRoutineStepTitle.setText("Step 1 of 3: Read (30s)");
+        tvRoutineStepTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvRoutineStepTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvRoutineStepTitle.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        routineInlineContainer.addView(tvRoutineStepTitle);
+
+        tvRoutineStepContent = new TextView(context);
+        tvRoutineStepContent.setText("“As waters break out, the LORD has broken out against my enemies before me.” — 2 Samuel 5:20");
+        tvRoutineStepContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvRoutineStepContent.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvRoutineStepContent.setPadding(0, dp(4), 0, dp(10));
+        tvRoutineStepContent.setLineSpacing(dp(2), 1.15f);
+        routineInlineContainer.addView(tvRoutineStepContent);
+
+        btnRoutineNext = new Button(context);
+        btnRoutineNext.setText("Next Step →");
+        btnRoutineNext.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnRoutineNext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnRoutineNext.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable rnBg = new GradientDrawable();
+        rnBg.setColor(PerazimTheme.COLOR_PURPLE_BRAND);
+        rnBg.setCornerRadius(dp(8));
+        btnRoutineNext.setBackground(rnBg);
+        btnRoutineNext.setPadding(dp(12), dp(6), dp(12), dp(6));
+        btnRoutineNext.setOnClickListener(v -> advanceReflectionStep());
+        routineInlineContainer.addView(btnRoutineNext);
+
+        card.addView(routineInlineContainer);
+
+        // ONE Primary Orange Button (#E17D2F)
+        btnBeginRoutine = new Button(context);
         syncRoutineStateWithGamificationStore();
-
-        if (routineStep >= 4) {
-            progressPercent = 100;
-        } else if (routineStep == 3) {
-            progressPercent = 66;
-        } else if (routineStep == 2) {
-            progressPercent = 33;
-        } else {
-            progressPercent = 0;
-        }
-
-        tvProgressSubtitle = new TextView(context);
-        if (routineStep >= 4) {
-            tvProgressSubtitle.setText("100% completed — All daily devotions accomplished! 🎉");
-        } else if (routineStep == 1) {
-            tvProgressSubtitle.setText("0% completed — Start today's 3-minute breakthrough routine");
-        } else {
-            tvProgressSubtitle.setText(progressPercent + "% completed — Step " + routineStep + " of 3 in progress");
-        }
-        tvProgressSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvProgressSubtitle.setTextColor(COLOR_TEXT_DARK);
-        tvProgressSubtitle.setPadding(0, dp(4), 0, dp(8));
-        card.addView(tvProgressSubtitle);
-
-        progressBarDaily = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
-        progressBarDaily.setMax(100);
-        progressBarDaily.setProgress(progressPercent);
-        progressBarDaily.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(10)));
-
-        GradientDrawable bgTrack = new GradientDrawable();
-        bgTrack.setColor(COLOR_PURPLE_TINT);
-        bgTrack.setCornerRadius(dp(6));
-
-        GradientDrawable progressFill = new GradientDrawable();
-        progressFill.setColor(COLOR_ACCENT_ORANGE);
-        progressFill.setCornerRadius(dp(6));
-
-        ClipDrawable clip = new ClipDrawable(progressFill, Gravity.START, ClipDrawable.HORIZONTAL);
-        LayerDrawable progressLayers = new LayerDrawable(new Drawable[]{bgTrack, clip});
-        progressLayers.setId(0, android.R.id.background);
-        progressLayers.setId(1, android.R.id.progress);
-        progressBarDaily.setProgressDrawable(progressLayers);
-        card.addView(progressBarDaily);
+        updateBeginRoutineButtonText();
+        btnBeginRoutine.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnBeginRoutine.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        btnBeginRoutine.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable brBg = new GradientDrawable();
+        brBg.setColor(PerazimTheme.COLOR_ORANGE_BRAND);
+        brBg.setCornerRadius(dp(10));
+        btnBeginRoutine.setBackground(brBg);
+        btnBeginRoutine.setPadding(dp(14), dp(10), dp(14), dp(10));
+        LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpBtn.setMargins(0, dp(8), 0, 0);
+        btnBeginRoutine.setLayoutParams(lpBtn);
+        btnBeginRoutine.setOnClickListener(v -> toggleOrAdvanceRoutine());
+        card.addView(btnBeginRoutine);
 
         return card;
     }
 
-    // =========================================================================
-    // SECTION 3: DAILY CORNERSTONE SCRIPTURE CARD (2 Samuel 5:20)
-    // =========================================================================
-
-    private View createDailyCornerstoneScriptureCard() {
-        LinearLayout verseCard = createCard(COLOR_PURPLE_DEEPEST, dp(16), COLOR_PRIMARY_PURPLE, dp(1));
-        verseCard.setOrientation(LinearLayout.VERTICAL);
+    private View createFourDoorsGrid() {
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(14));
-        verseCard.setLayoutParams(lp);
+        lp.setMargins(0, 0, 0, dp(16));
+        container.setLayoutParams(lp);
 
-        // Waters Header Image (waters.jpg)
-        Bitmap watersBmp = loadAssetBitmap("waters.jpg", 500);
-        if (watersBmp != null) {
-            ImageView imgWaters = new ImageView(context);
-            imgWaters.setImageBitmap(getRoundedCornerBitmap(watersBmp, dp(10)));
-            imgWaters.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpWaters = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(110));
-            lpWaters.setMargins(0, 0, 0, dp(10));
-            imgWaters.setLayoutParams(lpWaters);
-            verseCard.addView(imgWaters);
-        }
+        TextView tvSection = new TextView(context);
+        tvSection.setText("SANCTUARY DOORS");
+        tvSection.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvSection.setTypeface(Typeface.DEFAULT_BOLD);
+        tvSection.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvSection.setLetterSpacing(0.04f);
+        tvSection.setPadding(dp(2), 0, 0, dp(8));
+        container.addView(tvSection);
 
-        tvCornerstoneHeader = new TextView(context);
-        tvCornerstoneHeader.setText("📖 CORNERSTONE SCRIPTURE · 2 SAMUEL 5:20");
-        tvCornerstoneHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvCornerstoneHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvCornerstoneHeader.setTextColor(COLOR_ACCENT_ORANGE);
-        verseCard.addView(tvCornerstoneHeader);
+        // Row 1: Bible & Sermons
+        LinearLayout row1 = new LinearLayout(context);
+        row1.setOrientation(LinearLayout.HORIZONTAL);
+        row1.setPadding(0, 0, 0, dp(8));
+        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_bible, "Bible", "Read scripture", v -> parseAndOpenScripture(currentCornerstoneRef)));
+        View sep1 = new View(context);
+        sep1.setLayoutParams(new LinearLayout.LayoutParams(dp(8), 0));
+        row1.addView(sep1);
+        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_sermons, "Sermons", "Recent messages", v -> {
+            if (listener != null) listener.onNavigateToTab(1);
+        }));
+        container.addView(row1);
 
-        tvCornerstoneBody = new TextView(context);
-        tvCornerstoneBody.setText("“And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters. Therefore he called the name of that place Baal-perazim.”");
-        tvCornerstoneBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tvCornerstoneBody.setTypeface(Typeface.SERIF, Typeface.ITALIC);
-        tvCornerstoneBody.setTextColor(COLOR_WHITE);
-        tvCornerstoneBody.setPadding(0, dp(8), 0, dp(10));
-        tvCornerstoneBody.setLineSpacing(dp(3), 1.15f);
-        verseCard.addView(tvCornerstoneBody);
+        // Row 2: Worship & Prayer
+        LinearLayout row2 = new LinearLayout(context);
+        row2.setOrientation(LinearLayout.HORIZONTAL);
+        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_worship, "Worship", "Hymns & praise", v -> {
+            if (listener != null) listener.onNavigateToTab(2);
+        }));
+        View sep2 = new View(context);
+        sep2.setLayoutParams(new LinearLayout.LayoutParams(dp(8), 0));
+        row2.addView(sep2);
+        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_prayer, "Prayer", "Share & intercede", v -> {
+            if (listener != null) listener.onNavigateToTab(3);
+        }));
+        container.addView(row2);
 
-        // Actions Row: Reflect, Pray (+10 XP), WhatsApp Story Share
-        LinearLayout actionsRow = new LinearLayout(context);
-        actionsRow.setOrientation(LinearLayout.HORIZONTAL);
-
-        Button btnReflect = createSmallButton("Reflect", COLOR_PURPLE_DARK, COLOR_WHITE);
-        btnReflect.setOnClickListener(v -> scrollToRoutine());
-
-        Button btnPray = createSmallButton("Pray (+10 XP)", COLOR_ACCENT_ORANGE, COLOR_WHITE);
-        btnPray.setOnClickListener(v -> {
-            awardXp(10);
-            Toast.makeText(context, "🙏 Prayer lifted in agreement with Baal-perazim breakthrough! (+10 XP)", Toast.LENGTH_SHORT).show();
-        });
-
-        btnCornerstoneShare = createSmallButton("📱 WhatsApp Story", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
-        btnCornerstoneShare.setOnClickListener(v -> sharePassageToWhatsApp("“" + currentCornerstoneText.trim() + "” — " + currentCornerstoneRef + " (Perazim)"));
-
-        actionsRow.addView(btnReflect);
-        actionsRow.addView(btnPray);
-        actionsRow.addView(btnCornerstoneShare);
-        verseCard.addView(actionsRow);
-
-        // Dedicated "Read Passage" Button: Opens BibleReaderDialog
-        btnCornerstoneReadPassage = new Button(context);
-        btnCornerstoneReadPassage.setText("📖 READ PASSAGE (2 SAMUEL 5 · BAAL-PERAZIM)");
-        btnCornerstoneReadPassage.setTextColor(COLOR_WHITE);
-        btnCornerstoneReadPassage.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnCornerstoneReadPassage.setTypeface(Typeface.DEFAULT_BOLD);
-        btnCornerstoneReadPassage.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 2));
-        LinearLayout.LayoutParams lpRead = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpRead.setMargins(0, dp(8), 0, 0);
-        btnCornerstoneReadPassage.setLayoutParams(lpRead);
-        btnCornerstoneReadPassage.setOnClickListener(v -> parseAndOpenScripture(currentCornerstoneRef));
-        verseCard.addView(btnCornerstoneReadPassage);
-
-        return verseCard;
+        return container;
     }
 
-    // =========================================================================
-    // SECTION 4: 3-MINUTE DAILY REFLECTION ROUTINE CARD (Glorify Pattern)
-    // =========================================================================
+    private View createDoorCard(int iconRes, String title, String subtitle, View.OnClickListener onClickListener) {
+        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, dp(12), PerazimTheme.COLOR_STROKE, dp(1));
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setPadding(dp(12), dp(12), dp(10), dp(12));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        card.setLayoutParams(lp);
 
-    private View create3MinuteReflectionRoutineCard() {
-        LinearLayout routineCard = createCard(COLOR_WHITE, dp(16), COLOR_ORANGE_BORDER, dp(2));
-        routineCard.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(14));
-        routineCard.setLayoutParams(lp);
+        ImageView icon = new ImageView(context);
+        icon.setImageResource(iconRes);
+        icon.setColorFilter(PerazimTheme.COLOR_PURPLE_SOFT, PorterDuff.Mode.SRC_IN);
+        LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(22), dp(22));
+        lpIcon.setMargins(0, 0, dp(10), 0);
+        icon.setLayoutParams(lpIcon);
+        card.addView(icon);
 
-        TextView header = new TextView(context);
-        header.setText("⚡ 3-MINUTE DAILY REFLECTION ROUTINE");
-        header.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        header.setTypeface(Typeface.DEFAULT_BOLD);
-        header.setTextColor(COLOR_ACCENT_ORANGE);
-        routineCard.addView(header);
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        textCol.setLayoutParams(lpText);
 
-        // Step Pills (1. Read -> 2. Reflect -> 3. Pray)
-        LinearLayout stepPillsRow = new LinearLayout(context);
-        stepPillsRow.setOrientation(LinearLayout.HORIZONTAL);
-        stepPillsRow.setPadding(0, dp(6), 0, dp(12));
+        TextView tvTitle = new TextView(context);
+        tvTitle.setText(title);
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        textCol.addView(tvTitle);
 
-        stepIndicatorRead = createStepPill("1. Read 📖", true, false);
-        stepIndicatorReflect = createStepPill("2. Reflect 💡", false, false);
-        stepIndicatorPray = createStepPill("3. Pray 🙏", false, false);
+        TextView tvSub = new TextView(context);
+        tvSub.setText(subtitle);
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvSub.setMaxLines(1);
+        textCol.addView(tvSub);
+        card.addView(textCol);
 
-        stepPillsRow.addView(stepIndicatorRead);
-        stepPillsRow.addView(stepIndicatorReflect);
-        stepPillsRow.addView(stepIndicatorPray);
-        routineCard.addView(stepPillsRow);
+        ImageView chevron = new ImageView(context);
+        chevron.setImageResource(org.perazimchurch.app.R.drawable.ic_chevron_right);
+        chevron.setColorFilter(PerazimTheme.COLOR_PURPLE_MUTED, PorterDuff.Mode.SRC_IN);
+        LinearLayout.LayoutParams lpChev = new LinearLayout.LayoutParams(dp(14), dp(14));
+        chevron.setLayoutParams(lpChev);
+        card.addView(chevron);
 
-        // Dynamic Step Content Box
-        LinearLayout stepBox = new LinearLayout(context);
-        stepBox.setOrientation(LinearLayout.VERTICAL);
-        stepBox.setPadding(dp(12), dp(10), dp(12), dp(10));
-        GradientDrawable sbBg = new GradientDrawable();
-        sbBg.setColor(COLOR_BG_NEUTRAL);
-        sbBg.setCornerRadius(dp(10));
-        sbBg.setStroke(dp(1), COLOR_BORDER_GREY);
-        stepBox.setBackground(sbBg);
+        card.setOnClickListener(onClickListener);
+        return card;
+    }
 
-        tvRoutineStepTitle = new TextView(context);
-        tvRoutineStepTitle.setText("Step 1 of 3: Read Today's Word (30s)");
-        tvRoutineStepTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvRoutineStepTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvRoutineStepTitle.setTextColor(COLOR_TEXT_DARK);
-        stepBox.addView(tvRoutineStepTitle);
+    private void toggleOrAdvanceRoutine() {
+        if (routineInlineContainer == null) return;
+        if (routineStep >= 4) {
+            Toast.makeText(context, "Routine completed for today. God's grace abounds!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        routineInlineContainer.setVisibility(View.VISIBLE);
+        updateRoutineView();
+    }
 
-        tvRoutineStepContent = new TextView(context);
-        tvRoutineStepContent.setText("“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20");
-        tvRoutineStepContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvRoutineStepContent.setTextColor(COLOR_TEXT_MUTED);
-        tvRoutineStepContent.setPadding(0, dp(4), 0, dp(10));
-        tvRoutineStepContent.setLineSpacing(dp(2), 1.15f);
-        stepBox.addView(tvRoutineStepContent);
-
-        btnRoutineNext = new Button(context);
-        btnRoutineNext.setText("✓ DONE READING (NEXT STEP ➔)");
-        btnRoutineNext.setTextColor(COLOR_WHITE);
-        btnRoutineNext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        btnRoutineNext.setTypeface(Typeface.DEFAULT_BOLD);
-        btnRoutineNext.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
-        btnRoutineNext.setPadding(dp(12), dp(8), dp(12), dp(8));
-        btnRoutineNext.setOnClickListener(v -> advanceReflectionStep());
-        stepBox.addView(btnRoutineNext);
-
-        routineCard.addView(stepBox);
-        return routineCard;
+    private void updateBeginRoutineButtonText() {
+        if (btnBeginRoutine == null) return;
+        if (routineStep >= 4) {
+            btnBeginRoutine.setText("Routine completed today ✓");
+            btnBeginRoutine.setEnabled(true);
+        } else if (routineStep > 1) {
+            btnBeginRoutine.setText("Continue routine (Step " + routineStep + " of 3)");
+            btnBeginRoutine.setEnabled(true);
+        } else {
+            btnBeginRoutine.setText("Begin 3-minute routine");
+            btnBeginRoutine.setEnabled(true);
+        }
     }
 
     private void advanceReflectionStep() {
         if (routineStep == 1) {
             routineStep = 2;
             progressPercent = 33;
-            if (progressBarDaily != null) progressBarDaily.setProgress(progressPercent);
-            if (tvProgressSubtitle != null) tvProgressSubtitle.setText("33% completed — Step 2 of 3 in progress");
             saveRoutineState(null);
             updateRoutineView();
-            Toast.makeText(context, "Step 1 complete! Now meditate on today's breakthrough message.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 2) {
             routineStep = 3;
             progressPercent = 66;
-            if (progressBarDaily != null) progressBarDaily.setProgress(progressPercent);
-            if (tvProgressSubtitle != null) tvProgressSubtitle.setText("66% completed — Step 3 of 3 in progress");
             saveRoutineState(null);
             updateRoutineView();
-            Toast.makeText(context, "Step 2 complete! Stand in agreement in prayer.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 3) {
-            // Disable button temporarily during mutation
             btnRoutineNext.setEnabled(false);
-            btnRoutineNext.setText("Saving Breakthrough Reflection...");
+            btnRoutineNext.setText("Saving...");
 
             String reflectionId = (cachedHomeData != null && cachedHomeData.getTodayReflection() != null)
                     ? cachedHomeData.getTodayReflection().getId()
@@ -609,125 +542,64 @@ public class HomeUiBinder {
                     awardXp(20);
                 }
                 progressPercent = 100;
-                if (progressBarDaily != null) {
-                    progressBarDaily.setProgress(progressPercent);
-                }
-                if (tvProgressSubtitle != null) {
-                    tvProgressSubtitle.setText("100% completed — All daily devotions accomplished! 🎉");
-                }
                 updateRoutineView();
-
-                // Celebratory Toast & Modal
                 if (isNewDay) {
-                    Toast.makeText(context, "🎉 3-Minute Daily Reflection Completed! +20 Spiritual XP awarded!", Toast.LENGTH_LONG).show();
-
-                    new AlertDialog.Builder(context)
-                            .setTitle("🎉 Breakthrough Routine Completed!")
-                            .setMessage("Hallelujah! You completed today's 3-Minute Breakthrough Reflection!\n\n"
-                                    + "• Spiritual XP: +20 XP (Total: " + xpCount + " ⭐)\n"
-                                    + "• Active Streak: " + streakCount + " Days 🔥\n\n"
-                                    + "“The LORD will make you the head and not the tail; you shall be above only and not beneath.” — Deuteronomy 28:13")
-                            .setPositiveButton("Amen! Receive Breakthrough", null)
-                            .show();
+                    Toast.makeText(context, "Daily reflection completed. +20 XP awarded.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "🎉 You have already completed today's reflection! Keep the fire burning!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Routine already completed today.", Toast.LENGTH_SHORT).show();
                 }
             }, error -> {
                 btnRoutineNext.setEnabled(true);
-                btnRoutineNext.setText("🙏 Complete Reflection (+20 XP)");
-                Toast.makeText(context, "Could not complete reflection: " + (error != null ? error.getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
+                btnRoutineNext.setText("Complete Routine");
+                Toast.makeText(context, "Could not complete reflection: " + (error != null ? error.getMessage() : "Unknown error"), Toast.LENGTH_SHORT).show();
             });
         }
     }
 
     private void updateRoutineView() {
         syncRoutineStateWithGamificationStore();
+        updateBeginRoutineButtonText();
 
         Reflection refl = (cachedHomeData != null) ? cachedHomeData.getTodayReflection() : null;
 
         if (routineStep == 1) {
-            setStepPillState(stepIndicatorRead, true, false);
-            setStepPillState(stepIndicatorReflect, false, false);
-            setStepPillState(stepIndicatorPray, false, false);
-
-            tvRoutineStepTitle.setText("Step 1 of 3: Read Today's Word (30s)");
+            if (tvRoutineStepTitle != null) tvRoutineStepTitle.setText("Step 1 of 3: Read Today's Scripture (30s)");
             String text = (refl != null && !TextUtils.isEmpty(refl.getPassageText()))
                     ? refl.getPassageText()
                     : "“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20";
-            tvRoutineStepContent.setText(text);
-            btnRoutineNext.setText("✓ Done Reading (Next Step ➔)");
-            btnRoutineNext.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
-            btnRoutineNext.setEnabled(true);
+            if (tvRoutineStepContent != null) tvRoutineStepContent.setText(text);
+            if (btnRoutineNext != null) {
+                btnRoutineNext.setText("Proceed to Reflection →");
+                btnRoutineNext.setEnabled(true);
+            }
         } else if (routineStep == 2) {
-            setStepPillState(stepIndicatorRead, false, true);
-            setStepPillState(stepIndicatorReflect, true, false);
-            setStepPillState(stepIndicatorPray, false, false);
-
-            tvRoutineStepTitle.setText("Step 2 of 3: Bishop's Breakthrough Reflection (60s)");
+            if (tvRoutineStepTitle != null) tvRoutineStepTitle.setText("Step 2 of 3: Meditate & Reflect (60s)");
             String comm = (refl != null && !TextUtils.isEmpty(refl.getCommentary()))
                     ? refl.getCommentary()
-                    : "When David faced the Philistine host in the Valley of Rephaim, he did not rely on past military intellect. He inquired of the Lord. God burst forth like waters through a shattered dam. Whatever wall confronts you today, declare that the Lord of the Breakthrough is rising on your behalf!";
-            tvRoutineStepContent.setText(comm);
-            btnRoutineNext.setText("✓ Done Reflecting (Proceed to Prayer ➔)");
-            btnRoutineNext.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 3));
-            btnRoutineNext.setEnabled(true);
+                    : "When David faced the Philistine host in the Valley of Rephaim, he inquired of the Lord. God burst forth like waters through a shattered dam. Whatever wall confronts you today, declare that the Lord of the Breakthrough is rising on your behalf.";
+            if (tvRoutineStepContent != null) tvRoutineStepContent.setText(comm);
+            if (btnRoutineNext != null) {
+                btnRoutineNext.setText("Proceed to Prayer →");
+                btnRoutineNext.setEnabled(true);
+            }
         } else if (routineStep == 3) {
-            setStepPillState(stepIndicatorRead, false, true);
-            setStepPillState(stepIndicatorReflect, false, true);
-            setStepPillState(stepIndicatorPray, true, false);
-
-            tvRoutineStepTitle.setText("Step 3 of 3: Breakthrough Agreement Prayer (90s)");
+            if (tvRoutineStepTitle != null) tvRoutineStepTitle.setText("Step 3 of 3: Agreement Prayer (90s)");
             String prayer = (refl != null && !TextUtils.isEmpty(refl.getPrayerPrompt()))
                     ? refl.getPrayerPrompt()
-                    : "Heavenly Father, Lord of Baal-Perazim, I thank You that You are the God who breaks forth. Break forth upon every obstacle, every resistance, and every delay standing in my path. I receive supernatural breakthrough for my family, my health, and my destiny today. In Jesus' mighty name, Amen!";
-            tvRoutineStepContent.setText(prayer);
-            btnRoutineNext.setText("🙏 Complete Reflection (+20 XP)");
-            btnRoutineNext.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
-            btnRoutineNext.setEnabled(true);
-        } else if (routineStep == 4) {
-            setStepPillState(stepIndicatorRead, false, true);
-            setStepPillState(stepIndicatorReflect, false, true);
-            setStepPillState(stepIndicatorPray, false, true);
-
-            tvRoutineStepTitle.setText("✓ 3-Minute Routine Completed for Today!");
-            tvRoutineStepContent.setText("“Thy blessing is upon thy people. Selah.” — Psalm 3:8\nYou earned +20 XP and maintained your active " + streakCount + "-day streak!");
-            btnRoutineNext.setText("✓ Reflection Completed 🎉");
-            btnRoutineNext.setEnabled(false);
-            btnRoutineNext.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        }
-    }
-
-    private void setStepPillState(TextView pill, boolean active, boolean done) {
-        if (pill == null) return;
-        if (done) {
-            pill.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE));
-            pill.setTextColor(COLOR_PRIMARY_PURPLE);
-            if (!pill.getText().toString().contains("✓")) {
-                pill.setText(pill.getText().toString().replace("📖", "✓").replace("💡", "✓").replace("🙏", "✓"));
+                    : "Heavenly Father, Lord of Baal-Perazim, thank You that You are the God who breaks forth. Break forth upon every obstacle standing in my path. I receive Your breakthrough today. In Jesus' name, Amen.";
+            if (tvRoutineStepContent != null) tvRoutineStepContent.setText(prayer);
+            if (btnRoutineNext != null) {
+                btnRoutineNext.setText("Complete Routine");
+                btnRoutineNext.setEnabled(true);
             }
-        } else if (active) {
-            pill.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ACCENT_ORANGE));
-            pill.setTextColor(COLOR_ACCENT_ORANGE);
-        } else {
-            pill.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
-            pill.setTextColor(COLOR_TEXT_MUTED);
+        } else if (routineStep >= 4) {
+            if (tvRoutineStepTitle != null) tvRoutineStepTitle.setText("Daily Routine Complete");
+            if (tvRoutineStepContent != null) tvRoutineStepContent.setText("“Thy blessing is upon thy people. Selah.” — Psalm 3:8\nYou completed today's 3-minute breakthrough routine and maintained your " + streakCount + "-day streak.");
+            if (btnRoutineNext != null) {
+                btnRoutineNext.setText("Completed ✓");
+                btnRoutineNext.setEnabled(false);
+            }
         }
-    }
-
-    private TextView createStepPill(String label, boolean active, boolean done) {
-        TextView tv = new TextView(context);
-        tv.setText(label);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tv.setTypeface(Typeface.DEFAULT_BOLD);
-        tv.setGravity(Gravity.CENTER);
-        tv.setPadding(dp(6), dp(4), dp(6), dp(4));
-
-        setStepPillState(tv, active, done);
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        lp.setMargins(dp(2), 0, dp(2), 0);
-        tv.setLayoutParams(lp);
-        return tv;
     }
 
     // =========================================================================
@@ -863,60 +735,51 @@ public class HomeUiBinder {
     private void renderAnnouncementCards(@NonNull List<Announcement> announcements) {
         if (announcementsContainer == null) return;
         announcementsContainer.removeAllViews();
+        if (announcements.isEmpty()) return;
 
-        for (final Announcement ann : announcements) {
-            LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
-            card.setOrientation(LinearLayout.VERTICAL);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(0, 0, 0, dp(10));
-            card.setLayoutParams(lp);
+        final Announcement ann = announcements.get(0);
+        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, dp(12), PerazimTheme.COLOR_STROKE, dp(1));
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(10), dp(14), dp(10));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 0, 0, dp(10));
+        card.setLayoutParams(lp);
 
-            // Priority Badge + Date Header
-            LinearLayout topRow = new LinearLayout(context);
-            topRow.setOrientation(LinearLayout.HORIZONTAL);
-            topRow.setGravity(Gravity.CENTER_VERTICAL);
+        TextView tvDate = new TextView(context);
+        tvDate.setText(formatTimestamp(ann.getTimestamp()) + " · BULLETIN");
+        tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvDate.setTypeface(Typeface.DEFAULT_BOLD);
+        tvDate.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvDate.setLetterSpacing(0.04f);
+        card.addView(tvDate);
 
-            boolean isUrgent = "URGENT".equalsIgnoreCase(ann.getPriority());
-            TextView tvPriority = new TextView(context);
-            tvPriority.setText(isUrgent ? "URGENT NOTICE" : "CHURCH BULLETIN");
-            tvPriority.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvPriority.setTypeface(Typeface.DEFAULT_BOLD);
-            tvPriority.setTextColor(isUrgent ? COLOR_ACCENT_ORANGE : COLOR_PRIMARY_PURPLE);
-            tvPriority.setBackground(createPillBg(isUrgent ? COLOR_ORANGE_TINT : COLOR_PURPLE_TINT,
-                    isUrgent ? COLOR_ORANGE_BORDER : COLOR_BORDER_GREY));
-            tvPriority.setPadding(dp(6), dp(2), dp(6), dp(2));
-            topRow.addView(tvPriority);
+        TextView tvTitle = new TextView(context);
+        tvTitle.setText(ann.getTitle());
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvTitle.setPadding(0, dp(2), 0, dp(2));
+        card.addView(tvTitle);
 
-            View sp = new View(context);
-            topRow.addView(sp, new LinearLayout.LayoutParams(0, 1, 1.0f));
+        TextView tvBody = new TextView(context);
+        tvBody.setText(ann.getBody());
+        tvBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvBody.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvBody.setMaxLines(2);
+        tvBody.setEllipsize(TextUtils.TruncateAt.END);
+        tvBody.setLineSpacing(dp(2), 1.15f);
+        card.addView(tvBody);
 
-            TextView tvDate = new TextView(context);
-            tvDate.setText(formatTimestamp(ann.getTimestamp()));
-            tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvDate.setTextColor(COLOR_TEXT_MUTED);
-            topRow.addView(tvDate);
-            card.addView(topRow);
+        card.setOnClickListener(v -> {
+            new AlertDialog.Builder(context)
+                    .setTitle(ann.getTitle())
+                    .setMessage((ann.getBody() != null ? ann.getBody() : "") + "\n\n— Perazim Mission Church")
+                    .setPositiveButton("Close", null)
+                    .show();
+        });
 
-            // Title
-            TextView tvTitle = new TextView(context);
-            tvTitle.setText(ann.getTitle());
-            tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-            tvTitle.setTextColor(COLOR_TEXT_DARK);
-            tvTitle.setPadding(0, dp(4), 0, dp(2));
-            card.addView(tvTitle);
-
-            // Body
-            TextView tvBody = new TextView(context);
-            tvBody.setText(ann.getBody());
-            tvBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            tvBody.setTextColor(COLOR_TEXT_MUTED);
-            tvBody.setLineSpacing(dp(2), 1.15f);
-            card.addView(tvBody);
-
-            announcementsContainer.addView(card);
-        }
+        announcementsContainer.addView(card);
     }
 
     private void populateFallbackAnnouncements() {
@@ -1091,17 +954,10 @@ public class HomeUiBinder {
         currentCornerstoneRef = !TextUtils.isEmpty(ref) ? ref : "2 Samuel 5:20";
         currentCornerstoneText = !TextUtils.isEmpty(text) ? text : "";
         if (tvCornerstoneHeader != null) {
-            tvCornerstoneHeader.setText("📖 DAILY SCRIPTURE · " + currentCornerstoneRef.toUpperCase(Locale.ROOT));
+            tvCornerstoneHeader.setText(currentCornerstoneRef);
         }
         if (tvCornerstoneBody != null) {
             tvCornerstoneBody.setText("“" + currentCornerstoneText.trim() + "”");
-        }
-        if (btnCornerstoneShare != null) {
-            btnCornerstoneShare.setOnClickListener(v -> sharePassageToWhatsApp("“" + currentCornerstoneText.trim() + "” — " + currentCornerstoneRef + " (Perazim)"));
-        }
-        if (btnCornerstoneReadPassage != null) {
-            btnCornerstoneReadPassage.setText("📖 Read Passage (" + currentCornerstoneRef + ")");
-            btnCornerstoneReadPassage.setOnClickListener(v -> parseAndOpenScripture(currentCornerstoneRef));
         }
     }
 

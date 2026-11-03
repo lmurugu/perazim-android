@@ -27,19 +27,28 @@ public final class NavigationContract {
     public static final int TOTAL_TAB_COUNT = 5;
 
     // =========================================================================
-    // TAB TITLES
+    // TAB TITLES (§2 Contract: Home | Sermons | Worship | Prayer | Me)
     // =========================================================================
 
     public static final String TAB_TITLE_HOME = "Home";
     public static final String TAB_TITLE_SERMONS = "Sermons";
     public static final String TAB_TITLE_WORSHIP = "Worship";
-    public static final String TAB_TITLE_FELLOWSHIP = "Fellowship";
-    public static final String TAB_TITLE_PROFILE = "Profile";
+    public static final String TAB_TITLE_PRAYER = "Prayer";
+    public static final String TAB_TITLE_FELLOWSHIP = TAB_TITLE_PRAYER; // Backwards compatibility
+    public static final String TAB_TITLE_ME = "Me";
+    public static final String TAB_TITLE_PROFILE = TAB_TITLE_ME; // Backwards compatibility
 
     // =========================================================================
-    // TAB ICONS (Unicode Symbols / Drawables)
+    // TAB DRAWABLE RESOURCE IDENTIFIERS
     // =========================================================================
 
+    public static final int TAB_ICON_RES_HOME = org.perazimchurch.app.R.drawable.ic_nav_home;
+    public static final int TAB_ICON_RES_SERMONS = org.perazimchurch.app.R.drawable.ic_nav_sermons;
+    public static final int TAB_ICON_RES_WORSHIP = org.perazimchurch.app.R.drawable.ic_nav_worship;
+    public static final int TAB_ICON_RES_PRAYER = org.perazimchurch.app.R.drawable.ic_nav_prayer;
+    public static final int TAB_ICON_RES_ME = org.perazimchurch.app.R.drawable.ic_nav_me;
+
+    // Unicode symbols retained as legacy fallbacks
     public static final String TAB_ICON_HOME = "🏠";
     public static final String TAB_ICON_SERMONS = "🎥";
     public static final String TAB_ICON_WORSHIP = "🎵";
