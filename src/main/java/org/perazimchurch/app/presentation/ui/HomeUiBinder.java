@@ -1177,7 +1177,7 @@ public class HomeUiBinder {
 
         // Confirm Give Button
         Button btnConfirmGive = new Button(context);
-        btnConfirmGive.setText("💚 Complete M-Pesa Giving (+20 XP)");
+        btnConfirmGive.setText("💚 Complete M-Pesa Giving (Paybill 4069983)");
         btnConfirmGive.setTextColor(COLOR_WHITE);
         btnConfirmGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         btnConfirmGive.setTypeface(Typeface.DEFAULT_BOLD);
