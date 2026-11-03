@@ -1,0 +1,10 @@
+[android.widget.TextView] 🙏 Submit Prayer Petition
+[android.widget.TextView] Your petition will be submitted to the Perazim Prayer Wall and our Intercessory Team.
+[android.widget.EditText] Prayer Title (e.g., Healing, Family, Exams)
+[android.widget.EditText] Describe your petition or praise report in detail...
+[android.widget.CheckBox] Post Anonymously (Hide my name on the Wall)
+[android.widget.TextView] PASTORAL INTERCESSION CHANNELS:
+[android.widget.Button] 💬 WHATSAPP PASTOR
+[android.widget.Button] ✉️ PASTORAL SMS
+[android.widget.Button] CANCEL
+[android.widget.Button] POST TO WALL ONLY (+15 XP)

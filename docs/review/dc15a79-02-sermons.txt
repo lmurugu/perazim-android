@@ -1,0 +1,59 @@
+[android.widget.TextView] Perazim Mission Church
+[android.widget.TextView] 🔥 0
+[android.widget.TextView] ⭐ 0
+[android.widget.TextView] 💜 2
+[android.widget.Button] 💚 GIVE
+[android.widget.Button] 🤖 GUIDE
+[android.widget.TextView] 🔴
+[android.widget.TextView] LIVESTREAM BROADCAST
+[android.widget.TextView] Walking in Faith: Overcoming Fear in Difficult Times
+[android.widget.TextView] Speaker: Bishop Dr. David Mutweri | Central Campus
+[android.widget.Button] ▶ WATCH LIVE BROADCAST
+[android.widget.TextView] AUDIO PLAYER CONTROLLER
+[android.widget.Button] ⚡ 1.0×
+[android.widget.TextView] Supernatural Breakthrough
+[android.widget.TextView] Bishop Dr. David Mutweri • 2 Samuel 5:17-21
+[android.widget.TextView] 00:00
+[android.widget.TextView] 45:00
+[android.widget.Button] ▶ PLAY SERMON
+[android.widget.Button] ⏪ -15S
+[android.widget.Button] +30S ⏩
+[android.widget.TextView] 🔍
+[android.widget.EditText] Search by title, preacher, keyword...
+[android.widget.Button] ✕
+[android.widget.Button] ALL
+[android.widget.Button] BREAKTHROUGH 2026
+[android.widget.Button] WALKING IN FAITH
+[android.widget.Button] DELIVERANCE
+[android.widget.Button] PERAZIM LIVE & VIDEO
+[android.widget.TextView] SERMON ARCHIVES & AUDIO MESSAGES
+[android.widget.TextView] 🎙 Bishop Dr. David Mutweri
+[android.widget.TextView] Supernatural Breakthrough
+[android.widget.TextView] 📖 2 Samuel 5:17-21  •  ⏱ 45 mins
+[android.widget.TextView] 🏷 Breakthrough Power Series
+[android.widget.TextView] 🎥 Video
+[android.widget.TextView] ☁️ Streaming
+[android.widget.Button] 🎥 WATCH VIDEO
+[android.widget.Button] ▶ PLAY AUDIO
+[android.widget.Button] 💬 SHARE
+[android.widget.Button] 📥 DOWNLOAD
+[android.widget.TextView] 🎙 Bishop Dr. David Mutweri
+[android.widget.TextView] The Baal-Perazim Mandate
+[android.widget.TextView] 📖 1 Chronicles 14:8-17  •  ⏱ 52 mins
+[android.widget.TextView] 🏷 Covenant Mandates
+[android.widget.TextView] 🎥 Video
+[android.widget.TextView] ☁️ Streaming
+[android.widget.Button] 🎥 WATCH VIDEO
+[android.widget.Button] ▶ PLAY AUDIO
+[android.widget.Button] 💬 SHARE
+[android.widget.Button] 📥 DOWNLOAD
+[android.widget.TextView] 🏠
+[android.widget.TextView] Home
+[android.widget.TextView] 🎥
+[android.widget.TextView] Sermons
+[android.widget.TextView] 🎵
+[android.widget.TextView] Worship
+[android.widget.TextView] 👥
+[android.widget.TextView] Fellowship
+[android.widget.TextView] 👤
+[android.widget.TextView] Profile
