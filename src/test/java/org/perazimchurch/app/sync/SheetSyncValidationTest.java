@@ -246,129 +246,95 @@ public class SheetSyncValidationTest {
     }
 
     @Test
-    public void testAnnouncementSyncPreservesMetadata() throws IOException {
-        List<AnnouncementEntity> existingList = new ArrayList<>();
-        AnnouncementEntity existingAnn = new AnnouncementEntity(
-                "ann_1", "Old Title", "Old Body", "URGENT", 1700000000000L, 1705000000000L, "Nairobi", true);
-        existingList.add(existingAnn);
+    public void testAnnouncementProcessingMapsSheetContent() throws IOException {
+        List<AnnouncementEntity> list = new ArrayList<>();
+        DummyAnnouncementDao mockDao = new DummyAnnouncementDao(list);
 
-        DummyAnnouncementDao mockDao = new DummyAnnouncementDao(existingList);
-
-        // CSV updates title and body for ann_1 without priority, expires, or campus. Adds ann_2.
-        String csv = "id,title,body,active\n" +
-                "ann_1,\"Sunday Celebration\",\"Service starts at 9:00 AM\",true\n" +
-                "ann_2,\"Youth Fellowship\",\"Join us on Friday\",true";
+        String csv = "id,title,body,priority,date,campus,active\n" +
+                "ann_1,\"Sunday Celebration\",\"Service starts at 9:00 AM\",HIGH,2026-11-08,Nairobi,true\n" +
+                "ann_2,\"Youth Fellowship\",\"Join us on Friday\",NORMAL,2026-11-06,all,true";
         List<List<String>> rows = CsvParser.parse(csv);
 
         SheetSyncManager.SyncStats stats = SheetSyncManager.processAnnouncementsRows(rows, mockDao);
         assertEquals(2, stats.synced);
 
-        AnnouncementEntity updated1 = mockDao.getAnnouncementById("ann_1");
-        assertEquals("Sunday Celebration", updated1.getTitle());
-        assertEquals("URGENT", updated1.getPriority());
-        assertEquals(1700000000000L, updated1.getPublishedMillis());
-        assertEquals(1705000000000L, updated1.getExpiresMillis());
-        assertEquals("Nairobi", updated1.getCampusId());
+        AnnouncementEntity a1 = mockDao.getAnnouncementById("ann_1");
+        assertEquals("Sunday Celebration", a1.getTitle());
+        assertEquals("HIGH", a1.getPriority());
+        assertEquals("Nairobi", a1.getCampusId());
 
-        AnnouncementEntity new2 = mockDao.getAnnouncementById("ann_2");
-        assertEquals("NORMAL", new2.getPriority());
-        assertEquals("all", new2.getCampusId());
+        AnnouncementEntity a2 = mockDao.getAnnouncementById("ann_2");
+        assertEquals("NORMAL", a2.getPriority());
+        assertEquals("all", a2.getCampusId());
     }
 
     @Test
-    public void testEventSyncPreservesImageUrlAndCategory() throws IOException {
-        List<EventEntity> existingList = new ArrayList<>();
-        EventEntity existingEvt = new EventEntity(
-                "evt_1", "Old Title", "Night of Breakthrough Vigil", 1700000000000L, 1700007200000L,
-                "Prayer Hall", "Embu Headquarters", "custom_vigil_banner.jpg", "Vigil", true);
-        existingList.add(existingEvt);
+    public void testEventProcessingMapsSheetContent() throws IOException {
+        List<EventEntity> list = new ArrayList<>();
+        DummyEventDao mockDao = new DummyEventDao(list);
 
-        DummyEventDao mockDao = new DummyEventDao(existingList);
-
-        // CSV updates evt_1 without venue, campus, description, image_url, or category. Adds evt_2.
-        String csv = "id,title,active\n" +
-                "evt_1,\"Breakthrough Night 2026\",true\n" +
-                "evt_2,\"Sunday First Service\",true";
+        String csv = "id,title,description,venue,campus,category,active\n" +
+                "evt_1,\"Breakthrough Night 2026\",\"All-night prayer vigil\",Prayer Hall,Embu Headquarters,Vigil,true\n" +
+                "evt_2,\"Sunday First Service\",\"Morning praise and word\",Sanctuary,all,Worship,true";
         List<List<String>> rows = CsvParser.parse(csv);
 
         SheetSyncManager.SyncStats stats = SheetSyncManager.processEventsRows(rows, mockDao);
         assertEquals(2, stats.synced);
 
-        EventEntity updated1 = mockDao.getEventById("evt_1");
-        assertEquals("Breakthrough Night 2026", updated1.getTitle());
-        assertEquals("Night of Breakthrough Vigil", updated1.getDescription());
-        assertEquals("Prayer Hall", updated1.getLocation());
-        assertEquals("Embu Headquarters", updated1.getCampusId());
-        assertEquals("custom_vigil_banner.jpg", updated1.getImageUrl());
-        assertEquals("Vigil", updated1.getCategory());
-        assertEquals(1700000000000L, updated1.getStartTimeMillis());
-        assertEquals(1700007200000L, updated1.getEndTimeMillis());
+        EventEntity e1 = mockDao.getEventById("evt_1");
+        assertEquals("Breakthrough Night 2026", e1.getTitle());
+        assertEquals("Prayer Hall", e1.getLocation());
+        assertEquals("Embu Headquarters", e1.getCampusId());
+        assertEquals("Vigil", e1.getCategory());
 
-        EventEntity new2 = mockDao.getEventById("evt_2");
-        assertEquals("Sanctuary", new2.getLocation());
-        assertEquals("all", new2.getCampusId());
-        assertEquals("sanctuary.jpg", new2.getImageUrl());
-        assertEquals("Worship", new2.getCategory());
+        EventEntity e2 = mockDao.getEventById("evt_2");
+        assertEquals("Sanctuary", e2.getLocation());
+        assertEquals("Worship", e2.getCategory());
     }
 
     @Test
-    public void testRiddleSyncPreservesExplanationAndScriptureRef() throws IOException {
-        List<RiddleEntity> existingList = new ArrayList<>();
-        RiddleEntity existingRiddle = new RiddleEntity(
-                "rid_1", "Old Q", "Old A", "David used 5 smooth stones", "1 Samuel 17:40",
-                "HARD", "Giants", 50, true);
-        existingList.add(existingRiddle);
+    public void testRiddleProcessingMapsSheetContent() throws IOException {
+        List<RiddleEntity> list = new ArrayList<>();
+        DummyRiddleDao mockDao = new DummyRiddleDao(list);
 
-        DummyRiddleDao mockDao = new DummyRiddleDao(existingList);
-
-        // CSV updates question and answer without explanation, scripture_ref, difficulty, or xp. Adds rid_2.
-        String csv = "id,question,answer,active\n" +
-                "rid_1,\"Who defeated the Philistine giant?\",\"David\",true\n" +
-                "rid_2,\"Who built the ark?\",\"Noah\",true";
+        String csv = "id,question,answer,explanation,scripture_ref,difficulty,xp,active\n" +
+                "rid_1,\"Who defeated the Philistine giant?\",\"David\",\"David used 5 smooth stones\",\"1 Samuel 17:40\",HARD,50,true\n" +
+                "rid_2,\"Who built the ark?\",\"Noah\",\"Built gopher wood ark\",\"Genesis 6:14\",MEDIUM,20,true";
         List<List<String>> rows = CsvParser.parse(csv);
 
         SheetSyncManager.SyncStats stats = SheetSyncManager.processRiddlesRows(rows, mockDao);
         assertEquals(2, stats.synced);
 
-        RiddleEntity updated1 = mockDao.getRiddleById("rid_1");
-        assertEquals("David defeated the Philistine giant?", "Who defeated the Philistine giant?", updated1.getQuestion());
-        assertEquals("David", updated1.getAnswer());
-        assertEquals("David used 5 smooth stones", updated1.getExplanation());
-        assertEquals("1 Samuel 17:40", updated1.getScriptureRef());
-        assertEquals("HARD", updated1.getDifficulty());
-        assertEquals("Giants", updated1.getCategory());
-        assertEquals(50, updated1.getXp());
+        RiddleEntity r1 = mockDao.getRiddleById("rid_1");
+        assertEquals("David", r1.getAnswer());
+        assertEquals("David used 5 smooth stones", r1.getExplanation());
+        assertEquals("1 Samuel 17:40", r1.getScriptureRef());
+        assertEquals("HARD", r1.getDifficulty());
+        assertEquals(50, r1.getXp());
 
-        RiddleEntity new2 = mockDao.getRiddleById("rid_2");
-        assertEquals("Noah", new2.getAnswer());
-        assertEquals("", new2.getExplanation());
-        assertEquals("", new2.getScriptureRef());
-        assertEquals("MEDIUM", new2.getDifficulty());
-        assertEquals(20, new2.getXp());
+        RiddleEntity r2 = mockDao.getRiddleById("rid_2");
+        assertEquals("Noah", r2.getAnswer());
+        assertEquals("MEDIUM", r2.getDifficulty());
+        assertEquals(20, r2.getXp());
     }
 
     @Test
-    public void testJokeSyncPreservesCleanRatingAndCategory() throws IOException {
-        List<JokeEntity> existingList = new ArrayList<>();
-        JokeEntity existingJoke = new JokeEntity(
-                "joke_1", "Old text", "KIDS_SAFE", "SundaySchool", true);
-        existingList.add(existingJoke);
+    public void testJokeProcessingMapsSheetContent() throws IOException {
+        List<JokeEntity> list = new ArrayList<>();
+        DummyJokeDao mockDao = new DummyJokeDao(list);
 
-        DummyJokeDao mockDao = new DummyJokeDao(existingList);
-
-        // CSV updates joke text without clean_rating or category. Adds joke_2.
-        String csv = "id,text,active\n" +
-                "joke_1,\"Why did Noah have to fish with two lines? Because he had to feed two cats!\",true\n" +
-                "joke_2,\"Who was the greatest financier in the Bible? Noah, he was floating his stock while everyone else was in liquidation!\",true";
+        String csv = "id,text,clean_rating,category,active\n" +
+                "joke_1,\"Why did Noah have to fish with two lines? Because he had to feed two cats!\",FAMILY_SAFE,Fellowship,true\n" +
+                "joke_2,\"Who was the greatest financier in the Bible? Noah, he was floating his stock while everyone else was in liquidation!\",FAMILY_SAFE,Fellowship,true";
         List<List<String>> rows = CsvParser.parse(csv);
 
         SheetSyncManager.SyncStats stats = SheetSyncManager.processJokesRows(rows, mockDao);
         assertEquals(2, stats.synced);
 
-        JokeEntity updated1 = mockDao.getJokeById("joke_1");
-        assertTrue(updated1.getText().contains("feed two cats"));
-        assertEquals("KIDS_SAFE", updated1.getCleanRating());
-        assertEquals("SundaySchool", updated1.getCategory());
+        JokeEntity j1 = mockDao.getJokeById("joke_1");
+        assertTrue(j1.getText().contains("feed two cats"));
+        assertEquals("FAMILY_SAFE", j1.getCleanRating());
+        assertEquals("Fellowship", j1.getCategory());
 
         JokeEntity new2 = mockDao.getJokeById("joke_2");
         assertEquals("FAMILY_SAFE", new2.getCleanRating());

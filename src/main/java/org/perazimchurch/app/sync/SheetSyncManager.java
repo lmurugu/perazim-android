@@ -268,17 +268,13 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            AnnouncementEntity existing = dao.getAnnouncementById(id);
-            long dateMillis = parseDate(getCell(r, col, "date"),
-                    (existing != null) ? existing.getPublishedMillis() : System.currentTimeMillis());
-            long expiresMillis = (existing != null) ? existing.getExpiresMillis() : (dateMillis + (30L * 86400000L));
+            long dateMillis = parseDate(getCell(r, col, "date"), System.currentTimeMillis());
+            long expiresMillis = dateMillis + (30L * 86400000L);
             if (col.containsKey("expires") && !getCell(r, col, "expires").isEmpty()) {
                 expiresMillis = parseDate(getCell(r, col, "expires"), expiresMillis);
             }
-            String priority = getCellOrDefault(r, col, "priority",
-                    (existing != null && existing.getPriority() != null) ? existing.getPriority() : "NORMAL");
-            String campus = getCellOrDefault(r, col, "campus",
-                    (existing != null && existing.getCampusId() != null) ? existing.getCampusId() : "all");
+            String priority = getCellOrDefault(r, col, "priority", "NORMAL");
+            String campus = getCellOrDefault(r, col, "campus", "all");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
             AnnouncementEntity entity = new AnnouncementEntity(
@@ -313,21 +309,13 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            EventEntity existing = dao.getEventById(id);
-            long start = parseDate(getCell(r, col, "start"),
-                    (existing != null) ? existing.getStartTimeMillis() : System.currentTimeMillis());
-            long end = parseDate(getCell(r, col, "end"),
-                    (existing != null) ? existing.getEndTimeMillis() : (start + (2L * 3600000L)));
-            String venue = getCellOrDefault(r, col, "venue",
-                    (existing != null && existing.getLocation() != null) ? existing.getLocation() : "Sanctuary");
-            String campus = getCellOrDefault(r, col, "campus",
-                    (existing != null && existing.getCampusId() != null) ? existing.getCampusId() : "all");
-            String desc = getCellOrDefault(r, col, "description",
-                    (existing != null && existing.getDescription() != null) ? existing.getDescription() : "");
-            String imageUrl = getCellOrDefault(r, col, "image_url",
-                    (existing != null && existing.getImageUrl() != null) ? existing.getImageUrl() : "sanctuary.jpg");
-            String category = getCellOrDefault(r, col, "category",
-                    (existing != null && existing.getCategory() != null) ? existing.getCategory() : "Worship");
+            long start = parseDate(getCell(r, col, "start"), System.currentTimeMillis());
+            long end = parseDate(getCell(r, col, "end"), start + (2L * 3600000L));
+            String venue = getCellOrDefault(r, col, "venue", "Sanctuary");
+            String campus = getCellOrDefault(r, col, "campus", "all");
+            String desc = getCellOrDefault(r, col, "description", "");
+            String imageUrl = getCellOrDefault(r, col, "image_url", "sanctuary.jpg");
+            String category = getCellOrDefault(r, col, "category", "Worship");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
             EventEntity entity = new EventEntity(
@@ -417,21 +405,11 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            RiddleEntity existing = dao.getRiddleById(id);
-            String category = getCellOrDefault(r, col, "category",
-                    (existing != null && existing.getCategory() != null) ? existing.getCategory() : "MEDIUM");
-            String difficulty = getCellOrDefault(r, col, "difficulty",
-                    (existing != null && existing.getDifficulty() != null) ? existing.getDifficulty() : category);
-            int xp = parseInt(getCellOrDefault(r, col, "xp",
-                    (existing != null) ? String.valueOf(existing.getXp()) : "20"), 20);
-            String explanation = (existing != null && existing.getExplanation() != null) ? existing.getExplanation() : "";
-            if (col.containsKey("explanation") && !getCell(r, col, "explanation").isEmpty()) {
-                explanation = getCell(r, col, "explanation");
-            }
-            String scriptureRef = (existing != null && existing.getScriptureRef() != null) ? existing.getScriptureRef() : "";
-            if (col.containsKey("scripture_ref") && !getCell(r, col, "scripture_ref").isEmpty()) {
-                scriptureRef = getCell(r, col, "scripture_ref");
-            }
+            String category = getCellOrDefault(r, col, "category", "MEDIUM");
+            String difficulty = getCellOrDefault(r, col, "difficulty", category);
+            int xp = parseInt(getCellOrDefault(r, col, "xp", "20"), 20);
+            String explanation = getCellOrDefault(r, col, "explanation", "");
+            String scriptureRef = getCellOrDefault(r, col, "scripture_ref", "");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
             RiddleEntity entity = new RiddleEntity(
@@ -466,11 +444,8 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            JokeEntity existing = dao.getJokeById(id);
-            String cleanRating = getCellOrDefault(r, col, "clean_rating",
-                    (existing != null && existing.getCleanRating() != null) ? existing.getCleanRating() : "FAMILY_SAFE");
-            String category = getCellOrDefault(r, col, "category",
-                    (existing != null && existing.getCategory() != null) ? existing.getCategory() : "Fellowship");
+            String cleanRating = getCellOrDefault(r, col, "clean_rating", "FAMILY_SAFE");
+            String category = getCellOrDefault(r, col, "category", "Fellowship");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
             JokeEntity entity = new JokeEntity(id, text, cleanRating, category, active);
