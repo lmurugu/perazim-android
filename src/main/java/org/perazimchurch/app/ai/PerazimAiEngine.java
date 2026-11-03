@@ -40,6 +40,13 @@ public class PerazimAiEngine {
 
         String q = rawQuery.trim().toLowerCase(Locale.US);
 
+        // 0. CRISIS & PASTORAL CARE INTERVENTION
+        if (containsAny(q, "suicide", "suicidal", "kill myself", "end my life", "want to die", "hang myself",
+                "self harm", "self-harm", "cutting myself", "hurt myself", "end it all", "hopeless",
+                "giving up", "abused", "abuse")) {
+            return handleCrisisQuery();
+        }
+
         // 1. BIBLE RIDDLES & TRIVIA
         if (containsAny(q, "riddle", "trivia", "quiz", "puzzle")) {
             return handleRiddlesQuery();
@@ -108,6 +115,17 @@ public class PerazimAiEngine {
 
         // 13. DOMAIN GUARDRAIL: Off-topic rejection
         return handleOffTopicGuardrail(rawQuery);
+    }
+
+    private AiResponse handleCrisisQuery() {
+        String msg = "❤️ **You Are Precious and Deeply Loved**\n\n"
+                + "You do not have to carry this burden alone. God has not given up on you, and neither has your Perazim family.\n\n"
+                + "Please reach out immediately to our pastoral care team at **+254 710 772 227** (Call, SMS, or WhatsApp). Bishop Dr. David Mutweri and the church leadership are ready to stand with you in prayer and support.";
+        return AiResponse.plainText(msg, Arrays.asList(
+                "📞 Pastoral Line: +254 710 772 227",
+                "🙏 Request Prayer on Wall",
+                "📖 Read Comfort Scripture"
+        ));
     }
 
     public AiResponse getWelcomeResponse() {

@@ -13,7 +13,7 @@
 
 const MAX_QUESTION_CHARS = 500;
 const DAILY_LIMIT = 3;
-const UPSTREAM_TIMEOUT_MS = 15000;
+const UPSTREAM_TIMEOUT_MS = 30000;
 const PASTORAL_HOTLINE = "+254 710 772 227";
 
 // Crisis detection keywords for immediate pastoral intervention

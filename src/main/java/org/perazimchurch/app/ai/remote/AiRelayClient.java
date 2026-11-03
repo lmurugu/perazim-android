@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
 public final class AiRelayClient {
 
     private static final String TAG = "AiRelayClient";
-    private static final int TIMEOUT_MS = 15000;
+    private static final int TIMEOUT_MS = 30000;
     private static final String USER_AGENT = "Perazim-Android/2.2.0";
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
