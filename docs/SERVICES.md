@@ -24,7 +24,7 @@
   - Corrupted, missing, or empty downloads never overwrite or clear existing local data.
   - Fail-soft indicator displayed on UI ("Last updated: <time>" or "Not synced yet (using local seed data)").
 - **Verification Proof**:
-  - Unit tests: `org.perazimchurch.app.sync.SheetSyncValidationTest` (9/9 passing).
+  - Unit tests: `org.perazimchurch.app.sync.SheetSyncValidationTest` (15/15 passing), `org.perazimchurch.app.sync.CsvParserTest` (6/6 passing).
   - End-to-end sync: Awaiting entry of the 8 published URLs from Levi.
 
 ---
