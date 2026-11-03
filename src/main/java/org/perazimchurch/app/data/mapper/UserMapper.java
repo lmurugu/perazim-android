@@ -83,10 +83,10 @@ public final class UserMapper {
 
         if (appContext != null) {
             String uid = entity.getId();
-            int streak = GamificationStore.getStreak(appContext, uid, entity.getStreakCount() > 0 ? entity.getStreakCount() : 7);
+            int streak = GamificationStore.getStreak(appContext, uid, entity.getStreakCount());
             boolean frozen = GamificationStore.isStreakFrozen(appContext, uid, entity.isStreakFrozen());
-            int xp = GamificationStore.getSpiritualXp(appContext, uid, entity.getSpiritualXp() > 0 ? entity.getSpiritualXp() : 100);
-            int grace = GamificationStore.getGracePoints(appContext, uid, entity.getGracePoints() > 0 ? entity.getGracePoints() : 50);
+            int xp = GamificationStore.getSpiritualXp(appContext, uid, entity.getSpiritualXp());
+            int grace = GamificationStore.getGracePoints(appContext, uid, entity.getGracePoints() > 0 ? entity.getGracePoints() : 2);
             user.setStreakCount(streak);
             user.setSpiritualXp(xp);
             user.setGracePoints(grace);
@@ -101,9 +101,9 @@ public final class UserMapper {
                 user.setStreakFrozen(stats.streakFrozen);
             } else {
                 // Default gamification values from entity or fallback
-                user.setStreakCount(entity.getStreakCount() > 0 ? entity.getStreakCount() : 7);
-                user.setSpiritualXp(entity.getSpiritualXp() > 0 ? entity.getSpiritualXp() : 100);
-                user.setGracePoints(entity.getGracePoints() > 0 ? entity.getGracePoints() : 50);
+                user.setStreakCount(entity.getStreakCount() > 0 ? entity.getStreakCount() : 0);
+                user.setSpiritualXp(entity.getSpiritualXp() > 0 ? entity.getSpiritualXp() : 0);
+                user.setGracePoints(entity.getGracePoints() > 0 ? entity.getGracePoints() : 2);
                 user.setStreakFrozen(entity.isStreakFrozen());
             }
         }

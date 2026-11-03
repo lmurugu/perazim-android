@@ -35,10 +35,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.perazimchurch.app.data.local.preference.GamificationStore;
+import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.DownloadedContent;
 import org.perazimchurch.app.domain.model.Hymn;
 import org.perazimchurch.app.domain.model.User;
+import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.presentation.viewmodel.ProfileViewModel;
 import org.perazimchurch.app.presentation.viewmodel.SavedContentData;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -277,19 +280,30 @@ public class ProfileUiBinder {
         hudRow.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
+        String initialUid = "user_me";
+        try {
+            SessionManager sm = SessionManager.getInstance(context);
+            if (sm != null && sm.getActiveUserId() != null) initialUid = sm.getActiveUserId();
+        } catch (Exception ignored) {}
+        int currentStreak = GamificationStore.getStreak(context, initialUid, 0);
+        int currentXp = GamificationStore.getSpiritualXp(context, initialUid, 0);
+        int currentGrace = GamificationStore.getGracePoints(context, initialUid, 2);
+        int initialLevel = (currentXp / 500) + 1;
+        int initialProgress = currentXp % 500;
+
         // Streak Block
-        LinearLayout streakBlock = createMetricBox("🔥 7 Days", "Daily Streak", "Active", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ACCENT_ORANGE);
+        LinearLayout streakBlock = createMetricBox("🔥 " + currentStreak + " Days", "Daily Streak", "Active", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ACCENT_ORANGE);
         tvStreakValue = (TextView) streakBlock.getChildAt(0);
         tvStreakStatus = (TextView) streakBlock.getChildAt(2);
         hudRow.addView(streakBlock);
 
         // XP Block
-        LinearLayout xpBlock = createMetricBox("⭐ 450 XP", "Spiritual XP", "Level 1", PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_PRIMARY_PURPLE);
+        LinearLayout xpBlock = createMetricBox("⭐ " + currentXp + " XP", "Spiritual XP", "Level " + initialLevel, PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_PRIMARY_PURPLE);
         tvXpValue = (TextView) xpBlock.getChildAt(0);
         hudRow.addView(xpBlock);
 
         // Grace Points Block
-        LinearLayout graceBlock = createMetricBox("💜 5 Pts", "Grace Points", "Tokens", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ORANGE_DARK);
+        LinearLayout graceBlock = createMetricBox("💜 " + currentGrace + " Pts", "Grace Points", "Tokens", PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ORANGE_DARK);
         tvGraceValue = (TextView) graceBlock.getChildAt(0);
         hudRow.addView(graceBlock);
 
@@ -297,7 +311,7 @@ public class ProfileUiBinder {
 
         // Spiritual XP Progress Bar
         tvXpLevelLabel = new TextView(context);
-        tvXpLevelLabel.setText("Level 1 Disciple — 450 / 500 XP to Level 2");
+        tvXpLevelLabel.setText("Level " + initialLevel + " Disciple — " + initialProgress + " / 500 XP to Level " + (initialLevel + 1));
         tvXpLevelLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
         tvXpLevelLabel.setTypeface(Typeface.DEFAULT_BOLD);
         tvXpLevelLabel.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
@@ -306,7 +320,7 @@ public class ProfileUiBinder {
 
         xpProgressBar = new ProgressBar(context, null, android.R.attr.progressBarStyleHorizontal);
         xpProgressBar.setMax(500);
-        xpProgressBar.setProgress(450);
+        xpProgressBar.setProgress(initialProgress);
         LinearLayout.LayoutParams lpBar = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(10));
         lpBar.setMargins(0, 0, 0, dp(12));
@@ -767,7 +781,7 @@ public class ProfileUiBinder {
                 "👤",
                 "Presiding Bishop",
                 "Bishop Dr. David Mutweri (+254 710 772 227)",
-                v -> dialPhone("+254710772227")
+                v -> ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Peace be with you Bishop Dr. David Mutweri.")
         );
         card.addView(rowBishop);
 
@@ -834,10 +848,12 @@ public class ProfileUiBinder {
         tvTag.setPadding(0, 0, 0, dp(6));
         card.addView(tvTag);
 
-        card.addView(createInteractiveRow("📞", "Call Bishop Directly", "(+254) 0710 772 227", v -> dialPhone("+254710772227")));
-        card.addView(createInteractiveRow("✉️", "Bishop Email", "bishop@perazimchurch.org", v -> sendEmail("bishop@perazimchurch.org", "Pastoral Care")));
-        card.addView(createInteractiveRow("📧", "Secretariat", "info@perazimchurch.org", v -> sendEmail("info@perazimchurch.org", "Church Inquiry")));
-        card.addView(createInteractiveRow("💚", "Safaricom Giving Paybill", "4069983 (Lipa na M-Pesa)", v -> Toast.makeText(context, "Perazim Paybill: 4069983", Toast.LENGTH_SHORT).show()));
+        card.addView(createInteractiveRow("💬", "WhatsApp Bishop Directly", "(+254) 710 772 227 (Tap to Chat)", v -> ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Peace be with you Bishop Dr. David Mutweri. I am reaching out from the Perazim App for pastoral support.")));
+        card.addView(createInteractiveRow("📞", "Call Bishop Directly", "(+254) 710 772 227 (Native Phone Dialer)", v -> ChurchIntentManager.dialPhone(context, "+254710772227")));
+        card.addView(createInteractiveRow("✉️", "SMS Pastoral Line", "(+254) 710 772 227 (Offline SMS)", v -> ChurchIntentManager.sendSms(context, "+254710772227", "Praise God Bishop, I am requesting prayer through the Perazim App.")));
+        card.addView(createInteractiveRow("📍", "Directions to Embu HQ", "Perazim Mission Church, Embu", v -> ChurchIntentManager.openChurchMaps(context)));
+        card.addView(createInteractiveRow("💚", "Safaricom Giving Paybill", "4069983 (Lipa na M-Pesa)", v -> ChurchIntentManager.launchMpesaGiving(context, "4069983", "OFFERING", "")));
+        card.addView(createInteractiveRow("📧", "Secretariat Email", "info@perazimchurch.org", v -> ChurchIntentManager.sendEmail(context, "info@perazimchurch.org", "Perazim Church Inquiry", "")));
 
         return card;
     }
@@ -860,22 +876,29 @@ public class ProfileUiBinder {
                     if (user.getRole() != null && tvCovenantBadge != null) {
                         tvCovenantBadge.setText("🕊️ " + user.getRole());
                     }
+                    String uid = user.getId();
+                    if (uid == null || uid.trim().isEmpty() || "guest_user".equals(uid)) {
+                        uid = "user_me";
+                    }
+                    int liveStreak = GamificationStore.getStreak(context, uid, user.getStreakCount());
+                    int liveXp = GamificationStore.getSpiritualXp(context, uid, user.getSpiritualXp());
+                    int liveGrace = GamificationStore.getGracePoints(context, uid, user.getGracePoints());
+
                     if (tvStreakValue != null) {
-                        tvStreakValue.setText("🔥 " + user.getStreakCount() + " Days");
+                        tvStreakValue.setText("🔥 " + liveStreak + " Days");
                     }
                     isStreakFrozen = user.isStreakFrozen();
                     updateStreakFreezeUi(isStreakFrozen);
 
                     if (tvXpValue != null) {
-                        tvXpValue.setText("⭐ " + user.getSpiritualXp() + " XP");
+                        tvXpValue.setText("⭐ " + liveXp + " XP");
                     }
                     if (tvGraceValue != null) {
-                        tvGraceValue.setText("💜 " + user.getGracePoints() + " Pts");
+                        tvGraceValue.setText("💜 " + liveGrace + " Pts");
                     }
 
-                    int xp = user.getSpiritualXp();
-                    int level = (xp / 500) + 1;
-                    int progress = xp % 500;
+                    int level = (liveXp / 500) + 1;
+                    int progress = liveXp % 500;
                     if (xpProgressBar != null) {
                         xpProgressBar.setProgress(progress);
                     }

@@ -160,12 +160,30 @@ public class YouTubeFeedRepository {
                         String videoUrl = "https://www.youtube.com/watch?v=" + currentVideoId;
                         String thumb = currentThumbnail != null ? currentThumbnail : "https://i.ytimg.com/vi/" + currentVideoId + "/hqdefault.jpg";
 
+                        // Infer preacher from title if specified
+                        String preacher = "Bishop Dr. David Mutweri";
+                        if (title.contains("By:") || title.contains("by:")) {
+                            int idx = title.toLowerCase(Locale.US).indexOf("by:");
+                            String extracted = title.substring(idx + 3).trim();
+                            if (!extracted.isEmpty()) preacher = extracted;
+                        }
+
+                        // Infer scripture or series context
+                        String scripture = "Breakthrough Word";
+                        if (title.contains("(") && title.contains(")")) {
+                            int start = title.lastIndexOf('(');
+                            int end = title.lastIndexOf(')');
+                            if (start < end && end - start > 2) {
+                                scripture = title.substring(start + 1, end).trim();
+                            }
+                        }
+
                         Sermon sermon = new Sermon(
                                 "yt_" + currentVideoId,
                                 title,
-                                "Bishop Dr. David Mutweri",
-                                "2 Samuel 5:20",
-                                "Perazim YouTube Live",
+                                preacher,
+                                scripture,
+                                "Perazim Live Broadcast",
                                 "",
                                 videoUrl,
                                 thumb,

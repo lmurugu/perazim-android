@@ -43,6 +43,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.data.repository.RepositoryProvider;
 import org.perazimchurch.app.domain.model.Prayer;
+import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.presentation.state.UiState;
 import org.perazimchurch.app.presentation.viewmodel.FellowshipViewModel;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -746,9 +747,45 @@ public class FellowshipUiBinder {
         cbAnonymous.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
         layout.addView(cbAnonymous);
 
+        TextView tvPastoralTitle = new TextView(context);
+        tvPastoralTitle.setText("PASTORAL INTERCESSION CHANNELS:");
+        tvPastoralTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvPastoralTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvPastoralTitle.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
+        tvPastoralTitle.setPadding(0, dp(12), 0, dp(4));
+        layout.addView(tvPastoralTitle);
+
+        LinearLayout rowPastoralButtons = new LinearLayout(context);
+        rowPastoralButtons.setOrientation(LinearLayout.HORIZONTAL);
+        rowPastoralButtons.setPadding(0, 0, 0, dp(6));
+
+        Button btnSendWa = new Button(context);
+        btnSendWa.setText("💬 WhatsApp Pastor");
+        btnSendWa.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnSendWa.setTypeface(Typeface.DEFAULT_BOLD);
+        btnSendWa.setTextColor(Color.WHITE);
+        btnSendWa.setBackground(create3dButtonDrawable(PerazimTheme.COLOR_ACCENT_ORANGE, PerazimTheme.COLOR_ORANGE_DARK, PerazimTheme.RADIUS_MD, 2));
+        LinearLayout.LayoutParams lpSendWa = new LinearLayout.LayoutParams(0, dp(40), 1.0f);
+        lpSendWa.setMargins(0, 0, dp(3), 0);
+        btnSendWa.setLayoutParams(lpSendWa);
+
+        Button btnSendSms = new Button(context);
+        btnSendSms.setText("✉️ Pastoral SMS");
+        btnSendSms.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnSendSms.setTypeface(Typeface.DEFAULT_BOLD);
+        btnSendSms.setTextColor(Color.WHITE);
+        btnSendSms.setBackground(create3dButtonDrawable(PerazimTheme.COLOR_PRIMARY_PURPLE, PerazimTheme.COLOR_PURPLE_SHADOW, PerazimTheme.RADIUS_MD, 2));
+        LinearLayout.LayoutParams lpSendSms = new LinearLayout.LayoutParams(0, dp(40), 1.0f);
+        lpSendSms.setMargins(dp(3), 0, 0, 0);
+        btnSendSms.setLayoutParams(lpSendSms);
+
+        rowPastoralButtons.addView(btnSendWa);
+        rowPastoralButtons.addView(btnSendSms);
+        layout.addView(rowPastoralButtons);
+
         builder.setView(layout);
 
-        builder.setPositiveButton("Submit (+15 XP)", (dialog, which) -> {
+        builder.setPositiveButton("Post to Wall Only (+15 XP)", (dialog, which) -> {
             String title = etTitle.getText().toString().trim();
             String content = etContent.getText().toString().trim();
             boolean isAnonymous = cbAnonymous.isChecked();
@@ -776,7 +813,71 @@ public class FellowshipUiBinder {
         });
 
         builder.setNegativeButton("Cancel", null);
-        builder.show();
+        final AlertDialog dialog = builder.create();
+
+        btnSendWa.setOnClickListener(v -> {
+            String title = etTitle.getText().toString().trim();
+            String content = etContent.getText().toString().trim();
+            boolean isAnonymous = cbAnonymous.isChecked();
+
+            if (title.isEmpty()) {
+                Toast.makeText(context, "Please enter a prayer title", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (content.isEmpty()) {
+                Toast.makeText(context, "Please enter your petition details", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            viewModel.submitPrayer(
+                    title,
+                    content,
+                    isAnonymous,
+                    activeUserId,
+                    isAnonymous ? "Anonymous Saint" : activeUserName,
+                    () -> postToMain(this::refreshPrayers)
+            );
+
+            String senderName = isAnonymous ? "Church Member (Confidential)" : activeUserName;
+            String waMessage = "🙏 *Perazim Prayer Petition for Pastoral Intercession*\n\n"
+                    + "*From:* " + senderName + "\n"
+                    + "*Title:* " + title + "\n\n"
+                    + "*Petition:*\n" + content + "\n\n"
+                    + "— Submitted via Perazim App";
+            ChurchIntentManager.openWhatsAppChat(context, "+254710772227", waMessage);
+            dialog.dismiss();
+        });
+
+        btnSendSms.setOnClickListener(v -> {
+            String title = etTitle.getText().toString().trim();
+            String content = etContent.getText().toString().trim();
+            boolean isAnonymous = cbAnonymous.isChecked();
+
+            if (title.isEmpty()) {
+                Toast.makeText(context, "Please enter a prayer title", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (content.isEmpty()) {
+                Toast.makeText(context, "Please enter your petition details", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            viewModel.submitPrayer(
+                    title,
+                    content,
+                    isAnonymous,
+                    activeUserId,
+                    isAnonymous ? "Anonymous Saint" : activeUserName,
+                    () -> postToMain(this::refreshPrayers)
+            );
+
+            String senderName = isAnonymous ? "Member" : activeUserName;
+            String smsBody = "Perazim Prayer [" + title + "]: " + content + " (From: " + senderName + ")";
+            ChurchIntentManager.sendSms(context, "+254710772227", smsBody);
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     // =========================================================================

@@ -114,9 +114,9 @@ public class HomeUiBinder {
     private Button btnRoutineNext;
 
     // Progress State
-    private int streakCount = 7;
-    private int xpCount = 450;
-    private int progressPercent = 80;
+    private int streakCount = 0;
+    private int xpCount = 0;
+    private int progressPercent = 0;
     private TextView tvProgressSubtitle;
     private ProgressBar progressBarDaily;
 
@@ -154,8 +154,8 @@ public class HomeUiBinder {
                 org.perazimchurch.app.data.local.session.SessionManager sm = org.perazimchurch.app.data.local.session.SessionManager.getInstance(this.context);
                 if (sm != null && sm.getActiveUserId() != null) uid = sm.getActiveUserId();
             } catch (Exception ignored) {}
-            this.streakCount = org.perazimchurch.app.data.local.preference.GamificationStore.getStreak(this.context, uid, 7);
-            this.xpCount = org.perazimchurch.app.data.local.preference.GamificationStore.getSpiritualXp(this.context, uid, 450);
+            this.streakCount = org.perazimchurch.app.data.local.preference.GamificationStore.getStreak(this.context, uid, 0);
+            this.xpCount = org.perazimchurch.app.data.local.preference.GamificationStore.getSpiritualXp(this.context, uid, 0);
             try {
                 this.routineStep = this.context.getSharedPreferences("perazim_routine", Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1);
             } catch (Exception ignored) {}
@@ -337,8 +337,24 @@ public class HomeUiBinder {
         header.setTextColor(COLOR_PRIMARY_PURPLE);
         card.addView(header);
 
+        if (routineStep >= 4) {
+            progressPercent = 100;
+        } else if (routineStep == 3) {
+            progressPercent = 66;
+        } else if (routineStep == 2) {
+            progressPercent = 33;
+        } else {
+            progressPercent = 0;
+        }
+
         tvProgressSubtitle = new TextView(context);
-        tvProgressSubtitle.setText(progressPercent + "% completed — 4 of 5 devotions finished");
+        if (routineStep >= 4) {
+            tvProgressSubtitle.setText("100% completed — All daily devotions accomplished! 🎉");
+        } else if (routineStep == 1) {
+            tvProgressSubtitle.setText("0% completed — Start today's 3-minute breakthrough routine");
+        } else {
+            tvProgressSubtitle.setText(progressPercent + "% completed — Step " + routineStep + " of 3 in progress");
+        }
         tvProgressSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvProgressSubtitle.setTextColor(COLOR_TEXT_DARK);
         tvProgressSubtitle.setPadding(0, dp(4), 0, dp(8));
@@ -521,11 +537,17 @@ public class HomeUiBinder {
     private void advanceReflectionStep() {
         if (routineStep == 1) {
             routineStep = 2;
+            progressPercent = 33;
+            if (progressBarDaily != null) progressBarDaily.setProgress(progressPercent);
+            if (tvProgressSubtitle != null) tvProgressSubtitle.setText("33% completed — Step 2 of 3 in progress");
             saveRoutineState(null);
             updateRoutineView();
             Toast.makeText(context, "Step 1 complete! Now meditate on today's breakthrough message.", Toast.LENGTH_SHORT).show();
         } else if (routineStep == 2) {
             routineStep = 3;
+            progressPercent = 66;
+            if (progressBarDaily != null) progressBarDaily.setProgress(progressPercent);
+            if (tvProgressSubtitle != null) tvProgressSubtitle.setText("66% completed — Step 3 of 3 in progress");
             saveRoutineState(null);
             updateRoutineView();
             Toast.makeText(context, "Step 2 complete! Stand in agreement in prayer.", Toast.LENGTH_SHORT).show();

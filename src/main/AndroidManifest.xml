@@ -10,6 +10,35 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <queries>
+        <!-- WhatsApp -->
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <!-- Safaricom M-Pesa -->
+        <package android:name="com.safaricom.mpesa.lifestyle" />
+        <package android:name="com.safaricom.mpesa" />
+        <!-- SIM Toolkit -->
+        <package android:name="com.android.stk" />
+        <package android:name="com.android.stk2" />
+        <package android:name="com.mediatek.stkselection" />
+        <!-- YouTube -->
+        <package android:name="com.google.android.youtube" />
+        <!-- Google Maps -->
+        <package android:name="com.google.android.apps.maps" />
+        <!-- System intent resolvers -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO" />
+            <data android:scheme="smsto" />
+        </intent>
+    </queries>
+
     <application
         android:label="Perazim"
         android:icon="@drawable/ic_launcher"

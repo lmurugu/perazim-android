@@ -57,13 +57,13 @@ public class RoomUserRepository implements UserRepository {
 
         // Fallback to default guest user
         Context ctx = getEffectiveContext();
-        int defaultStreak = GamificationStore.getStreak(ctx, "guest_user", 7);
-        boolean defaultFrozen = GamificationStore.isStreakFrozen(ctx, "guest_user", false);
-        int defaultXp = GamificationStore.getSpiritualXp(ctx, "guest_user", 100);
-        int defaultGrace = GamificationStore.getGracePoints(ctx, "guest_user", 50);
+        int defaultStreak = GamificationStore.getStreak(ctx, "user_me", 0);
+        boolean defaultFrozen = GamificationStore.isStreakFrozen(ctx, "user_me", false);
+        int defaultXp = GamificationStore.getSpiritualXp(ctx, "user_me", 0);
+        int defaultGrace = GamificationStore.getGracePoints(ctx, "user_me", 2);
 
         User guestUser = new User(
-                "guest_user",
+                "user_me",
                 "Guest Pilgrim",
                 "guest@perazim.org",
                 "+254700000000",

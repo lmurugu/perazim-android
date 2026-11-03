@@ -42,6 +42,7 @@ import android.widget.Toast;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
 import org.perazimchurch.app.data.mapper.UserMapper;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.navigation.NavigationContract;
 import org.perazimchurch.app.presentation.ui.AiBreakthroughGuideDialog;
 import org.perazimchurch.app.presentation.ui.BibleReaderDialog;
@@ -88,11 +89,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public static final int COLOR_BG_NEUTRAL      = Color.parseColor("#FAF7FB"); // Whitened purple canvas
 
     // --- STATE VARIABLES ---
-    private int streakCount = 7;
-    private int xpCount = 450;
-    private int graceCount = 5;
+    private int streakCount = 0;
+    private int xpCount = 0;
+    private int graceCount = 2;
     private boolean streakFrozen = false;
-    private int progressPercent = 80;
+    private int progressPercent = 0;
     private boolean questClaimed = false;
     private String selectedCampus = "Perazim Mission Church";
 
@@ -165,9 +166,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         // Initialize gamification persistence
         UserMapper.init(this);
-        streakCount = GamificationStore.getStreak(this, resolveGamificationUserId(), 7);
-        xpCount = GamificationStore.getSpiritualXp(this, resolveGamificationUserId(), 450);
-        graceCount = GamificationStore.getGracePoints(this, resolveGamificationUserId(), 5);
+        streakCount = GamificationStore.getStreak(this, resolveGamificationUserId(), 0);
+        xpCount = GamificationStore.getSpiritualXp(this, resolveGamificationUserId(), 0);
+        graceCount = GamificationStore.getGracePoints(this, resolveGamificationUserId(), 2);
         streakFrozen = GamificationStore.isStreakFrozen(this, resolveGamificationUserId(), false);
 
         // Trigger first-launch onboarding
@@ -439,7 +440,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         textCol.addView(tvMiniTrackTitle);
 
         tvMiniTrackSub = new TextView(this);
-        tvMiniTrackSub.setText("Bishop Dr. David Mutweri · 03:42 / 28:15");
+        tvMiniTrackSub.setText("Bishop Dr. David Mutweri · Tap to Play Audio");
         tvMiniTrackSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvMiniTrackSub.setTextColor(COLOR_PURPLE_SOFT);
         tvMiniTrackSub.setMaxLines(1);
@@ -734,8 +735,28 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         goalHeader.setTextColor(COLOR_PRIMARY_PURPLE);
         progressCard.addView(goalHeader);
 
+        int routineStep = 1;
+        try {
+            routineStep = getSharedPreferences("perazim_routine", Context.MODE_PRIVATE).getInt("routine_step", 1);
+        } catch (Exception ignored) {}
+        if (routineStep >= 4) {
+            progressPercent = 100;
+        } else if (routineStep == 3) {
+            progressPercent = 66;
+        } else if (routineStep == 2) {
+            progressPercent = 33;
+        } else {
+            progressPercent = 0;
+        }
+
         progressTextView = new TextView(this);
-        progressTextView.setText(progressPercent + "% completed — 4 of 5 devotions finished");
+        if (routineStep >= 4) {
+            progressTextView.setText("100% completed — All daily devotions accomplished! 🎉");
+        } else if (routineStep == 1) {
+            progressTextView.setText("0% completed — Start today's 3-minute breakthrough routine");
+        } else {
+            progressTextView.setText(progressPercent + "% completed — Step " + routineStep + " of 3 in progress");
+        }
         progressTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         progressTextView.setTextColor(COLOR_TEXT_DARK);
         progressTextView.setPadding(0, dp(4), 0, dp(8));
@@ -1304,13 +1325,73 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         btnConfirmGive.setOnClickListener(v -> {
             String amt = etAmount.getText().toString().trim();
             if (amt.isEmpty()) amt = "1000";
+            String account = "PERAZIM-TITHE";
+            if (tvGivingAccount != null && tvGivingAccount.getText() != null) {
+                account = tvGivingAccount.getText().toString().replace("Account: ", "").trim();
+            }
             xpCount += 20;
             GamificationStore.saveSpiritualXp(this, resolveGamificationUserId(), xpCount);
             updateHud();
-            Toast.makeText(this, "🙏 Giving recorded for KES " + amt + " to Paybill 4069983! May God open the windows of heaven upon you! (+20 XP)", Toast.LENGTH_LONG).show();
+            ChurchIntentManager.launchMpesaGiving(this, "4069983", account, amt);
             dlg.dismiss();
         });
         container.addView(btnConfirmGive);
+
+        // Direct Action Buttons Row (STK, M-Pesa App, *334#)
+        TextView tvDirectTitle = new TextView(this);
+        tvDirectTitle.setText("DIRECT SAFARICOM LAUNCH OPTIONS:");
+        tvDirectTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvDirectTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvDirectTitle.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvDirectTitle.setPadding(0, dp(12), 0, dp(4));
+        container.addView(tvDirectTitle);
+
+        LinearLayout rowDirectActions = new LinearLayout(this);
+        rowDirectActions.setOrientation(LinearLayout.HORIZONTAL);
+        rowDirectActions.setPadding(0, 0, 0, dp(6));
+
+        Button btnStk = new Button(this);
+        btnStk.setText("📲 SIM Toolkit");
+        btnStk.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        btnStk.setTextColor(COLOR_PRIMARY_PURPLE);
+        btnStk.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        LinearLayout.LayoutParams lpStk = new LinearLayout.LayoutParams(0, dp(38), 1.0f);
+        lpStk.setMargins(0, 0, dp(2), 0);
+        btnStk.setLayoutParams(lpStk);
+        btnStk.setOnClickListener(v -> {
+            String acc = (tvGivingAccount != null && tvGivingAccount.getText() != null)
+                    ? tvGivingAccount.getText().toString().replace("Account: ", "").trim() : "PERAZIM-TITHE";
+            ChurchIntentManager.openSimToolkit(MainActivity.this, "4069983", acc);
+        });
+        rowDirectActions.addView(btnStk);
+
+        Button btnMpesa = new Button(this);
+        btnMpesa.setText("🟢 M-Pesa App");
+        btnMpesa.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        btnMpesa.setTextColor(COLOR_PRIMARY_PURPLE);
+        btnMpesa.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        LinearLayout.LayoutParams lpMpesa = new LinearLayout.LayoutParams(0, dp(38), 1.0f);
+        lpMpesa.setMargins(dp(2), 0, dp(2), 0);
+        btnMpesa.setLayoutParams(lpMpesa);
+        btnMpesa.setOnClickListener(v -> {
+            String acc = (tvGivingAccount != null && tvGivingAccount.getText() != null)
+                    ? tvGivingAccount.getText().toString().replace("Account: ", "").trim() : "PERAZIM-TITHE";
+            ChurchIntentManager.openMpesaApp(MainActivity.this, "4069983", acc);
+        });
+        rowDirectActions.addView(btnMpesa);
+
+        Button btnUssd = new Button(this);
+        btnUssd.setText("📞 Dial *334#");
+        btnUssd.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        btnUssd.setTextColor(COLOR_PRIMARY_PURPLE);
+        btnUssd.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        LinearLayout.LayoutParams lpUssd = new LinearLayout.LayoutParams(0, dp(38), 1.0f);
+        lpUssd.setMargins(dp(2), 0, 0, 0);
+        btnUssd.setLayoutParams(lpUssd);
+        btnUssd.setOnClickListener(v -> ChurchIntentManager.dialUssd(MainActivity.this, "*334#"));
+        rowDirectActions.addView(btnUssd);
+
+        container.addView(rowDirectActions);
 
         // Giving Inquiries & Pastoral Office Contact Box
         LinearLayout contactHelpBox = new LinearLayout(this);
@@ -1340,14 +1421,34 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvHelpDesc.setPadding(0, dp(2), 0, dp(6));
         contactHelpBox.addView(tvHelpDesc);
 
+        // WhatsApp Pastoral Care Row
+        TextView tvBishopWa = new TextView(this);
+        tvBishopWa.setText("💬 WhatsApp Bishop: (+254) 0710 772 227");
+        tvBishopWa.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvBishopWa.setTypeface(Typeface.DEFAULT_BOLD);
+        tvBishopWa.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvBishopWa.setPadding(0, dp(3), 0, dp(3));
+        tvBishopWa.setOnClickListener(v -> ChurchIntentManager.openWhatsAppChat(MainActivity.this, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I have an inquiry / covenant prayer request regarding Perazim giving."));
+        contactHelpBox.addView(tvBishopWa);
+
+        // SMS Pastoral Support Row
+        TextView tvBishopSms = new TextView(this);
+        tvBishopSms.setText("✉️ SMS Pastoral Line: (+254) 0710 772 227");
+        tvBishopSms.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvBishopSms.setTypeface(Typeface.DEFAULT_BOLD);
+        tvBishopSms.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvBishopSms.setPadding(0, dp(3), 0, dp(3));
+        tvBishopSms.setOnClickListener(v -> ChurchIntentManager.sendSms(MainActivity.this, "+254710772227", "Perazim Giving / Pastoral Support Request: "));
+        contactHelpBox.addView(tvBishopSms);
+
         // Bishop Phone Row
         TextView tvBishopPhone = new TextView(this);
-        tvBishopPhone.setText("📞 Bishop: (+254) 0710 772 227");
+        tvBishopPhone.setText("📞 Call Bishop: (+254) 0710 772 227");
         tvBishopPhone.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvBishopPhone.setTypeface(Typeface.DEFAULT_BOLD);
         tvBishopPhone.setTextColor(COLOR_PURPLE_DARK);
         tvBishopPhone.setPadding(0, dp(3), 0, dp(3));
-        tvBishopPhone.setOnClickListener(v -> dialPhoneNumber("+254710772227"));
+        tvBishopPhone.setOnClickListener(v -> ChurchIntentManager.dialPhone(MainActivity.this, "+254710772227"));
         contactHelpBox.addView(tvBishopPhone);
 
         // Church Email Row
@@ -2460,8 +2561,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         contactCard.addView(tvContactDesc);
 
         // Interactive Contact Rows
-        LinearLayout rowPhone = createInteractiveContactRow("📞", "Bishop's Direct Phone", "(+254) 0710 772 227", v -> dialPhoneNumber("+254710772227"));
+        LinearLayout rowWa = createInteractiveContactRow("💬", "WhatsApp Pastoral Line", "(+254) 0710 772 227 (Direct Chat)", v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am reaching out from the Perazim App."));
+        contactCard.addView(rowWa);
+
+        LinearLayout rowPhone = createInteractiveContactRow("📞", "Bishop's Direct Phone", "(+254) 0710 772 227 (Voice Call)", v -> ChurchIntentManager.dialPhone(this, "+254710772227"));
         contactCard.addView(rowPhone);
+
+        LinearLayout rowSms = createInteractiveContactRow("✉️", "SMS Pastoral Line", "(+254) 0710 772 227 (Offline / SMS)", v -> ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Pastoral Care Request: "));
+        contactCard.addView(rowSms);
+
+        LinearLayout rowMap = createInteractiveContactRow("📍", "Find Sanctuary / Directions", "Embu Headquarters (Google Maps)", v -> ChurchIntentManager.openChurchMaps(this));
+        contactCard.addView(rowMap);
 
         LinearLayout rowChurchEmail = createInteractiveContactRow("📧", "Church Secretariat Email", "info@perazimchurch.org", v -> sendEmail("info@perazimchurch.org", "Perazim Church Inquiry"));
         contactCard.addView(rowChurchEmail);
@@ -2477,18 +2587,22 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         contactButtonsRow.setOrientation(LinearLayout.HORIZONTAL);
         contactButtonsRow.setPadding(0, dp(6), 0, 0);
 
-        Button btnCall = createSmallButton("📞 Call", COLOR_ACCENT_ORANGE, COLOR_WHITE);
-        btnCall.setOnClickListener(v -> dialPhoneNumber("+254710772227"));
+        Button btnWa = createSmallButton("💬 WhatsApp", COLOR_ACCENT_ORANGE, COLOR_WHITE);
+        btnWa.setOnClickListener(v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop."));
 
-        Button btnEmailBishop = createSmallButton("✉️ Bishop", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
-        btnEmailBishop.setOnClickListener(v -> sendEmail("bishop@perazimchurch.org", "Pastoral Care"));
+        Button btnCall = createSmallButton("📞 Call", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+        btnCall.setOnClickListener(v -> ChurchIntentManager.dialPhone(this, "+254710772227"));
 
-        Button btnEmailChurch = createSmallButton("📧 Office", COLOR_PURPLE_DARK, COLOR_WHITE);
-        btnEmailChurch.setOnClickListener(v -> sendEmail("info@perazimchurch.org", "Church Information"));
+        Button btnSms = createSmallButton("✉️ SMS", COLOR_PURPLE_DARK, COLOR_WHITE);
+        btnSms.setOnClickListener(v -> ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Prayer Request: "));
 
+        Button btnMap = createSmallButton("📍 Maps", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+        btnMap.setOnClickListener(v -> ChurchIntentManager.openChurchMaps(this));
+
+        contactButtonsRow.addView(btnWa);
         contactButtonsRow.addView(btnCall);
-        contactButtonsRow.addView(btnEmailBishop);
-        contactButtonsRow.addView(btnEmailChurch);
+        contactButtonsRow.addView(btnSms);
+        contactButtonsRow.addView(btnMap);
         contactCard.addView(contactButtonsRow);
 
         content.addView(contactCard);
@@ -2761,12 +2875,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvPastoralDesc.setPadding(0, 0, 0, dp(8));
         pastoralCard.addView(tvPastoralDesc);
 
-        LinearLayout rowBishopCall = createInteractiveContactRow("📞", "Call Bishop Dr. David Mutweri", "(+254) 0710 772 227", v -> dialPhoneNumber("+254710772227"));
+        LinearLayout rowBishopWaDirect = createInteractiveContactRow("💬", "WhatsApp Bishop Directly", "(+254) 0710 772 227 (Direct Chat)", v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am contacting you for pastoral support and prayer."));
+        LinearLayout rowBishopCall = createInteractiveContactRow("📞", "Call Bishop Dr. David Mutweri", "(+254) 0710 772 227", v -> ChurchIntentManager.dialPhone(this, "+254710772227"));
+        LinearLayout rowBishopSmsDirect = createInteractiveContactRow("✉️", "SMS Pastoral Line", "(+254) 0710 772 227 (Offline / SMS)", v -> ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Pastoral Care Request: "));
+        LinearLayout rowMapDirect = createInteractiveContactRow("📍", "Find Sanctuary / Directions", "Embu Headquarters (Google Maps)", v -> ChurchIntentManager.openChurchMaps(this));
         LinearLayout rowBishopEmailDirect = createInteractiveContactRow("✉️", "Email Bishop Directly", "bishop@perazimchurch.org", v -> sendEmail("bishop@perazimchurch.org", "Pastoral Care Request"));
         LinearLayout rowChurchEmailDirect = createInteractiveContactRow("📧", "Church Secretariat", "info@perazimchurch.org", v -> sendEmail("info@perazimchurch.org", "Church Inquiry"));
         LinearLayout rowPaybillDirect = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "4069983 (Tap to Give)", v -> showGivingDialog());
 
+        pastoralCard.addView(rowBishopWaDirect);
         pastoralCard.addView(rowBishopCall);
+        pastoralCard.addView(rowBishopSmsDirect);
+        pastoralCard.addView(rowMapDirect);
         pastoralCard.addView(rowBishopEmailDirect);
         pastoralCard.addView(rowChurchEmailDirect);
         pastoralCard.addView(rowPaybillDirect);
@@ -3146,18 +3266,64 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     private void showContactDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🏛️ Church & Pastoral Office Contacts");
-        builder.setMessage("Perazim Mission Church Headquarters, Embu\n\n"
-                + "• Presiding Bishop: Bishop Dr. David Mutweri\n"
-                + "• Bishop Direct Phone: (+254) 0710 772 227\n"
-                + "• Church Office Email: info@perazimchurch.org\n"
-                + "• Bishop Email: bishop@perazimchurch.org\n"
-                + "• Giving Paybill: 4069983\n\n"
-                + "Tap an action below to connect directly:");
+        ScrollView sv = new ScrollView(this);
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(dp(18), dp(18), dp(18), dp(18));
+        container.setBackgroundColor(COLOR_WHITE);
 
-        builder.setPositiveButton("📞 Call Bishop", (dialog, which) -> dialPhoneNumber("+254710772227"));
-        builder.setNegativeButton("✉️ Email Bishop", (dialog, which) -> sendEmail("bishop@perazimchurch.org", "Pastoral Care & Prayer"));
-        builder.setNeutralButton("📧 Church Office", (dialog, which) -> sendEmail("info@perazimchurch.org", "Church Inquiries"));
+        TextView title = new TextView(this);
+        title.setText("🏛️ Church & Pastoral Office Contacts");
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setTextColor(COLOR_PURPLE_DARK);
+        container.addView(title);
+
+        TextView subtitle = new TextView(this);
+        subtitle.setText("Perazim Mission Church Headquarters, Embu\nPresiding Bishop: Bishop Dr. David Mutweri\n\nTap an action below to connect instantly:");
+        subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        subtitle.setTextColor(COLOR_TEXT_MUTED);
+        subtitle.setPadding(0, dp(4), 0, dp(14));
+        container.addView(subtitle);
+
+        // WhatsApp Pastoral Care
+        container.addView(createInteractiveContactRow("💬", "WhatsApp Pastoral Care", "(+254) 0710 772 227 (Direct Chat)", v -> {
+            ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am contacting you from the Perazim App for pastoral support and prayer.");
+        }));
+
+        // Phone Call Bishop
+        container.addView(createInteractiveContactRow("📞", "Call Bishop's Line", "(+254) 0710 772 227 (Tap to Call)", v -> {
+            ChurchIntentManager.dialPhone(this, "+254710772227");
+        }));
+
+        // SMS Pastoral Line
+        container.addView(createInteractiveContactRow("✉️", "SMS Pastoral Line", "(+254) 0710 772 227 (Offline / No Data)", v -> {
+            ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Pastoral Care Request: ");
+        }));
+
+        // Sanctuary Maps Directions
+        container.addView(createInteractiveContactRow("📍", "Find Sanctuary / Directions", "Embu Headquarters (Google Maps)", v -> {
+            ChurchIntentManager.openChurchMaps(this);
+        }));
+
+        // Lipa na M-Pesa Giving
+        container.addView(createInteractiveContactRow("💚", "Lipa na M-Pesa Giving", "Paybill 4069983 (Tap to Give)", v -> {
+            showGivingDialog();
+        }));
+
+        // Church Email
+        container.addView(createInteractiveContactRow("📧", "Church Secretariat Email", "info@perazimchurch.org", v -> {
+            sendEmail("info@perazimchurch.org", "Perazim Church Information");
+        }));
+
+        // Bishop Direct Email
+        container.addView(createInteractiveContactRow("✉️", "Bishop's Direct Email", "bishop@perazimchurch.org", v -> {
+            sendEmail("bishop@perazimchurch.org", "Pastoral Care & Counseling");
+        }));
+
+        sv.addView(container);
+        builder.setView(sv);
+        builder.setNegativeButton("Close", null);
         builder.show();
     }
 
