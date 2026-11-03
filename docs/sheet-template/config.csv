@@ -1,0 +1,5 @@
+key,value
+min_app_version,2.2.0
+ai_enabled,true
+ai_daily_limit,3
+community_enabled,true
