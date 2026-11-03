@@ -31,6 +31,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
 import androidx.annotation.NonNull;
 
 import org.perazimchurch.app.domain.model.Hymn;
@@ -370,72 +374,31 @@ public class WorshipUiBinder {
     }
 
     private View createHymnCard(final Hymn hymn) {
-        final LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
-        card.setOrientation(LinearLayout.HORIZONTAL);
-        card.setGravity(Gravity.CENTER_VERTICAL);
+        final LinearLayout card = createCard(COLOR_WHITE, dp(28), COLOR_BORDER_GREY, dp(1));
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(18), dp(14), dp(18), dp(14));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(10));
+        lp.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(lp);
 
-        // 1. Hymn Number Badge (#1, #2...)
-        TextView tvNumberBadge = new TextView(activity);
-        tvNumberBadge.setText("#" + hymn.getNumber());
-        tvNumberBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvNumberBadge.setTypeface(Typeface.DEFAULT_BOLD);
-        tvNumberBadge.setTextColor(COLOR_WHITE);
-        tvNumberBadge.setBackground(createPillBg(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW));
-        tvNumberBadge.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams lpNum = new LinearLayout.LayoutParams(dp(44), dp(32));
-        lpNum.setMargins(0, 0, dp(12), 0);
-        tvNumberBadge.setLayoutParams(lpNum);
-        card.addView(tvNumberBadge);
-
-        // 2. Middle Column: Title & Category & Key
-        LinearLayout midCol = new LinearLayout(activity);
-        midCol.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lpMid = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        midCol.setLayoutParams(lpMid);
+        // 1. Header Row: 🎵 Title + Favorite Toggle Heart
+        LinearLayout titleRow = new LinearLayout(activity);
+        titleRow.setOrientation(LinearLayout.HORIZONTAL);
+        titleRow.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView tvTitle = new TextView(activity);
-        tvTitle.setText(hymn.getTitle());
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tvTitle.setText("🎵  " + hymn.getTitle());
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
         tvTitle.setTextColor(COLOR_TEXT_DARK);
-        midCol.addView(tvTitle);
+        LinearLayout.LayoutParams lpTitle = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        tvTitle.setLayoutParams(lpTitle);
+        titleRow.addView(tvTitle);
 
-        LinearLayout subRow = new LinearLayout(activity);
-        subRow.setOrientation(LinearLayout.HORIZONTAL);
-        subRow.setGravity(Gravity.CENTER_VERTICAL);
-        subRow.setPadding(0, dp(3), 0, 0);
-
-        // Category pill
-        String cat = hymn.getCategory() != null && !hymn.getCategory().isEmpty() ? hymn.getCategory() : "Worship";
-        TextView tvCat = new TextView(activity);
-        tvCat.setText(cat);
-        tvCat.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvCat.setTypeface(Typeface.DEFAULT_BOLD);
-        tvCat.setTextColor(COLOR_ACCENT_ORANGE);
-        tvCat.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ORANGE_BORDER));
-        tvCat.setPadding(dp(6), dp(2), dp(6), dp(2));
-        subRow.addView(tvCat);
-
-        // Key & Time signature info
-        String key = hymn.getKeySignature() != null ? hymn.getKeySignature() : "D Major";
-        String time = hymn.getTimeSignature() != null ? hymn.getTimeSignature() : "4/4";
-        TextView tvKeyInfo = new TextView(activity);
-        tvKeyInfo.setText("  •  " + key + " (" + time + ")");
-        tvKeyInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvKeyInfo.setTextColor(COLOR_TEXT_MUTED);
-        subRow.addView(tvKeyInfo);
-
-        midCol.addView(subRow);
-        card.addView(midCol);
-
-        // 3. Favorite Heart Icon Toggle
         final Button btnHeart = new Button(activity);
         updateHeartButtonState(btnHeart, hymn.isFavorite());
-        LinearLayout.LayoutParams lpHeart = new LinearLayout.LayoutParams(dp(42), dp(42));
+        LinearLayout.LayoutParams lpHeart = new LinearLayout.LayoutParams(dp(32), dp(32));
         lpHeart.setMargins(dp(6), 0, 0, 0);
         btnHeart.setLayoutParams(lpHeart);
 
@@ -452,10 +415,133 @@ public class WorshipUiBinder {
                 }
             }));
         });
-        card.addView(btnHeart);
+        titleRow.addView(btnHeart);
+        card.addView(titleRow);
 
-        // Tap card to open Hymn Detail Sheet / Dialog
-        card.setOnClickListener(v -> showHymnDetailSheet(hymn));
+        // 2. Subtitle: Key of [key] • [bpm] BPM • Chords: [progression]
+        String rawKey = hymn.getKeySignature();
+        if (rawKey == null || rawKey.isEmpty()) {
+            rawKey = hymn.getKey() != null ? hymn.getKey() : "G";
+        }
+        String key = rawKey.replace("Major", "").trim();
+        int bpm = hymn.getTempoBpm() > 0 ? hymn.getTempoBpm() : 72;
+        String chords = hymn.getChords() != null && !hymn.getChords().isEmpty()
+                ? hymn.getChords().replace(" - ", ", ") : "G, C, D";
+
+        final TextView tvSub = new TextView(activity);
+        tvSub.setText("Key of " + key + " • " + bpm + " BPM • Chords: " + chords);
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvSub.setTextColor(COLOR_TEXT_MUTED);
+        tvSub.setPadding(0, dp(3), 0, dp(4));
+        card.addView(tvSub);
+
+        // 3. Inline Expandable Lyrics & Chords Container
+        final LinearLayout expandableContent = new LinearLayout(activity);
+        expandableContent.setOrientation(LinearLayout.VERTICAL);
+        expandableContent.setVisibility(View.GONE);
+        expandableContent.setPadding(0, dp(8), 0, dp(6));
+
+        // Chords Progression Box
+        LinearLayout chordBox = new LinearLayout(activity);
+        chordBox.setOrientation(LinearLayout.VERTICAL);
+        chordBox.setPadding(dp(12), dp(10), dp(12), dp(10));
+        GradientDrawable cbBg = new GradientDrawable();
+        cbBg.setColor(COLOR_PURPLE_TINT);
+        cbBg.setCornerRadius(dp(10));
+        cbBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        chordBox.setBackground(cbBg);
+
+        TextView tvChordTitle = new TextView(activity);
+        String timeSig = hymn.getTimeSignature() != null ? hymn.getTimeSignature() : "4/4";
+        tvChordTitle.setText("🎸 CHORD PROGRESSION (" + timeSig + "):");
+        tvChordTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvChordTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvChordTitle.setTextColor(COLOR_PRIMARY_PURPLE);
+        chordBox.addView(tvChordTitle);
+
+        TextView tvChordProg = new TextView(activity);
+        tvChordProg.setText(chords);
+        tvChordProg.setTypeface(Typeface.MONOSPACE, Typeface.DEFAULT_BOLD.getStyle());
+        tvChordProg.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvChordProg.setTextColor(COLOR_PURPLE_DARK);
+        tvChordProg.setPadding(0, dp(4), 0, 0);
+        chordBox.addView(tvChordProg);
+        expandableContent.addView(chordBox);
+
+        // Lyrics View
+        TextView tvLyrics = new TextView(activity);
+        tvLyrics.setText(hymn.getLyrics() != null ? hymn.getLyrics() : "");
+        tvLyrics.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvLyrics.setTextColor(COLOR_TEXT_DARK);
+        tvLyrics.setTypeface(Typeface.SERIF);
+        tvLyrics.setPadding(dp(4), dp(10), dp(4), dp(10));
+        tvLyrics.setLineSpacing(dp(3), 1.2f);
+        expandableContent.addView(tvLyrics);
+
+        // Action row inside expanded card
+        LinearLayout actionRow = new LinearLayout(activity);
+        actionRow.setOrientation(LinearLayout.HORIZONTAL);
+        actionRow.setGravity(Gravity.CENTER_VERTICAL);
+        actionRow.setPadding(0, dp(4), 0, dp(4));
+
+        Button btnShare = new Button(activity);
+        btnShare.setText("📱 Share Hymn");
+        btnShare.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnShare.setTextColor(COLOR_WHITE);
+        btnShare.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 8, 2));
+        btnShare.setPadding(dp(10), dp(4), dp(10), dp(4));
+        btnShare.setOnClickListener(v -> {
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_SUBJECT, hymn.getTitle() + " - Perazim Hymnal");
+            share.putExtra(Intent.EXTRA_TEXT, "🎵 " + hymn.getTitle() + "\nKey: " + hymn.getKeySignature() + "\nChords: " + hymn.getChords() + "\n\n" + hymn.getLyrics() + "\n\n— Perazim Mission Church Hymnal");
+            activity.startActivity(Intent.createChooser(share, "Share Hymn via"));
+        });
+        actionRow.addView(btnShare);
+
+        Button btnCopy = new Button(activity);
+        btnCopy.setText("📋 Copy Chords");
+        btnCopy.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnCopy.setTextColor(COLOR_PRIMARY_PURPLE);
+        btnCopy.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        btnCopy.setPadding(dp(10), dp(4), dp(10), dp(4));
+        LinearLayout.LayoutParams lpCopy = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpCopy.setMargins(dp(8), 0, 0, 0);
+        btnCopy.setLayoutParams(lpCopy);
+        btnCopy.setOnClickListener(v -> {
+            ClipboardManager cb = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
+            if (cb != null) {
+                cb.setPrimaryClip(ClipData.newPlainText("Hymn Chords", hymn.getTitle() + " Chords: " + chords));
+                Toast.makeText(activity, "✓ Chords copied to clipboard!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        actionRow.addView(btnCopy);
+
+        expandableContent.addView(actionRow);
+        card.addView(expandableContent);
+
+        // 4. Toggle Accordion Row
+        final TextView tvToggle = new TextView(activity);
+        tvToggle.setText("▼ Show Chords & Lyrics");
+        tvToggle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvToggle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvToggle.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvToggle.setPadding(0, dp(4), 0, 0);
+
+        View.OnClickListener toggleListener = v -> {
+            if (expandableContent.getVisibility() == View.VISIBLE) {
+                expandableContent.setVisibility(View.GONE);
+                tvToggle.setText("▼ Show Chords & Lyrics");
+            } else {
+                expandableContent.setVisibility(View.VISIBLE);
+                tvToggle.setText("▲ Hide Chords & Lyrics");
+            }
+        };
+
+        tvToggle.setOnClickListener(toggleListener);
+        tvSub.setOnClickListener(toggleListener);
+        card.addView(tvToggle);
 
         return card;
     }
@@ -463,10 +549,11 @@ public class WorshipUiBinder {
     private void updateHeartButtonState(Button btnHeart, boolean isFav) {
         if (isFav) {
             btnHeart.setText("❤️");
+            btnHeart.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             btnHeart.setBackground(createPillBg(COLOR_HEART_TINT, COLOR_HEART_RED));
         } else {
             btnHeart.setText("♡");
-            btnHeart.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            btnHeart.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             btnHeart.setTextColor(COLOR_TEXT_MUTED);
             btnHeart.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
         }
@@ -675,6 +762,21 @@ public class WorshipUiBinder {
         g.setCornerRadius(dp(14));
         g.setStroke(dp(1), strokeColor);
         return g;
+    }
+
+    private Drawable create3dButtonDrawable(int faceColor, int shadowColor, int radiusDp, int shadowDepthDp) {
+        GradientDrawable shadow = new GradientDrawable();
+        shadow.setColor(shadowColor);
+        shadow.setCornerRadius(dp(radiusDp));
+
+        GradientDrawable face = new GradientDrawable();
+        face.setColor(faceColor);
+        face.setCornerRadius(dp(radiusDp));
+
+        LayerDrawable layers = new LayerDrawable(new Drawable[]{shadow, face});
+        layers.setLayerInset(0, 0, dp(shadowDepthDp), 0, 0);
+        layers.setLayerInset(1, 0, 0, 0, dp(shadowDepthDp));
+        return layers;
     }
 
     private LinearLayout createCard(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {

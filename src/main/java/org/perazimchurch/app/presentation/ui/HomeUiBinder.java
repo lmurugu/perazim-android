@@ -314,13 +314,13 @@ public class HomeUiBinder {
         lp.setMargins(0, 0, 0, dp(14));
         card.setLayoutParams(lp);
 
-        Button btnGive = createSmallButton("💚 Give / Tithe", COLOR_ACCENT_ORANGE, COLOR_WHITE);
+        Button btnGive = createSmallButton("💚 GIVE / TITHE", COLOR_ACCENT_ORANGE, COLOR_WHITE);
         btnGive.setOnClickListener(v -> showGivingModal());
 
-        Button btnFullPassage = createSmallButton("📖 Holy Scripture", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+        Button btnFullPassage = createSmallButton("📖 HOLY SCRIPTURE", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
         btnFullPassage.setOnClickListener(v -> openScriptureReader("2SA", 5));
 
-        Button btnIntercede = createSmallButton("🙏 Intercede", COLOR_PURPLE_DARK, COLOR_WHITE);
+        Button btnIntercede = createSmallButton("🙏 INTERCEDE", COLOR_PURPLE_DARK, COLOR_WHITE);
         btnIntercede.setOnClickListener(v -> showPrayerRequestModal());
 
         card.addView(btnGive);
@@ -458,7 +458,7 @@ public class HomeUiBinder {
 
         // Dedicated "Read Passage" Button: Opens BibleReaderDialog
         btnCornerstoneReadPassage = new Button(context);
-        btnCornerstoneReadPassage.setText("📖 Read Passage (2 Samuel 5 · Baal-perazim)");
+        btnCornerstoneReadPassage.setText("📖 READ PASSAGE (2 SAMUEL 5 · BAAL-PERAZIM)");
         btnCornerstoneReadPassage.setTextColor(COLOR_WHITE);
         btnCornerstoneReadPassage.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnCornerstoneReadPassage.setTypeface(Typeface.DEFAULT_BOLD);
@@ -532,7 +532,7 @@ public class HomeUiBinder {
         stepBox.addView(tvRoutineStepContent);
 
         btnRoutineNext = new Button(context);
-        btnRoutineNext.setText("✓ Done Reading (Next Step ➔)");
+        btnRoutineNext.setText("✓ DONE READING (NEXT STEP ➔)");
         btnRoutineNext.setTextColor(COLOR_WHITE);
         btnRoutineNext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         btnRoutineNext.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1096,214 +1096,7 @@ public class HomeUiBinder {
     // =========================================================================
 
     public void showGivingModal() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        ScrollView sv = new ScrollView(context);
-        LinearLayout container = new LinearLayout(context);
-        container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(dp(18), dp(18), dp(18), dp(18));
-        container.setBackgroundColor(COLOR_WHITE);
-
-        // Header Title
-        TextView title = new TextView(context);
-        title.setText("💚 Lipa na M-Pesa · Giving & Tithes");
-        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
-        title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
-        container.addView(title);
-
-        TextView subtitle = new TextView(context);
-        subtitle.setText("“Honor the LORD with your wealth, with the firstfruits of all your crops.” — Proverbs 3:9");
-        subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        subtitle.setTypeface(Typeface.SERIF, Typeface.ITALIC);
-        subtitle.setTextColor(COLOR_TEXT_MUTED);
-        subtitle.setPadding(0, dp(2), 0, dp(14));
-        container.addView(subtitle);
-
-        // Paybill Details Box
-        LinearLayout paybillBox = new LinearLayout(context);
-        paybillBox.setOrientation(LinearLayout.VERTICAL);
-        paybillBox.setPadding(dp(14), dp(12), dp(14), dp(12));
-        GradientDrawable pbBg = new GradientDrawable();
-        pbBg.setColor(COLOR_PURPLE_TINT);
-        pbBg.setCornerRadius(dp(12));
-        pbBg.setStroke(dp(1), COLOR_PRIMARY_PURPLE);
-        paybillBox.setBackground(pbBg);
-
-        TextView tvPaybillLabel = new TextView(context);
-        tvPaybillLabel.setText("SAFARICOM M-PESA PAYBILL");
-        tvPaybillLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvPaybillLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        tvPaybillLabel.setTextColor(COLOR_PRIMARY_PURPLE);
-        paybillBox.addView(tvPaybillLabel);
-
-        LinearLayout pbRow = new LinearLayout(context);
-        pbRow.setOrientation(LinearLayout.HORIZONTAL);
-        pbRow.setGravity(Gravity.CENTER_VERTICAL);
-        pbRow.setPadding(0, dp(4), 0, dp(4));
-
-        TextView tvPaybillNum = new TextView(context);
-        tvPaybillNum.setText("Business No: 4069983");
-        tvPaybillNum.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        tvPaybillNum.setTypeface(Typeface.DEFAULT_BOLD);
-        tvPaybillNum.setTextColor(COLOR_PURPLE_DARK);
-        LinearLayout.LayoutParams lpPbNum = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        tvPaybillNum.setLayoutParams(lpPbNum);
-        pbRow.addView(tvPaybillNum);
-
-        Button btnCopyPaybill = new Button(context);
-        btnCopyPaybill.setText("📋 Copy 4069983");
-        btnCopyPaybill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnCopyPaybill.setTextColor(COLOR_WHITE);
-        btnCopyPaybill.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 8, 2));
-        btnCopyPaybill.setPadding(dp(8), dp(4), dp(8), dp(4));
-        btnCopyPaybill.setOnClickListener(v -> {
-            ClipboardManager cb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            if (cb != null) {
-                cb.setPrimaryClip(ClipData.newPlainText("Paybill", "4069983"));
-                Toast.makeText(context, "✓ Paybill 4069983 copied to clipboard!", Toast.LENGTH_SHORT).show();
-            }
-        });
-        pbRow.addView(btnCopyPaybill);
-        paybillBox.addView(pbRow);
-
-        final TextView tvAccount = new TextView(context);
-        tvAccount.setText("Account: PERAZIM-TITHE");
-        tvAccount.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvAccount.setTypeface(Typeface.DEFAULT_BOLD);
-        tvAccount.setTextColor(COLOR_ACCENT_ORANGE);
-        tvAccount.setPadding(0, dp(4), 0, 0);
-        paybillBox.addView(tvAccount);
-        container.addView(paybillBox);
-
-        // Fund Selector Spinner
-        TextView tvFundLabel = new TextView(context);
-        tvFundLabel.setText("SELECT GIVING FUND:");
-        tvFundLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvFundLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        tvFundLabel.setTextColor(COLOR_PRIMARY_PURPLE);
-        tvFundLabel.setPadding(0, dp(14), 0, dp(4));
-        container.addView(tvFundLabel);
-
-        Spinner fundSpinner = new Spinner(context);
-        List<String> funds = new ArrayList<>();
-        funds.add("Tithe (PERAZIM-TITHE)");
-        funds.add("Offering (PERAZIM-OFFERING)");
-        funds.add("Missions & Outreach (PERAZIM-MISSIONS)");
-        funds.add("Mercy Fund / Food Drive (PERAZIM-MERCY)");
-
-        ArrayAdapter<String> fundAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, funds);
-        fundAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        fundSpinner.setAdapter(fundAdapter);
-        fundSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0: tvAccount.setText("Account: PERAZIM-TITHE"); break;
-                    case 1: tvAccount.setText("Account: PERAZIM-OFFERING"); break;
-                    case 2: tvAccount.setText("Account: PERAZIM-MISSIONS"); break;
-                    case 3: tvAccount.setText("Account: PERAZIM-MERCY"); break;
-                }
-            }
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
-        });
-        container.addView(fundSpinner);
-
-        // Amount Selection & Preset Chips
-        TextView tvAmountLabel = new TextView(context);
-        tvAmountLabel.setText("AMOUNT (KES):");
-        tvAmountLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvAmountLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        tvAmountLabel.setTextColor(COLOR_PRIMARY_PURPLE);
-        tvAmountLabel.setPadding(0, dp(14), 0, dp(6));
-        container.addView(tvAmountLabel);
-
-        final EditText etAmount = new EditText(context);
-        etAmount.setHint("Enter amount in KES (e.g. 1000)");
-        etAmount.setInputType(InputType.TYPE_CLASS_NUMBER);
-        etAmount.setText("1000");
-
-        LinearLayout chipsRow = new LinearLayout(context);
-        chipsRow.setOrientation(LinearLayout.HORIZONTAL);
-        chipsRow.setPadding(0, 0, 0, dp(8));
-
-        String[] chipAmounts = {"200", "500", "1,000", "2,500"};
-        final String[] chipValues = {"200", "500", "1000", "2500"};
-        for (int i = 0; i < chipAmounts.length; i++) {
-            final String val = chipValues[i];
-            Button chip = new Button(context);
-            chip.setText(chipAmounts[i]);
-            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            chip.setTextColor(COLOR_PRIMARY_PURPLE);
-            chip.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-            LinearLayout.LayoutParams lpChip = new LinearLayout.LayoutParams(0, dp(34), 1.0f);
-            lpChip.setMargins(dp(2), 0, dp(2), 0);
-            chip.setLayoutParams(lpChip);
-            chip.setOnClickListener(v -> etAmount.setText(val));
-            chipsRow.addView(chip);
-        }
-        container.addView(chipsRow);
-        container.addView(etAmount);
-
-        // Confirm Give Button
-        Button btnConfirmGive = new Button(context);
-        btnConfirmGive.setText("💚 Complete M-Pesa Giving (Paybill 4069983)");
-        btnConfirmGive.setTextColor(COLOR_WHITE);
-        btnConfirmGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        btnConfirmGive.setTypeface(Typeface.DEFAULT_BOLD);
-        btnConfirmGive.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
-        LinearLayout.LayoutParams lpGive = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpGive.setMargins(0, dp(14), 0, 0);
-        btnConfirmGive.setLayoutParams(lpGive);
-
-        // Pastoral Contact Box: Bishop 0710 772 227
-        LinearLayout contactBox = new LinearLayout(context);
-        contactBox.setOrientation(LinearLayout.VERTICAL);
-        contactBox.setPadding(dp(12), dp(10), dp(12), dp(10));
-        contactBox.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        LinearLayout.LayoutParams lpContact = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpContact.setMargins(0, dp(14), 0, 0);
-        contactBox.setLayoutParams(lpContact);
-
-        TextView tvHelpHeader = new TextView(context);
-        tvHelpHeader.setText("📞 GIVING INQUIRIES & PASTORAL CARE");
-        tvHelpHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvHelpHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHelpHeader.setTextColor(COLOR_PRIMARY_PURPLE);
-        contactBox.addView(tvHelpHeader);
-
-        TextView tvBishopPhone = new TextView(context);
-        tvBishopPhone.setText("📞 Bishop Dr. David Mutweri: (+254) 0710 772 227");
-        tvBishopPhone.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvBishopPhone.setTypeface(Typeface.DEFAULT_BOLD);
-        tvBishopPhone.setTextColor(COLOR_PURPLE_DARK);
-        tvBishopPhone.setPadding(0, dp(4), 0, dp(2));
-        tvBishopPhone.setOnClickListener(v -> dialPhoneNumber("+254710772227"));
-        contactBox.addView(tvBishopPhone);
-
-        TextView tvChurchEmail = new TextView(context);
-        tvChurchEmail.setText("✉️ Church: info@perazimchurch.org");
-        tvChurchEmail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvChurchEmail.setTextColor(COLOR_TEXT_MUTED);
-        tvChurchEmail.setPadding(0, dp(2), 0, 0);
-        contactBox.addView(tvChurchEmail);
-
-        container.addView(btnConfirmGive);
-        container.addView(contactBox);
-
-        sv.addView(container);
-        builder.setView(sv);
-        final AlertDialog dlg = builder.create();
-
-        btnConfirmGive.setOnClickListener(v -> {
-            String amt = etAmount.getText().toString().trim();
-            if (amt.isEmpty()) amt = "1000";
-            ChurchIntentManager.launchMpesaGiving(context, "4069983", "TITHE", amt);
-            dlg.dismiss();
-        });
-
-        dlg.show();
+        GivingDialog.show(context);
     }
 
     public void showPrayerRequestModal() {
