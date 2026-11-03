@@ -172,48 +172,53 @@ public class SheetSyncValidationTest {
     }
 
     @Test
-    public void testHymnSyncPreservesFavoriteStatus() throws IOException {
+    public void testHymnSyncPreservesTimeSignatureAndFavorite() throws IOException {
         List<HymnEntity> existingList = new ArrayList<>();
-        // Seed hymn_101 as favorite
+        // Seed hymn_101 as favorite with custom 6/8 meter and category
         HymnEntity existingFavorite = new HymnEntity(
-                "hymn_101", 101, "Old Title", "Old lyrics", "C", "C Major", "4/4",
-                "Worship", true, "Writer", "1900", 80, "Worship", true);
+                "hymn_101", 101, "Old Title", "Old lyrics", "C", "C Major", "6/8",
+                "Faith", true, "Writer", "1900", 80, "Grace", true);
         existingList.add(existingFavorite);
 
         DummyHymnDao mockDao = new DummyHymnDao(existingList);
 
-        // CSV updates hymn_101 with new title/lyrics, and adds hymn_102 (brand new)
+        // CSV updates hymn_101 without time_signature or category, adds hymn_102 (no time_sig), adds hymn_103 (explicit 3/4)
         String csv = "id,title,writer,year,key,bpm,tags,lyrics,chords,active\n" +
                 "hymn_101,\"Amazing Grace (Updated)\",\"Newton\",\"1779\",\"G\",\"72\",\"Grace\",\"Updated lyrics\",\"G\",true\n" +
-                "hymn_102,\"How Great Thou Art\",\"Boberg\",\"1885\",\"Bb\",\"68\",\"Praise\",\"O Lord my God\",\"Bb\",true";
+                "hymn_102,\"How Great Thou Art\",\"Boberg\",\"1885\",\"Bb\",\"68\",\"Praise\",\"O Lord my God\",\"Bb\",true\n" +
+                "hymn_103,\"The Old Rugged Cross\",\"Bennard\",\"1913\",\"Bb\",\"68\",\"Cross\",\"On a hill far away\",\"Bb\",true\n";
         List<List<String>> rows = CsvParser.parse(csv);
 
         SheetSyncManager.SyncStats stats = SheetSyncManager.processHymnsRows(rows, mockDao);
-        assertEquals(2, stats.synced);
+        assertEquals(3, stats.synced);
 
-        // hymn_101 should preserve isFavorite = true
+        // hymn_101 must preserve isFavorite = true, timeSignature = "6/8", and category = "Faith"
         HymnEntity updated101 = mockDao.getHymnById("hymn_101");
         assertEquals("Amazing Grace (Updated)", updated101.getTitle());
         assertTrue("Local favorite flag must be preserved after sync", updated101.isFavorite());
+        assertEquals("Existing timeSignature must be preserved", "6/8", updated101.getTimeSignature());
+        assertEquals("Existing category must be preserved", "Faith", updated101.getCategory());
 
-        // hymn_102 should default to isFavorite = false
+        // hymn_102 should default to isFavorite = false, and timeSignature = "" (NEVER forced to 4/4)
         HymnEntity new102 = mockDao.getHymnById("hymn_102");
         assertEquals("How Great Thou Art", new102.getTitle());
         assertFalse("New hymn must default to isFavorite = false", new102.isFavorite());
+        assertEquals("Time signature must not be forced to 4/4 on new rows", "", new102.getTimeSignature());
     }
 
     @Test
-    public void testSermonSyncPreservesDownloadedFlags() throws IOException {
+    public void testSermonSyncPreservesExistingDurationSummaryNotesAndDownloads() throws IOException {
         List<SermonEntity> existingList = new ArrayList<>();
-        // Seed sermon_1 as downloaded with local file path
+        // Seed sermon_1 as downloaded with local file path, custom duration, summary, notes
         SermonEntity downloadedSermon = new SermonEntity(
                 "sermon_1", "Old Title", "Bishop Mutweri", "Series", "Passage",
-                "https://example.com/audio.mp3", "", 1700000000000L, 2700,
-                "Summary", "Notes", true, "/local/path/sermon_1.mp3", true);
+                "https://example.com/audio.mp3", "", 1700000000000L, 3450,
+                "Deep breakthrough summary", "My personal study notes", true, "/local/path/sermon_1.mp3", true);
         existingList.add(downloadedSermon);
 
         DummySermonDao mockDao = new DummySermonDao(existingList);
 
+        // CSV updates sermon_1 (omitting duration, summary, notes), adds sermon_2 (new row without duration/summary/notes)
         String csv = "id,title,speaker,date,series,scripture,youtube_url,audio_url,active\n" +
                 "sermon_1,\"Breakthrough Authority (Updated)\",\"Bishop Dr. David Mutweri\",\"2026-11-01\",\"Power\",\"2 Sam 5:20\",\"\",\"https://example.com/new_audio.mp3\",true\n" +
                 "sermon_2,\"Walking in Faith\",\"Bishop Dr. David Mutweri\",\"2026-11-08\",\"Faith\",\"Heb 11:1\",\"\",\"https://example.com/s2.mp3\",true";
@@ -222,16 +227,152 @@ public class SheetSyncValidationTest {
         SheetSyncManager.SyncStats stats = SheetSyncManager.processSermonsRows(rows, mockDao);
         assertEquals(2, stats.synced);
 
-        // sermon_1 must preserve isDownloaded = true and localAudioPath
+        // sermon_1 must preserve isDownloaded, localAudioPath, durationSeconds, summary, notes
         SermonEntity updated1 = mockDao.getSermonById("sermon_1");
         assertEquals("Breakthrough Authority (Updated)", updated1.getTitle());
         assertTrue("Local isDownloaded flag must be preserved after sync", updated1.isDownloaded());
         assertEquals("/local/path/sermon_1.mp3", updated1.getLocalAudioPath());
+        assertEquals("Existing durationSeconds must be preserved, not overwritten with 2700", 3450, updated1.getDurationSeconds());
+        assertEquals("Existing summary must be preserved, not overwritten with hardcoded text", "Deep breakthrough summary", updated1.getSummary());
+        assertEquals("Existing notes must be preserved", "My personal study notes", updated1.getNotes());
 
-        // sermon_2 should default to isDownloaded = false and empty localAudioPath
+        // sermon_2 should default to isDownloaded = false, empty localAudioPath, 0 duration, empty summary, empty notes
         SermonEntity new2 = mockDao.getSermonById("sermon_2");
         assertFalse("New sermon must default to isDownloaded = false", new2.isDownloaded());
         assertEquals("", new2.getLocalAudioPath());
+        assertEquals("New sermon duration must default to 0 when unspecified", 0, new2.getDurationSeconds());
+        assertEquals("New sermon summary must default to empty when unspecified", "", new2.getSummary());
+        assertEquals("New sermon notes must default to empty when unspecified", "", new2.getNotes());
+    }
+
+    @Test
+    public void testAnnouncementSyncPreservesMetadata() throws IOException {
+        List<AnnouncementEntity> existingList = new ArrayList<>();
+        AnnouncementEntity existingAnn = new AnnouncementEntity(
+                "ann_1", "Old Title", "Old Body", "URGENT", 1700000000000L, 1705000000000L, "Nairobi", true);
+        existingList.add(existingAnn);
+
+        DummyAnnouncementDao mockDao = new DummyAnnouncementDao(existingList);
+
+        // CSV updates title and body for ann_1 without priority, expires, or campus. Adds ann_2.
+        String csv = "id,title,body,active\n" +
+                "ann_1,\"Sunday Celebration\",\"Service starts at 9:00 AM\",true\n" +
+                "ann_2,\"Youth Fellowship\",\"Join us on Friday\",true";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processAnnouncementsRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        AnnouncementEntity updated1 = mockDao.getAnnouncementById("ann_1");
+        assertEquals("Sunday Celebration", updated1.getTitle());
+        assertEquals("URGENT", updated1.getPriority());
+        assertEquals(1700000000000L, updated1.getPublishedMillis());
+        assertEquals(1705000000000L, updated1.getExpiresMillis());
+        assertEquals("Nairobi", updated1.getCampusId());
+
+        AnnouncementEntity new2 = mockDao.getAnnouncementById("ann_2");
+        assertEquals("NORMAL", new2.getPriority());
+        assertEquals("all", new2.getCampusId());
+    }
+
+    @Test
+    public void testEventSyncPreservesImageUrlAndCategory() throws IOException {
+        List<EventEntity> existingList = new ArrayList<>();
+        EventEntity existingEvt = new EventEntity(
+                "evt_1", "Old Title", "Night of Breakthrough Vigil", 1700000000000L, 1700007200000L,
+                "Prayer Hall", "Embu Headquarters", "custom_vigil_banner.jpg", "Vigil", true);
+        existingList.add(existingEvt);
+
+        DummyEventDao mockDao = new DummyEventDao(existingList);
+
+        // CSV updates evt_1 without venue, campus, description, image_url, or category. Adds evt_2.
+        String csv = "id,title,active\n" +
+                "evt_1,\"Breakthrough Night 2026\",true\n" +
+                "evt_2,\"Sunday First Service\",true";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processEventsRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        EventEntity updated1 = mockDao.getEventById("evt_1");
+        assertEquals("Breakthrough Night 2026", updated1.getTitle());
+        assertEquals("Night of Breakthrough Vigil", updated1.getDescription());
+        assertEquals("Prayer Hall", updated1.getLocation());
+        assertEquals("Embu Headquarters", updated1.getCampusId());
+        assertEquals("custom_vigil_banner.jpg", updated1.getImageUrl());
+        assertEquals("Vigil", updated1.getCategory());
+        assertEquals(1700000000000L, updated1.getStartTimeMillis());
+        assertEquals(1700007200000L, updated1.getEndTimeMillis());
+
+        EventEntity new2 = mockDao.getEventById("evt_2");
+        assertEquals("Sanctuary", new2.getLocation());
+        assertEquals("all", new2.getCampusId());
+        assertEquals("sanctuary.jpg", new2.getImageUrl());
+        assertEquals("Worship", new2.getCategory());
+    }
+
+    @Test
+    public void testRiddleSyncPreservesExplanationAndScriptureRef() throws IOException {
+        List<RiddleEntity> existingList = new ArrayList<>();
+        RiddleEntity existingRiddle = new RiddleEntity(
+                "rid_1", "Old Q", "Old A", "David used 5 smooth stones", "1 Samuel 17:40",
+                "HARD", "Giants", 50, true);
+        existingList.add(existingRiddle);
+
+        DummyRiddleDao mockDao = new DummyRiddleDao(existingList);
+
+        // CSV updates question and answer without explanation, scripture_ref, difficulty, or xp. Adds rid_2.
+        String csv = "id,question,answer,active\n" +
+                "rid_1,\"Who defeated the Philistine giant?\",\"David\",true\n" +
+                "rid_2,\"Who built the ark?\",\"Noah\",true";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processRiddlesRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        RiddleEntity updated1 = mockDao.getRiddleById("rid_1");
+        assertEquals("David defeated the Philistine giant?", "Who defeated the Philistine giant?", updated1.getQuestion());
+        assertEquals("David", updated1.getAnswer());
+        assertEquals("David used 5 smooth stones", updated1.getExplanation());
+        assertEquals("1 Samuel 17:40", updated1.getScriptureRef());
+        assertEquals("HARD", updated1.getDifficulty());
+        assertEquals("Giants", updated1.getCategory());
+        assertEquals(50, updated1.getXp());
+
+        RiddleEntity new2 = mockDao.getRiddleById("rid_2");
+        assertEquals("Noah", new2.getAnswer());
+        assertEquals("", new2.getExplanation());
+        assertEquals("", new2.getScriptureRef());
+        assertEquals("MEDIUM", new2.getDifficulty());
+        assertEquals(20, new2.getXp());
+    }
+
+    @Test
+    public void testJokeSyncPreservesCleanRatingAndCategory() throws IOException {
+        List<JokeEntity> existingList = new ArrayList<>();
+        JokeEntity existingJoke = new JokeEntity(
+                "joke_1", "Old text", "KIDS_SAFE", "SundaySchool", true);
+        existingList.add(existingJoke);
+
+        DummyJokeDao mockDao = new DummyJokeDao(existingList);
+
+        // CSV updates joke text without clean_rating or category. Adds joke_2.
+        String csv = "id,text,active\n" +
+                "joke_1,\"Why did Noah have to fish with two lines? Because he had to feed two cats!\",true\n" +
+                "joke_2,\"Who was the greatest financier in the Bible? Noah, he was floating his stock while everyone else was in liquidation!\",true";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processJokesRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        JokeEntity updated1 = mockDao.getJokeById("joke_1");
+        assertTrue(updated1.getText().contains("feed two cats"));
+        assertEquals("KIDS_SAFE", updated1.getCleanRating());
+        assertEquals("SundaySchool", updated1.getCategory());
+
+        JokeEntity new2 = mockDao.getJokeById("joke_2");
+        assertEquals("FAMILY_SAFE", new2.getCleanRating());
+        assertEquals("Fellowship", new2.getCategory());
     }
 
     // -------------------------------------------------------------------------
@@ -241,14 +382,122 @@ public class SheetSyncValidationTest {
     private static class DummyAnnouncementDao implements AnnouncementDao {
         private final List<AnnouncementEntity> list;
         DummyAnnouncementDao(List<AnnouncementEntity> list) { this.list = list; }
-        @Override public void insert(AnnouncementEntity announcement) { list.add(announcement); }
-        @Override public void insertAll(List<AnnouncementEntity> announcements) { list.addAll(announcements); }
+        @Override public void insert(AnnouncementEntity announcement) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getId().equals(announcement.getId())) {
+                    list.set(i, announcement);
+                    return;
+                }
+            }
+            list.add(announcement);
+        }
+        @Override public void insertAll(List<AnnouncementEntity> announcements) {
+            for (AnnouncementEntity a : announcements) insert(a);
+        }
         @Override public void update(AnnouncementEntity announcement) {}
         @Override public void delete(AnnouncementEntity announcement) {}
-        @Override public AnnouncementEntity getAnnouncementById(String id) { return null; }
+        @Override public AnnouncementEntity getAnnouncementById(String id) {
+            for (AnnouncementEntity a : list) {
+                if (a.getId().equals(id)) return a;
+            }
+            return null;
+        }
         @Override public List<AnnouncementEntity> getActiveAnnouncements(long currentTimeMillis) { return list; }
         @Override public List<AnnouncementEntity> getAllAnnouncements() { return list; }
         @Override public List<AnnouncementEntity> getActiveAnnouncements() { return list; }
+        @Override public void deleteById(String id) {}
+        @Override public void deleteAll() {}
+    }
+
+    private static class DummyEventDao implements EventDao {
+        private final List<EventEntity> list;
+        DummyEventDao(List<EventEntity> list) { this.list = list; }
+        @Override public void insert(EventEntity event) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getId().equals(event.getId())) {
+                    list.set(i, event);
+                    return;
+                }
+            }
+            list.add(event);
+        }
+        @Override public void insertAll(List<EventEntity> events) {
+            for (EventEntity e : events) insert(e);
+        }
+        @Override public void update(EventEntity event) {}
+        @Override public void delete(EventEntity event) {}
+        @Override public EventEntity getEventById(String id) {
+            for (EventEntity e : list) {
+                if (e.getId().equals(id)) return e;
+            }
+            return null;
+        }
+        @Override public List<EventEntity> getAllEvents() { return list; }
+        @Override public List<EventEntity> getActiveEvents() { return list; }
+        @Override public List<EventEntity> getUpcomingEvents(long currentTimeMillis) { return list; }
+        @Override public List<EventEntity> getEventsByCampus(String campusId) { return list; }
+        @Override public void deleteById(String id) {}
+        @Override public void deleteAll() {}
+    }
+
+    private static class DummyRiddleDao implements RiddleDao {
+        private final List<RiddleEntity> list;
+        DummyRiddleDao(List<RiddleEntity> list) { this.list = list; }
+        @Override public void insert(RiddleEntity riddle) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getId().equals(riddle.getId())) {
+                    list.set(i, riddle);
+                    return;
+                }
+            }
+            list.add(riddle);
+        }
+        @Override public void insertAll(List<RiddleEntity> riddles) {
+            for (RiddleEntity r : riddles) insert(r);
+        }
+        @Override public void update(RiddleEntity riddle) {}
+        @Override public void delete(RiddleEntity riddle) {}
+        @Override public RiddleEntity getRiddleById(String id) {
+            for (RiddleEntity r : list) {
+                if (r.getId().equals(id)) return r;
+            }
+            return null;
+        }
+        @Override public List<RiddleEntity> getAllRiddles() { return list; }
+        @Override public List<RiddleEntity> getActiveRiddles() { return list; }
+        @Override public List<RiddleEntity> getRiddlesByDifficulty(String difficulty) { return list; }
+        @Override public RiddleEntity getRandomRiddle() { return list.isEmpty() ? null : list.get(0); }
+        @Override public void deleteById(String id) {}
+        @Override public void deleteAll() {}
+    }
+
+    private static class DummyJokeDao implements JokeDao {
+        private final List<JokeEntity> list;
+        DummyJokeDao(List<JokeEntity> list) { this.list = list; }
+        @Override public void insert(JokeEntity joke) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getId().equals(joke.getId())) {
+                    list.set(i, joke);
+                    return;
+                }
+            }
+            list.add(joke);
+        }
+        @Override public void insertAll(List<JokeEntity> jokes) {
+            for (JokeEntity j : jokes) insert(j);
+        }
+        @Override public void update(JokeEntity joke) {}
+        @Override public void delete(JokeEntity joke) {}
+        @Override public JokeEntity getJokeById(String id) {
+            for (JokeEntity j : list) {
+                if (j.getId().equals(id)) return j;
+            }
+            return null;
+        }
+        @Override public List<JokeEntity> getAllJokes() { return list; }
+        @Override public List<JokeEntity> getActiveJokes() { return list; }
+        @Override public List<JokeEntity> getJokesByCategory(String category) { return list; }
+        @Override public JokeEntity getRandomJoke() { return list.isEmpty() ? null : list.get(0); }
         @Override public void deleteById(String id) {}
         @Override public void deleteAll() {}
     }

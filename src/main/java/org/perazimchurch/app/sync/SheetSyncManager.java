@@ -268,13 +268,21 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            long dateMillis = parseDate(getCell(r, col, "date"), System.currentTimeMillis());
-            String priority = getCellOrDefault(r, col, "priority", "NORMAL");
-            String campus = getCellOrDefault(r, col, "campus", "all");
+            AnnouncementEntity existing = dao.getAnnouncementById(id);
+            long dateMillis = parseDate(getCell(r, col, "date"),
+                    (existing != null) ? existing.getPublishedMillis() : System.currentTimeMillis());
+            long expiresMillis = (existing != null) ? existing.getExpiresMillis() : (dateMillis + (30L * 86400000L));
+            if (col.containsKey("expires") && !getCell(r, col, "expires").isEmpty()) {
+                expiresMillis = parseDate(getCell(r, col, "expires"), expiresMillis);
+            }
+            String priority = getCellOrDefault(r, col, "priority",
+                    (existing != null && existing.getPriority() != null) ? existing.getPriority() : "NORMAL");
+            String campus = getCellOrDefault(r, col, "campus",
+                    (existing != null && existing.getCampusId() != null) ? existing.getCampusId() : "all");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
             AnnouncementEntity entity = new AnnouncementEntity(
-                    id, title, body, priority, dateMillis, dateMillis + (30L * 86400000L), campus, active);
+                    id, title, body, priority, dateMillis, expiresMillis, campus, active);
             dao.insert(entity);
             synced++;
         }
@@ -305,15 +313,25 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            long start = parseDate(getCell(r, col, "start"), System.currentTimeMillis());
-            long end = parseDate(getCell(r, col, "end"), start + (2L * 3600000L));
-            String venue = getCellOrDefault(r, col, "venue", "Sanctuary");
-            String campus = getCellOrDefault(r, col, "campus", "all");
-            String desc = getCellOrDefault(r, col, "description", "");
+            EventEntity existing = dao.getEventById(id);
+            long start = parseDate(getCell(r, col, "start"),
+                    (existing != null) ? existing.getStartTimeMillis() : System.currentTimeMillis());
+            long end = parseDate(getCell(r, col, "end"),
+                    (existing != null) ? existing.getEndTimeMillis() : (start + (2L * 3600000L)));
+            String venue = getCellOrDefault(r, col, "venue",
+                    (existing != null && existing.getLocation() != null) ? existing.getLocation() : "Sanctuary");
+            String campus = getCellOrDefault(r, col, "campus",
+                    (existing != null && existing.getCampusId() != null) ? existing.getCampusId() : "all");
+            String desc = getCellOrDefault(r, col, "description",
+                    (existing != null && existing.getDescription() != null) ? existing.getDescription() : "");
+            String imageUrl = getCellOrDefault(r, col, "image_url",
+                    (existing != null && existing.getImageUrl() != null) ? existing.getImageUrl() : "sanctuary.jpg");
+            String category = getCellOrDefault(r, col, "category",
+                    (existing != null && existing.getCategory() != null) ? existing.getCategory() : "Worship");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
             EventEntity entity = new EventEntity(
-                    id, title, desc, start, end, venue, campus, "sanctuary.jpg", "Worship", active);
+                    id, title, desc, start, end, venue, campus, imageUrl, category, active);
             dao.insert(entity);
             synced++;
         }
@@ -357,9 +375,17 @@ public final class SheetSyncManager {
 
             HymnEntity existing = dao.getHymnById(id);
             boolean isFavorite = (existing != null) && existing.isFavorite();
+            String timeSignature = (existing != null && existing.getTimeSignature() != null)
+                    ? existing.getTimeSignature()
+                    : "";
+            if (col.containsKey("time_signature") && !getCell(r, col, "time_signature").isEmpty()) {
+                timeSignature = getCell(r, col, "time_signature");
+            }
+            String category = getCellOrDefault(r, col, "category",
+                    (existing != null && existing.getCategory() != null) ? existing.getCategory() : tags);
 
             HymnEntity entity = new HymnEntity(
-                    id, num, title, lyrics, chords, key, "4/4", tags, isFavorite, writer, year, bpm, tags, active);
+                    id, num, title, lyrics, chords, key, timeSignature, category, isFavorite, writer, year, bpm, tags, active);
             dao.insert(entity);
             synced++;
         }
@@ -391,12 +417,25 @@ public final class SheetSyncManager {
                 continue;
             }
 
-            String category = getCellOrDefault(r, col, "category", "MEDIUM");
-            int xp = parseInt(getCellOrDefault(r, col, "xp", "20"), 20);
+            RiddleEntity existing = dao.getRiddleById(id);
+            String category = getCellOrDefault(r, col, "category",
+                    (existing != null && existing.getCategory() != null) ? existing.getCategory() : "MEDIUM");
+            String difficulty = getCellOrDefault(r, col, "difficulty",
+                    (existing != null && existing.getDifficulty() != null) ? existing.getDifficulty() : category);
+            int xp = parseInt(getCellOrDefault(r, col, "xp",
+                    (existing != null) ? String.valueOf(existing.getXp()) : "20"), 20);
+            String explanation = (existing != null && existing.getExplanation() != null) ? existing.getExplanation() : "";
+            if (col.containsKey("explanation") && !getCell(r, col, "explanation").isEmpty()) {
+                explanation = getCell(r, col, "explanation");
+            }
+            String scriptureRef = (existing != null && existing.getScriptureRef() != null) ? existing.getScriptureRef() : "";
+            if (col.containsKey("scripture_ref") && !getCell(r, col, "scripture_ref").isEmpty()) {
+                scriptureRef = getCell(r, col, "scripture_ref");
+            }
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
             RiddleEntity entity = new RiddleEntity(
-                    id, question, answer, "", "", category, category, xp, active);
+                    id, question, answer, explanation, scriptureRef, difficulty, category, xp, active);
             dao.insert(entity);
             synced++;
         }
@@ -427,8 +466,14 @@ public final class SheetSyncManager {
                 continue;
             }
 
+            JokeEntity existing = dao.getJokeById(id);
+            String cleanRating = getCellOrDefault(r, col, "clean_rating",
+                    (existing != null && existing.getCleanRating() != null) ? existing.getCleanRating() : "FAMILY_SAFE");
+            String category = getCellOrDefault(r, col, "category",
+                    (existing != null && existing.getCategory() != null) ? existing.getCategory() : "Fellowship");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
-            JokeEntity entity = new JokeEntity(id, text, "FAMILY_SAFE", "Fellowship", active);
+
+            JokeEntity entity = new JokeEntity(id, text, cleanRating, category, active);
             dao.insert(entity);
             synced++;
         }
@@ -472,10 +517,22 @@ public final class SheetSyncManager {
             String localAudioPath = (existing != null && existing.getLocalAudioPath() != null)
                     ? existing.getLocalAudioPath()
                     : "";
+            int durationSeconds = (existing != null) ? existing.getDurationSeconds() : 0;
+            if (col.containsKey("duration") && !getCell(r, col, "duration").isEmpty()) {
+                durationSeconds = parseInt(getCell(r, col, "duration"), durationSeconds);
+            }
+            String summary = (existing != null && existing.getSummary() != null) ? existing.getSummary() : "";
+            if (col.containsKey("summary") && !getCell(r, col, "summary").isEmpty()) {
+                summary = getCell(r, col, "summary");
+            }
+            String notes = (existing != null && existing.getNotes() != null) ? existing.getNotes() : "";
+            if (col.containsKey("notes") && !getCell(r, col, "notes").isEmpty()) {
+                notes = getCell(r, col, "notes");
+            }
 
             SermonEntity entity = new SermonEntity(
                     id, title, speaker, series, scripture, audioUrl, ytUrl, dateMillis,
-                    2700, "Sermon message", "", isDownloaded, localAudioPath, active);
+                    durationSeconds, summary, notes, isDownloaded, localAudioPath, active);
             dao.insert(entity);
             synced++;
         }
