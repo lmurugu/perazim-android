@@ -62,9 +62,10 @@
   1. No signature collision or package manager error.
   2. Room Database schema migration 4 -> 5 executed seamlessly on app startup without crash.
   3. Pre-upgrade seeded test data survived intact:
-     - Member Spiritual XP: `⭐ 10 XP` (Level 1 Disciple).
+     - Member Spiritual XP: `⭐ 10 XP` (Level 1 Disciple) proven intact.
      - Favorited worship hymn: *How Great Thou Art* retained active heart icon (`❤️`).
-     - Fellowship prayer petitions and member identity: Intact.
+     - Member identity: `Guest Pilgrim`, `Embu Headquarters` proven intact.
+     - Fellowship prayer petitions on wall: Not proven (the captured review dump `migration-02-after.txt` displays the Profile screen; prayer petition persistence on the Fellowship wall was not dumped and is marked not proven).
 - **Hardware Proof Files**:
   - Pre-upgrade state: [`migration-01-before.png`](docs/review/migration-01-before.png) and [`migration-01-before.txt`](docs/review/migration-01-before.txt)
   - Post-upgrade state: [`migration-02-after.png`](docs/review/migration-02-after.png) and [`migration-02-after.txt`](docs/review/migration-02-after.txt)
