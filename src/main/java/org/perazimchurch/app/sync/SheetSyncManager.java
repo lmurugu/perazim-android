@@ -355,8 +355,11 @@ public final class SheetSyncManager {
 
             int num = parseInt(id.replaceAll("\\D+", ""), i);
 
+            HymnEntity existing = dao.getHymnById(id);
+            boolean isFavorite = (existing != null) && existing.isFavorite();
+
             HymnEntity entity = new HymnEntity(
-                    id, num, title, lyrics, chords, key, "4/4", tags, false, writer, year, bpm, tags, active);
+                    id, num, title, lyrics, chords, key, "4/4", tags, isFavorite, writer, year, bpm, tags, active);
             dao.insert(entity);
             synced++;
         }
@@ -464,9 +467,15 @@ public final class SheetSyncManager {
             String audioUrl = getCellOrDefault(r, col, "audio_url", "");
             boolean active = parseBool(getCellOrDefault(r, col, "active", "true"));
 
+            SermonEntity existing = dao.getSermonById(id);
+            boolean isDownloaded = (existing != null) && existing.isDownloaded();
+            String localAudioPath = (existing != null && existing.getLocalAudioPath() != null)
+                    ? existing.getLocalAudioPath()
+                    : "";
+
             SermonEntity entity = new SermonEntity(
                     id, title, speaker, series, scripture, audioUrl, ytUrl, dateMillis,
-                    2700, "Sermon message", "", false, "", active);
+                    2700, "Sermon message", "", isDownloaded, localAudioPath, active);
             dao.insert(entity);
             synced++;
         }

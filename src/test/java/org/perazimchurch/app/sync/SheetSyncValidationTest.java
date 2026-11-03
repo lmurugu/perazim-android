@@ -171,6 +171,69 @@ public class SheetSyncValidationTest {
         assertEquals("giving_paybill", inserted.get(1).getKey());
     }
 
+    @Test
+    public void testHymnSyncPreservesFavoriteStatus() throws IOException {
+        List<HymnEntity> existingList = new ArrayList<>();
+        // Seed hymn_101 as favorite
+        HymnEntity existingFavorite = new HymnEntity(
+                "hymn_101", 101, "Old Title", "Old lyrics", "C", "C Major", "4/4",
+                "Worship", true, "Writer", "1900", 80, "Worship", true);
+        existingList.add(existingFavorite);
+
+        DummyHymnDao mockDao = new DummyHymnDao(existingList);
+
+        // CSV updates hymn_101 with new title/lyrics, and adds hymn_102 (brand new)
+        String csv = "id,title,writer,year,key,bpm,tags,lyrics,chords,active\n" +
+                "hymn_101,\"Amazing Grace (Updated)\",\"Newton\",\"1779\",\"G\",\"72\",\"Grace\",\"Updated lyrics\",\"G\",true\n" +
+                "hymn_102,\"How Great Thou Art\",\"Boberg\",\"1885\",\"Bb\",\"68\",\"Praise\",\"O Lord my God\",\"Bb\",true";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processHymnsRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        // hymn_101 should preserve isFavorite = true
+        HymnEntity updated101 = mockDao.getHymnById("hymn_101");
+        assertEquals("Amazing Grace (Updated)", updated101.getTitle());
+        assertTrue("Local favorite flag must be preserved after sync", updated101.isFavorite());
+
+        // hymn_102 should default to isFavorite = false
+        HymnEntity new102 = mockDao.getHymnById("hymn_102");
+        assertEquals("How Great Thou Art", new102.getTitle());
+        assertFalse("New hymn must default to isFavorite = false", new102.isFavorite());
+    }
+
+    @Test
+    public void testSermonSyncPreservesDownloadedFlags() throws IOException {
+        List<SermonEntity> existingList = new ArrayList<>();
+        // Seed sermon_1 as downloaded with local file path
+        SermonEntity downloadedSermon = new SermonEntity(
+                "sermon_1", "Old Title", "Bishop Mutweri", "Series", "Passage",
+                "https://example.com/audio.mp3", "", 1700000000000L, 2700,
+                "Summary", "Notes", true, "/local/path/sermon_1.mp3", true);
+        existingList.add(downloadedSermon);
+
+        DummySermonDao mockDao = new DummySermonDao(existingList);
+
+        String csv = "id,title,speaker,date,series,scripture,youtube_url,audio_url,active\n" +
+                "sermon_1,\"Breakthrough Authority (Updated)\",\"Bishop Dr. David Mutweri\",\"2026-11-01\",\"Power\",\"2 Sam 5:20\",\"\",\"https://example.com/new_audio.mp3\",true\n" +
+                "sermon_2,\"Walking in Faith\",\"Bishop Dr. David Mutweri\",\"2026-11-08\",\"Faith\",\"Heb 11:1\",\"\",\"https://example.com/s2.mp3\",true";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processSermonsRows(rows, mockDao);
+        assertEquals(2, stats.synced);
+
+        // sermon_1 must preserve isDownloaded = true and localAudioPath
+        SermonEntity updated1 = mockDao.getSermonById("sermon_1");
+        assertEquals("Breakthrough Authority (Updated)", updated1.getTitle());
+        assertTrue("Local isDownloaded flag must be preserved after sync", updated1.isDownloaded());
+        assertEquals("/local/path/sermon_1.mp3", updated1.getLocalAudioPath());
+
+        // sermon_2 should default to isDownloaded = false and empty localAudioPath
+        SermonEntity new2 = mockDao.getSermonById("sermon_2");
+        assertFalse("New sermon must default to isDownloaded = false", new2.isDownloaded());
+        assertEquals("", new2.getLocalAudioPath());
+    }
+
     // -------------------------------------------------------------------------
     // Test Dummy DAOs (recording in-memory without database overhead)
     // -------------------------------------------------------------------------
@@ -193,17 +256,63 @@ public class SheetSyncValidationTest {
     private static class DummyHymnDao implements HymnDao {
         private final List<HymnEntity> list;
         DummyHymnDao(List<HymnEntity> list) { this.list = list; }
-        @Override public void insert(HymnEntity hymn) { list.add(hymn); }
-        @Override public void insertAll(List<HymnEntity> hymns) { list.addAll(hymns); }
+        @Override public void insert(HymnEntity hymn) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getId().equals(hymn.getId())) {
+                    list.set(i, hymn);
+                    return;
+                }
+            }
+            list.add(hymn);
+        }
+        @Override public void insertAll(List<HymnEntity> hymns) {
+            for (HymnEntity h : hymns) insert(h);
+        }
         @Override public void update(HymnEntity hymn) {}
         @Override public void delete(HymnEntity hymn) {}
-        @Override public HymnEntity getHymnById(String id) { return null; }
+        @Override public HymnEntity getHymnById(String id) {
+            for (HymnEntity h : list) {
+                if (h.getId().equals(id)) return h;
+            }
+            return null;
+        }
         @Override public HymnEntity getHymnByNumber(int number) { return null; }
         @Override public List<HymnEntity> getAllHymns() { return list; }
         @Override public List<HymnEntity> getActiveHymns() { return list; }
         @Override public List<HymnEntity> getFavoriteHymns() { return list; }
         @Override public List<HymnEntity> getHymnsByCategory(String category) { return list; }
         @Override public List<HymnEntity> searchHymns(String query) { return list; }
+        @Override public void deleteById(String id) {}
+        @Override public void deleteAll() {}
+    }
+
+    private static class DummySermonDao implements SermonDao {
+        private final List<SermonEntity> list;
+        DummySermonDao(List<SermonEntity> list) { this.list = list; }
+        @Override public void insert(SermonEntity sermon) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).getId().equals(sermon.getId())) {
+                    list.set(i, sermon);
+                    return;
+                }
+            }
+            list.add(sermon);
+        }
+        @Override public void insertAll(List<SermonEntity> sermons) {
+            for (SermonEntity s : sermons) insert(s);
+        }
+        @Override public void update(SermonEntity sermon) {}
+        @Override public void delete(SermonEntity sermon) {}
+        @Override public SermonEntity getSermonById(String id) {
+            for (SermonEntity s : list) {
+                if (s.getId().equals(id)) return s;
+            }
+            return null;
+        }
+        @Override public List<SermonEntity> getAllSermons() { return list; }
+        @Override public List<SermonEntity> getActiveSermons() { return list; }
+        @Override public List<SermonEntity> getDownloadedSermons() { return list; }
+        @Override public List<SermonEntity> getSermonsBySeries(String series) { return list; }
         @Override public void deleteById(String id) {}
         @Override public void deleteAll() {}
     }
