@@ -78,3 +78,28 @@ Share `docs/CONTENT_GUIDE.md` with the church secretary. The secretary only need
 - Add or edit rows.
 - Set `active` to `FALSE` to hide an announcement, sermon, riddle, or event without deleting history.
 - The mobile app will automatically pick up changes within 6 hours, or immediately whenever a member taps "Refresh Content" in their profile.
+
+---
+
+## 6. Stage 2: Generative AI Assistant Relay Management
+
+Levi does not need to edit code to manage the AI Guide. All settings are controlled via web dashboards.
+
+### A. Cloudflare Workers Dashboard
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) and log in with `perazim.hq@gmail.com`.
+2. Under **Compute (Workers & Pages)**, select **`perazim-ai-relay`**.
+3. **Emergency Kill-Switch**:
+   - Go to **Settings > Variables and Secrets**.
+   - Set `AI_ENABLED` to `false` to pause AI generation church-wide (app automatically falls back to the offline guide).
+   - Set back to `true` to re-enable.
+4. **Updating Secrets**:
+   - If rotating the Gemini key or shared app token, update `GEMINI_API_KEY` or `APP_TOKEN` in the Secrets section.
+5. **Usage & Quota Monitoring**:
+   - Go to **Metrics** to monitor requests per day (free tier includes 100,000 requests/day).
+   - Under **Storage & Databases > KV**, select **`PERAZIM_KV`** to view active daily device rate limits.
+
+### B. Google AI Studio (Gemini API)
+1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey).
+2. Under API Keys, you can view the active key linked to `perazim-mission-church`.
+3. Model used: **`gemini-3.5-flash-lite`** (Free tier: 15 requests/min, 1,500 requests/day, $0 cost).
+

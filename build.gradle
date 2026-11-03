@@ -12,6 +12,12 @@ if (sheetPropertiesFile.exists()) {
     sheetProperties.load(new FileInputStream(sheetPropertiesFile))
 }
 
+def localPropertiesFile = file("local.properties")
+def localProperties = new Properties()
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+
 android {
     namespace 'org.perazimchurch.app'
     compileSdk 34
@@ -34,6 +40,9 @@ android {
         buildConfigField "String", "SHEET_URL_SERMONS", "\"${sheetProperties.getProperty('sheet_url_sermons', '')}\""
         buildConfigField "String", "SHEET_URL_VERSES", "\"${sheetProperties.getProperty('sheet_url_verses', '')}\""
         buildConfigField "String", "SHEET_URL_CONFIG", "\"${sheetProperties.getProperty('sheet_url_config', '')}\""
+
+        buildConfigField "String", "AI_RELAY_URL", "\"${localProperties.getProperty('ai_relay_url', 'https://perazim-ai-relay.perazim-mission.workers.dev/chat')}\""
+        buildConfigField "String", "AI_APP_TOKEN", "\"${localProperties.getProperty('ai_app_token', '')}\""
     }
     signingConfigs {
         release {

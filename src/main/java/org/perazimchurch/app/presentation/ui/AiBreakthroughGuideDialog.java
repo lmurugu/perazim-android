@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -28,13 +29,15 @@ import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.ai.AiResponse;
 import org.perazimchurch.app.ai.PerazimAiEngine;
+import org.perazimchurch.app.ai.remote.AiPreferences;
+import org.perazimchurch.app.ai.remote.AiRelayClient;
 
 import java.util.List;
 
 /**
  * Interactive Chatbot Interface for the Perazim Breakthrough Guide.
- * Provides instant on-device natural language navigation, gamification status checks,
- * quick suggestion chips, and direct action triggers.
+ * Provides on-device navigation, Google Gemini cloud AI breakthrough answers via Cloudflare Worker relay,
+ * daily client/server rate limiting (3 questions/day), plain-words consent, and instant offline fail-soft.
  */
 public class AiBreakthroughGuideDialog extends Dialog {
 
@@ -69,6 +72,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private LinearLayout chipsContainer;
     private EditText etInput;
     private Button btnSend;
+    private TextView tvSub;
 
     public AiBreakthroughGuideDialog(@NonNull Activity activity, @NonNull AiActionListener actionListener) {
         super(activity);
@@ -92,7 +96,14 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
 
         // Display initial greeting
-        displayAiMessage(aiEngine.getWelcomeResponse());
+        boolean consented = AiPreferences.hasConsented(activity);
+        displayAiMessage(aiEngine.getWelcomeResponse(), consented ? "⚡ Breakthrough AI Ready" : "📱 Offline Guide");
+        updateSubtitle();
+
+        // Show consent dialog on first launch if not yet accepted
+        if (!consented) {
+            chatScrollView.post(this::showConsentDialog);
+        }
     }
 
     @Override
@@ -102,6 +113,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
+        updateSubtitle();
     }
 
     private View buildRootLayout() {
@@ -160,8 +172,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         tvTitle.setTextColor(COLOR_PURPLE_DARK);
         titleCol.addView(tvTitle);
 
-        TextView tvSub = new TextView(activity);
-        tvSub.setText("⚡ Tiny Edge AI • 100% Offline • Perazim Guide");
+        tvSub = new TextView(activity);
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvSub.setTextColor(COLOR_ACCENT_ORANGE);
         tvSub.setTypeface(Typeface.DEFAULT_BOLD);
@@ -215,7 +226,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         inputBar.setPadding(dp(12), dp(2), dp(6), dp(2));
 
         etInput = new EditText(activity);
-        etInput.setHint("Ask about XP, Bible, sermons, tithe...");
+        etInput.setHint("Ask about Scripture, breakthrough, sermons...");
         etInput.setHintTextColor(COLOR_TEXT_MUTED);
         etInput.setTextColor(COLOR_TEXT_DARK);
         etInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
@@ -249,18 +260,224 @@ public class AiBreakthroughGuideDialog extends Dialog {
         return root;
     }
 
+    private void updateSubtitle() {
+        if (tvSub == null) return;
+        if (!AiPreferences.hasConsented(activity)) {
+            tvSub.setText("📱 Offline Guide • Tap to enable AI");
+            tvSub.setTextColor(COLOR_TEXT_MUTED);
+            tvSub.setOnClickListener(v -> showConsentDialog());
+        } else if (!AiPreferences.isAiEnabled(activity)) {
+            tvSub.setText("📱 Offline Guide • AI Resting");
+            tvSub.setTextColor(COLOR_TEXT_MUTED);
+            tvSub.setOnClickListener(null);
+        } else {
+            int remaining = AiPreferences.getRemainingQuestions(activity);
+            if (remaining > 0) {
+                tvSub.setText("⚡ Breakthrough AI • " + remaining + " questions left today");
+                tvSub.setTextColor(COLOR_ACCENT_ORANGE);
+            } else {
+                tvSub.setText("📱 Offline Guide • Daily limit reached");
+                tvSub.setTextColor(COLOR_TEXT_MUTED);
+            }
+            tvSub.setOnClickListener(null);
+        }
+    }
+
+    public void showConsentDialog() {
+        if (activity == null || activity.isFinishing()) return;
+
+        final Dialog consentDlg = new Dialog(activity);
+        consentDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        consentDlg.setCanceledOnTouchOutside(false);
+
+        LinearLayout layout = new LinearLayout(activity);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(COLOR_WHITE);
+        bg.setCornerRadius(dp(16));
+        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        layout.setBackground(bg);
+        layout.setPadding(dp(20), dp(20), dp(20), dp(20));
+
+        TextView title = new TextView(activity);
+        title.setText("🤖 Google Gemini AI Guide");
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setTextColor(COLOR_PURPLE_DARK);
+        layout.addView(title);
+
+        TextView body = new TextView(activity);
+        body.setText("Answers are generated by Google's AI. On the free service your questions may be used by Google to improve its models. Don't type private or personal details.\n\nEach member receives 3 daily breakthrough questions grounded in Church Scriptures.");
+        body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        body.setTextColor(COLOR_TEXT_DARK);
+        body.setPadding(0, dp(12), 0, dp(10));
+        body.setLineSpacing(dp(2), 1.1f);
+        layout.addView(body);
+
+        final CheckBox cbConsent = new CheckBox(activity);
+        cbConsent.setText("I understand and agree");
+        cbConsent.setTextColor(COLOR_PURPLE_DARK);
+        cbConsent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        layout.addView(cbConsent);
+
+        final CheckBox cbName = new CheckBox(activity);
+        cbName.setText("Address me by my first name");
+        cbName.setChecked(AiPreferences.isFirstNameOptedIn(activity));
+        cbName.setTextColor(COLOR_TEXT_MUTED);
+        cbName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        layout.addView(cbName);
+
+        LinearLayout btnRow = new LinearLayout(activity);
+        btnRow.setOrientation(LinearLayout.HORIZONTAL);
+        btnRow.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
+        btnRow.setPadding(0, dp(16), 0, 0);
+
+        Button btnDecline = new Button(activity);
+        btnDecline.setText("Offline Guide");
+        btnDecline.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnDecline.setTextColor(COLOR_TEXT_MUTED);
+        btnDecline.setBackground(null);
+        btnDecline.setOnClickListener(v -> {
+            AiPreferences.setConsent(activity, false);
+            consentDlg.dismiss();
+            updateSubtitle();
+        });
+        btnRow.addView(btnDecline);
+
+        final Button btnAccept = new Button(activity);
+        btnAccept.setText("Continue");
+        btnAccept.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnAccept.setTypeface(Typeface.DEFAULT_BOLD);
+        btnAccept.setTextColor(COLOR_WHITE);
+        btnAccept.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 8, 2));
+        btnAccept.setEnabled(false);
+        btnAccept.setAlpha(0.5f);
+        btnAccept.setPadding(dp(16), dp(8), dp(16), dp(8));
+
+        cbConsent.setOnCheckedChangeListener((btn, isChecked) -> {
+            btnAccept.setEnabled(isChecked);
+            btnAccept.setAlpha(isChecked ? 1.0f : 0.5f);
+        });
+
+        btnAccept.setOnClickListener(v -> {
+            AiPreferences.setConsent(activity, true);
+            AiPreferences.setFirstNameOptedIn(activity, cbName.isChecked());
+            consentDlg.dismiss();
+            updateSubtitle();
+        });
+        btnRow.addView(btnAccept);
+
+        layout.addView(btnRow);
+
+        consentDlg.setContentView(layout);
+        if (consentDlg.getWindow() != null) {
+            consentDlg.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            int w = (int) (activity.getResources().getDisplayMetrics().widthPixels * 0.90);
+            consentDlg.getWindow().setLayout(w, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        consentDlg.show();
+    }
+
     private void submitQuery(String text) {
         if (text == null || text.trim().isEmpty()) return;
+        final String query = text.trim();
         etInput.setText("");
 
         // 1. Render User Message Bubble
-        displayUserMessage(text.trim());
+        displayUserMessage(query);
 
-        // 2. Process query via on-device AI Engine
-        AiResponse response = aiEngine.processQuery(text.trim());
+        // 2. Check consent
+        if (!AiPreferences.hasConsented(activity)) {
+            showConsentDialog();
+            // Process offline fallback for this query
+            AiResponse offlineResp = aiEngine.processQuery(query);
+            displayAiMessage(offlineResp, "📱 Offline Guide • Consent needed for AI");
+            return;
+        }
 
-        // 3. Render AI Response Bubble with interactive buttons
-        displayAiMessage(response);
+        // 3. Check AI kill-switch and client quota
+        if (!AiPreferences.isAiEnabled(activity)) {
+            AiResponse offlineResp = aiEngine.processQuery(query);
+            displayAiMessage(offlineResp, "📱 Offline Guide • AI resting");
+            updateSubtitle();
+            return;
+        }
+
+        int remaining = AiPreferences.getRemainingQuestions(activity);
+        if (remaining <= 0) {
+            AiResponse offlineResp = aiEngine.processQuery(query);
+            displayAiMessage(offlineResp, "📱 Offline Guide • Daily limit reached");
+            updateSubtitle();
+            return;
+        }
+
+        // 4. Show typing/pondering indicator
+        final View typingIndicator = showTypingIndicator();
+
+        // 5. Query Cloudflare Relay
+        AiRelayClient.askQuestion(activity, query, new AiRelayClient.RelayCallback() {
+            @Override
+            public void onSuccess(@NonNull String answer, int remainingQuestionsToday) {
+                removeTypingIndicator(typingIndicator);
+                updateSubtitle();
+
+                String badge = "⚡ AI-generated • " + remainingQuestionsToday + " questions left today";
+                AiResponse response = AiResponse.plainText(answer, null);
+                displayAiMessage(response, badge);
+            }
+
+            @Override
+            public void onQuotaExceeded(int remainingQuestionsToday) {
+                removeTypingIndicator(typingIndicator);
+                updateSubtitle();
+
+                AiResponse offlineResp = aiEngine.processQuery(query);
+                displayAiMessage(offlineResp, "📱 Offline Guide • Daily limit reached");
+            }
+
+            @Override
+            public void onError(@NonNull String errorMessage, boolean shouldFallbackOffline) {
+                removeTypingIndicator(typingIndicator);
+                updateSubtitle();
+
+                if (shouldFallbackOffline) {
+                    AiResponse offlineResp = aiEngine.processQuery(query);
+                    displayAiMessage(offlineResp, "📱 Offline Guide");
+                } else {
+                    AiResponse errResp = AiResponse.plainText("⚠️ " + errorMessage, null);
+                    displayAiMessage(errResp, null);
+                }
+            }
+        });
+    }
+
+    private View showTypingIndicator() {
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, dp(4), dp(40), dp(4));
+
+        TextView tv = new TextView(activity);
+        tv.setText("🤖 Pondering with Scripture...");
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tv.setTypeface(Typeface.DEFAULT_BOLD);
+        tv.setTextColor(COLOR_PRIMARY_PURPLE);
+        tv.setPadding(dp(12), dp(6), dp(12), dp(6));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(COLOR_PURPLE_TINT);
+        bg.setCornerRadius(dp(12));
+        tv.setBackground(bg);
+
+        row.addView(tv);
+        messagesContainer.addView(row);
+        scrollToBottom();
+        return row;
+    }
+
+    private void removeTypingIndicator(View indicator) {
+        if (indicator != null && messagesContainer != null) {
+            messagesContainer.removeView(indicator);
+        }
     }
 
     private void displayUserMessage(String text) {
@@ -285,10 +502,21 @@ public class AiBreakthroughGuideDialog extends Dialog {
         scrollToBottom();
     }
 
-    private void displayAiMessage(AiResponse response) {
+    private void displayAiMessage(AiResponse response, @Nullable String badgeText) {
         LinearLayout bubbleCol = new LinearLayout(activity);
         bubbleCol.setOrientation(LinearLayout.VERTICAL);
         bubbleCol.setPadding(0, dp(4), dp(40), dp(8));
+
+        // Badge pill
+        if (badgeText != null && !badgeText.isEmpty()) {
+            TextView tvBadge = new TextView(activity);
+            tvBadge.setText(badgeText);
+            tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            tvBadge.setTypeface(Typeface.DEFAULT_BOLD);
+            tvBadge.setTextColor(badgeText.contains("Offline") ? COLOR_TEXT_MUTED : COLOR_ACCENT_ORANGE);
+            tvBadge.setPadding(dp(4), 0, 0, dp(2));
+            bubbleCol.addView(tvBadge);
+        }
 
         // Message text
         TextView tv = new TextView(activity);
@@ -398,9 +626,9 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private int dp(int value) {
         return (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                value,
-                activity.getResources().getDisplayMetrics()
+            TypedValue.COMPLEX_UNIT_DIP,
+            value,
+            activity.getResources().getDisplayMetrics()
         );
     }
 

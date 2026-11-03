@@ -32,22 +32,27 @@
 ## Upcoming Stage Services (Pending Levi Approval)
 
 ### Stage 2: Generative AI Assistant Relay
-- **Provider**: Cloudflare Workers (Free tier) + Google Gemini API Free Tier (via Google AI Studio). No Groq.
-- **Purpose**: Serverless reverse-proxy gateway protecting API keys and enforcing church safety guardrails and daily quotas per device.
+- **Provider**: Cloudflare Workers (Free Tier) + Google Gemini API Free Tier (via Google AI Studio).
+- **Status**: **ACTIVE** (Deployed live on Cloudflare Worker `perazim-ai-relay.perazim-mission.workers.dev`).
+- **Purpose**: Zero-cost serverless reverse-proxy gateway protecting the Google Gemini API key, enforcing church safety guardrails, crisis routing, and daily quotas per device.
 - **Documented Free Limits & Sources**:
   - Cloudflare Workers Free Tier:
     - 100,000 requests/day (resets daily at 00:00 UTC)
     - 10ms CPU execution time per invocation
     - 128 MB memory allocation per isolate
-    - 50 subrequests per invocation
+    - Cloudflare KV: 100,000 reads/day, 1,000 writes/day
     - *Source*: Cloudflare Workers Documentation, "Limits - Free Plan" (`https://developers.cloudflare.com/workers/platform/limits/`), verified November 3, 2026.
   - Google Gemini API Free Tier (Google AI Studio):
-    - Eligible Free Models: `gemini-2.0-flash`, `gemini-2.0-flash-lite` (Gemini 1.5 models are deprecated and omitted)
-    - Rate Limits: 15 RPM (requests per minute), 1,500 RPD (requests per day, resets at midnight Pacific Time), 1,000,000 TPM (tokens per minute)
-    - Context Window: Up to 1,000,000 tokens
-    - *Source*: Google AI Studio Pricing Documentation (`https://ai.google.dev/pricing`), verified November 3, 2026.
-  - Device Daily Quota: 3 questions/day/member enforced at proxy layer.
-- **Status**: Reserved for Stage 2 (pending approval).
+    - Active Model: `gemini-3.5-flash-lite` (verified operational; legacy `gemini-2.0-flash` is retired)
+    - Rate Limits: 15 RPM (requests per minute), 1,500 RPD (requests per day), 1,000,000 TPM (tokens per minute)
+    - *Source*: Google AI Studio Documentation (`https://ai.google.dev/pricing`), verified November 3, 2026.
+  - Device Daily Quota: 3 questions/day/member enforced at proxy layer (Cloudflare KV) and mirrored client-side (`AiPreferences`). Reset at midnight Africa/Nairobi timezone (UTC+3).
+- **Safety & Privacy Features**:
+  - 500-character query limit.
+  - Immediate crisis phrase regex detection routing directly to Pastoral Care hotline (`+254 710 772 227`).
+  - Strict church grounding system prompt: 2 Samuel 5:20, Micah 2:13, under 120 words, strictly Bible-grounded, no medical/financial advice, polite deflection of off-topic secular questions.
+  - Zero logging of member query text.
+  - Seamless offline fail-soft to `PerazimAiEngine` when quota exhausted or offline.
 
 ### Stage 3: Community Fellowship Backend
 - **Provider**: Firebase Spark Plan (Google Cloud). No Supabase.
