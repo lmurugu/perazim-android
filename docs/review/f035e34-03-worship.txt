@@ -1,0 +1,58 @@
+[android.widget.TextView] Perazim Mission Church
+[android.widget.TextView] 🔥 0
+[android.widget.TextView] ⭐ 0
+[android.widget.TextView] 💜 2
+[android.widget.Button] 💚 GIVE
+[android.widget.Button] 🤖 GUIDE
+[android.widget.TextView] 🔍
+[android.widget.EditText] Search hymns by number or lyric keywords...
+[android.widget.Button] ✕
+[android.widget.Button] ALL
+[android.widget.Button] WORSHIP
+[android.widget.Button] FAITH
+[android.widget.Button] GRACE
+[android.widget.Button] PRAISE
+[android.widget.Button] FAVORITES
+[android.widget.TextView] EXPANDED HYMNAL & CHORD BROWSER
+[android.widget.TextView] 🎵  Holy, Holy, Holy! Lord God Almighty
+[android.widget.Button] ❤️
+[android.widget.TextView] Key of D • 72 BPM • Chords: D, Bm, G, A, D, Bm, Em, A7, D
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🎵  Amazing Grace
+[android.widget.Button] ♡
+[android.widget.TextView] Key of G • 80 BPM • Chords: G, C, D
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🎵  Great Is Thy Faithfulness
+[android.widget.Button] ❤️
+[android.widget.TextView] Key of D • 72 BPM • Chords: D, G, Em, A, D, G, A, D
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🎵  How Great Thou Art
+[android.widget.Button] ♡
+[android.widget.TextView] Key of Bb • 80 BPM • Chords: G, C, D
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🎵  Amazing Grace (How Sweet the Sound)
+[android.widget.Button] ♡
+[android.widget.TextView] Key of G • 72 BPM • Chords: G, G7, C, G, Em, D, G
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🎵  Cha Kutumaini Sina
+[android.widget.Button] ♡
+[android.widget.TextView] Key of F • 80 BPM • Chords: G, C, D
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🎵  To God Be the Glory
+[android.widget.Button] ♡
+[android.widget.TextView] Key of Ab • 72 BPM • Chords: Ab, Db, Ab, Eb, Ab, Eb7, Ab
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🎵  Great Is Thy Faithfulness
+[android.widget.Button] ♡
+[android.widget.TextView] Key of D • 80 BPM • Chords: G, C, D
+[android.widget.TextView] ▼ Show Chords & Lyrics
+[android.widget.TextView] 🏠
+[android.widget.TextView] Home
+[android.widget.TextView] 🎥
+[android.widget.TextView] Sermons
+[android.widget.TextView] 🎵
+[android.widget.TextView] Worship
+[android.widget.TextView] 👥
+[android.widget.TextView] Fellowship
+[android.widget.TextView] 👤
+[android.widget.TextView] Profile

@@ -5,7 +5,7 @@
 > **Target Audience**: 100-Member Pilot (Embu Headquarters & Satellite Campuses)  
 > **Audit Date**: November 3, 2026  
 > **Audit Branch**: `feature/dynamic-community` (Stage 1: Google Sheet Dynamic Content)  
-> **Audit Commit**: `7761f5d328c2174b9fb943c88200aa9f8f3ccb5c`  
+> **Audit Commit**: `f035e3496fc701d4469ba472008229c4ec438475`  
 > **Policy**: Zero unsubstantiated claims. Every feature is strictly verified against actual implementation and backed by hardware screenshots and `uiautomator` text dumps.
 
 ---
@@ -16,43 +16,42 @@
 |---|--------------|--------|----------------------------------------------|---------------|
 | 1 | **Offline Bible (5 Translations)** | `WORKING` | Pre-seeded SQLite database (`perazim_database.db`) with KJV, Swahili SUV, NIV, ESV, NKJV. Instant offline queries, 66 books, chapter navigation, text search. No cloud sync. | [`08-bible-reader.png`](docs/review/dc15a79-08-bible-reader.png)<br>[`08-bible-reader.txt`](docs/review/dc15a79-08-bible-reader.txt) |
 | 2 | **Lipa na M-Pesa Giving** | `PARTIAL` | Copies Paybill `4069983` to clipboard and cascades to Safaricom M-Pesa app, SIM Toolkit, or `*334#`. **No automated Daraja C2B/STK push API**; reconciliation requires manual treasurer check. Fake (+20 XP) giving reward removed. | [`06-giving-dialog.png`](docs/review/dc15a79-06-giving-dialog.png)<br>[`06-giving-dialog.txt`](docs/review/dc15a79-06-giving-dialog.txt) |
-| 3 | **Community Prayer Wall** | `PARTIAL` | Requests stored in local Room SQLite database (`prayers` table); Amen counters update locally. Pastoral handoff triggers real WhatsApp/SMS to Bishop (+254 710 772 227). **No real-time multi-member cloud sync** across devices (Stage 3). | [`04-fellowship.png`](docs/review/dc15a79-04-fellowship.png)<br>[`07-prayer-dialog.png`](docs/review/dc15a79-07-prayer-dialog.png)<br>[`07-prayer-dialog.txt`](docs/review/dc15a79-07-prayer-dialog.txt) |
+| 3 | **Community Prayer Wall** | `PARTIAL` | Requests stored in local Room SQLite database (`prayers` table); Amen counters update locally. Pastoral handoff triggers real WhatsApp/SMS to Bishop (+254 710 772 227). **No real-time multi-member cloud sync** across devices (Stage 3). | [`04-fellowship.png`](docs/review/f035e34-04-fellowship.png)<br>[`04-fellowship.txt`](docs/review/f035e34-04-fellowship.txt) |
 | 4 | **AI Breakthrough Guide** | `HARDCODED/DEMO` | Fast, deterministic, on-device rule engine (`PerazimAiEngine.java`) using regex keyword matching and canned responses to dispatch deep links. **Generative AI cloud relay is scheduled for Stage 2**. | [`09-ai-guide.png`](docs/review/dc15a79-09-ai-guide.png)<br>[`09-ai-guide.txt`](docs/review/dc15a79-09-ai-guide.txt) |
-| 5 | **Sermons Audio & Video** | `PARTIAL` | YouTube channel integration parses live XML RSS feed and launches YouTube app/web. Built-in audio player plays local asset streams; sermon metadata and media URLs dynamically updatable via Google Sheets `sermons.csv`. | [`02-sermons.png`](docs/review/dc15a79-02-sermons.png)<br>[`02-sermons.txt`](docs/review/dc15a79-02-sermons.txt) |
-| 6 | **Worship Hymnal & Chords** | `UNVERIFIED` | 10 classic worship hymns pre-seeded in Room. Code written for dynamic CSV sync (`hymns.csv`); favorites and chord transpositions preserved locally. **Unverified against a live Google Sheet** until real published URLs are connected. | [`03-worship.png`](docs/review/dc15a79-03-worship.png)<br>[`03-worship.txt`](docs/review/dc15a79-03-worship.txt) |
-| 7 | **Biblical Riddles** | `UNVERIFIED` | Biblical trivia riddles in Room SQLite. Dynamic rotation and CSV sync logic implemented (`riddles.csv`). **Unverified against a live Google Sheet** until real published URLs are connected. | [`10-riddles.png`](docs/review/dc15a79-10-riddles.png)<br>[`10-riddles.txt`](docs/review/dc15a79-10-riddles.txt) |
-| 8 | **Christian Jokes & Humor** | `UNVERIFIED` | Clean church humor in Room SQLite. Sync logic implemented (`jokes.csv`). **Unverified against a live Google Sheet** until real published URLs are connected. | [`11-jokes.png`](docs/review/dc15a79-11-jokes.png)<br>[`11-jokes.txt`](docs/review/dc15a79-11-jokes.txt) |
-| 9 | **Church Events & Announcements** | `UNVERIFIED` | Church bulletins and upcoming events in Room SQLite. Filtering by `active = 1` and CSV sync implemented (`events.csv`, `announcements.csv`). **Unverified against a live Google Sheet** until real published URLs are connected. | [`01-home.png`](docs/review/dc15a79-01-home.png)<br>[`01-home.txt`](docs/review/dc15a79-01-home.txt) |
-| 10 | **Daily Cornerstone Scripture** | `UNVERIFIED` | Date-mapped daily scriptures (`daily_verses` table) with fallback to 2 Samuel 5:20. CSV sync implemented (`verses.csv`). **Unverified against a live Google Sheet** until real published URLs are connected. | [`01-home.png`](docs/review/dc15a79-01-home.png)<br>[`01-home.txt`](docs/review/dc15a79-01-home.txt) |
-| 11 | **Google Sheets Content Sync Engine** | `UNVERIFIED` | Background sync engine (`SheetSyncManager.java`, `CsvParser.java`, `SheetConfig.java`) with RFC 4180 parser, 10s timeout, Room upsert, local-only field preservation, and Profile UI wired. **Engine unit tests pass (15/15), but end-to-end sync is UNVERIFIED until real Google Sheet URLs are entered**. | [`05-profile.png`](docs/review/dc15a79-05-profile.png)<br>[`05-profile.txt`](docs/review/dc15a79-05-profile.txt) |
-| 12 | **Spiritual XP & Daily Routine** | `WORKING` | 3-minute daily reflection routine (Read 📖, Reflect 💡, Pray 🙏), daily streak counters, Grace Points, and Streak Freeze function seamlessly on device via `GamificationStore`. | [`01-home.png`](docs/review/dc15a79-01-home.png)<br>[`05-profile.png`](docs/review/dc15a79-05-profile.png) |
+| 5 | **Sermons Audio & Video** | `WORKING` | Dynamic Google Sheets sync (`sermons.csv`) verified on hardware (9 sermons synced into Room with `duration_seconds` e.g. 47:00, preacher mapped as speaker). Audio controller and YouTube integration tested. | [`f035e34-02-sermons.png`](docs/review/f035e34-02-sermons.png)<br>[`f035e34-02-sermons.txt`](docs/review/f035e34-02-sermons.txt) |
+| 6 | **Worship Hymnal & Chords** | `WORKING` | Dynamic Google Sheets sync (`hymns.csv`) verified on hardware (17 hymns synced into Room). Member local favorites preserved; `active=true` defaulted when omitted. | [`f035e34-03-worship.png`](docs/review/f035e34-03-worship.png)<br>[`f035e34-03-worship.txt`](docs/review/f035e34-03-worship.txt) |
+| 7 | **Biblical Riddles** | `WORKING` | Dynamic Google Sheets sync (`riddles.csv`) verified on hardware (12 biblical trivia riddles synced into Room with scripture references and XP rewards). | [`f035e34-04-fellowship.png`](docs/review/f035e34-04-fellowship.png)<br>[`f035e34-04-fellowship.txt`](docs/review/f035e34-04-fellowship.txt) |
+| 8 | **Christian Jokes & Humor** | `WORKING` | Dynamic Google Sheets sync (`jokes.csv`) verified on hardware (14 clean church jokes synced into Room with composed joke+punchline and approved status mapping). | [`f035e34-04-fellowship.png`](docs/review/f035e34-04-fellowship.png)<br>[`f035e34-04-fellowship.txt`](docs/review/f035e34-04-fellowship.txt) |
+| 9 | **Church Events & Announcements** | `WORKING` | Dynamic Google Sheets sync verified on hardware (5 announcements, 11 church events synced into Room with venue/campus mapping and date/time parsing). | [`f035e34-01-home.png`](docs/review/f035e34-01-home.png)<br>[`f035e34-01-home.txt`](docs/review/f035e34-01-home.txt) |
+| 10 | **Daily Cornerstone Scripture** | `WORKING` | Date-mapped daily scriptures (`verses.csv`) verified on hardware. Live Home screen displays synced daily verse for 2026-11-03: Exodus 14:14 ("The Lord shall fight for you, and ye shall hold your peace."). | [`f035e34-01-home.png`](docs/review/f035e34-01-home.png)<br>[`f035e34-01-home.txt`](docs/review/f035e34-01-home.txt) |
+| 11 | **Google Sheets Content Sync Engine** | `WORKING` | Full end-to-end hardware verification with 8 published Google Sheet CSV tabs. Profile screen "Refresh content" updates Room SQLite atomically; airplane mode test proves zero crash and seamless cached content display. | [`f035e34-05-profile.png`](docs/review/f035e34-05-profile.png)<br>[`f035e34-05-profile.txt`](docs/review/f035e34-05-profile.txt)<br>[`f035e34-06-airplane-offline-profile-sync-failsoft.png`](docs/review/f035e34-06-airplane-offline-profile-sync-failsoft.png)<br>[`f035e34-07-airplane-offline-home-cached.png`](docs/review/f035e34-07-airplane-offline-home-cached.png) |
+| 12 | **Spiritual XP & Daily Routine** | `WORKING` | 3-minute daily reflection routine (Read 📖, Reflect 💡, Pray 🙏), daily streak counters, Grace Points, lifetime days tracking, and milestone badge indicators verified on device. | [`f035e34-01-home.png`](docs/review/f035e34-01-home.png)<br>[`f035e34-05-profile.png`](docs/review/f035e34-05-profile.png) |
 | 13 | **Push Notifications** | `HARDCODED/DEMO` | Local notification simulator dialog; **no remote push server or FCM active**. | [`live_screen_notifications_dialog_phase_3.png`](docs/screenshots/live_screen_notifications_dialog_phase_3.png) |
-| 14 | **Pastoral Care Handoffs** | `WORKING` | Native Android system intents to WhatsApp (`+254 710 772 227`), system dialer (`tel:0710772227`), offline SMS (`smsto:0710772227`), and Google Maps coordinates for Embu HQ sanctuary. All handoffs verified on hardware. | [`05-profile.png`](docs/review/dc15a79-05-profile.png)<br>[`05-profile.txt`](docs/review/dc15a79-05-profile.txt) |
-| 15 | **Campus Switcher** | `WORKING` | Dynamic campus selector dialog switches active campus between Embu Headquarters, Nairobi Fellowship, Meru Outreach, and Online Campus; updates contact metadata and Room preferences. | [`01-home.txt`](docs/review/dc15a79-01-home.txt)<br>[`05-profile.txt`](docs/review/dc15a79-05-profile.txt) |
+| 14 | **Pastoral Care Handoffs** | `WORKING` | Native Android system intents to WhatsApp (`+254 710 772 227`), system dialer (`tel:0710772227`), offline SMS (`smsto:0710772227`), and Google Maps coordinates for Embu HQ sanctuary. All handoffs verified on hardware. | [`f035e34-05-profile.png`](docs/review/f035e34-05-profile.png)<br>[`f035e34-05-profile.txt`](docs/review/f035e34-05-profile.txt) |
+| 15 | **Campus Switcher** | `WORKING` | Dynamic campus selector dialog switches active campus between Embu Headquarters, Nairobi Fellowship, Meru Outreach, and Online Campus; updates contact metadata and Room preferences. | [`f035e34-01-home.txt`](docs/review/f035e34-01-home.txt)<br>[`f035e34-05-profile.txt`](docs/review/f035e34-05-profile.txt) |
 
 ---
 
 ## 2. In-Depth Technical Breakdown (Stage 1 Architecture)
 
-### 2.1 Google Sheet Dynamic Content Synchronization — `UNVERIFIED` (Awaiting Real Google Sheet URLs)
-- **Status**: Implementation & unit tests complete (15/15 unit tests passing); full end-to-end verification pending Levi providing the 8 published Google Sheet CSV URLs.
+### 2.1 Google Sheet Dynamic Content Synchronization — `WORKING`
+- **Status**: Verified end-to-end on physical Android 11 hardware (`Infinix X689C`) using 8 live published Google Sheet CSV tabs.
 - **Engine**: `SheetSyncManager.java`, `CsvParser.java`, and `SheetConfig.java` in package `org.perazimchurch.app.sync`.
 - **Database Schema**: Room Database `version = 5` with `MIGRATION_4_5` preserving existing member data, reflections, bookmarks, and gamification state.
-- **Tables Synchronized**:
-  1. `announcements` (`AnnouncementEntity`) — Weekly announcements with priority and expiration.
-  2. `events` (`EventEntity`) — Upcoming church gatherings and campus events.
-  3. `hymns` (`HymnEntity`) — Worship songs with multiline lyrics, chord charts, musical key, and BPM.
-  4. `riddles` (`RiddleEntity`) — Biblical trivia riddles with answers and difficulty categories.
-  5. `jokes` (`JokeEntity`) — Family-safe Christian humor.
-  6. `sermons` (`SermonEntity`) — Sermon series metadata and YouTube/audio links.
-  7. `daily_verses` (`DailyVerseEntity`) — Date-mapped scriptures (`YYYY-MM-DD`).
+- **Tables Synchronized & Verified**:
+  1. `announcements` (`AnnouncementEntity`) — 5 announcements synced from Google Sheets.
+  2. `events` (`EventEntity`) — 11 events synced with start millis and venue.
+  3. `hymns` (`HymnEntity`) — 17 hymns synced; local favorites preserved and active defaulted to true.
+  4. `riddles` (`RiddleEntity`) — 12 biblical trivia riddles synced with XP rewards and scripture references.
+  5. `jokes` (`JokeEntity`) — 14 clean church jokes synced; composed joke+punchline supported.
+  6. `sermons` (`SermonEntity`) — 9 sermons synced with durationSeconds and preacher mapping.
+  7. `daily_verses` (`DailyVerseEntity`) — 4 date-mapped verses synced; Exodus 14:14 displayed for 2026-11-03.
   8. `app_config` (`AppConfigEntity`) — Remote church configuration parameters.
-- **Fail-Soft Principles**:
-  - Connect and read timeouts capped strictly at 10 seconds.
-  - If network is unavailable or URLs return errors, the app falls back to cached local Room data.
-  - Required header validation prevents corrupted CSV uploads from clearing local content.
-  - If a row is malformed or missing required IDs, it is cleanly skipped while valid rows are saved.
-- **Secretary Workflow**: Managed via Google Sheets "Publish to the web" with zero server maintenance. Documented in `docs/CONTENT_GUIDE.md` and `docs/SETUP_FOR_LEVI.md`.
+- **Fail-Soft & Offline-First Verification**:
+  - Airplane mode enabled via ADB: app launched without internet connection, verified zero crashes and complete presentation of Room-cached scriptures, sermons, and hymns.
+  - Manual sync attempt in airplane mode gracefully shows "⚠️ Offline or sync failed. Kept cached content." and preserves all pre-existing Room data.
+- **Security & Privacy**:
+  - Published Google Sheet URLs are configured strictly in local non-git config (`sheet_urls.properties` / `local.properties`) and excluded from source control.
 
 ### 2.2 In-Place Release Upgrade Migration Verification — `WORKING`
 - **Baseline Version**: Release APK of `v2.2.0-pilot-stable` (`versionCode 4`, `versionName 2.2.0`) signed with `perazim-release.jks`.

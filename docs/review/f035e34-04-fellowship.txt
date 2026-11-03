@@ -1,0 +1,50 @@
+[android.widget.TextView] Perazim Mission Church
+[android.widget.TextView] 🔥 0
+[android.widget.TextView] ⭐ 0
+[android.widget.TextView] 💜 2
+[android.widget.Button] 💚 GIVE
+[android.widget.Button] 🤖 GUIDE
+[android.widget.Button] 🙏 PRAYER WALL
+[android.widget.Button] 🌟 PRAISE REPORTS
+[android.widget.Button] 🤝 CONNECTIONS
+[android.widget.Button] 💬 DIRECT CHAT
+[android.widget.Button] 🔔 NOTIFICATIONS
+[android.widget.TextView] COMMUNITY PRAYER WALL
+[android.widget.Button] ✍️ SUBMIT PRAYER REQUEST TO WALL (+15 XP)
+[android.widget.TextView] 🙏 Mama Sarah (Embu General Hospital)
+[android.widget.TextView] Submitted by: Elder Gitonga · Embu Community
+[android.widget.TextView] Praying for full recovery, divine strength, and quick healing following hip replacement surgery.
+[android.widget.Button] 🙏 AMEN (24)
+[android.widget.Button] 🌟 TESTIFY (+50 XP)
+[android.widget.TextView] 🙏 KCSE Candidates at Kangaru School
+[android.widget.TextView] Submitted by: Youth Ministry · Embu Community
+[android.widget.TextView] Interceding for focus, clarity of mind, and divine wisdom for all 120 Form 4 exam candidates.
+[android.widget.Button] 🙏 AMEN (38)
+[android.widget.Button] 🌟 TESTIFY (+50 XP)
+[android.widget.TextView] 🙏 Central Sanctuary Roof Completion
+[android.widget.TextView] Submitted by: Deacon Board · Embu Community
+[android.widget.TextView] Thanksgiving for milestones achieved and prayer for safety of engineering team completing the roof.
+[android.widget.Button] 🙏 AMEN (52)
+[android.widget.Button] 🌟 TESTIFY (+50 XP)
+[android.widget.TextView] 🙏 Family Agribusiness in Mwea
+[android.widget.TextView] Submitted by: Sister Mercy · Embu Community
+[android.widget.TextView] Trusting God for supernatural breakthrough, market favor, and open doors for church rice farmers.
+[android.widget.Button] 🙏 AMEN (19)
+[android.widget.Button] 🌟 TESTIFY (+50 XP)
+[android.widget.TextView] 🧩 DEVOTIONAL RIDDLES FOR FELLOWSHIP
+[android.widget.TextView] John 6:9-13 • MEDIUM
+[android.widget.TextView] I offered only five barley loaves and two small fish from my lunch, yet in the hands of the Lord, my meal satisfied five thousand men with twelve baskets of leftovers. Who was I?
+[android.widget.Button] 👆 TAP TO REVEAL ANSWER
+[android.widget.Button] NEXT RIDDLE ➔
+[android.widget.TextView] 😄 CHRISTIAN JOY & BIBLICAL HUMOR
+[android.widget.TextView] Who was the greatest financier in the Bible? Noah — he floated his stock while everyone else was in complete liquidation!
+[android.widget.TextView] 🏠
+[android.widget.TextView] Home
+[android.widget.TextView] 🎥
+[android.widget.TextView] Sermons
+[android.widget.TextView] 🎵
+[android.widget.TextView] Worship
+[android.widget.TextView] 👥
+[android.widget.TextView] Fellowship
+[android.widget.TextView] 👤
+[android.widget.TextView] Profile

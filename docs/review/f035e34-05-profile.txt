@@ -1,0 +1,77 @@
+[android.widget.TextView] Perazim Mission Church
+[android.widget.TextView] 🔥 0
+[android.widget.TextView] ⭐ 0
+[android.widget.TextView] 💜 2
+[android.widget.Button] 💚 GIVE
+[android.widget.Button] 🤖 GUIDE
+[android.widget.TextView] Guest Pilgrim
+[android.widget.TextView] guest@perazim.org
+[android.widget.TextView] Perazim Mission Church · Embu Headquarters
+[android.widget.TextView] 🕊️ MEMBER
+[android.widget.Button] 📍 SWITCH CHURCH CAMPUS
+[android.widget.TextView] 🔥 SPIRITUAL JOURNEY & GROWTH
+[android.widget.TextView] 🔥 0 Days
+[android.widget.TextView] Daily Streak
+[android.widget.TextView] Active
+[android.widget.TextView] ⭐ 0 XP
+[android.widget.TextView] Spiritual XP
+[android.widget.TextView] Level 1
+[android.widget.TextView] 💜 2 Pts
+[android.widget.TextView] Grace Points
+[android.widget.TextView] Tokens
+[android.widget.TextView] Level 1 Disciple — 0 / 500 XP to Level 2
+[android.widget.TextView] 📅 0 Days
+[android.widget.TextView] Lifetime Days
+[android.widget.TextView] Devotions
+[android.widget.TextView] 🏆 0 / 2
+[android.widget.TextView] Badges Earned
+[android.widget.TextView] Milestones
+[android.widget.TextView] MILESTONE BADGES
+[android.widget.TextView] 🔒 First Routine
+[android.widget.TextView] 🔒 7-Day Flame
+[android.widget.Button] ❄️ STREAK PROTECTION: FREEZE STREAK
+[android.widget.TextView] 📦 SAVED & OFFLINE CONTENT MANAGER
+[android.widget.Button] 🎙️ SERMONS (0)
+[android.widget.Button] 🎵 HYMNS (4)
+[android.widget.Button] 📖 VERSES (0)
+[android.widget.TextView] No audio sermons downloaded yet. Tap download on any sermon to listen offline with zero data.
+[android.widget.TextView] 🏛️ CHURCH IDENTITY & AFFILIATION
+[android.widget.TextView] PERAZIM MISSION CHURCH
+[android.widget.TextView] “The Place of Great Breakthrough” (2 Samuel 5:20)
+[android.widget.TextView] 📍
+[android.widget.TextView] Affiliated Campus (Tap to Switch)
+[android.widget.TextView] Embu Headquarters (Tap to change)
+[android.widget.TextView] Tap ➔
+[android.widget.TextView] 👤
+[android.widget.TextView] Presiding Bishop
+[android.widget.TextView] Bishop Dr. David Mutweri (+254 710 772 227)
+[android.widget.TextView] Tap ➔
+[android.widget.TextView] 🔄
+[android.widget.TextView] Refresh Content
+[android.widget.TextView] Last updated: Nov 3, 8:34 PM
+[android.widget.TextView] Tap to Sync ➔
+[android.widget.TextView] 🙏 PASTORAL CARE & DIRECT SUPPORT
+[android.widget.TextView] 💬
+[android.widget.TextView] WhatsApp Bishop Directly
+[android.widget.TextView] (+254) 710 772 227 (Tap to Chat)
+[android.widget.TextView] Tap ➔
+[android.widget.TextView] 📞
+[android.widget.TextView] Call Bishop Directly
+[android.widget.TextView] (+254) 710 772 227 (Native Phone Dialer)
+[android.widget.TextView] Tap ➔
+[android.widget.TextView] ✉️
+[android.widget.TextView] SMS Pastoral Line
+[android.widget.TextView] (+254) 710 772 227 (Offline SMS)
+[android.widget.TextView] Tap ➔
+[android.widget.TextView] 📍
+[android.widget.TextView] Directions to Embu HQ
+[android.widget.TextView] 🏠
+[android.widget.TextView] Home
+[android.widget.TextView] 🎥
+[android.widget.TextView] Sermons
+[android.widget.TextView] 🎵
+[android.widget.TextView] Worship
+[android.widget.TextView] 👥
+[android.widget.TextView] Fellowship
+[android.widget.TextView] 👤
+[android.widget.TextView] Profile

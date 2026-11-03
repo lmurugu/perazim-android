@@ -1,0 +1,53 @@
+[android.widget.TextView] Perazim Mission Church
+[android.widget.TextView] 🔥 0
+[android.widget.TextView] ⭐ 0
+[android.widget.TextView] 💜 2
+[android.widget.Button] 💚 GIVE
+[android.widget.Button] 🤖 GUIDE
+[android.widget.TextView] PERAZIM MISSION CHURCH
+[android.widget.TextView] “The Place of Great Breakthrough”
+“A place where everybody is somebody, and no body is a nobody”
+Perazim Mission Church · Embu Headquarters
+[android.widget.Button] 💚 GIVE / TITHE
+[android.widget.Button] 📖 HOLY SCRIPTURE
+[android.widget.Button] 🙏 INTERCEDE
+[android.widget.TextView] DAILY DEVOTION PROGRESS
+[android.widget.TextView] 0% completed — Start today's 3-minute breakthrough routine
+[android.widget.TextView] 📖 DAILY SCRIPTURE · EXODUS 14:14
+[android.widget.TextView] “The Lord shall fight for you, and ye shall hold your peace.”
+[android.widget.Button] REFLECT
+[android.widget.Button] PRAY (+10 XP)
+[android.widget.Button] 📱 WHATSAPP STORY
+[android.widget.Button] 📖 READ PASSAGE (EXODUS 14:14)
+[android.widget.TextView] ⚡ 3-MINUTE DAILY REFLECTION ROUTINE
+[android.widget.TextView] 1. Read 📖
+[android.widget.TextView] 2. Reflect 💡
+[android.widget.TextView] 3. Pray 🙏
+[android.widget.TextView] Step 1 of 3: Read Today's Word (30s)
+[android.widget.TextView] “As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20
+[android.widget.Button] ✓ DONE READING (NEXT STEP ➔)
+[android.widget.TextView] 🎙️ BISHOP DR. DAVID MUTWERI · RECENT SERMONS
+[android.widget.TextView] BREAKTHROUGH POWER SERIES
+[android.widget.TextView] Supernatural Breakthrough
+[android.widget.TextView] Bishop Dr. David Mutweri · 2 Samuel 5:17-21
+[android.widget.Button] ▶ PLAY SERMON
+[android.widget.Button] ℹ DETAILS
+[android.widget.TextView] COVENANT MANDATES
+[android.widget.TextView] The Baal-Perazim Mandate
+[android.widget.TextView] Bishop Dr. David Mutweri · 1 Chronicles 14:8-17
+[android.widget.Button] ▶ PLAY SERMON
+[android.widget.Button] ℹ DETAILS
+[android.widget.TextView] GRACE ABOUNDING
+[android.widget.TextView] Walking in Covenant Grace
+[android.widget.TextView] Bishop Dr. David Mutweri · Ephesians 2:1-10
+[android.widget.Button] ▶ PLAY SERMON
+[android.widget.TextView] 🏠
+[android.widget.TextView] Home
+[android.widget.TextView] 🎥
+[android.widget.TextView] Sermons
+[android.widget.TextView] 🎵
+[android.widget.TextView] Worship
+[android.widget.TextView] 👥
+[android.widget.TextView] Fellowship
+[android.widget.TextView] 👤
+[android.widget.TextView] Profile
