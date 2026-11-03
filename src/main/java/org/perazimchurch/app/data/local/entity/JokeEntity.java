@@ -2,6 +2,7 @@ package org.perazimchurch.app.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -16,12 +17,19 @@ public class JokeEntity {
     private String text;
     private String cleanRating;
     private String category;
+    private boolean active;
 
-    public JokeEntity(@NonNull String id, String text, String cleanRating, String category) {
+    public JokeEntity(@NonNull String id, String text, String cleanRating, String category, boolean active) {
         this.id = id;
         this.text = text;
         this.cleanRating = cleanRating;
         this.category = category;
+        this.active = active;
+    }
+
+    @Ignore
+    public JokeEntity(@NonNull String id, String text, String cleanRating, String category) {
+        this(id, text, cleanRating, category, true);
     }
 
     @NonNull
@@ -36,4 +44,7 @@ public class JokeEntity {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

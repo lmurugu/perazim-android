@@ -35,6 +35,9 @@ public interface HymnDao {
     @Query("SELECT * FROM hymns ORDER BY number ASC")
     List<HymnEntity> getAllHymns();
 
+    @Query("SELECT * FROM hymns WHERE active = 1 ORDER BY number ASC")
+    List<HymnEntity> getActiveHymns();
+
     @Query("SELECT * FROM hymns WHERE isFavorite = 1 ORDER BY number ASC")
     List<HymnEntity> getFavoriteHymns();
 

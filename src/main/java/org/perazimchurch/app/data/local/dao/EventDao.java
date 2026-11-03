@@ -32,6 +32,9 @@ public interface EventDao {
     @Query("SELECT * FROM events ORDER BY startTimeMillis ASC")
     List<EventEntity> getAllEvents();
 
+    @Query("SELECT * FROM events WHERE active = 1 ORDER BY startTimeMillis ASC")
+    List<EventEntity> getActiveEvents();
+
     @Query("SELECT * FROM events WHERE endTimeMillis >= :currentTimeMillis ORDER BY startTimeMillis ASC")
     List<EventEntity> getUpcomingEvents(long currentTimeMillis);
 

@@ -2,6 +2,7 @@ package org.perazimchurch.app.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -21,10 +22,11 @@ public class EventEntity {
     private String campusId;
     private String imageUrl;
     private String category;
+    private boolean active;
 
     public EventEntity(@NonNull String id, String title, String description,
                        long startTimeMillis, long endTimeMillis, String location,
-                       String campusId, String imageUrl, String category) {
+                       String campusId, String imageUrl, String category, boolean active) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -34,6 +36,14 @@ public class EventEntity {
         this.campusId = campusId;
         this.imageUrl = imageUrl;
         this.category = category;
+        this.active = active;
+    }
+
+    @Ignore
+    public EventEntity(@NonNull String id, String title, String description,
+                       long startTimeMillis, long endTimeMillis, String location,
+                       String campusId, String imageUrl, String category) {
+        this(id, title, description, startTimeMillis, endTimeMillis, location, campusId, imageUrl, category, true);
     }
 
     @NonNull
@@ -63,4 +73,7 @@ public class EventEntity {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

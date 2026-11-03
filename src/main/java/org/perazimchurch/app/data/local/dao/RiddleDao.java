@@ -32,6 +32,9 @@ public interface RiddleDao {
     @Query("SELECT * FROM riddles")
     List<RiddleEntity> getAllRiddles();
 
+    @Query("SELECT * FROM riddles WHERE active = 1")
+    List<RiddleEntity> getActiveRiddles();
+
     @Query("SELECT * FROM riddles WHERE difficulty = :difficulty")
     List<RiddleEntity> getRiddlesByDifficulty(String difficulty);
 

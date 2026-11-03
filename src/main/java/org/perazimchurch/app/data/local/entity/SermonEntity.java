@@ -2,6 +2,7 @@ package org.perazimchurch.app.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -25,11 +26,12 @@ public class SermonEntity {
     private String notes;
     private boolean isDownloaded;
     private String localAudioPath;
+    private boolean active;
 
     public SermonEntity(@NonNull String id, String title, String preacher, String series,
                         String passage, String audioUrl, String videoUrl, long dateMillis,
                         int durationSeconds, String summary, String notes,
-                        boolean isDownloaded, String localAudioPath) {
+                        boolean isDownloaded, String localAudioPath, boolean active) {
         this.id = id;
         this.title = title;
         this.preacher = preacher;
@@ -43,6 +45,15 @@ public class SermonEntity {
         this.notes = notes;
         this.isDownloaded = isDownloaded;
         this.localAudioPath = localAudioPath;
+        this.active = active;
+    }
+
+    @Ignore
+    public SermonEntity(@NonNull String id, String title, String preacher, String series,
+                        String passage, String audioUrl, String videoUrl, long dateMillis,
+                        int durationSeconds, String summary, String notes,
+                        boolean isDownloaded, String localAudioPath) {
+        this(id, title, preacher, series, passage, audioUrl, videoUrl, dateMillis, durationSeconds, summary, notes, isDownloaded, localAudioPath, true);
     }
 
     @NonNull
@@ -84,4 +95,7 @@ public class SermonEntity {
 
     public String getLocalAudioPath() { return localAudioPath; }
     public void setLocalAudioPath(String localAudioPath) { this.localAudioPath = localAudioPath; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

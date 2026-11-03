@@ -32,6 +32,9 @@ public interface JokeDao {
     @Query("SELECT * FROM jokes")
     List<JokeEntity> getAllJokes();
 
+    @Query("SELECT * FROM jokes WHERE active = 1")
+    List<JokeEntity> getActiveJokes();
+
     @Query("SELECT * FROM jokes WHERE category = :category")
     List<JokeEntity> getJokesByCategory(String category);
 

@@ -2,6 +2,7 @@ package org.perazimchurch.app.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -19,9 +20,10 @@ public class AnnouncementEntity {
     private long publishedMillis;
     private long expiresMillis;
     private String campusId;
+    private boolean active;
 
     public AnnouncementEntity(@NonNull String id, String title, String body, String priority,
-                              long publishedMillis, long expiresMillis, String campusId) {
+                              long publishedMillis, long expiresMillis, String campusId, boolean active) {
         this.id = id;
         this.title = title;
         this.body = body;
@@ -29,6 +31,13 @@ public class AnnouncementEntity {
         this.publishedMillis = publishedMillis;
         this.expiresMillis = expiresMillis;
         this.campusId = campusId;
+        this.active = active;
+    }
+
+    @Ignore
+    public AnnouncementEntity(@NonNull String id, String title, String body, String priority,
+                              long publishedMillis, long expiresMillis, String campusId) {
+        this(id, title, body, priority, publishedMillis, expiresMillis, campusId, true);
     }
 
     @NonNull
@@ -52,4 +61,7 @@ public class AnnouncementEntity {
 
     public String getCampusId() { return campusId; }
     public void setCampusId(String campusId) { this.campusId = campusId; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }

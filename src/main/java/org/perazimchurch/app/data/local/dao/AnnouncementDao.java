@@ -35,6 +35,9 @@ public interface AnnouncementDao {
     @Query("SELECT * FROM announcements ORDER BY publishedMillis DESC")
     List<AnnouncementEntity> getAllAnnouncements();
 
+    @Query("SELECT * FROM announcements WHERE active = 1 ORDER BY publishedMillis DESC")
+    List<AnnouncementEntity> getActiveAnnouncements();
+
     @Query("DELETE FROM announcements WHERE id = :id")
     void deleteById(String id);
 

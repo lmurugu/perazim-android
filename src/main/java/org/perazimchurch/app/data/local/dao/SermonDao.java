@@ -32,6 +32,9 @@ public interface SermonDao {
     @Query("SELECT * FROM sermons ORDER BY dateMillis DESC")
     List<SermonEntity> getAllSermons();
 
+    @Query("SELECT * FROM sermons WHERE active = 1 ORDER BY dateMillis DESC")
+    List<SermonEntity> getActiveSermons();
+
     @Query("SELECT * FROM sermons WHERE isDownloaded = 1 ORDER BY dateMillis DESC")
     List<SermonEntity> getDownloadedSermons();
 

@@ -2,6 +2,7 @@ package org.perazimchurch.app.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -18,15 +19,28 @@ public class RiddleEntity {
     private String explanation;
     private String scriptureRef;
     private String difficulty;
+    private String category;
+    private int xp;
+    private boolean active;
 
     public RiddleEntity(@NonNull String id, String question, String answer,
-                       String explanation, String scriptureRef, String difficulty) {
+                        String explanation, String scriptureRef, String difficulty,
+                        String category, int xp, boolean active) {
         this.id = id;
         this.question = question;
         this.answer = answer;
         this.explanation = explanation;
         this.scriptureRef = scriptureRef;
         this.difficulty = difficulty;
+        this.category = category;
+        this.xp = xp;
+        this.active = active;
+    }
+
+    @Ignore
+    public RiddleEntity(@NonNull String id, String question, String answer,
+                        String explanation, String scriptureRef, String difficulty) {
+        this(id, question, answer, explanation, scriptureRef, difficulty, difficulty, 20, true);
     }
 
     @NonNull
@@ -47,4 +61,13 @@ public class RiddleEntity {
 
     public String getDifficulty() { return difficulty; }
     public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public int getXp() { return xp; }
+    public void setXp(int xp) { this.xp = xp; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
 }
