@@ -50,3 +50,6 @@ keystore.properties
 # Firebase client config may contain project identifiers/API keys.
 # If required for build in later milestones, provide via CI secret or local-only file.
 google-services.json
+
+# Cloudflare Wrangler local state & cache
+.wrangler/

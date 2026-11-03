@@ -1,0 +1,9 @@
+name = "perazim-ai-relay"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+account_id = "6dc91bb08aac16e68dad2bf860e60aaf"
+
+[[kv_namespaces]]
+binding = "PERAZIM_KV"
+id = "4bd947e80a1143d6b8b68f085505f1b5"
