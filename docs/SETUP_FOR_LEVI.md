@@ -40,26 +40,38 @@ Inside your cloned repository, navigate to `docs/sheet-template/`. You will find
 
 ## 3. Publish the Tabs to the Web (CSV Format)
 
+> ⚠️ **Public Content Notice**: The published Google Sheet is public. Do not include private phone numbers (only the official church office lines), API keys, passwords, or confidential member prayer requests.
+
 To allow the Android app to read updates without authentication or API keys:
 
-1. In Google Sheets, click **File > Share > Publish to web**.
+1. In Google Sheets, click **File → Share → Publish to web**.
 2. Click the **Link** tab.
-3. Instead of "Entire Document", select the first tab: **`announcements`**.
-4. Instead of "Web page", select **Comma-separated values (.csv)**.
-5. Click **Publish** and confirm.
-6. Copy the published URL. It will look like:
+3. Instead of "Entire Document", select the specific tab (e.g. **`announcements`**).
+4. In the format dropdown (defaults to "Web page"), select **Comma-separated values (.csv)**.
+5. Click **Publish** (confirm "Are you sure you want to publish this selection?").
+6. Copy the published CSV link. It will look like:
    ```
-   https://docs.google.com/spreadsheets/d/e/2PACX-1v.../pub?gid=0&single=true&output=csv
+   https://docs.google.com/spreadsheets/d/e/2PACX-1v.../pub?gid=...&single=true&output=csv
    ```
-7. Repeat step 3–6 for each of the other 7 tabs, copying down their respective CSV URLs.
+7. Repeat steps 3–6 for each of the other 7 tabs (`events`, `hymns`, `riddles`, `jokes`, `sermons`, `verses`, `config`), keeping each header row intact and copying down all eight CSV links.
 
 ---
 
-## 4. Configure the URLs in the App
+## 4. Paste the 8 Links in Chat (No Terminal or Gradle Editing)
 
-Levi sends the 8 URLs in chat and Antigravity enters them. Levi does not run any commands or builds.
+**Levi does NOT need to touch a terminal, run any commands, or edit Gradle.**
 
-Once Antigravity enters the URLs into `sheet_urls.properties` and builds the app, the endpoints are embedded directly into `SheetConfig`.
+Simply copy and paste all eight published CSV links back into this chat window:
+1. `sheet_url_announcements`: `<paste link>`
+2. `sheet_url_events`: `<paste link>`
+3. `sheet_url_hymns`: `<paste link>`
+4. `sheet_url_riddles`: `<paste link>`
+5. `sheet_url_jokes`: `<paste link>`
+6. `sheet_url_sermons`: `<paste link>`
+7. `sheet_url_verses`: `<paste link>`
+8. `sheet_url_config`: `<paste link>`
+
+Antigravity will handle entering the URLs and validating the build.
 
 ### Verifying the Setup:
 1. Open the Perazim App on your Android device.
