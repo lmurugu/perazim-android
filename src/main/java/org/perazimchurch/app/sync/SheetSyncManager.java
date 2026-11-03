@@ -501,7 +501,7 @@ public final class SheetSyncManager {
                 summary = getCell(r, col, "summary");
             }
             String notes = (existing != null && existing.getNotes() != null) ? existing.getNotes() : "";
-            if (col.containsKey("notes") && !getCell(r, col, "notes").isEmpty()) {
+            if (notes.isEmpty() && col.containsKey("notes") && !getCell(r, col, "notes").isEmpty()) {
                 notes = getCell(r, col, "notes");
             }
 
