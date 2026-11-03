@@ -43,6 +43,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.domain.model.Announcement;
+import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.Event;
 import org.perazimchurch.app.domain.model.Reflection;
@@ -1229,8 +1230,7 @@ public class HomeUiBinder {
         btnConfirmGive.setOnClickListener(v -> {
             String amt = etAmount.getText().toString().trim();
             if (amt.isEmpty()) amt = "1000";
-            awardXp(20);
-            Toast.makeText(context, "🙏 Giving recorded for KES " + amt + " to Paybill 4069983! May God open the windows of heaven upon you! (+20 XP)", Toast.LENGTH_LONG).show();
+            ChurchIntentManager.launchMpesaGiving(context, "4069983", "TITHE", amt);
             dlg.dismiss();
         });
 

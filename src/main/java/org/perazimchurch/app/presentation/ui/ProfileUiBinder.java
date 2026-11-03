@@ -854,6 +854,7 @@ public class ProfileUiBinder {
         card.addView(createInteractiveRow("📍", "Directions to Embu HQ", "Perazim Mission Church, Embu", v -> ChurchIntentManager.openChurchMaps(context)));
         card.addView(createInteractiveRow("💚", "Safaricom Giving Paybill", "4069983 (Lipa na M-Pesa)", v -> ChurchIntentManager.launchMpesaGiving(context, "4069983", "OFFERING", "")));
         card.addView(createInteractiveRow("📧", "Secretariat Email", "info@perazimchurch.org", v -> ChurchIntentManager.sendEmail(context, "info@perazimchurch.org", "Perazim Church Inquiry", "")));
+        card.addView(createInteractiveRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: ")));
 
         return card;
     }

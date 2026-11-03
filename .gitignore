@@ -30,6 +30,7 @@ gradle-8.5-bin.zip
 *.db-*
 !src/main/assets/database/*.db
 *.png
+!docs/screenshots/*.png
 FORENSIC_*.md
 forensic/
 
@@ -38,6 +39,7 @@ forensic/
 *credential*.json
 daraja_config.properties
 secrets.properties
+keystore.properties
 *.keystore
 *.jks
 *.pem

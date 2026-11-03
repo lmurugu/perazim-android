@@ -118,6 +118,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private TextView tvMiniTrackSub;
     private Button btnMiniPlayPause;
     private Button btnMiniDataSaver;
+    private View miniPlayerContainer;
     private boolean isPlaying = false;
     private boolean isDataSaverActive = true;
 
@@ -410,6 +411,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     private View createMiniPlayer() {
         LinearLayout player = new LinearLayout(this);
+        miniPlayerContainer = player;
+        player.setVisibility(View.GONE);
         player.setOrientation(LinearLayout.HORIZONTAL);
         player.setGravity(Gravity.CENTER_VERTICAL);
         player.setBackgroundColor(COLOR_PURPLE_DARK);
@@ -432,7 +435,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         textCol.setLayoutParams(lpText);
 
         tvMiniTrackTitle = new TextView(this);
-        tvMiniTrackTitle.setText("Supernatural Breakthrough");
+        tvMiniTrackTitle.setText("No Audio Playing");
         tvMiniTrackTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvMiniTrackTitle.setTypeface(Typeface.DEFAULT_BOLD);
         tvMiniTrackTitle.setTextColor(COLOR_WHITE);
@@ -440,13 +443,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         textCol.addView(tvMiniTrackTitle);
 
         tvMiniTrackSub = new TextView(this);
-        tvMiniTrackSub.setText("Bishop Dr. David Mutweri · Tap to Play Audio");
+        tvMiniTrackSub.setText("Select a sermon to play audio");
         tvMiniTrackSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvMiniTrackSub.setTextColor(COLOR_PURPLE_SOFT);
         tvMiniTrackSub.setMaxLines(1);
         textCol.addView(tvMiniTrackSub);
 
-        textCol.setOnClickListener(v -> showSermonPlayerDialog("Supernatural Breakthrough in Hard Times", "Bishop Dr. David Mutweri"));
+        textCol.setOnClickListener(v -> {
+            String title = (tvMiniTrackTitle != null && !tvMiniTrackTitle.getText().toString().equals("No Audio Playing"))
+                    ? tvMiniTrackTitle.getText().toString()
+                    : "Supernatural Breakthrough in Hard Times";
+            showSermonPlayerDialog(title, "Bishop Dr. David Mutweri");
+        });
         player.addView(textCol);
 
         // Data Saver Switch Button
@@ -1329,9 +1337,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             if (tvGivingAccount != null && tvGivingAccount.getText() != null) {
                 account = tvGivingAccount.getText().toString().replace("Account: ", "").trim();
             }
-            xpCount += 20;
-            GamificationStore.saveSpiritualXp(this, resolveGamificationUserId(), xpCount);
-            updateHud();
             ChurchIntentManager.launchMpesaGiving(this, "4069983", account, amt);
             dlg.dismiss();
         });
@@ -2582,6 +2587,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout rowPaybill = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "4069983 (Tap to Give)", v -> showGivingDialog());
         contactCard.addView(rowPaybill);
 
+        LinearLayout rowFeedback = createInteractiveContactRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: "));
+        contactCard.addView(rowFeedback);
+
         // Quick Action Buttons
         LinearLayout contactButtonsRow = new LinearLayout(this);
         contactButtonsRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -3136,6 +3144,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void showSermonPlayerDialog(String sermonTitle, String speaker) {
+        if (miniPlayerContainer != null) {
+            miniPlayerContainer.setVisibility(View.VISIBLE);
+        }
+        if (tvMiniTrackTitle != null) {
+            tvMiniTrackTitle.setText(sermonTitle);
+        }
+        if (tvMiniTrackSub != null) {
+            tvMiniTrackSub.setText(speaker + " · Playing Audio");
+        }
+        isPlaying = true;
+        if (btnMiniPlayPause != null) {
+            btnMiniPlayPause.setText("⏸");
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
