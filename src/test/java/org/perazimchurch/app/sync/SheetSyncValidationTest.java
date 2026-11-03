@@ -246,6 +246,41 @@ public class SheetSyncValidationTest {
     }
 
     @Test
+    public void testDateParsingUsesNairobiTimezone() {
+        java.util.Calendar cal = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("Africa/Nairobi"), java.util.Locale.ROOT);
+        cal.clear();
+        cal.set(2026, java.util.Calendar.NOVEMBER, 3, 10, 0, 0);
+        long expectedMillis = cal.getTimeInMillis();
+
+        long parsed = SheetSyncManager.parseDate("2026-11-03 10:00", 0L);
+        assertEquals("Parsed date must match Africa/Nairobi timezone", expectedMillis, parsed);
+    }
+
+    @Test
+    public void testSermonSyncPreservesMemberNotesAgainstRemoteNotesColumn() throws IOException {
+        List<SermonEntity> existingList = new ArrayList<>();
+        SermonEntity existingSermon = new SermonEntity(
+                "sermon_1", "Original Title", "Speaker", "Series", "Scripture",
+                "https://audio.mp3", "", 1700000000000L, 1800,
+                "Summary", "Personal Member Study Notes", true, "/local/path/s1.mp3", true);
+        existingList.add(existingSermon);
+
+        DummySermonDao mockDao = new DummySermonDao(existingList);
+
+        String csv = "id,title,speaker,date,series,scripture,youtube_url,audio_url,active,notes\n" +
+                "sermon_1,\"Updated Title\",\"Speaker\",\"2026-11-01\",\"Series\",\"Scripture\",\"\",\"https://audio.mp3\",true,\"Remote Secretariat Note\"";
+        List<List<String>> rows = CsvParser.parse(csv);
+
+        SheetSyncManager.SyncStats stats = SheetSyncManager.processSermonsRows(rows, mockDao);
+        assertEquals(1, stats.synced);
+
+        SermonEntity updated = mockDao.getSermonById("sermon_1");
+        assertEquals("Personal Member Study Notes", updated.getNotes());
+        assertTrue(updated.isDownloaded());
+        assertEquals("/local/path/s1.mp3", updated.getLocalAudioPath());
+    }
+
+    @Test
     public void testAnnouncementProcessingMapsSheetContent() throws IOException {
         List<AnnouncementEntity> list = new ArrayList<>();
         DummyAnnouncementDao mockDao = new DummyAnnouncementDao(list);
