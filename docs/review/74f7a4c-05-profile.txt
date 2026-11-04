@@ -1,0 +1,10 @@
+[android.widget.TextView] Perazim
+[android.widget.TextView] Embu Headquarters
+[android.widget.TextView] Guest Pilgrim
+[android.widget.TextView] guest@perazim.org
+[android.widget.TextView] Embu Headquarters · Switch ▾
+[android.widget.TextView] Home
+[android.widget.TextView] Sermons
+[android.widget.TextView] Worship
+[android.widget.TextView] Prayer
+[android.widget.TextView] Me

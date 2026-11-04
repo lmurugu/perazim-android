@@ -1,0 +1,27 @@
+[android.widget.TextView] Perazim
+[android.widget.TextView] Embu Headquarters
+[android.widget.TextView] Prayer
+[android.widget.TextView] “Bear ye one another's burdens, and so fulfil the law of Christ.” — Galatians 6:2
+[android.widget.Button] PRAYER WALL
+[android.widget.Button] MY PRAYERS
+[android.widget.Button] + SHARE A PRAYER
+[android.widget.TextView] Faith Wanjiru
+[android.widget.TextView] 2 hours ago
+[android.widget.TextView] Prayers for University Exams
+[android.widget.TextView] Please stand with me as I sit my final semester engineering papers this week. Trusting the Lord for wisdom and clarity.
+[android.widget.Button] 🙏 AMEN (14)
+[android.widget.TextView] Brother John
+[android.widget.TextView] Yesterday
+[android.widget.TextView] Healing for My Mother
+[android.widget.TextView] Asking the church for prayers over my mother who is undergoing minor surgery tomorrow in Nairobi. We declare divine health and peace.
+[android.widget.Button] 🙏 AMEN (29)
+[android.widget.TextView] Anonymous
+[android.widget.TextView] 2 days ago
+[android.widget.TextView] Breakthrough in Job Interview
+[android.widget.TextView] Standing in faith for open doors in an upcoming accounting interview. Believing God for supernatural favour.
+[android.widget.Button] 🙏 AMEN (8)
+[android.widget.TextView] Home
+[android.widget.TextView] Sermons
+[android.widget.TextView] Worship
+[android.widget.TextView] Prayer
+[android.widget.TextView] Me

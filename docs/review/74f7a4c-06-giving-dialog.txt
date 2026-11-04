@@ -1,0 +1,21 @@
+[android.widget.TextView] GENEROSITY & HARVEST · 2 COR 9:7
+[android.widget.TextView] Give to Perazim Mission Church
+[android.widget.TextView] “Honor the LORD with your wealth, with the firstfruits of all your crops.” — Proverbs 3:9
+[android.widget.TextView] SAFARICOM M-PESA PAYBILL
+[android.widget.TextView] 4069983
+[android.widget.Button] COPY PAYBILL
+[android.widget.TextView] Account: PERAZIM-TITHE
+[android.widget.Button] COPY PAYBILL & ACCOUNT
+[android.widget.TextView] SELECT GIVING FUND:
+[android.widget.TextView] Tithe (PERAZIM-TITHE)
+[android.widget.TextView] AMOUNT (KES):
+[android.widget.Button] 200
+[android.widget.Button] 500
+[android.widget.Button] 1,000
+[android.widget.Button] 2,500
+[android.widget.EditText] 1000
+[android.widget.Button] OPEN M-PESA
+[android.widget.TextView] OTHER SAFARICOM LAUNCH OPTIONS:
+[android.widget.Button] SIM TOOLKIT
+[android.widget.Button] DIAL *334#
+[android.widget.TextView] Giving is processed directly by Safaricom M-Pesa. Perazim app never asks for or stores your M-Pesa PIN.

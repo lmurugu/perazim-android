@@ -1,0 +1,24 @@
+[android.widget.TextView] Fellowship Extras
+[android.widget.Button] DEVOTIONAL RIDDLES
+[android.widget.Button] CHRISTIAN JOY & HUMOR
+[android.widget.TextView] I lived longer than any mortal man recorded in Scripture, yet I died before my father did. Who am I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] Out of the eater came something to eat; out of the strong came something sweet. What is this riddle and what is its answer?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] I had no earthly father, no earthly mother, and was never born as a baby; yet God fashioned me from the virgin soil of Eden. Who am I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] I was neither a prophet, priest, nor king, yet God opened my mouth to speak with a human voice to rebuke a wayward prophet who was blind to the Angel of the Lord. Who am I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] King David named a battlefield after me when God broke through his enemies like a rushing torrent of bursting waters. What is the name of this place of Great Breakthrough?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] I was King of Salem and priest of God Most High, without genealogy, without beginning of days or end of life, foreshadowing the eternal priesthood of Jesus Christ. Who am I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] I was short in physical stature and despised as a tax collector, but I climbed a sycamore fig tree to catch a glimpse of Jesus in Jericho. Who am I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] I offered only five barley loaves and two small fish from my lunch, yet in the hands of the Lord, my meal satisfied five thousand men with twelve baskets of leftovers. Who was I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] I was built without sound of iron, axe, or tool of any kind at the site. What am I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.TextView] I was sold for twenty pieces of silver by my own brothers, yet later saved their lives in a famine. Who am I?
+[android.widget.Button] REVEAL ANSWER
+[android.widget.Button] CLOSE

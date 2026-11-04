@@ -1,0 +1,4 @@
+[android.widget.TextView] 📜 KJV ▾
+[android.widget.Button] 🔍 SEARCH
+[android.widget.Button] ✕
+[android.widget.Button] 📖 2 SAMUEL 5 · BAAL-PERAZIM ▾

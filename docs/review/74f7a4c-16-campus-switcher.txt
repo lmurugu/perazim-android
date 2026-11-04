@@ -1,0 +1,12 @@
+[android.widget.TextView] SELECT CHURCH CAMPUS
+[android.widget.TextView] Embu Headquarters
+[android.widget.TextView] Perazim Mission Church Branch
+[android.widget.TextView] Mwea Campus
+[android.widget.TextView] Perazim Mission Church Branch
+[android.widget.TextView] Rombo Campus
+[android.widget.TextView] Perazim Mission Church Branch
+[android.widget.TextView] Nairobi Fellowship
+[android.widget.TextView] Satellite & Digital Fellowship
+[android.widget.TextView] Online Sanctuary
+[android.widget.TextView] Satellite & Digital Fellowship
+[android.widget.Button] CANCEL

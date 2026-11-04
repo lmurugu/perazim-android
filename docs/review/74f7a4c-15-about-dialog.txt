@@ -1,0 +1,9 @@
+[android.widget.TextView] ABOUT PERAZIM MISSION CHURCH
+[android.widget.TextView] “A place where everybody is somebody, and no body is a nobody.”
+[android.widget.TextView] Leadership: Bishop Dr. David Mutweri
+Embu Headquarters, Kenya
+Campuses: Embu Headquarters, Mwea, Rombo, Nairobi, Online
+
+App Version: 2.2.0 (Build 4)
+Faithful offline-first faith companion.
+[android.widget.Button] CLOSE
