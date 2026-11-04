@@ -1,0 +1,14 @@
+[android.widget.Button] ← BACK
+[android.widget.TextView] BIBLICAL RIDDLES
+[android.widget.TextView] CREATION RIDDLE
+[android.widget.TextView] I had no mother and no father. I had no childhood years or youth. I walked in the garden before sin ever entered the world. Who am I?
+[android.widget.Button] REVEAL ANSWER (+10 XP)
+[android.widget.TextView] MIRACLE RIDDLE
+[android.widget.TextView] I was wrapped in graveclothes and laid in a stone tomb for four days until a single voice called me forth to walk the earth again. Who am I?
+[android.widget.Button] REVEAL ANSWER (+10 XP)
+[android.widget.TextView] BREAKTHROUGH RIDDLE
+[android.widget.TextView] When David fought the Philistines, God broke out before him like a rushing flood. What was this valley of victory named?
+[android.widget.Button] REVEAL ANSWER (+10 XP)
+[android.widget.TextView] GENEALOGY RIDDLE
+[android.widget.TextView] I lived longer than any other man recorded in Scripture (969 years), yet I died before my father did. How can this be?
+[android.widget.Button] REVEAL ANSWER (+10 XP)

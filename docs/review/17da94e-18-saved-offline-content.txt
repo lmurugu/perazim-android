@@ -1,0 +1,7 @@
+[android.widget.TextView] Saved & Offline Content
+[android.widget.TextView] 📦 SAVED & OFFLINE CONTENT MANAGER
+[android.widget.Button] 🎙️ SERMONS (0)
+[android.widget.Button] 🎵 HYMNS (0)
+[android.widget.Button] 📖 VERSES (0)
+[android.widget.TextView] No audio sermons downloaded yet. Tap download on any sermon to listen offline with zero data.
+[android.widget.Button] CLOSE

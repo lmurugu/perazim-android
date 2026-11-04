@@ -1,0 +1,9 @@
+[android.widget.TextView] Perazim
+[android.widget.TextView] Embu Headquarters
+[android.widget.TextView] PERAZIM MISSION CHURCH
+[android.widget.TextView] The Place of Great Breakthrough · Embu Headquarters
+[android.widget.TextView] Home
+[android.widget.TextView] Sermons
+[android.widget.TextView] Worship
+[android.widget.TextView] Prayer
+[android.widget.TextView] Me

@@ -1,0 +1,6 @@
+[android.widget.TextView] 📍 Select Church Campus
+[android.widget.TextView] Embu Headquarters
+[android.widget.TextView] Nairobi
+[android.widget.TextView] Meru
+[android.widget.TextView] Online
+[android.widget.Button] CANCEL
