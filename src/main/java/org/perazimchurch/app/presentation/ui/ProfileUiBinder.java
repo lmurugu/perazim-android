@@ -181,7 +181,7 @@ public class ProfileUiBinder {
     private View createProfileHeaderCard() {
         FrameLayout rootFrame = new FrameLayout(context);
         LinearLayout.LayoutParams lpRoot = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(140));
         lpRoot.setMargins(0, 0, 0, dp(12));
         rootFrame.setLayoutParams(lpRoot);
         rootFrame.setBackground(PerazimTheme.createHeroGradient(dp(PerazimTheme.RADIUS_LG), dp(1)));

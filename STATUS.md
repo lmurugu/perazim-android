@@ -98,6 +98,29 @@
   - Multi-Device Intercession Amen: [`20_sister_mary_amen.png`](docs/review/phase_A/20_sister_mary_amen.png)
   - Offline Sync Recovery (Both Prayers Synced): [`22_prayer_wall_synced.png`](docs/review/phase_A/22_prayer_wall_synced.png)
 
+### 2.4 Physical Hardware Verification on Infinix HOT 10T (`0667737142100269`) — `WORKING`
+- **Audit Date**: November 5, 2026
+- **Branch**: `phase-A-server`
+- **Device Specifications**: Physical Infinix HOT 10T (`Infinix_X689C`), Android 11 (API 30), Screen Resolution 720x1640 (tall aspect ratio).
+- **Aspect Ratio & Layout Engineering**:
+  - Identified layout bloat on tall screens where unconstrained `WRAP_CONTENT` headers caused 720x1279 background bitmaps to monopolize the viewport.
+  - Refactored `HomeUiBinder.java`, `ProfileUiBinder.java`, and `SermonsUiBinder.java` to enforce fixed dp header heights (`dp(140)` and `dp(160)`) with `CENTER_CROP` and `Gravity.BOTTOM` alignments.
+  - All 5 navigation tabs now render completely without clipping, bloat, or off-screen element push on the physical device.
+- **Physical Hardware Test Results**:
+  1. **Home Screen Sanctuary**: Constrained header, daily scripture card (Philippians 4:13), 3-minute breakthrough routine button, and all 4 Sanctuary Doors (Bible, Sermons, Worship, Prayer) fit simultaneously on screen without scrolling.
+  2. **Member Account Flow**: Registered user Levi (`0715440482`) authenticated against local server via USB reverse tunnel (`adb reverse tcp:3000 tcp:3000`). Profile screen displays 0 Streak, 0 XP, 2 Grace Points, 0 Lifetime Days, M-Pesa giving button, and full settings navigation.
+  3. **Live Prayer Intercession & Server Sync**: Prayer wall rendered live petitions from Sister Mary and Brother John. Tapping `🙏 AMEN (0)` on Sister Mary's petition updated the UI immediately to `✓ JOINED IN PRAYER (1)` and transmitted a `POST /api/sync` mutation over the network tunnel, returning HTTP 200 OK with zero data loss.
+  4. **Sermons & Audio Controller**: Livestream card displays correctly with sunrise lamp artwork; Supernatural Breakthrough audio player, search bar, and message list verified.
+  5. **Worship Hymnal**: Sacred hymns and choral worship banner, search bar, chips (Favorites, Worship, Faith, Grace, Praise), and hymnal list verified.
+- **Physical Hardware Proof Files**:
+  - Unconstrained Header Before Fix: [`01_home_screen_before_fix.png`](docs/review/infinix_hardware/01_home_screen_before_fix.png)
+  - Home Sanctuary View: [`02_home_sanctuary.png`](docs/review/infinix_hardware/02_home_sanctuary.png)
+  - Authenticated Member Profile (Levi): [`03_profile_authenticated.png`](docs/review/infinix_hardware/03_profile_authenticated.png)
+  - Prayer Wall Initial State: [`04_prayer_wall_initial.png`](docs/review/infinix_hardware/04_prayer_wall_initial.png)
+  - Prayer Wall Amen Synced: [`05_prayer_wall_amen_synced.png`](docs/review/infinix_hardware/05_prayer_wall_amen_synced.png)
+  - Sermons Tab: [`06_sermons_tab.png`](docs/review/infinix_hardware/06_sermons_tab.png)
+  - Worship Tab: [`07_worship_tab.png`](docs/review/infinix_hardware/07_worship_tab.png)
+
 ---
 
 ## 3. How to Run the Automated Visual Audit

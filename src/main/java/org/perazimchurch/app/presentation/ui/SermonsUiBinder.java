@@ -296,7 +296,7 @@ public class SermonsUiBinder {
     private View buildLiveStreamBanner() {
         FrameLayout rootFrame = new FrameLayout(activity);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(160));
         lp.setMargins(0, 0, 0, dp(14));
         rootFrame.setLayoutParams(lp);
         rootFrame.setBackground(PerazimTheme.createHeroGradient(dp(14), dp(1)));

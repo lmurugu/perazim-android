@@ -255,7 +255,7 @@ public class HomeUiBinder {
         // 1. Quiet Sanctuary Welcome Wordmark with Official Logo & Illustrated Quiet-Dark Header
         FrameLayout headerContainer = new FrameLayout(context);
         LinearLayout.LayoutParams lpHeader = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(140));
         lpHeader.setMargins(0, 0, 0, dp(14));
         headerContainer.setLayoutParams(lpHeader);
 
@@ -285,6 +285,8 @@ public class HomeUiBinder {
         headerBanner.setOrientation(LinearLayout.HORIZONTAL);
         headerBanner.setGravity(Gravity.CENTER_VERTICAL);
         headerBanner.setPadding(dp(14), dp(14), dp(14), dp(14));
+        headerBanner.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 
         ImageView churchLogo = new ImageView(context);
         churchLogo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
