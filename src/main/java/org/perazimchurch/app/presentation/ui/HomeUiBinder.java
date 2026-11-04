@@ -245,13 +245,28 @@ public class HomeUiBinder {
     private void initUi() {
         rootScrollView = new ScrollView(context);
         rootScrollView.setFillViewport(true);
-        rootScrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        rootScrollView.setBackground(PerazimTheme.createBackgroundGradient());
 
         contentContainer = new LinearLayout(context);
         contentContainer.setOrientation(LinearLayout.VERTICAL);
         contentContainer.setPadding(dp(16), dp(16), dp(16), dp(32));
 
-        // 1. Quiet Sanctuary Welcome Wordmark
+        // 1. Quiet Sanctuary Welcome Wordmark with Official Logo
+        LinearLayout headerBanner = new LinearLayout(context);
+        headerBanner.setOrientation(LinearLayout.HORIZONTAL);
+        headerBanner.setGravity(Gravity.CENTER_VERTICAL);
+        headerBanner.setPadding(0, 0, 0, dp(14));
+
+        ImageView churchLogo = new ImageView(context);
+        churchLogo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(44), dp(44));
+        lpLogo.setMargins(0, 0, dp(12), 0);
+        churchLogo.setLayoutParams(lpLogo);
+        headerBanner.addView(churchLogo);
+
+        LinearLayout titleCol = new LinearLayout(context);
+        titleCol.setOrientation(LinearLayout.VERTICAL);
+
         TextView tvChurchHeader = new TextView(context);
         tvChurchHeader.setText("PERAZIM MISSION CHURCH");
         tvChurchHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
@@ -259,20 +274,22 @@ public class HomeUiBinder {
         tvChurchHeader.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         tvChurchHeader.setLetterSpacing(0.04f);
         tvChurchHeader.setPadding(0, 0, 0, dp(2));
-        contentContainer.addView(tvChurchHeader);
+        titleCol.addView(tvChurchHeader);
 
         TextView tvSubGreeting = new TextView(context);
         tvSubGreeting.setText("The Place of Great Breakthrough · Embu Headquarters");
         tvSubGreeting.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvSubGreeting.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvSubGreeting.setPadding(0, 0, 0, dp(16));
-        contentContainer.addView(tvSubGreeting);
+        titleCol.addView(tvSubGreeting);
 
-        // 2. Single "Today" Card (Surface #3D1749)
+        headerBanner.addView(titleCol);
+        contentContainer.addView(headerBanner);
+
+        // 2. Single "Today" Card (Hero Darkened Gradient)
         View todayCard = createTodayCard();
         contentContainer.addView(todayCard);
 
-        // 3. Four Quiet Doors (2x2 Grid on Surface #3D1749)
+        // 3. Four Quiet Doors (2x2 Grid on Surface Gradient)
         View doorsGrid = createFourDoorsGrid();
         contentContainer.addView(doorsGrid);
 
@@ -286,7 +303,9 @@ public class HomeUiBinder {
     }
 
     private View createTodayCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, dp(16), PerazimTheme.COLOR_STROKE, dp(1));
+        LinearLayout card = new LinearLayout(context);
+        card.setPadding(dp(16), dp(16), dp(16), dp(16));
+        card.setBackground(PerazimTheme.createHeroGradient(dp(16), dp(1)));
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -329,15 +348,11 @@ public class HomeUiBinder {
         tvCornerstoneBody.setPadding(0, 0, 0, dp(12));
         card.addView(tvCornerstoneBody);
 
-        // Routine Inline Container (Surface 2 #4F1E5C)
+        // Routine Inline Container (Surface 2 Gradient)
         routineInlineContainer = new LinearLayout(context);
         routineInlineContainer.setOrientation(LinearLayout.VERTICAL);
         routineInlineContainer.setPadding(dp(12), dp(10), dp(12), dp(10));
-        GradientDrawable rcBg = new GradientDrawable();
-        rcBg.setColor(PerazimTheme.COLOR_SURFACE_2);
-        rcBg.setCornerRadius(dp(10));
-        rcBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        routineInlineContainer.setBackground(rcBg);
+        routineInlineContainer.setBackground(PerazimTheme.createSurface2Gradient(dp(10), dp(1)));
         routineInlineContainer.setVisibility(View.GONE);
 
         tvRoutineStepTitle = new TextView(context);
@@ -360,27 +375,21 @@ public class HomeUiBinder {
         btnRoutineNext.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnRoutineNext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnRoutineNext.setTypeface(Typeface.DEFAULT_BOLD);
-        GradientDrawable rnBg = new GradientDrawable();
-        rnBg.setColor(PerazimTheme.COLOR_PURPLE_BRAND);
-        rnBg.setCornerRadius(dp(8));
-        btnRoutineNext.setBackground(rnBg);
+        btnRoutineNext.setBackground(PerazimTheme.createActivePillGradient(dp(8)));
         btnRoutineNext.setPadding(dp(12), dp(6), dp(12), dp(6));
         btnRoutineNext.setOnClickListener(v -> advanceReflectionStep());
         routineInlineContainer.addView(btnRoutineNext);
 
         card.addView(routineInlineContainer);
 
-        // ONE Primary Orange Button (#E17D2F)
+        // ONE Primary Orange Button (Muted/Darkened Gradient)
         btnBeginRoutine = new Button(context);
         syncRoutineStateWithGamificationStore();
         updateBeginRoutineButtonText();
         btnBeginRoutine.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnBeginRoutine.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         btnBeginRoutine.setTypeface(Typeface.DEFAULT_BOLD);
-        GradientDrawable brBg = new GradientDrawable();
-        brBg.setColor(PerazimTheme.COLOR_ORANGE_BRAND);
-        brBg.setCornerRadius(dp(10));
-        btnBeginRoutine.setBackground(brBg);
+        btnBeginRoutine.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(10)));
         btnBeginRoutine.setPadding(dp(14), dp(10), dp(14), dp(10));
         LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1148,10 +1157,19 @@ public class HomeUiBinder {
     private LinearLayout createCard(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
         LinearLayout card = new LinearLayout(context);
         card.setPadding(dp(16), dp(16), dp(16), dp(16));
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setColor(bgColor);
-        drawable.setCornerRadius(dp(cornerRadiusDp));
-        drawable.setStroke(dp(borderWidthDp), borderColor);
+        GradientDrawable drawable;
+        if (bgColor == PerazimTheme.COLOR_SURFACE) {
+            drawable = PerazimTheme.createCardGradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        } else if (bgColor == PerazimTheme.COLOR_SURFACE_2) {
+            drawable = PerazimTheme.createSurface2Gradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        } else {
+            drawable = new GradientDrawable();
+            drawable.setColor(bgColor);
+            drawable.setCornerRadius(dp(cornerRadiusDp));
+            if (borderWidthDp > 0) {
+                drawable.setStroke(dp(borderWidthDp), borderColor);
+            }
+        }
         card.setBackground(drawable);
         return card;
     }

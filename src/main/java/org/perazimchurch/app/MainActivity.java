@@ -186,7 +186,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         rootLayout.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         rootLayout.setOrientation(LinearLayout.VERTICAL);
-        rootLayout.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        rootLayout.setBackground(PerazimTheme.createBackgroundGradient());
 
         // 1. Top App Bar
         View topBar = createTopAppBar();
@@ -285,13 +285,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        header.setBackground(PerazimTheme.createTopBarGradient(dp(1)));
         header.setPadding(dp(16), dp(10), dp(16), dp(10));
 
-        GradientDrawable headerBg = new GradientDrawable();
-        headerBg.setColor(PerazimTheme.COLOR_BG_DEEP);
-        headerBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        header.setBackground(headerBg);
+        // Official Church Logo
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(R.drawable.ic_perazim_logo);
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(28), dp(28));
+        lpLogo.setMargins(0, 0, dp(10), 0);
+        logo.setLayoutParams(lpLogo);
+        header.addView(logo);
 
         // Wordmark "Perazim"
         TextView wordmark = new TextView(this);
@@ -307,15 +310,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         spacer.setLayoutParams(lpSpacer);
         header.addView(spacer);
 
-        // Campus Selector Outline Chip
+        // Campus Selector Outline Chip with darkened surface gradient
         LinearLayout spinnerPill = new LinearLayout(this);
         spinnerPill.setOrientation(LinearLayout.HORIZONTAL);
         spinnerPill.setGravity(Gravity.CENTER_VERTICAL);
-        GradientDrawable pillBg = new GradientDrawable();
-        pillBg.setColor(PerazimTheme.COLOR_SURFACE);
-        pillBg.setCornerRadius(dp(12));
-        pillBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        spinnerPill.setBackground(pillBg);
+        spinnerPill.setBackground(PerazimTheme.createSurface2Gradient(dp(12), dp(1)));
         spinnerPill.setPadding(dp(8), dp(2), dp(6), dp(2));
 
         campusSpinner = new Spinner(this);
@@ -377,10 +376,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         player.setGravity(Gravity.CENTER_VERTICAL);
         player.setPadding(dp(12), dp(8), dp(12), dp(8));
 
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(PerazimTheme.COLOR_SURFACE);
-        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        player.setBackground(bg);
+        player.setBackground(PerazimTheme.createCardGradient(dp(12), dp(1)));
 
         ImageView icon = new ImageView(this);
         icon.setImageResource(R.drawable.ic_nav_sermons);
@@ -492,10 +488,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         bottomNav.setGravity(Gravity.CENTER_VERTICAL);
         bottomNav.setPadding(0, dp(4), 0, dp(4));
 
-        GradientDrawable navBorder = new GradientDrawable();
-        navBorder.setColor(PerazimTheme.COLOR_BG_DEEP);
-        navBorder.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        bottomNav.setBackground(navBorder);
+        bottomNav.setBackground(PerazimTheme.createBottomNavGradient(dp(1)));
 
         final int[] iconResIds = {
                 NavigationContract.TAB_ICON_RES_HOME,
@@ -569,9 +562,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     navTabIcons[i].setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
                 }
                 if (navTabButtons[i] != null) {
-                    GradientDrawable activePill = new GradientDrawable();
-                    activePill.setColor(PerazimTheme.COLOR_PURPLE_GHOST);
-                    activePill.setCornerRadius(dp(12));
+                    GradientDrawable activePill = PerazimTheme.createActivePillGradient(dp(12));
                     navTabButtons[i].setBackground(activePill);
                 }
             } else {

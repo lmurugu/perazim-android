@@ -1,6 +1,7 @@
 package org.perazimchurch.app.ui.theme;
 
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 
 /**
  * Design System Contract for Perazim Mission Church.
@@ -111,4 +112,146 @@ public final class PerazimTheme {
     public static final int RADIUS_LG = 14;
     public static final int RADIUS_XL = 20;
     public static final int RADIUS_PILL = 999;
+
+    // =========================================================================
+    // GRADIENT DRAWABLE FACTORIES (Darkened & Muted Palettes)
+    // =========================================================================
+
+    /**
+     * Vertical darkened background canvas gradient (#2E1038 -> #190720).
+     */
+    public static GradientDrawable createBackgroundGradient() {
+        return new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.parseColor("#2E1038"), Color.parseColor("#190720")}
+        );
+    }
+
+    /**
+     * Top App Bar darkened header gradient (#32123D -> #220A2B) with bottom hairline stroke.
+     */
+    public static GradientDrawable createTopBarGradient(int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.parseColor("#32123D"), Color.parseColor("#220A2B")}
+        );
+        if (strokePx > 0) {
+            gd.setStroke(strokePx, COLOR_STROKE);
+        }
+        return gd;
+    }
+
+    /**
+     * Bottom Navigation Bar darkened gradient (#260C2E -> #18061F) with top hairline stroke.
+     */
+    public static GradientDrawable createBottomNavGradient(int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.parseColor("#260C2E"), Color.parseColor("#18061F")}
+        );
+        if (strokePx > 0) {
+            gd.setStroke(strokePx, COLOR_STROKE);
+        }
+        return gd;
+    }
+
+    /**
+     * Standard card surface gradient (#421950 -> #31113E) with rounded corners and hairline stroke.
+     */
+    public static GradientDrawable createCardGradient(int radiusPx, int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor("#421950"), Color.parseColor("#31113E")}
+        );
+        gd.setCornerRadius(radiusPx);
+        if (strokePx > 0) {
+            gd.setStroke(strokePx, COLOR_STROKE);
+        }
+        return gd;
+    }
+
+    /**
+     * Elevated surface 2 gradient (#541F63 -> #3E164A) for search bars, input cards, and chip containers.
+     */
+    public static GradientDrawable createSurface2Gradient(int radiusPx, int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor("#541F63"), Color.parseColor("#3E164A")}
+        );
+        gd.setCornerRadius(radiusPx);
+        if (strokePx > 0) {
+            gd.setStroke(strokePx, COLOR_STROKE);
+        }
+        return gd;
+    }
+
+    /**
+     * Canonical single primary CTA warm muted/darkened orange gradient (#E88636 -> #C06119).
+     */
+    public static GradientDrawable createPrimaryOrangeGradient(int radiusPx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor("#E88636"), Color.parseColor("#C06119")}
+        );
+        gd.setCornerRadius(radiusPx);
+        return gd;
+    }
+
+    /**
+     * Hero card darkened gradient (#4A1B59 -> #2F0D39) for Daily Verse, Livestream hero, and Member identity.
+     */
+    public static GradientDrawable createHeroGradient(int radiusPx, int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor("#4A1B59"), Color.parseColor("#2F0D39")}
+        );
+        gd.setCornerRadius(radiusPx);
+        if (strokePx > 0) {
+            gd.setStroke(strokePx, Color.parseColor("#583B65"));
+        }
+        return gd;
+    }
+
+    /**
+     * Darkened dialog background gradient (#3D154A -> #24092C).
+     */
+    public static GradientDrawable createDialogGradient(int radiusPx, int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.parseColor("#3D154A"), Color.parseColor("#24092C")}
+        );
+        gd.setCornerRadius(radiusPx);
+        if (strokePx > 0) {
+            gd.setStroke(strokePx, COLOR_STROKE);
+        }
+        return gd;
+    }
+
+    /**
+     * Active filter / nav pill gradient in brand royal purple (#751E8D -> #521264).
+     */
+    public static GradientDrawable createActivePillGradient(int radiusPx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor("#751E8D"), Color.parseColor("#521264")}
+        );
+        gd.setCornerRadius(radiusPx);
+        return gd;
+    }
+
+    /**
+     * Subtle muted outline pill / button gradient (#361241 -> #280C31).
+     */
+    public static GradientDrawable createMutedPillGradient(int radiusPx, int strokeColor, int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.parseColor("#361241"), Color.parseColor("#280C31")}
+        );
+        gd.setCornerRadius(radiusPx);
+        if (strokePx > 0) {
+            gd.setStroke(strokePx, strokeColor);
+        }
+        return gd;
+    }
 }
+

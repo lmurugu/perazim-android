@@ -114,7 +114,7 @@ public class WorshipUiBinder {
     private void initViews() {
         rootScrollView = new ScrollView(activity);
         rootScrollView.setFillViewport(true);
-        rootScrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        rootScrollView.setBackground(PerazimTheme.createBackgroundGradient());
 
         contentLayout = new LinearLayout(activity);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
@@ -345,10 +345,10 @@ public class WorshipUiBinder {
             boolean isSelected = btn.getText().toString().equalsIgnoreCase(selectedCategory);
             if (isSelected) {
                 btn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-                btn.setBackground(createSolidPill(PerazimTheme.COLOR_PURPLE_BRAND, 14));
+                btn.setBackground(PerazimTheme.createActivePillGradient(dp(14)));
             } else {
                 btn.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-                btn.setBackground(createCardBackground(Color.TRANSPARENT, 14, PerazimTheme.COLOR_STROKE, 1));
+                btn.setBackground(PerazimTheme.createMutedPillGradient(dp(14), PerazimTheme.COLOR_STROKE, dp(1)));
             }
         }
     }
@@ -492,12 +492,12 @@ public class WorshipUiBinder {
 
         ScrollView dialogScroll = new ScrollView(activity);
         dialogScroll.setFillViewport(true);
-        dialogScroll.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        dialogScroll.setBackground(PerazimTheme.createDialogGradient(dp(18), dp(1)));
 
         LinearLayout detailBox = new LinearLayout(activity);
         detailBox.setOrientation(LinearLayout.VERTICAL);
         detailBox.setPadding(dp(20), dp(20), dp(20), dp(28));
-        detailBox.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        detailBox.setBackgroundColor(Color.TRANSPARENT);
 
         // Top Navigation & Controls Row: Back, Favorite, Font Size, Transpose
         LinearLayout topControlsRow = new LinearLayout(activity);
@@ -712,7 +712,7 @@ public class WorshipUiBinder {
         final AlertDialog dialog = builder.create();
 
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_DEEP));
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
         }
 
         btnBack.setOnClickListener(v -> dialog.dismiss());
@@ -817,15 +817,16 @@ public class WorshipUiBinder {
     private LinearLayout createCard(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
         LinearLayout card = new LinearLayout(activity);
         card.setPadding(dp(14), dp(14), dp(14), dp(14));
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setColor(bgColor);
-        drawable.setCornerRadius(dp(cornerRadiusDp));
-        drawable.setStroke(dp(borderWidthDp), borderColor);
-        card.setBackground(drawable);
+        card.setBackground(createCardBackground(bgColor, cornerRadiusDp, borderColor, borderWidthDp));
         return card;
     }
 
     private Drawable createCardBackground(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
+        if (bgColor == PerazimTheme.COLOR_SURFACE) {
+            return PerazimTheme.createCardGradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        } else if (bgColor == PerazimTheme.COLOR_SURFACE_2) {
+            return PerazimTheme.createSurface2Gradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));
@@ -834,6 +835,11 @@ public class WorshipUiBinder {
     }
 
     private Drawable createSolidPill(int bgColor, int cornerRadiusDp) {
+        if (bgColor == PerazimTheme.COLOR_PURPLE_BRAND) {
+            return PerazimTheme.createActivePillGradient(dp(cornerRadiusDp));
+        } else if (bgColor == PerazimTheme.COLOR_ORANGE_BRAND) {
+            return PerazimTheme.createPrimaryOrangeGradient(dp(cornerRadiusDp));
+        }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));

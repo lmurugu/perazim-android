@@ -32,6 +32,7 @@ gradle-8.5-bin.zip
 *.png
 !docs/screenshots/*.png
 !docs/review/*.png
+!src/main/res/**/*.png
 FORENSIC_*.md
 forensic/
 

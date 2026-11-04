@@ -127,7 +127,7 @@ public class ProfileUiBinder {
     public ScrollView buildView() {
         ScrollView scrollView = new ScrollView(context);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        scrollView.setBackground(PerazimTheme.createBackgroundGradient());
 
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -177,7 +177,7 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createProfileHeaderCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
+        LinearLayout card = new LinearLayout(context);
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
@@ -185,17 +185,13 @@ public class ProfileUiBinder {
         lpCard.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(lpCard);
         card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(PerazimTheme.createHeroGradient(dp(PerazimTheme.RADIUS_LG), dp(1)));
 
-        // Member Avatar
-        Bitmap avatarBmp = loadAssetBitmap("bishop_portrait.jpg", 200);
+        // Member Avatar with Church Logo
         ivAvatar = new ImageView(context);
-        if (avatarBmp != null) {
-            ivAvatar.setImageBitmap(getRoundedCornerBitmap(avatarBmp, dp(28)));
-            ivAvatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        } else {
-            ivAvatar.setImageBitmap(createMonogramBitmap("PMC", dp(56)));
-        }
-        LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(56), dp(56));
+        ivAvatar.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        ivAvatar.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(54), dp(54));
         lpAv.setMargins(0, 0, dp(14), 0);
         ivAvatar.setLayoutParams(lpAv);
         card.addView(ivAvatar);
@@ -220,13 +216,13 @@ public class ProfileUiBinder {
         tvMemberEmail.setPadding(0, dp(2), 0, dp(4));
         memberInfo.addView(tvMemberEmail);
 
-        // Campus Selector Chip
+        // Campus Selector Chip with darkened surface gradient
         tvMemberCampus = new TextView(context);
         tvMemberCampus.setText("Embu Headquarters · Switch ▾");
         tvMemberCampus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvMemberCampus.setTypeface(Typeface.DEFAULT_BOLD);
         tvMemberCampus.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvMemberCampus.setBackground(createPillDrawable(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
+        tvMemberCampus.setBackground(PerazimTheme.createSurface2Gradient(dp(12), dp(1)));
         tvMemberCampus.setPadding(dp(8), dp(3), dp(8), dp(3));
         LinearLayout.LayoutParams lpCampus = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -331,10 +327,7 @@ public class ProfileUiBinder {
         btnGive.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         btnGive.setTypeface(Typeface.DEFAULT_BOLD);
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(PerazimTheme.COLOR_ORANGE_BRAND);
-        bg.setCornerRadius(dp(12));
-        btnGive.setBackground(bg);
+        btnGive.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(12)));
         btnGive.setPadding(dp(14), dp(12), dp(14), dp(12));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -512,6 +505,7 @@ public class ProfileUiBinder {
     private void showAboutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("About Perazim Mission Church");
+        builder.setIcon(org.perazimchurch.app.R.drawable.ic_perazim_logo);
         builder.setMessage("“A place where everybody is somebody, and no body is a nobody.”\n\n"
                 + "Leadership: Bishop Dr. David Mutweri\n"
                 + "Embu Headquarters, Kenya\n"
@@ -519,7 +513,11 @@ public class ProfileUiBinder {
                 + "App Version: 2.2.0 (Build 4)\n"
                 + "Faithful offline-first faith companion.");
         builder.setPositiveButton("Close", null);
-        builder.show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
+        }
     }
 
     private void showFellowshipExtrasDialog() {
@@ -1309,11 +1307,17 @@ public class ProfileUiBinder {
     private LinearLayout createCard(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
         LinearLayout card = new LinearLayout(context);
         card.setPadding(dp(16), dp(16), dp(16), dp(16));
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setColor(bgColor);
-        drawable.setCornerRadius(dp(cornerRadiusDp));
-        drawable.setStroke(dp(borderWidthDp), borderColor);
-        card.setBackground(drawable);
+        if (bgColor == PerazimTheme.COLOR_SURFACE) {
+            card.setBackground(PerazimTheme.createCardGradient(dp(cornerRadiusDp), dp(borderWidthDp)));
+        } else if (bgColor == PerazimTheme.COLOR_SURFACE_2) {
+            card.setBackground(PerazimTheme.createSurface2Gradient(dp(cornerRadiusDp), dp(borderWidthDp)));
+        } else {
+            GradientDrawable drawable = new GradientDrawable();
+            drawable.setColor(bgColor);
+            drawable.setCornerRadius(dp(cornerRadiusDp));
+            drawable.setStroke(dp(borderWidthDp), borderColor);
+            card.setBackground(drawable);
+        }
         return card;
     }
 

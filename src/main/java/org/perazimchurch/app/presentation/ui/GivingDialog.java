@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -34,10 +35,10 @@ import java.util.List;
 /**
  * Lipa na M-Pesa Giving & Tithes Dialog.
  * Quiet dark contemplative design matching Perazim design guidelines:
- * - Dialog surface: #3D1749 with stroke #4A3554
- * - Title: "Give to Perazim Mission Church" (#F5F0F7, 18sp bold)
- * - Paybill 4069983 on quiet card #4F1E5C
- * - Primary action button: ONE solid orange #E17D2F "Open M-Pesa"
+ * - Dialog surface: darkened gradient with hairline stroke
+ * - Title: "Give to Perazim Mission Church" (#F5F0F7, 18sp bold) with official logo
+ * - Paybill 4069983 on surface 2 gradient
+ * - Primary action button: ONE muted/darkened orange gradient "Open M-Pesa"
  * - Secondary quiet actions: SIM Toolkit, Dial *334#
  * - Mandatory trust note: "Giving is processed directly by Safaricom M-Pesa. Perazim app never asks for or stores your M-Pesa PIN."
  * - Zero gamification rewards or points.
@@ -58,33 +59,45 @@ public final class GivingDialog {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
-        sv.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        sv.setBackground(PerazimTheme.createDialogGradient(dp(context, 18), dp(context, 1)));
 
         LinearLayout container = new LinearLayout(context);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(context, 20), dp(context, 22), dp(context, 20), dp(context, 22));
-        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        container.setBackground(PerazimTheme.createDialogGradient(dp(context, 18), dp(context, 1)));
 
-        // 1. Header Title
+        // 1. Header with Church Logo & Title
+        LinearLayout titleRow = new LinearLayout(context);
+        titleRow.setOrientation(LinearLayout.HORIZONTAL);
+        titleRow.setGravity(Gravity.CENTER_VERTICAL);
+
+        ImageView logo = new ImageView(context);
+        logo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(context, 34), dp(context, 34));
+        lpLogo.setMargins(0, 0, dp(context, 10), 0);
+        logo.setLayoutParams(lpLogo);
+        titleRow.addView(logo);
+
         TextView title = new TextView(context);
         title.setText("Give to Perazim Mission Church");
-        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         title.setTypeface(Typeface.DEFAULT_BOLD);
         title.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        container.addView(title);
+        titleRow.addView(title);
+        container.addView(titleRow);
 
         TextView subtitle = new TextView(context);
         subtitle.setText("“Honor the LORD with your wealth, with the firstfruits of all your crops.” — Proverbs 3:9");
         subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         subtitle.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        subtitle.setPadding(0, dp(context, 4), 0, dp(context, 16));
+        subtitle.setPadding(0, dp(context, 6), 0, dp(context, 16));
         container.addView(subtitle);
 
-        // 2. Paybill Details Box on #4F1E5C
+        // 2. Paybill Details Box on Surface 2 Gradient
         LinearLayout paybillBox = new LinearLayout(context);
         paybillBox.setOrientation(LinearLayout.VERTICAL);
         paybillBox.setPadding(dp(context, 16), dp(context, 14), dp(context, 16), dp(context, 14));
-        paybillBox.setBackground(createCardBackground(context, PerazimTheme.COLOR_SURFACE_2, 12, PerazimTheme.COLOR_STROKE, 1));
+        paybillBox.setBackground(PerazimTheme.createSurface2Gradient(dp(context, 12), dp(context, 1)));
 
         TextView tvPaybillLabel = new TextView(context);
         tvPaybillLabel.setText("SAFARICOM M-PESA PAYBILL");
@@ -112,7 +125,7 @@ public final class GivingDialog {
         btnCopyPaybill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnCopyPaybill.setTypeface(Typeface.DEFAULT_BOLD);
         btnCopyPaybill.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnCopyPaybill.setBackground(createSolidPill(context, PerazimTheme.COLOR_PURPLE_BRAND, 8));
+        btnCopyPaybill.setBackground(PerazimTheme.createActivePillGradient(dp(context, 8)));
         btnCopyPaybill.setPadding(dp(context, 12), dp(context, 6), dp(context, 12), dp(context, 6));
         pbRow.addView(btnCopyPaybill);
         paybillBox.addView(pbRow);
@@ -130,7 +143,7 @@ public final class GivingDialog {
         btnCopyAll.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnCopyAll.setTypeface(Typeface.DEFAULT_BOLD);
         btnCopyAll.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnCopyAll.setBackground(createCardBackground(context, Color.TRANSPARENT, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnCopyAll.setBackground(PerazimTheme.createMutedPillGradient(dp(context, 8), PerazimTheme.COLOR_STROKE, dp(context, 1)));
         btnCopyAll.setPadding(dp(context, 10), dp(context, 6), dp(context, 10), dp(context, 6));
         paybillBox.addView(btnCopyAll);
 
@@ -229,13 +242,13 @@ public final class GivingDialog {
         container.addView(chipsRow);
         container.addView(etAmount);
 
-        // 5. ONE Primary Orange CTA: "Open M-Pesa"
+        // 5. ONE Primary Orange CTA: "Open M-Pesa" (Muted/Darkened Orange Gradient)
         Button btnConfirmGive = new Button(context);
         btnConfirmGive.setText("Open M-Pesa");
         btnConfirmGive.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnConfirmGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         btnConfirmGive.setTypeface(Typeface.DEFAULT_BOLD);
-        btnConfirmGive.setBackground(createSolidPill(context, PerazimTheme.COLOR_ORANGE_BRAND, 12));
+        btnConfirmGive.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(context, 12)));
         LinearLayout.LayoutParams lpGive = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 48));
         lpGive.setMargins(0, dp(context, 16), 0, 0);
@@ -259,7 +272,7 @@ public final class GivingDialog {
         btnStk.setText("SIM Toolkit");
         btnStk.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnStk.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnStk.setBackground(createCardBackground(context, PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnStk.setBackground(PerazimTheme.createMutedPillGradient(dp(context, 8), PerazimTheme.COLOR_STROKE, dp(context, 1)));
         LinearLayout.LayoutParams lpStk = new LinearLayout.LayoutParams(0, dp(context, 38), 1.0f);
         lpStk.setMargins(0, 0, dp(context, 4), 0);
         btnStk.setLayoutParams(lpStk);
@@ -269,7 +282,7 @@ public final class GivingDialog {
         btnUssd.setText("Dial *334#");
         btnUssd.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnUssd.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnUssd.setBackground(createCardBackground(context, PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnUssd.setBackground(PerazimTheme.createMutedPillGradient(dp(context, 8), PerazimTheme.COLOR_STROKE, dp(context, 1)));
         LinearLayout.LayoutParams lpUssd = new LinearLayout.LayoutParams(0, dp(context, 38), 1.0f);
         lpUssd.setMargins(dp(context, 4), 0, 0, 0);
         btnUssd.setLayoutParams(lpUssd);

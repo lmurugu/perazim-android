@@ -152,7 +152,7 @@ public class SermonsUiBinder {
     private void initViews() {
         rootScrollView = new ScrollView(activity);
         rootScrollView.setFillViewport(true);
-        rootScrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        rootScrollView.setBackground(PerazimTheme.createBackgroundGradient());
 
         contentLayout = new LinearLayout(activity);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
@@ -273,7 +273,9 @@ public class SermonsUiBinder {
     // =========================================================================
 
     private View buildLiveStreamBanner() {
-        LinearLayout liveCard = createCard(PerazimTheme.COLOR_SURFACE, 14, PerazimTheme.COLOR_STROKE, 1);
+        LinearLayout liveCard = new LinearLayout(activity);
+        liveCard.setPadding(dp(14), dp(14), dp(14), dp(14));
+        liveCard.setBackground(PerazimTheme.createHeroGradient(dp(14), dp(1)));
         liveCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -296,12 +298,19 @@ public class SermonsUiBinder {
         liveBadgeRow.setOrientation(LinearLayout.HORIZONTAL);
         liveBadgeRow.setGravity(Gravity.CENTER_VERTICAL);
 
+        ImageView ivLogo = new ImageView(activity);
+        ivLogo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(16), dp(16));
+        lpLogo.setMargins(0, 0, dp(6), 0);
+        ivLogo.setLayoutParams(lpLogo);
+        liveBadgeRow.addView(ivLogo);
+
         TextView liveTag = new TextView(activity);
         liveTag.setText("LIVESTREAM BROADCAST");
         liveTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         liveTag.setTypeface(Typeface.DEFAULT_BOLD);
         liveTag.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        liveTag.setBackground(createCardBackground(PerazimTheme.COLOR_PURPLE_GHOST, 6, PerazimTheme.COLOR_STROKE, 1));
+        liveTag.setBackground(PerazimTheme.createSurface2Gradient(dp(6), dp(1)));
         liveTag.setPadding(dp(8), dp(3), dp(8), dp(3));
         liveBadgeRow.addView(liveTag);
         liveCard.addView(liveBadgeRow);
@@ -648,10 +657,10 @@ public class SermonsUiBinder {
             boolean isSelected = btn.getText().toString().equalsIgnoreCase(selectedChip);
             if (isSelected) {
                 btn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-                btn.setBackground(createSolidPill(PerazimTheme.COLOR_PURPLE_BRAND, 14));
+                btn.setBackground(PerazimTheme.createActivePillGradient(dp(14)));
             } else {
                 btn.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-                btn.setBackground(createCardBackground(Color.TRANSPARENT, 14, PerazimTheme.COLOR_STROKE, 1));
+                btn.setBackground(PerazimTheme.createMutedPillGradient(dp(14), PerazimTheme.COLOR_STROKE, dp(1)));
             }
         }
     }
@@ -1113,6 +1122,11 @@ public class SermonsUiBinder {
     }
 
     private Drawable createCardBackground(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
+        if (bgColor == PerazimTheme.COLOR_SURFACE) {
+            return PerazimTheme.createCardGradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        } else if (bgColor == PerazimTheme.COLOR_SURFACE_2) {
+            return PerazimTheme.createSurface2Gradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));
@@ -1121,6 +1135,11 @@ public class SermonsUiBinder {
     }
 
     private Drawable createSolidPill(int bgColor, int cornerRadiusDp) {
+        if (bgColor == PerazimTheme.COLOR_PURPLE_BRAND) {
+            return PerazimTheme.createActivePillGradient(dp(cornerRadiusDp));
+        } else if (bgColor == PerazimTheme.COLOR_ORANGE_BRAND) {
+            return PerazimTheme.createPrimaryOrangeGradient(dp(cornerRadiusDp));
+        }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));

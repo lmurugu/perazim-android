@@ -128,7 +128,7 @@ public class FellowshipUiBinder {
     public ScrollView buildView() {
         ScrollView scrollView = new ScrollView(context);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        scrollView.setBackground(PerazimTheme.createBackgroundGradient());
 
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -184,7 +184,7 @@ public class FellowshipUiBinder {
         btnSharePrayer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         btnSharePrayer.setTypeface(Typeface.DEFAULT_BOLD);
         btnSharePrayer.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnSharePrayer.setBackground(createSolidPillDrawable(PerazimTheme.COLOR_ORANGE_BRAND, 12));
+        btnSharePrayer.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(12)));
         LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(46));
         lpBtn.setMargins(0, 0, 0, dp(16));
@@ -310,13 +310,13 @@ public class FellowshipUiBinder {
     private void updateSegmentedStyles() {
         if (btnTabWall == null || btnTabMine == null) return;
         if (!isMineTab) {
-            btnTabWall.setBackground(createSolidPillDrawable(PerazimTheme.COLOR_PURPLE_BRAND, 8));
+            btnTabWall.setBackground(PerazimTheme.createActivePillGradient(dp(8)));
             btnTabWall.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
 
             btnTabMine.setBackgroundColor(Color.TRANSPARENT);
             btnTabMine.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         } else {
-            btnTabMine.setBackground(createSolidPillDrawable(PerazimTheme.COLOR_PURPLE_BRAND, 8));
+            btnTabMine.setBackground(PerazimTheme.createActivePillGradient(dp(8)));
             btnTabMine.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
 
             btnTabWall.setBackgroundColor(Color.TRANSPARENT);
@@ -603,7 +603,7 @@ public class FellowshipUiBinder {
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(dp(20), dp(18), dp(20), dp(18));
-        layout.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        layout.setBackground(PerazimTheme.createDialogGradient(dp(18), dp(1)));
 
         TextView tvHeading = new TextView(context);
         tvHeading.setText("Mark as Answered");
@@ -645,7 +645,7 @@ public class FellowshipUiBinder {
 
         AlertDialog dialog = builder.create();
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_SURFACE));
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
         }
         dialog.show();
     }
@@ -656,15 +656,27 @@ public class FellowshipUiBinder {
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(dp(20), dp(18), dp(20), dp(14));
-        layout.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        layout.setBackground(PerazimTheme.createDialogGradient(dp(18), dp(1)));
+
+        LinearLayout titleRow = new LinearLayout(context);
+        titleRow.setOrientation(LinearLayout.HORIZONTAL);
+        titleRow.setGravity(Gravity.CENTER_VERTICAL);
+        titleRow.setPadding(0, 0, 0, dp(4));
+
+        ImageView ivLogo = new ImageView(context);
+        ivLogo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(22), dp(22));
+        lpLogo.setMargins(0, 0, dp(8), 0);
+        ivLogo.setLayoutParams(lpLogo);
+        titleRow.addView(ivLogo);
 
         TextView tvDialogTitle = new TextView(context);
         tvDialogTitle.setText("Share a Prayer");
         tvDialogTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         tvDialogTitle.setTypeface(Typeface.DEFAULT_BOLD);
         tvDialogTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tvDialogTitle.setPadding(0, 0, 0, dp(4));
-        layout.addView(tvDialogTitle);
+        titleRow.addView(tvDialogTitle);
+        layout.addView(titleRow);
 
         TextView tvSub = new TextView(context);
         tvSub.setText("Your church community will stand in intercession with you.");
@@ -744,7 +756,7 @@ public class FellowshipUiBinder {
 
         AlertDialog dialog = builder.create();
         if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_SURFACE));
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
         }
         dialog.show();
     }
@@ -881,6 +893,11 @@ public class FellowshipUiBinder {
     }
 
     private Drawable createCardBackground(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
+        if (bgColor == PerazimTheme.COLOR_SURFACE) {
+            return PerazimTheme.createCardGradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        } else if (bgColor == PerazimTheme.COLOR_SURFACE_2) {
+            return PerazimTheme.createSurface2Gradient(dp(cornerRadiusDp), dp(borderWidthDp));
+        }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));
@@ -889,6 +906,11 @@ public class FellowshipUiBinder {
     }
 
     private Drawable createSolidPillDrawable(int bgColor, int cornerRadiusDp) {
+        if (bgColor == PerazimTheme.COLOR_PURPLE_BRAND) {
+            return PerazimTheme.createActivePillGradient(dp(cornerRadiusDp));
+        } else if (bgColor == PerazimTheme.COLOR_ORANGE_BRAND) {
+            return PerazimTheme.createPrimaryOrangeGradient(dp(cornerRadiusDp));
+        }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));
