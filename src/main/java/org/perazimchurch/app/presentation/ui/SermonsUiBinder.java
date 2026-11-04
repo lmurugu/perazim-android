@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -85,6 +86,7 @@ public class SermonsUiBinder {
     private LinearLayout cardsContainer;
     private ProgressBar loadingBar;
     private TextView tvEmptyState;
+    private View emptyStateContainer;
     private EditText etSearch;
     private Button btnWatchLiveBroadcast;
 
@@ -215,15 +217,34 @@ public class SermonsUiBinder {
         loadingBar.setLayoutParams(lpLoad);
         contentLayout.addView(loadingBar);
 
-        // 8. Empty State View
+        // 8. Empty State View with Illustrated Vignette
+        LinearLayout emptyBox = new LinearLayout(activity);
+        emptyBox.setOrientation(LinearLayout.VERTICAL);
+        emptyBox.setGravity(Gravity.CENTER);
+        emptyBox.setPadding(dp(16), dp(24), dp(16), dp(24));
+        emptyBox.setVisibility(View.GONE);
+
+        Bitmap emptyHillBmp = loadAssetBitmap("vignettes/vignette_empty_hill.png", 300);
+        if (emptyHillBmp != null) {
+            ImageView ivEmpty = new ImageView(activity);
+            ivEmpty.setImageBitmap(emptyHillBmp);
+            ivEmpty.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            ivEmpty.setAlpha(0.85f);
+            LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(dp(110), dp(110));
+            lpImg.setMargins(0, 0, 0, dp(12));
+            ivEmpty.setLayoutParams(lpImg);
+            emptyBox.addView(ivEmpty);
+        }
+
         tvEmptyState = new TextView(activity);
         tvEmptyState.setText("No sermons found matching your filter.\nTry adjusting your search query or filter chip.");
         tvEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         tvEmptyState.setGravity(Gravity.CENTER);
-        tvEmptyState.setPadding(dp(16), dp(24), dp(16), dp(24));
-        tvEmptyState.setVisibility(View.GONE);
-        contentLayout.addView(tvEmptyState);
+        emptyBox.addView(tvEmptyState);
+
+        emptyStateContainer = emptyBox;
+        contentLayout.addView(emptyStateContainer);
 
         // 9. Sermon Cards Container
         cardsContainer = new LinearLayout(activity);
@@ -273,14 +294,36 @@ public class SermonsUiBinder {
     // =========================================================================
 
     private View buildLiveStreamBanner() {
-        LinearLayout liveCard = new LinearLayout(activity);
-        liveCard.setPadding(dp(14), dp(14), dp(14), dp(14));
-        liveCard.setBackground(PerazimTheme.createHeroGradient(dp(14), dp(1)));
-        liveCard.setOrientation(LinearLayout.VERTICAL);
+        FrameLayout rootFrame = new FrameLayout(activity);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, 0, 0, dp(14));
-        liveCard.setLayoutParams(lp);
+        rootFrame.setLayoutParams(lp);
+        rootFrame.setBackground(PerazimTheme.createHeroGradient(dp(14), dp(1)));
+        rootFrame.setClipToOutline(true);
+
+        Bitmap lampBmp = loadAssetBitmap("backgrounds/bg_sermons_lamp.png", 720);
+        if (lampBmp != null) {
+            ImageView ivBg = new ImageView(activity);
+            ivBg.setImageBitmap(lampBmp);
+            ivBg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            rootFrame.addView(ivBg, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(activity);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#E62A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            rootFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        }
+
+        LinearLayout liveCard = new LinearLayout(activity);
+        liveCard.setPadding(dp(14), dp(14), dp(14), dp(14));
+        liveCard.setOrientation(LinearLayout.VERTICAL);
+        liveCard.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT));
 
         LinearLayout liveBadgeRow = new LinearLayout(activity);
         liveBadgeRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -331,7 +374,8 @@ public class SermonsUiBinder {
         });
         liveCard.addView(btnWatchLiveBroadcast);
 
-        return liveCard;
+        rootFrame.addView(liveCard);
+        return rootFrame;
     }
 
     // =========================================================================
@@ -695,10 +739,12 @@ public class SermonsUiBinder {
         cardsContainer.removeAllViews();
 
         if (sermons == null || sermons.isEmpty()) {
+            if (emptyStateContainer != null) emptyStateContainer.setVisibility(View.VISIBLE);
             tvEmptyState.setVisibility(View.VISIBLE);
             return;
         }
 
+        if (emptyStateContainer != null) emptyStateContainer.setVisibility(View.GONE);
         tvEmptyState.setVisibility(View.GONE);
         currentSermons.addAll(sermons);
 

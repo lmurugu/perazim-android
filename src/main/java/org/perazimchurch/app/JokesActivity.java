@@ -86,7 +86,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
         content.addView(navBar);
 
         // Classical Art Banner
-        Bitmap artBmp = loadAssetBitmap("art_christian.jpg", 800);
+        Bitmap artBmp = loadAssetBitmap("backgrounds/bg_jokes_dove.png", 800);
         if (artBmp != null) {
             Bitmap roundArt = getRoundedCornerBitmap(artBmp, dp(14));
             ImageView artView = new ImageView(this);

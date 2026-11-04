@@ -86,6 +86,7 @@ public class WorshipUiBinder {
     private LinearLayout cardsContainer;
     private ProgressBar loadingBar;
     private TextView tvEmptyState;
+    private View emptyStateContainer;
     private EditText etSearch;
 
     // Data State
@@ -176,15 +177,34 @@ public class WorshipUiBinder {
         loadingBar.setLayoutParams(lpLoad);
         contentLayout.addView(loadingBar);
 
-        // 7. Empty State View
+        // 7. Empty State View with Illustrated Vignette
+        LinearLayout emptyBox = new LinearLayout(activity);
+        emptyBox.setOrientation(LinearLayout.VERTICAL);
+        emptyBox.setGravity(Gravity.CENTER);
+        emptyBox.setPadding(dp(16), dp(24), dp(16), dp(24));
+        emptyBox.setVisibility(View.GONE);
+
+        Bitmap emptyDoveBmp = loadAssetBitmap("vignettes/vignette_empty_dove.png", 300);
+        if (emptyDoveBmp != null) {
+            ImageView ivEmpty = new ImageView(activity);
+            ivEmpty.setImageBitmap(emptyDoveBmp);
+            ivEmpty.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            ivEmpty.setAlpha(0.85f);
+            LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(dp(100), dp(100));
+            lpImg.setMargins(0, 0, 0, dp(12));
+            ivEmpty.setLayoutParams(lpImg);
+            emptyBox.addView(ivEmpty);
+        }
+
         tvEmptyState = new TextView(activity);
         tvEmptyState.setText("No hymns found matching your query.\nTry selecting another category or clearing your search.");
         tvEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         tvEmptyState.setGravity(Gravity.CENTER);
-        tvEmptyState.setPadding(dp(16), dp(24), dp(16), dp(24));
-        tvEmptyState.setVisibility(View.GONE);
-        contentLayout.addView(tvEmptyState);
+        emptyBox.addView(tvEmptyState);
+
+        emptyStateContainer = emptyBox;
+        contentLayout.addView(emptyStateContainer);
 
         // 8. Hymn Cards Container
         cardsContainer = new LinearLayout(activity);
@@ -394,10 +414,12 @@ public class WorshipUiBinder {
         cardsContainer.removeAllViews();
 
         if (hymns == null || hymns.isEmpty()) {
+            if (emptyStateContainer != null) emptyStateContainer.setVisibility(View.VISIBLE);
             tvEmptyState.setVisibility(View.VISIBLE);
             return;
         }
 
+        if (emptyStateContainer != null) emptyStateContainer.setVisibility(View.GONE);
         tvEmptyState.setVisibility(View.GONE);
         currentHymns.addAll(hymns);
 
@@ -584,21 +606,56 @@ public class WorshipUiBinder {
 
         detailBox.addView(topControlsRow);
 
-        // Number & Title
+        // Number & Title Strip with Illustrated Lyre Art and Scrim
+        FrameLayout hymnHeaderFrame = new FrameLayout(activity);
+        LinearLayout.LayoutParams lpHdr = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(90));
+        lpHdr.setMargins(0, 0, 0, dp(12));
+        hymnHeaderFrame.setLayoutParams(lpHdr);
+        hymnHeaderFrame.setBackground(PerazimTheme.createCardGradient(dp(12), dp(1)));
+        hymnHeaderFrame.setClipToOutline(true);
+
+        Bitmap lyreBmp = loadAssetBitmap("backgrounds/bg_hymn_lyre.png", 720);
+        if (lyreBmp != null) {
+            ImageView ivLyre = new ImageView(activity);
+            ivLyre.setImageBitmap(lyreBmp);
+            ivLyre.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            hymnHeaderFrame.addView(ivLyre, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(activity);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#E62A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            hymnHeaderFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        }
+
+        LinearLayout titleCol = new LinearLayout(activity);
+        titleCol.setOrientation(LinearLayout.VERTICAL);
+        titleCol.setGravity(Gravity.BOTTOM);
+        titleCol.setPadding(dp(14), dp(8), dp(14), dp(8));
+        titleCol.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
         TextView tvNumber = new TextView(activity);
         tvNumber.setText("HYMN #" + hymn.getNumber());
         tvNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvNumber.setTypeface(Typeface.DEFAULT_BOLD);
         tvNumber.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        detailBox.addView(tvNumber);
+        titleCol.addView(tvNumber);
 
         TextView tvDetailTitle = new TextView(activity);
         tvDetailTitle.setText(hymn.getTitle());
-        tvDetailTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
+        tvDetailTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         tvDetailTitle.setTypeface(Typeface.DEFAULT_BOLD);
         tvDetailTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tvDetailTitle.setPadding(0, dp(4), 0, dp(10));
-        detailBox.addView(tvDetailTitle);
+        tvDetailTitle.setPadding(0, dp(2), 0, 0);
+        titleCol.addView(tvDetailTitle);
+
+        hymnHeaderFrame.addView(titleCol);
+        detailBox.addView(hymnHeaderFrame);
 
         // Transpose Controls Row
         final int[] semitoneOffset = {0};

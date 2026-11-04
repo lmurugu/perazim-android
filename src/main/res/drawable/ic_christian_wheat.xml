@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Wheat Stalks & Grains -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M 12,3 L 12,21 M 12,6 C 9,5 8,7.5 12,9.5 M 12,6 C 15,5 16,7.5 12,9.5 M 12,10.5 C 8,9.5 7,12.5 12,14 M 12,10.5 C 16,9.5 17,12.5 12,14" />
+    <!-- Wheat Tie -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M 9,18 L 15,18 M 10,18 L 8,21 M 14,18 L 16,21" />
+</vector>

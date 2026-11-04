@@ -94,7 +94,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         content.addView(navBar);
 
         // Classical Art Banner
-        Bitmap artBmp = loadAssetBitmap("art_lazarus.jpg", 800);
+        Bitmap artBmp = loadAssetBitmap("backgrounds/bg_riddles_lantern.png", 800);
         if (artBmp != null) {
             Bitmap roundArt = getRoundedCornerBitmap(artBmp, dp(14));
             ImageView artView = new ImageView(this);

@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -86,6 +87,20 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         navBar.addView(title);
 
         content.addView(navBar);
+
+        // Sermons Preacher Hero Banner
+        Bitmap sermonHeroBmp = loadAssetBitmap("backgrounds/bg_sermons_lamp_portrait.png", 800);
+        if (sermonHeroBmp != null) {
+            Bitmap roundHero = getRoundedCornerBitmap(sermonHeroBmp, dp(14));
+            ImageView heroView = new ImageView(this);
+            heroView.setImageBitmap(roundHero);
+            heroView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            LinearLayout.LayoutParams lpHero = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, dp(160));
+            lpHero.setMargins(0, 0, 0, dp(14));
+            heroView.setLayoutParams(lpHero);
+            content.addView(heroView);
+        }
 
         // Featured Speaker Header
         LinearLayout speakerCard = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
@@ -297,6 +312,25 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, dstRect, paint);
+        return output;
+    }
+
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
+        if (bitmap == null) return null;
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(0xff424242);
+        canvas.drawRoundRect(rectF, pixels, pixels, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
         return output;
     }
 

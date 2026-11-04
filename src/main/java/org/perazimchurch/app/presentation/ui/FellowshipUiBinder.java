@@ -91,6 +91,7 @@ public class FellowshipUiBinder {
     private LinearLayout prayersContainer;
     private ProgressBar prayersLoadingSpinner;
     private TextView tvPrayersEmptyState;
+    private View prayersEmptyContainer;
     private View offlineBannerView;
 
     private final List<Prayer> displayedPrayers = new ArrayList<>();
@@ -237,14 +238,34 @@ public class FellowshipUiBinder {
         prayersLoadingSpinner.setLayoutParams(lpSpinner);
         prayersContainer.addView(prayersLoadingSpinner);
 
+        // Empty State View with Illustrated Candle Vignette
+        LinearLayout emptyBox = new LinearLayout(context);
+        emptyBox.setOrientation(LinearLayout.VERTICAL);
+        emptyBox.setGravity(Gravity.CENTER);
+        emptyBox.setPadding(dp(16), dp(24), dp(16), dp(24));
+        emptyBox.setVisibility(View.GONE);
+
+        Bitmap emptyCandleBmp = loadAssetBitmap("vignettes/vignette_empty_candle.png", 300);
+        if (emptyCandleBmp != null) {
+            ImageView ivEmpty = new ImageView(context);
+            ivEmpty.setImageBitmap(emptyCandleBmp);
+            ivEmpty.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            ivEmpty.setAlpha(0.85f);
+            LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(dp(120), dp(120));
+            lpImg.setMargins(0, 0, 0, dp(12));
+            ivEmpty.setLayoutParams(lpImg);
+            emptyBox.addView(ivEmpty);
+        }
+
         tvPrayersEmptyState = new TextView(context);
         tvPrayersEmptyState.setText("No prayer petitions yet. Be the first to share a petition.");
         tvPrayersEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvPrayersEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         tvPrayersEmptyState.setGravity(Gravity.CENTER);
-        tvPrayersEmptyState.setPadding(dp(16), dp(24), dp(16), dp(24));
-        tvPrayersEmptyState.setVisibility(View.GONE);
-        prayersContainer.addView(tvPrayersEmptyState);
+        emptyBox.addView(tvPrayersEmptyState);
+
+        prayersEmptyContainer = emptyBox;
+        prayersContainer.addView(prayersEmptyContainer);
 
         rootContainer.addView(prayersContainer);
 
@@ -263,6 +284,17 @@ public class FellowshipUiBinder {
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, 0, 0, dp(12));
         banner.setLayoutParams(lp);
+
+        Bitmap doveBmp = loadAssetBitmap("vignettes/vignette_offline_dove.png", 100);
+        if (doveBmp != null) {
+            ImageView ivDove = new ImageView(context);
+            ivDove.setImageBitmap(doveBmp);
+            ivDove.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            LinearLayout.LayoutParams lpDove = new LinearLayout.LayoutParams(dp(28), dp(28));
+            lpDove.setMargins(0, 0, dp(10), 0);
+            ivDove.setLayoutParams(lpDove);
+            banner.addView(ivDove);
+        }
 
         TextView tv = new TextView(context);
         tv.setText("Showing cached prayers. New prayers will sync when connected.");
@@ -408,10 +440,12 @@ public class FellowshipUiBinder {
                 tvPrayersEmptyState.setText("No prayer petitions yet. Be the first to share a petition.");
                 tvPrayersEmptyState.setVisibility(View.VISIBLE);
             }
+            if (prayersEmptyContainer != null) prayersEmptyContainer.setVisibility(View.VISIBLE);
             return;
         }
 
         if (tvPrayersEmptyState != null) tvPrayersEmptyState.setVisibility(View.GONE);
+        if (prayersEmptyContainer != null) prayersEmptyContainer.setVisibility(View.GONE);
 
         for (Prayer prayer : displayedPrayers) {
             View card = createWallPrayerCard(prayer);
@@ -428,10 +462,12 @@ public class FellowshipUiBinder {
                 tvPrayersEmptyState.setText("You haven't submitted any prayer requests yet.\nTap \"+ Share a prayer\" above.");
                 tvPrayersEmptyState.setVisibility(View.VISIBLE);
             }
+            if (prayersEmptyContainer != null) prayersEmptyContainer.setVisibility(View.VISIBLE);
             return;
         }
 
         if (tvPrayersEmptyState != null) tvPrayersEmptyState.setVisibility(View.GONE);
+        if (prayersEmptyContainer != null) prayersEmptyContainer.setVisibility(View.GONE);
 
         for (Prayer prayer : userPrayers) {
             View card = createMinePrayerCard(prayer);
@@ -442,7 +478,7 @@ public class FellowshipUiBinder {
     private void clearCards() {
         for (int i = prayersContainer.getChildCount() - 1; i >= 0; i--) {
             View child = prayersContainer.getChildAt(i);
-            if (child != prayersLoadingSpinner && child != tvPrayersEmptyState) {
+            if (child != prayersLoadingSpinner && child != tvPrayersEmptyState && child != prayersEmptyContainer) {
                 prayersContainer.removeViewAt(i);
             }
         }

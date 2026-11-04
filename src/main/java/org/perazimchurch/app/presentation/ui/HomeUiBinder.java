@@ -259,7 +259,7 @@ public class HomeUiBinder {
         lpHeader.setMargins(0, 0, 0, dp(14));
         headerContainer.setLayoutParams(lpHeader);
 
-        Bitmap homeBgBmp = loadAssetBitmap("backgrounds/bg_splash_breakthrough.png", 720);
+        Bitmap homeBgBmp = loadAssetBitmap("backgrounds/bg_home_dawn_cross.png", 720);
         if (homeBgBmp != null) {
             headerContainer.setBackground(PerazimTheme.createCardGradient(dp(16), dp(1)));
             headerContainer.setClipToOutline(true);
@@ -452,11 +452,11 @@ public class HomeUiBinder {
         LinearLayout row1 = new LinearLayout(context);
         row1.setOrientation(LinearLayout.HORIZONTAL);
         row1.setPadding(0, 0, 0, dp(8));
-        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_bible, "Bible", "Read scripture", v -> parseAndOpenScripture(currentCornerstoneRef)));
+        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_bible, "Bible", "Read scripture", v -> parseAndOpenScripture(currentCornerstoneRef)));
         View sep1 = new View(context);
         sep1.setLayoutParams(new LinearLayout.LayoutParams(dp(8), 0));
         row1.addView(sep1);
-        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_sermons, "Sermons", "Recent messages", v -> {
+        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_candle, "Sermons", "Recent messages", v -> {
             if (listener != null) listener.onNavigateToTab(1);
         }));
         container.addView(row1);
@@ -464,13 +464,13 @@ public class HomeUiBinder {
         // Row 2: Worship & Prayer
         LinearLayout row2 = new LinearLayout(context);
         row2.setOrientation(LinearLayout.HORIZONTAL);
-        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_worship, "Worship", "Hymns & praise", v -> {
+        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_lyre, "Worship", "Hymns & praise", v -> {
             if (listener != null) listener.onNavigateToTab(2);
         }));
         View sep2 = new View(context);
         sep2.setLayoutParams(new LinearLayout.LayoutParams(dp(8), 0));
         row2.addView(sep2);
-        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_door_prayer, "Prayer", "Share & intercede", v -> {
+        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_praying_hands, "Prayer", "Share & intercede", v -> {
             if (listener != null) listener.onNavigateToTab(3);
         }));
         container.addView(row2);

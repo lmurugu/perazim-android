@@ -394,32 +394,41 @@ public class ProfileUiBinder {
 
         // Row 2: Saved / Offline Content
         card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_door_sermons,
+                org.perazimchurch.app.R.drawable.ic_christian_bible,
                 "Saved & Offline Content",
                 "Downloaded sermons, favorite hymns, bookmarked verses",
                 v -> showSavedContentDialog()
         ));
         card.addView(createHorizontalDivider());
 
-        // Row 3: Breakthrough Guide
+        // Row 3: Tithes & Stewardship
         card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_door_bible,
-                "Breakthrough Guide",
-                "Available in next release",
-                v -> Toast.makeText(context, "Breakthrough Guide will arrive in next release.", Toast.LENGTH_SHORT).show()
+                org.perazimchurch.app.R.drawable.ic_christian_wheat,
+                "Tithe & Stewardship",
+                "Support ministry, worship, and missions via M-Pesa",
+                v -> GivingDialog.show(context)
         ));
         card.addView(createHorizontalDivider());
 
-        // Row 4: Fellowship Extras (Riddles & Jokes)
+        // Row 4: Breakthrough Guide
         card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_door_prayer,
+                org.perazimchurch.app.R.drawable.ic_christian_candle,
+                "Breakthrough Guide",
+                "Contemplative spiritual companion & scriptures",
+                v -> showBreakthroughGuideDialog()
+        ));
+        card.addView(createHorizontalDivider());
+
+        // Row 5: Fellowship Extras (Riddles & Jokes)
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_christian_praying_hands,
                 "Fellowship Extras",
                 "Devotional riddles and Christian joy & humor",
                 v -> showFellowshipExtrasDialog()
         ));
         card.addView(createHorizontalDivider());
 
-        // Row 5: Pastoral Care
+        // Row 6: Pastoral Care
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_phone,
                 "Pastoral Care & Office",
@@ -428,9 +437,9 @@ public class ProfileUiBinder {
         ));
         card.addView(createHorizontalDivider());
 
-        // Row 6: About Perazim
+        // Row 7: About Perazim
         card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_location,
+                org.perazimchurch.app.R.drawable.ic_christian_church,
                 "About Perazim Mission Church",
                 "Vision, leadership & version 2.2.0 (Build 4)",
                 v -> showAboutDialog()
@@ -496,14 +505,134 @@ public class ProfileUiBinder {
 
     public void showSavedContentDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Saved & Offline Content");
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
+
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        Bitmap arkBmp = loadAssetBitmap("backgrounds/bg_offline_ark.png", 720);
+        if (arkBmp != null) {
+            FrameLayout headerStrip = new FrameLayout(context);
+            headerStrip.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, dp(120)));
+            headerStrip.setBackground(PerazimTheme.createCardGradient(dp(12), dp(1)));
+            headerStrip.setClipToOutline(true);
+
+            ImageView ivArk = new ImageView(context);
+            ivArk.setImageBitmap(arkBmp);
+            ivArk.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            headerStrip.addView(ivArk, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(context);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#E62A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            headerStrip.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            TextView tvTag = new TextView(context);
+            tvTag.setText("SAVED & OFFLINE CONTENT");
+            tvTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            tvTag.setTypeface(Typeface.DEFAULT_BOLD);
+            tvTag.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            FrameLayout.LayoutParams lpTag = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lpTag.gravity = Gravity.BOTTOM | Gravity.START;
+            lpTag.setMargins(dp(16), 0, 0, dp(12));
+            tvTag.setLayoutParams(lpTag);
+            headerStrip.addView(tvTag);
+
+            container.addView(headerStrip);
+        }
+
         View view = createSavedContentManagerCard();
-        sv.addView(view);
+        container.addView(view);
+        sv.addView(container);
         builder.setView(sv);
         builder.setPositiveButton("Close", null);
-        builder.show();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
+        }
+    }
+
+    public void showBreakthroughGuideDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        ScrollView sv = new ScrollView(context);
+        sv.setFillViewport(true);
+
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        Bitmap flameBmp = loadAssetBitmap("backgrounds/bg_ai_guide_flame.png", 720);
+        if (flameBmp != null) {
+            FrameLayout headerStrip = new FrameLayout(context);
+            headerStrip.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, dp(120)));
+            headerStrip.setBackground(PerazimTheme.createCardGradient(dp(12), dp(1)));
+            headerStrip.setClipToOutline(true);
+
+            ImageView ivFlame = new ImageView(context);
+            ivFlame.setImageBitmap(flameBmp);
+            ivFlame.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            headerStrip.addView(ivFlame, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(context);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#E62A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            headerStrip.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            TextView tvTag = new TextView(context);
+            tvTag.setText("BREAKTHROUGH GUIDE");
+            tvTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            tvTag.setTypeface(Typeface.DEFAULT_BOLD);
+            tvTag.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            FrameLayout.LayoutParams lpTag = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lpTag.gravity = Gravity.BOTTOM | Gravity.START;
+            lpTag.setMargins(dp(16), 0, 0, dp(12));
+            tvTag.setLayoutParams(lpTag);
+            headerStrip.addView(tvTag);
+
+            container.addView(headerStrip);
+        }
+
+        LinearLayout body = new LinearLayout(context);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setPadding(dp(20), dp(16), dp(20), dp(20));
+
+        TextView tvSubtitle = new TextView(context);
+        tvSubtitle.setText("Contemplative Spiritual Companion");
+        tvSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        tvSubtitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvSubtitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        body.addView(tvSubtitle);
+
+        TextView tvDesc = new TextView(context);
+        tvDesc.setText("The Breakthrough Guide is an offline-first spiritual companion for scripture study, sermon reflections, and guided prayer devotionals tailored for Perazim Mission Church members.\n\n“The Lord has broken through my enemies before me, like a breakthrough of water.”\n— 2 Samuel 5:20");
+        tvDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvDesc.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvDesc.setLineSpacing(dp(3), 1.2f);
+        tvDesc.setPadding(0, dp(10), 0, 0);
+        body.addView(tvDesc);
+
+        container.addView(body);
+        sv.addView(container);
+        builder.setView(sv);
+        builder.setPositiveButton("Amen", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
+        }
     }
 
     private void showPastoralCareDialog() {
@@ -528,14 +657,74 @@ public class ProfileUiBinder {
 
     public void showAboutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("About Perazim Mission Church");
-        builder.setIcon(org.perazimchurch.app.R.drawable.ic_perazim_logo);
-        builder.setMessage("“A place where everybody is somebody, and no body is a nobody.”\n\n"
-                + "Leadership: Bishop Dr. David Mutweri\n"
+        ScrollView sv = new ScrollView(context);
+        sv.setFillViewport(true);
+
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        Bitmap sanctuaryBmp = loadAssetBitmap("backgrounds/bg_about_sanctuary.png", 720);
+        if (sanctuaryBmp != null) {
+            FrameLayout headerStrip = new FrameLayout(context);
+            headerStrip.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, dp(140)));
+            headerStrip.setBackground(PerazimTheme.createCardGradient(dp(12), dp(1)));
+            headerStrip.setClipToOutline(true);
+
+            ImageView ivSanctuary = new ImageView(context);
+            ivSanctuary.setImageBitmap(sanctuaryBmp);
+            ivSanctuary.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            headerStrip.addView(ivSanctuary, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(context);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#E62A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            headerStrip.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            TextView tvTag = new TextView(context);
+            tvTag.setText("ABOUT PERAZIM MISSION CHURCH");
+            tvTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            tvTag.setTypeface(Typeface.DEFAULT_BOLD);
+            tvTag.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            FrameLayout.LayoutParams lpTag = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lpTag.gravity = Gravity.BOTTOM | Gravity.START;
+            lpTag.setMargins(dp(16), 0, 0, dp(12));
+            tvTag.setLayoutParams(lpTag);
+            headerStrip.addView(tvTag);
+
+            container.addView(headerStrip);
+        }
+
+        LinearLayout body = new LinearLayout(context);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setPadding(dp(20), dp(16), dp(20), dp(20));
+
+        TextView tvMotto = new TextView(context);
+        tvMotto.setText("“A place where everybody is somebody, and no body is a nobody.”");
+        tvMotto.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tvMotto.setTypeface(Typeface.SERIF, Typeface.ITALIC);
+        tvMotto.setTextColor(PerazimTheme.COLOR_ORANGE_SOFT);
+        body.addView(tvMotto);
+
+        TextView tvContent = new TextView(context);
+        tvContent.setText("\nLeadership: Bishop Dr. David Mutweri\n"
                 + "Embu Headquarters, Kenya\n"
-                + "Campuses: Embu Headquarters, Nairobi, Meru, Online\n\n"
+                + "Campuses: Embu Headquarters, Mwea, Rombo, Nairobi, Online\n\n"
                 + "App Version: 2.2.0 (Build 4)\n"
                 + "Faithful offline-first faith companion.");
+        tvContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvContent.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvContent.setLineSpacing(dp(3), 1.2f);
+        body.addView(tvContent);
+
+        container.addView(body);
+        sv.addView(container);
+        builder.setView(sv);
         builder.setPositiveButton("Close", null);
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -1172,37 +1361,133 @@ public class ProfileUiBinder {
     public void showCampusSwitcherDialog() {
         final String[] campusNames = {
                 "Embu Headquarters",
-                "Nairobi",
-                "Meru",
-                "Online"
+                "Mwea Campus",
+                "Rombo Campus",
+                "Nairobi Fellowship",
+                "Online Sanctuary"
         };
         final String[] campusIds = {
                 "campus_embu",
+                "campus_mwea",
+                "campus_rombo",
                 "campus_nairobi",
-                "campus_meru",
                 "campus_online"
+        };
+        final String[] campusVignettes = {
+                "vignettes/vignette_campus_embu.png",
+                "vignettes/vignette_campus_mwea.png",
+                "vignettes/vignette_campus_rombo.png",
+                null,
+                null
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("📍 Select Church Campus");
-        builder.setItems(campusNames, (dialog, which) -> {
-            String selectedName = campusNames[which];
-            String selectedId = campusIds[which];
-            selectedCampusName = selectedName;
+        ScrollView sv = new ScrollView(context);
+        sv.setFillViewport(true);
 
-            // Switch campus in ViewModel (Room User update)
-            viewModel.switchCampus(selectedId, () -> {
-                postToMain(() -> {
-                    if (tvMemberCampus != null) {
-                        tvMemberCampus.setText("Perazim Mission Church · " + selectedName);
-                    }
-                    Toast.makeText(context, "📍 Switched campus to " + selectedName, Toast.LENGTH_SHORT).show();
-                    refreshProfile();
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+        container.setPadding(dp(16), dp(16), dp(16), dp(16));
+
+        TextView tvTitle = new TextView(context);
+        tvTitle.setText("SELECT CHURCH CAMPUS");
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvTitle.setLetterSpacing(0.04f);
+        tvTitle.setPadding(0, 0, 0, dp(14));
+        container.addView(tvTitle);
+
+        final AlertDialog[] dialogHolder = new AlertDialog[1];
+
+        for (int i = 0; i < campusNames.length; i++) {
+            final String name = campusNames[i];
+            final String id = campusIds[i];
+            final String vignettePath = campusVignettes[i];
+
+            LinearLayout rowCard = new LinearLayout(context);
+            rowCard.setOrientation(LinearLayout.HORIZONTAL);
+            rowCard.setGravity(Gravity.CENTER_VERTICAL);
+            rowCard.setPadding(dp(10), dp(10), dp(10), dp(10));
+            rowCard.setBackground(PerazimTheme.createCardGradient(dp(12), dp(1)));
+            LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lpRow.setMargins(0, 0, 0, dp(10));
+            rowCard.setLayoutParams(lpRow);
+
+            // 48dp rounded 10dp thumbnail
+            FrameLayout thumbFrame = new FrameLayout(context);
+            thumbFrame.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
+            thumbFrame.setBackground(PerazimTheme.createCardGradient(dp(10), dp(1)));
+            thumbFrame.setClipToOutline(true);
+
+            Bitmap thumbBmp = vignettePath != null ? loadAssetBitmap(vignettePath, 200) : null;
+            if (thumbBmp != null) {
+                ImageView ivThumb = new ImageView(context);
+                ivThumb.setImageBitmap(thumbBmp);
+                ivThumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                thumbFrame.addView(ivThumb, new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            } else {
+                ImageView ivIcon = new ImageView(context);
+                ivIcon.setImageResource(id.contains("online")
+                        ? org.perazimchurch.app.R.drawable.ic_christian_dove
+                        : org.perazimchurch.app.R.drawable.ic_christian_church);
+                ivIcon.setColorFilter(PerazimTheme.COLOR_PURPLE_SOFT, PorterDuff.Mode.SRC_IN);
+                FrameLayout.LayoutParams lpIcon = new FrameLayout.LayoutParams(dp(28), dp(28));
+                lpIcon.gravity = Gravity.CENTER;
+                ivIcon.setLayoutParams(lpIcon);
+                thumbFrame.addView(ivIcon);
+            }
+            rowCard.addView(thumbFrame);
+
+            LinearLayout textCol = new LinearLayout(context);
+            textCol.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+            lpText.setMargins(dp(12), 0, 0, 0);
+            textCol.setLayoutParams(lpText);
+
+            TextView tvName = new TextView(context);
+            tvName.setText(name);
+            tvName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            tvName.setTypeface(Typeface.DEFAULT_BOLD);
+            tvName.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            textCol.addView(tvName);
+
+            TextView tvSub = new TextView(context);
+            tvSub.setText(vignettePath != null ? "Perazim Mission Church Branch" : "Satellite & Digital Fellowship");
+            tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            tvSub.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+            textCol.addView(tvSub);
+
+            rowCard.addView(textCol);
+
+            rowCard.setOnClickListener(v -> {
+                selectedCampusName = name;
+                viewModel.switchCampus(id, () -> {
+                    postToMain(() -> {
+                        if (tvMemberCampus != null) {
+                            tvMemberCampus.setText("Perazim Mission Church · " + name);
+                        }
+                        Toast.makeText(context, "📍 Switched campus to " + name, Toast.LENGTH_SHORT).show();
+                        refreshProfile();
+                    });
                 });
+                if (dialogHolder[0] != null) dialogHolder[0].dismiss();
             });
-        });
+
+            container.addView(rowCard);
+        }
+
+        sv.addView(container);
+        builder.setView(sv);
         builder.setNegativeButton("Cancel", null);
-        builder.show();
+        AlertDialog dialog = builder.create();
+        dialogHolder[0] = dialog;
+        dialog.show();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
+        }
     }
 
     // =========================================================================

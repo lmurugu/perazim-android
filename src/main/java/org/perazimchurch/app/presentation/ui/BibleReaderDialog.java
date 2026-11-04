@@ -6,6 +6,8 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -13,6 +15,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -263,15 +267,32 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private View createHeaderBar() {
+        FrameLayout headerFrame = new FrameLayout(getContext());
+        headerFrame.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        Bitmap scrollBmp = loadAssetBitmap("backgrounds/bg_reader_scroll.png", 720);
+        if (scrollBmp != null) {
+            ImageView ivBg = new ImageView(getContext());
+            ivBg.setImageBitmap(scrollBmp);
+            ivBg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            headerFrame.addView(ivBg, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(getContext());
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.parseColor("#80140319"), Color.parseColor("#E6140319")});
+            bottomScrim.setBackground(scrimGrad);
+            headerFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
         LinearLayout header = new LinearLayout(getContext());
         header.setOrientation(LinearLayout.VERTICAL);
-        header.setBackgroundColor(COLOR_WHITE);
         header.setPadding(dp(14), dp(10), dp(14), dp(10));
-
-        GradientDrawable headerBg = new GradientDrawable();
-        headerBg.setColor(COLOR_WHITE);
-        headerBg.setStroke(dp(1), COLOR_BORDER_GREY);
-        header.setBackground(headerBg);
+        header.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // Top Row: Translation Badge + Close Button
         LinearLayout topRow = new LinearLayout(getContext());
@@ -333,7 +354,8 @@ public class BibleReaderDialog extends Dialog {
         btnBookChapterTitle.setOnClickListener(v -> showBookSelectorDialog());
         header.addView(btnBookChapterTitle);
 
-        return header;
+        headerFrame.addView(header);
+        return headerFrame;
     }
 
     private LinearLayout createSearchBarLayout() {
@@ -1227,6 +1249,29 @@ public class BibleReaderDialog extends Dialog {
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Nullable
+    private Bitmap loadAssetBitmap(String name, int maxDim) {
+        try {
+            java.io.InputStream is = getContext().getAssets().open(name);
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+
+            int sample = 1;
+            int max = Math.max(opts.outWidth, opts.outHeight);
+            while (max / sample > maxDim) sample *= 2;
+            opts.inJustDecodeBounds = false;
+            opts.inSampleSize = sample;
+            is = getContext().getAssets().open(name);
+            Bitmap bmp = BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+            return bmp;
+        } catch (Exception e) {
+            return null;
         }
     }
 }

@@ -3057,7 +3057,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         splash.setBackgroundColor(Color.parseColor("#140319"));
 
-        Bitmap splashBmp = loadAssetBitmap("backgrounds/bg_splash.png", 720);
+        Bitmap splashBmp = loadAssetBitmap("backgrounds/bg_splash_breakthrough.png", 720);
         if (splashBmp != null) {
             ImageView ivBg = new ImageView(this);
             ivBg.setImageBitmap(splashBmp);

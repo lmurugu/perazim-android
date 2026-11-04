@@ -87,6 +87,22 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
 
         content.addView(navBar);
 
+        // Classical Hymn Lyre Banner
+        Bitmap artBmp = loadAssetBitmap("backgrounds/bg_hymn_lyre.png", 800);
+        if (artBmp != null) {
+            Bitmap roundArt = getRoundedCornerBitmap(artBmp, dp(14));
+            ImageView artView = new ImageView(this);
+            artView.setImageBitmap(roundArt);
+            artView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            LinearLayout.LayoutParams lpArt = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    dp(160)
+            );
+            lpArt.setMargins(0, 0, 0, dp(14));
+            artView.setLayoutParams(lpArt);
+            content.addView(artView);
+        }
+
         // HYMN 1: GREAT IS THY FAITHFULNESS
         LinearLayout card1 = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
         card1.setOrientation(LinearLayout.VERTICAL);
