@@ -1,0 +1,32 @@
+[android.widget.TextView] Perazim
+[android.widget.TextView] Embu Headquarters
+[android.widget.TextView] Guest Pilgrim
+[android.widget.TextView] guest@perazim.org
+[android.widget.TextView] Embu Headquarters · Switch ▾
+[android.widget.TextView] 🔥 0 Days
+[android.widget.TextView] Streak
+[android.widget.TextView] ⭐ 0 XP
+[android.widget.TextView] Spiritual XP
+[android.widget.TextView] 💜 2 Pts
+[android.widget.TextView] Grace
+[android.widget.TextView] 📅 0 Days
+[android.widget.TextView] Lifetime
+[android.widget.Button] GIVE WITH M-PESA
+[android.widget.TextView] CHURCH & RESOURCES
+[android.widget.TextView] Refresh Content
+[android.widget.TextView] Last updated: Nov 3, 8:34 PM
+[android.widget.TextView] Saved & Offline Content
+[android.widget.TextView] Downloaded sermons, favorite hymns, bookmarked verses
+[android.widget.TextView] Breakthrough Guide
+[android.widget.TextView] Available in next release
+[android.widget.TextView] Fellowship Extras
+[android.widget.TextView] Devotional riddles and Christian joy & humor
+[android.widget.TextView] Pastoral Care & Office
+[android.widget.TextView] Call, WhatsApp, SMS, or directions to Embu Headquarters
+[android.widget.TextView] About Perazim Mission Church
+[android.widget.TextView] Vision, leadership & version 2.2.0 (Build 4)
+[android.widget.TextView] Home
+[android.widget.TextView] Sermons
+[android.widget.TextView] Worship
+[android.widget.TextView] Prayer
+[android.widget.TextView] Me

@@ -1,0 +1,7 @@
+[android.widget.TextView] Share a Prayer
+[android.widget.TextView] Your church community will stand in intercession with you.
+[android.widget.EditText] Prayer Title (e.g. Healing, Family, Peace)
+[android.widget.EditText] Describe your petition...
+[android.widget.CheckBox] Share anonymously
+[android.widget.Button] CANCEL
+[android.widget.Button] POST PRAYER
