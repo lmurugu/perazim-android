@@ -30,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -251,11 +252,37 @@ public class HomeUiBinder {
         contentContainer.setOrientation(LinearLayout.VERTICAL);
         contentContainer.setPadding(dp(16), dp(16), dp(16), dp(32));
 
-        // 1. Quiet Sanctuary Welcome Wordmark with Official Logo
+        // 1. Quiet Sanctuary Welcome Wordmark with Official Logo & Illustrated Quiet-Dark Header
+        FrameLayout headerContainer = new FrameLayout(context);
+        LinearLayout.LayoutParams lpHeader = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpHeader.setMargins(0, 0, 0, dp(14));
+        headerContainer.setLayoutParams(lpHeader);
+
+        Bitmap homeBgBmp = loadAssetBitmap("backgrounds/bg_home_header.png", 720);
+        if (homeBgBmp != null) {
+            headerContainer.setBackground(PerazimTheme.createCardGradient(dp(16), dp(1)));
+            headerContainer.setClipToOutline(true);
+
+            ImageView ivHomeBg = new ImageView(context);
+            ivHomeBg.setImageBitmap(homeBgBmp);
+            ivHomeBg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            headerContainer.addView(ivHomeBg, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(context);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            headerContainer.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
         LinearLayout headerBanner = new LinearLayout(context);
         headerBanner.setOrientation(LinearLayout.HORIZONTAL);
         headerBanner.setGravity(Gravity.CENTER_VERTICAL);
-        headerBanner.setPadding(0, 0, 0, dp(14));
+        headerBanner.setPadding(dp(14), dp(14), dp(14), dp(14));
 
         ImageView churchLogo = new ImageView(context);
         churchLogo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
@@ -283,7 +310,8 @@ public class HomeUiBinder {
         titleCol.addView(tvSubGreeting);
 
         headerBanner.addView(titleCol);
-        contentContainer.addView(headerBanner);
+        headerContainer.addView(headerBanner);
+        contentContainer.addView(headerContainer);
 
         // 2. Single "Today" Card (Hero Darkened Gradient)
         View todayCard = createTodayCard();

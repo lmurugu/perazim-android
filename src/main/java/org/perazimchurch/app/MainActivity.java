@@ -161,6 +161,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private WorshipUiBinder worshipUiBinder;
     private FellowshipUiBinder fellowshipUiBinder;
     private ProfileUiBinder profileUiBinder;
+    private FrameLayout splashContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,6 +182,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         factory = ViewModelFactory.getInstance(this);
         bibleViewModel = factory.createBibleViewModel();
+
+        FrameLayout rootWindow = new FrameLayout(this);
+        rootWindow.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setLayoutParams(new ViewGroup.LayoutParams(
@@ -217,7 +222,27 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         View bottomBar = createBottomTabBar();
         rootLayout.addView(bottomBar);
 
-        setContentView(rootLayout);
+        rootWindow.addView(rootLayout);
+
+        // 5. Illustrated Quiet-Dark Splash Overlay
+        splashContainer = createSplashScreen();
+        if (splashContainer != null) {
+            rootWindow.addView(splashContainer);
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (getIntent() != null && getIntent().getBooleanExtra("show_splash", false)) {
+                    return;
+                }
+                if (splashContainer != null) {
+                    splashContainer.animate()
+                            .alpha(0f)
+                            .setDuration(400)
+                            .withEndAction(() -> splashContainer.setVisibility(View.GONE))
+                            .start();
+                }
+            }, 1200);
+        }
+
+        setContentView(rootWindow);
         handleIntent(getIntent());
     }
 
@@ -249,6 +274,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     private void handleIntent(android.content.Intent intent) {
         if (intent == null) return;
+        if (intent.getBooleanExtra("show_splash", false)) {
+            if (splashContainer != null) {
+                splashContainer.setVisibility(View.VISIBLE);
+                splashContainer.setAlpha(1.0f);
+            }
+            return;
+        } else {
+            if (splashContainer != null && splashContainer.getVisibility() == View.VISIBLE) {
+                splashContainer.setVisibility(View.GONE);
+            }
+        }
+
         int tab = intent.getIntExtra("tab_index", -1);
         if (tab >= 0 && tab < 5) {
             switchTab(tab);
@@ -274,6 +311,60 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             try {
                 startActivity(new Intent(this, JokesActivity.class));
             } catch (Exception ignored) {}
+        }
+        if (intent.getBooleanExtra("open_sermon_player", false)) {
+            switchTab(1);
+            if (sermonsUiBinder != null) {
+                sermonsUiBinder.startSamplePlayback();
+            }
+        }
+        if (intent.getBooleanExtra("open_hymn_detail", false)) {
+            switchTab(2);
+            if (worshipUiBinder != null) {
+                worshipUiBinder.showSampleHymnDetail();
+            }
+        }
+        if (intent.getBooleanExtra("open_prayer_mine", false)) {
+            switchTab(3);
+            if (fellowshipUiBinder != null) {
+                fellowshipUiBinder.openMyPrayersTab();
+            }
+        }
+        if (intent.getBooleanExtra("open_about_dialog", false)) {
+            switchTab(4);
+            if (profileUiBinder != null) {
+                profileUiBinder.showAboutDialog();
+            }
+        }
+        if (intent.getBooleanExtra("open_campus_switcher", false)) {
+            switchTab(4);
+            if (profileUiBinder != null) {
+                profileUiBinder.showCampusSwitcherDialog();
+            }
+        }
+        if (intent.getBooleanExtra("open_fellowship_extras", false)) {
+            switchTab(4);
+            if (profileUiBinder != null) {
+                profileUiBinder.showFellowshipExtrasDialog();
+            }
+        }
+        if (intent.getBooleanExtra("open_saved_content", false)) {
+            switchTab(4);
+            if (profileUiBinder != null) {
+                profileUiBinder.showSavedContentDialog();
+            }
+        }
+        if (intent.getBooleanExtra("open_testimony_dialog", false)) {
+            switchTab(3);
+            if (fellowshipUiBinder != null) {
+                fellowshipUiBinder.showSampleTestimonyDialog();
+            }
+        }
+        if (intent.getBooleanExtra("open_search_active", false)) {
+            switchTab(1);
+            if (sermonsUiBinder != null) {
+                sermonsUiBinder.setSearchQuery("Breakthrough");
+            }
         }
     }
 
@@ -3022,5 +3113,74 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
         return output;
+    }
+
+    private FrameLayout createSplashScreen() {
+        FrameLayout splash = new FrameLayout(this);
+        splash.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        splash.setBackgroundColor(Color.parseColor("#140319"));
+
+        Bitmap splashBmp = loadAssetBitmap("backgrounds/bg_splash.png", 720);
+        if (splashBmp != null) {
+            ImageView ivBg = new ImageView(this);
+            ivBg.setImageBitmap(splashBmp);
+            ivBg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            splash.addView(ivBg, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            View scrim = new View(this);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
+            scrim.setBackground(scrimGrad);
+            splash.addView(scrim, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setGravity(Gravity.CENTER);
+        FrameLayout.LayoutParams lpContent = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpContent.gravity = Gravity.CENTER;
+        lpContent.setMargins(dp(24), 0, dp(24), 0);
+        content.setLayoutParams(lpContent);
+
+        ImageView logo = new ImageView(this);
+        logo.setImageResource(R.drawable.ic_perazim_logo);
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(88), dp(88));
+        lpLogo.gravity = Gravity.CENTER_HORIZONTAL;
+        lpLogo.setMargins(0, 0, 0, dp(20));
+        logo.setLayoutParams(lpLogo);
+        content.addView(logo);
+
+        TextView tvTitle = new TextView(this);
+        tvTitle.setText("PERAZIM MISSION CHURCH");
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvTitle.setLetterSpacing(0.06f);
+        tvTitle.setGravity(Gravity.CENTER);
+        content.addView(tvTitle);
+
+        TextView tvSubtitle = new TextView(this);
+        tvSubtitle.setText("The Place of Great Breakthrough");
+        tvSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvSubtitle.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvSubtitle.setGravity(Gravity.CENTER);
+        tvSubtitle.setPadding(0, dp(4), 0, dp(24));
+        content.addView(tvSubtitle);
+
+        TextView tvVerse = new TextView(this);
+        tvVerse.setText("“The Lord has broken through my enemies before me, like a breakthrough of water.”\n— 2 Samuel 5:20");
+        tvVerse.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvVerse.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        tvVerse.setGravity(Gravity.CENTER);
+        tvVerse.setLineSpacing(dp(2), 1.15f);
+        content.addView(tvVerse);
+
+        splash.addView(content);
+        return splash;
     }
 }

@@ -154,6 +154,68 @@ capture_screen "11-jokes"
 adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
 sleep 1
 
+# Screen 12: Sermons Player (Active Audio Controller)
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_sermon_player true >/dev/null 2>&1
+sleep 2
+capture_screen "12-sermons-player"
+
+# Screen 13: Hymn Detail Sheet (Full lyrics, key, transpose modal)
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_hymn_detail true >/dev/null 2>&1
+sleep 2
+capture_screen "13-hymn-detail"
+adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
+sleep 1
+
+# Screen 14: My Prayers Sub-tab
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_prayer_mine true >/dev/null 2>&1
+sleep 2
+capture_screen "14-prayer-mine"
+
+# Screen 15: About Dialog (About Perazim Mission Church)
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_about_dialog true >/dev/null 2>&1
+sleep 2
+capture_screen "15-about-dialog"
+adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
+sleep 1
+
+# Screen 16: Campus Switcher Dialog
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_campus_switcher true >/dev/null 2>&1
+sleep 2
+capture_screen "16-campus-switcher"
+adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
+sleep 1
+
+# Screen 17: Fellowship Extras Dialog
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_fellowship_extras true >/dev/null 2>&1
+sleep 2
+capture_screen "17-fellowship-extras"
+adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
+sleep 1
+
+# Screen 18: Saved & Offline Content Dialog
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_saved_content true >/dev/null 2>&1
+sleep 2
+capture_screen "18-saved-offline-content"
+adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
+sleep 1
+
+# Screen 19: Splash Screen
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez show_splash true >/dev/null 2>&1
+sleep 2
+capture_screen "19-splash"
+
+# Screen 20: Mark as Answered / Testimony Dialog
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_testimony_dialog true >/dev/null 2>&1
+sleep 2
+capture_screen "20-answered-prayer-testimony"
+adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
+sleep 1
+
+# Screen 21: Active Search Query State with Results
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_search_active true >/dev/null 2>&1
+sleep 2
+capture_screen "21-search-active"
+
 # Return to Home clean
 adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity >/dev/null 2>&1
 

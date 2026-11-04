@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -13,6 +15,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
+import java.io.InputStream;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -148,10 +151,36 @@ public class FellowshipUiBinder {
     public void bind(@NonNull ViewGroup rootContainer) {
         rootContainer.removeAllViews();
 
-        // 1. Title Bar
+        // 1. Quiet-Dark Prayer Header with Illustrated Art
+        FrameLayout headerContainer = new FrameLayout(context);
+        LinearLayout.LayoutParams lpHeader = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpHeader.setMargins(0, 0, 0, dp(14));
+        headerContainer.setLayoutParams(lpHeader);
+
+        Bitmap prayerBgBmp = loadAssetBitmap("backgrounds/bg_prayer_header.png", 720);
+        if (prayerBgBmp != null) {
+            headerContainer.setBackground(PerazimTheme.createCardGradient(dp(16), dp(1)));
+            headerContainer.setClipToOutline(true);
+
+            ImageView ivPrayerBg = new ImageView(context);
+            ivPrayerBg.setImageBitmap(prayerBgBmp);
+            ivPrayerBg.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            headerContainer.addView(ivPrayerBg, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(context);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            headerContainer.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
         LinearLayout headerRow = new LinearLayout(context);
         headerRow.setOrientation(LinearLayout.VERTICAL);
-        headerRow.setPadding(0, dp(4), 0, dp(14));
+        headerRow.setPadding(dp(16), dp(14), dp(16), dp(14));
 
         TextView tvTitle = new TextView(context);
         tvTitle.setText("Prayer");
@@ -167,7 +196,8 @@ public class FellowshipUiBinder {
         tvSubtitle.setPadding(0, dp(2), 0, 0);
         headerRow.addView(tvSubtitle);
 
-        rootContainer.addView(headerRow);
+        headerContainer.addView(headerRow);
+        rootContainer.addView(headerContainer);
 
         // 2. Offline Banner (shown if disconnected)
         offlineBannerView = createOfflineBanner();
@@ -296,7 +326,7 @@ public class FellowshipUiBinder {
         return segmented;
     }
 
-    private void switchSubTab(boolean mine) {
+    public void switchSubTab(boolean mine) {
         if (isMineTab == mine) return;
         isMineTab = mine;
         updateSegmentedStyles();
@@ -305,6 +335,18 @@ public class FellowshipUiBinder {
         } else {
             renderWallPrayers();
         }
+    }
+
+    public void openMyPrayersTab() {
+        switchSubTab(true);
+    }
+
+    public void showSampleTestimonyDialog() {
+        Prayer sample = new Prayer();
+        sample.setId("sample-answered-1");
+        sample.setTitle("Healing and Complete Restoration");
+        sample.setBody("Praying for full recovery from recent illness.");
+        promptMarkAnswered(sample);
     }
 
     private void updateSegmentedStyles() {
@@ -915,6 +957,30 @@ public class FellowshipUiBinder {
         drawable.setColor(bgColor);
         drawable.setCornerRadius(dp(cornerRadiusDp));
         return drawable;
+    }
+
+    private Bitmap loadAssetBitmap(String name, int maxDim) {
+        try {
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inJustDecodeBounds = true;
+            InputStream is = context.getAssets().open(name);
+            BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+
+            int sampleSize = 1;
+            while ((opts.outWidth / sampleSize) > maxDim || (opts.outHeight / sampleSize) > maxDim) {
+                sampleSize *= 2;
+            }
+
+            opts.inJustDecodeBounds = false;
+            opts.inSampleSize = sampleSize;
+            is = context.getAssets().open(name);
+            Bitmap bmp = BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+            return bmp;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private void postToMain(Runnable runnable) {

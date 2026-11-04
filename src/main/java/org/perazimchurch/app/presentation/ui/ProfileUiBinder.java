@@ -470,7 +470,7 @@ public class ProfileUiBinder {
         return row;
     }
 
-    private void showSavedContentDialog() {
+    public void showSavedContentDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Saved & Offline Content");
         ScrollView sv = new ScrollView(context);
@@ -502,7 +502,7 @@ public class ProfileUiBinder {
         builder.show();
     }
 
-    private void showAboutDialog() {
+    public void showAboutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("About Perazim Mission Church");
         builder.setIcon(org.perazimchurch.app.R.drawable.ic_perazim_logo);
@@ -520,7 +520,7 @@ public class ProfileUiBinder {
         }
     }
 
-    private void showFellowshipExtrasDialog() {
+    public void showFellowshipExtrasDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Fellowship Extras");
 

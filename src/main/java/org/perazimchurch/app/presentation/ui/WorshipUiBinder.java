@@ -485,6 +485,17 @@ public class WorshipUiBinder {
     // 5. HYMN DETAIL SHEET / DIALOG (QUIET CONTROLS)
     // =========================================================================
 
+    public void showSampleHymnDetail() {
+        Hymn sample = new Hymn();
+        sample.setId("1");
+        sample.setNumber(1);
+        sample.setTitle("Amazing Grace");
+        sample.setCategory("Classic Hymn");
+        sample.setKey("G");
+        sample.setLyrics("Amazing grace! how sweet the sound,\nThat saved a wretch like me!\nI once was lost, but now am found,\nWas blind, but now I see.\n\n’Twas grace that taught my heart to fear,\nAnd grace my fears relieved;\nHow precious did that grace appear\nThe hour I first believed!");
+        showHymnDetailSheet(sample);
+    }
+
     public void showHymnDetailSheet(final Hymn hymn) {
         if (hymn == null) return;
 

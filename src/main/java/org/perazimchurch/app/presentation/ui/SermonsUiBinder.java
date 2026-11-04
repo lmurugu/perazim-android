@@ -578,6 +578,25 @@ public class SermonsUiBinder {
         return searchLayout;
     }
 
+    public void setSearchQuery(String query) {
+        if (etSearch != null) {
+            etSearch.setText(query != null ? query : "");
+            if (query != null) {
+                etSearch.setSelection(query.length());
+            }
+        }
+    }
+
+    public void startSamplePlayback() {
+        Sermon sample = new Sermon();
+        sample.setId("sample-sermon-1");
+        sample.setTitle("Supernatural Breakthrough");
+        sample.setPreacher("Bishop Dr. David Mutweri");
+        sample.setPassage("2 Samuel 5:17-21");
+        sample.setDurationSeconds(2700);
+        startPlayback(sample);
+    }
+
     // =========================================================================
     // 4. FILTER CHIPS (All | Series | Downloaded)
     // =========================================================================
