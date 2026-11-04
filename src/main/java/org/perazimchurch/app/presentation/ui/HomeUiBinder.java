@@ -259,7 +259,7 @@ public class HomeUiBinder {
         lpHeader.setMargins(0, 0, 0, dp(14));
         headerContainer.setLayoutParams(lpHeader);
 
-        Bitmap homeBgBmp = loadAssetBitmap("backgrounds/bg_home_header.png", 720);
+        Bitmap homeBgBmp = loadAssetBitmap("backgrounds/bg_splash_breakthrough.png", 720);
         if (homeBgBmp != null) {
             headerContainer.setBackground(PerazimTheme.createCardGradient(dp(16), dp(1)));
             headerContainer.setClipToOutline(true);
@@ -277,6 +277,8 @@ public class HomeUiBinder {
             bottomScrim.setBackground(scrimGrad);
             headerContainer.addView(bottomScrim, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        } else {
+            headerContainer.setBackground(PerazimTheme.createHeroGradient(dp(16), dp(1)));
         }
 
         LinearLayout headerBanner = new LinearLayout(context);

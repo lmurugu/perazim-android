@@ -43,23 +43,40 @@ def make_bg(source_path, target_name, width=720, height=400, tint_hex="#2A0F33",
     size_kb = os.path.getsize(out_path) / 1024
     print(f"Generated {target_name}: {tinted.size}, {size_kb:.1f} KB")
 
-# 1. Home Header (Sanctuary atmosphere)
-sanctuary_src = os.path.join(ASSETS_DIR, "hero_sanctuary.jpg")
-if not os.path.exists(sanctuary_src):
-    sanctuary_src = os.path.join(ASSETS_DIR, "sanctuary.jpg")
-make_bg(sanctuary_src, "bg_home_header.png", width=720, height=360, tint_hex="#220A2B", blend=0.40, brightness=0.80)
+# 1. Worship Dusk (16:9 ratio, 720x405, dusk contemplative mood)
+worship_src = os.path.join(ASSETS_DIR, "art_worship_classic.jpg")
+if not os.path.exists(worship_src):
+    worship_src = os.path.join(ASSETS_DIR, "hymnals.jpg")
+make_bg(worship_src, "bg_worship_dusk.png", width=720, height=405, tint_hex="#250C2C", blend=0.45, brightness=0.75)
 
-# 2. Splash (Living Waters / Sanctuary Altar with deep presence)
+# 2. Prayer Moon (720x360, quiet moonlight prayer altar)
+prayer_src = os.path.join(ASSETS_DIR, "candle.jpg")
+if not os.path.exists(prayer_src):
+    prayer_src = os.path.join(ASSETS_DIR, "fellowship.jpg")
+make_bg(prayer_src, "bg_prayer_moon.png", width=720, height=360, tint_hex="#2A0F33", blend=0.45, brightness=0.75)
+
+# 3. Me Path (720x320, member journey & covenant path)
+me_src = os.path.join(ASSETS_DIR, "campus.jpg")
+if not os.path.exists(me_src):
+    me_src = os.path.join(ASSETS_DIR, "bookshelf.jpg")
+make_bg(me_src, "bg_me_path.png", width=720, height=320, tint_hex="#2D1036", blend=0.48, brightness=0.75)
+
+# 4. Give Harvest (720x200, gratitude & faithful kingdom giving)
+give_src = os.path.join(ASSETS_DIR, "art_christian.jpg")
+if not os.path.exists(give_src):
+    give_src = os.path.join(ASSETS_DIR, "waters.jpg")
+make_bg(give_src, "bg_give_harvest.png", width=720, height=200, tint_hex="#381A22", blend=0.45, brightness=0.78)
+
+# 5. Splash Breakthrough (720x360, supernatural breakthrough sanctuary banner)
+breakthrough_src = os.path.join(ASSETS_DIR, "hero_sanctuary.jpg")
+if not os.path.exists(breakthrough_src):
+    breakthrough_src = os.path.join(ASSETS_DIR, "sanctuary.jpg")
+make_bg(breakthrough_src, "bg_splash_breakthrough.png", width=720, height=360, tint_hex="#220A2B", blend=0.42, brightness=0.80)
+
+# Preserve existing bg_splash.png for full-screen entry splash
 waters_src = os.path.join(ASSETS_DIR, "waters.jpg")
-if not os.path.exists(waters_src):
-    waters_src = os.path.join(ASSETS_DIR, "sanctuary.jpg")
-make_bg(waters_src, "bg_splash.png", width=720, height=1280, tint_hex="#1F0826", blend=0.55, brightness=0.65)
-
-# 3. Prayer Header (Candle / Fellowship altar)
-candle_src = os.path.join(ASSETS_DIR, "candle.jpg")
-if not os.path.exists(candle_src):
-    candle_src = os.path.join(ASSETS_DIR, "fellowship.jpg")
-make_bg(candle_src, "bg_prayer_header.png", width=720, height=340, tint_hex="#2A0F33", blend=0.42, brightness=0.75)
+if os.path.exists(waters_src) and not os.path.exists(os.path.join(BG_DIR, "bg_splash.png")):
+    make_bg(waters_src, "bg_splash.png", width=720, height=1280, tint_hex="#1F0826", blend=0.55, brightness=0.65)
 
 print("\nAsset size report:")
 total = 0

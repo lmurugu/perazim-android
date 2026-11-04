@@ -158,7 +158,7 @@ public class FellowshipUiBinder {
         lpHeader.setMargins(0, 0, 0, dp(14));
         headerContainer.setLayoutParams(lpHeader);
 
-        Bitmap prayerBgBmp = loadAssetBitmap("backgrounds/bg_prayer_header.png", 720);
+        Bitmap prayerBgBmp = loadAssetBitmap("backgrounds/bg_prayer_moon.png", 720);
         if (prayerBgBmp != null) {
             headerContainer.setBackground(PerazimTheme.createCardGradient(dp(16), dp(1)));
             headerContainer.setClipToOutline(true);

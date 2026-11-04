@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -17,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -25,6 +28,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.io.InputStream;
 
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -64,7 +70,46 @@ public final class GivingDialog {
         LinearLayout container = new LinearLayout(context);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(context, 20), dp(context, 22), dp(context, 20), dp(context, 22));
-        container.setBackground(PerazimTheme.createDialogGradient(dp(context, 18), dp(context, 1)));
+        // Contemplative Header Strip with bg_give_harvest.png and bottom scrim gradient
+        Bitmap harvestBmp = loadAssetBitmap(context, "backgrounds/bg_give_harvest.png", 720);
+        if (harvestBmp != null) {
+            FrameLayout headerStrip = new FrameLayout(context);
+            LinearLayout.LayoutParams lpH = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 90));
+            lpH.setMargins(0, 0, 0, dp(context, 14));
+            headerStrip.setLayoutParams(lpH);
+            headerStrip.setBackground(PerazimTheme.createCardGradient(dp(context, 12), dp(context, 1)));
+            headerStrip.setClipToOutline(true);
+
+            ImageView ivHarvest = new ImageView(context);
+            ivHarvest.setImageBitmap(harvestBmp);
+            ivHarvest.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            headerStrip.addView(ivHarvest, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(context);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            headerStrip.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+            TextView tvHarvestTag = new TextView(context);
+            tvHarvestTag.setText("GENEROSITY & HARVEST · 2 COR 9:7");
+            tvHarvestTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            tvHarvestTag.setTypeface(Typeface.DEFAULT_BOLD);
+            tvHarvestTag.setTextColor(PerazimTheme.COLOR_ORANGE_MUTED);
+            tvHarvestTag.setLetterSpacing(0.06f);
+            FrameLayout.LayoutParams lpTag = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+            lpTag.gravity = Gravity.BOTTOM | Gravity.START;
+            lpTag.setMargins(dp(context, 12), 0, 0, dp(context, 10));
+            tvHarvestTag.setLayoutParams(lpTag);
+            headerStrip.addView(tvHarvestTag);
+
+            container.addView(headerStrip);
+        }
 
         // 1. Header with Church Logo & Title
         LinearLayout titleRow = new LinearLayout(context);
@@ -352,5 +397,30 @@ public final class GivingDialog {
         g.setColor(bgColor);
         g.setCornerRadius(dp(context, cornerRadiusDp));
         return g;
+    }
+
+    @Nullable
+    private static Bitmap loadAssetBitmap(@NonNull Context context, String name, int maxDim) {
+        try {
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inJustDecodeBounds = true;
+            InputStream is = context.getAssets().open(name);
+            BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+
+            int sampleSize = 1;
+            while ((opts.outWidth / sampleSize) > maxDim || (opts.outHeight / sampleSize) > maxDim) {
+                sampleSize *= 2;
+            }
+
+            opts.inJustDecodeBounds = false;
+            opts.inSampleSize = sampleSize;
+            is = context.getAssets().open(name);
+            Bitmap bmp = BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+            return bmp;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -1,0 +1,24 @@
+[android.widget.Button] ← BACK
+[android.widget.Button] A-
+[android.widget.Button] A+
+[android.widget.Button] ♡ FAVORITE
+[android.widget.TextView] HYMN #1
+[android.widget.TextView] Amazing Grace
+[android.widget.TextView] Transpose:
+[android.widget.TextView] G
+[android.widget.Button] ♭ -1
+[android.widget.Button] ♯ +1
+[android.widget.TextView] CHORD PROGRESSION
+[android.widget.TextView] G - C - D
+[android.widget.TextView] LYRICS
+[android.widget.TextView] Amazing grace! how sweet the sound,
+That saved a wretch like me!
+I once was lost, but now am found,
+Was blind, but now I see.
+
+’Twas grace that taught my heart to fear,
+And grace my fears relieved;
+How precious did that grace appear
+The hour I first believed!
+[android.widget.Button] COPY CHORDS
+[android.widget.Button] SHARE HYMN

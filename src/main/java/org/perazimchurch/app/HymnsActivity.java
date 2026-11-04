@@ -87,37 +87,6 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
 
         content.addView(navBar);
 
-        // Classical Art Row
-        LinearLayout artRow = new LinearLayout(this);
-        artRow.setOrientation(LinearLayout.HORIZONTAL);
-        artRow.setPadding(0, 0, 0, dp(16));
-
-        Bitmap hymnBmp = loadAssetBitmap("art_hymn.jpg", 400);
-        if (hymnBmp != null) {
-            Bitmap roundHymn = getRoundedCornerBitmap(hymnBmp, dp(12));
-            ImageView img1 = new ImageView(this);
-            img1.setImageBitmap(roundHymn);
-            img1.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(120), 1.0f);
-            lp.setMargins(0, 0, dp(8), 0);
-            img1.setLayoutParams(lp);
-            artRow.addView(img1);
-        }
-
-        Bitmap worshipBmp = loadAssetBitmap("art_worship_classic.jpg", 400);
-        if (worshipBmp != null) {
-            Bitmap roundWorship = getRoundedCornerBitmap(worshipBmp, dp(12));
-            ImageView img2 = new ImageView(this);
-            img2.setImageBitmap(roundWorship);
-            img2.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(0, dp(120), 1.0f);
-            lp2.setMargins(dp(8), 0, 0, 0);
-            img2.setLayoutParams(lp2);
-            artRow.addView(img2);
-        }
-
-        content.addView(artRow);
-
         // HYMN 1: GREAT IS THY FAITHFULNESS
         LinearLayout card1 = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
         card1.setOrientation(LinearLayout.VERTICAL);

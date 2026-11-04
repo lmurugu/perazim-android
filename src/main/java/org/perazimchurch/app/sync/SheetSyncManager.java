@@ -324,7 +324,7 @@ public final class SheetSyncManager {
             String venue = getCellOrDefault(r, col, "venue", getCellOrDefault(r, col, "location", "Sanctuary"));
             String campus = getCellOrDefault(r, col, "campus", "all");
             String desc = getCellOrDefault(r, col, "description", "");
-            String imageUrl = getCellOrDefault(r, col, "image_url", "sanctuary.jpg");
+            String imageUrl = getCellOrDefault(r, col, "image_url", "backgrounds/bg_splash_breakthrough.png");
             String category = getCellOrDefault(r, col, "category", "Worship");
             boolean active = col.containsKey("active") ? parseBool(getCellOrDefault(r, col, "active", "true")) : true;
 

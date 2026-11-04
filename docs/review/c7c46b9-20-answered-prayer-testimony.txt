@@ -1,0 +1,5 @@
+[android.widget.TextView] Mark as Answered
+[android.widget.TextView] Give praise for God's faithfulness in "Healing and Complete Restoration". Share a brief note of testimony:
+[android.widget.EditText] Write testimony here...
+[android.widget.Button] CANCEL
+[android.widget.Button] SUBMIT PRAISE

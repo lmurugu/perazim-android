@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -194,38 +195,61 @@ public class WorshipUiBinder {
     }
 
     // =========================================================================
-    // 1. CLASSICAL ART BANNER ROW
+    // 1. CLASSICAL ART BANNER ROW (16:9 HERO WITH CONTEMPLATIVE SCRIM)
     // =========================================================================
 
     @Nullable
     private View buildArtBanner() {
-        Bitmap hymnalsBmp = loadAssetBitmap("hymnals.jpg", 400);
-        if (hymnalsBmp == null) return null;
+        Bitmap duskBmp = loadAssetBitmap("backgrounds/bg_worship_dusk.png", 720);
+        if (duskBmp == null) return null;
 
-        LinearLayout artRow = new LinearLayout(activity);
-        artRow.setOrientation(LinearLayout.HORIZONTAL);
-        artRow.setPadding(0, 0, 0, dp(12));
+        FrameLayout heroFrame = new FrameLayout(activity);
+        LinearLayout.LayoutParams lpFrame = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(150));
+        lpFrame.setMargins(0, 0, 0, dp(14));
+        heroFrame.setLayoutParams(lpFrame);
+        heroFrame.setBackground(PerazimTheme.createCardGradient(dp(14), dp(1)));
+        heroFrame.setClipToOutline(true);
 
-        ImageView img1 = new ImageView(activity);
-        img1.setImageBitmap(getRoundedCornerBitmap(hymnalsBmp, dp(10)));
-        img1.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(90), 1.0f);
-        img1.setLayoutParams(lp);
-        artRow.addView(img1);
+        ImageView ivHero = new ImageView(activity);
+        ivHero.setImageBitmap(duskBmp);
+        ivHero.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        heroFrame.addView(ivHero, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        Bitmap stageBmp = loadAssetBitmap("stage.jpg", 400);
-        if (stageBmp != null) {
-            lp.setMargins(0, 0, dp(6), 0);
-            ImageView img2 = new ImageView(activity);
-            img2.setImageBitmap(getRoundedCornerBitmap(stageBmp, dp(10)));
-            img2.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(0, dp(90), 1.0f);
-            lp2.setMargins(dp(6), 0, 0, 0);
-            img2.setLayoutParams(lp2);
-            artRow.addView(img2);
-        }
+        View bottomScrim = new View(activity);
+        GradientDrawable scrimGrad = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
+        bottomScrim.setBackground(scrimGrad);
+        heroFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
-        return artRow;
+        LinearLayout textOverlay = new LinearLayout(activity);
+        textOverlay.setOrientation(LinearLayout.VERTICAL);
+        textOverlay.setGravity(Gravity.BOTTOM);
+        textOverlay.setPadding(dp(16), dp(16), dp(16), dp(14));
+        FrameLayout.LayoutParams lpText = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        textOverlay.setLayoutParams(lpText);
+
+        TextView tvTitle = new TextView(activity);
+        tvTitle.setText("SACRED HYMNS & CHORAL WORSHIP");
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvTitle.setLetterSpacing(0.04f);
+        textOverlay.addView(tvTitle);
+
+        TextView tvSubtitle = new TextView(activity);
+        tvSubtitle.setText("Perazim Mission Church · Songs of Contemplation");
+        tvSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvSubtitle.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        tvSubtitle.setPadding(0, dp(2), 0, 0);
+        textOverlay.addView(tvSubtitle);
+
+        heroFrame.addView(textOverlay);
+        return heroFrame;
     }
 
     // =========================================================================

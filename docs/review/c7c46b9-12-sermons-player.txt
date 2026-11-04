@@ -1,0 +1,56 @@
+[android.widget.TextView] Perazim
+[android.widget.TextView] Embu Headquarters
+[android.widget.TextView] Sermons
+[android.widget.TextView] Listen to messages and live worship from Perazim Mission Church
+[android.widget.TextView] LIVESTREAM BROADCAST
+[android.widget.TextView] Walking in Faith: Overcoming Fear in Difficult Times
+[android.widget.TextView] Bishop Dr. David Mutweri · Central Campus
+[android.widget.Button] WATCH LIVE BROADCAST
+[android.widget.TextView] AUDIO CONTROLLER
+[android.widget.Button] 1.0×
+[android.widget.TextView] Supernatural Breakthrough
+[android.widget.TextView] Bishop Dr. David Mutweri • 2 Samuel 5:17-21
+[android.widget.TextView] 00:03
+[android.widget.TextView] 01:00
+[android.widget.Button] -15S
+[android.widget.Button] PLAY SERMON
+[android.widget.Button] +30S
+[android.widget.EditText] Search title, preacher, passage…
+[android.widget.Button] ✕
+[android.widget.Button] ALL
+[android.widget.Button] SERIES
+[android.widget.Button] DOWNLOADED
+[android.widget.Button] VIDEO
+[android.widget.TextView] AUDIO MESSAGES & ARCHIVES
+[android.widget.TextView] Supernatural Breakthrough
+[android.widget.TextView] Bishop Dr. David Mutweri • 2 Samuel 5:17-21
+[android.widget.Button] ▶
+[android.widget.TextView] 47 min
+[android.widget.TextView] Recorded
+[android.widget.TextView] · Breakthrough Power Series
+[android.widget.Button] DOWNLOAD
+[android.widget.Button] SHARE
+[android.widget.TextView] The Baal-Perazim Mandate
+[android.widget.TextView] Bishop Dr. David Mutweri • 1 Chronicles 14:8-17
+[android.widget.Button] ▶
+[android.widget.TextView] 52 min
+[android.widget.TextView] Recorded
+[android.widget.TextView] · Covenant Mandates
+[android.widget.Button] DOWNLOAD
+[android.widget.Button] SHARE
+[android.widget.TextView] Walking in Covenant Grace
+[android.widget.TextView] Bishop Dr. David Mutweri • Ephesians 2:1-10
+[android.widget.Button] ▶
+[android.widget.TextView] 49 min
+[android.widget.TextView] Recorded
+[android.widget.TextView] · Grace Abounding
+[android.widget.Button] DOWNLOAD
+[android.widget.Button] SHARE
+[android.widget.TextView] Supernatural Breakthrough
+[android.widget.TextView] Bishop Dr. David Mutweri • 2 Samuel 5:17-21
+[android.widget.Button] ▶
+[android.widget.TextView] Home
+[android.widget.TextView] Sermons
+[android.widget.TextView] Worship
+[android.widget.TextView] Prayer
+[android.widget.TextView] Me

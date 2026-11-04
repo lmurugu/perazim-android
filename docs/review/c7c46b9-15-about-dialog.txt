@@ -1,0 +1,10 @@
+[android.widget.TextView] About Perazim Mission Church
+[android.widget.TextView] “A place where everybody is somebody, and no body is a nobody.”
+
+Leadership: Bishop Dr. David Mutweri
+Embu Headquarters, Kenya
+Campuses: Embu Headquarters, Nairobi, Meru, Online
+
+App Version: 2.2.0 (Build 4)
+Faithful offline-first faith companion.
+[android.widget.Button] CLOSE

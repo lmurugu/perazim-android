@@ -1,0 +1,20 @@
+[android.widget.Button] ← BACK
+[android.widget.TextView] CHRISTIAN JOY & HUMOR
+[android.widget.TextView] “A cheerful heart is good medicine, but a crushed spirit dries up the bones.” — Proverbs 17:22
+[android.widget.TextView] FINANCIAL ACUMEN
+[android.widget.TextView] Who was the greatest financier in the Bible?
+[android.widget.TextView] Noah! He floated his entire stock successfully while the rest of the world was in total liquidation!
+[android.widget.TextView] SUNDAY SCHOOL CLASSIC
+[android.widget.TextView] Why did Moses wander in the desert for 40 years?
+[android.widget.TextView] Because even in antiquity, men steadfastly refused to stop and ask for directions!
+[android.widget.TextView] PROPHETIC DELIVERY
+[android.widget.TextView] Why did Elijah never need food delivery apps?
+[android.widget.TextView] Because the ravens delivered his meals by the Brook Cherith every single day — with zero fees and top ratings!
+[android.widget.TextView] MARINE BIOLOGY
+[android.widget.TextView] Why was Jonah the ultimate deep-sea explorer?
+[android.widget.TextView] He spent three full days studying marine anatomy from the inside out before concluding it was time to preach in Nineveh!
+[android.widget.TextView] SUNDAY SLEEPER
+[android.widget.TextView] The Pastor and the Usher
+[android.widget.TextView] Pastor: 'Usher, wake up that brother snoring in row four!'
+Usher: 'Pastor, you put him to sleep, you wake him up!'
+[android.widget.Button] SMILE & PRAISE (+10 XP)

@@ -282,18 +282,6 @@ public class SermonsUiBinder {
         lp.setMargins(0, 0, 0, dp(14));
         liveCard.setLayoutParams(lp);
 
-        Bitmap stageBmp = loadAssetBitmap("stage.jpg", 500);
-        if (stageBmp != null) {
-            ImageView ivStage = new ImageView(activity);
-            ivStage.setImageBitmap(getRoundedCornerBitmap(stageBmp, dp(10)));
-            ivStage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpStage = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(120));
-            lpStage.setMargins(0, 0, 0, dp(10));
-            ivStage.setLayoutParams(lpStage);
-            liveCard.addView(ivStage);
-        }
-
         LinearLayout liveBadgeRow = new LinearLayout(activity);
         liveBadgeRow.setOrientation(LinearLayout.HORIZONTAL);
         liveBadgeRow.setGravity(Gravity.CENTER_VERTICAL);

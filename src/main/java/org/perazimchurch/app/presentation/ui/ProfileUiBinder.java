@@ -25,6 +25,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -177,15 +178,37 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createProfileHeaderCard() {
+        FrameLayout rootFrame = new FrameLayout(context);
+        LinearLayout.LayoutParams lpRoot = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpRoot.setMargins(0, 0, 0, dp(12));
+        rootFrame.setLayoutParams(lpRoot);
+        rootFrame.setBackground(PerazimTheme.createHeroGradient(dp(PerazimTheme.RADIUS_LG), dp(1)));
+        rootFrame.setClipToOutline(true);
+
+        Bitmap coverBmp = loadAssetBitmap("backgrounds/bg_me_path.png", 720);
+        if (coverBmp != null) {
+            ImageView ivCover = new ImageView(context);
+            ivCover.setImageBitmap(coverBmp);
+            ivCover.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            rootFrame.addView(ivCover, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+            View bottomScrim = new View(context);
+            GradientDrawable scrimGrad = new GradientDrawable(
+                    GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
+            bottomScrim.setBackground(scrimGrad);
+            rootFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        }
+
         LinearLayout card = new LinearLayout(context);
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpCard.setMargins(0, 0, 0, dp(12));
-        card.setLayoutParams(lpCard);
+        card.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT));
         card.setPadding(dp(14), dp(14), dp(14), dp(14));
-        card.setBackground(PerazimTheme.createHeroGradient(dp(PerazimTheme.RADIUS_LG), dp(1)));
 
         // Member Avatar with Church Logo
         ivAvatar = new ImageView(context);
@@ -231,7 +254,8 @@ public class ProfileUiBinder {
         memberInfo.addView(tvMemberCampus);
 
         card.addView(memberInfo);
-        return card;
+        rootFrame.addView(card);
+        return rootFrame;
     }
 
     // =========================================================================

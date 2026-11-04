@@ -740,19 +740,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(32));
 
-        // 1. Hero Photographic Banner (sanctuary.jpg)
-        Bitmap sanctuaryBmp = loadAssetBitmap("sanctuary.jpg", 600);
-        if (sanctuaryBmp != null) {
-            ImageView ivHero = new ImageView(this);
-            ivHero.setImageBitmap(getRoundedCornerBitmap(sanctuaryBmp, dp(14)));
-            ivHero.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpHero = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(150));
-            lpHero.setMargins(0, 0, 0, dp(14));
-            ivHero.setLayoutParams(lpHero);
-            content.addView(ivHero);
-        }
-
         // Canonical Church Identity & Welcome Header
         TextView tvChurchHeader = new TextView(this);
         tvChurchHeader.setText("PERAZIM MISSION CHURCH");
@@ -863,19 +850,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpVerse.setMargins(0, 0, 0, dp(14));
         verseCard.setLayoutParams(lpVerse);
-
-        // Breakthrough Waters Photographic Header (waters.jpg)
-        Bitmap watersBmp = loadAssetBitmap("waters.jpg", 500);
-        if (watersBmp != null) {
-            ImageView imgWaters = new ImageView(this);
-            imgWaters.setImageBitmap(getRoundedCornerBitmap(watersBmp, dp(10)));
-            imgWaters.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpWaters = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(110));
-            lpWaters.setMargins(0, 0, 0, dp(10));
-            imgWaters.setLayoutParams(lpWaters);
-            verseCard.addView(imgWaters);
-        }
 
         TextView verseHeader = new TextView(this);
         verseHeader.setText("📖 VERSE OF THE DAY · 2 SAMUEL 5:20");
@@ -1264,18 +1238,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(18), dp(18), dp(18), dp(18));
         container.setBackgroundColor(COLOR_WHITE);
-
-        // Header image (waters.jpg)
-        Bitmap watersBmp = loadAssetBitmap("waters.jpg", 500);
-        if (watersBmp != null) {
-            ImageView imgWaters = new ImageView(this);
-            imgWaters.setImageBitmap(getRoundedCornerBitmap(watersBmp, dp(10)));
-            imgWaters.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(130));
-            lpImg.setMargins(0, 0, 0, dp(12));
-            imgWaters.setLayoutParams(lpImg);
-            container.addView(imgWaters);
-        }
 
         TextView tvTitle = new TextView(this);
         tvTitle.setText("2 Samuel 5:17–21 · Baal Perazim");
@@ -1697,21 +1659,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(32));
 
-        // Livestream Ready Card with Stage Photographic Banner (stage.jpg)
         LinearLayout liveCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
         liveCard.setOrientation(LinearLayout.VERTICAL);
-
-        Bitmap stageBmp = loadAssetBitmap("stage.jpg", 500);
-        if (stageBmp != null) {
-            ImageView ivStage = new ImageView(this);
-            ivStage.setImageBitmap(getRoundedCornerBitmap(stageBmp, dp(10)));
-            ivStage.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpStage = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(130));
-            lpStage.setMargins(0, 0, 0, dp(10));
-            ivStage.setLayoutParams(lpStage);
-            liveCard.addView(ivStage);
-        }
 
         LinearLayout liveBadgeRow = new LinearLayout(this);
         liveBadgeRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -1765,8 +1714,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvArchive.setPadding(0, dp(20), 0, dp(10));
         content.addView(tvArchive);
 
-        // Archive 1: Candle Thumbnail
-        LinearLayout btnSermonArchive1 = createSermonCard("🎥 The Power of Prevailing Prayer", "Last Sunday • 48 mins • Bishop Dr. David Mutweri", "candle.jpg");
+        // Archive 1: Audio Sermon
+        LinearLayout btnSermonArchive1 = createSermonCard("🎥 The Power of Prevailing Prayer", "Last Sunday • 48 mins • Bishop Dr. David Mutweri", null);
         btnSermonArchive1.setOnClickListener(v -> showSermonPlayerDialog("The Power of Prevailing Prayer", "Bishop Dr. David Mutweri"));
         content.addView(btnSermonArchive1);
 
@@ -1775,8 +1724,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         btnSermonArchive2.setOnClickListener(v -> showSermonPlayerDialog("Grace That Transcends Generations", "Bishop Dr. David Mutweri"));
         content.addView(btnSermonArchive2);
 
-        // Archive 3: Campus / Bookshelf Thumbnail
-        LinearLayout btnSermonArchive3 = createSermonCard("🎥 Renewing the Inner Spirit", "3 weeks ago • 44 mins • Pastor Grace Mutweri", "campus.jpg");
+        // Archive 3: Audio Sermon
+        LinearLayout btnSermonArchive3 = createSermonCard("🎥 Renewing the Inner Spirit", "3 weeks ago • 44 mins • Pastor Grace Mutweri", null);
         btnSermonArchive3.setOnClickListener(v -> showSermonPlayerDialog("Renewing the Inner Spirit", "Pastor Grace Mutweri"));
         content.addView(btnSermonArchive3);
 
@@ -1860,19 +1809,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(32));
-
-        // Header Fellowship Photo Banner (fellowship.jpg)
-        Bitmap fellowshipBmp = loadAssetBitmap("fellowship.jpg", 600);
-        if (fellowshipBmp != null) {
-            ImageView ivFsp = new ImageView(this);
-            ivFsp.setImageBitmap(getRoundedCornerBitmap(fellowshipBmp, dp(14)));
-            ivFsp.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            LinearLayout.LayoutParams lpFsp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(140));
-            lpFsp.setMargins(0, 0, 0, dp(14));
-            ivFsp.setLayoutParams(lpFsp);
-            content.addView(ivFsp);
-        }
 
         // COMMUNITY PRAYER WALL HEADER
         TextView tvPrayerWallHeader = new TextView(this);

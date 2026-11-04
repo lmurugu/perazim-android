@@ -7,7 +7,7 @@
     "endTimeMillis": 1789378200000,
     "location": "Main Sanctuary, Embu Headquarters",
     "campusId": "campus_central",
-    "imageUrl": "sanctuary.jpg",
+    "imageUrl": "backgrounds/bg_splash_breakthrough.png",
     "category": "Worship"
   },
   {
@@ -18,7 +18,7 @@
     "endTimeMillis": 1789585200000,
     "location": "Sanctuary & Livestream, Embu Headquarters",
     "campusId": "campus_central",
-    "imageUrl": "stage.jpg",
+    "imageUrl": "backgrounds/bg_worship_dusk.png",
     "category": "Intercession"
   },
   {
@@ -29,7 +29,7 @@
     "endTimeMillis": 1789758000000,
     "location": "Youth Chapel & Amphitheater, Embu Headquarters",
     "campusId": "campus_central",
-    "imageUrl": "fellowship.jpg",
+    "imageUrl": "backgrounds/bg_prayer_moon.png",
     "category": "Youth"
   },
   {
@@ -40,7 +40,7 @@
     "endTimeMillis": 1789873200000,
     "location": "Main Sanctuary, Embu Headquarters",
     "campusId": "campus_central",
-    "imageUrl": "candle.jpg",
+    "imageUrl": "backgrounds/bg_me_path.png",
     "category": "Prayer"
   },
   {
@@ -51,7 +51,7 @@
     "endTimeMillis": 1790107200000,
     "location": "Mwea Mission Grounds, Kirinyaga County",
     "campusId": "campus_mwea",
-    "imageUrl": "campus_mwea.jpg",
+    "imageUrl": "backgrounds/bg_give_harvest.png",
     "category": "Outreach"
   },
   {
@@ -62,7 +62,7 @@
     "endTimeMillis": 1790712000000,
     "location": "Rombo Campus Sanctuary, Kajiado South",
     "campusId": "campus_rombo",
-    "imageUrl": "campus_rombo.jpg",
+    "imageUrl": "backgrounds/bg_splash_breakthrough.png",
     "category": "Outreach"
   }
 ]

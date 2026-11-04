@@ -111,7 +111,8 @@ adb -s "$DEVICE" shell input tap 648 1535 # Tab 4 Profile
 capture_screen "05-profile"
 
 # Screen 06: Giving Dialog
-adb -s "$DEVICE" shell am start -n org.perazimchurch.app/.MainActivity --ez open_giving true >/dev/null 2>&1
+adb -s "$DEVICE" shell cmd statusbar collapse >/dev/null 2>&1 || true
+adb -s "$DEVICE" shell am start -S -n org.perazimchurch.app/.MainActivity --ez open_giving true >/dev/null 2>&1
 sleep 2
 capture_screen "06-giving-dialog"
 adb -s "$DEVICE" shell input keyevent KEYCODE_BACK
