@@ -155,7 +155,7 @@ public class FellowshipUiBinder {
         // 1. Quiet-Dark Prayer Header with Illustrated Art
         FrameLayout headerContainer = new FrameLayout(context);
         LinearLayout.LayoutParams lpHeader = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(140));
         lpHeader.setMargins(0, 0, 0, dp(14));
         headerContainer.setLayoutParams(lpHeader);
 
@@ -403,20 +403,22 @@ public class FellowshipUiBinder {
             prayersLoadingSpinner.setVisibility(View.VISIBLE);
         }
         updateOfflineBannerVisibility();
-        viewModel.loadPublicPrayers(prayers -> postToMain(() -> {
-            if (prayersLoadingSpinner != null) {
-                prayersLoadingSpinner.setVisibility(View.GONE);
-            }
-            displayedPrayers.clear();
-            if (prayers != null && !prayers.isEmpty()) {
-                displayedPrayers.addAll(prayers);
-            } else {
-                displayedPrayers.addAll(getFallbackPrayers());
-            }
-            if (!isMineTab) {
-                renderWallPrayers();
-            }
-        }));
+        org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(context, (success, syncedCount, newPrayersCount) -> {
+            viewModel.loadPublicPrayers(prayers -> postToMain(() -> {
+                if (prayersLoadingSpinner != null) {
+                    prayersLoadingSpinner.setVisibility(View.GONE);
+                }
+                displayedPrayers.clear();
+                if (prayers != null && !prayers.isEmpty()) {
+                    displayedPrayers.addAll(prayers);
+                } else {
+                    displayedPrayers.addAll(getFallbackPrayers());
+                }
+                if (!isMineTab) {
+                    renderWallPrayers();
+                }
+            }));
+        });
     }
 
     private void loadUserPrayers() {
@@ -568,7 +570,9 @@ public class FellowshipUiBinder {
                 prayer.setAmenCount(count[0]);
                 prayer.setUserHasAmened(true);
                 updateAmenStyle(btnAmen, count[0], true);
-                viewModel.amenPrayer(prayer.getId(), activeUserId, null);
+                viewModel.amenPrayer(prayer.getId(), activeUserId, () -> {
+                    org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(context, null);
+                });
                 Toast.makeText(context, "Amen! Joined in prayer.", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, "You are already standing in prayer for this petition.", Toast.LENGTH_SHORT).show();
@@ -824,8 +828,10 @@ public class FellowshipUiBinder {
                     isAnonymous ? "Anonymous Saint" : activeUserName,
                     () -> postToMain(() -> {
                         Toast.makeText(context, "Prayer submitted to the Wall.", Toast.LENGTH_SHORT).show();
-                        refreshPrayers();
-                        loadUserPrayers();
+                        org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(context, (success, sCount, nCount) -> {
+                            refreshPrayers();
+                            loadUserPrayers();
+                        });
                     })
             );
         });

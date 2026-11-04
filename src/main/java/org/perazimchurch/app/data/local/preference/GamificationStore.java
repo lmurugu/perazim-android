@@ -59,7 +59,7 @@ public final class GamificationStore {
     }
 
     private static String resolveUserId(@Nullable String userId) {
-        return (userId == null || userId.trim().isEmpty()) ? "user_me" : userId;
+        return (userId == null || userId.trim().isEmpty()) ? "guest" : userId;
     }
 
     /**

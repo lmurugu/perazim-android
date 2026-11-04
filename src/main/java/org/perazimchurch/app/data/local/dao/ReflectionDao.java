@@ -38,6 +38,9 @@ public interface ReflectionDao {
     @Query("DELETE FROM reflections WHERE id = :id")
     void deleteById(String id);
 
+    @Query("UPDATE reflections SET userId = :toUserId WHERE userId = :fromUserId")
+    void migrateUserReflections(String fromUserId, String toUserId);
+
     @Query("DELETE FROM reflections")
     void deleteAll();
 }

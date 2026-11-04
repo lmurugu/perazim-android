@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: perazim_church
+      POSTGRES_USER: perazim_user
+      POSTGRES_PASSWORD: perazim_secure_password_2026
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  api:
+    build: .
+    restart: always
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://perazim_user:perazim_secure_password_2026@db:5432/perazim_church
+      JWT_SECRET: perazim_church_prod_secret_key_2026
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

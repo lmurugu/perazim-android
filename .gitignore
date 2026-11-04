@@ -32,10 +32,15 @@ gradle-8.5-bin.zip
 *.png
 !docs/screenshots/*.png
 !docs/review/*.png
+!docs/review/**/*.png
 !src/main/res/**/*.png
 !src/main/assets/**/*.png
 FORENSIC_*.md
 forensic/
+
+# Node / Server dependencies
+node_modules/
+server/node_modules/
 
 # Secret/config hygiene
 *secret*

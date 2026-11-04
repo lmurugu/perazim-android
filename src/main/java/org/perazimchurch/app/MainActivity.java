@@ -263,6 +263,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         if (topGraceBadge != null) {
             topGraceBadge.setText("💜 " + graceCount);
         }
+        org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(this, null);
     }
 
     @Override
@@ -639,6 +640,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             tabViews[i].setVisibility(i == currentTabIndex ? View.VISIBLE : View.GONE);
         }
         refreshTabStyles();
+        if (currentTabIndex == 3 && fellowshipUiBinder != null) {
+            fellowshipUiBinder.refreshPrayers();
+        }
     }
 
     private void refreshTabStyles() {
@@ -681,7 +685,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             SessionManager sm = SessionManager.getInstance(this);
             if (sm != null) active = sm.getActiveUserId();
         } catch (Exception e) { /* ignore */ }
-        return (active == null || active.trim().isEmpty()) ? "user_me" : active;
+        return (active == null || active.trim().isEmpty()) ? "guest" : active;
     }
 
     private ScrollView buildHomeScreen() {

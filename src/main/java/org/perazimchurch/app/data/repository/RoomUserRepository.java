@@ -42,33 +42,32 @@ public class RoomUserRepository implements UserRepository {
 
     @Override
     public User getCurrentUser() {
-        UserEntity activeEntity = userDao.getActiveUser();
-        if (activeEntity != null) {
-            return UserMapper.toDomain(activeEntity);
-        }
-
-        List<UserEntity> allUsers = userDao.getAllUsers();
-        if (allUsers != null && !allUsers.isEmpty()) {
-            UserEntity firstUser = allUsers.get(0);
-            firstUser.setActive(true);
-            userDao.update(firstUser);
-            return UserMapper.toDomain(firstUser);
-        }
-
-        // Fallback to default guest user
         Context ctx = getEffectiveContext();
-        int defaultStreak = GamificationStore.getStreak(ctx, "user_me", 0);
-        boolean defaultFrozen = GamificationStore.isStreakFrozen(ctx, "user_me", false);
-        int defaultXp = GamificationStore.getSpiritualXp(ctx, "user_me", 0);
-        int defaultGrace = GamificationStore.getGracePoints(ctx, "user_me", 2);
+        boolean isGuest = (ctx != null) && org.perazimchurch.app.data.local.session.SessionManager.getInstance(ctx).isGuest();
+        if (!isGuest) {
+            UserEntity activeEntity = userDao.getActiveUser();
+            if (activeEntity != null) {
+                return UserMapper.toDomain(activeEntity);
+            }
+        }
 
-        User guestUser = new User(
-                "user_me",
+        // Fallback to guest user
+        String guestId = (ctx != null) ? org.perazimchurch.app.data.local.session.SessionManager.getInstance(ctx).getActiveUserId() : "guest";
+        if (guestId == null || guestId.trim().isEmpty()) {
+            guestId = "guest";
+        }
+        int defaultStreak = GamificationStore.getStreak(ctx, guestId, 0);
+        boolean defaultFrozen = GamificationStore.isStreakFrozen(ctx, guestId, false);
+        int defaultXp = GamificationStore.getSpiritualXp(ctx, guestId, 0);
+        int defaultGrace = GamificationStore.getGracePoints(ctx, guestId, 2);
+
+        return new User(
+                guestId,
                 "Guest Pilgrim",
                 "guest@perazim.org",
                 "+254700000000",
                 "campus_central",
-                "MEMBER",
+                "GUEST",
                 defaultStreak,
                 defaultXp,
                 defaultGrace,
@@ -76,14 +75,6 @@ public class RoomUserRepository implements UserRepository {
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
-
-        UserEntity guestEntity = UserMapper.toEntity(guestUser);
-        if (guestEntity != null) {
-            guestEntity.setActive(true);
-            userDao.insert(guestEntity);
-        }
-
-        return guestUser;
     }
 
     @Override

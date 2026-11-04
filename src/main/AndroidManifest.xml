@@ -43,6 +43,7 @@
         android:label="Perazim"
         android:icon="@drawable/ic_launcher"
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
+        android:usesCleartextTraffic="true"
         android:allowBackup="true">
         <activity
             android:name=".MainActivity"

@@ -16,7 +16,7 @@
 |---|--------------|--------|----------------------------------------------|---------------|
 | 1 | **Offline Bible (5 Translations)** | `WORKING` | Pre-seeded SQLite database (`perazim_database.db`) with KJV, Swahili SUV, NIV, ESV, NKJV. Instant offline queries, 66 books, chapter navigation, text search. No cloud sync. | [`08-bible-reader.png`](docs/review/dc15a79-08-bible-reader.png)<br>[`08-bible-reader.txt`](docs/review/dc15a79-08-bible-reader.txt) |
 | 2 | **Lipa na M-Pesa Giving** | `PARTIAL` | Copies Paybill `4069983` to clipboard and cascades to Safaricom M-Pesa app, SIM Toolkit, or `*334#`. **No automated Daraja C2B/STK push API**; reconciliation requires manual treasurer check. Fake (+20 XP) giving reward removed. | [`06-giving-dialog.png`](docs/review/dc15a79-06-giving-dialog.png)<br>[`06-giving-dialog.txt`](docs/review/dc15a79-06-giving-dialog.txt) |
-| 3 | **Community Prayer Wall** | `PARTIAL` | Requests stored in local Room SQLite database (`prayers` table); Amen counters update locally. Pastoral handoff triggers real WhatsApp/SMS to Bishop (+254 710 772 227). **No real-time multi-member cloud sync** across devices (Stage 3). | [`04-fellowship.png`](docs/review/f035e34-04-fellowship.png)<br>[`04-fellowship.txt`](docs/review/f035e34-04-fellowship.txt) |
+| 3 | **Community Prayer Wall & Cloud Sync** | `WORKING` | Requests stored in local Room SQLite database (`prayers` table) and synchronized with self-hosted server via `SyncDispatcher`. Multi-account intercession verified on live hardware (Account 1 posts prayer, Account 2 reads and amens, amen count updates across devices and on server). Offline mutations safely enqueued in `sync_queue` and flushed on reconnect. | [`18_prayer_wall_fixed.png`](docs/review/phase_A/18_prayer_wall_fixed.png)<br>[`20_sister_mary_amen.png`](docs/review/phase_A/20_sister_mary_amen.png)<br>[`22_prayer_wall_synced.png`](docs/review/phase_A/22_prayer_wall_synced.png) |
 | 4 | **AI Breakthrough Guide** | `STAGE 2 PENDING` | Cloudflare Worker Gemini relay (`AiRelayClient.java`) and on-device fallback (`PerazimAiEngine.java`) implemented on branch; **Stage 2 gate is not yet approved/opened**. Generative AI cloud features remain gated pending Stage 2 formal approval. | [`09-ai-guide.png`](docs/review/dc15a79-09-ai-guide.png)<br>[`09-ai-guide.txt`](docs/review/dc15a79-09-ai-guide.txt) |
 | 5 | **Sermons Audio & Video** | `WORKING` | Dynamic Google Sheets sync (`sermons.csv`) verified on hardware (9 sermons synced into Room with `duration_seconds` e.g. 47:00, preacher mapped as speaker). Audio controller and YouTube integration tested. | [`f035e34-02-sermons.png`](docs/review/f035e34-02-sermons.png)<br>[`f035e34-02-sermons.txt`](docs/review/f035e34-02-sermons.txt) |
 | 6 | **Worship Hymnal & Chords** | `WORKING` | Dynamic Google Sheets sync (`hymns.csv`) verified on hardware (17 hymns synced into Room). Member local favorites preserved; `active=true` defaulted when omitted. | [`f035e34-03-worship.png`](docs/review/f035e34-03-worship.png)<br>[`f035e34-03-worship.txt`](docs/review/f035e34-03-worship.txt) |
@@ -29,6 +29,7 @@
 | 13 | **Push Notifications** | `HARDCODED/DEMO` | Local notification simulator dialog; **no remote push server or FCM active**. | [`live_screen_notifications_dialog_phase_3.png`](docs/screenshots/live_screen_notifications_dialog_phase_3.png) |
 | 14 | **Pastoral Care Handoffs** | `WORKING` | Native Android system intents to WhatsApp (`+254 710 772 227`), system dialer (`tel:0710772227`), offline SMS (`smsto:0710772227`), and Google Maps coordinates for Embu HQ sanctuary. All handoffs verified on hardware. | [`f035e34-05-profile.png`](docs/review/f035e34-05-profile.png)<br>[`f035e34-05-profile.txt`](docs/review/f035e34-05-profile.txt) |
 | 15 | **Campus Switcher** | `WORKING` | Dynamic campus selector dialog switches active campus between Embu Headquarters, Nairobi Fellowship, Meru Outreach, and Online Campus; updates contact metadata and Room preferences. | [`f035e34-01-home.txt`](docs/review/f035e34-01-home.txt)<br>[`f035e34-05-profile.txt`](docs/review/f035e34-05-profile.txt) |
+| 16 | **Member Accounts & Authentication** | `WORKING` | Kenyan phone number (`+254` / `07...`) + 4-digit PIN registration and login against self-hosted Node.js / PostgreSQL server with JWT tokens. Offline Guest mode preserved with seamless data migration upon sign-in. Zero fake starter numbers (0 streak, 0 XP, 2 grace points verified). | [`03_profile_guest_zeroed.png`](docs/review/phase_A/03_profile_guest_zeroed.png)<br>[`12_registered_profile.png`](docs/review/phase_A/12_registered_profile.png)<br>[`19_sister_mary_profile.png`](docs/review/phase_A/19_sister_mary_profile.png) |
 
 ---
 
@@ -68,6 +69,34 @@
 - **Hardware Proof Files**:
   - Pre-upgrade state: [`migration-01-before.png`](docs/review/migration-01-before.png) and [`migration-01-before.txt`](docs/review/migration-01-before.txt)
   - Post-upgrade state: [`migration-02-after.png`](docs/review/migration-02-after.png) and [`migration-02-after.txt`](docs/review/migration-02-after.txt)
+
+### 2.3 Phase A: Real Member Accounts, Self-Hosted Backend & Sync Engine — `WORKING`
+- **Audit Date**: November 4, 2026
+- **Branch**: `phase-A-server`
+- **Backend Architecture**: Self-hosted Node.js + Express backend in `server/` with PostgreSQL database schema (`server/schema.sql`), JWT token authentication (`server/src/middleware/auth.js`), REST endpoints for auth, prayers, amens, testimonies, and batch mutations (`/api/sync`). Containerized via `Dockerfile` and `docker-compose.yml`.
+- **Identity & Session Management**:
+  - `SessionManager.java` stores active JWT token, user ID, and auth state in private SharedPreferences.
+  - Eliminated hardcoded `"user_me"` and `"guest_user"` across the entire app.
+  - Offline Guest mode preserved; users can browse, pray, and read without an account.
+  - Room migration (`migrateLocalData`) preserves local guest prayers and bookmarks upon member registration/login.
+- **Starter Metrics Truth**:
+  - Completely purged fake starter numbers (450 XP, 7-day streak, 14 prayers).
+  - New member accounts and guest mode strictly default to 0 streak, 0 XP, 2 grace points (room to stumble).
+- **Bidirectional Sync Dispatcher**:
+  - `SyncDispatcher.java` bridges Room `sync_queue` and server `/api/sync`.
+  - Dispatches pending mutations in batches of 25 with exponential backoff on failure.
+  - Ingests remote prayers and amens into Room SQLite database.
+- **Hardware & Multi-Device Verification**:
+  - Account 1 (Brother John, `0711000001`): Registered on Embu campus, posted *"Prayer for healing in Embu"*. Successfully synced to server.
+  - Account 2 (Sister Mary, `0711000002`): Registered on Nairobi campus, saw Brother John's prayer on her prayer wall, tapped Amen. Amen count incremented to 1 locally and on the server.
+  - Fail-Soft Offline Test: Enabled airplane mode, posted *"Strength for fellowship outreach"*. Prayer appeared locally, mutation held in `sync_queue` with `PENDING` status. Restored connectivity; mutation automatically dispatched on app resume and verified on server without data loss.
+- **Hardware Proof Files**:
+  - Guest Profile (0 streak, 0 XP, 2 grace): [`03_profile_guest_zeroed.png`](docs/review/phase_A/03_profile_guest_zeroed.png)
+  - Registered Member Profile (Brother John): [`12_registered_profile.png`](docs/review/phase_A/12_registered_profile.png)
+  - Constrained Quiet-Dark Prayer Header: [`18_prayer_wall_fixed.png`](docs/review/phase_A/18_prayer_wall_fixed.png)
+  - Second Member Profile (Sister Mary, 0 streak, 0 XP, 2 grace): [`19_sister_mary_profile.png`](docs/review/phase_A/19_sister_mary_profile.png)
+  - Multi-Device Intercession Amen: [`20_sister_mary_amen.png`](docs/review/phase_A/20_sister_mary_amen.png)
+  - Offline Sync Recovery (Both Prayers Synced): [`22_prayer_wall_synced.png`](docs/review/phase_A/22_prayer_wall_synced.png)
 
 ---
 

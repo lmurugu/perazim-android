@@ -52,7 +52,7 @@ public class UserEntity {
     @Ignore
     public UserEntity(@NonNull String id, String name, String email, String phone, String role,
                       String campusId, String avatarUrl, long createdAt, long updatedAt, boolean isActive) {
-        this(id, name, email, phone, role, campusId, avatarUrl, createdAt, updatedAt, isActive, 7, 100, 50, false);
+        this(id, name, email, phone, role, campusId, avatarUrl, createdAt, updatedAt, isActive, 0, 0, 2, false);
     }
 
     @NonNull

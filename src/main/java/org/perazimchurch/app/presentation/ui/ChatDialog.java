@@ -129,7 +129,7 @@ public class ChatDialog extends Dialog {
         } else if (currentUser != null && currentUser.getId() != null) {
             this.currentUserId = currentUser.getId();
         } else {
-            this.currentUserId = "user_me";
+            this.currentUserId = SessionManager.getInstance(context).getActiveUserId();
         }
 
         if (currentUserName != null && !currentUserName.trim().isEmpty()) {

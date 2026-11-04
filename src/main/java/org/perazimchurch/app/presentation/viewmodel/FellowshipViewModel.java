@@ -206,6 +206,9 @@ public class FellowshipViewModel extends ViewModel {
         executor.execute(() -> {
             try {
                 prayerRepo.amenPrayer(prayerId, userId != null ? userId : "anonymous");
+                if (syncQueueManager != null) {
+                    syncQueueManager.enqueue(SyncOperationType.CREATE, "PRAYER_AMEN", prayerId, "{}", prayerId);
+                }
             } catch (Exception e) {
                 Log.e(TAG, "Error amening prayer: " + prayerId, e);
             } finally {

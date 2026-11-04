@@ -177,14 +177,14 @@ public class HomeUiBinder {
     }
 
     private String resolveUserId() {
-        if (context == null) return "user_me";
+        if (context == null) return "guest";
         try {
             SessionManager sm = SessionManager.getInstance(context);
             if (sm != null && sm.getActiveUserId() != null && !sm.getActiveUserId().trim().isEmpty()) {
                 return sm.getActiveUserId();
             }
         } catch (Exception ignored) {}
-        return "user_me";
+        return "guest";
     }
 
     private void syncRoutineStateWithGamificationStore() {

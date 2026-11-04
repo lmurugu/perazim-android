@@ -108,6 +108,7 @@ public class ProfileUiBinder {
 
     // Content Synchronization UI reference
     private TextView tvSyncStatusVal;
+    private Button btnAuthAction;
 
     public ProfileUiBinder(@NonNull Activity activity, @NonNull ProfileViewModel viewModel) {
         this.activity = activity;
@@ -253,9 +254,50 @@ public class ProfileUiBinder {
         tvMemberCampus.setOnClickListener(v -> showCampusSwitcherDialog());
         memberInfo.addView(tvMemberCampus);
 
+        // Auth Action Button (Sign In / Register or Log Out)
+        btnAuthAction = new Button(context);
+        btnAuthAction.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnAuthAction.setTypeface(Typeface.DEFAULT_BOLD);
+        btnAuthAction.setPadding(dp(10), dp(2), dp(10), dp(2));
+        LinearLayout.LayoutParams lpAuth = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(32));
+        lpAuth.topMargin = dp(6);
+        btnAuthAction.setLayoutParams(lpAuth);
+        updateAuthButtonState();
+        memberInfo.addView(btnAuthAction);
+
         card.addView(memberInfo);
         rootFrame.addView(card);
         return rootFrame;
+    }
+
+    private void updateAuthButtonState() {
+        if (btnAuthAction == null) return;
+        boolean isGuest = SessionManager.getInstance(context).isGuest();
+        if (isGuest) {
+            btnAuthAction.setText("🔑 Sign In / Register");
+            btnAuthAction.setTextColor(PerazimTheme.COLOR_ORANGE_SOFT);
+            btnAuthAction.setBackground(PerazimTheme.createCardGradient(dp(8), dp(1)));
+            btnAuthAction.setOnClickListener(v -> AuthDialog.show(context, user -> refreshProfile()));
+        } else {
+            btnAuthAction.setText("Log Out");
+            btnAuthAction.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+            btnAuthAction.setBackgroundColor(Color.TRANSPARENT);
+            btnAuthAction.setOnClickListener(v -> showLogoutConfirmationDialog());
+        }
+    }
+
+    private void showLogoutConfirmationDialog() {
+        new AlertDialog.Builder(context)
+                .setTitle("Log Out")
+                .setMessage("Are you sure you want to sign out of your Perazim account? Your offline prayers and readings will remain saved on this device in Guest Mode.")
+                .setPositiveButton("Log Out", (dialog, which) -> {
+                    SessionManager.getInstance(context).logout();
+                    Toast.makeText(context, "Logged out. Switched to Guest Mode.", Toast.LENGTH_SHORT).show();
+                    refreshProfile();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     // =========================================================================
@@ -381,7 +423,17 @@ public class ProfileUiBinder {
         tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
         tvHeader.setLetterSpacing(0.04f);
         tvHeader.setPadding(dp(12), dp(4), 0, dp(8));
-        card.addView(tvHeader);
+        // Row 0: Member Account Authentication
+        String authSummary = SessionManager.getInstance(context).isGuest()
+                ? "Offline Guest Mode · Tap to Sign In or Register"
+                : "Signed in · Tap to manage account";
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_christian_church,
+                "Member Account",
+                authSummary,
+                v -> AuthDialog.show(context, user -> refreshProfile())
+        ));
+        card.addView(createHorizontalDivider());
 
         // Row 1: Refresh Content
         card.addView(createOptionRow(
@@ -907,14 +959,14 @@ public class ProfileUiBinder {
     }
 
     private String resolveGamificationUserId() {
-        if (context == null) return "user_me";
+        if (context == null) return "guest";
         try {
             SessionManager sm = SessionManager.getInstance(context);
             if (sm != null && sm.getActiveUserId() != null && !sm.getActiveUserId().trim().isEmpty()) {
                 return sm.getActiveUserId();
             }
         } catch (Exception ignored) {}
-        return "user_me";
+        return "guest";
     }
 
     // =========================================================================
@@ -1340,6 +1392,7 @@ public class ProfileUiBinder {
             tvSyncStatusVal.setText("Syncing church content...");
         }
         Toast.makeText(context, "🔄 Syncing church content from Google Sheets...", Toast.LENGTH_SHORT).show();
+        org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(context, null);
         SheetSyncManager.syncNow(context, (success, synced, skipped, message) -> {
             postToMain(() -> {
                 if (tvSyncStatusVal != null) {
@@ -1529,28 +1582,33 @@ public class ProfileUiBinder {
         viewModel.loadProfile(user -> {
             postToMain(() -> {
                 currentUser = user;
-                if (user != null) {
+                updateAuthButtonState();
+                if (SessionManager.getInstance(context).isGuest()) {
+                    if (tvMemberName != null) tvMemberName.setText("Guest Pilgrim (Offline)");
+                    if (tvMemberEmail != null) tvMemberEmail.setText("Tap 'Sign In / Register' to connect with church");
+                } else if (user != null) {
                     if (tvMemberName != null && user.getFullName() != null) {
                         tvMemberName.setText(user.getFullName());
                     }
                     if (tvMemberEmail != null && user.getEmail() != null) {
                         tvMemberEmail.setText(user.getEmail());
                     }
-                    if (user.getRole() != null && tvCovenantBadge != null) {
-                        tvCovenantBadge.setText("🕊️ " + user.getRole());
-                    }
-                    String uid = user.getId();
-                    if (uid == null || uid.trim().isEmpty() || "guest_user".equals(uid)) {
-                        uid = "user_me";
-                    }
-                    int liveStreak = GamificationStore.getStreak(context, uid, user.getStreakCount());
-                    int liveXp = GamificationStore.getSpiritualXp(context, uid, user.getSpiritualXp());
-                    int liveGrace = GamificationStore.getGracePoints(context, uid, user.getGracePoints());
+                }
+                if (user != null && user.getRole() != null && tvCovenantBadge != null) {
+                    tvCovenantBadge.setText("🕊️ " + user.getRole());
+                }
+                String uid = (user != null && user.getId() != null) ? user.getId() : SessionManager.getInstance(context).getActiveUserId();
+                if (uid == null || uid.trim().isEmpty() || "guest_user".equals(uid)) {
+                    uid = "guest";
+                }
+                int liveStreak = GamificationStore.getStreak(context, uid, user != null ? user.getStreakCount() : 0);
+                int liveXp = GamificationStore.getSpiritualXp(context, uid, user != null ? user.getSpiritualXp() : 0);
+                int liveGrace = GamificationStore.getGracePoints(context, uid, user != null ? user.getGracePoints() : 2);
 
-                    if (tvStreakValue != null) {
-                        tvStreakValue.setText("🔥 " + liveStreak + " Days");
-                    }
-                    isStreakFrozen = user.isStreakFrozen();
+                if (tvStreakValue != null) {
+                    tvStreakValue.setText("🔥 " + liveStreak + " Days");
+                }
+                isStreakFrozen = user != null && user.isStreakFrozen();
 
                     if (tvXpValue != null) {
                         tvXpValue.setText("⭐ " + liveXp + " XP");
@@ -1593,13 +1651,12 @@ public class ProfileUiBinder {
                     if (tvXpLevelLabel != null) {
                         tvXpLevelLabel.setText("Level " + level + " Disciple — " + progress + " / 500 XP to Level " + (level + 1));
                     }
-                }
-                if (tvSyncStatusVal != null) {
-                    tvSyncStatusVal.setText(SheetSyncManager.getLastSyncStatusText(context));
-                }
+                    if (tvSyncStatusVal != null) {
+                        tvSyncStatusVal.setText(SheetSyncManager.getLastSyncStatusText(context));
+                    }
+                });
             });
-        });
-    }
+        }
 
     // =========================================================================
     // GRAPHICS & UTILITIES

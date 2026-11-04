@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.data.local.preference.GamificationStore;
+import org.perazimchurch.app.data.local.session.SessionManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -128,17 +129,30 @@ public class PerazimAiEngine {
         ));
     }
 
+    private String getEffectiveUserId() {
+        if (context == null) return "guest";
+        String id = SessionManager.getInstance(context).getActiveUserId();
+        return (id != null && !id.trim().isEmpty()) ? id : "guest";
+    }
+
     public AiResponse getWelcomeResponse() {
-        int xp = GamificationStore.getSpiritualXp(context, "user_me", 450);
-        int streak = GamificationStore.getStreak(context, "user_me", 7);
+        String userId = getEffectiveUserId();
+        int xp = GamificationStore.getSpiritualXp(context, userId, 0);
+        int streak = GamificationStore.getStreak(context, userId, 0);
+
+        String telemetryLine = (streak > 0)
+                ? "You currently have **⭐ " + xp + " Spiritual XP** and an active **🔥 " + streak + "-day streak**."
+                : (xp > 0)
+                ? "You currently have **⭐ " + xp + " Spiritual XP**. Start your devotional streak today!"
+                : "Welcome! Complete today's 3-minute reflection to earn your first Spiritual XP and start a devotional streak.";
 
         String msg = "🔥 **Shalom & Welcome to Perazim Breakthrough Guide!**\n\n"
-                + "I am your personal in-app assistant. You currently have **⭐ " + xp + " Spiritual XP** and an active **🔥 " + streak + "-day streak**.\n\n"
+                + "I am your personal in-app assistant. " + telemetryLine + "\n\n"
                 + "How can I guide your spiritual walk or app navigation today?";
 
         List<String> chips = Arrays.asList(
                 "⭐ Check my XP & Level",
-                "🔥 Protect my 7-day streak",
+                streak > 0 ? "🔥 Protect my " + streak + "-day streak" : "⚡ Start Daily Reflection (+10 XP)",
                 "🎥 Watch YouTube Live",
                 "📖 Read Swahili Bible",
                 "💚 Give Tithe via M-Pesa",
@@ -149,42 +163,62 @@ public class PerazimAiEngine {
     }
 
     private AiResponse handleXpQuery(String q) {
-        int xp = GamificationStore.getSpiritualXp(context, "user_me", 450);
+        String userId = getEffectiveUserId();
+        int xp = GamificationStore.getSpiritualXp(context, userId, 0);
         int level = calculateLevel(xp);
         String levelName = getLevelTitle(level);
         int nextLevelXp = level * 250;
         int remaining = Math.max(0, nextLevelXp - xp);
 
-        String msg = "⭐ **Spiritual XP Telemetry:**\n\n"
-                + "• **Current XP:** " + xp + " XP\n"
-                + "• **Rank:** Level " + level + " (" + levelName + ")\n"
-                + "• **Progress to Level " + (level + 1) + ":** " + remaining + " XP needed.\n\n"
-                + "💡 *Tip: Complete today's 3-minute prayer reflection (+10 XP) or solve a Bible Riddle (+20 XP) to level up!*";
+        String msg;
+        if (xp > 0) {
+            msg = "⭐ **Spiritual XP Telemetry:**\n\n"
+                    + "• **Current XP:** " + xp + " XP\n"
+                    + "• **Rank:** Level " + level + " (" + levelName + ")\n"
+                    + "• **Progress to Level " + (level + 1) + ":** " + remaining + " XP needed.\n\n"
+                    + "💡 *Tip: Complete today's 3-minute prayer reflection (+10 XP) or solve a Bible Riddle (+20 XP) to level up!*";
+        } else {
+            msg = "⭐ **Spiritual XP Telemetry:**\n\n"
+                    + "• **Current XP:** 0 XP\n"
+                    + "• **Rank:** Level 1 (" + levelName + ")\n"
+                    + "• **Progress to Level 2:** 250 XP needed.\n\n"
+                    + "💡 *Tip: Complete today's 3-minute prayer reflection (+10 XP) or solve a Bible Riddle (+20 XP) to earn your first Spiritual XP!*";
+        }
 
         List<String> chips = Arrays.asList("⚡ 3-Min Reflection (+10 XP)", "🧩 Solve Riddle (+20 XP)", "🔥 Check Streak");
         return AiResponse.withAction(msg, AiResponse.INTENT_REFLECTIONS, "⚡ Start Reflection (+10 XP)", null, chips);
     }
 
     private AiResponse handleStreakQuery(String q) {
-        int streak = GamificationStore.getStreak(context, "user_me", 7);
-        boolean isFrozen = GamificationStore.isStreakFrozen(context, "user_me", false);
-        int grace = GamificationStore.getGracePoints(context, "user_me", 5);
+        String userId = getEffectiveUserId();
+        int streak = GamificationStore.getStreak(context, userId, 0);
+        boolean isFrozen = GamificationStore.isStreakFrozen(context, userId, false);
+        int grace = GamificationStore.getGracePoints(context, userId, 2);
 
-        String status = isFrozen ? "❄️ FROZEN / SHIELDED" : "🔥 ACTIVE ALTAIRE";
+        String status = isFrozen ? "❄️ FROZEN / SHIELDED" : (streak > 0 ? "🔥 ACTIVE ALTAIRE" : "⚪ NOT STARTED");
 
-        String msg = "🔥 **Devotional Streak Status:**\n\n"
-                + "• **Current Streak:** " + streak + " Days (" + status + ")\n"
-                + "• **Grace Tokens:** " + grace + " 💜 available\n\n"
-                + (isFrozen
-                ? "Your streak is currently protected by Grace Freeze! Complete today's devotion to unfreeze and keep the flame burning."
-                : "Your streak is active! Make sure to read today's scripture and pray before midnight to keep your fire burning.");
+        String msg;
+        if (streak > 0) {
+            msg = "🔥 **Devotional Streak Status:**\n\n"
+                    + "• **Current Streak:** " + streak + " Days (" + status + ")\n"
+                    + "• **Grace Tokens:** " + grace + " 💜 available\n\n"
+                    + (isFrozen
+                    ? "Your streak is currently protected by Grace Freeze! Complete today's devotion to unfreeze and keep the flame burning."
+                    : "Your streak is active! Make sure to read today's scripture and pray before midnight to keep your fire burning.");
+        } else {
+            msg = "🔥 **Devotional Streak Status:**\n\n"
+                    + "• **Current Streak:** 0 Days (" + status + ")\n"
+                    + "• **Grace Tokens:** " + grace + " 💜 available\n\n"
+                    + "Your devotional journey begins today! Complete today's 3-minute prayer reflection to ignite Day 1 of your streak fire.";
+        }
 
         List<String> chips = Arrays.asList("💜 What are Grace Tokens?", "⚡ Complete Today's Devotion", "⭐ Check XP");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "👤 View Streak in Profile", null, chips);
     }
 
     private AiResponse handleGraceQuery(String q) {
-        int grace = GamificationStore.getGracePoints(context, "user_me", 5);
+        String userId = getEffectiveUserId();
+        int grace = GamificationStore.getGracePoints(context, userId, 2);
 
         String msg = "💜 **Grace Tokens (Unmerited Spiritual Protection):**\n\n"
                 + "You currently have **" + grace + " Grace Tokens**.\n\n"

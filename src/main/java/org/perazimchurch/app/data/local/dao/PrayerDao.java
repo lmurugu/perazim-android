@@ -41,6 +41,9 @@ public interface PrayerDao {
     @Query("DELETE FROM prayers WHERE id = :id")
     void deleteById(String id);
 
+    @Query("UPDATE prayers SET userId = :toUserId WHERE userId = :fromUserId")
+    void migrateUserPrayers(String fromUserId, String toUserId);
+
     @Query("DELETE FROM prayers")
     void deleteAll();
 }

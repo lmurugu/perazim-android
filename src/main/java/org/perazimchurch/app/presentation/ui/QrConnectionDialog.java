@@ -85,7 +85,7 @@ public class QrConnectionDialog extends Dialog {
         } else if (currentUser != null && currentUser.getId() != null) {
             this.userId = currentUser.getId();
         } else {
-            this.userId = "user_member";
+            this.userId = SessionManager.getInstance(context).getActiveUserId();
         }
 
         if (userName != null && !userName.trim().isEmpty()) {
