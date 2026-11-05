@@ -1,37 +1,61 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { query } = require('../db');
-const { requireAuth, signToken, revokeToken } = require('../middleware/auth');
+const { requireAuth, signToken, revokeToken, hashToken } = require('../middleware/auth');
 const { checkLoginRateLimit, recordFailedLogin, clearFailedLogins } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
-// Clean Kenyan/International phone number (e.g. 0712345678 -> +254712345678)
-function normalizePhone(phone) {
-  if (!phone) return '';
-  let cleaned = phone.replace(/[^0-9+]/g, '');
-  if (cleaned.startsWith('0')) {
-    cleaned = '+254' + cleaned.substring(1);
-  } else if (!cleaned.startsWith('+')) {
-    cleaned = '+' + cleaned;
+/**
+ * Validates and normalizes incoming Kenyan phone numbers.
+ * Supported formats:
+ * - 10-digit Kenyan format: 07XXXXXXXX or 01XXXXXXXX
+ * - E.164 Kenyan format: +2547XXXXXXXX or +2541XXXXXXXX
+ * - 12-digit format without leading plus: 2547XXXXXXXX or 2541XXXXXXXX
+ * Returns normalized E.164 string (+254XXXXXXXXX) or null if invalid.
+ */
+function validateAndNormalizePhone(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const cleaned = phone.trim().replace(/[\s\-()]/g, '');
+
+  // 10-digit Kenyan format starting with 07 or 01
+  if (/^0[17]\d{8}$/.test(cleaned)) {
+    return '+254' + cleaned.substring(1);
   }
-  return cleaned;
+
+  // E.164 Kenyan format (+254 followed by 7 or 1, then 8 digits)
+  if (/^\+254[17]\d{8}$/.test(cleaned)) {
+    return cleaned;
+  }
+
+  // 12-digit format without leading + (254 followed by 7 or 1, then 8 digits)
+  if (/^254[17]\d{8}$/.test(cleaned)) {
+    return '+' + cleaned;
+  }
+
+  return null;
+}
+
+function normalizePhone(phone) {
+  return validateAndNormalizePhone(phone) || '';
 }
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    let { phone, pin, name, campus_id } = req.body;
+    let { phone, pin, name, campus_id, grace_points } = req.body;
     if (!phone || !pin || !name) {
       return res.status(400).json({ error: 'Phone number, PIN, and full name are required' });
     }
 
-    const normPhone = normalizePhone(phone);
-    if (normPhone.length < 10) {
-      return res.status(400).json({ error: 'Please enter a valid phone number' });
+    const normPhone = validateAndNormalizePhone(phone);
+    if (!normPhone) {
+      return res.status(400).json({
+        error: 'Please enter a valid Kenyan phone number (e.g. 07XXXXXXXX, 01XXXXXXXX, or +254XXXXXXXXX)'
+      });
     }
 
-    if (pin.length < 4) {
+    if (typeof pin !== 'string' || pin.length < 4) {
       return res.status(400).json({ error: 'PIN must be at least 4 digits' });
     }
 
@@ -45,10 +69,13 @@ router.post('/register', async (req, res) => {
     const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
     const now = Date.now();
     const campus = campus_id || 'campus_embu';
+    const initialGracePoints = (grace_points !== undefined && grace_points !== null)
+      ? Number(grace_points)
+      : 2;
 
     await query(
       'INSERT INTO users (id, phone, pin_hash, name, campus_id, role, avatar_url, xp, streak, grace_points, is_active, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
-      [userId, normPhone, pinHash, name.trim(), campus, 'MEMBER', '', 0, 0, 2, true, now, now]
+      [userId, normPhone, pinHash, name.trim(), campus, 'MEMBER', '', 0, 0, initialGracePoints, true, now, now]
     );
 
     const userObj = {
@@ -60,7 +87,7 @@ router.post('/register', async (req, res) => {
       avatar_url: '',
       xp: 0,
       streak: 0,
-      grace_points: 2
+      grace_points: (initialGracePoints !== undefined && initialGracePoints !== null) ? Number(initialGracePoints) : 2
     };
 
     const token = signToken(userObj);
@@ -79,7 +106,13 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
       return res.status(400).json({ error: 'Phone number and PIN are required' });
     }
 
-    const normPhone = normalizePhone(phone);
+    const normPhone = validateAndNormalizePhone(phone);
+    if (!normPhone) {
+      return res.status(400).json({
+        error: 'Please enter a valid Kenyan phone number (e.g. 07XXXXXXXX, 01XXXXXXXX, or +254XXXXXXXXX)'
+      });
+    }
+
     const ip = req.ip || req.connection.remoteAddress;
     const result = await query('SELECT * FROM users WHERE phone = $1', [normPhone]);
     const user = result.rows && result.rows[0];
@@ -121,8 +154,13 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
 // POST /api/auth/logout (Token Revocation)
 router.post('/logout', requireAuth, async (req, res) => {
   try {
-    await revokeToken(req.token, req.user.id);
-    return res.json({ success: true, message: 'Logged out successfully. Token revoked.' });
+    const token = req.token;
+    const tokenHash = await revokeToken(token, req.user ? req.user.id : null);
+    return res.json({
+      success: true,
+      message: 'Logged out successfully. Token revoked.',
+      revokedTokenHash: tokenHash
+    });
   } catch (err) {
     console.error('Logout error:', err);
     return res.status(500).json({ error: 'Server error during logout' });
@@ -157,4 +195,5 @@ router.get('/me', requireAuth, async (req, res) => {
   }
 });
 
+router.validateAndNormalizePhone = validateAndNormalizePhone;
 module.exports = router;

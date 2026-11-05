@@ -103,10 +103,11 @@ async function query(sql, params = []) {
   // UPDATE users
   if (lower.startsWith('update users')) {
     const id = params[params.length - 1];
-    const user = memoryStore.users.find(u => u.id === id);
+    const user = memoryStore.users.find(u => u.id === id || u.phone === id);
     if (user) {
       if (lower.includes('xp =') && params[0] !== undefined) user.xp = params[0];
       if (lower.includes('streak =') && params[1] !== undefined) user.streak = params[1];
+      if (lower.includes('grace_points =') && params[0] !== undefined) user.grace_points = params[0];
     }
     return { rows: user ? [user] : [] };
   }
@@ -119,9 +120,66 @@ async function query(sql, params = []) {
 
   // SELECT FROM prayers
   if (lower.startsWith('select') && lower.includes('from prayers')) {
+    if (lower.includes('order by updated_at asc')) {
+      let rows = [...memoryStore.prayers].sort((a, b) => {
+        const aTime = a.updated_at !== undefined ? a.updated_at : a.created_at;
+        const bTime = b.updated_at !== undefined ? b.updated_at : b.created_at;
+        if (aTime !== bTime) {
+          return aTime - bTime;
+        }
+        return (a.id || '').localeCompare(b.id || '');
+      });
+
+      if (lower.includes('updated_at = $1 and id > $2')) {
+        const cursorTime = params[0];
+        const cursorId = params[1];
+        const limit = params[2];
+        rows = rows.filter(p => {
+          const pTime = p.updated_at !== undefined ? p.updated_at : p.created_at;
+          return (pTime > cursorTime) || (pTime === cursorTime && p.id > cursorId);
+        });
+        if (typeof limit === 'number') {
+          rows = rows.slice(0, limit);
+        }
+        return { rows };
+      }
+
+      if (lower.includes('updated_at > $1 or created_at > $1')) {
+        const cursorTime = params[0];
+        const limit = params[1];
+        rows = rows.filter(p => {
+          const pTime = p.updated_at !== undefined ? p.updated_at : p.created_at;
+          return pTime > cursorTime || p.created_at > cursorTime;
+        });
+        if (typeof limit === 'number') {
+          rows = rows.slice(0, limit);
+        }
+        return { rows };
+      }
+
+      if (lower.includes('updated_at >= $1')) {
+        const minTime = params[0];
+        const limit = params[1];
+        rows = rows.filter(p => {
+          const pTime = p.updated_at !== undefined ? p.updated_at : p.created_at;
+          return pTime >= minTime;
+        });
+        if (typeof limit === 'number') {
+          rows = rows.slice(0, limit);
+        }
+        return { rows };
+      }
+
+      const limit = params[params.length - 1];
+      if (typeof limit === 'number') {
+        rows = rows.slice(0, limit);
+      }
+      return { rows };
+    }
+
     let rows = [...memoryStore.prayers].sort((a, b) => b.created_at - a.created_at);
     if (params.length > 0 && typeof params[0] === 'number') {
-      rows = rows.filter(p => p.created_at > params[0]);
+      rows = rows.filter(p => p.created_at > params[0] || (p.updated_at && p.updated_at > params[0]));
     }
     return { rows };
   }
@@ -133,9 +191,9 @@ async function query(sql, params = []) {
     if (!existing) {
       const prayer = { id, title, content, author_id, author_name, is_anonymous: !!is_anonymous, visibility: visibility || 'PUBLIC', prayer_count: prayer_count || 0, is_answered: !!is_answered, testimony: testimony || '', created_at, updated_at };
       memoryStore.prayers.push(prayer);
-      return { rows: [prayer] };
+      return { rows: [prayer], rowCount: 1 };
     }
-    return { rows: [existing] };
+    return { rows: [existing], rowCount: 0 };
   }
 
   // UPDATE prayers SET prayer_count
@@ -146,7 +204,7 @@ async function query(sql, params = []) {
       prayer.prayer_count = (prayer.prayer_count || 0) + 1;
       prayer.updated_at = Date.now();
     }
-    return { rows: prayer ? [prayer] : [] };
+    return { rows: prayer ? [prayer] : [], rowCount: prayer ? 1 : 0 };
   }
 
   // UPDATE prayers SET is_answered = true

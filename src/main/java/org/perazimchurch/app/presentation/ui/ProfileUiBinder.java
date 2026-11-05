@@ -242,7 +242,7 @@ public class ProfileUiBinder {
 
         // Campus Indicator Chip with darkened surface gradient
         tvMemberCampus = new TextView(context);
-        tvMemberCampus.setText("📍 Embu Headquarters");
+        tvMemberCampus.setText("📍 Church Headquarters: Embu, Kenya");
         tvMemberCampus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvMemberCampus.setTypeface(Typeface.DEFAULT_BOLD);
         tvMemberCampus.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
@@ -1623,14 +1623,15 @@ public class ProfileUiBinder {
 
         row.addView(textCol);
 
-        TextView tvHint = new TextView(context);
-        tvHint.setText("Tap ➔");
-        tvHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
-        tvHint.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHint.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
-        row.addView(tvHint);
-
-        row.setOnClickListener(listener);
+        if (listener != null) {
+            TextView tvHint = new TextView(context);
+            tvHint.setText("Tap ➔");
+            tvHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
+            tvHint.setTypeface(Typeface.DEFAULT_BOLD);
+            tvHint.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
+            row.addView(tvHint);
+            row.setOnClickListener(listener);
+        }
         return row;
     }
 

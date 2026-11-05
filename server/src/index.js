@@ -45,10 +45,46 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// Validate startup configuration
+function validateStartup() {
+  const isProd = process.env.NODE_ENV === 'production';
+  const secret = process.env.JWT_SECRET;
+  if (isProd) {
+    if (!secret) {
+      const err = new Error('FATAL: A secure JWT_SECRET environment variable is strictly required in production mode. Refusing to boot.');
+      console.error(err.message);
+      process.exit(1);
+      throw err;
+    }
+    if (secret.length < 32 || secret === 'perazim-secret-key-2026') {
+      const err = new Error('FATAL: JWT_SECRET in production must be at least 32 characters and cannot use default placeholders.');
+      console.error(err.message);
+      process.exit(1);
+      throw err;
+    }
+  }
+}
+
+// Immediate evaluation in production
+if (process.env.NODE_ENV === 'production') {
+  validateStartup();
+}
+
 async function startServer() {
-  await initDb();
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Perazim Church Server listening on port ${PORT}`);
+  validateStartup();
+  try {
+    await initDb();
+  } catch (err) {
+    console.error(`FATAL: Database connection failed: ${err.message}. Actionable: Ensure PostgreSQL is running and DATABASE_URL is valid, or explicitly set ALLOW_MEMORY_STORE=true to allow local in-memory fallback.`);
+    process.exit(1);
+    throw err;
+  }
+  return new Promise((resolve, reject) => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Perazim Church Server listening on port ${PORT}`);
+      resolve(server);
+    });
+    server.on('error', reject);
   });
 }
 
@@ -56,4 +92,4 @@ if (require.main === module) {
   startServer();
 }
 
-module.exports = { app, startServer };
+module.exports = { app, startServer, validateStartup };

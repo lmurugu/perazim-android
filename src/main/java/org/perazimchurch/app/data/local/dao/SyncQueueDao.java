@@ -32,8 +32,14 @@ public interface SyncQueueDao {
     @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' ORDER BY timestampMillis ASC")
     List<SyncQueueEntity> getPendingItems();
 
-    @Query("SELECT * FROM sync_queue WHERE status = 'FAILED' ORDER BY timestampMillis ASC")
+    @Query("SELECT * FROM sync_queue WHERE status IN ('FAILED', 'REJECTED') ORDER BY timestampMillis ASC")
     List<SyncQueueEntity> getFailedItems();
+
+    @Query("SELECT * FROM sync_queue WHERE status = 'SYNCING' ORDER BY timestampMillis ASC")
+    List<SyncQueueEntity> getSyncingItems();
+
+    @Query("UPDATE sync_queue SET status = 'PENDING' WHERE status = 'SYNCING'")
+    int recoverOrphanedSyncing();
 
     @Query("SELECT COUNT(*) FROM sync_queue WHERE status = 'PENDING'")
     int getPendingCount();

@@ -23,7 +23,12 @@ public final class PrayerRemoteSource {
     }
 
     public interface SyncCallback {
-        void onSuccess(@NonNull JSONArray syncedIds, @NonNull JSONArray updatedPrayers, long serverTime);
+        void onSuccess(@NonNull JSONArray syncedIds,
+                       @NonNull JSONArray rejectedMutations,
+                       @NonNull JSONArray updatedPrayers,
+                       long serverTime,
+                       boolean hasMore,
+                       long nextCursor);
         void onError(int statusCode, @NonNull String errorMessage);
     }
 
@@ -130,23 +135,37 @@ public final class PrayerRemoteSource {
     public static void batchSync(@NonNull Context context,
                                  @NonNull JSONArray mutations,
                                  long lastSyncTimestamp,
+                                 long cursor,
                                  @Nullable String authToken,
                                  @NonNull SyncCallback callback) {
         try {
             JSONObject body = new JSONObject();
-            body.put("mutations", mutations);
+            body.put("mutations", mutations != null ? mutations : new JSONArray());
             body.put("lastSyncTimestamp", lastSyncTimestamp);
+            if (cursor > 0) {
+                body.put("cursor", cursor);
+            }
 
             ApiClient.post(context, "/api/sync", body, authToken, new ApiClient.ApiCallback() {
                 @Override
                 public void onSuccess(int statusCode, @NonNull JSONObject json) {
                     JSONArray syncedIds = json.optJSONArray("syncedIds");
-                    JSONArray prayers = json.optJSONArray("prayers");
+                    JSONArray rejectedMutations = json.optJSONArray("rejectedMutations");
+                    JSONArray updatedPrayers = json.optJSONArray("updatedPrayers");
+                    if (updatedPrayers == null) {
+                        updatedPrayers = json.optJSONArray("prayers");
+                    }
                     long serverTime = json.optLong("serverTime", System.currentTimeMillis());
+                    boolean hasMore = json.optBoolean("hasMore", false);
+                    long nextCursor = json.optLong("nextCursor", 0);
+
                     callback.onSuccess(
                             syncedIds != null ? syncedIds : new JSONArray(),
-                            prayers != null ? prayers : new JSONArray(),
-                            serverTime
+                            rejectedMutations != null ? rejectedMutations : new JSONArray(),
+                            updatedPrayers != null ? updatedPrayers : new JSONArray(),
+                            serverTime,
+                            hasMore,
+                            nextCursor
                     );
                 }
 
@@ -158,5 +177,13 @@ public final class PrayerRemoteSource {
         } catch (Exception e) {
             callback.onError(-1, e.getMessage() != null ? e.getMessage() : "Error in batch sync");
         }
+    }
+
+    public static void batchSync(@NonNull Context context,
+                                 @NonNull JSONArray mutations,
+                                 long lastSyncTimestamp,
+                                 @Nullable String authToken,
+                                 @NonNull SyncCallback callback) {
+        batchSync(context, mutations, lastSyncTimestamp, 0, authToken, callback);
     }
 }

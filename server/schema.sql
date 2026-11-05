@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS prayers (
     updated_at BIGINT NOT NULL
 );
 
+CREATE INDEX IF NOT EXISTS idx_prayers_updated_id ON prayers (updated_at ASC, id ASC);
+
 CREATE TABLE IF NOT EXISTS prayer_amens (
     prayer_id VARCHAR(64) REFERENCES prayers(id) ON DELETE CASCADE,
     user_id VARCHAR(64) NOT NULL,

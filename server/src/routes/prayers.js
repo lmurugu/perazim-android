@@ -4,15 +4,29 @@ const { requireAuth, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Helper to sanitize anonymous prayer representations
+function sanitizePrayer(prayer) {
+  if (prayer && prayer.is_anonymous) {
+    return {
+      ...prayer,
+      author_id: 'anonymous',
+      author_name: prayer.author_name || 'Anonymous Saint'
+    };
+  }
+  return prayer;
+}
+
 // GET /api/prayers
 router.get('/', async (req, res) => {
   try {
-    const since = req.query.since ? parseInt(req.query.since, 10) : 0;
+    const rawSince = req.query.since || req.query.cursor;
+    const since = (rawSince && !isNaN(rawSince)) ? Math.max(0, parseInt(rawSince, 10)) : 0;
     const result = await query(
       'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY created_at DESC LIMIT 100',
       [since]
     );
-    return res.json({ prayers: result.rows || [] });
+    const prayers = (result.rows || []).map(sanitizePrayer);
+    return res.json({ prayers });
   } catch (err) {
     console.error('Fetch prayers error:', err);
     return res.status(500).json({ error: 'Server error loading prayers' });
@@ -23,13 +37,13 @@ router.get('/', async (req, res) => {
 router.post('/', optionalAuth, async (req, res) => {
   try {
     const { id, title, content, isAnonymous, authorName } = req.body;
-    if (!title || !content) {
+    if (!title || !content || typeof title !== 'string' || typeof content !== 'string' || !title.trim() || !content.trim()) {
       return res.status(400).json({ error: 'Title and prayer request content are required' });
     }
 
     const prayerId = id || ('prayer_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7));
     const isAnon = !!isAnonymous;
-    const authorId = isAnon ? 'anonymous' : (req.user ? req.user.id : (req.body.authorId || 'guest'));
+    const authorId = req.user ? req.user.id : (req.body.authorId || 'guest');
     const effAuthorName = isAnon ? 'Anonymous Saint' : (req.user ? req.user.name : (authorName || 'Fellow Saint'));
     const now = Date.now();
 
@@ -53,7 +67,7 @@ router.post('/', optionalAuth, async (req, res) => {
       updated_at: now
     };
 
-    return res.status(201).json({ prayer: created });
+    return res.status(201).json({ prayer: sanitizePrayer(created) });
   } catch (err) {
     console.error('Create prayer error:', err);
     return res.status(500).json({ error: 'Server error submitting prayer' });
@@ -94,6 +108,9 @@ router.post('/:id/testimony', requireAuth, async (req, res) => {
   try {
     const prayerId = req.params.id;
     const { testimony } = req.body;
+    if (!testimony || typeof testimony !== 'string' || !testimony.trim()) {
+      return res.status(400).json({ error: 'Testimony content is required' });
+    }
     const now = Date.now();
 
     const check = await query('SELECT id, author_id FROM prayers WHERE id = $1', [prayerId]);
@@ -106,13 +123,14 @@ router.post('/:id/testimony', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Only the author may record a testimony for this prayer' });
     }
 
-    await query('UPDATE prayers SET is_answered = true, testimony = $2, updated_at = $3 WHERE id = $1', [prayerId, testimony || '', now]);
+    await query('UPDATE prayers SET is_answered = true, testimony = $2, updated_at = $3 WHERE id = $1', [prayerId, testimony.trim(), now]);
 
-    return res.json({ success: true, prayerId, testimony: testimony || '' });
+    return res.json({ success: true, prayerId, testimony: testimony.trim() });
   } catch (err) {
     console.error('Prayer testimony error:', err);
     return res.status(500).json({ error: 'Server error recording testimony' });
   }
 });
 
+router.sanitizePrayer = sanitizePrayer;
 module.exports = router;

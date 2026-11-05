@@ -10,5 +10,6 @@ public enum SyncStatus {
     SYNCED,
     FAILED,
     CONFLICT,
-    CANCELLED
+    CANCELLED,
+    REJECTED
 }

@@ -1,7 +1,13 @@
 /**
- * Multi-Client Acceptance Verification Suite (Section 7)
+ * Multi-Client API Contract Integration Test Suite
  *
- * Verifies all 7 multi-client acceptance criteria against live server & PostgreSQL:
+ * NOTE: This is a Node.js HTTP API contract integration test suite validating
+ * multi-client concurrency and server synchronization over HTTP.
+ * This is an API CONTRACT INTEGRATION TEST, NOT an Android on-device test.
+ * Android on-device verification is executed separately via ADB on physical
+ * devices and emulators (e.g., Room database inspection, offline airplane mode toggle).
+ *
+ * Verifies all 7 multi-client API contract criteria against live server & PostgreSQL:
  * 1. Independent registration & login on Client A and Client B.
  * 2. Bidirectional prayer delivery (A -> B and B -> A) with correct author attribution.
  * 3. Amen count synchronization across clients.
@@ -70,7 +76,8 @@ function assert(condition, message) {
 
 async function runAcceptanceChecks() {
   console.log('\n====================================================================');
-  console.log('🧪 PERAZIM PHASE A — SECTION 7 MULTI-CLIENT ACCEPTANCE VERIFICATION');
+  console.log('🧪 PERAZIM PHASE A — API CONTRACT MULTI-CLIENT INTEGRATION TEST');
+  console.log('   (Simulated HTTP clients; NOT an Android on-device test)');
   console.log('====================================================================\n');
 
   // Verify server is reachable
@@ -329,7 +336,7 @@ async function runAcceptanceChecks() {
   assert(matchingPrayers.length === 1, 'Single delivery verified: exactly ONE prayer record exists in database (no duplicates)');
 
   console.log('\n====================================================================');
-  console.log('🎉 ALL 7 MULTI-CLIENT ACCEPTANCE CHECKS PASSED WITH ZERO ERRORS!');
+  console.log('🎉 ALL 7 MULTI-CLIENT API CONTRACT CHECKS PASSED WITH ZERO ERRORS!');
   console.log('====================================================================\n');
 }
 

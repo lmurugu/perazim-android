@@ -57,7 +57,7 @@ async function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const token = authHeader.substring(7);
+  const token = authHeader.substring(7).trim();
   try {
     const payload = jwt.verify(token, getJwtSecret());
     if (await isTokenRevoked(token)) {
@@ -74,7 +74,7 @@ async function requireAuth(req, res, next) {
 async function optionalAuth(req, res, next) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7);
+    const token = authHeader.substring(7).trim();
     try {
       const payload = jwt.verify(token, getJwtSecret());
       if (!(await isTokenRevoked(token))) {

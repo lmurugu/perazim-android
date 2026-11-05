@@ -45,6 +45,8 @@ public final class SyncDispatcher {
 
     /**
      * Dispatches pending offline mutations and pulls remote updates.
+     * Recovers orphaned SYNCING items, handles permanent vs retryable rejections,
+     * paginates through all remote pages, and propagates prayer counts, testimony, and answered status into Room.
      */
     public static void dispatchSync(@NonNull Context context, @Nullable SyncResultCallback callback) {
         final Context appContext = context.getApplicationContext();
@@ -59,10 +61,17 @@ public final class SyncDispatcher {
         EXECUTOR.execute(() -> {
             try {
                 SyncQueueManager queueManager = SyncQueueManager.getInstance(appContext);
-                List<SyncQueueEntity> pending = queueManager.getPendingOperations(25);
 
+                // REQ-08: Recover any stuck operations in status 'SYNCING' (e.g. from app crash or killed process)
+                int recoveredCount = queueManager.recoverOrphanedSyncing();
+                if (recoveredCount > 0) {
+                    Log.i(TAG, "Recovered " + recoveredCount + " orphaned SYNCING operations back to PENDING.");
+                }
+
+                // Pull pending operations
+                List<SyncQueueEntity> pending = queueManager.getPendingOperations(25);
                 JSONArray mutationsArray = new JSONArray();
-                if (pending != null) {
+                if (pending != null && !pending.isEmpty()) {
                     for (SyncQueueEntity item : pending) {
                         try {
                             JSONObject obj = new JSONObject();
@@ -84,109 +93,272 @@ public final class SyncDispatcher {
                 long lastSyncTs = prefs.getLong(KEY_LAST_SYNC_TS, 0);
                 String authToken = SessionManager.getInstance(appContext).getAuthToken();
 
-                PrayerRemoteSource.batchSync(appContext, mutationsArray, lastSyncTs, authToken, new PrayerRemoteSource.SyncCallback() {
-                    @Override
-                    public void onSuccess(@NonNull JSONArray syncedIds, @NonNull JSONArray updatedPrayers, long serverTime) {
-                        EXECUTOR.execute(() -> {
-                            int syncedCount = 0;
-                            try {
-                                // Mark synced mutations
-                                for (int i = 0; i < syncedIds.length(); i++) {
-                                    String id = syncedIds.optString(i, null);
-                                    if (id != null) {
-                                        queueManager.markSynced(id);
-                                        syncedCount++;
-                                    }
-                                }
-
-                                // Ingest updated prayers into Room
-                                PerazimDatabase db = PerazimDatabase.getInstance(appContext);
-                                PrayerDao prayerDao = db.prayerDao();
-                                int newPrayersCount = 0;
-
-                                for (int i = 0; i < updatedPrayers.length(); i++) {
-                                    JSONObject pJson = updatedPrayers.optJSONObject(i);
-                                    if (pJson == null) continue;
-
-                                    String pId = pJson.optString("id", "");
-                                    if (pId.isEmpty()) continue;
-
-                                    String title = pJson.optString("title", "Prayer Request");
-                                    String content = pJson.optString("content", "");
-                                    String authorId = pJson.optString("author_id", "guest");
-                                    String authorName = pJson.optString("author_name", "Fellow Saint");
-                                    boolean isAnonymous = pJson.optBoolean("is_anonymous", false);
-                                    int count = pJson.optInt("prayer_count", 0);
-                                    boolean isAnswered = pJson.optBoolean("is_answered", false);
-                                    long createdAt = pJson.optLong("created_at", System.currentTimeMillis());
-
-                                    PrayerEntity existing = prayerDao.getPrayerById(pId);
-                                    if (existing == null) {
-                                        PrayerEntity newEntity = new PrayerEntity(
-                                                pId,
-                                                authorId,
-                                                authorName,
-                                                title,
-                                                content,
-                                                isAnonymous,
-                                                isAnswered,
-                                                count,
-                                                createdAt
-                                        );
-                                        prayerDao.insert(newEntity);
-                                        newPrayersCount++;
-                                    } else {
-                                        // Update counters & status while preserving local state
-                                        existing.setPrayerCount(Math.max(existing.getPrayerCount(), count));
-                                        if (isAnswered) {
-                                            existing.setAnswered(true);
-                                        }
-                                        prayerDao.update(existing);
-                                    }
-                                }
-
-                                prefs.edit().putLong(KEY_LAST_SYNC_TS, serverTime).apply();
-                                Log.i(TAG, "Sync complete. Synced " + syncedCount + " mutations, ingested " + newPrayersCount + " prayers.");
-
-                                final int finalSynced = syncedCount;
-                                final int finalNew = newPrayersCount;
-                                IS_SYNCING.set(false);
-                                if (callback != null) {
-                                    MAIN_HANDLER.post(() -> callback.onSyncComplete(true, finalSynced, finalNew));
-                                }
-                            } catch (Exception e) {
-                                Log.e(TAG, "Error ingesting sync batch into Room", e);
-                                IS_SYNCING.set(false);
-                                if (callback != null) {
-                                    MAIN_HANDLER.post(() -> callback.onSyncComplete(false, 0, 0));
-                                }
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onError(int statusCode, @NonNull String errorMessage) {
-                        EXECUTOR.execute(() -> {
-                            Log.w(TAG, "Batch sync failed (HTTP " + statusCode + "): " + errorMessage);
-                            // Mark pending operations as RETRY with backoff
-                            if (pending != null) {
-                                for (SyncQueueEntity item : pending) {
-                                    queueManager.recordFailure(item.getId(), errorMessage, true);
-                                }
-                            }
-                            IS_SYNCING.set(false);
-                            if (callback != null) {
-                                MAIN_HANDLER.post(() -> callback.onSyncComplete(false, 0, 0));
-                            }
-                        });
-                    }
-                });
+                // Kick off multi-page sync starting at page 1 with cursor = 0
+                executeSyncPage(
+                        appContext,
+                        queueManager,
+                        pending,
+                        mutationsArray,
+                        lastSyncTs,
+                        0L,
+                        1,
+                        0,
+                        0,
+                        0L,
+                        authToken,
+                        prefs,
+                        callback
+                );
             } catch (Exception e) {
                 Log.e(TAG, "Fatal error executing sync", e);
                 IS_SYNCING.set(false);
                 if (callback != null) {
                     MAIN_HANDLER.post(() -> callback.onSyncComplete(false, 0, 0));
                 }
+            }
+        });
+    }
+
+    /**
+     * Executes a single sync page request, processes mutations & updated prayers,
+     * and loops to subsequent pages before updating KEY_LAST_SYNC_TS.
+     */
+    private static void executeSyncPage(
+            @NonNull Context appContext,
+            @NonNull SyncQueueManager queueManager,
+            @Nullable List<SyncQueueEntity> pendingMutations,
+            @NonNull JSONArray mutationsToSend,
+            long lastSyncTs,
+            long cursor,
+            int pageNumber,
+            int accumulatedSyncedCount,
+            int accumulatedIngestedCount,
+            long maxServerTimeSeen,
+            @Nullable String authToken,
+            @NonNull SharedPreferences prefs,
+            @Nullable SyncResultCallback callback) {
+
+        PrayerRemoteSource.batchSync(appContext, mutationsToSend, lastSyncTs, cursor, authToken, new PrayerRemoteSource.SyncCallback() {
+            @Override
+            public void onSuccess(@NonNull JSONArray syncedIds,
+                                  @NonNull JSONArray rejectedMutations,
+                                  @NonNull JSONArray updatedPrayers,
+                                  long serverTime,
+                                  boolean hasMore,
+                                  long nextCursor) {
+                EXECUTOR.execute(() -> {
+                    try {
+                        int pageSyncedCount = 0;
+
+                        // On page 1, process mutations acknowledgment & rejections
+                        if (pageNumber == 1 && pendingMutations != null && !pendingMutations.isEmpty()) {
+                            java.util.Set<String> processedIds = new java.util.HashSet<>();
+
+                            // 1. Process successfully synced mutations
+                            for (int i = 0; i < syncedIds.length(); i++) {
+                                String id = syncedIds.optString(i, null);
+                                if (id != null && !id.isEmpty()) {
+                                    queueManager.markSynced(id);
+                                    processedIds.add(id);
+                                    pageSyncedCount++;
+                                }
+                            }
+
+                            // 2. Handle rejected mutations (REQ-08)
+                            for (int i = 0; i < rejectedMutations.length(); i++) {
+                                JSONObject rej = rejectedMutations.optJSONObject(i);
+                                if (rej == null) continue;
+                                String rejId = rej.optString("id", null);
+                                if (rejId == null || rejId.isEmpty()) continue;
+                                processedIds.add(rejId);
+
+                                String reason = rej.optString("reason", "UNKNOWN");
+                                String message = rej.optString("message", "Mutation rejected by server");
+
+                                if (SyncQueueManager.isPermanentFailure(reason, -1)) {
+                                    // Permanent rejection: preserve user content/draft in queue, mark FAILED
+                                    queueManager.recordPermanentFailure(rejId, reason, message);
+                                    Log.w(TAG, "Permanent mutation rejection for item " + rejId + " [" + reason + "]: " + message);
+                                } else {
+                                    // Transient failure: retry with exponential backoff
+                                    queueManager.recordFailure(rejId, "[" + reason + "] " + message, true);
+                                }
+                            }
+
+                            // 3. Mark unacknowledged items for retry (network dropped / partial server batch)
+                            for (SyncQueueEntity item : pendingMutations) {
+                                if (!processedIds.contains(item.getId())) {
+                                    Log.w(TAG, "Mutation " + item.getId() + " unacknowledged by server; scheduling retry.");
+                                    queueManager.recordFailure(item.getId(), "Unacknowledged in batch response", true);
+                                }
+                            }
+                        }
+
+                        // REQ-09: Ingest updated prayers into Room PrayerDao
+                        PerazimDatabase db = PerazimDatabase.getInstance(appContext);
+                        PrayerDao prayerDao = db.prayerDao();
+                        int pageIngestedCount = 0;
+
+                        for (int i = 0; i < updatedPrayers.length(); i++) {
+                            JSONObject pJson = updatedPrayers.optJSONObject(i);
+                            if (pJson == null) continue;
+
+                            String pId = pJson.optString("id", "");
+                            if (pId.isEmpty()) continue;
+
+                            String title = pJson.optString("title", "Prayer Request");
+                            String content = pJson.optString("content", "");
+                            String authorId = pJson.optString("author_id", pJson.optString("userId", "guest"));
+                            String authorName = pJson.optString("author_name", pJson.optString("authorName", "Fellow Saint"));
+                            boolean isAnonymous = pJson.optBoolean("is_anonymous", pJson.optBoolean("isAnonymous", false));
+                            int count = pJson.optInt("prayer_count", pJson.optInt("prayerCount", 0));
+                            boolean isAnswered = pJson.optBoolean("is_answered", pJson.optBoolean("isAnswered", false));
+                            String testimony = pJson.optString("testimony", "").trim();
+                            long createdAt = pJson.optLong("created_at", pJson.optLong("createdMillis", System.currentTimeMillis()));
+
+                            // Format content with testimony note if testimony exists
+                            String formattedContent = content;
+                            if (!testimony.isEmpty()) {
+                                if (formattedContent.isEmpty()) {
+                                    formattedContent = "[Testimony]: " + testimony;
+                                } else if (!formattedContent.contains("[Testimony]") && !formattedContent.contains(testimony)) {
+                                    formattedContent = formattedContent + "\n\n[Testimony]: " + testimony;
+                                }
+                            }
+
+                            PrayerEntity existing = prayerDao.getPrayerById(pId);
+                            if (existing == null) {
+                                PrayerEntity newEntity = new PrayerEntity(
+                                        pId,
+                                        authorId,
+                                        authorName,
+                                        title,
+                                        formattedContent,
+                                        isAnonymous,
+                                        isAnswered,
+                                        count,
+                                        createdAt
+                                );
+                                prayerDao.insert(newEntity);
+                                pageIngestedCount++;
+                            } else {
+                                boolean changed = false;
+
+                                // Propagate prayer counts (take maximum to preserve offline increment)
+                                int maxCount = Math.max(existing.getPrayerCount(), count);
+                                if (existing.getPrayerCount() != maxCount) {
+                                    existing.setPrayerCount(maxCount);
+                                    changed = true;
+                                }
+
+                                // Propagate isAnswered status
+                                if (isAnswered && !existing.isAnswered()) {
+                                    existing.setAnswered(true);
+                                    changed = true;
+                                }
+
+                                // Propagate testimony into Room
+                                if (!testimony.isEmpty()) {
+                                    String exContent = existing.getContent();
+                                    if (exContent == null || (!exContent.contains("[Testimony]") && !exContent.contains(testimony))) {
+                                        String updated = (exContent != null && !exContent.isEmpty())
+                                                ? exContent + "\n\n[Testimony]: " + testimony
+                                                : "[Testimony]: " + testimony;
+                                        existing.setContent(updated);
+                                        changed = true;
+                                    }
+                                }
+
+                                // Update title if remote changed
+                                if (title != null && !title.isEmpty() && !title.equals(existing.getTitle())) {
+                                    existing.setTitle(title);
+                                    changed = true;
+                                }
+
+                                if (changed) {
+                                    prayerDao.update(existing);
+                                }
+                                pageIngestedCount++;
+                            }
+                        }
+
+                        int totalSynced = accumulatedSyncedCount + pageSyncedCount;
+                        int totalIngested = accumulatedIngestedCount + pageIngestedCount;
+                        long highestServerTime = Math.max(maxServerTimeSeen, serverTime);
+
+                        // Multi-page pagination evaluation (REQ-08)
+                        boolean morePages = (hasMore || (nextCursor > 0 && nextCursor != cursor)) && (updatedPrayers.length() > 0);
+                        long effectiveNextCursor = nextCursor;
+                        if (effectiveNextCursor <= 0 && updatedPrayers.length() > 0) {
+                            JSONObject lastPrayer = updatedPrayers.optJSONObject(updatedPrayers.length() - 1);
+                            if (lastPrayer != null) {
+                                effectiveNextCursor = Math.max(lastPrayer.optLong("updated_at", 0), lastPrayer.optLong("created_at", 0));
+                            }
+                        }
+
+                        if (morePages && effectiveNextCursor > 0 && effectiveNextCursor != cursor) {
+                            Log.d(TAG, "Fetching next sync page " + (pageNumber + 1) + " (cursor=" + effectiveNextCursor + ")...");
+                            executeSyncPage(
+                                    appContext,
+                                    queueManager,
+                                    pendingMutations,
+                                    new JSONArray(), // Do not re-send mutations on subsequent pages
+                                    lastSyncTs,
+                                    effectiveNextCursor,
+                                    pageNumber + 1,
+                                    totalSynced,
+                                    totalIngested,
+                                    highestServerTime,
+                                    authToken,
+                                    prefs,
+                                    callback
+                            );
+                        } else {
+                            // All pages consumed! Only advance completed checkpoint timestamp after consuming every page
+                            long checkpointToSave = highestServerTime > 0 ? highestServerTime : System.currentTimeMillis();
+                            prefs.edit().putLong(KEY_LAST_SYNC_TS, checkpointToSave).apply();
+                            Log.i(TAG, "Sync complete across " + pageNumber + " page(s). Synced "
+                                    + totalSynced + " mutations, ingested " + totalIngested
+                                    + " prayers. Checkpoint advanced to " + checkpointToSave);
+
+                            IS_SYNCING.set(false);
+                            if (callback != null) {
+                                MAIN_HANDLER.post(() -> callback.onSyncComplete(true, totalSynced, totalIngested));
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error ingesting sync batch into Room", e);
+                        IS_SYNCING.set(false);
+                        if (callback != null) {
+                            MAIN_HANDLER.post(() -> callback.onSyncComplete(false, accumulatedSyncedCount, accumulatedIngestedCount));
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onError(int statusCode, @NonNull String errorMessage) {
+                EXECUTOR.execute(() -> {
+                    Log.w(TAG, "Batch sync failed on page " + pageNumber + " (HTTP " + statusCode + "): " + errorMessage);
+
+                    // Mark pending operations on failure
+                    if (pageNumber == 1 && pendingMutations != null) {
+                        boolean isPermanent = SyncQueueManager.isPermanentFailure(errorMessage, statusCode);
+                        for (SyncQueueEntity item : pendingMutations) {
+                            if (isPermanent) {
+                                queueManager.recordPermanentFailure(item.getId(), "HTTP_" + statusCode, errorMessage);
+                            } else {
+                                queueManager.recordFailure(item.getId(), "HTTP " + statusCode + ": " + errorMessage, true);
+                            }
+                        }
+                    }
+
+                    // On error, do not advance KEY_LAST_SYNC_TS checkpoint
+                    IS_SYNCING.set(false);
+                    if (callback != null) {
+                        MAIN_HANDLER.post(() -> callback.onSyncComplete(false, accumulatedSyncedCount, accumulatedIngestedCount));
+                    }
+                });
             }
         });
     }

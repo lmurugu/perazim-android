@@ -190,6 +190,58 @@ public class SyncQueueManager {
     }
 
     /**
+     * Resets any orphaned operations stuck in 'SYNCING' status back to 'PENDING'.
+     * Recovers from app crashes or process terminations during active sync dispatches.
+     *
+     * @return Number of recovered operations.
+     */
+    public synchronized int recoverOrphanedSyncing() {
+        return syncQueueDao.recoverOrphanedSyncing();
+    }
+
+    /**
+     * Records a permanent rejection (e.g. FORBIDDEN, CONFLICT_MISMATCH, UNSUPPORTED_OPERATION,
+     * AUTH_REQUIRED) for an operation without discarding the user's content or draft.
+     * Transitions status to FAILED and retains the error reason and payload.
+     *
+     * @param id           The sync queue item ID.
+     * @param reason       Machine-readable rejection code (e.g. FORBIDDEN, UNSUPPORTED_OPERATION).
+     * @param errorMessage Human-readable description.
+     */
+    public synchronized void recordPermanentFailure(String id, String reason, String errorMessage) {
+        if (id == null) return;
+        SyncQueueEntity item = syncQueueDao.getItemById(id);
+        if (item == null) return;
+
+        String prefix = (reason != null && !reason.trim().isEmpty()) ? "[" + reason.trim() + "] " : "";
+        String msg = (errorMessage != null && !errorMessage.trim().isEmpty()) ? errorMessage.trim() : "Permanent rejection";
+        item.setLastError(prefix + msg);
+        item.setStatus(SyncStatus.FAILED.name());
+        syncQueueDao.update(item);
+    }
+
+    /**
+     * Determines whether a given failure reason or HTTP status code represents a permanent failure
+     * (which should not be blindly retried) or a transient failure.
+     */
+    public static boolean isPermanentFailure(String reason, int statusCode) {
+        if (statusCode == 400 || statusCode == 401 || statusCode == 403 || statusCode == 404 || statusCode == 405 || statusCode == 422) {
+            return true;
+        }
+        if (reason != null) {
+            String r = reason.trim().toUpperCase();
+            return r.contains("FORBIDDEN")
+                    || r.contains("CONFLICT")
+                    || r.contains("UNSUPPORTED")
+                    || r.contains("AUTH_REQUIRED")
+                    || r.contains("NOT_FOUND")
+                    || r.contains("BAD_REQUEST")
+                    || r.contains("INVALID");
+        }
+        return false;
+    }
+
+    /**
      * Transitions item status to CONFLICT.
      *
      * @param id              The sync queue item ID.

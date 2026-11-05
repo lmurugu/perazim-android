@@ -1,14 +1,25 @@
 const express = require('express');
-const { query } = require('../db');
+const { query, withTransaction } = require('../db');
 const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
+function sanitizePrayer(prayer) {
+  if (prayer && (prayer.is_anonymous || prayer.is_anonymous === 'true' || prayer.is_anonymous === 1)) {
+    return {
+      ...prayer,
+      author_id: 'anonymous',
+      author_name: prayer.author_name || 'Anonymous Saint'
+    };
+  }
+  return prayer;
+}
+
 // POST /api/sync
 router.post('/', optionalAuth, async (req, res) => {
   try {
-    const { mutations, lastSyncTimestamp } = req.body;
-    const userId = req.user ? req.user.id : (req.body.userId || 'guest');
+    const { mutations, lastSyncTimestamp, cursor, limit: reqLimit } = req.body || {};
+    const userId = req.user ? req.user.id : ((req.body && req.body.userId) || 'guest');
     const syncedIds = [];
     const rejectedMutations = [];
     const now = Date.now();
@@ -29,25 +40,85 @@ router.post('/', optionalAuth, async (req, res) => {
             const title = payload.title || 'Prayer Request';
             const content = payload.content || '';
             const isAnon = !!payload.isAnonymous;
-            const authorId = isAnon ? 'anonymous' : (req.user ? req.user.id : userId);
+            const authorId = req.user ? req.user.id : (payload.authorId || userId);
             const authorName = isAnon ? 'Anonymous Saint' : (req.user ? req.user.name : (payload.authorName || 'Fellow Saint'));
 
-            await query(
-              'INSERT INTO prayers (id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT (id) DO NOTHING',
-              [prayerId, title, content, authorId, authorName, isAnon, 'PUBLIC', 0, false, '', now, now]
+            // REQ-05: Do NOT blindly ON CONFLICT DO NOTHING. Query existing first.
+            const existingRes = await query(
+              'SELECT id, author_id, content FROM prayers WHERE id = $1',
+              [prayerId]
             );
-            syncedIds.push(id);
-          } else if (entityType === 'PRAYER_AMEN') {
-            const prayerId = entityId;
-            try {
-              await query(
-                'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
-                [prayerId, userId, now]
-              );
-            } catch (amenErr) {
-              // Ignore duplicate amen error if DB doesn't support ON CONFLICT
+            const existing = existingRes.rows && existingRes.rows[0];
+
+            if (existing) {
+              if (existing.author_id !== authorId) {
+                rejectedMutations.push({
+                  id,
+                  reason: 'CONFLICT_MISMATCH',
+                  message: 'Prayer ID is registered to another author'
+                });
+                continue;
+              }
+              if (existing.content !== content) {
+                rejectedMutations.push({
+                  id,
+                  reason: 'CONFLICT_MISMATCH',
+                  message: 'Prayer ID already exists with conflicting content'
+                });
+                continue;
+              }
+              // Matching author and content: idempotent replay
+              syncedIds.push(id);
+            } else {
+              try {
+                await query(
+                  'INSERT INTO prayers (id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+                  [prayerId, title, content, authorId, authorName, isAnon, 'PUBLIC', 0, false, '', now, now]
+                );
+                syncedIds.push(id);
+              } catch (insertErr) {
+                // Handle potential race condition if another process inserted concurrently
+                if (insertErr.code === '23505' || (insertErr.message && insertErr.message.includes('duplicate key'))) {
+                  const raceRes = await query('SELECT id, author_id, content FROM prayers WHERE id = $1', [prayerId]);
+                  const raceExisting = raceRes.rows && raceRes.rows[0];
+                  if (raceExisting) {
+                    if (raceExisting.author_id !== authorId) {
+                      rejectedMutations.push({
+                        id,
+                        reason: 'CONFLICT_MISMATCH',
+                        message: 'Prayer ID is registered to another author'
+                      });
+                      continue;
+                    }
+                    if (raceExisting.content !== content) {
+                      rejectedMutations.push({
+                        id,
+                        reason: 'CONFLICT_MISMATCH',
+                        message: 'Prayer ID already exists with conflicting content'
+                      });
+                      continue;
+                    }
+                    syncedIds.push(id);
+                  }
+                } else {
+                  throw insertErr;
+                }
+              }
             }
-            await query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
+          } else if (entityType === 'PRAYER_AMEN') {
+            // REQ-04: Batch-Sync Amen Safety with transaction
+            const prayerId = entityId;
+            const amenUserId = req.user ? req.user.id : (payload.userId || req.body.userId || userId);
+
+            await withTransaction(async (client) => {
+              const insertRes = await client.query(
+                'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
+                [prayerId, amenUserId, now]
+              );
+              if (insertRes && insertRes.rowCount > 0) {
+                await client.query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
+              }
+            });
             syncedIds.push(id);
           } else if (entityType === 'PRAYER_TESTIMONY') {
             if (!req.user) {
@@ -104,18 +175,68 @@ router.post('/', optionalAuth, async (req, res) => {
       }
     }
 
-    // Return new remote prayers updated since lastSyncTimestamp
-    const since = lastSyncTimestamp ? parseInt(lastSyncTimestamp, 10) : 0;
-    const prayersResult = await query(
-      'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY created_at DESC LIMIT 50',
-      [since]
-    );
+    // REQ-07: Paginated Synchronization with stable ordering (updated_at ASC, id ASC)
+    const limit = Math.min(Math.max(1, parseInt(reqLimit || req.body.limit || req.query.limit, 10) || 50), 100);
+    const fetchLimit = limit + 1;
+
+    let cursorTime = 0;
+    let cursorId = null;
+
+    const rawCursor = cursor !== undefined && cursor !== null && cursor !== '' 
+      ? cursor 
+      : (req.query.cursor !== undefined && req.query.cursor !== null && req.query.cursor !== '' ? req.query.cursor : (lastSyncTimestamp !== undefined && lastSyncTimestamp !== null && lastSyncTimestamp !== '' ? lastSyncTimestamp : req.body.lastSyncTimestamp));
+
+    if (rawCursor !== undefined && rawCursor !== null && rawCursor !== '') {
+      if (typeof rawCursor === 'number') {
+        cursorTime = rawCursor;
+      } else {
+        const cursorStr = String(rawCursor).trim();
+        if (cursorStr.includes(':')) {
+          const parts = cursorStr.split(':');
+          cursorTime = parseInt(parts[0], 10) || 0;
+          cursorId = parts.slice(1).join(':') || null;
+        } else {
+          const parsed = parseInt(cursorStr, 10);
+          cursorTime = !isNaN(parsed) ? parsed : 0;
+        }
+      }
+    }
+
+    let prayersResult;
+    if (cursorId) {
+      prayersResult = await query(
+        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE (updated_at > $1) OR (updated_at = $1 AND id > $2) ORDER BY updated_at ASC, id ASC LIMIT $3',
+        [cursorTime, cursorId, fetchLimit]
+      );
+    } else if (cursorTime > 0) {
+      prayersResult = await query(
+        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY updated_at ASC, id ASC LIMIT $2',
+        [cursorTime, fetchLimit]
+      );
+    } else {
+      prayersResult = await query(
+        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at >= $1 ORDER BY updated_at ASC, id ASC LIMIT $2',
+        [0, fetchLimit]
+      );
+    }
+
+    const fetchedRows = prayersResult.rows || [];
+    const hasMore = fetchedRows.length > limit;
+    const pagedPrayers = hasMore ? fetchedRows.slice(0, limit) : fetchedRows;
+    const lastPrayer = pagedPrayers.length > 0 ? pagedPrayers[pagedPrayers.length - 1] : null;
+    const nextCursor = (hasMore && lastPrayer) ? `${lastPrayer.updated_at}:${lastPrayer.id}` : null;
+
+    // REQ-06: Anonymous Privacy - mask author_id as 'anonymous'
+    const sanitizedPrayers = pagedPrayers.map(sanitizePrayer);
 
     return res.json({
       syncedIds,
       rejectedMutations,
       serverTime: now,
-      prayers: prayersResult.rows || []
+      hasMore,
+      nextCursor,
+      prayers: sanitizedPrayers,
+      updatedPrayers: sanitizedPrayers
     });
   } catch (err) {
     console.error('Batch sync error:', err);
