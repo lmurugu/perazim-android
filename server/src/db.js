@@ -17,7 +17,8 @@ const memoryStore = {
   prayer_amens: [],
   messages: [],
   connections: [],
-  sync_events: []
+  sync_events: [],
+  revoked_tokens: []
 };
 
 async function initDb() {
@@ -172,23 +173,62 @@ async function query(sql, params = []) {
     const exists = memoryStore.prayer_amens.some(a => a.prayer_id === prayer_id && a.user_id === user_id);
     if (!exists) {
       memoryStore.prayer_amens.push({ prayer_id, user_id, created_at });
+      return { rows: [], rowCount: 1 };
     }
-    return { rows: [] };
+    return { rows: [], rowCount: 0 };
   }
 
   // INSERT INTO sync_events
   if (lower.startsWith('insert into sync_events')) {
     const [id, user_id, entity_type, entity_id, operation_type, payload, created_at] = params;
     memoryStore.sync_events.push({ id, user_id, entity_type, entity_id, operation_type, payload, created_at });
-    return { rows: [] };
+    return { rows: [], rowCount: 1 };
   }
 
-  return { rows: [] };
+  // SELECT FROM revoked_tokens
+  if (lower.startsWith('select') && lower.includes('from revoked_tokens')) {
+    const hash = params[0];
+    const item = memoryStore.revoked_tokens.find(t => t.token_hash === hash);
+    return { rows: item ? [item] : [], rowCount: item ? 1 : 0 };
+  }
+
+  // INSERT INTO revoked_tokens
+  if (lower.startsWith('insert into revoked_tokens')) {
+    const [token_hash, user_id, expires_at, revoked_at] = params;
+    const exists = memoryStore.revoked_tokens.some(t => t.token_hash === token_hash);
+    if (!exists) {
+      memoryStore.revoked_tokens.push({ token_hash, user_id, expires_at, revoked_at });
+      return { rows: [], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
+  return { rows: [], rowCount: 0 };
+}
+
+async function withTransaction(callback) {
+  if (isPostgres && pool) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const result = await callback(client);
+      await client.query('COMMIT');
+      return result;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+  // Simulated transaction over query
+  return callback({ query });
 }
 
 module.exports = {
   initDb,
   query,
+  withTransaction,
   closeDb,
   isPostgresActive: () => isPostgres,
   memoryStore

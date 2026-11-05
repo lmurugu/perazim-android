@@ -84,3 +84,10 @@ CREATE TABLE IF NOT EXISTS sync_events (
     payload TEXT NOT NULL,
     created_at BIGINT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS revoked_tokens (
+    token_hash VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(64),
+    expires_at BIGINT NOT NULL,
+    revoked_at BIGINT NOT NULL
+);

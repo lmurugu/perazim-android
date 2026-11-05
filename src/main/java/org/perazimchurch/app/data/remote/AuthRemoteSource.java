@@ -93,4 +93,15 @@ public final class AuthRemoteSource {
             }
         });
     }
+
+    public static void logout(@NonNull Context context, @Nullable String authToken) {
+        if (authToken == null || authToken.trim().isEmpty()) return;
+        ApiClient.post(context, "/api/auth/logout", new JSONObject(), authToken, new ApiClient.ApiCallback() {
+            @Override
+            public void onSuccess(int statusCode, @NonNull JSONObject json) {}
+
+            @Override
+            public void onError(int statusCode, @NonNull String errorMessage) {}
+        });
+    }
 }

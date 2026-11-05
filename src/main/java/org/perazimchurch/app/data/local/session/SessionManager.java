@@ -27,6 +27,7 @@ public class SessionManager {
     private static final String PREFS_NAME = "perazim_session_prefs";
     private static final String KEY_ACTIVE_USER_ID = "active_user_id";
     private static final String KEY_AUTH_TOKEN = "auth_token";
+    private static final String KEY_GUEST_USER_ID = "guest_user_id";
 
     private static volatile SessionManager INSTANCE;
 
@@ -124,8 +125,8 @@ public class SessionManager {
                 }
             }
         }
-        if (activeUserId == null || activeUserId.trim().isEmpty()) {
-            activeUserId = "guest";
+        if (activeUserId == null || activeUserId.trim().isEmpty() || "guest".equals(activeUserId)) {
+            activeUserId = getGuestUserId();
         }
         return activeUserId;
     }
@@ -153,12 +154,18 @@ public class SessionManager {
     public synchronized boolean isGuest() {
         String token = getAuthToken();
         String uid = getActiveUserId();
-        return token == null || token.trim().isEmpty() || "guest".equals(uid);
+        return token == null || token.trim().isEmpty() || uid == null || uid.startsWith("guest");
     }
 
     @NonNull
-    public String getGuestUserId() {
-        return "guest";
+    public synchronized String getGuestUserId() {
+        if (prefs == null) return "guest_default";
+        String guestId = prefs.getString(KEY_GUEST_USER_ID, null);
+        if (guestId == null || guestId.trim().isEmpty() || "guest".equals(guestId)) {
+            guestId = "guest_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+            prefs.edit().putString(KEY_GUEST_USER_ID, guestId).apply();
+        }
+        return guestId;
     }
 
     /**
@@ -312,11 +319,22 @@ public class SessionManager {
      */
     public synchronized void logout() {
         long now = System.currentTimeMillis();
-        this.activeUserId = "guest";
+        String oldToken = getAuthToken();
+        if (context != null && oldToken != null) {
+            AuthRemoteSource.logout(context, oldToken);
+        }
+
+        // Generate a new pristine guest context so future guest activity does not collide with previous member
+        String freshGuestId = "guest_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 10);
+        this.activeUserId = freshGuestId;
         this.currentUserCache = null;
         setAuthToken(null);
         if (prefs != null) {
-            prefs.edit().putString(KEY_ACTIVE_USER_ID, "guest").apply();
+            prefs.edit()
+                    .putString(KEY_GUEST_USER_ID, freshGuestId)
+                    .putString(KEY_ACTIVE_USER_ID, freshGuestId)
+                    .remove(KEY_AUTH_TOKEN)
+                    .apply();
         }
         if (userDao != null) {
             new Thread(() -> {
@@ -336,7 +354,7 @@ public class SessionManager {
                 }
             }).start();
         }
-        Log.d(TAG, "Active user logged out. Context reverted to guest.");
+        Log.d(TAG, "Active user logged out. Reverted to fresh isolated guest session: " + freshGuestId);
     }
 
     /**
@@ -446,7 +464,9 @@ public class SessionManager {
                     String role = userJson.optString("role", "MEMBER");
                     int xp = userJson.optInt("xp", 0);
                     int streak = userJson.optInt("streak", 0);
-                    int grace = userJson.optInt("grace_points", 2);
+                    if (userJson.has("grace_points")) {
+                        GamificationStore.saveGracePoints(context, userId, userJson.getInt("grace_points"));
+                    }
 
                     setAuthToken(token);
                     login(userId, name, phone, campusId, role);
@@ -458,6 +478,8 @@ public class SessionManager {
                         GamificationStore.saveStreak(context, userId, Math.max(streak, GamificationStore.getStreak(context, userId, 0)), false);
                     }
 
+                    String currentGuest = getGuestUserId();
+                    migrateLocalData(currentGuest, userId);
                     migrateLocalData("guest", userId);
                     migrateLocalData("user_me", userId);
                     migrateLocalData("guest_user", userId);
@@ -497,9 +519,15 @@ public class SessionManager {
                     String userCampus = userJson.optString("campus_id", campusId != null ? campusId : "campus_embu");
                     String role = userJson.optString("role", "MEMBER");
 
+                    if (userJson.has("grace_points")) {
+                        GamificationStore.saveGracePoints(context, userId, userJson.getInt("grace_points"));
+                    }
+
                     setAuthToken(token);
                     login(userId, userName, phone, userCampus, role);
 
+                    String currentGuest = getGuestUserId();
+                    migrateLocalData(currentGuest, userId);
                     migrateLocalData("guest", userId);
                     migrateLocalData("user_me", userId);
                     migrateLocalData("guest_user", userId);

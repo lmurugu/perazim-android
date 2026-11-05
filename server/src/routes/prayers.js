@@ -1,5 +1,5 @@
 const express = require('express');
-const { query } = require('../db');
+const { query, withTransaction } = require('../db');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -67,17 +67,22 @@ router.post('/:id/amen', optionalAuth, async (req, res) => {
     const userId = req.user ? req.user.id : (req.body.userId || 'anonymous');
     const now = Date.now();
 
-    const insertRes = await query(
-      'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
-      [prayerId, userId, now]
-    );
+    const result = await withTransaction(async (client) => {
+      const insertRes = await client.query(
+        'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
+        [prayerId, userId, now]
+      );
 
-    // Only increment prayer_count if a new amen record was inserted
-    if (!insertRes || insertRes.rowCount !== 0) {
-      await query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
-    }
+      // Only increment prayer_count if a new amen record was inserted
+      let updated = false;
+      if (insertRes && insertRes.rowCount > 0) {
+        await client.query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
+        updated = true;
+      }
+      return { inserted: insertRes ? insertRes.rowCount > 0 : false, updated };
+    });
 
-    return res.json({ success: true, prayerId });
+    return res.json({ success: true, prayerId, inserted: result.inserted });
   } catch (err) {
     console.error('Amen prayer error:', err);
     return res.status(500).json({ error: 'Server error amening prayer' });

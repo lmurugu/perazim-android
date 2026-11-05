@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { query } = require('../db');
-const { requireAuth, signToken } = require('../middleware/auth');
+const { requireAuth, signToken, revokeToken } = require('../middleware/auth');
 const { checkLoginRateLimit, recordFailedLogin, clearFailedLogins } = require('../middleware/rateLimiter');
 
 const router = express.Router();
@@ -105,9 +105,9 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
       campus_id: user.campus_id,
       role: user.role,
       avatar_url: user.avatar_url || '',
-      xp: user.xp || 0,
-      streak: user.streak || 0,
-      grace_points: user.grace_points || 2
+      xp: (user.xp !== undefined && user.xp !== null) ? Number(user.xp) : 0,
+      streak: (user.streak !== undefined && user.streak !== null) ? Number(user.streak) : 0,
+      grace_points: (user.grace_points !== undefined && user.grace_points !== null) ? Number(user.grace_points) : 2
     };
 
     const token = signToken(userObj);
@@ -115,6 +115,17 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
   } catch (err) {
     console.error('Login error:', err);
     return res.status(500).json({ error: 'Server error during login' });
+  }
+});
+
+// POST /api/auth/logout (Token Revocation)
+router.post('/logout', requireAuth, async (req, res) => {
+  try {
+    await revokeToken(req.token, req.user.id);
+    return res.json({ success: true, message: 'Logged out successfully. Token revoked.' });
+  } catch (err) {
+    console.error('Logout error:', err);
+    return res.status(500).json({ error: 'Server error during logout' });
   }
 });
 
@@ -135,9 +146,9 @@ router.get('/me', requireAuth, async (req, res) => {
         campus_id: user.campus_id,
         role: user.role,
         avatar_url: user.avatar_url || '',
-        xp: user.xp || 0,
-        streak: user.streak || 0,
-        grace_points: user.grace_points || 2
+        xp: (user.xp !== undefined && user.xp !== null) ? Number(user.xp) : 0,
+        streak: (user.streak !== undefined && user.streak !== null) ? Number(user.streak) : 0,
+        grace_points: (user.grace_points !== undefined && user.grace_points !== null) ? Number(user.grace_points) : 2
       }
     });
   } catch (err) {

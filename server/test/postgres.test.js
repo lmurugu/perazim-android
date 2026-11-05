@@ -22,8 +22,10 @@ function makeRequest(method, path, body = null, token = null) {
       port: PORT,
       path: path,
       method: method,
+      agent: false,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Connection': 'close'
       }
     };
 
@@ -225,14 +227,56 @@ async function runPostgresTests() {
     });
     assert(lockout.status === 429, '6th failed attempt triggers HTTP 429 lockout');
 
+    // 15. Token Revocation via POST /api/auth/logout
+    const logoutRes = await makeRequest('POST', '/api/auth/logout', {}, token1);
+    assert(logoutRes.status === 200, 'POST /api/auth/logout succeeds (200)');
+    const revokedCheck = await makeRequest('GET', '/api/auth/me', null, token1);
+    assert(revokedCheck.status === 401, 'Revoked token rejected with HTTP 401 on subsequent requests');
+
+    // 16. Starter Metric Preservation (0 grace points never overwritten with 2)
+    await query('UPDATE users SET grace_points = 0 WHERE phone = $1', ['+254711000002']);
+    const loginUser2Zero = await makeRequest('POST', '/api/auth/login', {
+      phone: '0711000002',
+      pin: '5678'
+    });
+    assert(loginUser2Zero.status === 200, 'User 2 logged in (200)');
+    assert(loginUser2Zero.body.user.grace_points === 0, 'Stored 0 grace points preserved on login (NOT reset to 2)');
+
+    const meUser2Zero = await makeRequest('GET', '/api/auth/me', null, loginUser2Zero.body.token);
+    assert(meUser2Zero.status === 200, 'User 2 GET /me succeeds (200)');
+    assert(meUser2Zero.body.user.grace_points === 0, 'Stored 0 grace points preserved on GET /me (NOT reset to 2)');
+
+    // 17. Server Process Restart Data Persistence
+    // Shut down HTTP server process, leave PostgreSQL intact, restart HTTP server
+    if (server.closeAllConnections) {
+      server.closeAllConnections();
+    }
+    await new Promise((resolve, reject) => {
+      server.close(err => (err ? reject(err) : resolve()));
+    });
+
+    const restartedServer = await new Promise((resolve, reject) => {
+      const s = app.listen(PORT, '127.0.0.1', () => resolve(s));
+      s.on('error', reject);
+    });
+
+    const verifyAfterRestart = await makeRequest('GET', '/api/prayers');
+    assert(verifyAfterRestart.status === 200, 'Prayers endpoint responds 200 after server process restart');
+    const persistedPrayer = verifyAfterRestart.body.prayers.find(p => p.id === prayerId);
+    assert(persistedPrayer !== undefined, 'Prayer preserved in PostgreSQL after API process restart');
+    assert(persistedPrayer.prayer_count >= 1, 'Prayer amen count preserved in PostgreSQL after API process restart');
+    assert(persistedPrayer.testimony === 'Mama discharged today in perfect health!', 'Prayer testimony preserved after restart');
+
+    await new Promise(r => restartedServer.close(r));
+
     console.log('\n======================================================');
-    console.log('🎉 ALL 14 REAL POSTGRESQL VERIFICATION TESTS PASSED!');
+    console.log('🎉 ALL 18 REAL POSTGRESQL VERIFICATION TESTS PASSED!');
     console.log('======================================================\n');
   } catch (err) {
     console.error('PostgreSQL test run failed with error:', err);
     process.exit(1);
   } finally {
-    server.close();
+    try { server.close(); } catch (e) {}
     await closeDb();
     process.exit(0);
   }
