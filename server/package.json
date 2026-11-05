@@ -8,7 +8,8 @@
     "test": "node test/api.test.js && node test/postgres.test.js",
     "test:unit": "node test/api.test.js",
     "test:pg": "node test/postgres.test.js",
-    "test:multi-client": "node test/api_multi_client.test.js"
+    "test:multi-client": "node test/api_multi_client.test.js",
+    "test:restart": "node test/api_process_restart.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
