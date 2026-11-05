@@ -10,6 +10,7 @@ router.post('/', optionalAuth, async (req, res) => {
     const { mutations, lastSyncTimestamp } = req.body;
     const userId = req.user ? req.user.id : (req.body.userId || 'guest');
     const syncedIds = [];
+    const rejectedMutations = [];
     const now = Date.now();
 
     if (Array.isArray(mutations)) {
@@ -28,7 +29,7 @@ router.post('/', optionalAuth, async (req, res) => {
             const title = payload.title || 'Prayer Request';
             const content = payload.content || '';
             const isAnon = !!payload.isAnonymous;
-            const authorId = isAnon ? 'anonymous' : userId;
+            const authorId = isAnon ? 'anonymous' : (req.user ? req.user.id : userId);
             const authorName = isAnon ? 'Anonymous Saint' : (req.user ? req.user.name : (payload.authorName || 'Fellow Saint'));
 
             await query(
@@ -38,22 +39,58 @@ router.post('/', optionalAuth, async (req, res) => {
             syncedIds.push(id);
           } else if (entityType === 'PRAYER_AMEN') {
             const prayerId = entityId;
-            await query('INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3)', [prayerId, userId, now]);
+            try {
+              await query(
+                'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
+                [prayerId, userId, now]
+              );
+            } catch (amenErr) {
+              // Ignore duplicate amen error if DB doesn't support ON CONFLICT
+            }
             await query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
             syncedIds.push(id);
           } else if (entityType === 'PRAYER_TESTIMONY') {
+            if (!req.user) {
+              rejectedMutations.push({ id, reason: 'AUTH_REQUIRED', message: 'Authentication required to post testimony' });
+              continue;
+            }
+
             const prayerId = entityId;
+            const prayerRes = await query('SELECT id, author_id FROM prayers WHERE id = $1', [prayerId]);
+            const prayer = prayerRes.rows && prayerRes.rows[0];
+
+            if (!prayer) {
+              rejectedMutations.push({ id, reason: 'NOT_FOUND', message: 'Prayer request not found' });
+              continue;
+            }
+
+            // Only prayer author or ADMIN can add testimony
+            if (prayer.author_id !== req.user.id && req.user.role !== 'ADMIN') {
+              rejectedMutations.push({ id, reason: 'FORBIDDEN', message: 'Only original prayer author may record testimony' });
+              continue;
+            }
+
             const testimony = payload.testimony || '';
             await query('UPDATE prayers SET is_answered = true, testimony = $2, updated_at = $3 WHERE id = $1', [prayerId, testimony, now]);
             syncedIds.push(id);
           } else if (entityType === 'USER_PROGRESS') {
-            if (req.user && payload.xp !== undefined) {
+            if (!req.user) {
+              rejectedMutations.push({ id, reason: 'AUTH_REQUIRED', message: 'Authentication required to update user progress' });
+              continue;
+            }
+
+            if (payload.xp !== undefined) {
               await query('UPDATE users SET xp = $1, streak = $2, updated_at = $3 WHERE id = $4', [payload.xp, payload.streak || 0, now, req.user.id]);
             }
             syncedIds.push(id);
           } else {
-            // Default accept for generic enqueued events
-            syncedIds.push(id);
+            // Refuse to acknowledge unsupported sync operations
+            rejectedMutations.push({
+              id,
+              reason: 'UNSUPPORTED_OPERATION',
+              message: `Entity '${entityType}' or operation '${operationType}' is not supported by this server`
+            });
+            continue;
           }
 
           // Record sync audit
@@ -70,12 +107,13 @@ router.post('/', optionalAuth, async (req, res) => {
     // Return new remote prayers updated since lastSyncTimestamp
     const since = lastSyncTimestamp ? parseInt(lastSyncTimestamp, 10) : 0;
     const prayersResult = await query(
-      'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers ORDER BY created_at DESC LIMIT 50',
+      'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY created_at DESC LIMIT 50',
       [since]
     );
 
     return res.json({
       syncedIds,
+      rejectedMutations,
       serverTime: now,
       prayers: prayersResult.rows || []
     });

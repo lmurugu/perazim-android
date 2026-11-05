@@ -22,6 +22,9 @@ const memoryStore = {
 
 async function initDb() {
   const connectionString = process.env.DATABASE_URL;
+  const isProd = process.env.NODE_ENV === 'production';
+  const allowMemory = process.env.ALLOW_MEMORY_STORE === 'true';
+
   if (connectionString) {
     try {
       const { Pool } = require('pg');
@@ -37,11 +40,28 @@ async function initDb() {
       console.log('✅ PostgreSQL schema verified & updated');
       return;
     } catch (err) {
-      console.warn('⚠️ PostgreSQL connection failed, falling back to local memory store:', err.message);
+      console.error('❌ FATAL: PostgreSQL connection failed with DATABASE_URL:', err.message);
+      // NEVER silently fall back to memory store when DATABASE_URL was explicitly provided
+      if (isProd || !allowMemory) {
+        throw new Error(`Database connection failed: ${err.message}. Refusing to fall back to transient memory.`);
+      }
+      console.warn('⚠️ WARNING: Falling back to local memory store because ALLOW_MEMORY_STORE=true is set. DATA WILL BE LOST ON RESTART.');
       isPostgres = false;
     }
   } else {
-    console.log('ℹ️ No DATABASE_URL set. Running with lightweight memory store (ideal for local testing).');
+    if (isProd) {
+      throw new Error('FATAL: DATABASE_URL environment variable is required in production. Refusing to run on transient memory store.');
+    }
+    console.warn('⚠️ WARNING: No DATABASE_URL set. Running with transient in-memory store. ALL DATA WILL BE LOST ON RESTART.');
+    isPostgres = false;
+  }
+}
+
+async function closeDb() {
+  if (pool) {
+    await pool.end();
+    pool = null;
+    isPostgres = false;
   }
 }
 
@@ -90,6 +110,12 @@ async function query(sql, params = []) {
     return { rows: user ? [user] : [] };
   }
 
+  // SELECT FROM prayers WHERE id = $1
+  if (lower.startsWith('select') && lower.includes('from prayers where id = $1')) {
+    const prayer = memoryStore.prayers.find(p => p.id === params[0]);
+    return { rows: prayer ? [prayer] : [] };
+  }
+
   // SELECT FROM prayers
   if (lower.startsWith('select') && lower.includes('from prayers')) {
     let rows = [...memoryStore.prayers].sort((a, b) => b.created_at - a.created_at);
@@ -124,14 +150,20 @@ async function query(sql, params = []) {
 
   // UPDATE prayers SET is_answered = true
   if (lower.startsWith('update prayers') && lower.includes('is_answered = true')) {
-    const [id, testimony, updated_at] = params;
+    const id = params[0];
+    const testimony = params[1] || '';
+    const updated_at = params[2] || Date.now();
     const prayer = memoryStore.prayers.find(p => p.id === id);
     if (prayer) {
+      if (params.length > 3 && params[3] && prayer.author_id !== params[3]) {
+        return { rows: [], rowCount: 0 };
+      }
       prayer.is_answered = true;
       if (testimony) prayer.testimony = testimony;
-      prayer.updated_at = updated_at || Date.now();
+      prayer.updated_at = updated_at;
+      return { rows: [prayer], rowCount: 1 };
     }
-    return { rows: prayer ? [prayer] : [] };
+    return { rows: [], rowCount: 0 };
   }
 
   // INSERT INTO prayer_amens
@@ -157,5 +189,7 @@ async function query(sql, params = []) {
 module.exports = {
   initDb,
   query,
+  closeDb,
+  isPostgresActive: () => isPostgres,
   memoryStore
 };

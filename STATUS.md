@@ -121,6 +121,36 @@
   - Sermons Tab: [`06_sermons_tab.png`](docs/review/infinix_hardware/06_sermons_tab.png)
   - Worship Tab: [`07_worship_tab.png`](docs/review/infinix_hardware/07_worship_tab.png)
 
+### 2.5 Phase A Backend Hardening & Review Remediation — `WORKING`
+- **Audit Date**: November 5, 2026
+- **Branch**: `phase-A-server`
+- **Remediation Scope**: Comprehensive resolution of all 6 architectural security and durability findings identified in Phase A code review.
+- **Findings Remediated & Verified**:
+  1. **Strict PostgreSQL Durability (Zero Silent Memory Fallback)**:
+     - `initDb()` in `server/src/db.js` strictly halts execution on connection failure if `DATABASE_URL` is set or when running in `production`.
+     - In-memory mock fallback is forbidden by default and can only be enabled if explicitly set via `ALLOW_MEMORY_STORE=true` for lightweight unit tests.
+  2. **Cryptographic JWT Secret Hardening**:
+     - `server/src/middleware/auth.js` enforces strict JWT secret validation.
+     - Production environments unconditionally reject missing secrets, secrets shorter than 32 characters, or default development placeholders, failing fast at boot.
+     - Development environments automatically generate a cryptographically random 32-byte ephemeral hex key per process.
+  3. **Brute-Force Rate Limiting (4-Digit PIN Protection)**:
+     - Implemented `server/src/middleware/rateLimiter.js` with sliding-window protection and phone number normalization (`07...` and `+254...` unified).
+     - Caps consecutive failed login attempts at 5 within a 15-minute window; subsequent attempts are locked out with HTTP `429 Too Many Requests` and a `Retry-After` header.
+     - Successful PIN verification immediately clears failed attempts.
+  4. **Strict Prayer Ownership & Testimony Security**:
+     - Protected `/api/prayers/:id/testimony` and `/api/sync` (`PRAYER_TESTIMONY` mutation) with mandatory JWT authentication.
+     - Enforces row-level authorization (`prayer.author_id === req.user.id || req.user.role === 'ADMIN'`). Tampering attempts by unauthorized accounts are rejected with HTTP `403 Forbidden`.
+  5. **Explicit Mutation Acknowledgment (Rejection of Unsupported Operations)**:
+     - Completely removed the blind wildcard `syncedIds.push(id)` fallback from `server/src/routes/sync.js`.
+     - Unrecognized or unsupported operations are rejected and returned in a dedicated `rejectedMutations` array (`[{ id, reason: 'UNSUPPORTED_OPERATION', message }]`), preventing client phones from falsely clearing unapplied mutations from their local `sync_queue`.
+  6. **Automated Real PostgreSQL Integration Test Suite**:
+     - Created `server/test/postgres.test.js` executing 14 end-to-end integration tests directly against a live PostgreSQL 15 container (`perazim-test-db`).
+     - Validates PostgreSQL table existence, `UNIQUE` constraint enforcement, idempotent prayer amens (`ON CONFLICT (prayer_id, user_id) DO NOTHING`), row ownership checks, rate limiting lockouts, and multi-mutation batch sync.
+     - Total test suite: 26 automated tests (12 unit + 14 real PostgreSQL integration tests) passing with 100% success rate.
+- **Physical Hardware Verification**:
+  - Live reverse port tunnel (`adb -s 0667737142100269 reverse tcp:3000 tcp:3000`) connected to the hardened server running on real PostgreSQL.
+  - Physical Infinix phone successfully loaded live prayers from PostgreSQL and confirmed synchronized prayer state.
+
 ---
 
 ## 3. How to Run the Automated Visual Audit

@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const { query } = require('../db');
 const { requireAuth, signToken } = require('../middleware/auth');
+const { checkLoginRateLimit, recordFailedLogin, clearFailedLogins } = require('../middleware/rateLimiter');
 
 const router = express.Router();
 
@@ -71,7 +72,7 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', checkLoginRateLimit, async (req, res) => {
   try {
     let { phone, pin } = req.body;
     if (!phone || !pin) {
@@ -79,17 +80,23 @@ router.post('/login', async (req, res) => {
     }
 
     const normPhone = normalizePhone(phone);
+    const ip = req.ip || req.connection.remoteAddress;
     const result = await query('SELECT * FROM users WHERE phone = $1', [normPhone]);
     const user = result.rows && result.rows[0];
 
     if (!user) {
+      recordFailedLogin(normPhone, ip);
       return res.status(401).json({ error: 'No account found with this phone number. Please sign up.' });
     }
 
     const isValid = await bcrypt.compare(pin, user.pin_hash);
     if (!isValid) {
+      recordFailedLogin(normPhone, ip);
       return res.status(401).json({ error: 'Incorrect PIN. Please try again.' });
     }
+
+    // Reset failed attempt counter on successful login
+    clearFailedLogins(normPhone, ip);
 
     const userObj = {
       id: user.id,

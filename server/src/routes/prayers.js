@@ -1,6 +1,6 @@
 const express = require('express');
 const { query } = require('../db');
-const { optionalAuth } = require('../middleware/auth');
+const { requireAuth, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   try {
     const since = req.query.since ? parseInt(req.query.since, 10) : 0;
     const result = await query(
-      'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers ORDER BY created_at DESC LIMIT 100',
+      'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY created_at DESC LIMIT 100',
       [since]
     );
     return res.json({ prayers: result.rows || [] });
@@ -67,8 +67,15 @@ router.post('/:id/amen', optionalAuth, async (req, res) => {
     const userId = req.user ? req.user.id : (req.body.userId || 'anonymous');
     const now = Date.now();
 
-    await query('INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3)', [prayerId, userId, now]);
-    await query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
+    const insertRes = await query(
+      'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
+      [prayerId, userId, now]
+    );
+
+    // Only increment prayer_count if a new amen record was inserted
+    if (!insertRes || insertRes.rowCount !== 0) {
+      await query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
+    }
 
     return res.json({ success: true, prayerId });
   } catch (err) {
@@ -78,11 +85,21 @@ router.post('/:id/amen', optionalAuth, async (req, res) => {
 });
 
 // POST /api/prayers/:id/testimony
-router.post('/:id/testimony', optionalAuth, async (req, res) => {
+router.post('/:id/testimony', requireAuth, async (req, res) => {
   try {
     const prayerId = req.params.id;
     const { testimony } = req.body;
     const now = Date.now();
+
+    const check = await query('SELECT id, author_id FROM prayers WHERE id = $1', [prayerId]);
+    const prayer = check.rows && check.rows[0];
+    if (!prayer) {
+      return res.status(404).json({ error: 'Prayer not found' });
+    }
+
+    if (prayer.author_id !== req.user.id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Only the author may record a testimony for this prayer' });
+    }
 
     await query('UPDATE prayers SET is_answered = true, testimony = $2, updated_at = $3 WHERE id = $1', [prayerId, testimony || '', now]);
 

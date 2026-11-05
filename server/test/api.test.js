@@ -127,13 +127,19 @@ async function runTests() {
     const amenedPrayer = fetchAfterAmen.body.prayers.find(p => p.id === prayerId);
     assert(amenedPrayer.prayer_count === 1, 'Prayer count incremented to 1');
 
-    // 9. User 1 posts testimony
+    // 9. Unauthorized Testimony Check (User 2 attempts to claim User 1's prayer)
+    const unauthorizedTestimonyRes = await makeRequest('POST', `/api/prayers/${prayerId}/testimony`, {
+      testimony: 'Unauthorized attempt to alter prayer'
+    }, token2);
+    assert(unauthorizedTestimonyRes.status === 403, 'Unauthorized user testimony rejected with 403 Forbidden');
+
+    // 10. Legitimate Author Testimony (User 1 posts testimony)
     const testimonyRes = await makeRequest('POST', `/api/prayers/${prayerId}/testimony`, {
       testimony: 'Praise God, full healing received!'
     }, token1);
-    assert(testimonyRes.status === 200, 'Prayer marked answered with testimony (200)');
+    assert(testimonyRes.status === 200, 'Original prayer author testimony accepted (200)');
 
-    // 10. Batch Offline Sync Dispatch
+    // 11. Batch Offline Sync Dispatch with Legitimate and Unsupported Mutations
     const syncRes = await makeRequest('POST', '/api/sync', {
       mutations: [
         {
@@ -146,16 +152,58 @@ async function runTests() {
             content: 'Written while offline in rural Meru',
             isAnonymous: false
           })
+        },
+        {
+          id: 'sync_item_unsupported',
+          operationType: 'DELETE',
+          entityType: 'UNKNOWN_ENTITY',
+          entityId: 'unknown_999',
+          payloadJson: '{}'
+        },
+        {
+          id: 'sync_item_unauthorized_testimony',
+          operationType: 'UPDATE',
+          entityType: 'PRAYER_TESTIMONY',
+          entityId: prayerId,
+          payloadJson: JSON.stringify({ testimony: 'Stolen testimony' })
         }
       ],
       lastSyncTimestamp: 0
     }, token2);
     assert(syncRes.status === 200, 'Batch sync endpoint responds 200');
-    assert(syncRes.body.syncedIds.includes('sync_item_1'), 'Offline mutation acknowledged and marked synced');
+    assert(syncRes.body.syncedIds.includes('sync_item_1'), 'Supported offline prayer acknowledged in syncedIds');
+    assert(!syncRes.body.syncedIds.includes('sync_item_unsupported'), 'Unsupported mutation NOT acknowledged in syncedIds');
+    assert(!syncRes.body.syncedIds.includes('sync_item_unauthorized_testimony'), 'Unauthorized sync testimony NOT acknowledged in syncedIds');
+    assert(Array.isArray(syncRes.body.rejectedMutations) && syncRes.body.rejectedMutations.length >= 2, 'Rejected mutations list returned');
     assert(syncRes.body.prayers.some(p => p.id === 'prayer_offline_101'), 'Offline prayer replicated to server wall');
 
+    // 12. Brute-Force Rate Limiting Test (5 failed attempts trigger 429 lockout)
+    const bruteForcePhone = '0788000000';
+    // Register account to test wrong PIN attempts
+    await makeRequest('POST', '/api/auth/register', {
+      phone: bruteForcePhone,
+      pin: '1234',
+      name: 'Rate Limit Target',
+      campus_id: 'campus_embu'
+    });
+
+    for (let i = 1; i <= 5; i++) {
+      const failRes = await makeRequest('POST', '/api/auth/login', {
+        phone: bruteForcePhone,
+        pin: '9999'
+      });
+      assert(failRes.status === 401, `Failed attempt ${i} returns 401 Incorrect PIN`);
+    }
+
+    const lockedRes = await makeRequest('POST', '/api/auth/login', {
+      phone: bruteForcePhone,
+      pin: '9999'
+    });
+    assert(lockedRes.status === 429, '6th failed attempt triggers HTTP 429 Too Many Requests rate limit');
+    assert(lockedRes.body.error.includes('Too many failed login attempts'), 'Rate limit error message returned');
+
     console.log('\n======================================================');
-    console.log('🎉 ALL 10 SERVER VERIFICATION TESTS PASSED SUCCESSFULLY!');
+    console.log('🎉 ALL 12 SERVER VERIFICATION TESTS PASSED SUCCESSFULLY!');
     console.log('======================================================\n');
   } catch (err) {
     console.error('Test run failed with error:', err);
