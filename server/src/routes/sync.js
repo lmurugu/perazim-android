@@ -33,7 +33,7 @@ router.post('/', optionalAuth, async (req, res) => {
             const authorName = isAnon ? 'Anonymous Saint' : (req.user ? req.user.name : (payload.authorName || 'Fellow Saint'));
 
             await query(
-              'INSERT INTO prayers (id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+              'INSERT INTO prayers (id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT (id) DO NOTHING',
               [prayerId, title, content, authorId, authorName, isAnon, 'PUBLIC', 0, false, '', now, now]
             );
             syncedIds.push(id);
