@@ -115,40 +115,6 @@ public final class AuthDialog {
         layoutName.setVisibility(View.GONE);
         formContainer.addView(layoutName);
 
-        // Campus selector (for registration only)
-        final LinearLayout layoutCampus = new LinearLayout(context);
-        layoutCampus.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams campusLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        campusLp.topMargin = dp(context, 10);
-        layoutCampus.setLayoutParams(campusLp);
-
-        TextView lblCampus = new TextView(context);
-        lblCampus.setText("Home Campus");
-        lblCampus.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        lblCampus.setTextSize(12);
-        layoutCampus.addView(lblCampus);
-
-        final Spinner spCampus = new Spinner(context);
-        final List<String> campusDisplay = Arrays.asList(
-                "Embu Headquarters (Central)",
-                "Nairobi Fellowship",
-                "Meru Outreach",
-                "Online Global Campus"
-        );
-        final List<String> campusIds = Arrays.asList(
-                "campus_embu",
-                "campus_nairobi",
-                "campus_meru",
-                "campus_online"
-        );
-        ArrayAdapter<String> campusAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, campusDisplay);
-        spCampus.setAdapter(campusAdapter);
-        spCampus.setBackground(PerazimTheme.createCardGradient(dp(context, 8), dp(context, 1)));
-        layoutCampus.addView(spCampus);
-        layoutCampus.setVisibility(View.GONE);
-        formContainer.addView(layoutCampus);
-
         // Phone Number field
         TextView lblPhone = new TextView(context);
         lblPhone.setText("Phone Number (Safaricom / Airtel)");
@@ -241,7 +207,6 @@ public final class AuthDialog {
                 btnTabLogin.setBackgroundColor(Color.TRANSPARENT);
                 btnTabLogin.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
                 layoutName.setVisibility(View.VISIBLE);
-                layoutCampus.setVisibility(View.VISIBLE);
                 btnSubmit.setText("Create Account");
             } else {
                 btnTabLogin.setBackground(PerazimTheme.createSurface2Gradient(dp(context, 8), dp(context, 1)));
@@ -249,7 +214,6 @@ public final class AuthDialog {
                 btnTabRegister.setBackgroundColor(Color.TRANSPARENT);
                 btnTabRegister.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
                 layoutName.setVisibility(View.GONE);
-                layoutCampus.setVisibility(View.GONE);
                 btnSubmit.setText("Sign In");
             }
         };
@@ -296,8 +260,7 @@ public final class AuthDialog {
                     Toast.makeText(context, "Please enter your full name", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                int campusIdx = spCampus.getSelectedItemPosition();
-                String campusId = (campusIdx >= 0 && campusIdx < campusIds.size()) ? campusIds.get(campusIdx) : "campus_embu";
+                String campusId = "campus_embu";
 
                 sm.registerWithPhoneAndPin(phone, pin, name, campusId, new SessionManager.SessionAuthCallback() {
                     @Override

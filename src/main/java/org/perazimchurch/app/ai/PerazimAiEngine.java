@@ -317,17 +317,16 @@ public class PerazimAiEngine {
                 + "• **Motto:** *\"The Place of Great Breakthrough\"*\n"
                 + "• **Overseer:** Bishop Dr. David Mutweri\n"
                 + "• **Headquarters:** Embu Central Sanctuary, Kenya\n"
-                + "• **Campuses:** Embu HQ, Nairobi, Meru\n"
                 + "• **Main Service:** Sunday 9:00 AM – 1:00 PM\n"
                 + "• **Cornerstone Scripture:** 2 Samuel 5:20 (*\"The LORD hath broken forth upon mine enemies...\"*)";
 
-        List<String> chips = Arrays.asList("📍 Switch Campus", "🎥 Watch Livestream", "💚 Give Tithe");
-        return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "🏛️ View Campus Details", null, chips);
+        List<String> chips = Arrays.asList("🎥 Watch Livestream", "💚 Give Tithe", "📖 Read Scripture");
+        return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "🏛️ View Church Profile", null, chips);
     }
 
     private AiResponse handleProfileQuery() {
         String msg = "👤 **Member Profile & Offline Manager:**\n\n"
-                + "Manage your spiritual credentials, campus affiliation, and offline storage.\n"
+                + "Manage your spiritual credentials and offline storage.\n"
                 + "• View downloaded sermon audios and hymnals.\n"
                 + "• Toggle Grace streak freeze protection.\n"
                 + "• Pastoral care & direct support contacts.";
@@ -337,15 +336,17 @@ public class PerazimAiEngine {
     }
 
     private AiResponse handleOffTopicGuardrail(String rawQuery) {
-        String msg = "🛡️ **Perazim Breakthrough Guide:**\n\n"
-                + "I am specifically designed to assist you with the **Perazim Church App**, Holy Scripture, Bishop Mutweri's sermons, devotional XP streaks, and church fellowship.\n\n"
-                + "I cannot assist with secular news, sports, or external topics, but I'd love to help guide your spiritual walk in the app!";
+        String msg = "📱 **Offline Church Guide (On-Device Rules):**\n\n"
+                + "I could not find an offline match for \"" + (rawQuery != null ? rawQuery : "") + "\".\n\n"
+                + "As an offline guide, I operate on built-in church rules for Scripture, Sermons, Hymns, Giving, and Devotionals. For broader open-ended Bible questions, please connect to the internet to chat with our online Cloud AI (Google Gemini).\n\n"
+                + "Here are some things I can help you with right now offline:";
 
         List<String> chips = Arrays.asList(
                 "⭐ Check my Spiritual XP",
                 "📖 Read Scripture (2 Samuel 5)",
                 "🎥 Watch YouTube Live",
-                "💚 Give Tithe via M-Pesa"
+                "💚 Give Tithe via M-Pesa",
+                "🎵 Hymnal & Chords"
         );
 
         return AiResponse.plainText(msg, chips);

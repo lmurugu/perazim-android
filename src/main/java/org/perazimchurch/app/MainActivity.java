@@ -104,7 +104,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private TextView topXpBadge;
     private TextView topGraceBadge;
     private Button topGiveBtn;
-    private Spinner campusSpinner;
 
     // Navigation Shell Views
     private FrameLayout tabContainer;
@@ -273,6 +272,31 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         handleIntent(intent);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (sermonsUiBinder != null && sermonsUiBinder.isPlaying()) {
+            sermonsUiBinder.pausePlayback();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (sermonsUiBinder != null) {
+            sermonsUiBinder.release();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (sermonsUiBinder != null && sermonsUiBinder.isPlaying()) {
+            sermonsUiBinder.stopPlayback();
+            return;
+        }
+        super.onBackPressed();
+    }
+
     private void handleIntent(android.content.Intent intent) {
         if (intent == null) return;
         if (intent.getBooleanExtra("show_splash", false)) {
@@ -337,12 +361,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 profileUiBinder.showAboutDialog();
             }
         }
-        if (intent.getBooleanExtra("open_campus_switcher", false)) {
-            switchTab(4);
-            if (profileUiBinder != null) {
-                profileUiBinder.showCampusSwitcherDialog();
-            }
-        }
         if (intent.getBooleanExtra("open_fellowship_extras", false)) {
             switchTab(4);
             if (profileUiBinder != null) {
@@ -401,38 +419,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout.LayoutParams lpSpacer = new LinearLayout.LayoutParams(0, 0, 1.0f);
         spacer.setLayoutParams(lpSpacer);
         header.addView(spacer);
-
-        // Campus Selector Outline Chip with darkened surface gradient
-        LinearLayout spinnerPill = new LinearLayout(this);
-        spinnerPill.setOrientation(LinearLayout.HORIZONTAL);
-        spinnerPill.setGravity(Gravity.CENTER_VERTICAL);
-        spinnerPill.setBackground(PerazimTheme.createSurface2Gradient(dp(12), dp(1)));
-        spinnerPill.setPadding(dp(8), dp(2), dp(6), dp(2));
-
-        campusSpinner = new Spinner(this);
-        List<String> campuses = new ArrayList<>();
-        campuses.add("Embu Headquarters");
-        campuses.add("Nairobi Fellowship");
-        campuses.add("Meru Outreach");
-        campuses.add("Online Campus");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, campuses) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View v = super.getView(position, convertView, parent);
-                if (v instanceof TextView) {
-                    ((TextView) v).setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-                    ((TextView) v).setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-                }
-                return v;
-            }
-        };
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        campusSpinner.setAdapter(adapter);
-        campusSpinner.setBackground(null);
-        campusSpinner.setOnItemSelectedListener(this);
-        spinnerPill.addView(campusSpinner);
-        header.addView(spinnerPill);
 
         return header;
     }
@@ -634,6 +620,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     private void switchTab(int index) {
         if (currentTabIndex == index) return;
+        if (currentTabIndex == 1 && sermonsUiBinder != null && sermonsUiBinder.isPlaying()) {
+            sermonsUiBinder.pausePlayback();
+        }
         currentTabIndex = index;
 
         for (int i = 0; i < 5; i++) {
@@ -2800,11 +2789,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public void onClick(DialogInterface dialog, int which) {}
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (parent == campusSpinner) {
-            selectedCampus = (String) parent.getItemAtPosition(position);
-        }
-    }
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {}
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {}

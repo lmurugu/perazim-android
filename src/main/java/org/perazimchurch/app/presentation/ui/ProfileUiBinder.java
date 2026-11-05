@@ -240,9 +240,9 @@ public class ProfileUiBinder {
         tvMemberEmail.setPadding(0, dp(2), 0, dp(4));
         memberInfo.addView(tvMemberEmail);
 
-        // Campus Selector Chip with darkened surface gradient
+        // Campus Indicator Chip with darkened surface gradient
         tvMemberCampus = new TextView(context);
-        tvMemberCampus.setText("Embu Headquarters · Switch ▾");
+        tvMemberCampus.setText("📍 Embu Headquarters");
         tvMemberCampus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvMemberCampus.setTypeface(Typeface.DEFAULT_BOLD);
         tvMemberCampus.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
@@ -251,7 +251,6 @@ public class ProfileUiBinder {
         LinearLayout.LayoutParams lpCampus = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         tvMemberCampus.setLayoutParams(lpCampus);
-        tvMemberCampus.setOnClickListener(v -> showCampusSwitcherDialog());
         memberInfo.addView(tvMemberCampus);
 
         // Auth Action Button (Sign In / Register or Log Out)
@@ -766,7 +765,7 @@ public class ProfileUiBinder {
         TextView tvContent = new TextView(context);
         tvContent.setText("\nLeadership: Bishop Dr. David Mutweri\n"
                 + "Embu Headquarters, Kenya\n"
-                + "Campuses: Embu Headquarters, Mwea, Rombo, Nairobi, Online\n\n"
+                + "Mission: Spreading the Gospel of Christ across Kenya & Beyond\n\n"
                 + "App Version: 2.2.0 (Build 4)\n"
                 + "Faithful offline-first faith companion.");
         tvContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
@@ -1048,9 +1047,9 @@ public class ProfileUiBinder {
             g.setCornerRadius(dp(PerazimTheme.RADIUS_MD));
             btn.setBackground(g);
         } else {
-            btn.setTextColor(PerazimTheme.COLOR_TEXT_DARK);
+            btn.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
             GradientDrawable g = new GradientDrawable();
-            g.setColor(PerazimTheme.COLOR_BG_NEUTRAL);
+            g.setColor(PerazimTheme.COLOR_SURFACE_2);
             g.setCornerRadius(dp(PerazimTheme.RADIUS_MD));
             g.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
             btn.setBackground(g);
@@ -1235,7 +1234,7 @@ public class ProfileUiBinder {
             TextView tvText = new TextView(context);
             tvText.setText(verse.getText());
             tvText.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
-            tvText.setTextColor(PerazimTheme.COLOR_TEXT_DARK);
+            tvText.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
             tvText.setMaxLines(2);
             textCol.addView(tvText);
 
@@ -1251,7 +1250,7 @@ public class ProfileUiBinder {
         row.setPadding(dp(10), dp(8), dp(10), dp(8));
 
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        bg.setColor(PerazimTheme.COLOR_SURFACE_2);
         bg.setCornerRadius(dp(PerazimTheme.RADIUS_SM));
         bg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
         row.setBackground(bg);
@@ -1308,12 +1307,12 @@ public class ProfileUiBinder {
         tvMotto.setPadding(0, dp(2), 0, dp(4));
         card.addView(tvMotto);
 
-        // Clickable Campus Affiliation Row
+        // Church Headquarters Location Row
         LinearLayout rowCampus = createInteractiveRow(
                 "📍",
-                "Affiliated Campus (Tap to Switch)",
-                selectedCampusName + " (Tap to change)",
-                v -> showCampusSwitcherDialog()
+                "Church Headquarters",
+                "Embu, Kenya",
+                null
         );
         card.addView(rowCampus);
 
@@ -1408,139 +1407,10 @@ public class ProfileUiBinder {
     }
 
     /**
-     * Shows a dialog allowing the user to select one of the four official campuses:
-     * Embu Headquarters, Nairobi, Meru, Online.
+     * Campus switcher removed as Embu Headquarters is the sole active campus.
      */
     public void showCampusSwitcherDialog() {
-        final String[] campusNames = {
-                "Embu Headquarters",
-                "Mwea Campus",
-                "Rombo Campus",
-                "Nairobi Fellowship",
-                "Online Sanctuary"
-        };
-        final String[] campusIds = {
-                "campus_embu",
-                "campus_mwea",
-                "campus_rombo",
-                "campus_nairobi",
-                "campus_online"
-        };
-        final String[] campusVignettes = {
-                "vignettes/vignette_campus_embu.png",
-                "vignettes/vignette_campus_mwea.png",
-                "vignettes/vignette_campus_rombo.png",
-                null,
-                null
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        ScrollView sv = new ScrollView(context);
-        sv.setFillViewport(true);
-
-        LinearLayout container = new LinearLayout(context);
-        container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(dp(16), dp(16), dp(16), dp(16));
-
-        TextView tvTitle = new TextView(context);
-        tvTitle.setText("SELECT CHURCH CAMPUS");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tvTitle.setLetterSpacing(0.04f);
-        tvTitle.setPadding(0, 0, 0, dp(14));
-        container.addView(tvTitle);
-
-        final AlertDialog[] dialogHolder = new AlertDialog[1];
-
-        for (int i = 0; i < campusNames.length; i++) {
-            final String name = campusNames[i];
-            final String id = campusIds[i];
-            final String vignettePath = campusVignettes[i];
-
-            LinearLayout rowCard = new LinearLayout(context);
-            rowCard.setOrientation(LinearLayout.HORIZONTAL);
-            rowCard.setGravity(Gravity.CENTER_VERTICAL);
-            rowCard.setPadding(dp(10), dp(10), dp(10), dp(10));
-            rowCard.setBackground(PerazimTheme.createCardGradient(dp(12), dp(1)));
-            LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lpRow.setMargins(0, 0, 0, dp(10));
-            rowCard.setLayoutParams(lpRow);
-
-            // 48dp rounded 10dp thumbnail
-            FrameLayout thumbFrame = new FrameLayout(context);
-            thumbFrame.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
-            thumbFrame.setBackground(PerazimTheme.createCardGradient(dp(10), dp(1)));
-            thumbFrame.setClipToOutline(true);
-
-            Bitmap thumbBmp = vignettePath != null ? loadAssetBitmap(vignettePath, 200) : null;
-            if (thumbBmp != null) {
-                ImageView ivThumb = new ImageView(context);
-                ivThumb.setImageBitmap(thumbBmp);
-                ivThumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                thumbFrame.addView(ivThumb, new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            } else {
-                ImageView ivIcon = new ImageView(context);
-                ivIcon.setImageResource(id.contains("online")
-                        ? org.perazimchurch.app.R.drawable.ic_christian_dove
-                        : org.perazimchurch.app.R.drawable.ic_christian_church);
-                ivIcon.setColorFilter(PerazimTheme.COLOR_PURPLE_SOFT, PorterDuff.Mode.SRC_IN);
-                FrameLayout.LayoutParams lpIcon = new FrameLayout.LayoutParams(dp(28), dp(28));
-                lpIcon.gravity = Gravity.CENTER;
-                ivIcon.setLayoutParams(lpIcon);
-                thumbFrame.addView(ivIcon);
-            }
-            rowCard.addView(thumbFrame);
-
-            LinearLayout textCol = new LinearLayout(context);
-            textCol.setOrientation(LinearLayout.VERTICAL);
-            LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-            lpText.setMargins(dp(12), 0, 0, 0);
-            textCol.setLayoutParams(lpText);
-
-            TextView tvName = new TextView(context);
-            tvName.setText(name);
-            tvName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvName.setTypeface(Typeface.DEFAULT_BOLD);
-            tvName.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-            textCol.addView(tvName);
-
-            TextView tvSub = new TextView(context);
-            tvSub.setText(vignettePath != null ? "Perazim Mission Church Branch" : "Satellite & Digital Fellowship");
-            tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            tvSub.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-            textCol.addView(tvSub);
-
-            rowCard.addView(textCol);
-
-            rowCard.setOnClickListener(v -> {
-                selectedCampusName = name;
-                viewModel.switchCampus(id, () -> {
-                    postToMain(() -> {
-                        if (tvMemberCampus != null) {
-                            tvMemberCampus.setText("Perazim Mission Church · " + name);
-                        }
-                        Toast.makeText(context, "📍 Switched campus to " + name, Toast.LENGTH_SHORT).show();
-                        refreshProfile();
-                    });
-                });
-                if (dialogHolder[0] != null) dialogHolder[0].dismiss();
-            });
-
-            container.addView(rowCard);
-        }
-
-        sv.addView(container);
-        builder.setView(sv);
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
-        dialogHolder[0] = dialog;
-        dialog.show();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18), dp(1)));
-        }
+        Toast.makeText(context, "Perazim Mission Church is located at Embu Headquarters.", Toast.LENGTH_SHORT).show();
     }
 
     // =========================================================================

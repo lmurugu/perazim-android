@@ -396,13 +396,23 @@ public class SermonsUiBinder {
         headerRow.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView tvHeader = new TextView(activity);
-        tvHeader.setText("AUDIO CONTROLLER");
+        tvHeader.setText("AUDIO CONTROLLER · SAMPLE AUDIO PREVIEW");
         tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
         tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
         LinearLayout.LayoutParams lpH = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
         tvHeader.setLayoutParams(lpH);
         headerRow.addView(tvHeader);
+
+        Button btnStopHeader = new Button(activity);
+        btnStopHeader.setText("⏹ Stop");
+        btnStopHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnStopHeader.setTypeface(Typeface.DEFAULT_BOLD);
+        btnStopHeader.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnStopHeader.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnStopHeader.setPadding(dp(10), dp(4), dp(10), dp(4));
+        btnStopHeader.setOnClickListener(v -> stopPlayback());
+        headerRow.addView(btnStopHeader);
 
         btnSpeedToggle = new Button(activity);
         btnSpeedToggle.setText("1.0×");
@@ -411,6 +421,10 @@ public class SermonsUiBinder {
         btnSpeedToggle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnSpeedToggle.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
         btnSpeedToggle.setPadding(dp(10), dp(4), dp(10), dp(4));
+        LinearLayout.LayoutParams lpSpeed = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpSpeed.setMargins(dp(6), 0, 0, 0);
+        btnSpeedToggle.setLayoutParams(lpSpeed);
         btnSpeedToggle.setOnClickListener(v -> cycleSpeed());
         headerRow.addView(btnSpeedToggle);
 
@@ -418,7 +432,7 @@ public class SermonsUiBinder {
 
         // Title & Speaker
         tvPlayerTitle = new TextView(activity);
-        tvPlayerTitle.setText("Supernatural Breakthrough");
+        tvPlayerTitle.setText("Supernatural Breakthrough (Sample Preview)");
         tvPlayerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tvPlayerTitle.setTypeface(Typeface.DEFAULT_BOLD);
         tvPlayerTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
@@ -486,7 +500,7 @@ public class SermonsUiBinder {
 
         card.addView(timeRow);
 
-        // Controls: Rewind, Play/Pause (#681A7D), Forward
+        // Controls: Rewind, Play/Pause (#681A7D), Forward, Stop
         LinearLayout ctrlRow = new LinearLayout(activity);
         ctrlRow.setOrientation(LinearLayout.HORIZONTAL);
         ctrlRow.setGravity(Gravity.CENTER_VERTICAL);
@@ -541,6 +555,20 @@ public class SermonsUiBinder {
             }
         });
         ctrlRow.addView(btnForward);
+
+        Button btnStop = new Button(activity);
+        btnStop.setText("⏹ Stop");
+        btnStop.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnStop.setTypeface(Typeface.DEFAULT_BOLD);
+        btnStop.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnStop.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
+        btnStop.setPadding(dp(12), dp(6), dp(12), dp(6));
+        btnStop.setOnClickListener(v -> stopPlayback());
+        LinearLayout.LayoutParams lpStop = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpStop.setMargins(dp(6), 0, 0, 0);
+        btnStop.setLayoutParams(lpStop);
+        ctrlRow.addView(btnStop);
 
         card.addView(ctrlRow);
 
@@ -843,6 +871,22 @@ public class SermonsUiBinder {
             metaRow.addView(tvSeries);
         }
 
+        boolean isSample = (sermon.getLocalAudioPath() == null || sermon.getLocalAudioPath().isEmpty()) && (sermon.getAudioUrl() == null || sermon.getAudioUrl().isEmpty());
+        if (isSample) {
+            TextView tvSample = new TextView(activity);
+            tvSample.setText("Sample Audio Preview");
+            tvSample.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+            tvSample.setTypeface(Typeface.DEFAULT_BOLD);
+            tvSample.setTextColor(PerazimTheme.COLOR_ORANGE_BRAND);
+            tvSample.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 6, PerazimTheme.COLOR_STROKE, 1));
+            tvSample.setPadding(dp(6), dp(2), dp(6), dp(2));
+            LinearLayout.LayoutParams lpSample = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lpSample.setMargins(dp(6), 0, 0, 0);
+            tvSample.setLayoutParams(lpSample);
+            metaRow.addView(tvSample);
+        }
+
         card.addView(metaRow);
 
         // Actions Row: Download affordance, Notes, Share
@@ -1005,7 +1049,12 @@ public class SermonsUiBinder {
         playerHandler.removeCallbacks(playerRunnable);
 
         activeSermon = sermon;
-        tvPlayerTitle.setText(sermon.getTitle() != null ? sermon.getTitle() : "Untitled Sermon");
+        boolean isSample = (sermon.getLocalAudioPath() == null || sermon.getLocalAudioPath().isEmpty()) && (sermon.getAudioUrl() == null || sermon.getAudioUrl().isEmpty());
+        String title = sermon.getTitle() != null ? sermon.getTitle() : "Untitled Sermon";
+        if (isSample) {
+            title += " (Sample Audio Preview)";
+        }
+        tvPlayerTitle.setText(title);
         String preacher = sermon.getPreacher() != null ? sermon.getPreacher() : "Bishop Dr. David Mutweri";
         String passage = sermon.getPassage() != null ? sermon.getPassage() : "2 Samuel 5:17-21";
         tvPlayerSpeaker.setText(preacher + " • " + passage);
@@ -1136,6 +1185,21 @@ public class SermonsUiBinder {
             } catch (Exception ignored) {}
         }
         Toast.makeText(activity, "Playback speed: " + btnSpeedToggle.getText(), Toast.LENGTH_SHORT).show();
+    }
+
+    public void stopPlayback() {
+        release();
+        currentPositionSeconds = 0;
+        if (audioSeekBar != null) {
+            audioSeekBar.setProgress(0);
+        }
+        if (tvCurrentPos != null) {
+            tvCurrentPos.setText("00:00");
+        }
+        if (btnPlayPause != null) {
+            btnPlayPause.setText("Play Sermon");
+        }
+        Toast.makeText(activity, "Sermon audio stopped", Toast.LENGTH_SHORT).show();
     }
 
     public void release() {

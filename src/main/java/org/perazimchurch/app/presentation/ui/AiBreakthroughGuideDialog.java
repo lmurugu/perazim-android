@@ -31,6 +31,7 @@ import org.perazimchurch.app.ai.AiResponse;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.AiPreferences;
 import org.perazimchurch.app.ai.remote.AiRelayClient;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         // Display initial greeting
         boolean consented = AiPreferences.hasConsented(activity);
-        displayAiMessage(aiEngine.getWelcomeResponse(), consented ? "⚡ Breakthrough AI Ready" : "📱 Offline Guide");
+        displayAiMessage(aiEngine.getWelcomeResponse(), consented ? "⚡ Online Cloud AI (Gemini Relay Ready)" : "📱 Offline Guide (On-Device Rules)");
         updateSubtitle();
 
         // Show consent dialog on first launch if not yet accepted
@@ -127,7 +128,8 @@ public class AiBreakthroughGuideDialog extends Dialog {
         LinearLayout sheet = new LinearLayout(activity);
         sheet.setOrientation(LinearLayout.VERTICAL);
         GradientDrawable sheetBg = new GradientDrawable();
-        sheetBg.setColor(COLOR_WHITE);
+        sheetBg.setColor(PerazimTheme.COLOR_SURFACE);
+        sheetBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         sheetBg.setCornerRadii(new float[]{dp(20), dp(20), dp(20), dp(20), 0, 0, 0, 0});
         sheet.setBackground(sheetBg);
         sheet.setPadding(dp(16), dp(12), dp(16), dp(16));
@@ -139,7 +141,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         // Drag Handle
         View handle = new View(activity);
         GradientDrawable handleBg = new GradientDrawable();
-        handleBg.setColor(COLOR_BORDER_GREY);
+        handleBg.setColor(PerazimTheme.COLOR_STROKE);
         handleBg.setCornerRadius(dp(3));
         handle.setBackground(handleBg);
         LinearLayout.LayoutParams lpH = new LinearLayout.LayoutParams(dp(44), dp(5));
@@ -169,12 +171,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
         tvTitle.setText("Perazim Breakthrough Guide");
         tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_PURPLE_DARK);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         titleCol.addView(tvTitle);
 
         tvSub = new TextView(activity);
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSub.setTextColor(COLOR_ACCENT_ORANGE);
+        tvSub.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
         tvSub.setTypeface(Typeface.DEFAULT_BOLD);
         titleCol.addView(tvSub);
 
@@ -183,7 +185,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         Button btnClose = new Button(activity);
         btnClose.setText("✕");
         btnClose.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        btnClose.setTextColor(COLOR_TEXT_MUTED);
+        btnClose.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         btnClose.setBackground(null);
         btnClose.setPadding(dp(6), dp(6), dp(6), dp(6));
         btnClose.setOnClickListener(v -> dismiss());
@@ -222,13 +224,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
         LinearLayout inputBar = new LinearLayout(activity);
         inputBar.setOrientation(LinearLayout.HORIZONTAL);
         inputBar.setGravity(Gravity.CENTER_VERTICAL);
-        inputBar.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
+        inputBar.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
         inputBar.setPadding(dp(12), dp(2), dp(6), dp(2));
 
         etInput = new EditText(activity);
         etInput.setHint("Ask about Scripture, breakthrough, sermons...");
-        etInput.setHintTextColor(COLOR_TEXT_MUTED);
-        etInput.setTextColor(COLOR_TEXT_DARK);
+        etInput.setHintTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        etInput.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         etInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         etInput.setBackground(null);
         etInput.setSingleLine(true);
@@ -391,14 +393,14 @@ public class AiBreakthroughGuideDialog extends Dialog {
             showConsentDialog();
             // Process offline fallback for this query
             AiResponse offlineResp = aiEngine.processQuery(query);
-            displayAiMessage(offlineResp, "📱 Offline Guide • Consent needed for AI");
+            displayAiMessage(offlineResp, "📱 Offline Guide (Consent Required for Online AI)");
             return;
         }
 
         // 3. Check AI kill-switch and client quota
         if (!AiPreferences.isAiEnabled(activity)) {
             AiResponse offlineResp = aiEngine.processQuery(query);
-            displayAiMessage(offlineResp, "📱 Offline Guide • AI resting");
+            displayAiMessage(offlineResp, "📱 Offline Guide (Cloud AI Inactive)");
             updateSubtitle();
             return;
         }
@@ -406,7 +408,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         int remaining = AiPreferences.getRemainingQuestions(activity);
         if (remaining <= 0) {
             AiResponse offlineResp = aiEngine.processQuery(query);
-            displayAiMessage(offlineResp, "📱 Offline Guide • Daily limit reached");
+            displayAiMessage(offlineResp, "📱 Offline Guide (Daily Cloud Quota Reached · 3/3 Used)");
             updateSubtitle();
             return;
         }
@@ -421,7 +423,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 removeTypingIndicator(typingIndicator);
                 updateSubtitle();
 
-                String badge = "⚡ AI-generated • " + remainingQuestionsToday + " questions left today";
+                String badge = "⚡ Online Cloud AI (Gemini · " + remainingQuestionsToday + " questions left today)";
                 AiResponse response = AiResponse.plainText(answer, null);
                 displayAiMessage(response, badge);
             }
@@ -432,7 +434,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 updateSubtitle();
 
                 AiResponse offlineResp = aiEngine.processQuery(query);
-                displayAiMessage(offlineResp, "📱 Offline Guide • Daily limit reached");
+                displayAiMessage(offlineResp, "📱 Offline Guide (Daily Cloud Quota Reached · 3/3 Used)");
             }
 
             @Override
@@ -442,10 +444,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
                 if (shouldFallbackOffline) {
                     AiResponse offlineResp = aiEngine.processQuery(query);
-                    displayAiMessage(offlineResp, "📱 Offline Guide");
+                    displayAiMessage(offlineResp, "📱 Offline Guide (Internet / Cloud Relay Unavailable)");
                 } else {
                     AiResponse errResp = AiResponse.plainText("⚠️ " + errorMessage, null);
-                    displayAiMessage(errResp, null);
+                    displayAiMessage(errResp, "⚠️ System Notice");
                 }
             }
         });
@@ -513,7 +515,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             tvBadge.setText(badgeText);
             tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
             tvBadge.setTypeface(Typeface.DEFAULT_BOLD);
-            tvBadge.setTextColor(badgeText.contains("Offline") ? COLOR_TEXT_MUTED : COLOR_ACCENT_ORANGE);
+            tvBadge.setTextColor((int) (badgeText.contains("Offline") ? PerazimTheme.COLOR_PURPLE_MUTED : PerazimTheme.COLOR_ORANGE_BRAND));
             tvBadge.setPadding(dp(4), 0, 0, dp(2));
             bubbleCol.addView(tvBadge);
         }
@@ -521,13 +523,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
         // Message text
         TextView tv = new TextView(activity);
         tv.setText(response.getMessageText());
-        tv.setTextColor(COLOR_TEXT_DARK);
+        tv.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tv.setPadding(dp(14), dp(10), dp(14), dp(10));
 
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_PURPLE_TINT);
-        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        bg.setColor(PerazimTheme.COLOR_SURFACE_2);
+        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         bg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), dp(14), dp(14), dp(2), dp(2)});
         tv.setBackground(bg);
         bubbleCol.addView(tv);
@@ -606,8 +608,8 @@ public class AiBreakthroughGuideDialog extends Dialog {
             chip.setText(chipText);
             chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             chip.setTypeface(Typeface.DEFAULT_BOLD);
-            chip.setTextColor(COLOR_PRIMARY_PURPLE);
-            chip.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+            chip.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            chip.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
             chip.setPadding(dp(10), dp(4), dp(10), dp(4));
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
