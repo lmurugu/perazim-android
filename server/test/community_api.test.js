@@ -81,7 +81,7 @@ async function runTests() {
 
   try {
     // 1. Setup Test Accounts (Levi the Admin, Brother John, Sister Mary)
-    
+
   const bcrypt = require("bcryptjs");
   const hash1234 = bcrypt.hashSync("1234", 10);
   await registerOrLogin('0715440482', '1234', 'Pastor Levi', 'campus_embu');
@@ -90,7 +90,7 @@ async function runTests() {
   await query("UPDATE users SET pin_hash = $1 WHERE phone = '+254722222222' OR phone = '0722222222'", [hash1234]);
 
   console.log('--- Step 1: Registering Test Members ---');
-    
+
     // Register Levi (Admin)
     const { token: leviToken, user: leviUser } = await registerOrLogin('0715440482', '1234', 'Pastor Levi', 'campus_embu', 'ADMIN');
     console.log('✅ Admin Levi registered (Token acquired)');
@@ -452,7 +452,7 @@ async function runTests() {
     console.log('✅ Incorrect answer recognized gracefully');
 
     // Fetch stored challenge answer from DB to test correct submission
-     
+
     const chalDb = await query('SELECT answer FROM daily_challenges WHERE date = $1', [todayChal.body.date]);
     const correctAnswer = chalDb.rows[0].answer;
 

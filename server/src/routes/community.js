@@ -139,7 +139,7 @@ router.get('/posts', optionalAuth, async (req, res) => {
     const limitParamIndex = paramIndex++;
 
     const queryStr = `
-      SELECT 
+      SELECT
         p.id, p.author_id, p.author_name, p.type, p.title, p.content, p.media_url,
         p.group_id, p.is_pinned, p.is_answered, p.event_date, p.event_location,
         p.amen_count, p.comment_count, p.created_at, p.updated_at,
@@ -551,7 +551,7 @@ router.get('/conversations', requireAuth, async (req, res) => {
          m.delivery_status AS last_delivery_status,
          m.created_at AS last_message_time,
          (
-           SELECT COUNT(*) FROM messages unread 
+           SELECT COUNT(*) FROM messages unread
            WHERE unread.sender_id = (CASE WHEN m.sender_id = $1 THEN m.receiver_id ELSE m.sender_id END)
              AND unread.receiver_id = $1
              AND unread.delivery_status != 'READ'
@@ -741,7 +741,7 @@ router.post('/posts/:id/rsvp', requireAuth, async (req, res) => {
     );
 
     const countRes = await query(
-      `SELECT 
+      `SELECT
          COUNT(*) FILTER (WHERE status = 'ATTENDING') AS attending_count,
          COUNT(*) FILTER (WHERE status = 'DECLINED') AS declined_count
        FROM event_rsvps
@@ -766,7 +766,7 @@ router.get('/posts/:id/rsvps', optionalAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const countRes = await query(
-      `SELECT 
+      `SELECT
          COUNT(*) FILTER (WHERE status = 'ATTENDING') AS attending_count,
          COUNT(*) FILTER (WHERE status = 'DECLINED') AS declined_count
        FROM event_rsvps

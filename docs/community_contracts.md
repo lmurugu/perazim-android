@@ -1,10 +1,10 @@
 # Perazim Mission Church — Community Upgrade Contract Specification
 
-> **Version**: 1.0.0-PROD  
-> **Target Scope**: 10–20 Member Closed Pilot (Embu Headquarters, Nairobi Fellowship, Meru Outreach)  
-> **Branch**: `phase-B-community`  
-> **Database Version**: Room SQLite Version 6 (Migration from Version 5)  
-> **Server Engine**: Node.js / Express + PostgreSQL 15 Container (`perazim-test-db`)  
+> **Version**: 1.0.0-PROD
+> **Target Scope**: 10–20 Member Closed Pilot (Embu Headquarters, Nairobi Fellowship, Meru Outreach)
+> **Branch**: `phase-B-community`
+> **Database Version**: Room SQLite Version 6 (Migration from Version 5)
+> **Server Engine**: Node.js / Express + PostgreSQL 15 Container (`perazim-test-db`)
 > **Timezone**: Africa/Nairobi (UTC+3)
 
 ---

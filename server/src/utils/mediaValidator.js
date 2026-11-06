@@ -1,6 +1,6 @@
 /**
  * Media Validator & Sanitizer for Perazim Church Community Attachments.
- * 
+ *
  * Enforces strict constraints:
  * - File size <= 1,048,576 bytes (1MB)
  * - Supported MIME formats: JPEG, PNG, WebP
