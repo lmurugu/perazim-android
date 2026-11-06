@@ -46,7 +46,7 @@ public class RepositoryProvider {
         this.eventRepository = new RoomEventRepository(db.eventDao());
         this.announcementRepository = new RoomAnnouncementRepository(db.announcementDao());
         this.reflectionRepository = new RoomReflectionRepository(db.reflectionDao());
-        this.bibleRepository = new RoomBibleRepository(db.bibleDao());
+        this.bibleRepository = new RoomBibleRepository(appContext, db);
         this.downloadedContentRepository = new RoomDownloadedContentRepository(db.downloadedContentDao());
         this.connectionRepository = new RoomConnectionRepository(db.connectionDao());
         this.notificationRepository = new RoomNotificationRepository(db.notificationDao());

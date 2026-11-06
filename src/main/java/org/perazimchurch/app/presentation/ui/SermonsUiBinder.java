@@ -511,7 +511,9 @@ public class SermonsUiBinder {
         btnRewind.setTypeface(Typeface.DEFAULT_BOLD);
         btnRewind.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnRewind.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
-        btnRewind.setPadding(dp(12), dp(6), dp(12), dp(6));
+        btnRewind.setPadding(dp(8), dp(6), dp(8), dp(6));
+        btnRewind.setMinWidth(0);
+        btnRewind.setMinimumWidth(0);
         btnRewind.setOnClickListener(v -> {
             currentPositionSeconds = Math.max(0, currentPositionSeconds - 15);
             audioSeekBar.setProgress(currentPositionSeconds);
@@ -530,7 +532,10 @@ public class SermonsUiBinder {
         btnPlayPause.setTypeface(Typeface.DEFAULT_BOLD);
         btnPlayPause.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnPlayPause.setBackground(createSolidPill(PerazimTheme.COLOR_PURPLE_BRAND, 10));
-        btnPlayPause.setPadding(dp(16), dp(8), dp(16), dp(8));
+        btnPlayPause.setPadding(dp(4), dp(8), dp(4), dp(8));
+        btnPlayPause.setAllCaps(false);
+        btnPlayPause.setMinWidth(0);
+        btnPlayPause.setMinimumWidth(0);
         LinearLayout.LayoutParams lpPlay = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
         lpPlay.setMargins(dp(8), 0, dp(8), 0);
         btnPlayPause.setLayoutParams(lpPlay);
@@ -543,7 +548,9 @@ public class SermonsUiBinder {
         btnForward.setTypeface(Typeface.DEFAULT_BOLD);
         btnForward.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnForward.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
-        btnForward.setPadding(dp(12), dp(6), dp(12), dp(6));
+        btnForward.setPadding(dp(8), dp(6), dp(8), dp(6));
+        btnForward.setMinWidth(0);
+        btnForward.setMinimumWidth(0);
         btnForward.setOnClickListener(v -> {
             currentPositionSeconds = Math.min(totalDurationSeconds, currentPositionSeconds + 30);
             audioSeekBar.setProgress(currentPositionSeconds);
@@ -562,7 +569,9 @@ public class SermonsUiBinder {
         btnStop.setTypeface(Typeface.DEFAULT_BOLD);
         btnStop.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnStop.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 8, PerazimTheme.COLOR_STROKE, 1));
-        btnStop.setPadding(dp(12), dp(6), dp(12), dp(6));
+        btnStop.setPadding(dp(8), dp(6), dp(8), dp(6));
+        btnStop.setMinWidth(0);
+        btnStop.setMinimumWidth(0);
         btnStop.setOnClickListener(v -> stopPlayback());
         LinearLayout.LayoutParams lpStop = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -1122,6 +1131,8 @@ public class SermonsUiBinder {
                     }));
                     mediaPlayer.setOnErrorListener((mp, what, extra) -> {
                         Log.w("SermonsUiBinder", "MediaPlayer error: what=" + what + ", extra=" + extra);
+                        release();
+                        btnPlayPause.setText("Play Sermon");
                         return true;
                     });
                     mediaPlayer.prepare();

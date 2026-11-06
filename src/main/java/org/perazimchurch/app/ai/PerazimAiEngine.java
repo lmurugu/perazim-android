@@ -193,7 +193,7 @@ public class PerazimAiEngine {
         String userId = getEffectiveUserId();
         int streak = GamificationStore.getStreak(context, userId, 0);
         boolean isFrozen = GamificationStore.isStreakFrozen(context, userId, false);
-        int grace = GamificationStore.getGracePoints(context, userId, 2);
+        int grace = GamificationStore.getGracePoints(context, userId, 0);
 
         String status = isFrozen ? "❄️ FROZEN / SHIELDED" : (streak > 0 ? "🔥 ACTIVE ALTAIRE" : "⚪ NOT STARTED");
 
@@ -218,7 +218,7 @@ public class PerazimAiEngine {
 
     private AiResponse handleGraceQuery(String q) {
         String userId = getEffectiveUserId();
-        int grace = GamificationStore.getGracePoints(context, userId, 2);
+        int grace = GamificationStore.getGracePoints(context, userId, 0);
 
         String msg = "💜 **Grace Tokens (Unmerited Spiritual Protection):**\n\n"
                 + "You currently have **" + grace + " Grace Tokens**.\n\n"

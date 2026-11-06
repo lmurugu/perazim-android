@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class SessionManager {
 
+    private static final java.util.concurrent.ExecutorService MIGRATION_EXECUTOR = java.util.concurrent.Executors.newSingleThreadExecutor();
+
     private static final String TAG = "SessionManager";
     private static final String PREFS_NAME = "perazim_session_prefs";
     private static final String KEY_ACTIVE_USER_ID = "active_user_id";
@@ -239,6 +241,7 @@ public class SessionManager {
 
         long now = System.currentTimeMillis();
 
+        this.currentUserCache = null;
         this.activeUserId = userId;
         if (prefs != null) {
             prefs.edit().putString(KEY_ACTIVE_USER_ID, userId).apply();
@@ -364,7 +367,8 @@ public class SessionManager {
      */
     @Nullable
     public synchronized UserEntity getCurrentUser() {
-        if (currentUserCache != null && currentUserCache.isActive()) {
+        if (currentUserCache != null && currentUserCache.isActive()
+                && currentUserCache.getId().equals(getActiveUserId())) {
             return currentUserCache;
         }
         String currentId = getActiveUserId();
@@ -415,12 +419,37 @@ public class SessionManager {
             return;
         }
         if (context == null) return;
-        new Thread(() -> {
+        MIGRATION_EXECUTOR.execute(() -> {
             try {
                 PerazimDatabase db = PerazimDatabase.getInstance(context);
-                db.prayerDao().migrateUserPrayers(fromUserId, toUserId);
-                db.reflectionDao().migrateUserReflections(fromUserId, toUserId);
-
+                String migrationKey = "migrated_guest_" + fromUserId;
+                if (prefs != null) {
+                    if (prefs.getBoolean(migrationKey, false)) return;
+                    String ownerKey = "guest_migration_owner_" + fromUserId;
+                    String claimedOwner = prefs.getString(ownerKey, null);
+                    if (claimedOwner != null && !toUserId.equals(claimedOwner)) return;
+                    // Persist the sole destination before copying anything; interrupted work can retry only for it.
+                    if (claimedOwner == null && !prefs.edit().putString(ownerKey, toUserId).commit()) {
+                        throw new IllegalStateException("Could not claim guest migration");
+                    }
+                }
+                db.runInTransaction(() -> {
+                    db.prayerDao().migrateUserPrayers(fromUserId, toUserId);
+                    db.reflectionDao().migrateUserReflections(fromUserId, toUserId);
+                    java.util.List<org.perazimchurch.app.data.local.entity.SyncQueueEntity> drafts = new java.util.ArrayList<>(db.syncQueueDao().getPendingItems());
+                    drafts.addAll(db.syncQueueDao().getFailedItems());
+                    drafts.addAll(db.syncQueueDao().getSyncingItems());
+                    for (org.perazimchurch.app.data.local.entity.SyncQueueEntity item : drafts) {
+                        if (fromUserId.equals(org.perazimchurch.app.sync.SyncQueueManager.ownerOf(item))) {
+                            try {
+                                JSONObject payload = new JSONObject(item.getPayloadJson());
+                                payload.put("_sessionOwnerId", toUserId);
+                                item.setPayloadJson(payload.toString());
+                                db.syncQueueDao().update(item);
+                            } catch (org.json.JSONException e) { throw new IllegalStateException(e); }
+                        }
+                    }
+                });
                 // Migrate gamification state
                 int guestXp = GamificationStore.getSpiritualXp(context, fromUserId, 0);
                 if (guestXp > 0) {
@@ -432,11 +461,17 @@ public class SessionManager {
                     int existingStreak = GamificationStore.getStreak(context, toUserId, 0);
                     GamificationStore.saveStreak(context, toUserId, Math.max(guestStreak, existingStreak), false);
                 }
+                // Complete before clearing source metrics; retries use the same claimed destination.
+                if (prefs != null && !prefs.edit().putBoolean(migrationKey, true).commit()) {
+                    throw new IllegalStateException("Could not persist guest migration claim");
+                }
+                GamificationStore.saveSpiritualXp(context, fromUserId, 0);
+                GamificationStore.saveStreak(context, fromUserId, 0, false);
                 Log.i(TAG, "Successfully migrated local data from " + fromUserId + " to " + toUserId);
             } catch (Exception e) {
                 Log.e(TAG, "Error migrating local data: " + e.getMessage(), e);
             }
-        }).start();
+        });
     }
 
     public interface SessionAuthCallback {
@@ -454,6 +489,7 @@ public class SessionManager {
             callback.onError("Context unavailable for network login");
             return;
         }
+        final String currentGuest = getGuestUserId();
         AuthRemoteSource.login(context, phone, pin, new AuthRemoteSource.AuthCallback() {
             @Override
             public void onSuccess(@NonNull String token, @NonNull JSONObject userJson) {
@@ -468,8 +504,10 @@ public class SessionManager {
                         GamificationStore.saveGracePoints(context, userId, userJson.getInt("grace_points"));
                     }
 
-                    setAuthToken(token);
-                    login(userId, name, phone, campusId, role);
+                    synchronized (SessionManager.this) {
+                        setAuthToken(token);
+                        login(userId, name, phone, campusId, role);
+                    }
 
                     if (xp > 0) {
                         GamificationStore.saveSpiritualXp(context, userId, Math.max(xp, GamificationStore.getSpiritualXp(context, userId, 0)));
@@ -478,7 +516,6 @@ public class SessionManager {
                         GamificationStore.saveStreak(context, userId, Math.max(streak, GamificationStore.getStreak(context, userId, 0)), false);
                     }
 
-                    String currentGuest = getGuestUserId();
                     migrateLocalData(currentGuest, userId);
                     migrateLocalData("guest", userId);
                     migrateLocalData("user_me", userId);
@@ -510,6 +547,7 @@ public class SessionManager {
             callback.onError("Context unavailable for registration");
             return;
         }
+        final String currentGuest = getGuestUserId();
         AuthRemoteSource.register(context, phone, pin, name, campusId, new AuthRemoteSource.AuthCallback() {
             @Override
             public void onSuccess(@NonNull String token, @NonNull JSONObject userJson) {
@@ -523,10 +561,11 @@ public class SessionManager {
                         GamificationStore.saveGracePoints(context, userId, userJson.getInt("grace_points"));
                     }
 
-                    setAuthToken(token);
-                    login(userId, userName, phone, userCampus, role);
+                    synchronized (SessionManager.this) {
+                        setAuthToken(token);
+                        login(userId, userName, phone, userCampus, role);
+                    }
 
-                    String currentGuest = getGuestUserId();
                     migrateLocalData(currentGuest, userId);
                     migrateLocalData("guest", userId);
                     migrateLocalData("user_me", userId);

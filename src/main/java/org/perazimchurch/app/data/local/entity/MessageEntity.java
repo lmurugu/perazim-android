@@ -17,21 +17,30 @@ public class MessageEntity {
     private String senderId;
     private String senderName;
     private String content;
+    private String mediaUrl;
     private long sentMillis;
     private String deliveryStatus;
     private String syncStatus;
 
     public MessageEntity(@NonNull String id, String conversationId, String senderId,
-                         String senderName, String content, long sentMillis,
+                         String senderName, String content, String mediaUrl, long sentMillis,
                          String deliveryStatus, String syncStatus) {
         this.id = id;
         this.conversationId = conversationId;
         this.senderId = senderId;
         this.senderName = senderName;
         this.content = content;
+        this.mediaUrl = mediaUrl != null ? mediaUrl : "";
         this.sentMillis = sentMillis;
         this.deliveryStatus = deliveryStatus;
         this.syncStatus = syncStatus;
+    }
+
+    @androidx.room.Ignore
+    public MessageEntity(@NonNull String id, String conversationId, String senderId,
+                         String senderName, String content, long sentMillis,
+                         String deliveryStatus, String syncStatus) {
+        this(id, conversationId, senderId, senderName, content, "", sentMillis, deliveryStatus, syncStatus);
     }
 
     @NonNull
@@ -58,4 +67,7 @@ public class MessageEntity {
 
     public String getSyncStatus() { return syncStatus; }
     public void setSyncStatus(String syncStatus) { this.syncStatus = syncStatus; }
+
+    public String getMediaUrl() { return mediaUrl != null ? mediaUrl : ""; }
+    public void setMediaUrl(String mediaUrl) { this.mediaUrl = mediaUrl; }
 }

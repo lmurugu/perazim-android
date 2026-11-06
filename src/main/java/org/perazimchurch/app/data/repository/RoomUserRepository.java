@@ -45,13 +45,17 @@ public class RoomUserRepository implements UserRepository {
         Context ctx = getEffectiveContext();
         boolean isGuest = (ctx != null) && org.perazimchurch.app.data.local.session.SessionManager.getInstance(ctx).isGuest();
         if (!isGuest) {
-            UserEntity activeEntity = userDao.getActiveUser();
+            String sessionId = ctx != null
+                    ? org.perazimchurch.app.data.local.session.SessionManager.getInstance(ctx).getActiveUserId()
+                    : null;
+            UserEntity activeEntity = sessionId != null
+                    ? userDao.getUserById(sessionId) : userDao.getActiveUser();
             if (activeEntity != null) {
                 return UserMapper.toDomain(activeEntity);
             }
         }
 
-        // Fallback to guest user
+        // Keep the signed-in identity even when its local profile has not loaded.
         String guestId = (ctx != null) ? org.perazimchurch.app.data.local.session.SessionManager.getInstance(ctx).getActiveUserId() : "guest";
         if (guestId == null || guestId.trim().isEmpty()) {
             guestId = "guest";
@@ -59,15 +63,15 @@ public class RoomUserRepository implements UserRepository {
         int defaultStreak = GamificationStore.getStreak(ctx, guestId, 0);
         boolean defaultFrozen = GamificationStore.isStreakFrozen(ctx, guestId, false);
         int defaultXp = GamificationStore.getSpiritualXp(ctx, guestId, 0);
-        int defaultGrace = GamificationStore.getGracePoints(ctx, guestId, 2);
+        int defaultGrace = GamificationStore.getGracePoints(ctx, guestId, 0);
 
         return new User(
                 guestId,
-                "Guest Pilgrim",
-                "guest@perazim.org",
-                "+254700000000",
-                "campus_central",
-                "GUEST",
+                isGuest ? "Guest Pilgrim" : "Perazim Member",
+                isGuest ? "" : "Profile details unavailable offline",
+                "",
+                "",
+                isGuest ? "GUEST" : "MEMBER",
                 defaultStreak,
                 defaultXp,
                 defaultGrace,

@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // --- STATE VARIABLES ---
     private int streakCount = 0;
     private int xpCount = 0;
-    private int graceCount = 2;
+    private int graceCount = 0;
     private boolean streakFrozen = false;
     private int progressPercent = 0;
     private boolean questClaimed = false;
@@ -170,7 +170,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         UserMapper.init(this);
         streakCount = GamificationStore.getStreak(this, resolveGamificationUserId(), 0);
         xpCount = GamificationStore.getSpiritualXp(this, resolveGamificationUserId(), 0);
-        graceCount = GamificationStore.getGracePoints(this, resolveGamificationUserId(), 2);
+        graceCount = GamificationStore.getGracePoints(this, resolveGamificationUserId(), 0);
         streakFrozen = GamificationStore.isStreakFrozen(this, resolveGamificationUserId(), false);
 
         // Trigger first-launch onboarding
@@ -2356,9 +2356,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvChurchSlogan.setPadding(0, 0, 0, dp(8));
         churchCard.addView(tvChurchSlogan);
 
-        LinearLayout rowAffCampus = createInteractiveContactRow("📍", "Affiliated Campus", selectedCampus + " (Embu, Kenya)", v -> Toast.makeText(this, "Active Campus: " + selectedCampus, Toast.LENGTH_SHORT).show());
         LinearLayout rowBishopAff = createInteractiveContactRow("👤", "Presiding Bishop", "Bishop Dr. David Mutweri", v -> dialPhoneNumber("+254710772227"));
-        churchCard.addView(rowAffCampus);
         churchCard.addView(rowBishopAff);
 
         content.addView(churchCard);

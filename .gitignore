@@ -60,3 +60,6 @@ google-services.json
 
 # Cloudflare Wrangler local state & cache
 .wrangler/
+
+# Local PC backend runtime (database, binaries, logs, private configuration)
+server/.runtime/

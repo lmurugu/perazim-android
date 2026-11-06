@@ -73,7 +73,6 @@ public class ProfileUiBinder {
     // Active User UI references
     private TextView tvMemberName;
     private TextView tvMemberEmail;
-    private TextView tvMemberCampus;
     private TextView tvCovenantBadge;
     private ImageView ivAvatar;
 
@@ -240,18 +239,6 @@ public class ProfileUiBinder {
         tvMemberEmail.setPadding(0, dp(2), 0, dp(4));
         memberInfo.addView(tvMemberEmail);
 
-        // Campus Indicator Chip with darkened surface gradient
-        tvMemberCampus = new TextView(context);
-        tvMemberCampus.setText("📍 Church Headquarters: Embu, Kenya");
-        tvMemberCampus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvMemberCampus.setTypeface(Typeface.DEFAULT_BOLD);
-        tvMemberCampus.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvMemberCampus.setBackground(PerazimTheme.createSurface2Gradient(dp(12), dp(1)));
-        tvMemberCampus.setPadding(dp(8), dp(3), dp(8), dp(3));
-        LinearLayout.LayoutParams lpCampus = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        tvMemberCampus.setLayoutParams(lpCampus);
-        memberInfo.addView(tvMemberCampus);
 
         // Auth Action Button (Sign In / Register or Log Out)
         btnAuthAction = new Button(context);
@@ -321,7 +308,7 @@ public class ProfileUiBinder {
         String uid = resolveGamificationUserId();
         int currentStreak = GamificationStore.getStreak(context, uid, 0);
         int currentXp = GamificationStore.getSpiritualXp(context, uid, 0);
-        int currentGrace = GamificationStore.getGracePoints(context, uid, 2);
+        int currentGrace = GamificationStore.getGracePoints(context, uid, 0);
         int lifetimeDays = GamificationStore.getLifetimeRoutineDays(context, uid, 0);
 
         LinearLayout c1 = createStatColumn(currentStreak + "d", "Streak");
@@ -1307,15 +1294,6 @@ public class ProfileUiBinder {
         tvMotto.setPadding(0, dp(2), 0, dp(4));
         card.addView(tvMotto);
 
-        // Church Headquarters Location Row
-        LinearLayout rowCampus = createInteractiveRow(
-                "📍",
-                "Church Headquarters",
-                "Embu, Kenya",
-                null
-        );
-        card.addView(rowCampus);
-
         // Bishop Contact Row
         LinearLayout rowBishop = createInteractiveRow(
                 "👤",
@@ -1473,7 +1451,7 @@ public class ProfileUiBinder {
                 }
                 int liveStreak = GamificationStore.getStreak(context, uid, user != null ? user.getStreakCount() : 0);
                 int liveXp = GamificationStore.getSpiritualXp(context, uid, user != null ? user.getSpiritualXp() : 0);
-                int liveGrace = GamificationStore.getGracePoints(context, uid, user != null ? user.getGracePoints() : 2);
+                int liveGrace = GamificationStore.getGracePoints(context, uid, user != null ? user.getGracePoints() : 0);
 
                 if (tvStreakValue != null) {
                     tvStreakValue.setText("🔥 " + liveStreak + " Days");

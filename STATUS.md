@@ -177,3 +177,15 @@ The script automatically navigates the app and writes high-resolution screenshot
 - `docs/review/<hash>-09-ai-guide.png` / `.txt`
 - `docs/review/<hash>-10-riddles.png` / `.txt`
 - `docs/review/<hash>-11-jokes.png` / `.txt`
+
+## 2026-11-06 — UI audit corrections
+
+- Bible repository initialization now receives application context and loads the existing bundled KJV starter assets before its first background read. Upgrade hydration preserves saved bookmarks and study notes; seed-time verification no longer writes a sample bookmark or note into member data. Previously saved bookmarks are retained.
+- The five translation choices remain. Assets are unchanged: only KJV starter passages are bundled. Missing translations/chapters show an explicit unavailable message rather than displaying KJV text under another translation name. Clipboard citations use the actual translation ID.
+- Removed the campus/headquarters row and chip from the active profile, plus the legacy affiliated-campus row.
+- Sermon control buttons no longer reserve platform minimum widths that squeezed the central play label. Existing pause-on-background, pause-on-tab-change, back-to-stop, and Stop behavior remains; player errors reset the play state.
+- The guide opens with an accurately labeled on-device response. Members can ask offline questions immediately without an automatic online-consent dialog; online opt-in remains available from the subtitle.
+- New member Grace defaults are zero in entity creation, repository/profile fallbacks, the main screen, and offline-guide state reads. Persisted member balances remain intact. Added a zero-balances regression test.
+- Added the missing `Post` domain model matching the existing community entity contract so the already-present repository interface compiles.
+- Validation: `./gradlew testDebugUnitTest assembleDebug --offline` passed; 47 tests, no failures/errors, including Bible mapping, sync queue mechanics, and new-account balance regression. Debug APK: `build/outputs/apk/debug/app-debug.apk`. Physical-device results are recorded separately after installation; the build alone does not establish visual/lifecycle correctness.
+- Follow-up profile correction: authenticated members now resolve their cached profile by the session's exact user ID. If the profile is not cached, the screen shows “Perazim Member / Profile details unavailable offline” rather than a fabricated guest name/email/phone. Guest sign-in controls still follow session state. The physical guide screenshot showed input and Send visible; misleading hierarchy bounds alone did not justify a layout change.

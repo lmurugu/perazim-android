@@ -82,6 +82,21 @@ public final class ApiClient {
         execute(context, "POST", endpoint, jsonBody != null ? jsonBody.toString() : null, authToken, callback);
     }
 
+    public static void put(@NonNull Context context,
+                           @NonNull String endpoint,
+                           @Nullable JSONObject jsonBody,
+                           @Nullable String authToken,
+                           @NonNull ApiCallback callback) {
+        execute(context, "PUT", endpoint, jsonBody != null ? jsonBody.toString() : null, authToken, callback);
+    }
+
+    public static void delete(@NonNull Context context,
+                              @NonNull String endpoint,
+                              @Nullable String authToken,
+                              @NonNull ApiCallback callback) {
+        execute(context, "DELETE", endpoint, null, authToken, callback);
+    }
+
     private static void execute(Context context,
                                 String method,
                                 String endpoint,

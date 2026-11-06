@@ -160,7 +160,8 @@ public final class BibleDataSeeder {
             // Check if 66 books and key breakthrough verse exist
             List<BibleBookEntity> existingBooks = bibleDao.getBooksByTranslation(DEFAULT_TRANSLATION_ID);
             BibleVerseEntity sampleVerse = bibleDao.getVerse(10, 5, 20); // 2 Samuel 5:20
-            if (existingBooks != null && existingBooks.size() >= 66 && sampleVerse != null) {
+            if (existingBooks != null && existingBooks.size() >= 66 && sampleVerse != null
+                    && (context == null || bibleDao.getVerse("KJV", 66, 21, 27) != null)) {
                 Log.d(TAG, "Bible already fully seeded with KJV default, 66 canonical books, and verses.");
                 return;
             }
@@ -172,12 +173,7 @@ public final class BibleDataSeeder {
         seedChaptersAndVerses(context, bibleDao);
         Log.i(TAG, "Local Bible engine seeded successfully.");
 
-        try {
-            RoomBibleRepository repo = new RoomBibleRepository(bibleDao);
-            verifyUsingRoomBibleRepository(context, repo);
-        } catch (Exception e) {
-            Log.e(TAG, "Bible repository contract verification warning: " + e.getMessage(), e);
-        }
+
     }
 
     /**
@@ -494,6 +490,14 @@ public final class BibleDataSeeder {
         }
 
         bibleDao.insertChapters(chapterList);
+        // Hydrating starter assets must preserve personal bookmarks and notes.
+        for (BibleVerseEntity verse : verseList) {
+            BibleVerseEntity saved = bibleDao.getVerseById(verse.getId());
+            if (saved != null) {
+                verse.setFavorite(saved.isFavorite());
+                verse.setNote(saved.getNote());
+            }
+        }
         bibleDao.insertVerses(verseList);
         Log.d(TAG, "Inserted " + chapterList.size() + " chapters and " + verseList.size() + " verses.");
     }

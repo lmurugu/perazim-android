@@ -212,8 +212,11 @@ async function runPostgresTests() {
       phone: '0711000001',
       pin: '1234',
       name: 'Brother John (Embu)',
-      campus_id: 'campus_embu'
+      campus_id: 'campus_embu',
+      grace_points: 999
     });
+    assert(regUser1.body.user.grace_points === 0, 'PostgreSQL registration ignores client-granted points');
+    assert((await query('SELECT grace_points FROM users WHERE id = $1', [regUser1.body.user.id])).rows[0].grace_points === 0, 'PostgreSQL persists starting allowance 0');
     assert(regUser1.status === 201, 'User 1 registered in real PostgreSQL table (201)');
     const token1 = regUser1.body.token;
 

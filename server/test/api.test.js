@@ -493,10 +493,10 @@ async function runTests() {
       pin: '4321',
       name: 'Zero Grace Point Brother',
       campus_id: 'campus_embu',
-      grace_points: 0
+      grace_points: 999
     });
-    assert(zeroGraceUser.status === 201, 'REQ-03: User registered with explicit 0 grace points (201)');
-    assert(zeroGraceUser.body.user.grace_points === 0, 'REQ-03: Stored 0 grace points preserved on register (NOT reset to 2)');
+    assert(zeroGraceUser.status === 201, 'REQ-03: User registered with server-owned starting allowance (201)');
+    assert(zeroGraceUser.body.user.grace_points === 0, 'REQ-03: New account starts at 0 even when client requests 999 points');
 
     const zeroLogin = await makeRequest('POST', '/api/auth/login', {
       phone: '0711000004',

@@ -69,7 +69,23 @@ public final class SyncDispatcher {
                 }
 
                 // Pull pending operations
-                List<SyncQueueEntity> pending = queueManager.getPendingOperations(25);
+                SessionManager session = SessionManager.getInstance(appContext);
+                final String syncUserId;
+                final String authToken;
+                final boolean guestSession;
+                synchronized (session) {
+                    syncUserId = session.getActiveUserId();
+                    authToken = session.getAuthToken();
+                    guestSession = session.isGuest();
+                }
+                List<SyncQueueEntity> pending = new java.util.ArrayList<>();
+                if (authToken != null && !guestSession) {
+                    for (SyncQueueEntity item : queueManager.getPendingOperations(0)) {
+                        // Legacy unowned drafts are retained for manual recovery, never attributed to another member.
+                        if (syncUserId.equals(SyncQueueManager.ownerOf(item)) && pending.size() < 25
+                                && item.getTimestampMillis() <= System.currentTimeMillis()) pending.add(item);
+                    }
+                }
                 JSONArray mutationsArray = new JSONArray();
                 if (pending != null && !pending.isEmpty()) {
                     for (SyncQueueEntity item : pending) {
@@ -89,9 +105,8 @@ public final class SyncDispatcher {
                     }
                 }
 
-                SharedPreferences prefs = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+                SharedPreferences prefs = appContext.getSharedPreferences(PREF_NAME + "_" + syncUserId, Context.MODE_PRIVATE);
                 long lastSyncTs = prefs.getLong(KEY_LAST_SYNC_TS, 0);
-                String authToken = SessionManager.getInstance(appContext).getAuthToken();
 
                 // Kick off multi-page sync starting at page 1 with cursor = 0
                 executeSyncPage(

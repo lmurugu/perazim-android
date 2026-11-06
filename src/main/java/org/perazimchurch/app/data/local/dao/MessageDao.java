@@ -32,6 +32,12 @@ public interface MessageDao {
     @Query("SELECT * FROM messages WHERE conversationId = :conversationId ORDER BY sentMillis ASC")
     List<MessageEntity> getMessagesForConversation(String conversationId);
 
+    @Query("UPDATE messages SET deliveryStatus = :status WHERE id = :id")
+    void updateDeliveryStatus(String id, String status);
+
+    @Query("SELECT COUNT(*) FROM messages WHERE senderId != :userId AND deliveryStatus != 'READ'")
+    int getUnreadMessageCount(String userId);
+
     @Query("DELETE FROM messages WHERE id = :id")
     void deleteById(String id);
 

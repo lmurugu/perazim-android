@@ -21,6 +21,7 @@ public class UserEntity {
     private String role;
     private String campusId;
     private String avatarUrl;
+    private String bio;
     private long createdAt;
     private long updatedAt;
     private boolean isActive;
@@ -31,7 +32,7 @@ public class UserEntity {
     private boolean streakFrozen;
 
     public UserEntity(@NonNull String id, String name, String email, String phone, String role,
-                      String campusId, String avatarUrl, long createdAt, long updatedAt, boolean isActive,
+                      String campusId, String avatarUrl, String bio, long createdAt, long updatedAt, boolean isActive,
                       int streakCount, int spiritualXp, int gracePoints, boolean streakFrozen) {
         this.id = id;
         this.name = name;
@@ -40,6 +41,7 @@ public class UserEntity {
         this.role = role;
         this.campusId = campusId;
         this.avatarUrl = avatarUrl;
+        this.bio = bio != null ? bio : "";
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.isActive = isActive;
@@ -51,8 +53,15 @@ public class UserEntity {
 
     @Ignore
     public UserEntity(@NonNull String id, String name, String email, String phone, String role,
+                      String campusId, String avatarUrl, long createdAt, long updatedAt, boolean isActive,
+                      int streakCount, int spiritualXp, int gracePoints, boolean streakFrozen) {
+        this(id, name, email, phone, role, campusId, avatarUrl, "", createdAt, updatedAt, isActive, streakCount, spiritualXp, gracePoints, streakFrozen);
+    }
+
+    @Ignore
+    public UserEntity(@NonNull String id, String name, String email, String phone, String role,
                       String campusId, String avatarUrl, long createdAt, long updatedAt, boolean isActive) {
-        this(id, name, email, phone, role, campusId, avatarUrl, createdAt, updatedAt, isActive, 0, 0, 2, false);
+        this(id, name, email, phone, role, campusId, avatarUrl, "", createdAt, updatedAt, isActive, 0, 0, 0, false);
     }
 
     @NonNull
@@ -97,4 +106,7 @@ public class UserEntity {
 
     public boolean isStreakFrozen() { return streakFrozen; }
     public void setStreakFrozen(boolean streakFrozen) { this.streakFrozen = streakFrozen; }
+
+    public String getBio() { return bio != null ? bio : ""; }
+    public void setBio(String bio) { this.bio = bio; }
 }

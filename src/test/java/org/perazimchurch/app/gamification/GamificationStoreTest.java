@@ -45,6 +45,17 @@ public class GamificationStoreTest {
         GamificationStore.setPreferencesForTesting(null);
     }
 
+    @Test
+    public void newMemberStartsWithZeroBalances() {
+        org.perazimchurch.app.data.local.entity.UserEntity member =
+                new org.perazimchurch.app.data.local.entity.UserEntity(
+                        "new-member", "Member", "member@example.test", "", "MEMBER",
+                        "", "", 0L, 0L, true);
+        assertEquals(0, member.getStreakCount());
+        assertEquals(0, member.getSpiritualXp());
+        assertEquals(0, member.getGracePoints());
+    }
+
     // =========================================================================
     // 1. DATE BOUNDARY & TIMEZONE (AFRICA/NAIROBI)
     // =========================================================================

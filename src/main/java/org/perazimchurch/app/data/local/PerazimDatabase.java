@@ -15,15 +15,20 @@ import org.perazimchurch.app.data.local.dao.AnnouncementDao;
 import org.perazimchurch.app.data.local.dao.AppConfigDao;
 import org.perazimchurch.app.data.local.dao.BibleDao;
 import org.perazimchurch.app.data.local.dao.CampusDao;
+import org.perazimchurch.app.data.local.dao.CommentDao;
 import org.perazimchurch.app.data.local.dao.ConnectionDao;
 import org.perazimchurch.app.data.local.dao.ConversationDao;
+import org.perazimchurch.app.data.local.dao.DailyChallengeDao;
 import org.perazimchurch.app.data.local.dao.DailyVerseDao;
 import org.perazimchurch.app.data.local.dao.DownloadedContentDao;
 import org.perazimchurch.app.data.local.dao.EventDao;
+import org.perazimchurch.app.data.local.dao.EventRsvpDao;
+import org.perazimchurch.app.data.local.dao.GroupDao;
 import org.perazimchurch.app.data.local.dao.HymnDao;
 import org.perazimchurch.app.data.local.dao.JokeDao;
 import org.perazimchurch.app.data.local.dao.MessageDao;
 import org.perazimchurch.app.data.local.dao.NotificationDao;
+import org.perazimchurch.app.data.local.dao.PostDao;
 import org.perazimchurch.app.data.local.dao.PrayerDao;
 import org.perazimchurch.app.data.local.dao.ReflectionDao;
 import org.perazimchurch.app.data.local.dao.RiddleDao;
@@ -38,15 +43,21 @@ import org.perazimchurch.app.data.local.entity.BibleChapterEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.CampusEntity;
+import org.perazimchurch.app.data.local.entity.CommentEntity;
 import org.perazimchurch.app.data.local.entity.ConnectionEntity;
 import org.perazimchurch.app.data.local.entity.ConversationEntity;
+import org.perazimchurch.app.data.local.entity.DailyChallengeEntity;
 import org.perazimchurch.app.data.local.entity.DailyVerseEntity;
 import org.perazimchurch.app.data.local.entity.DownloadedContentEntity;
 import org.perazimchurch.app.data.local.entity.EventEntity;
+import org.perazimchurch.app.data.local.entity.EventRsvpEntity;
+import org.perazimchurch.app.data.local.entity.GroupEntity;
+import org.perazimchurch.app.data.local.entity.GroupMemberEntity;
 import org.perazimchurch.app.data.local.entity.HymnEntity;
 import org.perazimchurch.app.data.local.entity.JokeEntity;
 import org.perazimchurch.app.data.local.entity.MessageEntity;
 import org.perazimchurch.app.data.local.entity.NotificationEntity;
+import org.perazimchurch.app.data.local.entity.PostEntity;
 import org.perazimchurch.app.data.local.entity.PrayerEntity;
 import org.perazimchurch.app.data.local.entity.ReflectionEntity;
 import org.perazimchurch.app.data.local.entity.RiddleEntity;
@@ -59,7 +70,8 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
  * Main Room Database for the Perazim Android application.
  * Persists all core entities: Users, Campuses, Sermons, Hymns, Riddles, Jokes, Events,
  * Announcements, Prayers, Reflections, Daily Verses, App Config, Bible (translations, books, chapters, verses),
- * Conversations, Messages, Connections, Notifications, Sync Queues, and Offline Downloads.
+ * Conversations, Messages, Connections, Notifications, Sync Queues, Offline Downloads,
+ * and Community (Posts, Comments, Groups, Group Members, Event RSVPs, Daily Challenges).
  */
 @Database(
     entities = {
@@ -85,9 +97,15 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         SyncMetadataEntity.class,
         DownloadedContentEntity.class,
         DailyVerseEntity.class,
-        AppConfigEntity.class
+        AppConfigEntity.class,
+        PostEntity.class,
+        CommentEntity.class,
+        GroupEntity.class,
+        GroupMemberEntity.class,
+        EventRsvpEntity.class,
+        DailyChallengeEntity.class
     },
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters({Converters.class})
@@ -116,6 +134,11 @@ public abstract class PerazimDatabase extends RoomDatabase {
     public abstract SyncMetadataDao syncMetadataDao();
     public abstract DailyVerseDao dailyVerseDao();
     public abstract AppConfigDao appConfigDao();
+    public abstract PostDao postDao();
+    public abstract CommentDao commentDao();
+    public abstract GroupDao groupDao();
+    public abstract EventRsvpDao eventRsvpDao();
+    public abstract DailyChallengeDao dailyChallengeDao();
 
     public static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
@@ -137,6 +160,41 @@ public abstract class PerazimDatabase extends RoomDatabase {
         }
     };
 
+    public static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("ALTER TABLE users ADD COLUMN bio TEXT DEFAULT ''");
+            db.execSQL("ALTER TABLE messages ADD COLUMN mediaUrl TEXT DEFAULT ''");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `community_posts` (" +
+                    "`id` TEXT NOT NULL, `authorId` TEXT, `authorName` TEXT, `authorAvatar` TEXT, " +
+                    "`type` TEXT, `title` TEXT, `content` TEXT, `mediaUrl` TEXT, `groupId` TEXT, " +
+                    "`isPinned` INTEGER NOT NULL DEFAULT 0, `isAnswered` INTEGER NOT NULL DEFAULT 0, " +
+                    "`eventDate` INTEGER, `eventLocation` TEXT, `amenCount` INTEGER NOT NULL DEFAULT 0, " +
+                    "`commentCount` INTEGER NOT NULL DEFAULT 0, `userHasAmened` INTEGER NOT NULL DEFAULT 0, " +
+                    "`userRsvpStatus` TEXT, `createdMillis` INTEGER NOT NULL DEFAULT 0, " +
+                    "`updatedMillis` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`id`))");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `post_comments` (" +
+                    "`id` TEXT NOT NULL, `postId` TEXT, `authorId` TEXT, `authorName` TEXT, " +
+                    "`authorAvatar` TEXT, `content` TEXT, `createdMillis` INTEGER NOT NULL DEFAULT 0, " +
+                    "PRIMARY KEY(`id`))");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `community_groups` (" +
+                    "`id` TEXT NOT NULL, `name` TEXT, `description` TEXT, `createdBy` TEXT, " +
+                    "`isActive` INTEGER NOT NULL DEFAULT 1, `createdMillis` INTEGER NOT NULL DEFAULT 0, " +
+                    "`memberCount` INTEGER NOT NULL DEFAULT 0, `isMember` INTEGER NOT NULL DEFAULT 0, " +
+                    "PRIMARY KEY(`id`))");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `group_members` (" +
+                    "`groupId` TEXT NOT NULL, `userId` TEXT NOT NULL, `role` TEXT, `name` TEXT, " +
+                    "`avatarUrl` TEXT, `campusId` TEXT, `joinedMillis` INTEGER NOT NULL DEFAULT 0, " +
+                    "PRIMARY KEY(`groupId`, `userId`))");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `event_rsvps` (" +
+                    "`postId` TEXT NOT NULL, `userId` TEXT NOT NULL, `status` TEXT, " +
+                    "`updatedMillis` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`postId`, `userId`))");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `daily_challenges` (" +
+                    "`date` TEXT NOT NULL, `riddleId` TEXT, `question` TEXT, `hint` TEXT, " +
+                    "`isCompleted` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`date`))");
+        }
+    };
+
     public static PerazimDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (PerazimDatabase.class) {
@@ -147,7 +205,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
                             DATABASE_NAME
                     )
                     .createFromAsset("database/perazim_database.db")
-                    .addMigrations(MIGRATION_4_5)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6)
                     .fallbackToDestructiveMigration()
                     .build();
                 }

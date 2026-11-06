@@ -22,6 +22,7 @@ public class SyncQueueManager {
 
     private static volatile SyncQueueManager INSTANCE;
     private final SyncQueueDao syncQueueDao;
+    private Context appContext;
 
     public SyncQueueManager(SyncQueueDao syncQueueDao) {
         this.syncQueueDao = syncQueueDao;
@@ -29,6 +30,7 @@ public class SyncQueueManager {
 
     public SyncQueueManager(Context context) {
         this(PerazimDatabase.getInstance(context).syncQueueDao());
+        this.appContext = context.getApplicationContext();
     }
 
     public static SyncQueueManager getInstance(Context context) {
@@ -44,6 +46,11 @@ public class SyncQueueManager {
 
     public static synchronized void resetInstance() {
         INSTANCE = null;
+    }
+
+    public static String ownerOf(SyncQueueEntity item) {
+        try { return new org.json.JSONObject(item.getPayloadJson()).optString("_sessionOwnerId", ""); }
+        catch (Exception ignored) { return ""; }
     }
 
     public SyncQueueDao getSyncQueueDao() {
@@ -65,6 +72,19 @@ public class SyncQueueManager {
      */
     public synchronized String enqueue(String operationType, String entityType, String entityId,
                                        String payloadJson, String idempotencyKey) {
+        // Bind the draft to the account that created it, never the next signed-in account.
+        String owner = appContext != null
+                ? org.perazimchurch.app.data.local.session.SessionManager.getInstance(appContext).getActiveUserId() : null;
+        if (owner != null) {
+            try {
+                org.json.JSONObject payload = new org.json.JSONObject(payloadJson != null ? payloadJson : "{}");
+                payload.put("_sessionOwnerId", owner);
+                payloadJson = payload.toString();
+                if (idempotencyKey != null) idempotencyKey = owner + ":" + idempotencyKey;
+            } catch (org.json.JSONException e) {
+                throw new IllegalArgumentException("Queued payload must be a JSON object", e);
+            }
+        }
         // 1. Check for existing pending/syncing item with same idempotencyKey
         if (idempotencyKey != null && !idempotencyKey.trim().isEmpty()) {
             SyncQueueEntity existingById = syncQueueDao.getItemById(idempotencyKey.trim());
@@ -80,7 +100,7 @@ public class SyncQueueManager {
         // 2. Check for existing pending/syncing item with same (entityType, entityId, operationType)
         if (entityType != null && entityId != null && operationType != null) {
             SyncQueueEntity existingByEntity = syncQueueDao.findPendingOrSyncing(entityType, entityId, operationType);
-            if (existingByEntity != null) {
+            if (existingByEntity != null && (owner == null || owner.equals(ownerOf(existingByEntity)))) {
                 return existingByEntity.getId();
             }
         }

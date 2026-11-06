@@ -97,14 +97,9 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
 
         // Display initial greeting
-        boolean consented = AiPreferences.hasConsented(activity);
-        displayAiMessage(aiEngine.getWelcomeResponse(), consented ? "⚡ Online Cloud AI (Gemini Relay Ready)" : "📱 Offline Guide (On-Device Rules)");
+        displayAiMessage(aiEngine.getWelcomeResponse(), "📱 Offline Guide (On-Device Rules)");
         updateSubtitle();
 
-        // Show consent dialog on first launch if not yet accepted
-        if (!consented) {
-            chatScrollView.post(this::showConsentDialog);
-        }
     }
 
     @Override
@@ -390,8 +385,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         // 2. Check consent
         if (!AiPreferences.hasConsented(activity)) {
-            showConsentDialog();
-            // Process offline fallback for this query
+            // Answer immediately on device; online consent is available from the subtitle.
             AiResponse offlineResp = aiEngine.processQuery(query);
             displayAiMessage(offlineResp, "📱 Offline Guide (Consent Required for Online AI)");
             return;

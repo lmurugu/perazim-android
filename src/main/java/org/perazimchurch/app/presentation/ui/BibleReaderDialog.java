@@ -578,32 +578,13 @@ public class BibleReaderDialog extends Dialog {
                 currentVerses.addAll(verses);
                 renderVerseList(currentVerses, false);
             } else {
-                // Safeguard: Fallback to 2 Samuel 5 canonical passage if empty
-                if ("2SA".equals(bookId) && chapter == 5) {
-                    load2Samuel5Fallback();
-                } else {
-                    tvEmptyState.setText("📖 Canonical Catalog: " + currentBookName + " Chapter " + currentChapter + "\n(Chapter text staged for offline sync. Complete 31,102-verse corpus syncs in Phase 4)");
-                    tvEmptyState.setVisibility(View.VISIBLE);
-                }
+                currentVerses.clear();
+                tvEmptyState.setText("No " + currentTranslation + " text is downloaded for "
+                        + currentBookName + " " + currentChapter
+                        + ".\n\nKJV starter passages are bundled for offline reading. Other translations require an authorized scripture source.");
+                tvEmptyState.setVisibility(View.VISIBLE);
             }
         });
-    }
-
-    private void load2Samuel5Fallback() {
-        currentVerses.clear();
-        String[][] raw = {
-                {"17", "When the Philistines heard that David had been anointed king over Israel, they went up in full force to search for David, but David heard about it and went down to the stronghold."},
-                {"18", "Now the Philistines had come and spread out in the Valley of Rephaim;"},
-                {"19", "so David inquired of the LORD, “Shall I go and attack the Philistines? Will you deliver them into my hands?” The LORD answered him, “Go, for I will surely deliver the Philistines into your hands.”"},
-                {"20", "And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters. Therefore he called the name of that place Baal-perazim."},
-                {"21", "The Philistines abandoned their idols there, and David and his men carried them off."}
-        };
-        for (String[] r : raw) {
-            int vNum = Integer.parseInt(r[0]);
-            BibleVerse v = new BibleVerse("2SA.5." + vNum, "KJV", "2SA", 5, vNum, r[1], false, null);
-            currentVerses.add(v);
-        }
-        renderVerseList(currentVerses, false);
     }
 
     private void toggleSearchMode() {
@@ -884,7 +865,7 @@ public class BibleReaderDialog extends Dialog {
         Button btnCopy = createOptionButton("📋 Copy to Clipboard", COLOR_PURPLE_DARK, COLOR_WHITE);
         btnCopy.setOnClickListener(v -> {
             ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Holy Scripture", citation + "\n\"" + verse.getText() + "\" (KJV)");
+            ClipData clip = ClipData.newPlainText("Holy Scripture", citation + "\n\"" + verse.getText() + "\" (" + verse.getTranslationId() + ")");
             if (cm != null) {
                 cm.setPrimaryClip(clip);
                 Toast.makeText(getContext(), "✓ Copied " + citation + " to clipboard!", Toast.LENGTH_SHORT).show();
@@ -975,7 +956,7 @@ public class BibleReaderDialog extends Dialog {
         container.addView(tvTitle);
 
         TextView tvSub = new TextView(getContext());
-        tvSub.setText("Canonical 66 Books · KJV (66-Book Catalog & Core Starter Verses)");
+        tvSub.setText("66-book catalog · KJV starter passages available offline");
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         tvSub.setPadding(0, dp(2), 0, dp(12));

@@ -43,7 +43,7 @@ function normalizePhone(phone) {
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    let { phone, pin, name, campus_id, grace_points } = req.body;
+    let { phone, pin, name, campus_id } = req.body;
     if (!phone || !pin || !name) {
       return res.status(400).json({ error: 'Phone number, PIN, and full name are required' });
     }
@@ -69,9 +69,8 @@ router.post('/register', async (req, res) => {
     const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
     const now = Date.now();
     const campus = campus_id || 'campus_embu';
-    const initialGracePoints = (grace_points !== undefined && grace_points !== null)
-      ? Number(grace_points)
-      : 2;
+    // Starting allowance is server-owned; clients cannot grant themselves points.
+    const initialGracePoints = 0;
 
     await query(
       'INSERT INTO users (id, phone, pin_hash, name, campus_id, role, avatar_url, xp, streak, grace_points, is_active, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
@@ -87,7 +86,7 @@ router.post('/register', async (req, res) => {
       avatar_url: '',
       xp: 0,
       streak: 0,
-      grace_points: (initialGracePoints !== undefined && initialGracePoints !== null) ? Number(initialGracePoints) : 2
+      grace_points: (initialGracePoints !== undefined && initialGracePoints !== null) ? Number(initialGracePoints) : 0
     };
 
     const token = signToken(userObj);
@@ -140,7 +139,7 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
       avatar_url: user.avatar_url || '',
       xp: (user.xp !== undefined && user.xp !== null) ? Number(user.xp) : 0,
       streak: (user.streak !== undefined && user.streak !== null) ? Number(user.streak) : 0,
-      grace_points: (user.grace_points !== undefined && user.grace_points !== null) ? Number(user.grace_points) : 2
+      grace_points: (user.grace_points !== undefined && user.grace_points !== null) ? Number(user.grace_points) : 0
     };
 
     const token = signToken(userObj);
@@ -186,7 +185,7 @@ router.get('/me', requireAuth, async (req, res) => {
         avatar_url: user.avatar_url || '',
         xp: (user.xp !== undefined && user.xp !== null) ? Number(user.xp) : 0,
         streak: (user.streak !== undefined && user.streak !== null) ? Number(user.streak) : 0,
-        grace_points: (user.grace_points !== undefined && user.grace_points !== null) ? Number(user.grace_points) : 2
+        grace_points: (user.grace_points !== undefined && user.grace_points !== null) ? Number(user.grace_points) : 0
       }
     });
   } catch (err) {
