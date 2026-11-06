@@ -1,5 +1,13 @@
 # Perazim app: complete every authorized update
 
+## Cost-conscious model preference
+
+Use GPT-6.1 Sol with low effort (owner's “Light”) for the main agent and
+Luna with high effort for bounded sub-agent tasks. This session exposes
+`gpt-6-luna`, not `gpt-6.1-luna`; report that distinction rather than silently
+claiming an unavailable version. Keep delegation minimal and avoid duplicate
+reads/tests. Do not escalate model/effort automatically without the owner's approval.
+
 ## Current development scope (owner instruction, 2026-11-06)
 
 The owner has deferred public deployment and authorized community development:
