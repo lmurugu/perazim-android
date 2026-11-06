@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Embedded, zero-cost, on-device AI intent and natural language engine.
+ * Built-in offline app-navigation guide. This is a rules engine, not a language model.
  * Features:
  * - Ultra-lightweight footprint (<1.2MB overhead).
  * - Instant (<15ms) on-device query classification on budget hardware (MediaTek Helio G70).
@@ -110,7 +110,7 @@ public class PerazimAiEngine {
         }
 
         // 12. GREETINGS & SALUTATIONS
-        if (containsAny(q, "hello", "hi", "hey", "praise the lord", "bwana asifiwe", "shalom", "good morning", "good evening")) {
+        if (q.matches("(?:hello|hi|hey|praise the lord|bwana asifiwe|shalom|good morning|good evening)[!. ]*")) {
             return getWelcomeResponse();
         }
 

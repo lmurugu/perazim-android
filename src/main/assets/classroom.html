@@ -1,0 +1,75 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; media-src blob:; connect-src 'none'; img-src 'none'; base-uri 'none'; form-action 'none'"><title>Video class</title><style>
+*{box-sizing:border-box}body{margin:0;background:#101820;color:#f7fafb;font-family:system-ui,sans-serif;padding:20px}h1{font-size:23px;margin:0 0 8px}p{color:#c6d5dc;line-height:1.5}#status{min-height:48px}#videos{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.tile{background:#21313d;border-radius:16px;overflow:hidden;position:relative}video{width:100%;height:230px;object-fit:cover;display:block}.name{padding:10px;font-size:14px}.controls{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}button{border:0;border-radius:24px;padding:14px 19px;font-size:16px;font-weight:600;color:#102a36;background:#e0eeef}button:disabled{opacity:.5}#leave{background:#ffd7d7}#join{background:#b9edc8}.note{font-size:13px}
+</style></head><body><h1 id="title">Video class</h1><p id="status" role="status" aria-live="polite">Ready to join your class.</p><div class="controls"><button id="join">Join class</button><button id="mic" disabled>Mute microphone</button><button id="camera" disabled>Turn camera off</button><button id="leave">Leave</button></div><div id="videos"></div><p class="note">PC pilot · up to 4 participants · direct audio and video. Keep this screen open. Leaving or switching apps ends the call. Peers need a reachable local network; internet calling is not deployed.</p>
+<script>
+'use strict';
+let nextId=0, stream=null, self=null, cursor=0, stopped=false, joining=false, pollTimer=null, failures=0;
+const pending=new Map(), peers=new Map();
+const byId=id=>document.getElementById(id), status=text=>{byId('status').textContent=text;};
+window.setTitle=title=>{byId('title').textContent=title;};
+function request(action,body={}){
+ return new Promise((resolve,reject)=>{
+  const id=String(++nextId), timeout=setTimeout(()=>{pending.delete(id);reject(new Error('The PC server did not respond.'));},15000);
+  pending.set(id,{resolve,reject,timeout});
+  ClassroomNative.request(id,action,JSON.stringify(body));
+ });
+}
+window.nativeResponse=(id,ok,result)=>{const p=pending.get(id);if(!p)return;clearTimeout(p.timeout);pending.delete(id);if(ok)p.resolve(result);else{const e=new Error(result.error||'Classroom request failed');e.status=result.status;p.reject(e);}};
+function tile(id,name,media,local=false){
+ let card=byId('tile-'+id);if(!card){card=document.createElement('div');card.id='tile-'+id;card.className='tile';const video=document.createElement('video');video.autoplay=true;video.playsInline=true;video.muted=local;card.append(video);const label=document.createElement('div');label.className='name';card.append(label);byId('videos').append(card);}
+ card.querySelector('.name').textContent=name; if(media)card.querySelector('video').srcObject=media;
+}
+function drop(id){const peer=peers.get(id);if(peer){peer.pc.close();peers.delete(id);}byId('tile-'+id)?.remove();}
+async function signal(id,payload){if(stopped)return;try{await request('signal',{target:id,payload});}catch(error){if(!stopped&&peers.has(id)&&error.status!==404)status(error.message);}}
+function ensurePeer(member){
+ const id=member.sessionId;if(peers.has(id))return peers.get(id);
+ const pc=new RTCPeerConnection({iceServers:[]});
+ const peer={pc,ice:[],name:member.displayName||'Member'};peers.set(id,peer);
+ for(const track of stream.getTracks())pc.addTrack(track,stream);
+ tile(id,peer.name+' · connecting',null);
+ pc.onicecandidate=e=>{if(e.candidate)signal(id,{type:'ice',candidate:e.candidate.toJSON()});};
+ pc.ontrack=e=>{if(!stopped)tile(id,peer.name,e.streams[0]);};
+ pc.onconnectionstatechange=()=>{if(stopped)return;if(pc.connectionState==='failed')status('A participant could not connect. Use the same reachable local network and rejoin.');if(pc.connectionState==='connected')status('In class · '+(peers.size+1)+' participant'+(peers.size?'s':''));};
+ return peer;
+}
+async function reconcile(members){
+ const live=new Set(members.map(m=>m.sessionId));for(const id of peers.keys())if(!live.has(id))drop(id);
+ for(const member of members){if(member.sessionId===self||peers.has(member.sessionId))continue;
+  const peer=ensurePeer(member);
+  if(self<member.sessionId){await peer.pc.setLocalDescription(await peer.pc.createOffer());await signal(member.sessionId,{type:'offer',sdp:peer.pc.localDescription.sdp});}
+ }
+}
+async function receive(event){
+ const peer=peers.get(event.from);if(!peer)return;const p=event.payload;
+ if(p.type==='ice'){if(peer.pc.remoteDescription)await peer.pc.addIceCandidate(p.candidate);else peer.ice.push(p.candidate);return;}
+ if(p.type==='offer'||p.type==='answer'){
+  await peer.pc.setRemoteDescription({type:p.type,sdp:p.sdp});
+  for(const candidate of peer.ice.splice(0))await peer.pc.addIceCandidate(candidate);
+  if(p.type==='offer'){await peer.pc.setLocalDescription(await peer.pc.createAnswer());await signal(event.from,{type:'answer',sdp:peer.pc.localDescription.sdp});}
+ }
+}
+async function poll(){
+ if(stopped||!self)return;
+ try{const result=await request('poll',{after:cursor});if(stopped)return;await reconcile(result.participants);for(const event of result.events)await receive(event);cursor=result.cursor;failures=0;if(!peers.size)status('In class · waiting for other participants.');}
+ catch(error){if(stopped)return;failures++;status(error.message+' Retrying…');if(error.status===401||error.status===403||error.status===410||failures>=5){status(error.message+' Leave and join again.');window.leaveCall();return;}}
+ if(!stopped)pollTimer=setTimeout(poll,800);
+}
+byId('join').onclick=async()=>{
+ if(joining||self||stopped)return;joining=true;byId('join').disabled=true;status('Starting camera and microphone…');
+ try{
+  if(!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection)throw new Error('Update Android System WebView to use video classes.');
+  stream=await navigator.mediaDevices.getUserMedia({audio:true,video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}});
+  if(stopped){stream.getTracks().forEach(t=>t.stop());return;}
+  tile('local','You',stream,true);
+  const random=new Uint8Array(20);crypto.getRandomValues(random);const joinKey=Array.from(random,n=>n.toString(16).padStart(2,'0')).join('');
+  const result=await request('join',{joinKey});if(stopped)return;self=result.sessionId;cursor=result.cursor;
+  byId('mic').disabled=false;byId('camera').disabled=false;byId('join').textContent='Joined';
+  await reconcile(result.participants);status('In class · waiting for connections.');poll();
+ }catch(error){status(error.message);window.leaveCall();}finally{joining=false;}
+};
+byId('mic').onclick=()=>{const tracks=stream?.getAudioTracks()||[];if(!tracks.length)return;const enabled=!tracks[0].enabled;tracks.forEach(t=>t.enabled=enabled);byId('mic').textContent=enabled?'Mute microphone':'Unmute microphone';byId('mic').setAttribute('aria-pressed',String(!enabled));};
+byId('camera').onclick=()=>{const tracks=stream?.getVideoTracks()||[];if(!tracks.length)return;const enabled=!tracks[0].enabled;tracks.forEach(t=>t.enabled=enabled);byId('camera').textContent=enabled?'Turn camera off':'Turn camera on';byId('camera').setAttribute('aria-pressed',String(!enabled));};
+window.leaveCall=()=>{if(stopped)return;stopped=true;clearTimeout(pollTimer);for(const id of peers.keys())drop(id);if(stream)stream.getTracks().forEach(t=>t.stop());for(const p of pending.values()){clearTimeout(p.timeout);p.reject(new Error('Call ended'));}pending.clear();byId('join').disabled=true;byId('mic').disabled=true;byId('camera').disabled=true;};
+byId('leave').onclick=()=>{window.leaveCall();ClassroomNative.close();};
+window.addEventListener('pagehide',window.leaveCall);
+</script></body></html>

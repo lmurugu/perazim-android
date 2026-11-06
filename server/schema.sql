@@ -203,3 +203,25 @@ CREATE TABLE IF NOT EXISTS user_challenge_completions (
 
 -- Apply the new-account allowance to existing installations without resetting balances.
 ALTER TABLE users ALTER COLUMN grace_points SET DEFAULT 0;
+
+-- Member-created class sessions belong to an existing private group.
+CREATE TABLE IF NOT EXISTS community_classes (
+    id VARCHAR(64) PRIMARY KEY,
+    group_id VARCHAR(64) NOT NULL REFERENCES community_groups(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    starts_at BIGINT NOT NULL,
+    duration_minutes INTEGER NOT NULL DEFAULT 60,
+    meeting_url TEXT NOT NULL DEFAULT '',
+    created_by VARCHAR(64) NOT NULL REFERENCES users(id),
+    is_cancelled BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at BIGINT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_classes_group_start ON community_classes(group_id, starts_at);
+
+-- Upload ownership prevents a guessed private attachment URL being reposted publicly.
+CREATE TABLE IF NOT EXISTS community_media (
+    filename VARCHAR(128) PRIMARY KEY,
+    owner_id VARCHAR(64) NOT NULL REFERENCES users(id),
+    created_at BIGINT NOT NULL
+);

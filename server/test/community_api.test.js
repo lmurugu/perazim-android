@@ -352,7 +352,7 @@ async function runTests() {
     assert(roster.body.members.some(m => m.user_id === maryUser.id));
     console.log('✅ Group member management verified');
 
-    // Non-admin attempting to create group is rejected with 403
+    // Every signed-in member may own a private group.
     const badGroup = await request({
       hostname: '127.0.0.1',
       port: 3008,
@@ -360,10 +360,11 @@ async function runTests() {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${johnToken}` }
     }, {
-      name: 'Unauthorized Rogue Group'
+      name: 'John Private Study Group'
     });
-    assert.strictEqual(badGroup.status, 403);
-    console.log('✅ Non-admin group creation rejected with 403 Forbidden');
+    assert.strictEqual(badGroup.status, 201);
+    const privateGroupId = badGroup.body.group.id;
+    console.log('✅ Member-owned private group created');
 
     // 9. 1-to-1 Private Messaging
     console.log('\n--- Step 9: 1-to-1 Private Messaging ---');
@@ -379,9 +380,10 @@ async function runTests() {
       mediaUrl: uploadedMediaUrl
     });
     assert.strictEqual(sendMsg.status, 201);
-    assert.strictEqual(sendMsg.body.message.delivery_status, 'DELIVERED');
+    assert.strictEqual(sendMsg.body.message.delivery_status, 'SENT');
+    assert.strictEqual(sendMsg.body.message.delivered_at, null);
     const msgId = sendMsg.body.message.id;
-    console.log(`✅ Sent direct message (${msgId}) with status DELIVERED`);
+    console.log(`✅ Sent direct message (${msgId}) with status SENT`);
 
     // Mary checks conversations
     const convs = await request({
@@ -423,6 +425,50 @@ async function runTests() {
     assert.strictEqual(ackRes.body.updated, 1);
     console.log('✅ Message marked as READ');
 
+    // Scope and retry regressions: outsiders cannot enumerate private content/media.
+    const api = (method, route, token, body) => request({hostname:'127.0.0.1',port:3008,path:route,method,
+      headers:token?{Authorization:`Bearer ${token}`} : {}},body);
+    const privateUpload = await api('POST','/api/community/media/upload',johnToken,{base64Data:png1x1Base64});
+    assert.strictEqual(privateUpload.status,201);
+    const privateUrl=privateUpload.body.mediaUrl;
+    const privatePost = await api('POST','/api/community/posts',johnToken,{id:`post_private_${Date.now()}`,title:'Private group',content:'Members only',groupId:privateGroupId,mediaUrl:privateUrl});
+    assert.strictEqual(privatePost.status,201);
+    const privateId=privatePost.body.post.id;
+    assert.strictEqual((await api('GET',`/api/community/posts?groupId=${privateGroupId}`,maryToken)).status,403);
+    assert.strictEqual((await api('GET',`/api/community/groups/${privateGroupId}/members`,maryToken)).status,403);
+    assert.strictEqual((await api('GET',`/api/community/posts/${privateId}/comments`,maryToken)).status,404);
+    assert.strictEqual((await api('POST',`/api/community/posts/${privateId}/amen`,maryToken,{})).status,404);
+    assert.strictEqual((await api('GET',privateUrl,null)).status,404);
+    assert.strictEqual((await api('GET',privateUrl,maryToken)).status,404);
+    assert.strictEqual((await api('GET',privateUrl,johnToken)).status,200);
+    assert.strictEqual((await api('POST','/api/community/posts',maryToken,{title:'Stolen upload',content:'Not mine',mediaUrl:privateUrl})).status,400);
+    const publicPosts=await api('GET','/api/community/posts?limit=100',null);
+    assert(!publicPosts.body.posts.some(p=>p.id===privateId));
+    assert.strictEqual((await api('POST',`/api/community/groups/${privateGroupId}/members`,johnToken,{userId:maryUser.id})).status,200);
+    assert.strictEqual((await api('GET',privateUrl,maryToken)).status,200);
+    const scheduled=await api('POST','/api/community/classes',johnToken,{id:`class_test_${Date.now()}`,groupId:privateGroupId,title:'Bible study',startsAt:Date.now()+3600000,durationMinutes:60});
+    assert.strictEqual(scheduled.status,201);
+    const classId=scheduled.body.class.id;
+    assert((await api('GET','/api/community/classes',maryToken)).body.classes.some(c=>c.id===classId));
+    assert.strictEqual((await api('DELETE',`/api/community/classes/${classId}`,maryToken)).status,403);
+    assert.strictEqual((await api('DELETE',`/api/community/groups/${privateGroupId}/members/${maryUser.id}`,johnToken)).status,200);
+    assert.strictEqual((await api('GET',privateUrl,maryToken)).status,404);
+    assert(!(await api('GET','/api/community/classes',maryToken)).body.classes.some(c=>c.id===classId));
+    assert.strictEqual((await api('DELETE',`/api/community/classes/${classId}`,johnToken)).status,200);
+    const retryPayload={id:`msg_retry_${Date.now()}`,receiverId:maryUser.id,content:'Retry once'};
+    const firstSend=await api('POST','/api/community/messages',johnToken,retryPayload);
+    const retrySend=await api('POST','/api/community/messages',johnToken,retryPayload);
+    assert.strictEqual(firstSend.status,201);assert.strictEqual(retrySend.status,200);
+    assert.strictEqual(firstSend.body.message.id,retrySend.body.message.id);
+    const outsiderThread=await api('GET',`/api/community/messages/${johnUser.id}`,leviToken);
+    assert(!outsiderThread.body.messages.some(m=>m.id===retryPayload.id));
+    const outsiderAck=await api('POST','/api/community/messages/ack',leviToken,{messageIds:[retryPayload.id],status:'READ'});
+    assert.strictEqual(outsiderAck.body.updated,0);
+    const senderThread=await api('GET',`/api/community/messages/${maryUser.id}`,johnToken);
+    assert.strictEqual(senderThread.body.messages.find(m=>m.id===msgId).delivery_status,'READ');
+    console.log('✅ Private groups, scoped media, classes, membership revocation, and idempotent private messaging verified');
+
+    await query('DELETE FROM user_challenge_completions WHERE user_id = $1', [johnUser.id]);
     // 10. Daily Bible Challenge & Zero Reward Farming
     console.log('\n--- Step 10: Daily Bible Challenge ---');
     const todayChal = await request({

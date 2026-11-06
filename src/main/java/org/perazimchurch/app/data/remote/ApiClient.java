@@ -104,10 +104,11 @@ public final class ApiClient {
                                 @Nullable String authToken,
                                 ApiCallback callback) {
         final Context appContext = context.getApplicationContext();
+        final String requestBaseUrl = getBaseUrl(appContext);
         EXECUTOR.execute(() -> {
             HttpURLConnection conn = null;
             try {
-                String baseUrl = getBaseUrl(appContext);
+                String baseUrl = requestBaseUrl;
                 String fullUrl = baseUrl + (endpoint.startsWith("/") ? endpoint : "/" + endpoint);
 
                 URL url = new URL(fullUrl);

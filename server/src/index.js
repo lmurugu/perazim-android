@@ -3,7 +3,6 @@ const cors = require('cors');
 const { initDb } = require('./db');
 const { proxyTrustSetting } = require('./config/proxy');
 
-const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const prayerRoutes = require('./routes/prayers');
@@ -18,8 +17,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 
-// Static uploads serving
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Attachment authorization is evaluated against its current post/chat scope.
+app.get('/uploads/:filename', communityRoutes.serveMedia);
 
 // Request logger
 app.use((req, res, next) => {
@@ -47,6 +46,7 @@ app.use('/api/prayers', prayerRoutes);
 app.use('/api/campuses', campusRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/community', communityRoutes);
+app.use('/api/classroom-calls', require('./routes/classroomCalls'));
 
 // Global error handler
 app.use((err, req, res, next) => {

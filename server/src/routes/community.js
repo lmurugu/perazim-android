@@ -12,6 +12,56 @@ if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
+// Group contents and rosters are private to current members (or the church admin).
+async function canAccessGroup(user, groupId) {
+  if (!user) return false;
+  const result = await query(`SELECT g.id FROM community_groups g
+    WHERE g.id = $1 AND g.is_active = TRUE AND
+    ($2 = 'ADMIN' OR g.created_by = $3 OR EXISTS
+      (SELECT 1 FROM group_memberships m WHERE m.group_id = g.id AND m.user_id = $3))`,
+    [groupId, user.role, user.id]);
+  return result.rows.length > 0;
+}
+async function canManageGroup(user, groupId) {
+  const result = await query(`SELECT id FROM community_groups
+    WHERE id = $1 AND is_active = TRUE AND (created_by = $2 OR $3 = 'ADMIN')`,
+    [groupId, user.id, user.role]);
+  return result.rows.length > 0;
+}
+async function canAccessPost(user, postId) {
+  const result = await query('SELECT group_id FROM community_posts WHERE id = $1', [postId]);
+  if (!result.rows.length) return false;
+  return !result.rows[0].group_id || await canAccessGroup(user, result.rows[0].group_id);
+}
+
+// Only local, validated uploads owned by this member can be attached.
+async function ownsMedia(userId, mediaUrl) {
+  if (!mediaUrl) return true;
+  if (typeof mediaUrl !== 'string' || !/^\/uploads\/att_[a-zA-Z0-9_.-]+$/.test(mediaUrl)) return false;
+  const result = await query('SELECT 1 FROM community_media WHERE filename = $1 AND owner_id = $2', [path.basename(mediaUrl), userId]);
+  return result.rows.length > 0;
+}
+
+// Used for the legacy /uploads path too: never expose private photos as static files.
+const serveMedia = [optionalAuth, async (req, res) => {
+  try {
+    const filename = req.params.filename;
+    if (!/^att_[a-zA-Z0-9_.-]+$/.test(filename)) return res.sendStatus(404);
+    const url = '/uploads/' + filename;
+    const posts = await query('SELECT id FROM community_posts WHERE media_url = $1', [url]);
+    let allowed = false;
+    for (const post of posts.rows) if (await canAccessPost(req.user, post.id)) { allowed = true; break; }
+    if (!allowed && req.user) {
+      const mine = await query('SELECT 1 FROM community_media WHERE filename = $1 AND owner_id = $2', [filename, req.user.id]);
+      const chats = await query('SELECT 1 FROM messages WHERE media_url = $1 AND (sender_id = $2 OR receiver_id = $2)', [url, req.user.id]);
+      allowed = mine.rows.length > 0 || chats.rows.length > 0;
+    }
+    if (!allowed) return res.sendStatus(404);
+    res.set('Cache-Control', 'private, no-store');
+    return res.sendFile(path.join(UPLOADS_DIR, filename));
+  } catch (error) { return res.sendStatus(500); }
+}];
+
 // Helper to get current date string in Africa/Nairobi timezone (YYYY-MM-DD)
 function getNairobiDateString() {
   const d = new Date();
@@ -114,6 +164,9 @@ router.get('/posts', optionalAuth, async (req, res) => {
       params.push(type.toUpperCase());
     }
 
+    if (groupId && !await canAccessGroup(req.user, groupId)) {
+      return res.status(403).json({ error: 'This group is private. Ask its owner to add you.' });
+    }
     if (groupId) {
       conditions.push(`p.group_id = $${paramIndex++}`);
       params.push(groupId);
@@ -181,6 +234,8 @@ router.post('/posts', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Post content is required' });
     }
 
+    if (!await ownsMedia(req.user.id, mediaUrl)) return res.status(400).json({ error: 'Choose a photo uploaded by your account' });
+    if (String(type).toUpperCase() === 'EVENT' && (!Number.isFinite(Number(eventDate)) || Number(eventDate) <= 0)) return res.status(400).json({ error: 'Set a valid event date' });
     const allowedTypes = ['GENERAL', 'PRAYER', 'PRAISE', 'EVENT'];
     const postType = type.toUpperCase();
     if (!allowedTypes.includes(postType)) {
@@ -204,6 +259,8 @@ router.post('/posts', requireAuth, async (req, res) => {
         amen_count, comment_count, created_at, updated_at
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, FALSE, FALSE, $9, $10, 0, 0, $11, $11)
+      ON CONFLICT (id) DO UPDATE SET id = community_posts.id
+        WHERE community_posts.author_id = EXCLUDED.author_id
       RETURNING *
     `;
 
@@ -221,7 +278,9 @@ router.post('/posts', requireAuth, async (req, res) => {
       now
     ]);
 
-    if (postType === 'PRAYER') {
+    if (!result.rows.length) return res.status(409).json({ error: 'Post identifier already in use' });
+
+    if (postType === 'PRAYER' && !groupId) {
       await query(
         `INSERT INTO prayers (id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, FALSE, 'PUBLIC', 0, FALSE, '', $6, $6)
@@ -303,6 +362,7 @@ router.delete('/posts/:id', requireAuth, async (req, res) => {
 router.post('/posts/:id/amen', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
     const userId = req.user.id;
     const now = Date.now();
 
@@ -316,7 +376,8 @@ router.post('/posts/:id/amen', requireAuth, async (req, res) => {
       if (existing.rows.length > 0) {
         return { amenCount: postCheck.rows[0].amen_count, hasAmened: true };
       }
-      await client.query('INSERT INTO post_amens (post_id, user_id, created_at) VALUES ($1, $2, $3)', [id, userId, now]);
+      const added = await client.query('INSERT INTO post_amens (post_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING post_id', [id, userId, now]);
+      if (!added.rows.length) return { amenCount: (await client.query('SELECT amen_count FROM community_posts WHERE id = $1', [id])).rows[0].amen_count, hasAmened: true };
       const updateRes = await client.query(
         'UPDATE community_posts SET amen_count = amen_count + 1 WHERE id = $1 RETURNING amen_count',
         [id]
@@ -339,6 +400,7 @@ router.post('/posts/:id/amen', requireAuth, async (req, res) => {
 router.get('/posts/:id/comments', optionalAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
     const result = await query(
       `SELECT c.id, c.post_id, c.author_id, c.author_name, c.content, c.created_at,
               u.avatar_url AS author_avatar
@@ -360,7 +422,8 @@ router.get('/posts/:id/comments', optionalAuth, async (req, res) => {
 router.post('/posts/:id/comments', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
-    const { content } = req.body;
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
+    const { content, id: suppliedId } = req.body;
 
     if (!content || !content.trim()) {
       return res.status(400).json({ error: 'Comment content cannot be empty' });
@@ -372,7 +435,13 @@ router.post('/posts/:id/comments', requireAuth, async (req, res) => {
     }
 
     const post = postCheck.rows[0];
-    const commentId = `comm_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const commentId = suppliedId || `comm_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const previous = await query('SELECT * FROM post_comments WHERE id = $1', [commentId]);
+    if (previous.rows.length) {
+      if (previous.rows[0].author_id !== req.user.id || previous.rows[0].post_id !== id)
+        return res.status(409).json({ error: 'Comment identifier already in use' });
+      return res.json({ comment: previous.rows[0] });
+    }
     const now = Date.now();
 
     const comment = await withTransaction(async (client) => {
@@ -425,9 +494,10 @@ router.get('/groups', requireAuth, async (req, res) => {
               (SELECT COUNT(*) FROM group_memberships gm WHERE gm.group_id = g.id) AS member_count,
               (EXISTS (SELECT 1 FROM group_memberships gm WHERE gm.group_id = g.id AND gm.user_id = $1)) AS is_member
        FROM community_groups g
-       WHERE g.is_active = TRUE
+       WHERE g.is_active = TRUE AND ($2 = 'ADMIN' OR g.created_by = $1 OR EXISTS
+         (SELECT 1 FROM group_memberships x WHERE x.group_id = g.id AND x.user_id = $1))
        ORDER BY g.created_at ASC`,
-      [req.user.id]
+      [req.user.id, req.user.role]
     );
 
     res.json({ groups: result.rows });
@@ -441,9 +511,10 @@ router.get('/groups', requireAuth, async (req, res) => {
 router.get('/groups/:id/members', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    if (!await canAccessGroup(req.user, id)) return res.status(403).json({ error: 'This group is private' });
     const result = await query(
       `SELECT gm.group_id, gm.user_id, gm.role, gm.joined_at,
-              u.name, u.phone, u.avatar_url, u.campus_id
+              u.name, u.avatar_url
        FROM group_memberships gm
        JOIN users u ON gm.user_id = u.id
        WHERE gm.group_id = $1
@@ -461,10 +532,6 @@ router.get('/groups/:id/members', requireAuth, async (req, res) => {
 // POST /api/community/groups (Admin only)
 router.post('/groups', requireAuth, async (req, res) => {
   try {
-    if ((req.user.role !== 'ADMIN')) {
-      return res.status(403).json({ error: 'Only church administrators can create official community groups.' });
-    }
-
     const { id, name, description = '' } = req.body;
     if (!name || !name.trim()) {
       return res.status(400).json({ error: 'Group name is required' });
@@ -499,12 +566,10 @@ router.post('/groups', requireAuth, async (req, res) => {
 // POST /api/community/groups/:id/members (Admin only)
 router.post('/groups/:id/members', requireAuth, async (req, res) => {
   try {
-    if ((req.user.role !== 'ADMIN')) {
-      return res.status(403).json({ error: 'Only church administrators can add members to official groups.' });
-    }
-
     const { id } = req.params;
-    const { userId, role = 'MEMBER' } = req.body;
+    if (!await canManageGroup(req.user, id)) return res.status(403).json({ error: 'Only this group owner or an administrator can manage members' });
+    const { userId } = req.body;
+    const role = 'MEMBER';
 
     if (!userId) {
       return res.status(400).json({ error: 'userId is required' });
@@ -608,19 +673,27 @@ router.post('/messages', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Message content or media attachment is required' });
     }
 
+    if (!await ownsMedia(req.user.id, mediaUrl)) return res.status(400).json({ error: 'Choose a photo uploaded by your account' });
     const receiverCheck = await query('SELECT name FROM users WHERE id = $1', [receiverId]);
     if (receiverCheck.rows.length === 0) {
       return res.status(404).json({ error: 'Recipient member not found' });
     }
 
+    if (receiverId === req.user.id) return res.status(400).json({ error: 'Choose another member' });
     const convId = getConversationId(req.user.id, receiverId);
     const msgId = id || `msg_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const previous = await query('SELECT * FROM messages WHERE id = $1', [msgId]);
+    if (previous.rows.length) {
+      if (previous.rows[0].sender_id !== req.user.id || previous.rows[0].receiver_id !== receiverId)
+        return res.status(409).json({ error: 'Message identifier already in use' });
+      return res.json({ message: previous.rows[0] });
+    }
     const now = Date.now();
 
     const message = await withTransaction(async (client) => {
       const insertRes = await client.query(
         `INSERT INTO messages (id, conversation_id, sender_id, receiver_id, content, media_url, delivery_status, created_at, delivered_at)
-         VALUES ($1, $2, $3, $4, $5, $6, 'DELIVERED', $7, $7)
+         VALUES ($1, $2, $3, $4, $5, $6, 'SENT', $7, NULL)
          RETURNING *`,
         [msgId, convId, req.user.id, receiverId, (content || '').trim(), mediaUrl, now]
       );
@@ -654,6 +727,7 @@ router.post('/messages', requireAuth, async (req, res) => {
 router.post('/messages/ack', requireAuth, async (req, res) => {
   try {
     const { messageIds = [], status = 'READ' } = req.body;
+    if (!['DELIVERED', 'READ'].includes(status)) return res.status(400).json({ error: 'Invalid acknowledgement status' });
     if (!Array.isArray(messageIds) || messageIds.length === 0) {
       return res.json({ updated: 0 });
     }
@@ -661,7 +735,7 @@ router.post('/messages/ack', requireAuth, async (req, res) => {
     const resUpdate = await query(
       `UPDATE messages
        SET delivery_status = $1
-       WHERE id = ANY($2::text[]) AND receiver_id = $3
+       WHERE id = ANY($2::text[]) AND receiver_id = $3 AND delivery_status != 'READ'
        RETURNING id`,
       [status, messageIds, req.user.id]
     );
@@ -696,6 +770,9 @@ router.post('/media/upload', requireAuth, async (req, res) => {
     const filePath = path.join(UPLOADS_DIR, saveFilename);
 
     fs.writeFileSync(filePath, validated.buffer);
+    try {
+      await query('INSERT INTO community_media (filename, owner_id, created_at) VALUES ($1, $2, $3)', [saveFilename, req.user.id, Date.now()]);
+    } catch (error) { fs.unlinkSync(filePath); throw error; }
 
     res.status(201).json({
       mediaUrl: `/uploads/${saveFilename}`,
@@ -718,6 +795,7 @@ router.post('/media/upload', requireAuth, async (req, res) => {
 router.post('/posts/:id/rsvp', requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
     const { status = 'ATTENDING' } = req.body;
     const validStatuses = ['ATTENDING', 'DECLINED'];
 
@@ -765,6 +843,7 @@ router.post('/posts/:id/rsvp', requireAuth, async (req, res) => {
 router.get('/posts/:id/rsvps', optionalAuth, async (req, res) => {
   try {
     const { id } = req.params;
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
     const countRes = await query(
       `SELECT
          COUNT(*) FILTER (WHERE status = 'ATTENDING') AS attending_count,
@@ -980,4 +1059,69 @@ router.put('/profile', requireAuth, async (req, res) => {
   }
 });
 
+// Authenticated directory exposes names/IDs only, never phone numbers or emails.
+router.get('/members', requireAuth, async (req, res) => {
+  try {
+    const search = String(req.query.search || '').trim().slice(0, 80);
+    const result = await query(`SELECT id, name, avatar_url FROM users
+      WHERE id != $1 AND name ILIKE $2 ORDER BY name, id LIMIT 50`, [req.user.id, `%${search}%`]);
+    res.json({ members: result.rows });
+  } catch (error) { res.status(500).json({ error: 'Could not load members' }); }
+});
+
+router.delete('/groups/:id/members/:userId', requireAuth, async (req, res) => {
+  try {
+    if (!await canManageGroup(req.user, req.params.id)) return res.status(403).json({ error: 'Only the group owner can remove members' });
+    const owner = await query('SELECT created_by FROM community_groups WHERE id = $1', [req.params.id]);
+    if (owner.rows[0].created_by === req.params.userId) return res.status(400).json({ error: 'The owner cannot be removed' });
+    await query('DELETE FROM group_memberships WHERE group_id = $1 AND user_id = $2', [req.params.id, req.params.userId]);
+    res.json({ success: true });
+  } catch (error) { res.status(500).json({ error: 'Could not remove member' }); }
+});
+
+router.get('/classes', requireAuth, async (req, res) => {
+  try {
+    const result = await query(`SELECT c.*, g.name AS group_name, u.name AS teacher_name
+      FROM community_classes c JOIN community_groups g ON g.id = c.group_id
+      JOIN users u ON u.id = c.created_by
+      WHERE g.is_active = TRUE AND ($2 = 'ADMIN' OR g.created_by = $1 OR EXISTS
+        (SELECT 1 FROM group_memberships m WHERE m.group_id = g.id AND m.user_id = $1))
+      ORDER BY c.starts_at DESC LIMIT 100`, [req.user.id, req.user.role]);
+    res.json({ classes: result.rows });
+  } catch (error) { res.status(500).json({ error: 'Could not load classes' }); }
+});
+
+router.post('/classes', requireAuth, async (req, res) => {
+  try {
+    const { groupId, title, description = '', startsAt, durationMinutes = 60 } = req.body;
+    if (!groupId || !await canManageGroup(req.user, groupId)) return res.status(403).json({ error: 'Choose a group you own' });
+    if (typeof title !== 'string' || !title.trim() || title.length > 255 ||
+        !Number.isSafeInteger(Number(startsAt)) || Number(startsAt) < 1 ||
+        !Number.isInteger(Number(durationMinutes)) || Number(durationMinutes) < 5 || Number(durationMinutes) > 480) {
+      return res.status(400).json({ error: 'A title, valid date/time and duration of 5–480 minutes are required' });
+    }
+    const id = req.body.id || `class_${crypto.randomBytes(12).toString('hex')}`;
+    const result = await query(`INSERT INTO community_classes
+      (id, group_id, title, description, starts_at, duration_minutes, created_by, created_at)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      ON CONFLICT (id) DO UPDATE SET id = community_classes.id
+        WHERE community_classes.created_by = EXCLUDED.created_by
+      RETURNING *`, [id, groupId, title.trim(), String(description).slice(0, 10000),
+      Number(startsAt), Number(durationMinutes), req.user.id, Date.now()]);
+    if (!result.rows.length) return res.status(409).json({ error: 'Class identifier already in use' });
+    res.status(201).json({ class: result.rows[0] });
+  } catch (error) { res.status(500).json({ error: 'Could not schedule class' }); }
+});
+
+router.delete('/classes/:id', requireAuth, async (req, res) => {
+  try {
+    const result = await query(`UPDATE community_classes SET is_cancelled = TRUE
+      WHERE id = $1 AND (created_by = $2 OR $3 = 'ADMIN') RETURNING id`,
+      [req.params.id, req.user.id, req.user.role]);
+    if (!result.rows.length) return res.status(403).json({ error: 'Only the teacher can cancel this class' });
+    res.json({ success: true });
+  } catch (error) { res.status(500).json({ error: 'Could not cancel class' }); }
+});
+
 module.exports = router;
+module.exports.serveMedia = serveMedia;

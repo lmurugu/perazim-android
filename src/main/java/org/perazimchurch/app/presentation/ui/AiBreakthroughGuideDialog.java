@@ -2,6 +2,7 @@ package org.perazimchurch.app.presentation.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -31,6 +32,8 @@ import org.perazimchurch.app.ai.AiResponse;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.AiPreferences;
 import org.perazimchurch.app.ai.remote.AiRelayClient;
+import org.perazimchurch.app.ai.remote.ConversationHistory;
+import org.perazimchurch.app.ai.local.OnDeviceAi;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.List;
@@ -74,6 +77,18 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private EditText etInput;
     private Button btnSend;
     private TextView tvSub;
+    private final ConversationHistory onlineHistory = new ConversationHistory();
+    private boolean requestInFlight;
+    private final ConversationHistory localHistory = new ConversationHistory();
+    private Button btnMode;
+    private boolean localRequest;
+    private String guideMode() {
+        return activity.getSharedPreferences("perazim_guide_mode", Context.MODE_PRIVATE).getString("mode", "local");
+    }
+    private void setGuideMode(String mode) {
+        activity.getSharedPreferences("perazim_guide_mode", Context.MODE_PRIVATE).edit().putString("mode", mode).apply();
+        updateSubtitle();
+    }
 
     public AiBreakthroughGuideDialog(@NonNull Activity activity, @NonNull AiActionListener actionListener) {
         super(activity);
@@ -96,8 +111,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
 
-        // Display initial greeting
-        displayAiMessage(aiEngine.getWelcomeResponse(), "📱 Offline Guide (On-Device Rules)");
+        // Welcome is shown once and is never sent as model conversation history.
+        displayAiMessage(AiResponse.plainText(
+                "What would you like to explore? Ask a Bible question, talk through a concern, or find something in the app.\n\nChoose on-phone AI for a private conversation after a one-time model download, online AI for cloud answers, or built-in app help for quick shortcuts.",
+                java.util.Arrays.asList("Open the Bible", "Find my groups", "Start a reflection")), "Perazim Guide");
         updateSubtitle();
 
     }
@@ -187,6 +204,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
         header.addView(btnClose);
 
         sheet.addView(header);
+        btnMode = new Button(activity);
+        btnMode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnMode.setAllCaps(false);
+        btnMode.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        btnMode.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
+        btnMode.setOnClickListener(v -> {
+            if (localRequest) { OnDeviceAi.cancel(); return; }
+            if (!requestInFlight) showModeOptions();
+        });
+        sheet.addView(btnMode);
 
         // Chat messages scroll container
         chatScrollView = new ScrollView(activity);
@@ -259,6 +286,21 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void updateSubtitle() {
         if (tvSub == null) return;
+        String mode = guideMode();
+        if (btnMode != null) btnMode.setText("local".equals(mode)
+                ? (OnDeviceAi.isInstalled(activity) ? "On-phone AI · " + OnDeviceAi.MODEL_NAME + " · Change" : "On-phone AI · Download model · Change")
+                : ("online".equals(mode) ? "Online AI · Change mode" : "Offline app guide · Change mode"));
+        if ("local".equals(mode)) {
+            tvSub.setText(OnDeviceAi.isInstalled(activity) ? "Private on-device conversation · No internet needed" : "Download the model once to chat entirely offline");
+            tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+            tvSub.setOnClickListener(v -> showModeOptions());
+            return;
+        }
+        if ("guide".equals(mode)) {
+            tvSub.setText("Built-in app help · Not a generative model");
+            tvSub.setOnClickListener(v -> showModeOptions());
+            return;
+        }
         if (!AiPreferences.hasConsented(activity)) {
             tvSub.setText("📱 Offline Guide • Tap to enable AI");
             tvSub.setTextColor(COLOR_TEXT_MUTED);
@@ -278,6 +320,48 @@ public class AiBreakthroughGuideDialog extends Dialog {
             }
             tvSub.setOnClickListener(null);
         }
+    }
+
+    private void showModeOptions() {
+        new AlertDialog.Builder(activity).setTitle("Choose your guide")
+                .setItems(new String[]{"On-phone AI — private, works without internet", "Download / resume on-phone model (469 MB)", "Online AI — Google Gemini", "Offline app help — built-in shortcuts", "Clear this conversation"}, (dialog, which) -> {
+                    if (which == 0) setGuideMode("local");
+                    else if (which == 1) showModelDownload();
+                    else if (which == 2) { setGuideMode("online"); if (!AiPreferences.hasConsented(activity)) showConsentDialog(); }
+                    else if (which == 3) setGuideMode("guide");
+                    else {
+                        localHistory.clear(); onlineHistory.clear();
+                        messagesContainer.removeAllViews();
+                        displayAiMessage(AiResponse.plainText("Conversation cleared. What would you like to discuss?", null), "Perazim Guide");
+                    }
+                }).setNegativeButton("Close", null).show();
+    }
+
+    private void showModelDownload() {
+        if (OnDeviceAi.isInstalled(activity)) {
+            setGuideMode("local");
+            new AlertDialog.Builder(activity).setMessage("The on-phone model is installed. Questions and answers stay on this phone in this mode.").setPositiveButton("Done", null).show();
+            return;
+        }
+        new AlertDialog.Builder(activity).setTitle("Download on-phone AI")
+                .setMessage("Qwen2.5 0.5B Instruct is a small Apache-2.0 licensed language model from Qwen. Download: 469 MB. Allow at least 560 MB of free space. Wi-Fi is recommended. After setup it works with Wi-Fi and mobile data off.\n\nThis compact model can be slower and less accurate than online AI. Verify Bible references and important information.")
+                .setNegativeButton("Not now", null)
+                .setPositiveButton("Download", (dialog, which) -> {
+                    AlertDialog progress = new AlertDialog.Builder(activity).setTitle("Downloading on-phone model")
+                            .setMessage("Starting…").setCancelable(false).setNegativeButton("Pause", (d,w) -> OnDeviceAi.cancel()).create();
+                    progress.show();
+                    OnDeviceAi.download(activity, new OnDeviceAi.DownloadCallback() {
+                        public void onProgress(int percent) { if (progress.isShowing()) progress.setMessage(percent + "% · The download can be paused and resumed."); }
+                        public void onComplete() { progress.dismiss(); setGuideMode("local"); if (isShowing()) displayAiMessage(AiResponse.plainText("The model is ready. You can turn off Wi-Fi and mobile data and ask your question.", null), "On-phone AI ready"); }
+                        public void onError(String error) { progress.dismiss(); if (isShowing()) new AlertDialog.Builder(activity).setMessage(error).setPositiveButton("OK", null).show(); }
+                    });
+                }).show();
+    }
+
+    @Override public void dismiss() {
+        if (localRequest) OnDeviceAi.cancel();
+        localHistory.clear(); onlineHistory.clear();
+        super.dismiss();
     }
 
     public void showConsentDialog() {
@@ -304,7 +388,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         layout.addView(title);
 
         TextView body = new TextView(activity);
-        body.setText("Answers are generated by Google's AI. On the free service your questions may be used by Google to improve its models. Don't type private or personal details.\n\nEach member receives 3 daily breakthrough questions grounded in Church Scriptures.");
+        body.setText("Google's AI generates online answers. Your question and up to 6 recent question-and-answer exchanges from this chat are sent through the church relay to Google. Offline-guide messages are not sent. This chat history is kept only while this window is open. On the free service, Google may use questions to improve its models; avoid private details.\n\nThe online service currently allows 3 questions per day.");
         body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         body.setTextColor(COLOR_TEXT_DARK);
         body.setPadding(0, dp(12), 0, dp(10));
@@ -336,6 +420,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         btnDecline.setBackground(null);
         btnDecline.setOnClickListener(v -> {
             AiPreferences.setConsent(activity, false);
+            onlineHistory.clear();
             consentDlg.dismiss();
             updateSubtitle();
         });
@@ -376,12 +461,41 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private void submitQuery(String text) {
-        if (text == null || text.trim().isEmpty()) return;
+        if (requestInFlight || text == null || text.trim().isEmpty()) return;
         final String query = text.trim();
         etInput.setText("");
 
         // 1. Render User Message Bubble
         displayUserMessage(query);
+
+        String mode = guideMode();
+        if ("local".equals(mode)) {
+            if (!OnDeviceAi.isInstalled(activity)) {
+                displayAiMessage(AiResponse.plainText("Download the on-phone model to have a real AI conversation without internet. Use the mode button above to set it up. Built-in app help remains available separately.", null), "Model not installed");
+                return;
+            }
+            final View indicator = showTypingIndicator();
+            requestInFlight = true; localRequest = true; btnSend.setEnabled(false);
+            if (btnMode != null) btnMode.setText("Stop response");
+            OnDeviceAi.ask(activity, query, localHistory.snapshot(), new OnDeviceAi.Callback() {
+                public void onSuccess(String answer) {
+                    removeTypingIndicator(indicator); localRequest = false; updateSubtitle();
+                    if (!isShowing()) return;
+                    String result = ConversationHistory.withoutRepeatedGreeting(answer, !localHistory.isEmpty());
+                    localHistory.addExchange(query, result);
+                    displayAiMessage(AiResponse.plainText(result, null), "On-phone AI · Qwen · Offline");
+                }
+                public void onError(String error) {
+                    removeTypingIndicator(indicator); localRequest = false; updateSubtitle();
+                    if (isShowing()) displayAiMessage(AiResponse.plainText(error, null), "On-phone model notice");
+                }
+            });
+            return;
+        }
+        if ("guide".equals(mode)) {
+            displayAiMessage(aiEngine.processQuery(query), "Offline app help · Built-in rules");
+            return;
+        }
 
         // 2. Check consent
         if (!AiPreferences.hasConsented(activity)) {
@@ -409,22 +523,28 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         // 4. Show typing/pondering indicator
         final View typingIndicator = showTypingIndicator();
+        requestInFlight = true;
+        btnSend.setEnabled(false);
 
         // 5. Query Cloudflare Relay
-        AiRelayClient.askQuestion(activity, query, new AiRelayClient.RelayCallback() {
+        AiRelayClient.askQuestion(activity, query, onlineHistory.snapshot(), new AiRelayClient.RelayCallback() {
             @Override
             public void onSuccess(@NonNull String answer, int remainingQuestionsToday) {
                 removeTypingIndicator(typingIndicator);
+                if (!isShowing()) return;
                 updateSubtitle();
 
                 String badge = "⚡ Online Cloud AI (Gemini · " + remainingQuestionsToday + " questions left today)";
-                AiResponse response = AiResponse.plainText(answer, null);
+                String conversationalAnswer = ConversationHistory.withoutRepeatedGreeting(answer, !onlineHistory.isEmpty());
+                onlineHistory.addExchange(query, conversationalAnswer);
+                AiResponse response = AiResponse.plainText(conversationalAnswer, null);
                 displayAiMessage(response, badge);
             }
 
             @Override
             public void onQuotaExceeded(int remainingQuestionsToday) {
                 removeTypingIndicator(typingIndicator);
+                if (!isShowing()) return;
                 updateSubtitle();
 
                 AiResponse offlineResp = aiEngine.processQuery(query);
@@ -434,6 +554,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             @Override
             public void onError(@NonNull String errorMessage, boolean shouldFallbackOffline) {
                 removeTypingIndicator(typingIndicator);
+                if (!isShowing()) return;
                 updateSubtitle();
 
                 if (shouldFallbackOffline) {
@@ -471,6 +592,9 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private void removeTypingIndicator(View indicator) {
+        requestInFlight = false;
+        if (btnSend != null) btnSend.setEnabled(true);
+        if (!isShowing()) return;
         if (indicator != null && messagesContainer != null) {
             messagesContainer.removeView(indicator);
         }

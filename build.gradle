@@ -22,6 +22,12 @@ android {
     namespace 'org.perazimchurch.app'
     compileSdk 34
     compileOptions { sourceCompatibility JavaVersion.VERSION_11; targetCompatibility JavaVersion.VERSION_11 }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+            keepDebugSymbols += ['**/*.so']
+        }
+    }
     buildFeatures {
         buildConfig true
     }

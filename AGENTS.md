@@ -1,18 +1,15 @@
 # Perazim app: complete every authorized update
 
-## Phase A acceptance hold (owner instruction, 2026-11-06)
+## Current development scope (owner instruction, 2026-11-06)
 
-Phase A is NOT accepted. Work only on its five blockers; do not start or extend
-Phase B. Do not publish a Phase A complete report until all five are addressed:
-real verse screenshots for KJV/SUV/NIV/ESV/NKJV, public HTTPS deployment,
-complete campus label/row removal, progress-writing helper audit/remediation,
-and zero starting grace points unless the owner explicitly approves otherwise.
-
-Do not run multi-user acceptance tests until the public HTTPS endpoint is up
-and reachable from a phone using normal mobile data with Wi-Fi and USB tunneling
-excluded. Local, LAN, emulator, and `adb reverse` results are development evidence
-only. Never count them as network acceptance. This gate overrides the general
-test/synchronization workflow below where it would run those acceptance tests.
+The owner has deferred public deployment and authorized community development:
+feed, groups, classes, private chat, games and better AI. The previous Phase A-only
+hold is superseded. Do not purchase hosting or publish the PC backend. Preserve
+zero starting grace points and the progress-helper safeguards. Public acceptance
+remains unverified; local tests are development evidence, not internet acceptance.
+The owner explicitly authorizes opening the app over YouTube or other personal
+apps on the connected test phone. Preserve accounts and data; never clear data
+or log out except after a deliberate user-selected account/server change.
 
 The owner wants changes followed through without reminders. Apply this workflow
 at the end of each authorized implementation task in this repository.
@@ -26,7 +23,7 @@ at the end of each authorized implementation task in this repository.
 3. When Android changes, update the connected, authorized phone in place with
    `adb install -r build/outputs/apk/debug/app-debug.apk`. Select an explicit
    device if more than one is connected. Never uninstall, clear data, downgrade,
-   log out, or navigate a phone being used personally. Verify the installed
+   log out, or interrupt unrelated actions beyond opening/testing this app as authorized above. Verify the installed
    base APK's SHA-256 matches the built APK; a version label alone is insufficient.
 4. When backend code changes, restart the configured local PC backend using
    `server/scripts/local-backend.sh stop` then `start`, and verify

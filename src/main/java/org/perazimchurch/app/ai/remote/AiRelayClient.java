@@ -23,6 +23,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Collections;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -66,7 +68,15 @@ public final class AiRelayClient {
     public static void askQuestion(@NonNull final Context context,
                                    @NonNull final String rawQuestion,
                                    @NonNull final RelayCallback callback) {
+        askQuestion(context, rawQuestion, Collections.emptyList(), callback);
+    }
+
+    public static void askQuestion(@NonNull final Context context,
+                                   @NonNull final String rawQuestion,
+                                   @NonNull final List<ConversationHistory.Turn> history,
+                                   @NonNull final RelayCallback callback) {
         final Context appContext = context.getApplicationContext();
+        final List<ConversationHistory.Turn> snapshot = new ArrayList<>(history);
 
         // 1. Consent check
         if (!AiPreferences.hasConsented(appContext)) {
@@ -90,10 +100,10 @@ public final class AiRelayClient {
         }
 
         // 4. Background network execution
-        EXECUTOR.execute(() -> executeRequest(appContext, rawQuestion, callback));
+        EXECUTOR.execute(() -> executeRequest(appContext, rawQuestion, snapshot, callback));
     }
 
-    private static void executeRequest(Context appContext, String rawQuestion, RelayCallback callback) {
+    private static void executeRequest(Context appContext, String rawQuestion, List<ConversationHistory.Turn> history, RelayCallback callback) {
         HttpURLConnection conn = null;
         try {
             // Gather contextual details
@@ -133,7 +143,18 @@ public final class AiRelayClient {
             // Build JSON payload
             JSONObject root = new JSONObject();
             root.put("deviceId", deviceId);
-            root.put("question", rawQuestion.trim());
+            root.put("question", ConversationHistory.legacyQuestion(rawQuestion.trim(), history));
+            root.put("currentQuestion", rawQuestion.trim());
+            JSONArray historyJson = new JSONArray();
+            int from = Math.max(0, history.size() - ConversationHistory.MAX_TURNS);
+            for (int i = from; i < history.size(); i++) {
+                ConversationHistory.Turn turn = history.get(i);
+                JSONObject message = new JSONObject();
+                message.put("role", turn.role);
+                message.put("text", turn.text);
+                historyJson.put(message);
+            }
+            root.put("history", historyJson);
             if (firstName != null && !firstName.isEmpty()) {
                 root.put("firstName", firstName);
             }
@@ -190,6 +211,10 @@ public final class AiRelayClient {
                 String answer = respJson.optString("answer", "").trim();
                 int remaining = respJson.optInt("remaining", 0);
 
+                if (answer.isEmpty()) {
+                    postError(callback, "The AI returned an empty answer. Please try again.", true);
+                    return;
+                }
                 AiPreferences.recordQuestionUsed(appContext);
                 postSuccess(callback, answer, remaining);
             } else if (statusCode == 429) {

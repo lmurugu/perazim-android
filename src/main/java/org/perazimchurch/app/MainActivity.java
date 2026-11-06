@@ -47,6 +47,7 @@ import org.perazimchurch.app.navigation.NavigationContract;
 import org.perazimchurch.app.presentation.ui.AiBreakthroughGuideDialog;
 import org.perazimchurch.app.presentation.ui.BibleReaderDialog;
 import org.perazimchurch.app.presentation.ui.FellowshipUiBinder;
+import org.perazimchurch.app.presentation.ui.CommunityUiBinder;
 import org.perazimchurch.app.presentation.ui.HomeUiBinder;
 import org.perazimchurch.app.presentation.ui.GivingDialog;
 import org.perazimchurch.app.presentation.ui.OnboardingDialog;
@@ -158,6 +159,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private SermonsUiBinder sermonsUiBinder;
     private WorshipUiBinder worshipUiBinder;
     private FellowshipUiBinder fellowshipUiBinder;
+    private CommunityUiBinder communityUiBinder;
     private ProfileUiBinder profileUiBinder;
     private FrameLayout splashContainer;
 
@@ -277,6 +279,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         if (sermonsUiBinder != null && sermonsUiBinder.isPlaying()) {
             sermonsUiBinder.pausePlayback();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,int resultCode,Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        if(communityUiBinder!=null)communityUiBinder.onActivityResult(requestCode,resultCode,data);
     }
 
     @Override
@@ -578,7 +586,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 NavigationContract.TAB_TITLE_HOME,
                 NavigationContract.TAB_TITLE_SERMONS,
                 NavigationContract.TAB_TITLE_WORSHIP,
-                NavigationContract.TAB_TITLE_PRAYER,
+                "Community",
                 NavigationContract.TAB_TITLE_ME
         };
 
@@ -628,8 +636,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             tabViews[i].setVisibility(i == currentTabIndex ? View.VISIBLE : View.GONE);
         }
         refreshTabStyles();
-        if (currentTabIndex == 3 && fellowshipUiBinder != null) {
-            fellowshipUiBinder.refreshPrayers();
+        if (currentTabIndex == 3 && communityUiBinder != null) {
+            communityUiBinder.refresh();
         }
     }
 
@@ -1790,7 +1798,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             factory = ViewModelFactory.getInstance(this);
         }
         fellowshipUiBinder = new FellowshipUiBinder(this, factory.createFellowshipViewModel());
-        return fellowshipUiBinder.bind();
+        communityUiBinder = new CommunityUiBinder(this, () -> {
+            ScrollView prayer = fellowshipUiBinder.bind();
+            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Prayer wall")
+                    .setView(prayer).setNegativeButton("Close", null).create();
+            dialog.show();
+            if (dialog.getWindow() != null) dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT, (int)(getResources().getDisplayMetrics().heightPixels * 0.90));
+        });
+        return communityUiBinder.bind();
     }
 
     private ScrollView buildLegacyFellowshipScreen() {
