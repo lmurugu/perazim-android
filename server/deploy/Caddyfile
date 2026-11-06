@@ -1,0 +1,14 @@
+{
+    email {$ACME_EMAIL}
+}
+
+{$API_DOMAIN} {
+    # Existing community code is not part of Phase A public rollout.
+    @phaseB path /api/community /api/community/*
+    handle @phaseB {
+        respond "Not found" 404
+    }
+    handle {
+        reverse_proxy api:3000
+    }
+}

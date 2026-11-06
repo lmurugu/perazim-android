@@ -1,0 +1,70 @@
+# Standalone VPS stack. It is not an override for ../docker-compose.yml.
+name: perazim
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: perazim_church
+      POSTGRES_USER: perazim_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a unique hex POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [database]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U perazim_user -d perazim_church"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ..
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # API has no host ports; Caddy is the only public request path.
+      TRUST_PROXY_HOPS: "1"
+      DATABASE_URL: postgres://perazim_user:${POSTGRES_PASSWORD:?Set a unique hex POSTGRES_PASSWORD}@db:5432/perazim_church
+      JWT_SECRET: ${JWT_SECRET:?Set a unique JWT_SECRET of at least 32 characters}
+    volumes:
+      - uploads:/app/uploads
+    networks: [database, edge]
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  https:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?Set the public API DNS hostname}
+      ACME_EMAIL: ${ACME_EMAIL:?Set the certificate operator email}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge]
+    depends_on:
+      api:
+        condition: service_healthy
+
+networks:
+  database:
+    internal: true
+  edge:
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:

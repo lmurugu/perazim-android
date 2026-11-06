@@ -12,6 +12,8 @@
  * 6. Cleanly terminates Child Process 2.
  */
 
+const { assertDisposableTestDatabase } = require('./test_database_safety');
+assertDisposableTestDatabase(process.env.DATABASE_URL || 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test');
 const http = require('http');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -192,7 +194,7 @@ function terminateChildProcess(child, timeoutMs = 5000) {
 
 function isDatabaseSafeForTruncate(dbName, isExplicitlySafe = false) {
   if (!dbName || typeof dbName !== 'string') return false;
-  return dbName.endsWith('_test') || isExplicitlySafe === true;
+  return dbName.endsWith('_test');
 }
 
 async function prepareTestDatabase() {
@@ -205,7 +207,7 @@ async function prepareTestDatabase() {
     if (!isDatabaseSafeForTruncate(activeDb, isExplicitlySafe)) {
       throw new Error(
         `SAFETY ABORT: Refusing to run tests on non-test database "${activeDb}". ` +
-        `Target database name must end with "_test" or PERAZIM_TEST_SAFE=true must be set.`
+        `Target database name must end with "_test"; overrides are not allowed.`
       );
     }
 

@@ -1,5 +1,19 @@
 # Perazim app: complete every authorized update
 
+## Phase A acceptance hold (owner instruction, 2026-11-06)
+
+Phase A is NOT accepted. Work only on its five blockers; do not start or extend
+Phase B. Do not publish a Phase A complete report until all five are addressed:
+real verse screenshots for KJV/SUV/NIV/ESV/NKJV, public HTTPS deployment,
+complete campus label/row removal, progress-writing helper audit/remediation,
+and zero starting grace points unless the owner explicitly approves otherwise.
+
+Do not run multi-user acceptance tests until the public HTTPS endpoint is up
+and reachable from a phone using normal mobile data with Wi-Fi and USB tunneling
+excluded. Local, LAN, emulator, and `adb reverse` results are development evidence
+only. Never count them as network acceptance. This gate overrides the general
+test/synchronization workflow below where it would run those acceptance tests.
+
 The owner wants changes followed through without reminders. Apply this workflow
 at the end of each authorized implementation task in this repository.
 

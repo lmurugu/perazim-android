@@ -1,3 +1,7 @@
+// This suite always uses its own transient store, never an inherited member DB.
+delete process.env.DATABASE_URL;
+process.env.NODE_ENV = 'test';
+process.env.ALLOW_MEMORY_STORE = 'true';
 const http = require('http');
 const { app, startServer } = require('../src/index');
 

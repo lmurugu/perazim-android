@@ -36,7 +36,7 @@ public final class GamificationStore {
     /**
      * Testing hook to inject an in-memory SharedPreferences instance during unit tests.
      */
-    public static void setPreferencesForTesting(@Nullable SharedPreferences prefs) {
+    static void setPreferencesForTesting(@Nullable SharedPreferences prefs) {
         sOverridePrefs = prefs;
     }
 
@@ -45,7 +45,8 @@ public final class GamificationStore {
     }
 
     private static SharedPreferences getPrefs(@Nullable Context context) {
-        if (sOverridePrefs != null) {
+        // Test preferences must never redirect writes made with a real app context.
+        if (context == null && sOverridePrefs != null) {
             return sOverridePrefs;
         }
         if (context == null) {
@@ -271,7 +272,7 @@ public final class GamificationStore {
     /**
      * Core date-parameterized implementation allowing deterministic testing across date boundaries.
      */
-    public static boolean recordDailyRoutineCompletedForDate(Context context, String userId, String dateString, int currentStreak) {
+    static boolean recordDailyRoutineCompletedForDate(Context context, String userId, String dateString, int currentStreak) {
         if (!isAvailable(context) || dateString == null || dateString.trim().isEmpty()) return false;
         String uid = resolveUserId(userId);
         String lastDate = getLastRoutineDate(context, uid, null);

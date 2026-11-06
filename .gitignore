@@ -63,3 +63,4 @@ google-services.json
 
 # Local PC backend runtime (database, binaries, logs, private configuration)
 server/.runtime/
+server/deploy/backups/

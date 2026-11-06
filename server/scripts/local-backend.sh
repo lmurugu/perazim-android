@@ -43,6 +43,20 @@ JS
     cd "$SERVER_DIR"
     nohup setsid node src/index.js >> "$RUNTIME/api.log" 2>&1 < /dev/null &
     echo "$!" > "$RUNTIME/api.pid"
+    # Keep the launching shell alive until the detached API has actually bound
+    # its socket; returning immediately can race process startup in task runners.
+    ready=false
+    for attempt in {1..15}; do
+      if curl --fail --silent --max-time 2 http://127.0.0.1:3000/api/health >/dev/null; then
+        ready=true
+        break
+      fi
+      sleep 1
+    done
+    if [[ "$ready" != true ]]; then
+      echo 'Local API did not become healthy; inspect .runtime/api.log.' >&2
+      exit 1
+    fi
     echo 'Started local API on port 3000; PostgreSQL stays on loopback port 5433.'
     ;;
   stop)

@@ -86,7 +86,7 @@ public final class UserMapper {
             int streak = GamificationStore.getStreak(appContext, uid, entity.getStreakCount());
             boolean frozen = GamificationStore.isStreakFrozen(appContext, uid, entity.isStreakFrozen());
             int xp = GamificationStore.getSpiritualXp(appContext, uid, entity.getSpiritualXp());
-            int grace = GamificationStore.getGracePoints(appContext, uid, entity.getGracePoints() > 0 ? entity.getGracePoints() : 2);
+            int grace = GamificationStore.getGracePoints(appContext, uid, entity.getGracePoints());
             user.setStreakCount(streak);
             user.setSpiritualXp(xp);
             user.setGracePoints(grace);
@@ -103,7 +103,7 @@ public final class UserMapper {
                 // Default gamification values from entity or fallback
                 user.setStreakCount(entity.getStreakCount() > 0 ? entity.getStreakCount() : 0);
                 user.setSpiritualXp(entity.getSpiritualXp() > 0 ? entity.getSpiritualXp() : 0);
-                user.setGracePoints(entity.getGracePoints() > 0 ? entity.getGracePoints() : 2);
+                user.setGracePoints(entity.getGracePoints());
                 user.setStreakFrozen(entity.isStreakFrozen());
             }
         }
@@ -158,20 +158,6 @@ public final class UserMapper {
                 domain.getGracePoints(),
                 domain.isStreakFrozen()
         );
-    }
-
-    /**
-     * Updates gamification stats in cache and GamificationStore for a given user id.
-     */
-    public static void updateGamificationStats(String userId, int streakCount, int spiritualXp, int gracePoints, boolean streakFrozen) {
-        if (userId != null) {
-            STATS_CACHE.put(userId, new GamificationStats(streakCount, spiritualXp, gracePoints, streakFrozen));
-            if (appContext != null) {
-                GamificationStore.saveStreak(appContext, userId, streakCount, streakFrozen);
-                GamificationStore.saveSpiritualXp(appContext, userId, spiritualXp);
-                GamificationStore.saveGracePoints(appContext, userId, gracePoints);
-            }
-        }
     }
 
     /**

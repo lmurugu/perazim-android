@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
+import org.perazimchurch.app.data.local.preference.GamificationTestAccess;
 import org.perazimchurch.app.presentation.ui.GivingDialog;
 
 import java.io.File;
@@ -37,12 +38,12 @@ public class GamificationStoreTest {
     @Before
     public void setUp() {
         fakePrefs = new FakeSharedPreferences();
-        GamificationStore.setPreferencesForTesting(fakePrefs);
+        GamificationTestAccess.setPreferences(fakePrefs);
     }
 
     @After
     public void tearDown() {
-        GamificationStore.setPreferencesForTesting(null);
+        GamificationTestAccess.setPreferences(null);
     }
 
     @Test
@@ -97,7 +98,7 @@ public class GamificationStoreTest {
         assertFalse(GamificationStore.isRoutineCompletedForDate(null, USER_ID, today));
 
         // Step 3: Complete today's routine
-        boolean isNewDay = GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, today, 1);
+        boolean isNewDay = GamificationTestAccess.completeForDate(USER_ID, today, 1);
         assertTrue("First completion on today must report new day", isNewDay);
 
         // Step 4: Querying today's completion now returns true
@@ -117,29 +118,29 @@ public class GamificationStoreTest {
         String day2 = "2026-11-02";
 
         // Day 1: First completion
-        boolean day1First = GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, day1, 1);
+        boolean day1First = GamificationTestAccess.completeForDate(USER_ID, day1, 1);
         assertTrue(day1First);
         assertEquals(1, GamificationStore.getLifetimeRoutineDays(null, USER_ID));
 
         // Day 1: User re-runs routine on the same day (should NOT double increment)
-        boolean day1Second = GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, day1, 1);
+        boolean day1Second = GamificationTestAccess.completeForDate(USER_ID, day1, 1);
         assertFalse("Duplicate completion on same day must not report new day", day1Second);
         assertEquals("Lifetime days must remain 1 after second tap today",
                 1, GamificationStore.getLifetimeRoutineDays(null, USER_ID));
 
         // Day 1: Third tap on same day
-        boolean day1Third = GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, day1, 1);
+        boolean day1Third = GamificationTestAccess.completeForDate(USER_ID, day1, 1);
         assertFalse(day1Third);
         assertEquals(1, GamificationStore.getLifetimeRoutineDays(null, USER_ID));
 
         // Day 2: First completion on new calendar day
-        boolean day2First = GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, day2, 2);
+        boolean day2First = GamificationTestAccess.completeForDate(USER_ID, day2, 2);
         assertTrue(day2First);
         assertEquals("Lifetime days must increment to 2 on next calendar day",
                 2, GamificationStore.getLifetimeRoutineDays(null, USER_ID));
 
         // Day 2: Re-run on Day 2
-        boolean day2Second = GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, day2, 2);
+        boolean day2Second = GamificationTestAccess.completeForDate(USER_ID, day2, 2);
         assertFalse(day2Second);
         assertEquals(2, GamificationStore.getLifetimeRoutineDays(null, USER_ID));
     }
@@ -159,7 +160,7 @@ public class GamificationStoreTest {
         assertEquals(100, GamificationStore.getSpiritualXp(null, USER_ID, 0));
 
         // Complete Day 1 routine (streak = 1)
-        GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, "2026-11-01", 1);
+        GamificationTestAccess.completeForDate(USER_ID, "2026-11-01", 1);
 
         // badge_first_routine must be awarded
         assertTrue("First routine badge must be earned", GamificationStore.hasBadgeFirstRoutine(null, USER_ID));
@@ -169,18 +170,18 @@ public class GamificationStoreTest {
         assertEquals("XP must remain unchanged by badge acquisition", 100, GamificationStore.getSpiritualXp(null, USER_ID, 0));
 
         // Advance to streak 6: badge_streak_7 still false
-        GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, "2026-11-06", 6);
+        GamificationTestAccess.completeForDate(USER_ID, "2026-11-06", 6);
         assertFalse("Streak 7 badge must still be false at streak 6", GamificationStore.hasBadgeStreak7(null, USER_ID));
         assertEquals(100, GamificationStore.getSpiritualXp(null, USER_ID, 0));
 
         // Reach streak 7: badge_streak_7 awarded
-        GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, "2026-11-07", 7);
+        GamificationTestAccess.completeForDate(USER_ID, "2026-11-07", 7);
         assertTrue("Streak 7 badge must now be earned", GamificationStore.hasBadgeStreak7(null, USER_ID));
         assertTrue("First routine badge remains earned", GamificationStore.hasBadgeFirstRoutine(null, USER_ID));
         assertEquals("XP must still be 100 (badges do not give XP)", 100, GamificationStore.getSpiritualXp(null, USER_ID, 0));
 
         // Day 8 (streak = 8): Badges stay earned, one-shot booleans remain stable
-        GamificationStore.recordDailyRoutineCompletedForDate(null, USER_ID, "2026-11-08", 8);
+        GamificationTestAccess.completeForDate(USER_ID, "2026-11-08", 8);
         assertTrue(GamificationStore.hasBadgeFirstRoutine(null, USER_ID));
         assertTrue(GamificationStore.hasBadgeStreak7(null, USER_ID));
         assertEquals(100, GamificationStore.getSpiritualXp(null, USER_ID, 0));

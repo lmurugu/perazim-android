@@ -1,3 +1,5 @@
+const { assertDisposableTestDatabase } = require('./test_database_safety');
+assertDisposableTestDatabase(process.env.DATABASE_URL || 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test');
 const http = require('http');
 const { app } = require('../src/index');
 const { initDb, query, closeDb, isPostgresActive } = require('../src/db');
@@ -109,14 +111,14 @@ function getDatabaseName(connStr) {
 
 function isDatabaseSafeForTruncate(dbName, isExplicitlySafe = false) {
   if (!dbName || typeof dbName !== 'string') return false;
-  return dbName.endsWith('_test') || isExplicitlySafe === true;
+  return dbName.endsWith('_test');
 }
 
 function assertDatabaseSafe(dbName, isExplicitlySafe = false) {
   if (!isDatabaseSafeForTruncate(dbName, isExplicitlySafe)) {
     throw new Error(
       `SAFETY ABORT: Refusing to truncate tables on non-test database "${dbName}". ` +
-      `Target database name must end with "_test" or PERAZIM_TEST_SAFE=true must be set.`
+      `Target database name must end with "_test"; overrides are not allowed.`
     );
   }
   return true;
@@ -167,7 +169,7 @@ async function runPostgresTests() {
   assert(isDatabaseSafeForTruncate('perazim_test', false) === true, 'Database ending in _test is approved for truncation without override');
   assert(isDatabaseSafeForTruncate('perazim_church', false) === false, 'Production database name is rejected for truncation');
   assert(isDatabaseSafeForTruncate('perazim_prod', false) === false, 'Production database without _test suffix is rejected for truncation');
-  assert(isDatabaseSafeForTruncate('perazim_church', true) === true, 'Explicit PERAZIM_TEST_SAFE override is honored');
+  assert(isDatabaseSafeForTruncate('perazim_church', true) === false, 'PERAZIM_TEST_SAFE cannot bypass member database protection');
   assert(isDatabaseSafeForTruncate('', false) === false, 'Empty database name is rejected for truncation');
   assert(isDatabaseSafeForTruncate(null, false) === false, 'Null database name is rejected for truncation');
 

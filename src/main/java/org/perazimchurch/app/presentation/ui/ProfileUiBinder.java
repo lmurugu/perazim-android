@@ -58,7 +58,6 @@ import java.util.List;
  * Binds directly to {@link ProfileViewModel} and manages:
  * <ul>
  *     <li>Member Profile Header (active user name, email, role, and avatar).</li>
- *     <li>Campus Switcher Dialog (Embu Headquarters, Nairobi, Meru, Online).</li>
  *     <li>Spiritual Journey Card (streak counter, streak freeze toggle, spiritual XP progress bar, Grace Points).</li>
  *     <li>Saved Content Manager with tabbed/expandable view for Downloaded Sermons, Favorite Hymns, and Bookmarked Scripture Verses.</li>
  * </ul>
@@ -94,7 +93,6 @@ public class ProfileUiBinder {
     // Current State Cache
     private User currentUser;
     private SavedContentData currentSavedContent;
-    private String selectedCampusName = "Embu Headquarters";
     private boolean isStreakFrozen = false;
 
     // Saved Content Manager UI references
@@ -470,7 +468,7 @@ public class ProfileUiBinder {
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_phone,
                 "Pastoral Care & Office",
-                "Call, WhatsApp, SMS, or directions to Embu Headquarters",
+                "Call, WhatsApp, SMS, or directions to the church",
                 v -> showPastoralCareDialog()
         ));
         card.addView(createHorizontalDivider());
@@ -1382,13 +1380,6 @@ public class ProfileUiBinder {
                 }
             });
         });
-    }
-
-    /**
-     * Campus switcher removed as Embu Headquarters is the sole active campus.
-     */
-    public void showCampusSwitcherDialog() {
-        Toast.makeText(context, "Perazim Mission Church is located at Embu Headquarters.", Toast.LENGTH_SHORT).show();
     }
 
     // =========================================================================

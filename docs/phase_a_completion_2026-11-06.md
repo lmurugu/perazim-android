@@ -1,4 +1,14 @@
 
+# Historical development evidence — Phase A NOT ACCEPTED
+
+**Superseded as a completion claim by the owner's 2026-11-06 acceptance hold.**
+This file records local development evidence only. No VPS or public HTTPS
+deployment exists. USB/LAN results and old screenshots do not satisfy the
+owner's network or UI acceptance requirements. No new multi-user acceptance
+tests may run until public HTTPS is reachable from normal mobile data.
+See [deployment preparation](../server/deploy/README.md) for the unresolved
+hosting/access decisions. Do not treat this document's name as acceptance.
+
 ## Server and connected services verification
 
 - Core API contract suite (`npm run test:unit`): all 19 test groups passed after changes on 2026-11-06. Covers registration, login, revocation, prayer sync, anonymity, replay handling, pagination, startup safeguards, and zero grace-point preservation. The registration test submits 999 points and verifies the server grants 0.
@@ -13,7 +23,7 @@
 
 No hosting target or public hostname has been supplied or verified, and no deployment was performed. The Compose configuration now requires operator-supplied database/JWT secrets, enables production mode, keeps PostgreSQL private, binds the API to host loopback, persists uploads, and includes health checks. Docker is unavailable here, so Compose runtime validation remains outstanding.
 
-Follow [server deployment prerequisites](../server/README.md#production-prerequisites): choose the host, supply secrets without committing them, configure an HTTPS reverse proxy, provision an administrator through an operator-controlled database action, back up database/uploads volumes, set the Android release API URL, and run database/community/restart verification against a disposable test database before production rollout.
+Follow [server deployment prerequisites](../server/README.md#production-prerequisites): choose the host, supply secrets without committing them, configure an HTTPS reverse proxy, back up database/uploads volumes, and set the Android release API URL. Any future multi-user acceptance run is gated on verified public HTTPS access from normal mobile data; Phase B community acceptance is out of scope.
 
 
 ## Android build, device evidence, and account isolation

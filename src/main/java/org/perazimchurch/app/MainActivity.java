@@ -97,7 +97,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private boolean streakFrozen = false;
     private int progressPercent = 0;
     private boolean questClaimed = false;
-    private String selectedCampus = "Perazim Mission Church";
 
     // Top Header Views
     private TextView topStreakBadge;
@@ -2514,8 +2513,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         layout.setPadding(dp(20), dp(12), dp(20), dp(12));
 
         TextView tvInfo = new TextView(this);
-        tvInfo.setText("Current Campus: " + selectedCampus + "\n\n" +
-                "Audio Mode: " + (isDataSaverActive ? "📶 32kbps AAC (Data-Saver Active)" : "🎧 HD Audio") + "\n\n" +
+        tvInfo.setText("Audio Mode: " + (isDataSaverActive ? "📶 32kbps AAC (Data-Saver Active)" : "🎧 HD Audio") + "\n\n" +
                 "Offline Cache: 24.8 MB preserved\n\n" +
                 "App Version: 2.1.0 (Build 3)");
         tvInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);

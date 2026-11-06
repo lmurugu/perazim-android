@@ -3,7 +3,9 @@
  * Tests real PostgreSQL integration for all Phase B Community features.
  */
 
-process.env.DATABASE_URL = 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test';
+const { assertDisposableTestDatabase } = require('./test_database_safety');
+process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test';
+assertDisposableTestDatabase(process.env.DATABASE_URL);
 process.env.JWT_SECRET = 'community-test-jwt-secret-perazim-2026-secure';
 process.env.PORT = '3008';
 

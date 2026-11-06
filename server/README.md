@@ -2,14 +2,13 @@
 
 A lightweight, robust backend for the Perazim Mission Church Android app.
 
-## Quick Start (Deploy on VPS with Docker)
+## Phase A public deployment is pending
 
-1. Make sure Docker and Docker Compose are installed on your Linux VPS.
-2. In this `server` directory, run:
-   ```bash
-   docker compose up -d
-   ```
-3. Your server is now running 24/7 on port `3000` with PostgreSQL database persistence!
+No VPS/public HTTPS endpoint has been deployed. See the
+[prepared deployment stack and access/budget checklist](deploy/README.md).
+Running the development Compose file alone does not establish public HTTPS or
+mobile-data acceptance. Multi-user acceptance tests are on hold until the
+owner's public HTTPS/mobile-data gate is satisfied; do not start Phase B work.
 
 ## Local Run Without Docker (Development / Testing)
 

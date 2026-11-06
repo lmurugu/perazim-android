@@ -17,6 +17,12 @@
  * 7. Offline queueing & sync: reconnect and verify single delivery.
  */
 
+throw new Error(
+  'SAFETY ABORT: Legacy localhost multi-client helper is disabled because it can write ' +
+  'test accounts to the running member database. Public HTTPS deployment and a ' +
+  'dedicated disposable acceptance environment must be established before replacing this harness.'
+);
+
 const http = require('http');
 
 const SERVER_PORT = process.env.PORT || 3000;

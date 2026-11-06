@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { initDb } = require('./db');
+const { proxyTrustSetting } = require('./config/proxy');
 
 const path = require('path');
 
@@ -11,6 +12,7 @@ const syncRoutes = require('./routes/sync');
 const communityRoutes = require('./routes/community');
 
 const app = express();
+app.set('trust proxy', proxyTrustSetting(process.env.TRUST_PROXY_HOPS));
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
