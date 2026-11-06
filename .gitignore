@@ -63,6 +63,7 @@ google-services.json
 
 # Local PC backend runtime (database, binaries, logs, private configuration)
 server/.runtime/
+server/uploads/
 server/deploy/backups/
 
 # Local on-device AI build/download cache (model is installed separately)

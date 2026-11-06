@@ -61,6 +61,11 @@ android {
         }
     }
     buildTypes {
+        validation {
+            initWith debug
+            applicationIdSuffix '.validation'
+            matchingFallbacks = ['debug']
+        }
         release {
             minifyEnabled true
             shrinkResources true

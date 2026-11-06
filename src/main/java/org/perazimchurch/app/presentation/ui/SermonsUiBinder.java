@@ -46,6 +46,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.data.repository.YouTubeFeedRepository;
+import org.perazimchurch.app.LocalBibleAudioActivity;
 import org.perazimchurch.app.domain.model.Sermon;
 import org.perazimchurch.app.presentation.viewmodel.SermonsViewModel;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -178,6 +179,13 @@ public class SermonsUiBinder {
         tvSub.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
         tvSub.setPadding(0, dp(2), 0, 0);
         headerRow.addView(tvSub);
+
+        Button localBibleAudio = new Button(activity);
+        localBibleAudio.setText("Bible audio on this phone");
+        localBibleAudio.setOnClickListener(v -> activity.startActivity(new Intent(activity, LocalBibleAudioActivity.class)));
+        LinearLayout.LayoutParams localAudioLp = new LinearLayout.LayoutParams(-2, -2);
+        localAudioLp.topMargin = dp(8);
+        headerRow.addView(localBibleAudio, localAudioLp);
 
         contentLayout.addView(headerRow);
 
