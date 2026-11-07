@@ -106,7 +106,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         DailyChallengeEntity.class
     },
     version = 6,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters({Converters.class})
 public abstract class PerazimDatabase extends RoomDatabase {

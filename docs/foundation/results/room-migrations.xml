@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest" tests="5" failures="0" errors="0" skipped="0" time="5.207" timestamp="2026-11-07T04:33:52" hostname="localhost">
+  <properties>
+    <property name="device" value="Infinix X689C - 11" />
+    <property name="flavor" value="" />
+    <property name="project" value=":" />
+  </properties>
+  <testcase name="migration5To6PreservesRowsAndAddsMessageMediaDefault" classname="org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest" time="0.323" />
+  <testcase name="closedVersion6DatabaseCopyRestoresAndValidatesWithRows" classname="org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest" time="0.068" />
+  <testcase name="bundledVersion5AssetMigratesTo6WithoutLosingBibleContent" classname="org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest" time="0.935" />
+  <testcase name="migration4To5PreservesUserBibleNotesAndPendingDraft" classname="org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest" time="0.123" />
+  <testcase name="migration4To6RunsBothRoomMigrationsAndPreservesRows" classname="org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest" time="0.129" />
+</testsuite>

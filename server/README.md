@@ -63,3 +63,10 @@ Do not delete `.runtime` unless intentionally removing local data and credential
 See [the verification report](../docs/phase_a_completion_2026-11-06.md#always-on-pc-backend-local-development)
 for connection and test evidence. Existing phone accounts are not migrated into
 this separate local database.
+
+## PostgreSQL migration foundation
+
+Ordered migrations and their explicit safety rules are documented in
+[`docs/POSTGRES_MIGRATIONS.md`](docs/POSTGRES_MIGRATIONS.md). API startup behavior
+is unchanged; migration status/plan are separate read-only commands, while
+schema changes and verified baselining require explicit CLI commands.

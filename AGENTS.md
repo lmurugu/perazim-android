@@ -8,7 +8,20 @@ Luna with high effort for bounded sub-agent tasks. This session exposes
 claiming an unavailable version. Keep delegation minimal and avoid duplicate
 reads/tests. Do not escalate model/effort automatically without the owner's approval.
 
-## Current development scope (owner instruction, 2026-11-06)
+## Active authorisation: Phase A foundation only (2026-11-07)
+
+The owner authorised foundation, baseline documentation, migration infrastructure,
+synthetic preservation fixtures, backup/restore verification and regression tests
+only. Do not begin membership, permission, AI gateway, knowledge, attendance,
+escalation or other feature phases. Stop after reporting Phase A for review.
+Preserve pre-existing working-tree content, including the untracked specification
+folder. Never run migration/restore commands on existing member databases during
+foundation testing. Keep destructive Room fallback until every supported upgrade
+path is demonstrated; do not infer supported installed versions from source alone.
+Do not deploy, change provider configuration/credentials or modify production.
+This narrow authorisation supersedes the broader historical scope below.
+
+## Historical development scope (owner instruction, 2026-11-06)
 
 The owner has deferred public deployment and authorized community development:
 feed, groups, classes, private chat, games and better AI. The previous Phase A-only

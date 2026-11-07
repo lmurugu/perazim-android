@@ -37,6 +37,12 @@ android {
         targetSdk 34
         versionCode 4
         versionName "2.2.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas"]
+            }
+        }
 
         buildConfigField "String", "SHEET_URL_ANNOUNCEMENTS", "\"${sheetProperties.getProperty('sheet_url_announcements', '')}\""
         buildConfigField "String", "SHEET_URL_EVENTS", "\"${sheetProperties.getProperty('sheet_url_events', '')}\""
@@ -75,6 +81,10 @@ android {
             }
         }
     }
+    testBuildType 'validation'
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas")
+    }
 }
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -83,4 +93,7 @@ dependencies {
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.zxing:core:3.5.3'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.room:room-testing:2.6.1'
 }

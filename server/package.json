@@ -10,7 +10,9 @@
     "test:pg": "node test/postgres.test.js",
     "test:community": "node test/community_api.test.js",
     "test:multi-client": "node test/api_multi_client.test.js",
-    "test:restart": "node test/api_process_restart.test.js"
+    "test:restart": "node test/api_process_restart.test.js",
+    "test:migrations": "node test/migrations.test.js",
+    "db:migrate": "node scripts/db-migrate.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
