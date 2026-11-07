@@ -419,6 +419,14 @@ public class ProfileUiBinder {
         ));
         card.addView(createHorizontalDivider());
 
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_christian_church,
+                "Church Membership",
+                "Check your status or submit a private request",
+                v -> MembershipDialog.show(context)
+        ));
+        card.addView(createHorizontalDivider());
+
         // Row 1: Refresh Content
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_refresh,

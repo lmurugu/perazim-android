@@ -129,7 +129,7 @@ if [[ ! -x "$PG_DUMP_TOOLS/pg_dump" || ! -x "$PG_DUMP_TOOLS/pg_restore" ]]; then
   echo 'Matching pg_dump and pg_restore tools must be available in PHASE_B_PG_BIN.' >&2
   exit 1
 fi
-RUNTIME_PG_MAJOR="$("$PG_TOOLS/postgres" --version | sed -E 's/.*PostgreSQL ([0-9]+).*/\1/')"
+RUNTIME_PG_MAJOR="$("$PG_TOOLS/postgres" --version | sed -nE 's/^postgres \(PostgreSQL\) ([0-9]+).*/\1/p')"
 if [[ "$EXTERNAL_CLUSTER" == 0 && "$RUNTIME_PG_MAJOR" != 18 ]]; then
   echo "The owned-cluster runner requires PostgreSQL 18 runtime binaries; found major ${RUNTIME_PG_MAJOR}." >&2
   exit 1

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.json.JSONObject;
+import org.perazimchurch.app.BuildConfig;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -97,33 +98,70 @@ public final class ApiClient {
         execute(context, "DELETE", endpoint, null, authToken, callback);
     }
 
+    /** Sends a protected operation directly; privileged requests are never queued for offline retry. */
+    public static void privileged(@NonNull Context context, @NonNull String method,
+                                  @NonNull String endpoint, @Nullable JSONObject body,
+                                  @NonNull String authToken, @NonNull String privilegedToken,
+                                  @NonNull ApiCallback callback) {
+        if (!endpoint.startsWith("/api/admin/") ||
+                !("GET".equals(method) || "POST".equals(method) || "PATCH".equals(method) || "DELETE".equals(method)) ||
+                authToken.trim().isEmpty() || privilegedToken.trim().isEmpty()) {
+            MAIN_HANDLER.post(() -> callback.onError(-1, "Administrator authentication is required."));
+            return;
+        }
+        execute(context, method, endpoint, body == null ? null : body.toString(), authToken, privilegedToken, callback);
+    }
+
     private static void execute(Context context,
                                 String method,
                                 String endpoint,
                                 @Nullable String bodyString,
                                 @Nullable String authToken,
                                 ApiCallback callback) {
+        execute(context, method, endpoint, bodyString, authToken, null, callback);
+    }
+
+    private static void execute(Context context, String method, String endpoint,
+                                @Nullable String bodyString, @Nullable String authToken,
+                                @Nullable String privilegedToken, ApiCallback callback) {
         final Context appContext = context.getApplicationContext();
         final String requestBaseUrl = getBaseUrl(appContext);
+        final String path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
+        final boolean protectedPath = path.startsWith("/api/admin/") || path.startsWith("/api/membership/") ||
+                path.equals("/api/access/permissions");
         EXECUTOR.execute(() -> {
             HttpURLConnection conn = null;
             try {
-                String baseUrl = requestBaseUrl;
-                String fullUrl = baseUrl + (endpoint.startsWith("/") ? endpoint : "/" + endpoint);
+                if (!requestBaseUrl.equals(getBaseUrl(appContext))) {
+                    MAIN_HANDLER.post(() -> callback.onError(-1, "The server changed. Try again."));
+                    return;
+                }
+                String fullUrl = requestBaseUrl.replaceAll("/+$", "") + path;
 
                 URL url = new URL(fullUrl);
+                if (protectedPath && !allowsProtectedTransport(url)) {
+                    MAIN_HANDLER.post(() -> callback.onError(-1, "Membership and administration require a secure server connection."));
+                    return;
+                }
                 conn = (HttpURLConnection) url.openConnection();
+                conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod(method);
                 conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
                 conn.setReadTimeout(READ_TIMEOUT_MS);
                 conn.setRequestProperty("User-Agent", USER_AGENT);
                 conn.setRequestProperty("Accept", "application/json");
+                if (protectedPath) {
+                    conn.setUseCaches(false);
+                    conn.setRequestProperty("Cache-Control", "no-store");
+                }
 
                 if (authToken != null && !authToken.trim().isEmpty()) {
                     conn.setRequestProperty("Authorization", "Bearer " + authToken.trim());
                 }
+                if (privilegedToken != null) conn.setRequestProperty("X-Privileged-Session", privilegedToken);
 
-                if (bodyString != null && ("POST".equals(method) || "PUT".equals(method))) {
+                if (bodyString != null && ("POST".equals(method) || "PUT".equals(method) ||
+                        "PATCH".equals(method) || "DELETE".equals(method))) {
                     conn.setDoOutput(true);
                     conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     byte[] bytes = bodyString.getBytes(StandardCharsets.UTF_8);
@@ -161,15 +199,18 @@ public final class ApiClient {
                 final int finalStatus = statusCode;
                 final JSONObject finalJson = json;
 
-                if (statusCode >= 200 && statusCode < 300) {
-                    MAIN_HANDLER.post(() -> callback.onSuccess(finalStatus, finalJson));
-                } else {
-                    String errorMsg = finalJson.optString("error", "Request failed with HTTP " + statusCode);
-                    MAIN_HANDLER.post(() -> callback.onError(finalStatus, errorMsg));
-                }
+                MAIN_HANDLER.post(() -> {
+                    if (!requestBaseUrl.equals(getBaseUrl(appContext))) {
+                        callback.onError(-1, "The server changed. Try again.");
+                    } else if (finalStatus >= 200 && finalStatus < 300) {
+                        callback.onSuccess(finalStatus, finalJson);
+                    } else {
+                        callback.onError(finalStatus, finalJson.optString("error", "Request failed with HTTP " + finalStatus));
+                    }
+                });
             } catch (Exception e) {
-                Log.w(TAG, "Network request failed [" + method + " " + endpoint + "]: " + e.getMessage());
-                String msg = (e.getMessage() != null && !e.getMessage().isEmpty()) ? e.getMessage() : "Offline or server unreachable";
+                Log.w(TAG, "Network request failed [" + method + "]: " + e.getClass().getSimpleName());
+                String msg = "Offline or server unreachable";
                 MAIN_HANDLER.post(() -> callback.onError(-1, msg));
             } finally {
                 if (conn != null) {
@@ -177,5 +218,13 @@ public final class ApiClient {
                 }
             }
         });
+    }
+
+    static boolean allowsProtectedTransport(URL url) {
+        if (url.getUserInfo() != null) return false;
+        if ("https".equalsIgnoreCase(url.getProtocol())) return true;
+        if (!"validation".equals(BuildConfig.BUILD_TYPE) || !"http".equalsIgnoreCase(url.getProtocol())) return false;
+        String host = url.getHost();
+        return "127.0.0.1".equals(host) || "[::1]".equals(host) || "localhost".equalsIgnoreCase(host);
     }
 }

@@ -13,6 +13,7 @@ import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.data.local.dao.UserDao;
 import org.perazimchurch.app.data.local.entity.UserEntity;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
+import org.perazimchurch.app.data.remote.ApiClient;
 import org.perazimchurch.app.data.remote.AuthRemoteSource;
 
 import java.util.List;
@@ -36,9 +37,12 @@ public class SessionManager {
     private final Context context;
     private final UserDao userDao;
     private final SharedPreferences prefs;
+    private final SessionTokenStore tokenStore;
 
     private volatile String activeUserId;
     private volatile String authToken;
+    private volatile String authTokenAccount;
+    private volatile String authTokenOrigin;
     private volatile UserEntity currentUserCache;
 
     /**
@@ -97,9 +101,11 @@ public class SessionManager {
         this.userDao = userDao;
         if (this.context != null) {
             this.prefs = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            this.tokenStore = new SessionTokenStore(this.context);
             this.activeUserId = this.prefs.getString(KEY_ACTIVE_USER_ID, null);
         } else {
             this.prefs = null;
+            this.tokenStore = null;
             this.activeUserId = null;
         }
     }
@@ -135,22 +141,61 @@ public class SessionManager {
 
     @Nullable
     public synchronized String getAuthToken() {
-        if (authToken != null) return authToken;
-        if (prefs != null) {
-            authToken = prefs.getString(KEY_AUTH_TOKEN, null);
+        if (context == null || tokenStore == null) return null;
+        String accountId = getActiveUserId();
+        if (accountId.startsWith("guest")) return null;
+        String origin;
+        try {
+            origin = SessionTokenStore.normalizeOrigin(ApiClient.getBaseUrl(context));
+        } catch (IllegalArgumentException e) {
+            clearTokenCache();
+            return null;
         }
-        return authToken;
+        if (authToken != null) {
+            if (accountId.equals(authTokenAccount) && origin.equals(authTokenOrigin)) return authToken;
+            clearTokenCache();
+        }
+
+        String token = tokenStore.readOrMigrateLegacy(prefs, KEY_AUTH_TOKEN, accountId, origin);
+        if (token != null) {
+            cacheToken(token, accountId, origin);
+            return token;
+        }
+        return null;
     }
 
     public synchronized void setAuthToken(@Nullable String token) {
-        this.authToken = token;
-        if (prefs != null) {
-            if (token != null) {
-                prefs.edit().putString(KEY_AUTH_TOKEN, token).apply();
-            } else {
-                prefs.edit().remove(KEY_AUTH_TOKEN).apply();
-            }
+        clearTokenCache();
+        if (token == null) {
+            if (tokenStore != null) tokenStore.clear();
+            if (prefs != null) prefs.edit().remove(KEY_AUTH_TOKEN).commit();
+            return;
         }
+        if (context == null || tokenStore == null || prefs == null) return;
+        String accountId = getActiveUserId();
+        if (accountId.startsWith("guest") || !tokenStore.blockLegacyMigration()) return;
+        String origin;
+        try {
+            origin = SessionTokenStore.normalizeOrigin(ApiClient.getBaseUrl(context));
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        if (!tokenStore.write(token, accountId, origin)) return;
+        if (!prefs.edit().remove(KEY_AUTH_TOKEN).commit()) return;
+        if (!tokenStore.unblockLegacyMigration()) return;
+        cacheToken(token, accountId, origin);
+    }
+
+    private void cacheToken(String token, String accountId, String origin) {
+        this.authToken = token;
+        this.authTokenAccount = accountId;
+        this.authTokenOrigin = origin;
+    }
+
+    private void clearTokenCache() {
+        this.authToken = null;
+        this.authTokenAccount = null;
+        this.authTokenOrigin = null;
     }
 
     public synchronized boolean isGuest() {
@@ -178,6 +223,11 @@ public class SessionManager {
      */
     public synchronized void setActiveUserId(@Nullable String id) {
         long now = System.currentTimeMillis();
+        String priorId = getActiveUserId();
+        if (id == null || !id.equals(priorId)) {
+            clearTokenCache();
+            if (tokenStore != null) tokenStore.blockLegacyMigration();
+        }
         this.activeUserId = id;
 
         if (prefs != null) {
@@ -242,6 +292,10 @@ public class SessionManager {
         long now = System.currentTimeMillis();
 
         this.currentUserCache = null;
+        if (!userId.equals(getActiveUserId())) {
+            clearTokenCache();
+            if (tokenStore != null) tokenStore.blockLegacyMigration();
+        }
         this.activeUserId = userId;
         if (prefs != null) {
             prefs.edit().putString(KEY_ACTIVE_USER_ID, userId).apply();
@@ -505,8 +559,12 @@ public class SessionManager {
                     }
 
                     synchronized (SessionManager.this) {
-                        setAuthToken(token);
                         login(userId, name, phone, campusId, role);
+                        setAuthToken(token);
+                        if (!token.equals(getAuthToken())) {
+                            callback.onError("Secure session storage is unavailable. Please try again.");
+                            return;
+                        }
                     }
 
                     if (xp > 0) {
@@ -562,8 +620,12 @@ public class SessionManager {
                     }
 
                     synchronized (SessionManager.this) {
-                        setAuthToken(token);
                         login(userId, userName, phone, userCampus, role);
+                        setAuthToken(token);
+                        if (!token.equals(getAuthToken())) {
+                            callback.onError("Secure session storage is unavailable. Please try again.");
+                            return;
+                        }
                     }
 
                     migrateLocalData(currentGuest, userId);

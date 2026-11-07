@@ -93,7 +93,8 @@ async function startServer() {
     throw err;
   }
   return new Promise((resolve, reject) => {
-    const server = app.listen(PORT, '0.0.0.0', () => {
+    const bindAddress = process.env.NODE_ENV === 'test' ? '127.0.0.1' : '0.0.0.0';
+    const server = app.listen(PORT, bindAddress, () => {
       console.log(`🚀 Perazim Church Server listening on port ${PORT}`);
       resolve(server);
     });
