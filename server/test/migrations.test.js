@@ -83,6 +83,11 @@ async function run() {
   const rollbackName = `perazim_migration_rollback_${suffix}_test`;
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'perazim-pg-restore-'));
   let sourcePool;
+  // Keep the Phase A baseline-adoption regression pinned to its original schema.
+  // Later feature migrations are exercised separately against ordered history.
+  const foundationDir = path.join(tempDir, 'foundation');
+  fs.mkdirSync(foundationDir);
+  fs.copyFileSync(path.join(__dirname, '../migrations/0001_current_schema_baseline.sql'), path.join(foundationDir, '0001_current_schema_baseline.sql'));
   const testMigrationsDir = path.join(tempDir, 'migrations');
   fs.mkdirSync(testMigrationsDir);
   fs.copyFileSync(path.join(__dirname, '../migrations/0001_current_schema_baseline.sql'), path.join(testMigrationsDir, '0001_current_schema_baseline.sql'));
@@ -96,14 +101,14 @@ async function run() {
     sourcePool = new Pool({ connectionString: dbUrl(admin, sourceName) });
 
     await sourcePool.query('BEGIN READ ONLY');
-    const before = await status(sourcePool);
+    const before = await status(sourcePool, foundationDir);
     assert.strictEqual(before.state, 'empty');
-    assert.strictEqual((await plan(sourcePool)).pending.length, 1);
+    assert.strictEqual((await plan(sourcePool, foundationDir)).pending.length, 1);
     await sourcePool.query('ROLLBACK');
-    const migrated = await migrate(sourcePool);
+    const migrated = await migrate(sourcePool, foundationDir);
     assert.strictEqual(migrated.state, 'tracked');
     assert.strictEqual(migrated.applied.length, 1);
-    assert.strictEqual((await migrate(sourcePool)).applied.length, 1, 'repeat migration is a no-op');
+    assert.strictEqual((await migrate(sourcePool, foundationDir)).applied.length, 1, 'repeat migration is a no-op');
 
     await sourcePool.query(`
       INSERT INTO users (id,phone,pin_hash,name,campus_id,role,avatar_url,xp,streak,grace_points,is_active,created_at,updated_at,bio)
@@ -136,26 +141,26 @@ async function run() {
     await sourcePool.query(`DROP TABLE public.${LEDGER}`);
     const schemaRowsBeforeBaseline = await sourcePool.query("SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema='public' ORDER BY table_name, ordinal_position");
     await sourcePool.query('BEGIN READ ONLY');
-    assert.strictEqual((await status(sourcePool)).state, 'untracked');
-    assert.strictEqual((await plan(sourcePool)).action, 'baseline-check-required');
+    assert.strictEqual((await status(sourcePool, foundationDir)).state, 'untracked');
+    assert.strictEqual((await plan(sourcePool, foundationDir)).action, 'baseline-check-required');
     await sourcePool.query('ROLLBACK');
     await sourcePool.query('CREATE TABLE public.baseline_drift_probe (id integer PRIMARY KEY)');
     await sourcePool.query('INSERT INTO public.baseline_drift_probe VALUES (42)');
-    await assert.rejects(() => baseline(sourcePool), /does not exactly match/);
+    await assert.rejects(() => baseline(sourcePool, foundationDir), /does not exactly match/);
     assert.strictEqual((await sourcePool.query('SELECT id FROM public.baseline_drift_probe')).rows[0].id, 42, 'baseline mismatch leaves unexpected user objects and data untouched');
     await sourcePool.query('DROP TABLE public.baseline_drift_probe');
-    const baselineState = await baseline(sourcePool);
+    const baselineState = await baseline(sourcePool, foundationDir);
     assert.strictEqual(baselineState.applied.length, 1);
     assert.strictEqual(await rowSnapshot(sourcePool, true), rowStateBeforeBaseline, 'verified baseline changes only the ledger');
     assert.strictEqual(await structuralSnapshot(sourcePool, true), structureBeforeBaseline, 'verified baseline preserves all schema metadata and sequence definitions');
     assert.strictEqual((await sourcePool.query(`SELECT count(*)::int AS n FROM information_schema.columns WHERE table_schema='public' AND table_name <> '${LEDGER}'`)).rows[0].n, schemaRowsBeforeBaseline.rowCount);
-    await assert.rejects(() => baseline(sourcePool), /Baseline refused: database is tracked/);
+    await assert.rejects(() => baseline(sourcePool, foundationDir), /Baseline refused: database is tracked/);
     assert.strictEqual(await rowSnapshot(sourcePool, true), rowStateBeforeBaseline, 'a repeated baseline attempt leaves user rows unchanged');
 
     const originalChecksum = baselineState.applied[0];
     const goodChecksum = (await sourcePool.query(`SELECT checksum FROM public.${LEDGER} WHERE version=$1`, [originalChecksum.version])).rows[0].checksum;
     await sourcePool.query(`UPDATE public.${LEDGER} SET checksum=$1 WHERE version=$2`, ['0'.repeat(64), originalChecksum.version]);
-    await assert.rejects(() => status(sourcePool), /checksum\/name drift/);
+    await assert.rejects(() => status(sourcePool, foundationDir), /checksum\/name drift/);
     await sourcePool.query(`UPDATE public.${LEDGER} SET checksum=$1 WHERE version=$2`, [goodChecksum, originalChecksum.version]);
 
     await fs.promises.writeFile(badMigrationPath, 'CREATE TABLE public.migration_rollback_probe (id integer); SELECT 1 / 0;\n');
@@ -170,7 +175,7 @@ async function run() {
 
     await createDb(adminPool, restoreName);
     const dumpFile = path.join(tempDir, 'fixture.dump');
-    const pgBin = path.join(__dirname, '../.runtime/pgsql/usr/bin');
+    const pgBin = process.env.PHASE_B_PG_BIN || path.join(__dirname, '../.runtime/pgsql/usr/bin');
     const pgEnv = { ...process.env, PATH: `${pgBin}:${process.env.PATH || ''}` };
     execFileSync('pg_dump', ['--format=custom', '--no-owner', '--file', dumpFile, '--dbname', dbUrl(admin, sourceName)], { env: pgEnv, stdio: 'pipe' });
     execFileSync('pg_restore', ['--no-owner', '--dbname', dbUrl(admin, restoreName), dumpFile], { env: pgEnv, stdio: 'pipe' });
@@ -178,7 +183,7 @@ async function run() {
     try {
       assert.strictEqual(await rowSnapshot(restoredPool), await rowSnapshot(sourcePool), 'pg_dump/pg_restore preserves fixture rows and migration ledger');
       assert.strictEqual(await structuralSnapshot(restoredPool), await structuralSnapshot(sourcePool), 'pg_dump/pg_restore preserves schema objects, constraints, indexes, and sequence definitions');
-      assert.strictEqual((await status(restoredPool)).applied.length, 1);
+      assert.strictEqual((await status(restoredPool, foundationDir)).applied.length, 1);
     } finally { await restoredPool.end(); }
     console.log(`Migration safety integration passed on isolated databases ${sourceName}, ${restoreName}, ${rollbackName}.`);
   } finally {
