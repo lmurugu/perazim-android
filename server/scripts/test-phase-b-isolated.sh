@@ -170,6 +170,10 @@ run 'Foundation migration safety suite' \
   env -u DATABASE_URL NODE_ENV=test MIGRATIONS_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \
   npm --prefix "$SERVER_DIR" run test:migrations
 
+run 'B4/B5 membership, permissions and administrator workflow' \
+  env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" \
+  node "$SERVER_DIR/test/phase_b_workflow.test.js"
+
 if [[ -f "$B3_SECURITY_TEST" ]]; then
   run 'B3 security integration suite' \
     env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" MIGRATIONS_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \

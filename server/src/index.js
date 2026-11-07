@@ -9,6 +9,8 @@ const prayerRoutes = require('./routes/prayers');
 const campusRoutes = require('./routes/campuses');
 const syncRoutes = require('./routes/sync');
 const communityRoutes = require('./routes/community');
+const membershipRoutes = require('./routes/membership');
+const adminMembershipRoutes = require('./routes/adminMembership');
 
 const app = express();
 app.set('trust proxy', proxyTrustSetting(process.env.TRUST_PROXY_HOPS));
@@ -47,6 +49,8 @@ app.use('/api/campuses', campusRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/classroom-calls', require('./routes/classroomCalls'));
+app.use('/api', membershipRoutes);
+app.use('/api/admin', adminMembershipRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
