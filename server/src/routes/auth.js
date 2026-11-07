@@ -121,6 +121,11 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
       return res.status(401).json({ error: 'No account found with this phone number. Please sign up.' });
     }
 
+    if (user.is_active === false) {
+      recordFailedLogin(normPhone, ip);
+      return res.status(401).json({ error: 'This account is unavailable. Contact the church office.' });
+    }
+
     const isValid = await bcrypt.compare(pin, user.pin_hash);
     if (!isValid) {
       recordFailedLogin(normPhone, ip);

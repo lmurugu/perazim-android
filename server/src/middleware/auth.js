@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { query } = require('../db');
+const { query, isPostgresActive } = require('../db');
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -63,10 +63,13 @@ async function requireAuth(req, res, next) {
     if (await isTokenRevoked(token)) {
       return res.status(401).json({ error: 'Token has been revoked. Please log in again.' });
     }
-    req.user = payload;
+    const current = await currentAccount(payload);
+    if (!current) return res.status(401).json({ error: 'Account is unavailable. Please log in again.' });
+    req.user = current;
     req.token = token;
     next();
   } catch (err) {
+    if (err && err.code === 'AUTH_ACCOUNT_UNAVAILABLE') return res.status(401).json({ error: 'Account is unavailable. Please log in again.' });
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 }
@@ -78,14 +81,39 @@ async function optionalAuth(req, res, next) {
     try {
       const payload = jwt.verify(token, getJwtSecret());
       if (!(await isTokenRevoked(token))) {
-        req.user = payload;
-        req.token = token;
+        const current = await currentAccount(payload);
+        if (current) {
+          req.user = current;
+          req.token = token;
+        }
       }
     } catch (err) {
       // Ignore invalid token in optional auth
     }
   }
   next();
+}
+
+async function currentAccount(payload) {
+  const result = await query('SELECT id, phone, name, role, campus_id, is_active FROM users WHERE id = $1', [payload.id]);
+  const user = result.rows && result.rows[0];
+  if (!user || user.is_active === false) return null;
+
+  // The B5 recovery cutoff is enabled only in isolated synthetic Phase B servers.
+  // Legacy deployments without migration 0002 retain their existing auth schema.
+  if (process.env.NODE_ENV === 'test' && process.env.PHASE_B_SYNTHETIC === 'true' && isPostgresActive()) {
+    const security = await query('SELECT auth_not_before FROM admin_security WHERE user_id = $1', [user.id]);
+    const notBefore = security.rows && security.rows[0] ? Number(security.rows[0].auth_not_before) : 0;
+    if (notBefore > 0 && (!payload.iat || payload.iat * 1000 < notBefore)) return null;
+  }
+
+  return {
+    id: user.id,
+    phone: user.phone,
+    name: user.name,
+    role: user.role,
+    campus_id: user.campus_id
+  };
 }
 
 function signToken(user) {
