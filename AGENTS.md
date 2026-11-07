@@ -8,18 +8,22 @@ Luna with high effort for bounded sub-agent tasks. This session exposes
 claiming an unavailable version. Keep delegation minimal and avoid duplicate
 reads/tests. Do not escalate model/effort automatically without the owner's approval.
 
-## Active authorisation: Phase A foundation only (2026-11-07)
+## Active authorisation: Phase B B1–B7 (2026-11-07)
 
-The owner authorised foundation, baseline documentation, migration infrastructure,
-synthetic preservation fixtures, backup/restore verification and regression tests
-only. Do not begin membership, permission, AI gateway, knowledge, attendance,
-escalation or other feature phases. Stop after reporting Phase A for review.
-Preserve pre-existing working-tree content, including the untracked specification
-folder. Never run migration/restore commands on existing member databases during
-foundation testing. Keep destructive Room fallback until every supported upgrade
-path is demonstrated; do not infer supported installed versions from source alone.
-Do not deploy, change provider configuration/credentials or modify production.
-This narrow authorisation supersedes the broader historical scope below.
+The owner explicitly authorised membership verification and explicit permissions,
+including synthetic persistence, current backend authority, private claims/review,
+synthetic administrator security, Android integration and isolated acceptance tests.
+Do not process real membership records or activate any real administrator. Do not
+migrate/adopt an existing member database, deploy, push, restart live services,
+change provider configuration, or begin Phase C. All security/migration fixtures
+must use uniquely named disposable test databases. Preserve the untracked project
+specifications, Decisions Register, baseline migration checksum and existing data.
+Only the separate validation app may be used for device tests; do not install a
+new main-app build or connect validation to the running member backend.
+Room destructive fallback remains until historical support is resolved and its
+removal separately approved. Public/offline and ordinary registered features must
+remain available; client roles and snapshots never establish current authority.
+This instruction supersedes the historical automatic restart/install workflow.
 
 ## Historical development scope (owner instruction, 2026-11-06)
 
