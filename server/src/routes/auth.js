@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const { query } = require('../db');
 const { requireAuth, signToken, revokeToken, hashToken } = require('../middleware/auth');
 const { checkLoginRateLimit, recordFailedLogin, clearFailedLogins } = require('../middleware/rateLimiter');
+const { classifyRegistrationPhone } = require('../phase-b/memberContacts');
+const { phaseBDatabaseAllowed, phaseBTransaction, newId } = require('../phase-b/security');
 
 const router = express.Router();
 
@@ -55,6 +57,11 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // The lookup is performed on the same normalized E.164 value used by the
+    // account record. The CSV loader reads the canonical Android asset lazily.
+    const classification = classifyRegistrationPhone(normPhone);
+    const matchedContact = classification.contact;
+
     if (typeof pin !== 'string' || pin.length < 4) {
       return res.status(400).json({ error: 'PIN must be at least 4 digits' });
     }
@@ -77,6 +84,44 @@ router.post('/register', async (req, res) => {
       [userId, normPhone, pinHash, name.trim(), campus, 'MEMBER', '', 0, 0, initialGracePoints, true, now, now]
     );
 
+    const membershipStatus = classification.status;
+    // Membership verification tables are part of the separately migrated
+    // Phase B database. Preserve account creation when that feature is
+    // unavailable, while returning the CSV-derived result in the registration
+    // response. In an enabled Phase B database, persist the status and queue
+    // unmatched registrations for human review.
+    if (phaseBDatabaseAllowed()) {
+      try {
+        await phaseBTransaction(async client => {
+          const claimId = matchedContact ? null : newId();
+          const requestId = matchedContact ? null : newId();
+          if (claimId) {
+            await client.query(
+              `INSERT INTO membership_claims (id,user_id,request_id,user_name,user_phone,status,created_at,updated_at)
+               VALUES ($1,$2,$3,$4,$5,'REVIEW',$6,$6)`,
+              [claimId, userId, requestId, name.trim().replace(/\s+/g, ' '), normPhone, now]
+            );
+          }
+          await client.query(
+            `INSERT INTO membership_verifications (user_id,membership_record_id,status,verification_source,revision,updated_at)
+             VALUES ($1,NULL,$2,$3,1,$4)
+             ON CONFLICT (user_id) DO UPDATE SET membership_record_id=NULL,status=EXCLUDED.status,
+               verification_source=EXCLUDED.verification_source,revision=membership_verifications.revision+1,updated_at=EXCLUDED.updated_at`,
+            [userId, membershipStatus, matchedContact ? 'CONTACT_LIST' : 'MANUAL', now]
+          );
+          await client.query(
+            `INSERT INTO membership_verification_history (id,user_id,claim_id,previous_status,new_status,actor_id,reason,created_at)
+             VALUES ($1,$2,$3,NULL,$4,$2,$5,$6)`,
+            [newId(), userId, claimId, membershipStatus, matchedContact ? 'AUTO_CONTACT_LIST' : 'REGISTRATION_REVIEW', now]
+          );
+        });
+      } catch (verificationError) {
+        // The account has already been created; verification issues must not
+        // turn registration into a failure.
+        console.error('Registration membership classification could not be persisted:', verificationError.message);
+      }
+    }
+
     const userObj = {
       id: userId,
       phone: normPhone,
@@ -86,7 +131,8 @@ router.post('/register', async (req, res) => {
       avatar_url: '',
       xp: 0,
       streak: 0,
-      grace_points: (initialGracePoints !== undefined && initialGracePoints !== null) ? Number(initialGracePoints) : 0
+      grace_points: (initialGracePoints !== undefined && initialGracePoints !== null) ? Number(initialGracePoints) : 0,
+      membership_status: membershipStatus
     };
 
     const token = signToken(userObj);
