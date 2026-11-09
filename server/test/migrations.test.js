@@ -78,9 +78,9 @@ async function run() {
   const admin = requireSafeAdminUrl();
   const adminPool = new Pool({ connectionString: admin.toString() });
   const suffix = `${process.pid}_${crypto.randomBytes(5).toString('hex')}`;
-  const sourceName = `perazim_migration_source_${suffix}_test`;
-  const restoreName = `perazim_migration_restore_${suffix}_test`;
-  const rollbackName = `perazim_migration_rollback_${suffix}_test`;
+  const sourceName = `perazim_phaseb_migration_source_${suffix}_test`;
+  const restoreName = `perazim_phaseb_migration_restore_${suffix}_test`;
+  const rollbackName = `perazim_phaseb_migration_rollback_${suffix}_test`;
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'perazim-pg-restore-'));
   let sourcePool;
   // Keep the Phase A baseline-adoption regression pinned to its original schema.

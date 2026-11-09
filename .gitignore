@@ -69,3 +69,6 @@ server/deploy/backups/
 # Local on-device AI build/download cache (model is installed separately)
 .local-ai-build/
 *.gguf
+
+# Real membership data must never be staged or packaged with Android assets.
+src/main/assets/member_contacts.csv

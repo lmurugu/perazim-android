@@ -2,17 +2,20 @@
 set -euo pipefail
 
 ALLOW_MISSING_B3=0
+SEC_01_ONLY=0
 case "${1:-}" in
   '') ;;
+  --sec-01) SEC_01_ONLY=1 ;;
   --allow-missing-b3) ALLOW_MISSING_B3=1 ;;
   --help)
     cat <<'HELP'
-Usage: scripts/test-phase-b-isolated.sh [--allow-missing-b3]
+Usage: scripts/test-phase-b-isolated.sh [--allow-missing-b3|--sec-01]
 
 Runs Phase B persistence, migration, security, and legacy backend checks using
 only a temporary local PostgreSQL cluster and generated *_test databases. By
 default the B3 security suite must exist. The option --allow-missing-b3 is for
-preparatory validation only.
+preparatory validation only. --sec-01 runs the focused SEC-01 suite and
+related backend regressions in an owned cluster.
 
 Optional: set PHASE_B_TEST_ADMIN_URL to an explicit local PostgreSQL URL for an
 isolated test cluster and PHASE_B_PG_BIN to matching pg_dump/pg_restore tools.
@@ -42,7 +45,10 @@ cleanup() {
   if [[ "$LEGACY_CREATED" == 1 ]]; then "$PG_TOOLS/dropdb" --if-exists --force --host "$PGHOST" --port "$PGPORT" --username "$PGUSER" "$LEGACY_DB" >/dev/null 2>&1 || true; fi
   if [[ "$RESTART_CREATED" == 1 ]]; then "$PG_TOOLS/dropdb" --if-exists --force --host "$PGHOST" --port "$PGPORT" --username "$PGUSER" "$RESTART_DB" >/dev/null 2>&1 || true; fi
   if [[ "$CLUSTER_STARTED" == 1 || ( -n "$PG_DATA" && -f "$PG_DATA/PG_VERSION" ) ]]; then
-    "$PG_TOOLS/pg_ctl" -D "$PG_DATA" -m fast -w stop >/dev/null 2>&1 || true
+    if ! "$PG_TOOLS/pg_ctl" -D "$PG_DATA" -m fast -w stop >/dev/null; then
+      echo "Could not stop owned test cluster at $PG_DATA; its directory was retained." >&2
+      exit 1
+    fi
   fi
   if [[ "$EXTERNAL_CLUSTER" == 0 && -n "$PG_TEMP" ]]; then rm -rf -- "$PG_TEMP"; fi
   exit "$exit_code"
@@ -68,6 +74,11 @@ export PATH="$PG_TOOLS:$PATH"
 export TMPDIR=/tmp
 unset DATABASE_URL PGDATABASE PGSERVICE PGSERVICEFILE PGOPTIONS PGPASSWORD PHASE_B_SYNTHETIC PHASE_B_ADMIN_KEY || true
 export PGPASSFILE=/dev/null
+
+if [[ "$SEC_01_ONLY" == 1 && -n "${PHASE_B_TEST_ADMIN_URL:-}" ]]; then
+  echo "SEC-01 requires an owned disposable PostgreSQL cluster." >&2
+  exit 2
+fi
 
 if [[ -n "${PHASE_B_TEST_ADMIN_URL:-}" ]]; then
   EXTERNAL_CLUSTER=1
@@ -162,6 +173,12 @@ SERVER_VERSION="$("$PG_TOOLS/psql" --no-psqlrc --set ON_ERROR_STOP=1 --host "$PG
 printf '[Phase B isolated runner] PostgreSQL %s on local port %s\n' "$SERVER_VERSION" "$PGPORT"
 printf '[Phase B isolated runner] External test cluster: %s\n' "$([[ "$EXTERNAL_CLUSTER" == 1 ]] && echo yes || echo no)"
 
+if [[ "$EXTERNAL_CLUSTER" == 0 ]]; then
+  run 'SEC-01 membership claim rate limits' \
+    env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" \
+    node "$SERVER_DIR/test/phase_b_claim_rate_limit.test.js"
+fi
+
 run 'B2 persistence, migration, failure rollback, and dump/restore' \
   env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \
   node "$SERVER_DIR/test/phase_b_persistence.test.js"
@@ -187,6 +204,11 @@ if [[ -f "$B3_AUTHORITY_TEST" ]]; then
     node "$B3_AUTHORITY_TEST"
 else
   echo '[Phase B isolated runner] B3 authority suite skipped by explicit --allow-missing-b3.'
+fi
+
+if [[ "$SEC_01_ONLY" == 1 ]]; then
+  printf '\n[Phase B isolated runner] SEC-01 and related regressions passed.\n'
+  exit 0
 fi
 
 "$PG_TOOLS/createdb" --host "$PGHOST" --port "$PGPORT" --username "$PGUSER" "$LEGACY_DB"

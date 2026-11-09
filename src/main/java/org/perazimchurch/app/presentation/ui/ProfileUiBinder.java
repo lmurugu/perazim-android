@@ -418,6 +418,17 @@ public class ProfileUiBinder {
                 v -> AuthDialog.show(context, user -> refreshProfile())
         ));
         card.addView(createHorizontalDivider());
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_phone,
+                "Change account phone number",
+                "Unavailable · your current number and membership link stay unchanged",
+                v -> new AlertDialog.Builder(context)
+                        .setTitle("Phone number change unavailable")
+                        .setMessage("Phone number changes are currently unavailable. Your current account number and any membership link are unchanged.")
+                        .setPositiveButton("Close", null)
+                        .show()
+        ));
+        card.addView(createHorizontalDivider());
 
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_christian_church,

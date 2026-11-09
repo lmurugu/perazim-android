@@ -11,6 +11,7 @@ const syncRoutes = require('./routes/sync');
 const communityRoutes = require('./routes/community');
 const membershipRoutes = require('./routes/membership');
 const adminMembershipRoutes = require('./routes/adminMembership');
+const privacyRoutes = require('./routes/privacy');
 
 const app = express();
 app.set('trust proxy', proxyTrustSetting(process.env.TRUST_PROXY_HOPS));
@@ -44,6 +45,7 @@ app.get('/api/health', (req, res) => {
 
 // Mount modular routes
 app.use('/api/auth', authRoutes);
+app.use('/api/privacy', privacyRoutes);
 app.use('/api/prayers', prayerRoutes);
 app.use('/api/campuses', campusRoutes);
 app.use('/api/sync', syncRoutes);

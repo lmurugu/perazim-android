@@ -19,7 +19,8 @@ function phaseBDatabaseAllowed() {
     const host = url.hostname.toLowerCase();
     const local = host === 'localhost' || host === '::1' || host === '[::1]' || net.isIP(host) === 4 && host.startsWith('127.');
     const database = decodeURIComponent(url.pathname.replace(/^\//, ''));
-    return local && /^perazim_phaseb_[a-z0-9]{6,32}_test$/.test(database);
+    const approvedDatabase = /^perazim_phaseb_[a-z0-9]{6,32}_test$/.test(database);
+    return local && approvedDatabase;
   } catch (_) {
     return false;
   }
@@ -116,13 +117,13 @@ function safeReason(value) {
   return typeof value === 'string' && /^[A-Z][A-Z0-9_]{2,39}$/.test(value) ? value : null;
 }
 
-async function writeAudit(client, { actorId, action, resourceType, resourceId = '', outcome = 'SUCCESS', reason = 'OWNER_APPROVED', requestId = null }) {
+async function writeAudit(client, { actorId, action, resourceType, resourceId = '', outcome = 'SUCCESS', reason = 'OWNER_APPROVED', requestId = null, createdAt = Date.now() }) {
   const reasonCode = safeReason(reason);
   if (!reasonCode) throw new PhaseBError(400, 'INVALID_REASON', 'Reason must be a short approved reason code');
   await client.query(
     `INSERT INTO admin_audit_log (id,actor_id,action,resource_type,resource_id,outcome,reason,request_id,created_at)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
-    [newId(), actorId, action, resourceType, String(resourceId), outcome, reasonCode, requestId, Date.now()]
+    [newId(), actorId, action, resourceType, String(resourceId), outcome, reasonCode, requestId, createdAt]
   );
 }
 

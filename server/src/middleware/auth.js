@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const { query, isPostgresActive } = require('../db');
+const { query, isPostgresActive, memoryStore } = require('../db');
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -67,10 +67,47 @@ async function requireAuth(req, res, next) {
     if (!current) return res.status(401).json({ error: 'Account is unavailable. Please log in again.' });
     req.user = current;
     req.token = token;
+    const gate = await privacyAcknowledgementGate(req, current.id);
+    if (gate) return res.status(428).json({ code: 'PRIVACY_NOTICE_ACK_REQUIRED', version: gate.version, sha256: gate.content_hash });
     next();
   } catch (err) {
+    if (err && err.code === 'PRIVACY_GATE_UNAVAILABLE') return res.status(503).json({ error: 'Privacy acknowledgement status is temporarily unavailable.' });
     if (err && err.code === 'AUTH_ACCOUNT_UNAVAILABLE') return res.status(401).json({ error: 'Account is unavailable. Please log in again.' });
     return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+}
+
+async function privacyAcknowledgementGate(req, userId) {
+  const path = String(req.originalUrl || req.baseUrl + req.path || '').split('?')[0];
+  const allowed = new Set([
+    '/api/auth/logout', '/api/privacy/notice/current', '/api/privacy/public-policy',
+    '/api/privacy/presentation', '/api/privacy/acknowledge', '/api/privacy/requests'
+  ]);
+  if (allowed.has(path) || path.startsWith('/api/privacy/requests/')) return null;
+  if (!isPostgresActive()) {
+    if (process.env.NODE_ENV !== 'test') return null;
+    const notice = memoryStore.data01TestPrivacyNotice;
+    if (!notice || notice.publication_status !== 'PUBLISHED' || Number(notice.effective_at) > Date.now() || notice.withdrawn_at) return null;
+    const acknowledged = memoryStore.privacy_notice_acknowledgements.some(row => row.user_id === userId && row.notice_version === notice.version && row.content_hash === notice.content_hash);
+    return acknowledged ? null : notice;
+  }
+  try {
+    const current = await query(
+      `SELECT version,content_hash FROM privacy_notice_versions
+        WHERE is_active=TRUE AND publication_status='PUBLISHED' AND withdrawn_at IS NULL AND effective_at <= $1 LIMIT 1`, [Date.now()]
+    );
+    if (!current.rows.length) return null;
+    const notice = current.rows[0];
+    const ack = await query(
+      `SELECT 1 FROM privacy_notice_acknowledgements
+        WHERE user_id=$1 AND notice_version=$2 AND content_hash=$3 LIMIT 1`,
+      [userId, notice.version, notice.content_hash]
+    );
+    return ack.rows.length ? null : notice;
+  } catch (_) {
+    const error = new Error('Privacy gate unavailable');
+    error.code = 'PRIVACY_GATE_UNAVAILABLE';
+    throw error;
   }
 }
 

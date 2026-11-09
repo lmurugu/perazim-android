@@ -18,7 +18,12 @@ const memoryStore = {
   messages: [],
   connections: [],
   sync_events: [],
-  revoked_tokens: []
+  revoked_tokens: [],
+  privacy_notice_acknowledgements: [],
+  privacy_presentation_receipts: [],
+  data_subject_requests: [],
+  data_subject_request_events: [],
+  data_subject_request_revisions: []
 };
 
 async function initDb() {
@@ -98,6 +103,13 @@ async function query(sql, params = []) {
     const user = { id, phone, pin_hash, name, campus_id, role, avatar_url, xp, streak, grace_points, is_active, created_at, updated_at };
     memoryStore.users.push(user);
     return { rows: [user] };
+  }
+
+  // INSERT INTO privacy_notice_acknowledgements
+  if (lower.startsWith('insert into privacy_notice_acknowledgements')) {
+    const [user_id, notice_version, content_hash, presented_at, acknowledged_at, acknowledgement_text] = params;
+    memoryStore.privacy_notice_acknowledgements.push({ user_id, notice_version, content_hash, presented_at, acknowledged_at, acknowledgement_text, client_platform: 'android' });
+    return { rows: [], rowCount: 1 };
   }
 
   // UPDATE users
@@ -264,23 +276,54 @@ async function query(sql, params = []) {
   return { rows: [], rowCount: 0 };
 }
 
-async function withTransaction(callback) {
+async function withTransaction(work) {
   if (isPostgres && pool) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      const result = await callback(client);
+      const value = await work(client);
       await client.query('COMMIT');
-      return result;
-    } catch (err) {
-      await client.query('ROLLBACK');
-      throw err;
-    } finally {
-      client.release();
-    }
+      return value;
+    } catch (error) {
+      try { await client.query('ROLLBACK'); } catch (_) {}
+      throw error;
+    } finally { client.release(); }
   }
-  // Simulated transaction over query
-  return callback({ query });
+  const receipts = [...memoryStore.privacy_presentation_receipts];
+  const acknowledgements = [...memoryStore.privacy_notice_acknowledgements];
+  try {
+    return await work({ query: async (sql, params = []) => {
+      const normalized = sql.trim().toLowerCase();
+      if (normalized.startsWith('insert into privacy_presentation_receipts')) {
+        const [receipt_hash,user_id,notice_version,content_hash,presented_at,expires_at] = params;
+        if (memoryStore.privacy_presentation_receipts.some(item => item.receipt_hash === receipt_hash)) throw new Error('duplicate receipt');
+        memoryStore.privacy_presentation_receipts.push({receipt_hash,user_id,notice_version,content_hash,presented_at,expires_at,consumed_at:null});
+        return {rows:[],rowCount:1};
+      }
+      if (normalized.startsWith('select') && normalized.includes('from privacy_presentation_receipts')) {
+        const [receipt_hash,user_id,now] = params;
+        const row = memoryStore.privacy_presentation_receipts.find(item => item.receipt_hash===receipt_hash && item.user_id===user_id && item.consumed_at===null && item.expires_at>now);
+        return {rows:row?[{...row}]:[],rowCount:row?1:0};
+      }
+      if (normalized.startsWith('update privacy_presentation_receipts')) {
+        const [consumed_at,receipt_hash,user_id] = params;
+        const row=memoryStore.privacy_presentation_receipts.find(item=>item.receipt_hash===receipt_hash&&item.user_id===user_id&&item.consumed_at===null);
+        if(row) row.consumed_at=consumed_at;
+        return {rows:row?[{...row}]:[],rowCount:row?1:0};
+      }
+      if (normalized.startsWith('insert into privacy_notice_acknowledgements')) {
+        const [user_id,notice_version,content_hash,presented_at,acknowledged_at,acknowledgement_text] = params;
+        if(memoryStore.privacy_notice_acknowledgements.some(item=>item.user_id===user_id&&item.notice_version===notice_version)) throw new Error('duplicate acknowledgement');
+        memoryStore.privacy_notice_acknowledgements.push({user_id,notice_version,content_hash,presented_at,acknowledged_at,acknowledgement_text,client_platform:'android'});
+        return {rows:[],rowCount:1};
+      }
+      return query(sql, params);
+    }});
+  } catch (error) {
+    memoryStore.privacy_presentation_receipts = receipts;
+    memoryStore.privacy_notice_acknowledgements = acknowledgements;
+    throw error;
+  }
 }
 
 module.exports = {

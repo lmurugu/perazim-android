@@ -21,6 +21,9 @@ public final class AuthRemoteSource {
                                 @NonNull String pin,
                                 @NonNull String name,
                                 @Nullable String campusId,
+                                @NonNull String privacyNoticeVersion,
+                                @NonNull String privacyNoticeHash,
+                                long privacyNoticePresentedAt,
                                 @NonNull AuthCallback callback) {
         try {
             JSONObject body = new JSONObject();
@@ -28,6 +31,10 @@ public final class AuthRemoteSource {
             body.put("pin", pin);
             body.put("name", name);
             body.put("campus_id", (campusId != null && !campusId.isEmpty()) ? campusId : "campus_embu");
+            body.put("privacy_notice_version", privacyNoticeVersion);
+            body.put("privacy_notice_hash", privacyNoticeHash);
+            body.put("privacy_notice_presented_at", privacyNoticePresentedAt);
+            body.put("privacy_notice_acknowledged", true);
 
             ApiClient.post(context, "/api/auth/register", body, null, new ApiClient.ApiCallback() {
                 @Override

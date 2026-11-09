@@ -4,11 +4,34 @@ process.env.NODE_ENV = 'test';
 process.env.ALLOW_MEMORY_STORE = 'true';
 const http = require('http');
 const { app, startServer } = require('../src/index');
+const { memoryStore } = require('../src/db');
+const { hashContent } = require('../src/phase-b/privacyNotice');
+
+const syntheticTestNotice = 'Synthetic API test notice; not an institutional policy.';
+memoryStore.data01TestPrivacyNotice = {
+  version: 'TEST-API-NOTICE-1',
+  content: syntheticTestNotice,
+  content_hash: hashContent(syntheticTestNotice),
+  publication_status: 'PUBLISHED',
+  effective_at: Date.now() - 1000
+};
 
 const PORT = 3001;
 process.env.PORT = PORT;
 
-function makeRequest(method, path, body = null, token = null) {
+async function makeRequest(method, path, body = null, token = null) {
+  // Successful synthetic registration cases model a member reviewing the
+  // current notice. Direct no-acknowledgement and stale-version rejection is
+  // exercised separately by privacy_privacy_gate.test.js.
+  if (method === 'POST' && path === '/api/auth/register' && body) {
+    const current = await makeRequest('GET', '/api/privacy/notice/current');
+    body = {
+      ...body,
+      privacy_notice_version: current.body.version,
+      privacy_notice_hash: current.body.sha256,
+      privacy_notice_acknowledged: true
+    };
+  }
   return new Promise((resolve, reject) => {
     const payload = body ? JSON.stringify(body) : null;
     const options = {

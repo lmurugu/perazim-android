@@ -600,13 +600,16 @@ public class SessionManager {
                                         @NonNull String pin,
                                         @NonNull String name,
                                         @Nullable String campusId,
+                                        @NonNull String privacyNoticeVersion,
+                                        @NonNull String privacyNoticeHash,
+                                        long privacyNoticePresentedAt,
                                         @NonNull SessionAuthCallback callback) {
         if (context == null) {
             callback.onError("Context unavailable for registration");
             return;
         }
         final String currentGuest = getGuestUserId();
-        AuthRemoteSource.register(context, phone, pin, name, campusId, new AuthRemoteSource.AuthCallback() {
+        AuthRemoteSource.register(context, phone, pin, name, campusId, privacyNoticeVersion, privacyNoticeHash, privacyNoticePresentedAt, new AuthRemoteSource.AuthCallback() {
             @Override
             public void onSuccess(@NonNull String token, @NonNull JSONObject userJson) {
                 try {

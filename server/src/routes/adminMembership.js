@@ -10,6 +10,8 @@ const {
   requireAdminAuthority, userPermission, writeAudit, safeReason
 } = require('../phase-b/security');
 const { decryptSecret, matchingCounter } = require('../phase-b/totp');
+const { matchesMembershipIdentity, normalizeName, readMembershipAccount } = require('../phase-b/membershipIdentity');
+const { batchFingerprint, classifyImportRows, prepareImportRows } = require('../phase-b/membershipImport');
 
 const router = express.Router();
 router.use(requirePhaseB, requireAuth);
@@ -71,9 +73,10 @@ async function adminReadWork(req, work) {
 
 async function assertFreshRequest(client, actorId, action, requestId) {
   if (!requestUuid(requestId)) throw new PhaseBError(400, 'INVALID_REQUEST_ID', 'A valid request_id is required');
+  const actions = Array.isArray(action) ? action : [action];
   const prior = await client.query(
-    'SELECT resource_id FROM admin_audit_log WHERE actor_id=$1 AND action=$2 AND request_id=$3 ORDER BY created_at DESC LIMIT 1',
-    [actorId, action, requestId]
+    'SELECT 1 FROM admin_audit_log WHERE actor_id=$1 AND action=ANY($2::text[]) AND lower(request_id)=lower($3) LIMIT 1',
+    [actorId, actions, requestId]
   );
   if (prior.rows.length) throw new PhaseBError(409, 'REQUEST_ALREADY_PROCESSED', 'This request has already been processed');
 }
@@ -98,25 +101,41 @@ async function assertUniqueTargetIsPilot(client, targetUserId) {
 router.post('/security/step-up', async (req, res) => {
   try {
     const { pin, code } = req.body || {};
-    const now = Date.now();
     const session = await phaseBTransaction(async client => {
-      const attempts = await client.query(
-        `SELECT COUNT(*)::int AS count FROM admin_audit_log f WHERE f.actor_id=$1 AND f.action='ADMIN_STEP_UP_FAILURE'
-          AND f.created_at>GREATEST($2,COALESCE((SELECT MAX(s.created_at) FROM admin_audit_log s WHERE s.actor_id=$1 AND s.action='ADMIN_STEP_UP_SUCCESS'),0))`,
-        [req.user.id, now - 15 * 60 * 1000]
-      );
-      if (attempts.rows[0].count >= 5) return { failure: 'RATE_LIMITED' };
       const result = await client.query(
         `SELECT pb.user_id,u.pin_hash,u.is_active,s.totp_secret_cipher,s.totp_last_counter,s.security_version,s.auth_not_before
            FROM pilot_bootstrap pb JOIN users u ON u.id=pb.user_id JOIN admin_security s ON s.user_id=pb.user_id
           WHERE pb.singleton=TRUE AND pb.user_id=$1 FOR UPDATE OF pb,u,s`, [req.user.id]
       );
       const pilot = result.rows[0];
+      // Serialize counting, verification and audit writes on the same actor.
+      // An authenticated non-pilot still uses the existing failure policy.
+      if (!pilot) await client.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [req.user.id]);
+      const now = Date.now();
+      const { rows: [attempts] } = await client.query(
+        `WITH recent AS (
+           SELECT action,created_at FROM admin_audit_log
+           WHERE actor_id=$1 AND action IN ('ADMIN_STEP_UP_FAILURE','ADMIN_STEP_UP_SUCCESS') AND created_at>$2
+         )
+         SELECT COUNT(*) FILTER (WHERE action='ADMIN_STEP_UP_FAILURE' AND created_at>
+           COALESCE((SELECT MAX(created_at) FROM recent WHERE action='ADMIN_STEP_UP_SUCCESS'),0))::int AS count,
+           MAX(created_at) AS last_at FROM recent`,
+        [req.user.id, now - 15 * 60 * 1000]
+      );
+      if (attempts.count >= 5) return { failure: 'RATE_LIMITED' };
+
+      const recordStepUp = success => writeAudit(client, {
+        actorId: req.user.id, resourceType: 'administrator', resourceId: req.user.id,
+        action: success ? 'ADMIN_STEP_UP_SUCCESS' : 'ADMIN_STEP_UP_FAILURE',
+        outcome: success ? 'SUCCESS' : 'DENIED', reason: success ? 'AUTH_SUCCESS' : 'AUTH_FAILURE',
+        // Preserve reset ordering even when adjacent attempts share a millisecond.
+        createdAt: Math.max(Date.now(), Number(attempts.last_at) + 1)
+      });
       let valid = !!(pilot && pilot.is_active && now >= Number(pilot.auth_not_before));
       if (valid && (typeof pin !== 'string' || !/^\d{4,12}$/.test(pin) || typeof code !== 'string' || !/^\d{6}$/.test(code))) valid = false;
       if (valid) valid = await bcrypt.compare(pin, pilot.pin_hash);
       if (!valid) {
-        await writeAudit(client, { actorId: req.user.id, action: 'ADMIN_STEP_UP_FAILURE', resourceType: 'administrator', resourceId: req.user.id, outcome: 'DENIED', reason: 'AUTH_FAILURE' });
+        await recordStepUp(false);
         return { failure: 'STEP_UP_FAILED' };
       }
       let secret;
@@ -124,7 +143,7 @@ router.post('/security/step-up', async (req, res) => {
       catch (_) { return { failure: 'STEP_UP_UNAVAILABLE' }; }
       const counter = matchingCounter(secret, code, now, Number(pilot.totp_last_counter));
       if (counter === null) {
-        await writeAudit(client, { actorId: req.user.id, action: 'ADMIN_STEP_UP_FAILURE', resourceType: 'administrator', resourceId: req.user.id, outcome: 'DENIED', reason: 'AUTH_FAILURE' });
+        await recordStepUp(false);
         return { failure: 'STEP_UP_FAILED' };
       }
       const updated = await client.query(
@@ -132,7 +151,7 @@ router.post('/security/step-up', async (req, res) => {
         [req.user.id, counter]
       );
       if (!updated.rows.length) {
-        await writeAudit(client, { actorId: req.user.id, action: 'ADMIN_STEP_UP_FAILURE', resourceType: 'administrator', resourceId: req.user.id, outcome: 'DENIED', reason: 'AUTH_FAILURE' });
+        await recordStepUp(false);
         return { failure: 'STEP_UP_FAILED' };
       }
       const raw = crypto.randomBytes(32).toString('base64url');
@@ -142,13 +161,13 @@ router.post('/security/step-up', async (req, res) => {
          VALUES ($1,$2,$3,$4,$5,NULL,$6)`,
         [hash(raw), req.user.id, updated.rows[0].security_version, hash(req.token), expiresAt, now]
       );
-      await writeAudit(client, { actorId: req.user.id, action: 'ADMIN_STEP_UP_SUCCESS', resourceType: 'administrator', resourceId: req.user.id, reason: 'AUTH_SUCCESS' });
-      return { raw, expiresAt };
+      await recordStepUp(true);
+      return { raw, expiresAt, now };
     });
     if (session.failure === 'RATE_LIMITED') throw new PhaseBError(429, 'STEP_UP_RATE_LIMITED', 'Too many administrator authentication attempts');
     if (session.failure === 'STEP_UP_UNAVAILABLE') throw new PhaseBError(503, 'STEP_UP_UNAVAILABLE', 'Administrator second factor is unavailable');
     if (session.failure) throw new PhaseBError(401, 'STEP_UP_FAILED', 'Administrator authentication failed');
-    return res.json({ token: session.raw, expires_at: session.expiresAt, server_time: now });
+    return res.json({ token: session.raw, expires_at: session.expiresAt, server_time: session.now });
   } catch (error) { return asError(res, error); }
 });
 
@@ -216,35 +235,277 @@ router.post('/membership/import', async (req, res) => {
     if (typeof source !== 'string' || !source.trim() || source.trim().length > 100 || !Array.isArray(records) || records.length < 1 || records.length > 10000 || !reasonCode) {
       throw new PhaseBError(400, 'INVALID_IMPORT', 'A source, records array, and approved reason code are required');
     }
-    const normalized = [];
-    const seen = new Set();
-    for (const record of records) {
-      const reference = typeof record?.reference === 'string' ? record.reference.trim() : '';
-      const fullName = typeof record?.full_name === 'string' ? record.full_name.trim().replace(/\s+/g, ' ') : '';
-      const phone = validateAndNormalizePhone(record?.phone);
-      if (!reference || reference.length > 100 || !fullName || fullName.length > 128 || !phone) throw new PhaseBError(400, 'INVALID_IMPORT_RECORD', 'One or more records are invalid');
-      if (seen.has(reference)) throw new PhaseBError(409, 'DUPLICATE_REFERENCE', 'Import contains duplicate references');
-      seen.add(reference);
-      normalized.push({ reference, fullName, phone });
-    }
+    const prepared = prepareImportRows(records);
+    const idempotencyKey = batchFingerprint(source, prepared);
     const requestTime = Date.now();
-    const importId = await adminWork(req, 'membership.register.import', 'global', async client => {
+    const result = await adminWork(req, 'membership.register.import', 'global', async client => {
       await assertFreshRequest(client, req.user.id, 'MEMBERSHIP_IMPORT', requestId);
-      const prior = await client.query('SELECT reference FROM membership_records WHERE reference=ANY($1::text[]) LIMIT 1', [normalized.map(item => item.reference)]);
-      if (prior.rows.length) throw new PhaseBError(409, 'DUPLICATE_REFERENCE', 'Import references must be new');
+      const replay = await client.query(
+        `SELECT id FROM membership_imports WHERE idempotency_key=$1`, [idempotencyKey]
+      );
+      if (replay.rows.length) {
+        await writeAudit(client, { actorId: req.user.id, action: 'MEMBERSHIP_IMPORT_REPLAY', resourceType: 'membership_import', resourceId: replay.rows[0].id, reason: reasonCode, requestId });
+        return { id: replay.rows[0].id, replayed: true, counts: await importCounts(client, replay.rows[0].id) };
+      }
+
+      const changedReplay = await client.query(
+        `SELECT id FROM membership_imports
+          WHERE source=$1 AND idempotency_key IS DISTINCT FROM $2
+          ORDER BY created_at DESC LIMIT 1`, [source.trim(), idempotencyKey]
+      );
+
+      const references = prepared.map(row => row.sourceReference?.toLowerCase()).filter(Boolean);
+      const phones = prepared.map(row => row.normalizedPhone).filter(Boolean);
+      const candidates = references.length || phones.length
+        ? await client.query(
+          `SELECT lower(reference) AS reference_key,phone,
+                  lower(regexp_replace(btrim(full_name), '\\s+', ' ', 'g')) AS normalized_name
+             FROM membership_records
+            WHERE lower(reference)=ANY($1::text[]) OR phone=ANY($2::text[])`,
+          [references, phones]
+        )
+        : { rows: [] };
+      const stagingCandidates = references.length || phones.length
+        ? await client.query(
+          `SELECT lower(source_reference) AS reference_key,normalized_phone,
+                  lower(regexp_replace(btrim(full_name), '\\s+', ' ', 'g')) AS normalized_name
+             FROM membership_import_staging_rows
+            WHERE row_status IN ('INCOMPLETE','REVIEW')
+              AND (lower(source_reference)=ANY($1::text[]) OR normalized_phone=ANY($2::text[]))`,
+          [references, phones]
+        )
+        : { rows: [] };
+      const existingReferences = new Set([...candidates.rows, ...stagingCandidates.rows].map(row => row.reference_key).filter(Boolean));
+      const existingPhones = new Set([...candidates.rows.map(row => row.phone), ...stagingCandidates.rows.map(row => row.normalized_phone)].filter(Boolean));
+      const existingIdentities = new Set([...candidates.rows, ...stagingCandidates.rows]
+        .filter(row => row.normalized_name && (row.phone || row.normalized_phone))
+        .map(row => `${row.normalized_name}\u0000${row.phone || row.normalized_phone}`));
+      const existingReferenceIdentities = new Map();
+      for (const row of [...candidates.rows, ...stagingCandidates.rows]) {
+        if (!row.reference_key) continue;
+        if (!existingReferenceIdentities.has(row.reference_key)) existingReferenceIdentities.set(row.reference_key, new Set());
+        existingReferenceIdentities.get(row.reference_key).add(`${row.normalized_name || ''}\u0000${row.phone || row.normalized_phone || ''}`);
+      }
+      const classified = classifyImportRows(prepared, {
+        existingReferences, existingPhones, existingIdentities, existingReferenceIdentities,
+        changedBatchReplay: changedReplay.rows.length > 0
+      });
+
       const id = newId();
-      const digest = crypto.createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
-      await client.query('INSERT INTO membership_imports (id,source,checksum,actor_id,created_at) VALUES ($1,$2,$3,$4,$5)', [id, source.trim(), digest, req.user.id, requestTime]);
-      for (const item of normalized) {
-        await client.query(
-          `INSERT INTO membership_records (id,import_id,reference,full_name,phone,record_status,revision,created_at,updated_at)
-           VALUES ($1,$2,$3,$4,$5,'ACTIVE',1,$6,$6)`, [newId(), id, item.reference, item.fullName, item.phone, requestTime]
-        );
+      const inserted = await client.query(
+        `INSERT INTO membership_imports (id,source,checksum,actor_id,created_at,idempotency_key)
+         VALUES ($1,$2,$3,$4,$5,$6) ON CONFLICT (idempotency_key) DO NOTHING RETURNING id`,
+        [id, source.trim(), idempotencyKey, req.user.id, requestTime, idempotencyKey]
+      );
+      if (!inserted.rows.length) {
+        const existing = await client.query('SELECT id FROM membership_imports WHERE idempotency_key=$1', [idempotencyKey]);
+        if (!existing.rows.length) throw new PhaseBError(409, 'IMPORT_RETRY_REQUIRED', 'Import could not be accepted; retry the request');
+        await writeAudit(client, { actorId: req.user.id, action: 'MEMBERSHIP_IMPORT_REPLAY', resourceType: 'membership_import', resourceId: existing.rows[0].id, reason: reasonCode, requestId });
+        return { id: existing.rows[0].id, replayed: true, counts: await importCounts(client, existing.rows[0].id) };
+      }
+
+      for (const row of classified.rows) {
+        if (row.rowStatus === 'ACCEPTED') {
+          await client.query(
+            `INSERT INTO membership_records (id,import_id,reference,full_name,phone,record_status,revision,created_at,updated_at)
+             VALUES ($1,$2,$3,$4,$5,'ACTIVE',1,$6,$6)`,
+            [newId(), id, row.sourceReference, row.fullName, row.normalizedPhone, requestTime]
+          );
+        } else {
+          const stagingId = newId();
+          await client.query(
+            `INSERT INTO membership_import_staging_rows
+              (id,import_id,row_number,source_reference,full_name,phone_value,normalized_phone,row_status,issue_codes,fingerprint,created_at,updated_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$11)`,
+            [stagingId, id, row.rowNumber, row.sourceReference, row.fullName, row.phoneValue, row.normalizedPhone,
+              row.rowStatus, row.issues, row.fingerprint, requestTime]
+          );
+          await client.query(
+            `INSERT INTO membership_import_staging_events (id,staging_row_id,actor_id,event,reason,created_at)
+             VALUES ($1,$2,$3,'STAGED',$4,$5)`, [newId(), stagingId, req.user.id, reasonCode, requestTime]
+          );
+        }
       }
       await writeAudit(client, { actorId: req.user.id, action: 'MEMBERSHIP_IMPORT', resourceType: 'membership_import', resourceId: id, reason: reasonCode, requestId });
-      return id;
+      return { id, replayed: false, counts: classified.counts };
     });
-    return res.status(201).json({ success: true, import_id: importId, count: normalized.length });
+    return res.status(result.replayed ? 200 : 201).json({ success: true, import_id: result.id, replayed: result.replayed, counts: result.counts });
+  } catch (error) { return asError(res, error); }
+});
+
+async function importCounts(client, importId) {
+  const result = await client.query(
+    `SELECT
+       (SELECT count(*)::int FROM membership_records WHERE import_id=$1) AS accepted,
+       count(*) FILTER (WHERE row_status='INCOMPLETE')::int AS incomplete,
+       count(*) FILTER (WHERE 'DUPLICATE_REFERENCE'=ANY(issue_codes))::int AS duplicate_reference,
+       count(*) FILTER (WHERE 'SHARED_PHONE'=ANY(issue_codes))::int AS shared_phone,
+       count(*) FILTER (WHERE 'POSSIBLE_DUPLICATE_PERSON'=ANY(issue_codes))::int AS possible_duplicate,
+       count(*) FILTER (WHERE 'IDENTITY_CONFLICT'=ANY(issue_codes))::int AS identity_conflict,
+       count(*) FILTER (WHERE 'CHANGED_BATCH_REPLAY'=ANY(issue_codes))::int AS changed_batch_replay,
+       count(*) FILTER (WHERE row_status='REJECTED')::int AS rejected
+     FROM membership_import_staging_rows WHERE import_id=$1`, [importId]
+  );
+  return result.rows[0];
+}
+
+router.get('/membership/imports/:id/staging', async (req, res) => {
+  try {
+    if (!uuid(req.params.id)) throw new PhaseBError(404, 'NOT_FOUND', 'Import not found');
+    const now = Date.now();
+    const rows = await adminWork(req, 'membership.register.import', 'global', async client => {
+      const batch = await client.query('SELECT id FROM membership_imports WHERE id=$1', [req.params.id]);
+      if (!batch.rows.length) throw new PhaseBError(404, 'NOT_FOUND', 'Import not found');
+      const result = await client.query(
+        `SELECT id,row_number,source_reference,full_name,phone_value,normalized_phone,row_status,issue_codes,promoted_record_id,created_at,updated_at
+           FROM membership_import_staging_rows WHERE import_id=$1 ORDER BY row_number`, [req.params.id]
+      );
+      await writeAudit(client, { actorId: req.user.id, action: 'MEMBERSHIP_IMPORT_STAGING_READ', resourceType: 'membership_import', resourceId: req.params.id, reason: 'ADMIN_READ' });
+      return result.rows;
+    });
+    return res.json({ rows, server_time: now });
+  } catch (error) { return asError(res, error); }
+});
+
+router.post('/membership/import-staging/:id/promote', async (req, res) => {
+  try {
+    const rowId = req.params.id;
+    const { reference, full_name: fullName, phone, reviewed_conflicts: reviewedConflicts,
+      request_id: requestId, reason } = req.body || {};
+    const reasonCode = validReason(reason);
+    const normalizedReference = typeof reference === 'string' ? reference.trim() : '';
+    const normalizedName = typeof fullName === 'string' ? fullName.trim().replace(/\s+/g, ' ') : '';
+    const normalizedPhone = validateAndNormalizePhone(phone);
+    if (!uuid(rowId) || !normalizedReference || normalizedReference.length > 100 || !normalizedName || normalizedName.length > 128 ||
+        !normalizedPhone || typeof reviewedConflicts !== 'boolean' || !reasonCode) {
+      throw new PhaseBError(400, 'INVALID_STAGING_PROMOTION', 'A valid corrected identity, conflict review decision, and reason code are required');
+    }
+    const now = Date.now();
+    const recordId = await adminWork(req, 'membership.register.import', 'global', async client => {
+      await assertFreshRequest(client, req.user.id, 'MEMBERSHIP_IMPORT_ROW_PROMOTE', requestId);
+      const { rows: [staged] } = await client.query(
+        `SELECT id,import_id,row_status FROM membership_import_staging_rows WHERE id=$1 FOR UPDATE`, [rowId]
+      );
+      if (!staged || staged.row_status === 'PROMOTED') throw new PhaseBError(409, 'STAGING_ROW_UNAVAILABLE', 'This staged row cannot be promoted');
+      const ref = await client.query('SELECT 1 FROM membership_records WHERE lower(reference)=lower($1) LIMIT 1', [normalizedReference]);
+      if (ref.rows.length) throw new PhaseBError(409, 'DUPLICATE_REFERENCE', 'The reviewed reference is already in use');
+      const conflicts = await client.query(
+        `SELECT 1 FROM membership_records WHERE phone=$1
+           OR lower(regexp_replace(btrim(full_name), '\\s+', ' ', 'g'))=lower($2) LIMIT 2`, [normalizedPhone, normalizedName]
+      );
+      if (conflicts.rows.length && reviewedConflicts !== true) {
+        throw new PhaseBError(409, 'CONFLICT_REVIEW_REQUIRED', 'A possible contact or identity conflict requires explicit administrator review');
+      }
+      const newRecordId = newId();
+      await client.query(
+        `INSERT INTO membership_records (id,import_id,reference,full_name,phone,record_status,revision,created_at,updated_at)
+         VALUES ($1,$2,$3,$4,$5,'ACTIVE',1,$6,$6)`,
+        [newRecordId, staged.import_id, normalizedReference, normalizedName, normalizedPhone, now]
+      );
+      await client.query(
+        `UPDATE membership_import_staging_rows SET row_status='PROMOTED',promoted_record_id=$2,updated_at=$3 WHERE id=$1`,
+        [rowId, newRecordId, now]
+      );
+      await client.query(
+        `INSERT INTO membership_import_staging_events (id,staging_row_id,actor_id,event,reason,created_at)
+         VALUES ($1,$2,$3,'PROMOTED',$4,$5)`, [newId(), rowId, req.user.id, reasonCode, now]
+      );
+      await writeAudit(client, { actorId: req.user.id, action: 'MEMBERSHIP_IMPORT_ROW_PROMOTE', resourceType: 'membership_import_staging_row', resourceId: rowId, reason: reasonCode, requestId });
+      return newRecordId;
+    });
+    return res.status(201).json({ success: true, record_id: recordId, membership_status: 'UNVERIFIED' });
+  } catch (error) { return asError(res, error); }
+});
+
+router.get('/membership/identity-reconciliation', async (req, res) => {
+  try {
+    const now = Date.now();
+    const requests = await adminWork(req, 'membership.claim.review', 'global', async client => {
+      const result = await client.query(
+        `SELECT id,request_id,user_id,proposed_name,proposed_phone,status,submitted_at,updated_at
+           FROM membership_identity_reconciliation_requests
+          WHERE status IN ('PENDING','CORRECTION_REQUIRED')
+          ORDER BY submitted_at,id LIMIT 200`
+      );
+      await writeAudit(client, { actorId: req.user.id, action: 'MEMBERSHIP_IDENTITY_RECONCILIATION_READ', resourceType: 'membership_identity_reconciliation', resourceId: '', reason: 'ADMIN_READ' });
+      return result.rows;
+    });
+    return res.json({ requests, server_time: now });
+  } catch (error) { return asError(res, error); }
+});
+
+router.post('/membership/identity-reconciliation/:id/decision', async (req, res) => {
+  try {
+    const reconciliationId = req.params.id;
+    const { decision, record_id: recordId, record_revision: recordRevision, reason, request_id: requestId } = req.body || {};
+    const reasonCode = validReason(reason);
+    if (!uuid(reconciliationId) || !['APPROVE','REJECT','CORRECTION_REQUIRED'].includes(decision) || !reasonCode ||
+        (decision === 'APPROVE' && (!uuid(recordId) || !Number.isSafeInteger(recordRevision) || recordRevision < 1))) {
+      throw new PhaseBError(400, 'INVALID_RECONCILIATION_DECISION', 'A valid decision, reason, record_id, and record_revision when approving are required');
+    }
+    const now = Date.now();
+    await adminWork(req, 'membership.claim.review', 'global', async client => {
+      const action = `MEMBERSHIP_IDENTITY_RECONCILIATION_${decision}`;
+      await assertFreshRequest(client, req.user.id, action, requestId);
+      const { rows: [reconciliation] } = await client.query(
+        `SELECT id,user_id,proposed_name,proposed_phone,status
+           FROM membership_identity_reconciliation_requests WHERE id=$1 FOR UPDATE`, [reconciliationId]
+      );
+      if (!reconciliation || !['PENDING','CORRECTION_REQUIRED'].includes(reconciliation.status)) {
+        throw new PhaseBError(409, 'RECONCILIATION_UNAVAILABLE', 'This identity request cannot be decided');
+      }
+      if (reconciliation.user_id === req.user.id) throw new PhaseBError(403, 'SELF_REVIEW_DENIED', 'An administrator cannot review their own identity request');
+      let selectedRecordId = null;
+      let selectedRecordRevision = null;
+      if (decision === 'APPROVE') {
+        if (!await userPermission(client, req.user.id, 'membership.record.read', recordId, now, true)) {
+          throw new PhaseBError(403, 'PERMISSION_DENIED', 'This action is not permitted');
+        }
+        const account = await readMembershipAccount(client, reconciliation.user_id, true);
+        const accountPhone = validateAndNormalizePhone(account?.phone);
+        if (!account?.is_active || account.registered_name || accountPhone !== reconciliation.proposed_phone) {
+          throw new PhaseBError(409, 'RECONCILIATION_IDENTITY_MISMATCH', 'The submitted identity cannot be confirmed');
+        }
+        const { rows: [record] } = await client.query(
+          `SELECT id,full_name,phone,record_status,revision FROM membership_records WHERE id=$1 FOR UPDATE`, [recordId]
+        );
+        if (record && record.revision !== recordRevision) throw new PhaseBError(409, 'RECONCILIATION_STALE_RECORD', 'The reviewed membership record has changed; review the current revision');
+        if (!record || record.record_status !== 'ACTIVE' || normalizeName(record.full_name) !== normalizeName(reconciliation.proposed_name) ||
+            validateAndNormalizePhone(record.phone) !== reconciliation.proposed_phone) {
+          throw new PhaseBError(409, 'RECONCILIATION_IDENTITY_MISMATCH', 'The submitted identity cannot be confirmed');
+        }
+        const linked = await client.query(
+          `SELECT user_id FROM membership_verifications WHERE membership_record_id=$1 AND status='VERIFIED_MEMBER' FOR UPDATE`, [recordId]
+        );
+        if (linked.rows.length) throw new PhaseBError(409, 'RECONCILIATION_RECORD_UNAVAILABLE', 'The selected record cannot be used for reconciliation');
+        const current = await client.query('SELECT registered_name,source,created_at FROM membership_account_identities WHERE user_id=$1 FOR UPDATE', [reconciliation.user_id]);
+        if (current.rows.length) throw new PhaseBError(409, 'RECONCILIATION_UNAVAILABLE', 'This account is not eligible for identity reconciliation');
+        await client.query(
+          `INSERT INTO membership_account_identities (user_id,registered_name,source,created_at)
+           VALUES ($1,$2,'ADMIN_RECONCILIATION',$3)`, [reconciliation.user_id, record.full_name, now]
+        );
+        await client.query(
+          `INSERT INTO membership_account_identity_history (user_id,revision,registered_name,source,changed_by,changed_at)
+           VALUES ($1,1,$2,'ADMIN_RECONCILIATION',$3,$4)`, [reconciliation.user_id, record.full_name, req.user.id, now]
+        );
+        selectedRecordId = record.id;
+        selectedRecordRevision = record.revision;
+      }
+      const nextStatus = decision === 'APPROVE' ? 'APPROVED' : decision === 'REJECT' ? 'REJECTED' : 'CORRECTION_REQUIRED';
+      await client.query(
+        `UPDATE membership_identity_reconciliation_requests
+            SET status=$2,updated_at=$3,reviewer_id=$4,membership_record_id=$5,decision_reason=$6,membership_record_revision=$7
+          WHERE id=$1`, [reconciliationId, nextStatus, now, req.user.id, selectedRecordId, reasonCode, selectedRecordRevision]
+      );
+      await client.query(
+        `INSERT INTO membership_identity_reconciliation_events
+          (id,reconciliation_id,actor_id,event,reason,membership_record_id,created_at,membership_record_revision)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+        [newId(), reconciliationId, req.user.id, nextStatus, reasonCode, selectedRecordId, now, selectedRecordRevision]
+      );
+      await writeAudit(client, { actorId: req.user.id, action, resourceType: 'membership_identity_reconciliation', resourceId: reconciliationId, reason: reasonCode, requestId });
+    });
+    return res.json({ success: true, status: decision === 'APPROVE' ? 'APPROVED' : decision === 'REJECT' ? 'REJECTED' : 'CORRECTION_REQUIRED', verified: false });
   } catch (error) { return asError(res, error); }
 });
 
@@ -268,9 +529,13 @@ router.post('/membership/claims/:id/decision', async (req, res) => {
       let record = null;
       if (decision === 'APPROVE') {
         if (!await userPermission(client, req.user.id, 'membership.record.read', recordId, now, true)) throw new PhaseBError(403, 'PERMISSION_DENIED', 'This action is not permitted');
+        const account = await readMembershipAccount(client, claim.user_id, true);
+        if (!matchesMembershipIdentity(account, claim.user_name, claim.user_phone)) {
+          throw new PhaseBError(409, 'CLAIM_IDENTITY_MISMATCH', 'The claim does not match the registered account identity');
+        }
         const recordResult = await client.query(`SELECT id,full_name,phone,record_status FROM membership_records WHERE id=$1 FOR UPDATE`, [recordId]);
         record = recordResult.rows[0];
-        if (!record || record.record_status !== 'ACTIVE' || record.phone !== claim.user_phone || record.full_name.toLowerCase().trim() !== claim.user_name.toLowerCase().trim()) {
+        if (!record || record.record_status !== 'ACTIVE' || !matchesMembershipIdentity(account, record.full_name, record.phone)) {
           throw new PhaseBError(409, 'RECORD_MISMATCH', 'The selected record cannot be confirmed for this claim');
         }
         const linked = await client.query(`SELECT user_id FROM membership_verifications WHERE membership_record_id=$1 AND status='VERIFIED_MEMBER' FOR UPDATE`, [recordId]);
@@ -340,15 +605,21 @@ router.post('/membership/users/:id/correct', async (req, res) => {
     await adminWork(req, 'membership.verification.correct', userId, async client => {
       await assertFreshRequest(client, req.user.id, 'MEMBERSHIP_VERIFICATION_CORRECT', requestId);
       if (!await userPermission(client, req.user.id, 'membership.record.read', recordId, now, true)) throw new PhaseBError(403, 'PERMISSION_DENIED', 'This action is not permitted');
-      const record = await client.query(`SELECT id,record_status FROM membership_records WHERE id=$1 FOR UPDATE`, [recordId]);
+      const account = await readMembershipAccount(client, userId, true);
+      const record = await client.query(`SELECT full_name,phone,record_status FROM membership_records WHERE id=$1 FOR UPDATE`, [recordId]);
       if (!record.rows.length || record.rows[0].record_status !== 'ACTIVE') throw new PhaseBError(404, 'NOT_FOUND', 'Membership record not found');
       const current = await client.query('SELECT status,membership_record_id FROM membership_verifications WHERE user_id=$1 FOR UPDATE', [userId]);
-      const previous = current.rows[0]?.status || 'REGISTERED';
-      const priorRecordId = current.rows[0]?.membership_record_id || 'none';
+      const previous = current.rows[0]?.status;
+      if (previous !== 'VERIFIED_MEMBER') {
+        throw new PhaseBError(409, 'VERIFICATION_UNAVAILABLE', 'An existing verified link is required for correction');
+      }
+      if (!matchesMembershipIdentity(account, record.rows[0].full_name, record.rows[0].phone)) {
+        throw new PhaseBError(409, 'RECORD_MISMATCH', 'The selected record does not match the registered account identity');
+      }
+      const priorRecordId = current.rows[0].membership_record_id;
       await client.query(
-        `INSERT INTO membership_verifications (user_id,membership_record_id,status,revision,updated_at)
-         VALUES ($1,$2,'VERIFIED_MEMBER',1,$3) ON CONFLICT (user_id) DO UPDATE SET membership_record_id=EXCLUDED.membership_record_id,
-           status='VERIFIED_MEMBER',revision=membership_verifications.revision+1,updated_at=EXCLUDED.updated_at`, [userId, recordId, now]
+        `UPDATE membership_verifications SET membership_record_id=$2,revision=revision+1,updated_at=$3 WHERE user_id=$1`,
+        [userId, recordId, now]
       );
       await client.query(
         `INSERT INTO membership_verification_history (id,user_id,previous_status,new_status,actor_id,reason,created_at)
@@ -371,14 +642,31 @@ router.patch('/membership/records/:id', async (req, res) => {
       throw new PhaseBError(400, 'INVALID_CORRECTION', 'A record ID, valid name and phone, and approved reason code are required');
     }
     const now = Date.now();
+    const correctedName = fullName.trim().replace(/\s+/g, ' ');
     await adminWork(req, 'membership.record.correct', recordId, async client => {
       await assertFreshRequest(client, req.user.id, 'MEMBERSHIP_RECORD_CORRECT', requestId);
-      const updated = await client.query(
-        `UPDATE membership_records SET full_name=$2,phone=$3,revision=revision+1,updated_at=$4 WHERE id=$1 RETURNING id`,
-        [recordId, fullName.trim().replace(/\s+/g, ' '), normalizedPhone, now]
+      const { rows: [record] } = await client.query(
+        'SELECT full_name,phone,revision,updated_at FROM membership_records WHERE id=$1 FOR UPDATE', [recordId]
       );
-      if (!updated.rows.length) throw new PhaseBError(404, 'NOT_FOUND', 'Membership record not found');
-      await writeAudit(client, { actorId: req.user.id, action: 'MEMBERSHIP_RECORD_CORRECT', resourceType: 'membership_record', resourceId: recordId, reason: reasonCode, requestId });
+      if (!record) throw new PhaseBError(404, 'NOT_FOUND', 'Membership record not found');
+      const { rows: [linked] } = await client.query(
+        "SELECT user_id FROM membership_verifications WHERE membership_record_id=$1 AND status='VERIFIED_MEMBER'", [recordId]
+      );
+      if (linked && !matchesMembershipIdentity(await readMembershipAccount(client, linked.user_id, true), correctedName, normalizedPhone)) {
+        throw new PhaseBError(409, 'RECORD_MISMATCH', 'Revoke the verified link before changing its registered identity');
+      }
+      await client.query(
+        `INSERT INTO membership_record_revisions (record_id,revision,full_name,phone,updated_at)
+         VALUES ($1,$2,$3,$4,$5)`, [recordId, record.revision, record.full_name, record.phone, record.updated_at]
+      );
+      const { rows: [updated] } = await client.query(
+        `UPDATE membership_records SET full_name=$2,phone=$3,revision=revision+1,updated_at=$4 WHERE id=$1 RETURNING revision`,
+        [recordId, correctedName, normalizedPhone, now]
+      );
+      await writeAudit(client, {
+        actorId: req.user.id, action: 'MEMBERSHIP_RECORD_CORRECT', resourceType: 'membership_record',
+        resourceId: `${recordId}:${record.revision}:${updated.revision}`, reason: reasonCode, requestId
+      });
     });
     return res.json({ success: true, record_id: recordId });
   } catch (error) { return asError(res, error); }
@@ -488,17 +776,20 @@ router.post('/security/revoke-sessions', async (req, res) => {
     const { request_id: requestId, reason, compromised = false } = req.body || {};
     const reasonCode = validReason(reason);
     if (!reasonCode || typeof compromised !== 'boolean') throw new PhaseBError(400, 'INVALID_REVOCATION', 'An approved reason code and compromised flag are required');
+    const revokeAction = 'ADMIN_SESSION_REVOKE';
+    const containmentAction = 'ADMIN_COMPROMISE_CONTAINMENT';
     const now = Date.now();
     await phaseBTransaction(async client => {
       await authorize(client, req, 'admin.permissions.revoke', 'global', true);
       await authorize(client, req, 'admin.audit.read', 'global', true);
-      await assertFreshRequest(client, req.user.id, 'ADMIN_SESSION_REVOKE', requestId);
+      // Authorization holds the pilot row locks until the mutation and audit commit.
+      await assertFreshRequest(client, req.user.id, [revokeAction, containmentAction], requestId);
       await client.query(`UPDATE admin_security SET security_version=security_version+1,auth_not_before=CASE WHEN $2 THEN $3 ELSE auth_not_before END WHERE user_id=$1`, [req.user.id, compromised, (Math.floor(now / 1000) + 1) * 1000]);
       await client.query('UPDATE privileged_sessions SET revoked_at=$2 WHERE user_id=$1 AND revoked_at IS NULL', [req.user.id, now]);
       if (compromised) {
         await client.query('UPDATE users SET is_active=FALSE,updated_at=$2 WHERE id=$1', [req.user.id, now]);
       }
-      await writeAudit(client, { actorId: req.user.id, action: compromised ? 'ADMIN_COMPROMISE_CONTAINMENT' : 'ADMIN_SESSION_REVOKE', resourceType: 'administrator', resourceId: req.user.id, reason: reasonCode, requestId });
+      await writeAudit(client, { actorId: req.user.id, action: compromised ? containmentAction : revokeAction, resourceType: 'administrator', resourceId: req.user.id, reason: reasonCode, requestId });
     });
     return res.json({ success: true, compromised, sessions_revoked: true });
   } catch (error) { return asError(res, error); }

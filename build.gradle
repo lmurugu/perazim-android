@@ -83,7 +83,31 @@ android {
     }
     testBuildType 'validation'
     sourceSets {
+        main {
+            assets {
+                exclude '**/member_contacts.csv'
+            }
+        }
         androidTest.assets.srcDirs += files("$projectDir/schemas")
+    }
+}
+
+// Android Gradle Plugin 8.2 currently merges this source asset despite the
+// source-set exclusion. Remove only this exact private file from every merged
+// variant asset directory before AAPT packages the APK.
+tasks.configureEach { task ->
+    if (task.name.startsWith('merge') && task.name.endsWith('Assets')) {
+        task.doLast {
+            def variant = task.name.substring('merge'.length(), task.name.length() - 'Assets'.length()).toLowerCase(Locale.ROOT)
+            def mergedAssets = layout.buildDirectory.dir("intermediates/assets/${variant}").get().asFile
+            if (mergedAssets.isDirectory()) {
+                fileTree(mergedAssets).matching { include '**/member_contacts.csv' }.files.each { privateAsset ->
+                    if (!privateAsset.delete()) {
+                        throw new GradleException('Unable to exclude the private membership asset from Android packaging')
+                    }
+                }
+            }
+        }
     }
 }
 dependencies {
