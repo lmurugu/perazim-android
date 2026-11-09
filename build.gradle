@@ -52,7 +52,9 @@ android {
         validation {
             initWith debug
             applicationIdSuffix '.validation'
+            versionNameSuffix '-pilot'
             matchingFallbacks = ['debug']
+            buildConfigField "String", "API_BASE_URL", "\"https://fedora.taile47793.ts.net\""
         }
         release {
             minifyEnabled true
