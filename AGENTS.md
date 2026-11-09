@@ -28,38 +28,96 @@ routine, reversible work that is necessary to reach that outcome.
   external blockers, approval decisions, and residual limitations. Never infer
   operational or deployment success from source code or isolated tests alone.
 
-This execution mandate does not expand the active authorization below. Explicit
+This execution mandate does not expand a valid task authorisation. Explicit
 data, security, privacy, architecture, deployment, and organisational boundaries
 remain controlling. In particular, autonomous work does not authorize handling
 real membership data, changing production state, weakening safeguards, or
 deploying or pushing changes.
 
+## Instruction precedence and authorisation validity
+
+Apply instructions in this order:
+
+1. Latest explicit owner instruction.
+2. Latest verified task-specific authorisation and restrictions.
+3. Latest owner-approved PERAZIM master project memory bank.
+4. Current repository instructions and technical specifications.
+5. Historical instructions and previous agent reports.
+6. General autonomous execution principles.
+
+A newer explicit restriction overrides a broader standing mandate. Dated
+authorisations are historical records, not permanent authority. Before relying
+on one, verify it against the latest approved project memory and owner decisions.
+Silence never authorises a new phase or consequential/restricted action. If the
+current approved memory version cannot be identified, use explicit current
+session instructions and verified repository evidence; do not silently treat a
+draft or stale memory file as approved.
+
+## Continuity and data-protection safeguards
+
+At the start of each new implementation session, read the latest approved
+master project memory bank and these repository instructions, inspect the actual
+repository/working tree, and reconcile historical claims against current source.
+Identify what is completed, incomplete, superseded, and awaiting a decision.
+After a significant implementation task, update the relevant continuity record
+with verified outcomes. Preserve history and mark superseded decisions rather
+than silently deleting them. Never claim memory was updated unless the file was
+actually changed and checked.
+
+Never expose credentials, API keys, passwords, signing material, access tokens,
+private member information, or sensitive runtime data in reports, commits, logs,
+or generated files. Never use real membership records for testing, debugging,
+demonstration, or synthetic-fixture generation. Do not send personal or
+sensitive church data to a new external processor without required owner
+approval and privacy assessment. Preserve authentication, authorisation, data
+isolation, rate limiting, safeguarding, and existing privacy controls.
+
+Autonomy permits technical problem-solving within the assigned objective. It
+does not authorise unrelated feature expansion or changing established
+requirements. Every additional change must directly support the intended
+outcome. Distinguish source implementation, automated tests, device checks,
+local operational verification, and production acceptance in completion reports.
+
 ## Cost-conscious model preference
 
-Use GPT-6.1 Sol with low effort (owner's “Light”) for the main agent and
-Luna with high effort for bounded sub-agent tasks. This session exposes
-`gpt-6-luna`, not `gpt-6.1-luna`; report that distinction rather than silently
-claiming an unavailable version. Keep delegation minimal and avoid duplicate
-reads/tests. Do not escalate model/effort automatically without the owner's approval.
+Use the owner's preferred model and effort when available. The recorded
+preference is GPT-6.1 Sol with low effort (owner's “Light”) for the main agent
+and Luna with high effort for bounded sub-agent tasks. If a requested model
+identifier is unavailable, report the actual available identifier and never
+claim or silently imply that a different model was used. Keep delegation
+minimal; delegate only when it materially improves the outcome. Avoid duplicate
+reads/tests. Do not increase model cost, effort, or delegation beyond the
+owner's stated preference without approval.
 
-## Active authorisation: Phase B B1–B7 (2026-11-07)
+## Historical authorisation record: Phase B B1–B7 (2026-11-07)
 
-The owner explicitly authorised membership verification and explicit permissions,
-including synthetic persistence, current backend authority, private claims/review,
-synthetic administrator security, Android integration and isolated acceptance tests.
-Do not process real membership records or activate any real administrator. Do not
-migrate/adopt an existing member database, deploy, push, restart live services,
-change provider configuration, or begin Phase C. All security/migration fixtures
-must use uniquely named disposable test databases. Preserve the untracked project
-specifications, Decisions Register, baseline migration checksum and existing data.
-Only the separate validation app may be used for device tests; do not install a
-new main-app build or connect validation to the running member backend.
-Room destructive fallback remains until historical support is resolved and its
-removal separately approved. Public/offline and ordinary registered features must
-remain available; client roles and snapshots never establish current authority.
-This instruction supersedes the historical automatic restart/install workflow.
+The owner recorded authorisation on 2026-11-07 for bounded Phase B B1–B7 work:
+synthetic membership verification/persistence, current backend authority, private
+claims/review, synthetic administrator security, Android integration, and isolated
+acceptance tests. This dated record does not itself authorise a new task or phase;
+verify its current validity and boundaries against the latest approved project
+memory and explicit owner decisions before relying on it.
+
+The recorded limits are: no real membership records or real administrator
+activation; no migration/adoption of an existing member database; no production
+deployment, push, live-service restart, provider configuration changes, or Phase
+C; uniquely named disposable databases for security/migration fixtures; preserve
+project specs, Decisions Register, baseline migration checksum and existing data;
+keep Room destructive fallback until historical support is resolved and removal
+separately authorised; preserve public/offline and ordinary registered features;
+client roles and snapshots never establish current authority. These limits remain
+in force wherever the latest owner-approved instructions retain them.
+
+Device-level acceptance must use the separate validation app with synthetic,
+isolated fixtures until the owner explicitly authorises another route. Do not
+install a new main-app build or connect validation to the running member backend.
+This overrides older phone-install or automatic restart workflows.
 
 ## Historical development scope (owner instruction, 2026-11-06)
+
+This is a dated historical record, not permanent authority. Verify it against the
+latest approved project memory and current explicit owner decisions before using
+it to justify a new task or consequential action.
 
 The owner has deferred public deployment and authorized community development:
 feed, groups, classes, private chat, games and better AI. The previous Phase A-only
@@ -79,27 +137,31 @@ at the end of each authorized implementation task in this repository.
    code/resources, run `./gradlew testDebugUnitTest assembleDebug --offline` when
    dependencies are available. For backend changes, run the applicable npm
    suites; use the disposable test database, never the live app database.
-3. When Android changes, update the connected, authorized phone in place with
-   `adb install -r build/outputs/apk/debug/app-debug.apk`. Select an explicit
-   device if more than one is connected. Never uninstall, clear data, downgrade,
-   log out, or interrupt unrelated actions beyond opening/testing this app as authorized above. Verify the installed
-   base APK's SHA-256 matches the built APK; a version label alone is insufficient.
-4. When backend code changes, restart the configured local PC backend using
-   `server/scripts/local-backend.sh stop` then `start`, and verify
-   `http://127.0.0.1:3000/api/health`. Preserve `server/.runtime/` and its data.
-   Re-establish `adb reverse tcp:3000 tcp:3000` for the connected development
-   phone when its configured backend is localhost. Never silently change an
-   account's server endpoint or publish the PC backend to the internet.
-5. After successful relevant checks, commit the completed task on the current
-   working branch without asking for another reminder or confirmation. Review
-   staged files for secrets and personal captures. Keep credentials, runtime
-   databases, signing keys, APKs, and local configuration out of Git. Do not
-   include unrelated unfinished work, amend existing commits, merge into main,
-   force-push, or push remotely unless that action is separately authorized.
-6. Report the commit hash, check results, working-tree status, phone installation
-   status, backend health, and whether the commit was pushed. If a phone is
-   disconnected, a check fails, or access is unavailable, finish independent work
-   and state the exact remaining update; never claim everything is synchronized.
+3. Android code may be built and tested with authorised automated checks. Do not
+   install a new main-app build. Device-level acceptance tests must use only the
+   separate validation app and synthetic fixtures until the owner explicitly
+   authorises otherwise. Never clear data, uninstall, downgrade, log out, or
+   interrupt unrelated device activity.
+4. Never restart production or live member-facing services under this
+   authorisation. A local development backend may be restarted only after
+   positively identifying it as the configured development instance and
+   preserving its runtime data. Then verify its health endpoint. If the instance
+   or data boundary is uncertain, do not restart it; complete independent work
+   and report the limitation. Never silently change an account's server endpoint
+   or publish the PC backend to the internet.
+5. Before committing, establish which changes belong to the assigned task and
+   which predate it. Stage only attributable task changes. Never include
+   unrelated, pre-existing, untracked, or unfinished user work. If changes
+   overlap and cannot be isolated safely, preserve the working tree and report
+   the limitation instead of committing. Review staged files for secrets and
+   personal captures. Keep credentials, runtime databases, signing keys, APKs,
+   and local configuration out of Git. Do not amend commits, switch branches,
+   merge, force-push, or push remotely without separate authorisation.
+6. Report the commit hash if committed, exact check results, remaining working-tree
+   changes, device verification status, backend operational status, and whether
+   the commit was pushed. If a check fails or access is unavailable, finish
+   independent work and state the exact remaining action; never claim everything
+   is synchronized.
 
 These are standing instructions for agents working in the repository. They do
 not install a background watcher, commit unfinished edits on every file save, or
