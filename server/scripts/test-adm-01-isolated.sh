@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+# Enforce migration policy before mktemp/initdb/createdb or any connection.
+node server/scripts/assert-migration-plan-safe.js
 pg_root="$PWD/server/.runtime/pgsql/usr"
 pg_tools="$pg_root/bin"
 export LD_LIBRARY_PATH="$pg_root/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"

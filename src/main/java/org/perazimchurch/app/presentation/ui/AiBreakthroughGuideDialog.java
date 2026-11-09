@@ -34,13 +34,14 @@ import org.perazimchurch.app.ai.remote.AiPreferences;
 import org.perazimchurch.app.ai.remote.AiRelayClient;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
 import org.perazimchurch.app.ai.local.OnDeviceAi;
+import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.List;
 
 /**
  * Interactive Chatbot Interface for the Perazim Breakthrough Guide.
- * Provides on-device navigation, Google Gemini cloud AI breakthrough answers via Cloudflare Worker relay,
+ * Provides built-in app help and explicit unavailability notices for unverified generative AI modes,
  * daily client/server rate limiting (3 questions/day), plain-words consent, and instant offline fail-soft.
  */
 public class AiBreakthroughGuideDialog extends Dialog {
@@ -83,7 +84,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private Button btnMode;
     private boolean localRequest;
     private String guideMode() {
-        return activity.getSharedPreferences("perazim_guide_mode", Context.MODE_PRIVATE).getString("mode", "local");
+        return activity.getSharedPreferences("perazim_guide_mode", Context.MODE_PRIVATE).getString("mode", "guide");
     }
     private void setGuideMode(String mode) {
         activity.getSharedPreferences("perazim_guide_mode", Context.MODE_PRIVATE).edit().putString("mode", mode).apply();
@@ -113,7 +114,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         // Welcome is shown once and is never sent as model conversation history.
         displayAiMessage(AiResponse.plainText(
-                "What would you like to explore? Ask a Bible question, talk through a concern, or find something in the app.\n\nChoose on-phone AI for a private conversation after a one-time model download, online AI for cloud answers, or built-in app help for quick shortcuts.",
+                "What would you like to explore? Ask about using the app or find a built-in shortcut.\n\nGenerative AI is unavailable in this build: on-device answers are not yet limited to approved sources, and an authenticated church AI service has not been verified.",
                 java.util.Arrays.asList("Open the Bible", "Find my groups", "Start a reflection")), "Perazim Guide");
         updateSubtitle();
 
@@ -288,10 +289,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
         if (tvSub == null) return;
         String mode = guideMode();
         if (btnMode != null) btnMode.setText("local".equals(mode)
-                ? (OnDeviceAi.isInstalled(activity) ? "On-phone AI · " + OnDeviceAi.MODEL_NAME + " · Change" : "On-phone AI · Download model · Change")
-                : ("online".equals(mode) ? "Online AI · Change mode" : "Offline app guide · Change mode"));
+                ? "On-phone AI unavailable · Change mode"
+                : ("online".equals(mode) ? "Online AI unavailable · Change mode" : "Offline app guide · Change mode"));
         if ("local".equals(mode)) {
-            tvSub.setText(OnDeviceAi.isInstalled(activity) ? "Private on-device conversation · No internet needed" : "Download the model once to chat entirely offline");
+            tvSub.setText("Unavailable until approved-source controls are implemented");
             tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
             tvSub.setOnClickListener(v -> showModeOptions());
             return;
@@ -301,10 +302,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
             tvSub.setOnClickListener(v -> showModeOptions());
             return;
         }
-        if (!AiPreferences.hasConsented(activity)) {
-            tvSub.setText("📱 Offline Guide • Tap to enable AI");
+        if ("online".equals(mode) && !BuildConfig.ONLINE_AI_ENABLED) {
+            tvSub.setText("Online AI unavailable in this build");
             tvSub.setTextColor(COLOR_TEXT_MUTED);
-            tvSub.setOnClickListener(v -> showConsentDialog());
+            tvSub.setOnClickListener(null);
+            return;
+        }
+        if (!AiPreferences.hasConsented(activity)) {
+            tvSub.setText("Online AI unavailable in this build");
+            tvSub.setTextColor(COLOR_TEXT_MUTED);
+            tvSub.setOnClickListener(null);
         } else if (!AiPreferences.isAiEnabled(activity)) {
             tvSub.setText("📱 Offline Guide • AI Resting");
             tvSub.setTextColor(COLOR_TEXT_MUTED);
@@ -324,10 +331,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void showModeOptions() {
         new AlertDialog.Builder(activity).setTitle("Choose your guide")
-                .setItems(new String[]{"On-phone AI — private, works without internet", "Download / resume on-phone model (469 MB)", "Online AI — Google Gemini", "Offline app help — built-in shortcuts", "Clear this conversation"}, (dialog, which) -> {
+                .setItems(new String[]{"On-phone AI — unavailable pending approved-source controls", "Model download — disabled", "Online AI — unavailable pending authenticated service", "Offline app help — built-in shortcuts", "Clear this conversation"}, (dialog, which) -> {
                     if (which == 0) setGuideMode("local");
                     else if (which == 1) showModelDownload();
-                    else if (which == 2) { setGuideMode("online"); if (!AiPreferences.hasConsented(activity)) showConsentDialog(); }
+                    else if (which == 2) setGuideMode("online");
                     else if (which == 3) setGuideMode("guide");
                     else {
                         localHistory.clear(); onlineHistory.clear();
@@ -338,13 +345,19 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private void showModelDownload() {
+        if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
+            new AlertDialog.Builder(activity)
+                    .setMessage("On-device AI downloads are disabled until approved-source controls are implemented and verified.")
+                    .setPositiveButton("OK", null).show();
+            return;
+        }
         if (OnDeviceAi.isInstalled(activity)) {
             setGuideMode("local");
             new AlertDialog.Builder(activity).setMessage("The on-phone model is installed. Questions and answers stay on this phone in this mode.").setPositiveButton("Done", null).show();
             return;
         }
         new AlertDialog.Builder(activity).setTitle("Download on-phone AI")
-                .setMessage("Qwen2.5 0.5B Instruct is a small Apache-2.0 licensed language model from Qwen. Download: 469 MB. Allow at least 560 MB of free space. Wi-Fi is recommended. After setup it works with Wi-Fi and mobile data off.\n\nThis compact model can be slower and less accurate than online AI. Verify Bible references and important information.")
+                .setMessage("On-device AI downloads are disabled until approved-source controls are implemented and verified.")
                 .setNegativeButton("Not now", null)
                 .setPositiveButton("Download", (dialog, which) -> {
                     AlertDialog progress = new AlertDialog.Builder(activity).setTitle("Downloading on-phone model")
@@ -366,6 +379,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     public void showConsentDialog() {
         if (activity == null || activity.isFinishing()) return;
+        if (!BuildConfig.ONLINE_AI_ENABLED) {
+            new AlertDialog.Builder(activity)
+                    .setMessage("Online AI is unavailable in this build while the authenticated church service is being verified.")
+                    .setPositiveButton("OK", null).show();
+            return;
+        }
 
         final Dialog consentDlg = new Dialog(activity);
         consentDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -470,6 +489,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         String mode = guideMode();
         if ("local".equals(mode)) {
+            if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
+                displayAiMessage(AiResponse.plainText("On-device AI is unavailable until approved-source controls are implemented and verified. Built-in app help remains available.", null), "On-phone AI unavailable");
+                return;
+            }
             if (!OnDeviceAi.isInstalled(activity)) {
                 displayAiMessage(AiResponse.plainText("Download the on-phone model to have a real AI conversation without internet. Use the mode button above to set it up. Built-in app help remains available separately.", null), "Model not installed");
                 return;
@@ -494,6 +517,11 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
         if ("guide".equals(mode)) {
             displayAiMessage(aiEngine.processQuery(query), "Offline app help · Built-in rules");
+            return;
+        }
+
+        if (!BuildConfig.ONLINE_AI_ENABLED) {
+            displayAiMessage(AiResponse.plainText("Online AI is unavailable in this build while an authenticated church service is being verified. Built-in app help remains available.", null), "Online AI unavailable");
             return;
         }
 

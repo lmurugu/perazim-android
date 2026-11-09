@@ -7,30 +7,29 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * Configuration holder for published Google Sheet CSV tab URLs.
- * If URLs are empty or unreachable, the application continues to use
- * the existing local pre-seeded Room data without interruption.
+ * Client-side remote feed URLs are deliberately absent until every feed's
+ * publication status, contents and access controls have been reviewed.
  */
 public final class SheetConfig {
 
     private static final String PREFS_NAME = "perazim_sheet_config";
 
     public enum Tab {
-        ANNOUNCEMENTS("sheet_url_announcements", org.perazimchurch.app.BuildConfig.SHEET_URL_ANNOUNCEMENTS),
-        EVENTS("sheet_url_events", org.perazimchurch.app.BuildConfig.SHEET_URL_EVENTS),
-        HYMNS("sheet_url_hymns", org.perazimchurch.app.BuildConfig.SHEET_URL_HYMNS),
-        RIDDLES("sheet_url_riddles", org.perazimchurch.app.BuildConfig.SHEET_URL_RIDDLES),
-        JOKES("sheet_url_jokes", org.perazimchurch.app.BuildConfig.SHEET_URL_JOKES),
-        SERMONS("sheet_url_sermons", org.perazimchurch.app.BuildConfig.SHEET_URL_SERMONS),
-        VERSES("sheet_url_verses", org.perazimchurch.app.BuildConfig.SHEET_URL_VERSES),
-        CONFIG("sheet_url_config", org.perazimchurch.app.BuildConfig.SHEET_URL_CONFIG);
+        ANNOUNCEMENTS("sheet_url_announcements"),
+        EVENTS("sheet_url_events"),
+        HYMNS("sheet_url_hymns"),
+        RIDDLES("sheet_url_riddles"),
+        JOKES("sheet_url_jokes"),
+        SERMONS("sheet_url_sermons"),
+        VERSES("sheet_url_verses"),
+        CONFIG("sheet_url_config");
 
         private final String prefKey;
         private final String defaultUrl;
 
-        Tab(String prefKey, String defaultUrl) {
+        Tab(String prefKey) {
             this.prefKey = prefKey;
-            this.defaultUrl = (defaultUrl != null) ? defaultUrl : "";
+            this.defaultUrl = "";
         }
 
         public String getPrefKey() {
@@ -55,6 +54,7 @@ public final class SheetConfig {
      */
     @NonNull
     public static String getTabUrl(@NonNull Context context, @NonNull Tab tab) {
+        if (!org.perazimchurch.app.BuildConfig.REMOTE_SHEET_FEEDS_ENABLED) return "";
         String url = getPrefs(context).getString(tab.getPrefKey(), "");
         if (url == null || url.trim().isEmpty()) {
             url = tab.getDefaultUrl();

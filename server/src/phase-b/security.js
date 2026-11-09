@@ -2,7 +2,7 @@
 
 const crypto = require('crypto');
 const net = require('net');
-const { isPostgresActive, withTransaction } = require('../db');
+const { isPostgresActive, withTransaction, validatePhaseBTestDatabaseUrl } = require('../db');
 
 class PhaseBError extends Error {
   constructor(status, code, message) {
@@ -15,12 +15,8 @@ class PhaseBError extends Error {
 function phaseBDatabaseAllowed() {
   if (process.env.NODE_ENV !== 'test' || process.env.PHASE_B_SYNTHETIC !== 'true' || !isPostgresActive()) return false;
   try {
-    const url = new URL(process.env.DATABASE_URL || '');
-    const host = url.hostname.toLowerCase();
-    const local = host === 'localhost' || host === '::1' || host === '[::1]' || net.isIP(host) === 4 && host.startsWith('127.');
-    const database = decodeURIComponent(url.pathname.replace(/^\//, ''));
-    const approvedDatabase = /^perazim_phaseb_[a-z0-9]{6,32}_test$/.test(database);
-    return local && approvedDatabase;
+    validatePhaseBTestDatabaseUrl(process.env.DATABASE_URL || '');
+    return true;
   } catch (_) {
     return false;
   }
@@ -28,11 +24,7 @@ function phaseBDatabaseAllowed() {
 
 function isLocalDatabaseAddress(value) {
   let address = String(value || '').split('/')[0].toLowerCase().replace(/^::ffff:/, '');
-  if (address === '::1' || address.startsWith('fc') || address.startsWith('fd') || address.startsWith('fe80:')) return true;
-  if (net.isIP(address) !== 4) return false;
-  const octets = address.split('.').map(Number);
-  return octets[0] === 10 || octets[0] === 127 || octets[0] === 169 && octets[1] === 254 ||
-    octets[0] === 192 && octets[1] === 168 || octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31;
+  return address === '::1' || net.isIP(address) === 4 && address.startsWith('127.');
 }
 
 function requirePhaseB(req, res, next) {
@@ -48,10 +40,12 @@ function requireDatabase() {
 async function verifyDatabaseHandle(client) {
   requireDatabase();
   const expected = decodeURIComponent(new URL(process.env.DATABASE_URL).pathname.replace(/^\//, ''));
-  const result = await client.query('SELECT current_database() AS database, inet_server_addr()::text AS address');
+  const result = await client.query('SELECT current_database() AS database, inet_server_addr()::text AS address, inet_server_port() AS port');
   const actual = result.rows[0] || {};
   if (actual.database !== expected) throw new PhaseBError(503, 'PHASE_B_UNAVAILABLE', 'Phase B synthetic environment unavailable');
   if (actual.address && !isLocalDatabaseAddress(actual.address)) throw new PhaseBError(503, 'PHASE_B_UNAVAILABLE', 'Phase B synthetic environment unavailable');
+  const target = validatePhaseBTestDatabaseUrl(process.env.DATABASE_URL);
+  if (Number(actual.port) !== target.port) throw new PhaseBError(503, 'PHASE_B_UNAVAILABLE', 'Phase B synthetic environment unavailable');
 }
 
 function hash(value) {

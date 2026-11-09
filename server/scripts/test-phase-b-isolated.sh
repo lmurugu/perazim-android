@@ -3,22 +3,26 @@ set -euo pipefail
 
 ALLOW_MISSING_B3=0
 SEC_01_ONLY=0
+INDEPENDENT_ONLY=0
 case "${1:-}" in
   '') ;;
   --sec-01) SEC_01_ONLY=1 ;;
   --allow-missing-b3) ALLOW_MISSING_B3=1 ;;
+  --independent) INDEPENDENT_ONLY=1 ;;
   --help)
     cat <<'HELP'
-Usage: scripts/test-phase-b-isolated.sh [--allow-missing-b3|--sec-01]
+Usage: scripts/test-phase-b-isolated.sh [--independent|--allow-missing-b3|--sec-01]
 
 Runs Phase B persistence, migration, security, and legacy backend checks using
-only a temporary local PostgreSQL cluster and generated *_test databases. By
-default the B3 security suite must exist. The option --allow-missing-b3 is for
-preparatory validation only. --sec-01 runs the focused SEC-01 suite and
-related backend regressions in an owned cluster.
+only a temporary local PostgreSQL cluster and generated *_test databases. The
+full Phase B plan is currently blocked because it includes prohibited migration
+0007. --independent runs database-free suites that do not load migrations.
+--allow-missing-b3 is for preparatory validation only. --sec-01 remains blocked
+by the migration-plan guard until its plan excludes 0007.
 
-Optional: set PHASE_B_TEST_ADMIN_URL to an explicit local PostgreSQL URL for an
-isolated test cluster and PHASE_B_PG_BIN to matching pg_dump/pg_restore tools.
+The runner refuses externally supplied PostgreSQL URLs. It always creates and
+removes its own temporary loopback cluster. PHASE_B_PG_BIN may select matching
+pg_dump/pg_restore tools.
 HELP
     exit 0 ;;
   *) echo "Unknown argument. Use --help." >&2; exit 2 ;;
@@ -26,6 +30,15 @@ esac
 
 APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SERVER_DIR="$APP_DIR/server"
+if [[ "$INDEPENDENT_ONLY" == 1 ]]; then
+  npm --prefix "$SERVER_DIR" run test:phase-e-independent
+  exit $?
+fi
+
+# Refuse the configured migration plan before checking PostgreSQL binaries,
+# creating a temporary directory, starting a cluster, or creating databases.
+node "$SERVER_DIR/scripts/assert-migration-plan-safe.js"
+
 PG_ROOT="$SERVER_DIR/.runtime/pgsql/usr"
 PG_TOOLS="$PG_ROOT/bin"
 B3_SECURITY_TEST="$SERVER_DIR/test/phase_b_security.test.js"
@@ -72,49 +85,21 @@ fi
 export LD_LIBRARY_PATH="$PG_ROOT/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export PATH="$PG_TOOLS:$PATH"
 export TMPDIR=/tmp
-unset DATABASE_URL PGDATABASE PGSERVICE PGSERVICEFILE PGOPTIONS PGPASSWORD PHASE_B_SYNTHETIC PHASE_B_ADMIN_KEY || true
+unset DATABASE_URL PGDATABASE PGHOSTADDR PGSERVICE PGSERVICEFILE PGOPTIONS PGPASSWORD PHASE_B_SYNTHETIC PHASE_B_ADMIN_KEY || true
 export PGPASSFILE=/dev/null
 
-if [[ "$SEC_01_ONLY" == 1 && -n "${PHASE_B_TEST_ADMIN_URL:-}" ]]; then
-  echo "SEC-01 requires an owned disposable PostgreSQL cluster." >&2
+if [[ -n "${PHASE_B_TEST_ADMIN_URL:-}" ]]; then
+  echo 'SAFETY ABORT: isolated Phase B tests never connect to externally supplied PostgreSQL URLs.' >&2
   exit 2
 fi
 
-if [[ -n "${PHASE_B_TEST_ADMIN_URL:-}" ]]; then
-  EXTERNAL_CLUSTER=1
-  ADMIN_URL="$PHASE_B_TEST_ADMIN_URL"
-  # Parse only this explicit test URL. Never read DATABASE_URL or local backend
-  # credentials, and never print the URL or its password.
-  ADMIN_PARTS_TEXT="$(PHASE_B_ADMIN_URL="$ADMIN_URL" node - <<'NODE'
-const u = new URL(process.env.PHASE_B_ADMIN_URL);
-const database = decodeURIComponent(u.pathname.slice(1));
-const host = (u.searchParams.get('host') || u.hostname).replace(/^\[|\]$/g, '').toLowerCase();
-const port = u.searchParams.get('port') || u.port || '5432';
-const user = decodeURIComponent(u.username);
-const password = decodeURIComponent(u.password);
-if (!['postgres:', 'postgresql:'].includes(u.protocol) || database !== 'postgres') process.exit(20);
-const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.startsWith('/tmp/');
-if (!isLocal) process.exit(21);
-if ([host, port, user, password].some(value => /[\r\n]/.test(value))) process.exit(22);
-process.stdout.write(`${host}\n${port}\n${user}\n${password}\n`);
-NODE
-  )" || { echo "PHASE_B_TEST_ADMIN_URL must target a local postgres maintenance database." >&2; exit 1; }
-  mapfile -t ADMIN_PARTS <<< "$ADMIN_PARTS_TEXT"
-  PGHOST="${ADMIN_PARTS[0]}"
-  PGPORT="${ADMIN_PARTS[1]}"
-  PGUSER="${ADMIN_PARTS[2]}"
-  if [[ -n "${ADMIN_PARTS[3]}" ]]; then PGPASSWORD="${ADMIN_PARTS[3]}"; export PGPASSWORD; else unset PGPASSWORD || true; fi
-  export PGHOST PGPORT PGUSER
-  unset DATABASE_URL || true
-  PG_DUMP_TOOLS="${PHASE_B_PG_BIN:-$PG_TOOLS}"
-else
-  EXTERNAL_CLUSTER=0
-  PG_TEMP="$(mktemp -d /tmp/perazim-phase-b-runner.XXXXXX)"
-  chmod 700 "$PG_TEMP"
-  PG_DATA="$PG_TEMP/data"
-  PG_SOCKET="$PG_TEMP/socket"
-  mkdir -m 700 "$PG_SOCKET"
-  PGPORT="$(node - <<'NODE'
+EXTERNAL_CLUSTER=0
+PG_TEMP="$(mktemp -d /tmp/perazim-phase-b-runner.XXXXXX)"
+chmod 700 "$PG_TEMP"
+PG_DATA="$PG_TEMP/data"
+PG_SOCKET="$PG_TEMP/socket"
+mkdir -m 700 "$PG_SOCKET"
+PGPORT="$(node - <<'NODE'
 const net = require('net');
 const server = net.createServer();
 server.listen(0, '127.0.0.1', () => {
@@ -122,19 +107,18 @@ server.listen(0, '127.0.0.1', () => {
   server.close(() => process.stdout.write(String(port)));
 });
 NODE
-  )"
-  PGHOST='127.0.0.1'
-  PGUSER='postgres'
-  unset PGPASSWORD DATABASE_URL || true
-  export PGHOST PGPORT PGUSER
-  "$PG_TOOLS/initdb" -D "$PG_DATA" -U postgres -L "$PG_ROOT/share/pgsql" \
-    --auth-local=trust --auth-host=trust --locale=C.UTF-8 >/dev/null
-  "$PG_TOOLS/pg_ctl" -D "$PG_DATA" -l "$PG_TEMP/postgres.log" \
-    -o "-h 127.0.0.1 -p $PGPORT -k $PG_SOCKET -c dynamic_library_path=$PG_ROOT/lib64/pgsql" -w start >/dev/null
-  CLUSTER_STARTED=1
-  PG_DUMP_TOOLS="$PG_TOOLS"
-  ADMIN_URL="postgres://postgres@127.0.0.1:$PGPORT/postgres"
-fi
+)"
+PGHOST='127.0.0.1'
+PGUSER='postgres'
+unset PGPASSWORD DATABASE_URL || true
+export PGHOST PGPORT PGUSER
+"$PG_TOOLS/initdb" -D "$PG_DATA" -U postgres -L "$PG_ROOT/share/pgsql" \
+  --auth-local=trust --auth-host=trust --locale=C.UTF-8 >/dev/null
+"$PG_TOOLS/pg_ctl" -D "$PG_DATA" -l "$PG_TEMP/postgres.log" \
+  -o "-h 127.0.0.1 -p $PGPORT -k $PG_SOCKET -c dynamic_library_path=$PG_ROOT/lib64/pgsql" -w start >/dev/null
+CLUSTER_STARTED=1
+PG_DUMP_TOOLS="$PG_TOOLS"
+ADMIN_URL="postgres://postgres@127.0.0.1:$PGPORT/postgres"
 
 if [[ ! -x "$PG_DUMP_TOOLS/pg_dump" || ! -x "$PG_DUMP_TOOLS/pg_restore" ]]; then
   echo 'Matching pg_dump and pg_restore tools must be available in PHASE_B_PG_BIN.' >&2
@@ -169,15 +153,16 @@ run() {
   "$@"
 }
 
+run 'Phase B database destination preflight' \
+  node "$SERVER_DIR/test/phase_b_database_guard.test.js"
+
 SERVER_VERSION="$("$PG_TOOLS/psql" --no-psqlrc --set ON_ERROR_STOP=1 --host "$PGHOST" --port "$PGPORT" --username "$PGUSER" --dbname postgres --tuples-only --no-align --command 'SHOW server_version')"
 printf '[Phase B isolated runner] PostgreSQL %s on local port %s\n' "$SERVER_VERSION" "$PGPORT"
-printf '[Phase B isolated runner] External test cluster: %s\n' "$([[ "$EXTERNAL_CLUSTER" == 1 ]] && echo yes || echo no)"
+printf '[Phase B isolated runner] Owned disposable cluster: yes\n'
 
-if [[ "$EXTERNAL_CLUSTER" == 0 ]]; then
-  run 'SEC-01 membership claim rate limits' \
-    env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" \
-    node "$SERVER_DIR/test/phase_b_claim_rate_limit.test.js"
-fi
+run 'SEC-01 membership claim rate limits' \
+  env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_TEST_EXPECTED_PORT="$PGPORT" PHASE_B_TEST_EXPECTED_DATA_DIR="$PG_DATA" \
+  node "$SERVER_DIR/test/phase_b_claim_rate_limit.test.js"
 
 run 'B2 persistence, migration, failure rollback, and dump/restore' \
   env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \
@@ -188,19 +173,19 @@ run 'Foundation migration safety suite' \
   npm --prefix "$SERVER_DIR" run test:migrations
 
 run 'B4/B5 membership, permissions and administrator workflow' \
-  env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" \
+  env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_TEST_EXPECTED_PORT="$PGPORT" PHASE_B_TEST_EXPECTED_DATA_DIR="$PG_DATA" \
   node "$SERVER_DIR/test/phase_b_workflow.test.js"
 
 if [[ -f "$B3_SECURITY_TEST" ]]; then
   run 'B3 security integration suite' \
-    env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" MIGRATIONS_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \
+    env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_TEST_EXPECTED_PORT="$PGPORT" PHASE_B_TEST_EXPECTED_DATA_DIR="$PG_DATA" MIGRATIONS_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \
     node "$B3_SECURITY_TEST"
 else
   echo '[Phase B isolated runner] B3 security suite skipped by explicit --allow-missing-b3.'
 fi
 if [[ -f "$B3_AUTHORITY_TEST" ]]; then
   run 'B3 authority integration suite' \
-    env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \
+    env -u DATABASE_URL NODE_ENV=test PHASE_B_TEST_ADMIN_URL="$ADMIN_URL" PHASE_B_TEST_EXPECTED_PORT="$PGPORT" PHASE_B_TEST_EXPECTED_DATA_DIR="$PG_DATA" PHASE_B_PG_BIN="$PG_DUMP_TOOLS" \
     node "$B3_AUTHORITY_TEST"
 else
   echo '[Phase B isolated runner] B3 authority suite skipped by explicit --allow-missing-b3.'
@@ -214,6 +199,9 @@ fi
 "$PG_TOOLS/createdb" --host "$PGHOST" --port "$PGPORT" --username "$PGUSER" "$LEGACY_DB"
 LEGACY_CREATED=1
 LEGACY_URL="$(make_database_url "$LEGACY_DB")"
+run 'Prepare legacy API regression database with current migrations' \
+  env -u DATABASE_URL NODE_ENV=test DATABASE_URL="$LEGACY_URL" \
+  node "$SERVER_DIR/scripts/db-migrate.js" migrate "--confirm=$LEGACY_DB"
 run 'Legacy unit, PostgreSQL, and community contracts on a fresh test database' \
   env -u DATABASE_URL NODE_ENV=test DATABASE_URL="$LEGACY_URL" npm --prefix "$SERVER_DIR" test
 
@@ -221,8 +209,8 @@ run 'Legacy unit, PostgreSQL, and community contracts on a fresh test database' 
 RESTART_CREATED=1
 RESTART_URL="$(make_database_url "$RESTART_DB")"
 run 'Prepare the separate restart test database with the existing schema' \
-  env PGHOST="$PGHOST" PGPORT="$PGPORT" PGUSER="$PGUSER" \
-  "$PG_TOOLS/psql" --no-psqlrc --set ON_ERROR_STOP=1 --dbname "$RESTART_DB" --file "$SERVER_DIR/schema.sql"
+  env -u DATABASE_URL NODE_ENV=test DATABASE_URL="$RESTART_URL" \
+  node "$SERVER_DIR/scripts/db-migrate.js" migrate "--confirm=$RESTART_DB"
 run 'API process restart persistence on its own initialized test database' \
   env -u DATABASE_URL NODE_ENV=test DATABASE_URL="$RESTART_URL" npm --prefix "$SERVER_DIR" run test:restart
 

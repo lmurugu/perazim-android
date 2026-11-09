@@ -5,6 +5,7 @@ const assert = require('assert/strict');
 const crypto = require('crypto');
 const { Pool } = require('pg');
 const { migrate } = require('../src/migrations');
+const { getCurrentNotice } = require('../src/phase-b/privacyNotice');
 
 async function run() {
   const adminUrl = new URL(process.env.PHASE_B_TEST_ADMIN_URL || '');
@@ -32,6 +33,7 @@ async function run() {
       const listener = app.listen(0, '127.0.0.1', () => resolve(listener));
     });
     const base = `http://127.0.0.1:${server.address().port}`;
+    const notice = await getCurrentNotice();
     async function request(path, token, body) {
       const response = await fetch(base + path, {
         method: body ? 'POST' : 'GET',
@@ -42,7 +44,9 @@ async function run() {
     }
     const registration = await request('/api/auth/register', null, {
       name: 'Synthetic Authority Test', phone: '+254700009881', pin: '853692',
-      role: 'ADMIN', membership_status: 'VERIFIED_MEMBER', permissions: ['admin.permissions.grant']
+      role: 'ADMIN', membership_status: 'VERIFIED_MEMBER', permissions: ['admin.permissions.grant'],
+      privacy_notice_version: notice.version, privacy_notice_hash: notice.content_hash,
+      privacy_notice_acknowledged: true
     });
     assert.equal(registration.status, 201);
     const { user, token } = registration.body;
@@ -66,6 +70,9 @@ async function run() {
     assert.equal((await request('/api/prayers')).status, 200);
     assert.equal((await request('/api/prayers', null, { title: 'Synthetic guest', content: 'Synthetic public fixture' })).status, 201);
     assert.equal((await request('/api/community/posts')).status, 200);
+    // The community router schedules synthetic seed work one second after load.
+    // Let that bounded task finish before closing pools and dropping this DB.
+    await new Promise(resolve => setTimeout(resolve, 1200));
     console.log('B3 current-authority gate passed: forged/stale claims, current roles, inactive login/request, signature, logout revocation, public and guest compatibility.');
   } finally {
     if (server) await new Promise(resolve => server.close(resolve));

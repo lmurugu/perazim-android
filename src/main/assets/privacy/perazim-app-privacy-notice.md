@@ -1,55 +1,56 @@
-<!-- Faithful text rendition of the supplied working draft. Draft status and placeholders are preserved. -->
-
+<!-- Draft factual rendition for institutional and professional review. Not published. -->
 
 PERAZIM MISSIONS CHURCH INTERNATIONAL
 # Perazim App — Privacy Notice for Users
 
-KENYA  |  VERSION 0.1  |  DRAFT FOR REVIEW
+KENYA | VERSION 0.2 | DRAFT FOR REVIEW — NOT PUBLISHED
 
 ## Before you register
 
-This notice explains how Perazim Missions Church International (PMCI) handles information when you create or use a Perazim account. Read it together with the PMCI Data Protection and Privacy Policy at [policy URL / in-app location].
+This draft describes information currently handled by the Perazim app. Registration stays unavailable until PMCI completes its review and an authorised publication decision is recorded. Read it with the PMCI Data Protection and Privacy Policy at [policy URL / in-app location].
 
 ## Who operates the app
 
-Perazim is operated by [exact registered legal name of PMCI]. Privacy contact: [email] | [telephone] | [postal/physical address].
+Perazim is operated by [exact registered legal name of PMCI]. Privacy contact: [email] | [telephone] | [postal/physical address]. These details must be completed before publication.
 
-## Information used
+## Information the app handles
 
-Depending on the features you use, Perazim may process your name, telephone number, account identifier, authentication/security records, profile details, membership claim information, membership status and technical information needed to secure and operate the app. Do not add optional categories until the app actually collects them and the purpose is approved.
+Account information includes your name, telephone number, campus, account identifier, PIN authentication record, session and security events, profile biography and avatar reference. If you submit a membership claim, the app stores the claim and its review decision separately from ordinary registration. Community features can store posts, comments, group and event activity, private messages, uploaded photos, prayer requests and testimonies. An anonymous display option for a prayer request or testimony does not make its author anonymous to the service. Technical and privacy records include acknowledgement evidence, consent choices, request receipts and service logs.
 
-## Why it is used
+## Authentication and membership
 
-Information is used to create and secure your account, provide app functions, communicate with you where appropriate, review a membership claim, maintain security and respond to your requests. PMCI identifies a lawful basis for each purpose in its full policy. Some processing may involve sensitive information revealing religious affiliation and receives additional safeguards.
+The app uses a PIN with your telephone number. It does not currently use a one-time code or an OTP provider. Phone access, PIN authentication, registration, or a name match does not prove church membership. New accounts begin as REGISTERED. A membership claim receives a neutral receipt; only an authorised reviewer may confirm or reject it after review.
 
-## Phone number and membership are different
+## Community visibility
 
-Your telephone number may identify your app account. If a one-time code is used, it helps establish that you can access the number at that time. It does not prove that you are a PMCI member. A matching number does not automatically grant verified membership. Only an authorised administrator may confirm a membership claim after review.
+Signed-in users can search the member directory, which returns member names, account identifiers and avatar references. A profile biography may be displayed with community content. Posts, comments, prayer requests, testimonies and uploaded media may be visible to the audiences defined by the relevant feature. Group rosters and private messages have access checks. Do not put information in a post, prayer request, testimony or message unless you are comfortable sharing it with its intended audience.
 
-## What you can see
+## Artificial intelligence
 
-You can access your own permitted account and profile information. You cannot access another member's private record or the full church membership register. The register is restricted to authorised administrative functions and is not intended to be included in AI responses or downloadable offline app content.
+The online AI option sends the question you enter and bounded conversation history to the Perazim relay for processing by Google Gemini. The app may also send a device identifier and limited context such as your chosen first-name preference, streak, verse and passages. Free-text may contain personal or sensitive information; avoid entering membership-register details or other people's information. The relay and provider configuration must be reviewed and named before publication. Server-side membership eligibility and the provider's current retention settings have not been independently verified in this checkout.
 
-## Who may process information
+The optional on-device Qwen model runs on your device after download and can work offline. The model is obtained from the configured download source. The app's bundled and local materials are not a complete, independently certified knowledge boundary; do not treat generated answers as approved church decisions. The church membership register is not an intended Qwen or Gemini source.
 
-PMCI may use [insert actual hosting provider and country], [insert actual SMS/OTP provider], [insert backup provider] and other named providers for defined services. These details must be completed before publication. PMCI does not sell your personal information.
+## Storage, providers and safeguards
 
-## Your choices and rights
+Perazim uses an application server and PostgreSQL for account and service records, and Android local storage for selected cached or queued app data. The account session token is encrypted using Android Keystore-backed AES-GCM. The Room database is not encrypted by the app. Android backup is enabled; the configured rules exclude the session-token preference files but do not exclude the Room database or all other app data. The repository does not verify database-at-rest encryption, backup-provider protections or a tested backup-expiry cycle. The Android client requires HTTPS for protected requests; that does not establish that a public service is deployed with TLS. [Insert actual hosting, processor, storage and transfer details before publication.]
 
-You may request access to your own information, correction of inaccurate information, and exercise other rights available under Kenyan law. You may contact [privacy contact]. If consent is the basis for a particular optional activity, you may withdraw it without affecting processing lawfully carried out before withdrawal.
+## Choices and requests
 
-## Security and retention
-
-PMCI applies safeguards described in its full policy and retains information only as long as necessary for the approved purpose and legal requirements. No internet-connected service can promise absolute security; suspected incidents are handled under PMCI's incident-response procedure.
+The app records acknowledgement of the notice. Separate consent choices can be recorded only for configured purposes; the app does not currently present a complete optional-consent flow. The service accepts authenticated ACCESS, CORRECTION and ERASURE requests and returns a receipt/status. Intake does not itself provide a copy, correct a record or erase it. Objection, restriction and portability workflows are not implemented in the app. Contact [privacy contact] for follow-up; the request-handling procedure and applicable deadlines require institutional review.
 
 ## Children
 
-If you are under 18, use of the app and processing of your information must follow PMCI's child-data safeguards and any required parent/guardian involvement. The app must not enable children to access other members' information.
+The app does not currently perform an age check or provide a parent/guardian consent flow. This draft does not establish that use by children is suitable. PMCI must decide and implement appropriate safeguards before publication or child use.
 
 ## Acknowledgement
 
-By selecting 'I have read the Privacy Notice', you acknowledge that this notice has been presented to you. This acknowledgement is not, by itself, consent to every processing activity. Where PMCI relies on consent for a particular optional purpose, it will ask separately and explain the choice.
+The Android registration control and stored acknowledgement text currently read:
 
-## Version
+> I acknowledge that PMCI has provided me with the Perazim App Privacy Notice and that I can read the full PMCI Data Protection and Privacy Policy here. I understand how to contact PMCI about my personal information.
 
-Version [x] | Effective [date] | Policy link [URL] | Privacy contact [email/phone].
+This is an acknowledgement record, not consent to every processing activity. Optional consent, where configured, is handled separately.
+
+## Draft status and version
+
+Version 0.2 | DRAFT FOR REVIEW — NOT PUBLISHED | Effective date: [not set] | Policy link: [URL] | Privacy contact: [not set]. Legal references, lawful bases, provider details, retention periods and institutional approvals require review before publication.

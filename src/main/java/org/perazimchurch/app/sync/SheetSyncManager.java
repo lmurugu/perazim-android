@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.data.local.PerazimDatabase;
+import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.dao.AnnouncementDao;
 import org.perazimchurch.app.data.local.dao.AppConfigDao;
 import org.perazimchurch.app.data.local.dao.DailyVerseDao;
@@ -26,6 +27,7 @@ import org.perazimchurch.app.data.local.entity.RiddleEntity;
 import org.perazimchurch.app.data.local.entity.SermonEntity;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -107,6 +109,9 @@ public final class SheetSyncManager {
 
     @NonNull
     public static String getLastSyncStatusText(@NonNull Context context) {
+        if (!BuildConfig.REMOTE_SHEET_FEEDS_ENABLED) {
+            return "Online content feeds are unavailable in this build; using local content.";
+        }
         long lastMillis = getLastSyncMillis(context);
         if (lastMillis <= 0L) {
             return "Not synced yet (using local seed data)";
@@ -120,6 +125,7 @@ public final class SheetSyncManager {
      * Automatic sync on app startup. Only runs if > 6 hours have passed since last sync.
      */
     public static void syncOnAppStartIfNeeded(@NonNull Context context) {
+        if (!BuildConfig.REMOTE_SHEET_FEEDS_ENABLED) return;
         long last = getLastSyncMillis(context);
         long now = System.currentTimeMillis();
         if ((now - last) >= SIX_HOURS_MILLIS) {
@@ -134,6 +140,13 @@ public final class SheetSyncManager {
      * Manual sync triggered by user (e.g. from Profile "Refresh content" button).
      */
     public static void syncNow(@NonNull Context context, @Nullable SyncCallback callback) {
+        if (!BuildConfig.REMOTE_SHEET_FEEDS_ENABLED) {
+            if (callback != null) {
+                callback.onSyncComplete(false, 0, 0,
+                        "Online content feeds are unavailable in this build; using local content.");
+            }
+            return;
+        }
         final Context appContext = context.getApplicationContext();
         EXECUTOR.execute(() -> {
             int totalSynced = 0;
@@ -632,6 +645,9 @@ public final class SheetSyncManager {
     // -------------------------------------------------------------------------
 
     private static List<List<String>> fetchCsv(String urlString) throws Exception {
+        if (!BuildConfig.REMOTE_SHEET_FEEDS_ENABLED) {
+            throw new IOException("Online content feeds are unavailable in this build.");
+        }
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");

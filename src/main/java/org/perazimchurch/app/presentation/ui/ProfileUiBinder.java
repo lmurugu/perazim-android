@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -20,6 +21,8 @@ import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -35,7 +38,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
+import org.json.JSONObject;
+import org.perazimchurch.app.data.local.PerazimDatabase;
+import org.perazimchurch.app.data.local.entity.UserEntity;
+import org.perazimchurch.app.data.remote.ApiClient;
+import org.perazimchurch.app.data.remote.CommunityRemoteSource;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.model.BibleVerse;
@@ -49,6 +58,10 @@ import org.perazimchurch.app.sync.SheetSyncManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
+import java.io.File;
+import java.io.ByteArrayOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +77,9 @@ import java.util.List;
  */
 public class ProfileUiBinder {
 
+    private static final int REQUEST_AVATAR_GALLERY = 7411;
+    private static final int REQUEST_AVATAR_CAMERA = 7412;
+
     private final Context context;
     private final Activity activity;
     private final ProfileViewModel viewModel;
@@ -74,6 +90,9 @@ public class ProfileUiBinder {
     private TextView tvMemberEmail;
     private TextView tvCovenantBadge;
     private ImageView ivAvatar;
+    private Uri cameraPhotoUri;
+    private File cameraPhotoFile;
+    private String displayedAvatarRef = "";
 
     // Spiritual Journey UI references
     private TextView tvStreakValue;
@@ -210,8 +229,14 @@ public class ProfileUiBinder {
 
         // Member Avatar with Church Logo
         ivAvatar = new ImageView(context);
-        ivAvatar.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
-        ivAvatar.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        ivAvatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        GradientDrawable avatarBackground = new GradientDrawable();
+        avatarBackground.setShape(GradientDrawable.OVAL);
+        avatarBackground.setColor(Color.WHITE);
+        ivAvatar.setBackground(avatarBackground);
+        ivAvatar.setClipToOutline(true);
+        ivAvatar.setOnClickListener(v -> showAvatarPicker());
+        ivAvatar.setContentDescription("Profile picture. Tap to change.");
         LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(54), dp(54));
         lpAv.setMargins(0, 0, dp(14), 0);
         ivAvatar.setLayoutParams(lpAv);
@@ -1385,7 +1410,7 @@ public class ProfileUiBinder {
         if (tvSyncStatusVal != null) {
             tvSyncStatusVal.setText("Syncing church content...");
         }
-        Toast.makeText(context, "🔄 Syncing church content from Google Sheets...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Refreshing local and church content...", Toast.LENGTH_SHORT).show();
         org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(context, null);
         SheetSyncManager.syncNow(context, (success, synced, skipped, message) -> {
             postToMain(() -> {
@@ -1395,7 +1420,7 @@ public class ProfileUiBinder {
                 if (success) {
                     Toast.makeText(context, "✅ Church content updated (" + synced + " items synced)", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(context, "⚠️ Offline or sync failed. Kept cached content.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -1440,6 +1465,7 @@ public class ProfileUiBinder {
         viewModel.loadProfile(user -> {
             postToMain(() -> {
                 currentUser = user;
+                renderAvatarFromCurrentUser();
                 updateAuthButtonState();
                 if (SessionManager.getInstance(context).isGuest()) {
                     if (tvMemberName != null) tvMemberName.setText("Guest Pilgrim (Offline)");
@@ -1515,6 +1541,267 @@ public class ProfileUiBinder {
                 });
             });
         }
+
+    private void renderAvatarFromCurrentUser() {
+        if (ivAvatar == null) return;
+        SessionManager session = SessionManager.getInstance(context);
+        UserEntity entity = session.getCurrentUser();
+        String userId = entity != null ? entity.getId()
+                : (currentUser != null ? currentUser.getId() : session.getActiveUserId());
+        String cachedRef = context.getSharedPreferences("profile_avatar_cache", Context.MODE_PRIVATE)
+                .getString("avatar:" + userId, "");
+        String avatarRef = entity != null && entity.getAvatarUrl() != null && !entity.getAvatarUrl().isEmpty()
+                ? entity.getAvatarUrl() : cachedRef;
+        displayedAvatarRef = avatarRef;
+        renderAvatar(avatarRef, userId);
+    }
+
+    private void renderAvatar(@Nullable String avatarRef, @Nullable String userId) {
+        if (ivAvatar == null) return;
+        if (avatarRef == null) avatarRef = "";
+        int drawable = ProfileAvatarHelper.drawableId(context,
+                ProfileAvatarHelper.numberFor(avatarRef, userId));
+        ivAvatar.setImageResource(drawable != 0 ? drawable : org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        ivAvatar.setTag(userId + "|" + avatarRef);
+        if (avatarRef.startsWith("/uploads/")) loadUploadedAvatar(avatarRef, userId);
+    }
+
+    private void loadUploadedAvatar(@NonNull String path, @Nullable String userId) {
+        String token = SessionManager.getInstance(context).getAuthToken();
+        if (token == null || token.trim().isEmpty()) return;
+        Object expectedTag = ivAvatar.getTag();
+        String base = ApiClient.getBaseUrl(context).replaceAll("/+$", "");
+        new Thread(() -> {
+            Bitmap bitmap = null;
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(base + path);
+                if (!ApiClient.allowsProtectedTransport(url)) return;
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setInstanceFollowRedirects(false);
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(15000);
+                connection.setRequestProperty("Authorization", "Bearer " + token.trim());
+                connection.setRequestProperty("Accept", "image/*");
+                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    try (InputStream input = connection.getInputStream(); ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
+                        byte[] chunk = new byte[8192];
+                        int count;
+                        int total = 0;
+                        while ((count = input.read(chunk)) != -1 && total <= 2 * 1024 * 1024) {
+                            bytes.write(chunk, 0, count);
+                            total += count;
+                        }
+                        if (total <= 2 * 1024 * 1024) bitmap = BitmapFactory.decodeByteArray(bytes.toByteArray(), 0, bytes.size());
+                    }
+                }
+            } catch (Exception ignored) {
+                // The deterministic default remains visible for missing/unavailable photos.
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+            Bitmap loaded = bitmap;
+            postToMain(() -> {
+                if (loaded != null && ivAvatar != null && expectedTag.equals(ivAvatar.getTag())) {
+                    ivAvatar.setImageBitmap(loaded);
+                }
+            });
+        }, "profile-avatar-load").start();
+    }
+
+    private void showAvatarPicker() {
+        LinearLayout panel = new LinearLayout(context);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setPadding(dp(12), dp(8), dp(12), dp(4));
+
+        TextView heading = new TextView(context);
+        heading.setText("Choose a profile picture");
+        heading.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        heading.setTypeface(Typeface.DEFAULT_BOLD);
+        heading.setPadding(0, 0, 0, dp(10));
+        panel.addView(heading);
+
+        LinearLayout grid = new LinearLayout(context);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        String activeId = SessionManager.getInstance(context).getActiveUserId();
+        int selectedNumber = displayedAvatarRef.startsWith("default:")
+                ? ProfileAvatarHelper.numberFor(displayedAvatarRef, activeId)
+                : (displayedAvatarRef.isEmpty() ? ProfileAvatarHelper.defaultNumber(activeId) : -1);
+        for (int row = 0; row < 5; row++) {
+            LinearLayout rowView = new LinearLayout(context);
+            rowView.setGravity(Gravity.CENTER);
+            for (int col = 0; col < 4; col++) {
+                int number = row * 4 + col + 1;
+                ImageView choice = new ImageView(context);
+                choice.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                choice.setImageResource(ProfileAvatarHelper.drawableId(context, number));
+                GradientDrawable outline = new GradientDrawable();
+                outline.setShape(GradientDrawable.OVAL);
+                outline.setColor(Color.TRANSPARENT);
+                outline.setStroke(dp(number == selectedNumber ? 3 : 1),
+                        number == selectedNumber ? PerazimTheme.COLOR_ORANGE_SOFT : PerazimTheme.COLOR_STROKE);
+                choice.setBackground(outline);
+                choice.setClipToOutline(true);
+                choice.setContentDescription("Default avatar " + number);
+                LinearLayout.LayoutParams choiceParams = new LinearLayout.LayoutParams(dp(50), dp(50));
+                choiceParams.setMargins(dp(3), dp(3), dp(3), dp(3));
+                rowView.addView(choice, choiceParams);
+                choice.setOnClickListener(v -> {
+                    AlertDialog dialog = (AlertDialog) panel.getTag();
+                    if (dialog != null) dialog.dismiss();
+                    persistAvatarChoice("default:" + number);
+                });
+            }
+            grid.addView(rowView);
+        }
+        panel.addView(grid);
+
+        Button gallery = new Button(context);
+        gallery.setText("Choose photo from gallery");
+        gallery.setOnClickListener(v -> { dismissAvatarPicker(panel); choosePhotoFromGallery(); });
+        panel.addView(gallery);
+        Button camera = new Button(context);
+        camera.setText("Take a photo");
+        camera.setOnClickListener(v -> { dismissAvatarPicker(panel); takePhoto(); });
+        panel.addView(camera);
+        Button reset = new Button(context);
+        reset.setText("Use my automatic default / remove photo");
+        reset.setOnClickListener(v -> {
+            dismissAvatarPicker(panel);
+            persistAvatarChoice("");
+        });
+        panel.addView(reset);
+
+        ScrollView pickerScroll = new ScrollView(context);
+        pickerScroll.setFillViewport(true);
+        pickerScroll.addView(panel);
+        AlertDialog dialog = new AlertDialog.Builder(context).setView(pickerScroll).setNegativeButton("Close", null).create();
+        panel.setTag(dialog);
+        dialog.show();
+    }
+
+    private void dismissAvatarPicker(@NonNull View panel) {
+        Object dialog = panel.getTag();
+        if (dialog instanceof AlertDialog) ((AlertDialog) dialog).dismiss();
+    }
+
+    private void choosePhotoFromGallery() {
+        if (activity == null) return;
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        activity.startActivityForResult(Intent.createChooser(intent, "Choose profile photo"), REQUEST_AVATAR_GALLERY);
+    }
+
+    private void takePhoto() {
+        if (activity == null) return;
+        if (context.checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            activity.requestPermissions(new String[]{android.Manifest.permission.CAMERA}, REQUEST_AVATAR_CAMERA);
+            Toast.makeText(context, "Allow camera access, then tap your avatar again.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            cameraPhotoFile = File.createTempFile("profile_avatar_", ".jpg", context.getCacheDir());
+            cameraPhotoUri = FileProvider.getUriForFile(context,
+                    context.getPackageName() + ".fileprovider", cameraPhotoFile);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraPhotoUri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            activity.startActivityForResult(intent, REQUEST_AVATAR_CAMERA);
+        } catch (Exception e) {
+            if (cameraPhotoFile != null) cameraPhotoFile.delete();
+            cameraPhotoFile = null;
+            cameraPhotoUri = null;
+            Toast.makeText(context, "Could not open the camera.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            if (requestCode == REQUEST_AVATAR_CAMERA && cameraPhotoUri != null) {
+                if (cameraPhotoFile != null) cameraPhotoFile.delete();
+                cameraPhotoFile = null;
+                cameraPhotoUri = null;
+            }
+            return requestCode == REQUEST_AVATAR_CAMERA || requestCode == REQUEST_AVATAR_GALLERY;
+        }
+        Uri imageUri = requestCode == REQUEST_AVATAR_CAMERA ? cameraPhotoUri
+                : (data == null ? null : data.getData());
+        cameraPhotoUri = null;
+        File capturedFile = requestCode == REQUEST_AVATAR_CAMERA ? cameraPhotoFile : null;
+        cameraPhotoFile = null;
+        if (requestCode != REQUEST_AVATAR_CAMERA && requestCode != REQUEST_AVATAR_GALLERY) return false;
+        if (imageUri == null) {
+            if (capturedFile != null) capturedFile.delete();
+            Toast.makeText(context, "The selected photo could not be opened.", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        Toast.makeText(context, "Preparing photo…", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            byte[] png = ProfileAvatarHelper.makeCircularPng(context, imageUri);
+            if (capturedFile != null) capturedFile.delete();
+            if (png == null) {
+                postToMain(() -> Toast.makeText(context, "Could not prepare this photo. Try another image.", Toast.LENGTH_LONG).show());
+                return;
+            }
+            String encoded = Base64.encodeToString(png, Base64.NO_WRAP);
+            new CommunityRemoteSource(context).uploadPhoto(encoded, "profile.png", new CommunityRemoteSource.CommunityCallback<String>() {
+                @Override public void onSuccess(String mediaUrl) {
+                    if (mediaUrl == null || mediaUrl.isEmpty()) {
+                        postToMain(() -> Toast.makeText(context, "Photo upload returned no reference.", Toast.LENGTH_LONG).show());
+                    } else {
+                        persistAvatarChoice(mediaUrl);
+                    }
+                }
+                @Override public void onError(int statusCode, String message) {
+                    postToMain(() -> Toast.makeText(context, "Photo upload failed: " + message, Toast.LENGTH_LONG).show());
+                }
+            });
+        }, "profile-avatar-upload").start();
+        return true;
+    }
+
+    private void persistAvatarChoice(@NonNull String avatarRef) {
+        SessionManager session = SessionManager.getInstance(context);
+        UserEntity active = session.getCurrentUser();
+        String userId = active != null ? active.getId() : session.getActiveUserId();
+        if (session.isGuest()) {
+            saveAvatarLocally(userId, avatarRef);
+            displayedAvatarRef = avatarRef;
+            renderAvatar(avatarRef, userId);
+            return;
+        }
+        new CommunityRemoteSource(context).updateAvatar(avatarRef,
+                new CommunityRemoteSource.CommunityCallback<JSONObject>() {
+                    @Override public void onSuccess(JSONObject response) {
+                        saveAvatarLocally(userId, avatarRef);
+                        postToMain(() -> {
+                            displayedAvatarRef = avatarRef;
+                            renderAvatar(avatarRef, userId);
+                            Toast.makeText(context, "Profile picture updated.", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                    @Override public void onError(int statusCode, String message) {
+                        postToMain(() -> Toast.makeText(context, "Could not update profile picture: " + message,
+                                Toast.LENGTH_LONG).show());
+                    }
+                });
+    }
+
+    private void saveAvatarLocally(@NonNull String userId, @NonNull String avatarRef) {
+        context.getSharedPreferences("profile_avatar_cache", Context.MODE_PRIVATE)
+                .edit().putString("avatar:" + userId, avatarRef).apply();
+        new Thread(() -> {
+            UserEntity entity = PerazimDatabase.getInstance(context).userDao().getUserById(userId);
+            if (entity != null) {
+                entity.setAvatarUrl(avatarRef);
+                entity.setUpdatedAt(System.currentTimeMillis());
+                PerazimDatabase.getInstance(context).userDao().update(entity);
+                SessionManager.getInstance(context).refreshCurrentUser();
+            }
+        }, "profile-avatar-save").start();
+    }
 
     // =========================================================================
     // GRAPHICS & UTILITIES

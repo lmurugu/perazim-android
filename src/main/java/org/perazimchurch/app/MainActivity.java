@@ -284,6 +284,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     @Override
     protected void onActivityResult(int requestCode,int resultCode,Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
+        if(profileUiBinder!=null && profileUiBinder.onActivityResult(requestCode,resultCode,data))return;
         if(communityUiBinder!=null)communityUiBinder.onActivityResult(requestCode,resultCode,data);
     }
 

@@ -36,8 +36,7 @@ public final class ApiClient {
 
     private static final String PREFS_NAME = "perazim_server_prefs";
     private static final String KEY_SERVER_URL = "server_base_url";
-    public static final String DEFAULT_EMULATOR_URL = "http://10.0.2.2:3000";
-    public static final String DEFAULT_DEVICE_URL = "http://127.0.0.1:3000";
+    private static final String DEBUG_DEFAULT_DEVICE_URL = "http://127.0.0.1:3000";
 
     private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
@@ -56,7 +55,10 @@ public final class ApiClient {
         if (customUrl != null && !customUrl.trim().isEmpty()) {
             return customUrl.trim();
         }
-        return DEFAULT_DEVICE_URL;
+        if (BuildConfig.API_BASE_URL != null && !BuildConfig.API_BASE_URL.trim().isEmpty()) {
+            return BuildConfig.API_BASE_URL.trim();
+        }
+        return BuildConfig.DEBUG ? DEBUG_DEFAULT_DEVICE_URL : "";
     }
 
     public static void setBaseUrl(@NonNull Context context, @Nullable String url) {
@@ -127,8 +129,9 @@ public final class ApiClient {
         final Context appContext = context.getApplicationContext();
         final String requestBaseUrl = getBaseUrl(appContext);
         final String path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
-        final boolean protectedPath = path.startsWith("/api/admin/") || path.startsWith("/api/membership/") ||
-                path.equals("/api/access/permissions");
+        final boolean carriesCredentials = authToken != null && !authToken.trim().isEmpty() ||
+                privilegedToken != null && !privilegedToken.trim().isEmpty();
+        final boolean protectedPath = requiresSecureTransport(path, carriesCredentials);
         EXECUTOR.execute(() -> {
             HttpURLConnection conn = null;
             try {
@@ -140,7 +143,7 @@ public final class ApiClient {
 
                 URL url = new URL(fullUrl);
                 if (protectedPath && !allowsProtectedTransport(url)) {
-                    MAIN_HANDLER.post(() -> callback.onError(-1, "Membership and administration require a secure server connection."));
+                    MAIN_HANDLER.post(() -> callback.onError(-1, "This request requires a secure server connection."));
                     return;
                 }
                 conn = (HttpURLConnection) url.openConnection();
@@ -220,11 +223,19 @@ public final class ApiClient {
         });
     }
 
-    static boolean allowsProtectedTransport(URL url) {
-        if (url.getUserInfo() != null) return false;
-        if ("https".equalsIgnoreCase(url.getProtocol())) return true;
-        if (!"validation".equals(BuildConfig.BUILD_TYPE) || !"http".equalsIgnoreCase(url.getProtocol())) return false;
-        String host = url.getHost();
-        return "127.0.0.1".equals(host) || "[::1]".equals(host) || "localhost".equalsIgnoreCase(host);
+    public static boolean requiresSecureTransport(String path) {
+        return SecureTransportPolicy.requiresSecureTransport(path, false);
+    }
+
+    public static boolean requiresSecureTransport(String path, boolean carriesCredentials) {
+        return SecureTransportPolicy.requiresSecureTransport(path, carriesCredentials);
+    }
+
+    public static boolean allowsProtectedTransport(URL url) {
+        return SecureTransportPolicy.allowsProtectedTransport(url, BuildConfig.BUILD_TYPE);
+    }
+
+    static boolean allowsProtectedTransport(URL url, String buildType) {
+        return SecureTransportPolicy.allowsProtectedTransport(url, buildType);
     }
 }

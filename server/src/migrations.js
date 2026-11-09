@@ -5,6 +5,7 @@ const path = require('path');
 const MIGRATIONS_DIR = path.join(__dirname, '../migrations');
 const LEDGER = 'perazim_schema_migrations';
 const LOCK_KEY = '723448319116047';
+const PROHIBITED_VERSION = '0007';
 
 function loadMigrations(directory = MIGRATIONS_DIR) {
   const sqlFiles = fs.readdirSync(directory).filter(name => name.endsWith('.sql'));
@@ -21,6 +22,16 @@ function loadMigrations(directory = MIGRATIONS_DIR) {
     if (migrations[index].version !== String(index + 1).padStart(4, '0')) {
       throw new Error(`Migration files must begin at 0001 and remain gap-free; found ${migrations[index].name}.`);
     }
+  }
+  return migrations;
+}
+
+function assertMigrationPlanAllowed(migrations, prohibitedVersion = PROHIBITED_VERSION) {
+  const prohibited = migrations.find(migration => migration.version === prohibitedVersion);
+  if (prohibited) {
+    const error = new Error(`Migration ${prohibited.version} (${prohibited.name}) is prohibited in this execution context; refusing before database access.`);
+    error.code = 'PROHIBITED_MIGRATION_IN_PLAN';
+    throw error;
   }
   return migrations;
 }
@@ -128,6 +139,8 @@ async function createLedger(client) {
 }
 
 async function migrate(pool, migrationsDirectory = MIGRATIONS_DIR) {
+  // Migration-plan policy is checked before withLock calls pool.connect().
+  assertMigrationPlanAllowed(loadMigrations(migrationsDirectory));
   return withLock(pool, async client => {
     const result = await verifyHistory(client, migrationsDirectory);
     if (result.state.kind === 'untracked') throw new Error('Existing schema needs explicit verified baselining; migrate will not adopt it automatically.');
@@ -159,4 +172,4 @@ async function baseline(pool, migrationsDirectory = MIGRATIONS_DIR) {
   });
 }
 
-module.exports = { LEDGER, loadMigrations, status, plan, migrate, baseline, verifyHistory };
+module.exports = { LEDGER, loadMigrations, assertMigrationPlanAllowed, status, plan, migrate, baseline, verifyHistory };

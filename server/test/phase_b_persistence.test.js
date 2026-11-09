@@ -73,7 +73,8 @@ const EXPECTED_MIGRATIONS = [
   '0008_membership_import_staging.sql',
   '0009_legacy_identity_reconciliation.sql',
   '0010_data01_privacy_governance.sql',
-  '0011_identity_revision_pin.sql'
+  '0011_identity_revision_pin.sql',
+  '0012_membership_verification_history_append_only.sql'
 ];
 
 const EXPECTED_ALL_TABLES = [
@@ -102,6 +103,7 @@ const EXPECTED_FUNCTIONS = [
   'reject_membership_identity_reconciliation_revision_mutation',
   'reject_membership_import_staging_event_mutation',
   'reject_membership_record_revision_mutation',
+  'reject_membership_verification_history_mutation',
   'reject_privacy_acknowledgement_mutation'
 ];
 const EXPECTED_TRIGGERS = [
@@ -125,6 +127,8 @@ const EXPECTED_TRIGGERS = [
   'membership_import_staging_events.membership_import_staging_events_no_truncate',
   'membership_record_revisions.membership_record_revisions_no_row_mutation',
   'membership_record_revisions.membership_record_revisions_no_truncate',
+  'membership_verification_history.membership_verification_history_no_row_mutation',
+  'membership_verification_history.membership_verification_history_no_truncate',
   'privacy_notice_acknowledgements.privacy_ack_no_truncate',
   'privacy_notice_acknowledgements.privacy_ack_no_update_delete',
   'privacy_policy_versions.privacy_policy_version_identity_immutable',
@@ -312,6 +316,17 @@ async function run() {
     await assert.rejects(() => sourcePool.query(`DELETE FROM admin_audit_log WHERE id=$1`, [membershipFixture.auditId]), /append-only/);
     await assert.rejects(() => sourcePool.query('TRUNCATE admin_audit_log'), /append-only/);
     assert.strictEqual((await sourcePool.query('SELECT count(*)::int AS count FROM admin_audit_log')).rows[0].count, 1, 'audit row survives rejected updates, deletes, and truncate');
+    const verificationHistoryId = newId();
+    const historyCountBefore = (await sourcePool.query('SELECT count(*)::int AS count FROM membership_verification_history')).rows[0].count;
+    await sourcePool.query(`INSERT INTO membership_verification_history
+      (id,user_id,claim_id,previous_status,new_status,actor_id,reason,created_at)
+      VALUES ($1,$2,$3,'REGISTERED','VERIFIED_MEMBER',$2,'SYNTHETIC_TEST',$4)`,
+    [verificationHistoryId, fixture.owner, membershipFixture.claimId, Date.now()]);
+    await assert.rejects(() => sourcePool.query(`UPDATE membership_verification_history SET reason='changed' WHERE id=$1`, [verificationHistoryId]), /append-only/);
+    await assert.rejects(() => sourcePool.query(`DELETE FROM membership_verification_history WHERE id=$1`, [verificationHistoryId]), /append-only/);
+    await assert.rejects(() => sourcePool.query('TRUNCATE membership_verification_history'), /append-only/);
+    assert.strictEqual((await sourcePool.query('SELECT count(*)::int AS count FROM membership_verification_history')).rows[0].count, historyCountBefore + 1,
+      'verification history accepts inserts and survives rejected updates, deletes, and truncate');
     await assert.rejects(() => sourcePool.query("UPDATE membership_records SET record_status='UNKNOWN' WHERE id=$1", [membershipFixture.recordId]));
     await assert.rejects(() => sourcePool.query('UPDATE membership_records SET revision=0 WHERE id=$1', [membershipFixture.recordId]));
     await assert.rejects(() => sourcePool.query("UPDATE membership_verifications SET membership_record_id=$1,status='VERIFIED_MEMBER' WHERE user_id=$2", [membershipFixture.recordId, fixture.member]), /duplicate key/);

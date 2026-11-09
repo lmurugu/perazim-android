@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const net = require('net');
 
 let pool = null;
 let isPostgres = false;
@@ -33,12 +34,46 @@ async function initDb() {
 
   if (connectionString) {
     try {
+      const syntheticTarget = process.env.NODE_ENV === 'test' && process.env.PHASE_B_SYNTHETIC === 'true'
+        ? validatePhaseBTestDatabaseUrl(connectionString)
+        : null;
+      if (syntheticTarget) {
+        const expectedPort = Number(process.env.PHASE_B_TEST_EXPECTED_PORT);
+        const expectedDataDirectory = process.env.PHASE_B_TEST_EXPECTED_DATA_DIR;
+        if (!Number.isInteger(expectedPort) || expectedPort !== syntheticTarget.port ||
+            !expectedDataDirectory || !fs.existsSync(expectedDataDirectory) ||
+            !fs.statSync(expectedDataDirectory).isDirectory()) {
+          throw new Error('SAFETY ABORT: Phase B tests require the exact expected port and disposable cluster data directory before connecting.');
+        }
+      }
       const { Pool } = require('pg');
-      pool = new Pool({ connectionString });
+      // In synthetic Phase B mode, pass the already validated effective
+      // destination as explicit driver options. Do not let URL query settings
+      // or PG* environment defaults change where this pool connects.
+      pool = new Pool(syntheticTarget || { connectionString });
       // Test connection
       await pool.query('SELECT 1');
       isPostgres = true;
       console.log('✅ Connected to PostgreSQL database');
+
+      if (syntheticTarget) {
+        const identity = await pool.query(`SELECT current_database() AS database,
+          inet_server_addr()::text AS address, inet_server_port() AS port,
+          current_setting('data_directory') AS data_directory`);
+        const row = identity.rows[0] || {};
+        const address = String(row.address || '').split('/')[0].toLowerCase().replace(/^::ffff:/, '');
+        const loopback = address === '::1' || net.isIP(address) === 4 && address.startsWith('127.');
+        const expectedPort = Number(process.env.PHASE_B_TEST_EXPECTED_PORT);
+        const expectedDataDirectory = process.env.PHASE_B_TEST_EXPECTED_DATA_DIR;
+        if (row.database !== syntheticTarget.database || !loopback || Number(row.port) !== syntheticTarget.port ||
+            Number(row.port) !== expectedPort ||
+            path.resolve(row.data_directory) !== path.resolve(expectedDataDirectory)) {
+          await pool.end();
+          pool = null;
+          isPostgres = false;
+          throw new Error(`SAFETY ABORT: Connected PostgreSQL identity did not match the approved disposable target (database=${row.database || 'unknown'}, address=${address || 'unknown'}, port=${row.port || 'unknown'}, data_directory=${row.data_directory || 'unknown'}).`);
+        }
+      }
 
       // Initialize schema
       const schemaSql = fs.readFileSync(path.join(__dirname, '../schema.sql'), 'utf8');
@@ -46,6 +81,11 @@ async function initDb() {
       console.log('✅ PostgreSQL schema verified & updated');
       return;
     } catch (err) {
+      if (pool) {
+        try { await pool.end(); } catch (_) {}
+        pool = null;
+        isPostgres = false;
+      }
       console.error('❌ FATAL: PostgreSQL connection failed with DATABASE_URL:', err.message);
       // NEVER silently fall back to memory store when DATABASE_URL was explicitly provided
       if (isProd || !allowMemory) {
@@ -61,6 +101,38 @@ async function initDb() {
     console.warn('⚠️ WARNING: No DATABASE_URL set. Running with transient in-memory store. ALL DATA WILL BE LOST ON RESTART.');
     isPostgres = false;
   }
+}
+
+function validatePhaseBTestDatabaseUrl(connectionString) {
+  let url;
+  try {
+    url = new URL(connectionString || '');
+  } catch (_) {
+    throw new Error('SAFETY ABORT: Phase B tests require a valid PostgreSQL URL.');
+  }
+  if (!['postgres:', 'postgresql:'].includes(url.protocol) || url.search || url.hash) {
+    throw new Error('SAFETY ABORT: Phase B test URLs cannot contain connection overrides or fragments.');
+  }
+  let driver;
+  try { driver = require('pg-connection-string').parse(connectionString); }
+  catch (_) { throw new Error('SAFETY ABORT: Phase B tests require a valid PostgreSQL URL.'); }
+  const host = String(driver.host || '').toLowerCase().replace(/^\[|\]$/g, '');
+  const loopback = host === '::1' || net.isIP(host) === 4 && host.startsWith('127.');
+  const port = Number(driver.port);
+  const database = String(driver.database || '');
+  const user = String(driver.user || '');
+  if (!loopback || !Number.isInteger(port) || port < 1 || port > 65535 ||
+      !/^perazim_phaseb_[a-z0-9]{6,32}_test$/.test(database) || user !== 'postgres' || driver.ssl) {
+    throw new Error('SAFETY ABORT: Phase B tests require an explicit loopback URL for a uniquely named disposable database.');
+  }
+  return {
+    host,
+    port,
+    database,
+    user,
+    password: driver.password || undefined,
+    ssl: false
+  };
 }
 
 async function closeDb() {
@@ -328,6 +400,7 @@ async function withTransaction(work) {
 
 module.exports = {
   initDb,
+  validatePhaseBTestDatabaseUrl,
   query,
   withTransaction,
   closeDb,

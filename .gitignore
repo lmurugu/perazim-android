@@ -52,7 +52,7 @@ keystore.properties
 *.keystore
 *.jks
 *.pem
-.env
+.env*
 
 # Firebase client config may contain project identifiers/API keys.
 # If required for build in later milestones, provide via CI secret or local-only file.
@@ -63,6 +63,7 @@ google-services.json
 
 # Local PC backend runtime (database, binaries, logs, private configuration)
 server/.runtime/
+server/test-privacy-notice.md
 server/uploads/
 server/deploy/backups/
 

@@ -148,9 +148,10 @@ async function main() {
 
     // Recovery cutoff invalidates all tokens issued before auth_not_before.
     const oldRecoveryToken = token(users.target);
+    const recoveryCutoff = (Math.floor(Date.now() / 1000) + 1) * 1000;
     await query(`INSERT INTO admin_security (user_id,totp_secret_cipher,auth_not_before,created_at)
       VALUES ($1,'synthetic-test', $2, $3) ON CONFLICT (user_id) DO UPDATE SET auth_not_before=EXCLUDED.auth_not_before`,
-      [users.target.id, (Math.floor(now / 1000) + 2) * 1000, now]);
+      [users.target.id, recoveryCutoff, Date.now()]);
     response = await request(port, 'GET', '/api/community/groups', oldRecoveryToken);
     assert.strictEqual(response.status, 401, 'recovery cutoff invalidates existing bearer tokens');
 

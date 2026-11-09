@@ -54,7 +54,10 @@ const serveMedia = [optionalAuth, async (req, res) => {
     if (!allowed && req.user) {
       const mine = await query('SELECT 1 FROM community_media WHERE filename = $1 AND owner_id = $2', [filename, req.user.id]);
       const chats = await query('SELECT 1 FROM messages WHERE media_url = $1 AND (sender_id = $2 OR receiver_id = $2)', [url, req.user.id]);
-      allowed = mine.rows.length > 0 || chats.rows.length > 0;
+      // Profile photos are visible in the authenticated member directory. Keep
+      // that visibility explicit and scoped to the exact URL stored on a user.
+      const directoryAvatar = await query('SELECT 1 FROM users WHERE avatar_url = $1 LIMIT 1', [url]);
+      allowed = mine.rows.length > 0 || chats.rows.length > 0 || directoryAvatar.rows.length > 0;
     }
     if (!allowed) return res.sendStatus(404);
     res.set('Cache-Control', 'private, no-store');
@@ -1041,6 +1044,16 @@ router.put('/profile', requireAuth, async (req, res) => {
     const currentUser = userRes.rows[0];
     const updatedName = name !== undefined ? name.trim() : currentUser.name;
     const updatedBio = bio !== undefined ? bio.trim() : (currentUser.bio || '');
+    if (avatarUrl !== undefined) {
+      if (typeof avatarUrl !== 'string' || avatarUrl.length > 500) {
+        return res.status(400).json({ error: 'Invalid profile picture reference' });
+      }
+      const candidateAvatar = avatarUrl.trim();
+      const isDefaultAvatar = candidateAvatar === '' || /^default:(?:0?[1-9]|1[0-9]|20)$/.test(candidateAvatar);
+      if (!isDefaultAvatar && !await ownsMedia(req.user.id, candidateAvatar)) {
+        return res.status(400).json({ error: 'Profile picture must be a default avatar or an upload owned by this account' });
+      }
+    }
     const updatedAvatar = avatarUrl !== undefined ? avatarUrl.trim() : (currentUser.avatar_url || '');
     const now = Date.now();
 

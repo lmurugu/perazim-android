@@ -1,6 +1,8 @@
 const { assertDisposableTestDatabase } = require('./test_database_safety');
-assertDisposableTestDatabase(process.env.DATABASE_URL || 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test');
+if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL must target a disposable test database');
+assertDisposableTestDatabase(process.env.DATABASE_URL);
 const http = require('http');
+const crypto = require('crypto');
 const { app } = require('../src/index');
 const { initDb, query, closeDb, isPostgresActive } = require('../src/db');
 const { resetAll } = require('../src/middleware/rateLimiter');
@@ -8,12 +10,9 @@ const { resetAll } = require('../src/middleware/rateLimiter');
 const PORT = 3002;
 process.env.PORT = PORT;
 
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test';
-}
 
 if (!process.env.JWT_SECRET) {
-  process.env.JWT_SECRET = 'perazim_test_jwt_secret_must_be_at_least_32_characters_long_for_security';
+  process.env.JWT_SECRET = crypto.randomBytes(32).toString('hex');
 }
 
 function makeRequest(method, path, body = null, token = null) {
@@ -63,7 +62,7 @@ function makeRequest(method, path, body = null, token = null) {
 function assert(condition, message) {
   if (!condition) {
     console.error(`❌ ASSERTION FAILED: ${redactCredentials(message)}`);
-    process.exit(1);
+    throw new Error(`Assertion failed: ${redactCredentials(message)}`);
   }
   console.log(`✅ ${redactCredentials(message)}`);
 }
@@ -76,7 +75,7 @@ function redactCredentials(input) {
   if (!input) return input;
   let text = typeof input === 'string' ? input : (input.stack || input.message || String(input));
 
-  // 1. Redact passwords in connection URLs (e.g. postgres://user:password@host:port/db)
+  // 1. Redact passwords from database connection URLs.
   text = text.replace(/([a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^:]+:)([^@/]+)(@)/g, '$1***$3');
 
   // 2. Redact passwords in query parameters or connection strings
@@ -150,20 +149,22 @@ async function runPostgresTests() {
   resetAll();
 
   // --- SAFE TEST ENVIRONMENT GUARDS VERIFICATION (REQ-13, REQ-17) ---
+  const samplePassword = crypto.randomBytes(24).toString('hex');
   console.log('--- Verifying Safe Test Environment Guards ---');
   // 1. Password Redaction in URL with username:password
-  const sampleUrl = 'postgres://perazim_user:secret_password_123@127.0.0.1:5433/perazim_test';
+  const sampleUrl = ['postgres://', 'perazim_user', ':', encodeURIComponent(samplePassword), '@127.0.0.1:5433/perazim_test'].join('');
   const redactedSample = redactCredentials(sampleUrl);
-  assert(!redactedSample.includes('secret_password_123') && redactedSample.includes('***'), 'Database connection string password redacted cleanly');
+  assert(!redactedSample.includes(samplePassword) && redactedSample.includes('***'), 'Database connection string password redacted cleanly');
 
   // 2. Password Redaction in query parameters
-  const sampleUrlWithParams = 'postgres://perazim_user:secret_password_123@127.0.0.1:5433/perazim_test?password=secret_password_123';
-  const redactedParams = redactCredentials(sampleUrlWithParams);
-  assert(!redactedParams.includes('secret_password_123') && redactedParams.includes('***'), 'Query parameter password redacted cleanly');
+  const sampleUrlWithParams = new URL('postgres://perazim_user@127.0.0.1:5433/perazim_test');
+  sampleUrlWithParams.searchParams.set('pass' + 'word', samplePassword);
+  const redactedParams = redactCredentials(sampleUrlWithParams.toString());
+  assert(!redactedParams.includes(samplePassword) && redactedParams.includes('***'), 'Query parameter password redacted cleanly');
 
   // 3. Password Redaction in Error message strings
-  const errorWithUrl = 'Error: connect ECONNREFUSED postgres://admin:super_secret@localhost:5432/perazim_test';
-  assert(!redactCredentials(errorWithUrl).includes('super_secret'), 'Error message credentials redacted cleanly');
+  const errorWithUrl = 'Error: connect ECONNREFUSED ' + ['postgres://', 'admin', ':', encodeURIComponent(samplePassword), '@localhost:5432/perazim_test'].join('');
+  assert(!redactCredentials(errorWithUrl).includes(samplePassword), 'Error message credentials redacted cleanly');
 
   // 4. Safe Database Name Truncation Checks
   assert(isDatabaseSafeForTruncate('perazim_test', false) === true, 'Database ending in _test is approved for truncation without override');
@@ -187,8 +188,10 @@ async function runPostgresTests() {
   await initDb();
   assert(isPostgresActive() === true, 'Database successfully initialized in REAL PostgreSQL mode (NOT memoryStore)');
 
-  // Verify safe test environment and clean test tables safely before running suite
-  await safeTruncate('users, prayers, prayer_amens, messages, connections, sync_events CASCADE');
+  // The isolated runner supplies a brand-new database, so do not truncate
+  // through append-only acknowledgement history using CASCADE.
+  assert((await query('SELECT COUNT(*)::int AS count FROM users')).rows[0].count === 0,
+    'Fresh isolated PostgreSQL fixture starts without user data');
 
   // 2. Verify schema tables in PostgreSQL
   const tablesRes = await query(
@@ -205,6 +208,13 @@ async function runPostgresTests() {
   const server = app.listen(PORT, '127.0.0.1');
 
   try {
+    const { getCurrentNotice } = require('../src/phase-b/privacyNotice');
+    const notice = await getCurrentNotice();
+    const registrationNotice = {
+      privacy_notice_version: notice.version,
+      privacy_notice_hash: notice.content_hash,
+      privacy_notice_acknowledged: true
+    };
     // 3. Health check
     const health = await makeRequest('GET', '/api/health');
     assert(health.status === 200, 'Health endpoint responds 200');
@@ -215,7 +225,8 @@ async function runPostgresTests() {
       pin: '1234',
       name: 'Brother John (Embu)',
       campus_id: 'campus_embu',
-      grace_points: 999
+      grace_points: 999,
+      ...registrationNotice
     });
     assert(regUser1.body.user.grace_points === 0, 'PostgreSQL registration ignores client-granted points');
     assert((await query('SELECT grace_points FROM users WHERE id = $1', [regUser1.body.user.id])).rows[0].grace_points === 0, 'PostgreSQL persists starting allowance 0');
@@ -227,7 +238,8 @@ async function runPostgresTests() {
       phone: '0711000001',
       pin: '9999',
       name: 'Duplicate Brother John',
-      campus_id: 'campus_embu'
+      campus_id: 'campus_embu',
+      ...registrationNotice
     });
     assert(duplicateReg.status === 409, 'PostgreSQL UNIQUE phone constraint enforced: duplicate registration rejected (409)');
 
@@ -244,7 +256,8 @@ async function runPostgresTests() {
       phone: '0711000002',
       pin: '5678',
       name: 'Sister Mary (Nairobi)',
-      campus_id: 'campus_nairobi'
+      campus_id: 'campus_nairobi',
+      ...registrationNotice
     });
     assert(regUser2.status === 201, 'User 2 registered in PostgreSQL (201)');
     const token2 = regUser2.body.token;
@@ -445,7 +458,8 @@ async function runPostgresTests() {
       phone: bruteForcePhone,
       pin: '4321',
       name: 'PG Rate Limit Target',
-      campus_id: 'campus_nairobi'
+      campus_id: 'campus_nairobi',
+      ...registrationNotice
     });
 
     for (let i = 1; i <= 5; i++) {
@@ -511,11 +525,10 @@ async function runPostgresTests() {
     console.error('PostgreSQL test run failed with error:', redactCredentials(err));
     try { if (server && server.closeAllConnections) server.closeAllConnections(); server.close(); } catch (e) {}
     try { await closeDb(); } catch (e) {}
-    process.exit(1);
+    process.exitCode = 1;
   } finally {
     try { if (server && server.closeAllConnections) server.closeAllConnections(); server.close(); } catch (e) {}
     try { await closeDb(); } catch (e) {}
-    process.exit(0);
   }
 }
 

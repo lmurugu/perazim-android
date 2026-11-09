@@ -13,16 +13,21 @@
  */
 
 const { assertDisposableTestDatabase } = require('./test_database_safety');
-assertDisposableTestDatabase(process.env.DATABASE_URL || 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test');
+if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL must target a disposable test database');
+assertDisposableTestDatabase(process.env.DATABASE_URL);
+const crypto = require('crypto');
 const http = require('http');
 const path = require('path');
 const { spawn } = require('child_process');
 const { Pool } = require('pg');
 
 const PORT = 3099;
-const DATABASE_URL = process.env.DATABASE_URL || 'postgres://perazim_test:test_secret_pass_2026@127.0.0.1:5433/perazim_test';
-const JWT_SECRET = process.env.JWT_SECRET || 'production_grade_jwt_secret_key_minimum_32_characters_long_2026_test';
+const DATABASE_URL = process.env.DATABASE_URL;
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
 const SERVER_DIR = path.resolve(__dirname, '..');
+const TEST_PHONE = `+2547${crypto.randomInt(0, 100000000).toString().padStart(8, '0')}`;
+const TEST_NAME = 'Synthetic Process Restart Account';
+const TEST_PRAYER_TITLE = 'Synthetic process restart persistence check';
 
 /**
  * Redacts credentials (passwords) from database connection strings, error messages,
@@ -32,7 +37,7 @@ function redactCredentials(input) {
   if (!input) return input;
   let text = typeof input === 'string' ? input : (input.stack || input.message || String(input));
 
-  // 1. Redact passwords in connection URLs (e.g. postgres://user:password@host:port/db)
+  // 1. Redact passwords from database connection URLs.
   text = text.replace(/([a-zA-Z][a-zA-Z0-9+.-]*:\/\/[^:]+:)([^@/]+)(@)/g, '$1***$3');
 
   // 2. Redact passwords in query parameters or connection strings
@@ -214,9 +219,12 @@ async function prepareTestDatabase() {
     console.log(`🔒 Truncation safety check passed for database "${activeDb}" (is_test_db=${activeDb.endsWith('_test')})`);
 
     // Clean up specific restart test phone numbers to guarantee clean test slate
-    const testPhone = '+254711999888';
-    await pool.query('DELETE FROM users WHERE phone = $1', [testPhone]);
-    await pool.query("DELETE FROM prayers WHERE title = 'Lord grant us peace and faith during trials'");
+    await pool.query('DELETE FROM users WHERE phone = $1', [TEST_PHONE]);
+    await pool.query('DELETE FROM prayers WHERE title = $1', [TEST_PRAYER_TITLE]);
+    const notice = await pool.query(`SELECT version,content_hash FROM privacy_notice_versions
+      WHERE is_active=TRUE ORDER BY created_at DESC LIMIT 1`);
+    if (!notice.rows[0]) throw new Error('Synthetic restart database has no current privacy notice fixture.');
+    return notice.rows[0];
   } finally {
     await pool.end();
   }
@@ -235,7 +243,7 @@ async function runProcessRestartTest() {
 
   try {
     // 1. Prepare clean test state with safety check
-    await prepareTestDatabase();
+    const registrationNotice = await prepareTestDatabase();
 
     // ========================================================================
     // STAGE 1: Spawn Child Process 1
@@ -248,13 +256,16 @@ async function runProcessRestartTest() {
     console.log(`Child Process 1 is healthy and responding on port ${PORT}`);
 
     // Register test user
-    const testPhone = '+254711999888';
+    const testPhone = TEST_PHONE;
     const testPin = '1234';
     const regRes = await makeRequest('POST', '/api/auth/register', {
       phone: testPhone,
       pin: testPin,
-      name: 'Brother Samuel (Restart Test)',
-      campus_id: 'campus_embu'
+      name: TEST_NAME,
+      campus_id: 'campus_embu',
+      privacy_notice_version: registrationNotice.version,
+      privacy_notice_hash: registrationNotice.content_hash,
+      privacy_notice_acknowledged: true
     });
     assert(regRes.status === 201, 'User registered in Process 1 (201)');
     const token = regRes.body.token;
@@ -262,8 +273,8 @@ async function runProcessRestartTest() {
     assert(!!token, 'Received valid JWT token from Process 1');
 
     // Submit prayer petition
-    const prayerTitle = 'Lord grant us peace and faith during trials';
-    const prayerContent = 'Prayer persistence verification across hard process restart.';
+    const prayerTitle = TEST_PRAYER_TITLE;
+    const prayerContent = 'Synthetic prayer fixture used to verify process restart persistence.';
     const postPrayer = await makeRequest('POST', '/api/prayers', {
       title: prayerTitle,
       content: prayerContent,
@@ -317,7 +328,7 @@ async function runProcessRestartTest() {
     });
     assert(loginRes.status === 200, 'User successfully authenticated against Process 2 (200)');
     assert(loginRes.body.user.id === userId, 'User ID matches record stored before process restart');
-    assert(loginRes.body.user.name === 'Brother Samuel (Restart Test)', 'User profile name matches record stored before restart');
+    assert(loginRes.body.user.name === TEST_NAME, 'User profile name matches record stored before restart');
     const newToken = loginRes.body.token;
 
     // 2. Fetch prayers from Process 2 and verify petition & amen survived restart
@@ -327,7 +338,7 @@ async function runProcessRestartTest() {
     assert(persistedPrayer !== undefined, 'Prayer petition survived hard Node.js process restart intact in PostgreSQL');
     assert(persistedPrayer.title === prayerTitle, 'Prayer title preserved across process restart');
     assert(persistedPrayer.content === prayerContent, 'Prayer content preserved across process restart');
-    assert(persistedPrayer.author_name === 'Brother Samuel (Restart Test)', 'Prayer author attribution preserved across restart');
+    assert(persistedPrayer.author_name === TEST_NAME, 'Prayer author attribution preserved across restart');
     assert(persistedPrayer.prayer_count >= 1, 'Prayer amen count (>= 1) preserved in PostgreSQL across process restart');
 
     // 3. Post author testimony via Process 2 to prove write capabilities on resurrected process

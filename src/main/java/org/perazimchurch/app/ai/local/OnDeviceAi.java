@@ -3,6 +3,7 @@ package org.perazimchurch.app.ai.local;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
 import java.io.*;
 import java.net.*;
@@ -30,6 +31,10 @@ public final class OnDeviceAi {
     public static void cancel() { cancelled = true; Process p = active; if (p != null) p.destroy(); }
     public static void ask(Context context, String question, List<ConversationHistory.Turn> history, Callback callback) {
         Context c = context.getApplicationContext();
+        if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
+            MAIN.post(() -> callback.onError("On-device AI is unavailable until approved-source controls are implemented and verified."));
+            return;
+        }
         String prompt = LocalPrompt.build(question, history);
         WORK.execute(() -> {
             cancelled = false;
@@ -67,6 +72,10 @@ public final class OnDeviceAi {
     }
     public static void download(Context context, DownloadCallback callback) {
         Context c = context.getApplicationContext();
+        if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
+            MAIN.post(() -> callback.onError("On-device AI downloads are disabled until approved-source controls are implemented and verified."));
+            return;
+        }
         WORK.execute(() -> {
             cancelled = false;
             HttpURLConnection connection = null;

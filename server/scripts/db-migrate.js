@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const { Pool } = require('pg');
-const { status, plan, migrate, baseline } = require('../src/migrations');
+const { status, plan, migrate, baseline, loadMigrations, assertMigrationPlanAllowed } = require('../src/migrations');
 
 async function main() {
   const command = process.argv[2] || 'status';
@@ -21,6 +21,7 @@ async function main() {
       throw new Error(`Write command requires the exact target confirmation: --confirm=${target}`);
     }
   }
+  if (command === 'migrate') assertMigrationPlanAllowed(loadMigrations());
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   try { process.stdout.write(`${JSON.stringify(await commands[command](pool), null, 2)}\n`); }
   finally { await pool.end(); }

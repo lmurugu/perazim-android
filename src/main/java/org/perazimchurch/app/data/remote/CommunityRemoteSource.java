@@ -351,4 +351,21 @@ public final class CommunityRemoteSource {
             callback.onError(-1, e.getMessage());
         }
     }
+
+    public void updateAvatar(@NonNull String avatarUrl, @NonNull CommunityCallback<JSONObject> callback) {
+        try {
+            JSONObject body = new JSONObject();
+            body.put("avatarUrl", avatarUrl);
+            ApiClient.put(context, "api/community/profile", body, getAuthToken(), new ApiClient.ApiCallback() {
+                @Override public void onSuccess(int statusCode, @NonNull JSONObject json) {
+                    callback.onSuccess(json);
+                }
+                @Override public void onError(int statusCode, @NonNull String errorMessage) {
+                    callback.onError(statusCode, errorMessage);
+                }
+            });
+        } catch (Exception e) {
+            callback.onError(-1, e.getMessage());
+        }
+    }
 }

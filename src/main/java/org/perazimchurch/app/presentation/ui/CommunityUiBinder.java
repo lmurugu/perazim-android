@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -27,6 +30,9 @@ import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.data.remote.ApiClient;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 import java.text.DateFormat;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -217,7 +223,12 @@ public final class CommunityUiBinder {
         if(isOwner)body.addView(button("Add a member",()->chooseMember(member->{JSONObject data=new JSONObject();postSafe(data,"userId",member.optString("id"));post("api/community/groups/"+encode(groupId)+"/members",data,r->toast("Member added"),this::showError);})));
         LinearLayout list=column();body.addView(list);panel("Group members",body);
         get("api/community/groups/"+encode(groupId)+"/members",r->{list.removeAllViews();JSONArray rows=r.optJSONArray("members");if(rows!=null)for(int i=0;i<rows.length();i++){
-            JSONObject m=rows.optJSONObject(i);if(m==null)continue;LinearLayout card=card(list);card.addView(text(m.optString("name")+" · "+m.optString("role"),16));
+            JSONObject m=rows.optJSONObject(i);if(m==null)continue;LinearLayout card=card(list);
+            LinearLayout memberHead=new LinearLayout(activity);memberHead.setGravity(Gravity.CENTER_VERTICAL);
+            ImageView avatar=memberAvatar(m.optString("avatar_url"),m.optString("user_id"));
+            memberHead.addView(avatar,new LinearLayout.LayoutParams(dp(44),dp(44)));
+            TextView memberName=text(m.optString("name")+" · "+m.optString("role"),16);memberHead.addView(memberName,new LinearLayout.LayoutParams(0,-2,1));
+            card.addView(memberHead);
             if(!this.owner.equals(m.optString("user_id")))card.addView(button("Message",()->showConversation(m.optString("user_id"),m.optString("name"))));
             if(isOwner&&!group.optString("created_by").equals(m.optString("user_id")))card.addView(button("Remove from group",()->new AlertDialog.Builder(activity).setTitle("Remove "+m.optString("name")+"?").setNegativeButton("Keep",null).setPositiveButton("Remove",(d,w)->request("DELETE","api/community/groups/"+encode(groupId)+"/members/"+encode(m.optString("user_id")),null,x->toast("Member removed; reopen roster to refresh"),this::showError)).show()));
         }},this::showError);
@@ -253,8 +264,34 @@ public final class CommunityUiBinder {
     private interface MemberChoice { void selected(JSONObject member); }
     private void chooseMember(MemberChoice choice) {
         LinearLayout body=column();EditText search=input("Search members by name",false);body.addView(search);LinearLayout list=column();body.addView(list);AlertDialog dialog=panel("Choose a member",body);
-        Runnable load=()->get("api/community/members?search="+encode(search.getText().toString()),r->{list.removeAllViews();JSONArray rows=r.optJSONArray("members");if(rows==null||rows.length()==0)list.addView(text("No members found.",15));if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject m=rows.optJSONObject(i);if(m!=null)list.addView(button(m.optString("name"),()->{dialog.dismiss();choice.selected(m);}));}},this::showError);
+        Runnable load=()->get("api/community/members?search="+encode(search.getText().toString()),r->{list.removeAllViews();JSONArray rows=r.optJSONArray("members");if(rows==null||rows.length()==0)list.addView(text("No members found.",15));if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject m=rows.optJSONObject(i);if(m!=null)addMemberChoice(list,m,()->{dialog.dismiss();choice.selected(m);});}},this::showError);
         body.addView(button("Search",load),1);load.run();
+    }
+    private void addMemberChoice(LinearLayout parent,JSONObject member,Runnable selected) {
+        LinearLayout item=new LinearLayout(activity);item.setOrientation(LinearLayout.HORIZONTAL);item.setGravity(Gravity.CENTER_VERTICAL);
+        ImageView avatar=memberAvatar(member.optString("avatar_url"),member.optString("id"));
+        item.addView(avatar,new LinearLayout.LayoutParams(dp(44),dp(44)));
+        TextView name=text(member.optString("name"),16);item.addView(name,new LinearLayout.LayoutParams(0,-2,1));
+        item.setFocusable(true);item.setContentDescription("Choose member "+member.optString("name"));item.setOnClickListener(v->selected.run());
+        LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(-1,-2);params.setMargins(0,dp(4),0,dp(4));parent.addView(item,params);
+    }
+    private ImageView memberAvatar(String avatarRef,String userId) {
+        ImageView image=new ImageView(activity);image.setScaleType(ImageView.ScaleType.CENTER_CROP);image.setContentDescription("Profile picture for "+userId);
+        int drawable=ProfileAvatarHelper.drawableId(activity,ProfileAvatarHelper.numberFor(avatarRef,userId));
+        image.setImageResource(drawable!=0?drawable:org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        Object tag=userId+"|"+avatarRef;image.setTag(tag);
+        if(!avatarRef.startsWith("/uploads/"))return image;
+        String token=session().getAuthToken(),base=ApiClient.getBaseUrl(activity).replaceAll("/+$","");
+        if(token==null||token.trim().isEmpty())return image;
+        images.execute(()->{Bitmap bitmap=null;HttpURLConnection connection=null;try{
+            URL url=new URL(base+avatarRef);if(!ApiClient.allowsProtectedTransport(url))return;
+            connection=(HttpURLConnection)url.openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(8000);connection.setReadTimeout(8000);
+            connection.setRequestProperty("Authorization","Bearer "+token.trim());connection.setRequestProperty("Accept","image/*");
+            int length=connection.getContentLength();if(connection.getResponseCode()==200&&(length<=0||length<=1024*1024)){try(InputStream stream=connection.getInputStream()){BitmapFactory.Options options=new BitmapFactory.Options();options.inSampleSize=4;bitmap=BitmapFactory.decodeStream(stream,null,options);}}
+        }catch(Exception ignored){}finally{if(connection!=null)connection.disconnect();}
+            Bitmap loaded=bitmap;if(loaded!=null)activity.runOnUiThread(()->{if(!activity.isFinishing()&&sameScope()&&tag.equals(image.getTag()))image.setImageBitmap(loaded);});
+        });
+        return image;
     }
     public void showConversation(String partnerId,String name) {
         if(!signedIn())return;LinearLayout body=column();LinearLayout messages=column();body.addView(messages);EditText input=input("Private message",true);body.addView(input);
@@ -306,7 +343,7 @@ public final class CommunityUiBinder {
     }
     public void showConnection() {
         LinearLayout body=column();body.addView(text("For a PC-hosted pilot, connect the phone and PC to the same Wi-Fi or hotspot. Enter the PC's address including port 3000. Bluetooth sharing installs the app; it does not connect members to the server.",15));
-        EditText address=input("http://PC-IP:3000 or https://api.example.org",false);address.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_URI);address.setText(ApiClient.getBaseUrl(activity));body.addView(address);TextView result=text("",14);body.addView(result);AlertDialog dialog=panel("PC connection",body);
+        EditText address=input("https://your-approved-api-host",false);address.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_VARIATION_URI);address.setText(ApiClient.getBaseUrl(activity));body.addView(address);TextView result=text("",14);body.addView(result);AlertDialog dialog=panel("PC connection",body);
         body.addView(button("Test current connection",()->get("api/health",r->result.setText("Current server is healthy. Changing the address requires a separate confirmation below."),(c,m)->result.setText(error(c,m)))));
         body.addView(button("Save server address",()->{
             String value=address.getText().toString().trim();try{java.net.URI uri=new java.net.URI(value);if(!("http".equals(uri.getScheme())||"https".equals(uri.getScheme()))||uri.getHost()==null||uri.getUserInfo()!=null||uri.getQuery()!=null||uri.getFragment()!=null||!(uri.getPath()==null||uri.getPath().isEmpty()||"/".equals(uri.getPath())))throw new IllegalArgumentException();}catch(Exception e){address.setError("Enter a server origin, for example http://192.168.1.10:3000");return;}
@@ -350,7 +387,8 @@ public final class CommunityUiBinder {
         android.widget.ImageView view=new android.widget.ImageView(activity);view.setAdjustViewBounds(true);view.setMaxHeight(dp(280));view.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);view.setContentDescription("Community photo");target.addView(view,new LinearLayout.LayoutParams(-1,dp(220)));
         String expectedOwner=owner,expectedServer=server,token=session().getAuthToken();
         images.execute(()->{java.net.HttpURLConnection connection=null;try{
-            connection=(java.net.HttpURLConnection)new java.net.URL(expectedServer+url).openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(10000);connection.setReadTimeout(10000);
+            java.net.URL photoUrl=new java.net.URL(expectedServer+url);if(!ApiClient.allowsProtectedTransport(photoUrl))return;
+            connection=(java.net.HttpURLConnection)photoUrl.openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(10000);connection.setReadTimeout(10000);
             if(token!=null&&!token.isEmpty())connection.setRequestProperty("Authorization","Bearer "+token);
             if(connection.getResponseCode()!=200)return;
             android.graphics.Bitmap bitmap;try(java.io.InputStream in=connection.getInputStream()){bitmap=android.graphics.BitmapFactory.decodeStream(in);}

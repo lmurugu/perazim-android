@@ -136,12 +136,15 @@ async function currentAccount(payload) {
   const user = result.rows && result.rows[0];
   if (!user || user.is_active === false) return null;
 
-  // The B5 recovery cutoff is enabled only in isolated synthetic Phase B servers.
-  // Legacy deployments without migration 0002 retain their existing auth schema.
-  if (process.env.NODE_ENV === 'test' && process.env.PHASE_B_SYNTHETIC === 'true' && isPostgresActive()) {
-    const security = await query('SELECT auth_not_before FROM admin_security WHERE user_id = $1', [user.id]);
-    const notBefore = security.rows && security.rows[0] ? Number(security.rows[0].auth_not_before) : 0;
-    if (notBefore > 0 && (!payload.iat || payload.iat * 1000 < notBefore)) return null;
+  // Apply recovery cutoffs in every environment when the Phase B table exists.
+  // Older schemas without Phase B remain compatible until migrated.
+  if (isPostgresActive()) {
+    const schema = await query("SELECT to_regclass('public.admin_security') AS admin_security_table");
+    if (schema.rows && schema.rows[0] && schema.rows[0].admin_security_table) {
+      const security = await query('SELECT auth_not_before FROM admin_security WHERE user_id = $1', [user.id]);
+      const notBefore = security.rows && security.rows[0] ? Number(security.rows[0].auth_not_before) : 0;
+      if (notBefore > 0 && (!payload.iat || payload.iat * 1000 < notBefore)) return null;
+    }
   }
 
   return {

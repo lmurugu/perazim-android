@@ -6,18 +6,6 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
-def sheetPropertiesFile = file("sheet_urls.properties")
-def sheetProperties = new Properties()
-if (sheetPropertiesFile.exists()) {
-    sheetProperties.load(new FileInputStream(sheetPropertiesFile))
-}
-
-def localPropertiesFile = file("local.properties")
-def localProperties = new Properties()
-if (localPropertiesFile.exists()) {
-    localProperties.load(new FileInputStream(localPropertiesFile))
-}
-
 android {
     namespace 'org.perazimchurch.app'
     compileSdk 34
@@ -44,17 +32,11 @@ android {
             }
         }
 
-        buildConfigField "String", "SHEET_URL_ANNOUNCEMENTS", "\"${sheetProperties.getProperty('sheet_url_announcements', '')}\""
-        buildConfigField "String", "SHEET_URL_EVENTS", "\"${sheetProperties.getProperty('sheet_url_events', '')}\""
-        buildConfigField "String", "SHEET_URL_HYMNS", "\"${sheetProperties.getProperty('sheet_url_hymns', '')}\""
-        buildConfigField "String", "SHEET_URL_RIDDLES", "\"${sheetProperties.getProperty('sheet_url_riddles', '')}\""
-        buildConfigField "String", "SHEET_URL_JOKES", "\"${sheetProperties.getProperty('sheet_url_jokes', '')}\""
-        buildConfigField "String", "SHEET_URL_SERMONS", "\"${sheetProperties.getProperty('sheet_url_sermons', '')}\""
-        buildConfigField "String", "SHEET_URL_VERSES", "\"${sheetProperties.getProperty('sheet_url_verses', '')}\""
-        buildConfigField "String", "SHEET_URL_CONFIG", "\"${sheetProperties.getProperty('sheet_url_config', '')}\""
-
-        buildConfigField "String", "AI_RELAY_URL", "\"${localProperties.getProperty('ai_relay_url', 'https://perazim-ai-relay.perazim-mission.workers.dev/chat')}\""
-        buildConfigField "String", "AI_APP_TOKEN", "\"${localProperties.getProperty('ai_app_token', '')}\""
+        // Unverified external feeds and AI relays must not be packaged in any APK variant.
+        buildConfigField "boolean", "REMOTE_SHEET_FEEDS_ENABLED", "false"
+        buildConfigField "boolean", "ONLINE_AI_ENABLED", "false"
+        buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "false"
+        buildConfigField "String", "API_BASE_URL", "\"\""
     }
     signingConfigs {
         release {
@@ -76,6 +58,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "API_BASE_URL", "\"https://fedora.taile47793.ts.net\""
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
@@ -92,22 +75,37 @@ android {
     }
 }
 
-// Android Gradle Plugin 8.2 currently merges this source asset despite the
-// source-set exclusion. Remove only this exact private file from every merged
-// variant asset directory before AAPT packages the APK.
+tasks.register('verifyReleaseApk', Exec) {
+    def apk = layout.buildDirectory.file('outputs/apk/release/app-release.apk')
+    inputs.file(apk)
+    commandLine 'python3', file('scripts/inspect_release_apk.py').absolutePath, apk.get().asFile.absolutePath
+}
+
+tasks.configureEach { task ->
+    if (task.name == 'assembleRelease') {
+        task.finalizedBy 'verifyReleaseApk'
+    }
+}
+
+// Stop before asset merging if the private membership register is put back in
+// an Android asset source directory. This check inspects filenames only; it
+// never reads, copies, or deletes the register.
+tasks.register('assertPrivateMembershipRegisterOutsideAndroidAssets') {
+    doLast {
+        def found = android.sourceSets.main.assets.srcDirs.any { assetDir ->
+            assetDir.exists() && fileTree(assetDir).matching {
+                include '**/member_contacts.csv'
+            }.files.any()
+        }
+        if (found) {
+            throw new GradleException('Private membership register must be stored outside Android asset directories')
+        }
+    }
+}
+
 tasks.configureEach { task ->
     if (task.name.startsWith('merge') && task.name.endsWith('Assets')) {
-        task.doLast {
-            def variant = task.name.substring('merge'.length(), task.name.length() - 'Assets'.length()).toLowerCase(Locale.ROOT)
-            def mergedAssets = layout.buildDirectory.dir("intermediates/assets/${variant}").get().asFile
-            if (mergedAssets.isDirectory()) {
-                fileTree(mergedAssets).matching { include '**/member_contacts.csv' }.files.each { privateAsset ->
-                    if (!privateAsset.delete()) {
-                        throw new GradleException('Unable to exclude the private membership asset from Android packaging')
-                    }
-                }
-            }
-        }
+        task.dependsOn 'assertPrivateMembershipRegisterOutsideAndroidAssets'
     }
 }
 dependencies {
