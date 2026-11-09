@@ -7,6 +7,7 @@ const {
   OnlineAiError, ONLINE_PERMISSION_ENV, validateOnlineAiBody,
   containsObviousSensitiveData, evaluateOnlineEligibility, createWorkerProvider
 } = require('../phase-b/onlineAi');
+const { retrieveInstitutionalContext } = require('../phase-b/governedKnowledge');
 
 const router = express.Router();
 
@@ -48,13 +49,35 @@ router.post('/online', requireAuth, async (req, res) => {
     });
     if (!eligibility.allowed) throw new OnlineAiError(eligibility.status, eligibility.code, 'Online AI access is not available for this account.');
 
+    const context = await retrieveInstitutionalContext(query, question);
+    if (!context.sufficient) {
+      return res.json({
+        answer: 'I do not have an approved Perazim source available to verify an institutional answer to this question. I cannot present an unverified answer as the church’s position.',
+        remaining: null,
+        sourceReferences: [],
+        sourceSufficiency: 'INSUFFICIENT'
+      });
+    }
+    const sourceReferences = context.passages.map(p => ({
+      sourceId: p.sourceId, title: p.title, version: p.version,
+      authorityClass: p.authorityClass, approvalStatus: p.approvalStatus,
+      location: p.location, contentHash: p.contentHash
+    }));
+    if (context.conflicts.length) {
+      return res.json({
+        answer: 'I found approved Perazim sources that are explicitly marked as conflicting. I cannot resolve that conflict or state an institutional position; this question needs review by the appropriate church authority.',
+        remaining: null, sourceReferences, sourceSufficiency: 'CONFLICTED',
+        conflicts: context.conflicts, escalationRequired: true
+      });
+    }
+
     const provider = createWorkerProvider({
       workerUrl: process.env.PERAZIM_AI_WORKER_URL,
       sharedSecret: process.env.PERAZIM_AI_WORKER_SHARED_SECRET,
       subjectKey: process.env.PERAZIM_AI_SUBJECT_PSEUDONYM_KEY
     });
-    const result = await provider.answer({ userId: req.user.id, question });
-    return res.json({ answer: result.answer, remaining: result.remaining });
+    const result = await provider.answer({ userId: req.user.id, question, context });
+    return res.json({ answer: result.answer, remaining: result.remaining, sourceReferences, sourceSufficiency: 'SUFFICIENT' });
   } catch (error) {
     if (error instanceof OnlineAiError) return res.status(error.status).json({ error: error.message, code: error.code });
     // Never log raw prompts, tokens, provider details, or database values.

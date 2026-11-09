@@ -58,12 +58,14 @@ function createWorkerProvider({ workerUrl, sharedSecret, subjectKey, fetchImpl =
     throw new OnlineAiError(503, 'ONLINE_AI_UNAVAILABLE', 'The online AI service is not configured.');
   }
   return {
-    async answer({ userId, question }) {
+    async answer({ userId, question, context = null }) {
       const requestId = crypto.randomUUID();
       const issuedAt = Math.floor(now() / 1000);
+      const contextDigest = context ? crypto.createHash('sha256').update(JSON.stringify(context), 'utf8').digest('hex') : null;
       const token = jwt.sign({
         iss: 'perazim-express', aud: 'perazim-ai-worker', iat: issuedAt,
-        exp: issuedAt + 60, jti: requestId, sub: workerPseudonym(userId, subjectKey)
+        exp: issuedAt + 60, jti: requestId, sub: workerPseudonym(userId, subjectKey),
+        ...(contextDigest ? { ctx: contextDigest } : {})
       }, sharedSecret, { algorithm: 'HS256' });
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 10000);
@@ -71,7 +73,7 @@ function createWorkerProvider({ workerUrl, sharedSecret, subjectKey, fetchImpl =
         const response = await fetchImpl(workerUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ requestId, question }),
+          body: JSON.stringify({ requestId, question, ...(context ? { context } : {}) }),
           signal: controller.signal
         });
         if (!response.ok) throw new OnlineAiError(response.status === 429 ? 429 : 503,

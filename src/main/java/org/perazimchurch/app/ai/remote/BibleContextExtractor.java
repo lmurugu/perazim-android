@@ -23,6 +23,7 @@ import java.util.Set;
 /**
  * Extracts up to 3 relevant scripture passages from the local Room Bible database
  * based on keyword matching in the user query, capped at 600 total characters.
+ * Missing local results remain empty; the assistant must not receive memorized substitute verses.
  */
 public final class BibleContextExtractor {
 
@@ -126,9 +127,6 @@ public final class BibleContextExtractor {
 
     @NonNull
     public static List<String> getFallbackPassages() {
-        return Arrays.asList(
-                "2 Samuel 5:20 — And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters.",
-                "Micah 2:13 — The breaker is come up before them: they have broken up, and have passed through the gate, and are gone out by it: and their king shall pass before them, and the LORD on the head of them."
-        );
+        return Collections.emptyList();
     }
 }

@@ -10,7 +10,7 @@ The checked-in Android client and online feature gates currently keep this path 
 
 ## Request contract
 
-Express sends a `POST` request to `/chat` with a bearer JWT grant and a JSON body containing exactly:
+Express sends a `POST` request to `/chat` with a bearer JWT grant and a JSON body containing:
 
 ```json
 {
@@ -18,6 +18,8 @@ Express sends a `POST` request to `/chat` with a bearer JWT grant and a JSON bod
   "question": "<1–500 character question>"
 }
 ```
+
+When governed retrieval returns eligible evidence, Express may also include a bounded `context` object containing `purpose: "INSTITUTIONAL"`, a query hash, and up to six source-attributed passages. The short-lived signed grant binds the context digest. The Worker checks each passage's approval marker, source/version/location metadata, authority class, size and content hash. A missing or altered digest is rejected. The text is passed in the user-content field as JSON evidence, never inserted into the fixed `systemInstruction`. The Worker treats it as untrusted data and ignores embedded instructions. The server route does not call the Worker when no approved passage is available.
 
 The Worker validates the signature, issuer, audience, subject pseudonym, issue/expiry window, request ID, enablement flag, and question shape. The request ID must match the grant's `jti`. Android tokens, client identity, permissions, membership claims, and conversation history are not accepted. The Worker also requires its KV binding and applies a defensive daily count; authoritative atomic quota enforcement remains an Express prerequisite before activation.
 
