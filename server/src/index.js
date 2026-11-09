@@ -55,6 +55,7 @@ app.use('/api/community', communityRoutes);
 app.use('/api/classroom-calls', require('./routes/classroomCalls'));
 app.use('/api', membershipRoutes);
 app.use('/api/admin', adminMembershipRoutes);
+app.use('/api/admin/ai-sources', require('./routes/knowledgeGovernance'));
 
 // Global error handler
 app.use((err, req, res, next) => {

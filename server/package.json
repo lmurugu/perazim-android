@@ -18,7 +18,7 @@
     "test:phase-e-independent": "npm run test:privacy && npm run test:admin-enrollment && npm run test:phase-b-database-guard && npm run test:migration-0007-guard && npm run test:online-ai-contract",
     "test:phase-b-database-guard": "node test/phase_b_database_guard.test.js",
     "test:online-ai-contract": "node test/online_ai_contract.test.js && node test/worker_service_auth.test.js",
-    "test:governed-ai": "node test/governed_knowledge.test.js && node test/online_ai_contract.test.js && node test/worker_service_auth.test.js",
+    "test:governed-ai": "node test/governed_knowledge.test.js && node test/knowledge_governance.test.js && node test/scripture_corpus.test.js && node test/response_validation.test.js && node test/online_ai_contract.test.js && node test/worker_service_auth.test.js",
     "db:migrate": "node scripts/db-migrate.js"
   },
   "dependencies": {

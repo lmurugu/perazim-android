@@ -135,7 +135,7 @@ function chunkDocument(text, source) {
 }
 
 function isEligible(source, { purpose = INSTITUTIONAL_PURPOSE, audience = 'PUBLIC', permissions = [] } = {}) {
-  if (!source || source.status !== 'APPROVED' || SENSITIVE_CLASSIFICATIONS.has(String(source.confidentiality || '').toUpperCase())) return false;
+  if (!source || source.status !== 'APPROVED' || source.publicationStatus !== 'PUBLISHED' || SENSITIVE_CLASSIFICATIONS.has(String(source.confidentiality || '').toUpperCase())) return false;
   if (!Array.isArray(source.permittedUses) || !source.permittedUses.includes(purpose)) return false;
   if (!Array.isArray(source.permittedAudiences) || !source.permittedAudiences.includes(audience)) return false;
   if (String(source.authorityClass || '').toUpperCase() === 'PERSONAL_THEOLOGY' && purpose === INSTITUTIONAL_PURPOSE) return false;
@@ -189,7 +189,7 @@ function buildContextPackage(query, ranked) {
     const source = item.source;
     const passage = {
       sourceId: source.sourceId, title: source.title, version: source.version,
-      authorityClass: source.authorityClass, approvalStatus: source.status,
+      authorityClass: source.authorityClass, approvalStatus: source.status, publicationStatus: source.publicationStatus,
       approvalReference: source.approvalReference, conflictGroup: source.conflictGroup || null, location: item.location,
       contentHash: item.contentHash, text: item.content
     };
@@ -199,7 +199,7 @@ function buildContextPackage(query, ranked) {
     passages.push(passage);
   }
   const conflicts = conflictGroups.map(([conflictGroup, ids]) => ({ conflictGroup, sourceIds: [...ids].sort() }));
-  return Object.freeze({ purpose: INSTITUTIONAL_PURPOSE, queryHash: sha256(query), passages: Object.freeze(passages), conflicts: Object.freeze(conflicts), sufficient: passages.length > 0 });
+  return Object.freeze({ purpose: INSTITUTIONAL_PURPOSE, queryHash: sha256(query), passages: Object.freeze(passages), scriptures: Object.freeze([]), conflicts: Object.freeze(conflicts), sufficient: passages.length > 0 });
 }
 
 function classifyResponseCategory(category) {
@@ -246,7 +246,7 @@ function lookupScripture(reference, translationId, corpus) {
   return { ok: true, book: book.name, chapter: parsed.chapter, startVerse: parsed.startVerse, endVerse: parsed.endVerse, translationId: translation, corpusId: corpus.corpusId, corpusVersion: corpus.version, text: verses.map(v => v.text).join(' '), verses: verses.map(v => ({ verse: v.verseNumber, text: v.text })) };
 }
 
-async function ingestSource(client, metadata, extractedText, { actorId = null, now = () => Date.now() } = {}) {
+async function ingestSource(client, metadata, extractedText, { actorId = null, requestId = null, now = () => Date.now() } = {}) {
   if (!client || typeof client.query !== 'function') throw new KnowledgeError('INGESTION_STORE_REQUIRED', 'An isolated database transaction is required.');
   const input = metadata || {};
   const source = {
@@ -271,15 +271,15 @@ async function ingestSource(client, metadata, extractedText, { actorId = null, n
       (source_id, version, title, document_type, issuing_authority, authority_class, scope_of_authority, conflict_group,
        publication_date, approval_status, confidentiality, permitted_audiences, permitted_uses,
        confidentiality_reviewed_by, confidentiality_reviewed_at, source_location, content_hash, language, translation_id, ingested_at, created_by,
-       supersedes_source_id, supersedes_version)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'UNVERIFIED',$10,$11::jsonb,$12::jsonb,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)
+       supersedes_source_id, supersedes_version, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'UNVERIFIED',$10,$11::jsonb,$12::jsonb,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
      RETURNING source_id, version, approval_status, content_hash`,
     [source.sourceId, source.version, source.title, source.documentType, source.issuingAuthority,
-      source.authorityClass, source.scopeOfAuthority, input.conflictGroup || null, source.publicationDate, source.confidentiality,
+      source.authorityClass, source.scopeOfAuthority, null, source.publicationDate, source.confidentiality,
       JSON.stringify(source.permittedAudiences), JSON.stringify(source.permittedUses),
       source.confidentialityReviewer, source.confidentialityReviewedAt, source.sourceLocation,
       source.contentHash, source.language, source.translationId, source.ingestedAt, actorId,
-      source.supersedesSourceId, source.supersedesVersion]
+      source.supersedesSourceId, source.supersedesVersion, source.ingestedAt]
   );
   for (const chunk of chunks) {
     await client.query(
@@ -291,9 +291,9 @@ async function ingestSource(client, metadata, extractedText, { actorId = null, n
     );
   }
   await client.query(
-    `INSERT INTO ai_knowledge_events (event_id, source_id, source_version, event_type, actor_id, reason, created_at)
-     VALUES ($1,$2,$3,'INGESTED',$4,'source_registered_unverified',$5)`,
-    [crypto.randomUUID(), source.sourceId, source.version, actorId, source.ingestedAt]
+    `INSERT INTO ai_knowledge_events (event_id, source_id, source_version, event_type, actor_id, actor_role, reason, created_at, request_id)
+     VALUES ($1,$2,$3,'INGESTED',$4,'SOURCE_ADMIN','SOURCE_REGISTERED_UNVERIFIED',$5,$6)`,
+    [crypto.randomUUID(), source.sourceId, source.version, actorId, source.ingestedAt, requestId]
   );
   return { source: result.rows[0], chunkCount: chunks.length };
 }
@@ -303,10 +303,11 @@ async function retrieveInstitutionalContext(queryFn, question) {
     return buildContextPackage(String(question || ''), []);
   }
   const { rows: sources } = await queryFn(
-    `SELECT source_id, version, title, authority_class, approval_status, approval_reference, conflict_group,
+    `SELECT source_id, version, title, authority_class, approval_status, publication_status, approval_reference, conflict_group,
             confidentiality, permitted_audiences, permitted_uses, effective_at, content_hash
        FROM ai_knowledge_sources
       WHERE approval_status = 'APPROVED'
+        AND publication_status = 'PUBLISHED'
         AND confidentiality = 'PUBLIC'
         AND permitted_audiences @> '["PUBLIC"]'::jsonb
         AND permitted_uses @> '["INSTITUTIONAL"]'::jsonb
@@ -317,7 +318,7 @@ async function retrieveInstitutionalContext(queryFn, question) {
   if (!sources.length) return buildContextPackage(question, []);
   const byIdVersion = new Map(sources.map(s => [`${s.source_id}\0${s.version}`, {
     sourceId: s.source_id, version: s.version, title: s.title,
-    authorityClass: s.authority_class, status: s.approval_status,
+    authorityClass: s.authority_class, status: s.approval_status, publicationStatus: s.publication_status,
     approvalReference: s.approval_reference, conflictGroup: s.conflict_group, confidentiality: s.confidentiality,
     permittedAudiences: s.permitted_audiences, permittedUses: s.permitted_uses,
     contentHash: s.content_hash
@@ -328,6 +329,7 @@ async function retrieveInstitutionalContext(queryFn, question) {
        FROM ai_knowledge_chunks c
        JOIN ai_knowledge_sources s ON s.source_id = c.source_id AND s.version = c.source_version
       WHERE s.approval_status = 'APPROVED'
+        AND s.publication_status = 'PUBLISHED'
         AND s.confidentiality = 'PUBLIC'
         AND s.permitted_audiences @> '["PUBLIC"]'::jsonb
         AND s.permitted_uses @> '["INSTITUTIONAL"]'::jsonb
@@ -341,7 +343,19 @@ async function retrieveInstitutionalContext(queryFn, question) {
     contentHash: c.content_hash
   }));
   const sourceRows = sources.map(s => byIdVersion.get(`${s.source_id}\0${s.version}`));
-  return buildContextPackage(question, rankChunks(question, chunks, sourceRows, { purpose: INSTITUTIONAL_PURPOSE, audience: 'PUBLIC', maxResults: MAX_RETRIEVAL_CANDIDATES }));
+  const options = { purpose: INSTITUTIONAL_PURPOSE, audience: 'PUBLIC', maxResults: MAX_RETRIEVAL_CANDIDATES };
+  const ranked = rankChunks(question, chunks, sourceRows, options);
+  const activeConflictGroups = new Set(ranked.map(item => item.source.conflictGroup).filter(Boolean));
+  const included = new Set(ranked.map(item => `${item.sourceId}\0${item.sourceVersion}\0${item.chunkId}`));
+  for (const chunk of chunks) {
+    const source = byIdVersion.get(`${chunk.sourceId}\0${chunk.sourceVersion}`);
+    const key = `${chunk.sourceId}\0${chunk.sourceVersion}\0${chunk.chunkId}`;
+    if (source && activeConflictGroups.has(source.conflictGroup) && !included.has(key) && isEligible(source, options) && sha256(chunk.content) === chunk.contentHash) {
+      ranked.push({ ...chunk, score: 0, source });
+      included.add(key);
+    }
+  }
+  return buildContextPackage(question, ranked);
 }
 
 module.exports = {

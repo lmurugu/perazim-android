@@ -5,6 +5,12 @@ const jwt = require('jsonwebtoken');
 
 const MAX_QUESTION_CHARS = 500;
 const ONLINE_PERMISSION_ENV = 'PERAZIM_AI_ONLINE_PERMISSION_CODE';
+const CRISIS_PATTERNS = [
+  /\b(suicide|suicidal|kill\s+myself|end\s+my\s+life|want\s+to\s+die|hang\s+myself)\b/i,
+  /\b(self[\s-]?harm|cutting\s+myself|hurt\s+myself)\b/i,
+  /\b(end\s+it\s+all|hopeless.*die|feel\s+like\s+giving\s+up\s+on\s+life)\b/i,
+  /\b(abused|physically\s+abused|sexual\s+assault|domestic\s+violence)\b/i
+];
 
 class OnlineAiError extends Error {
   constructor(status, code, message) {
@@ -35,6 +41,8 @@ function containsObviousSensitiveData(question) {
     /(?:\+?\d[\d\s().-]{7,}\d)/.test(question) ||
     /\b(?:my|our)\s+(?:PIN|password|TOTP|recovery code|medical diagnosis|HIV status|bank account)\b/i.test(question);
 }
+
+function isCrisisQuestion(question) { return CRISIS_PATTERNS.some(pattern => pattern.test(String(question || ''))); }
 
 function evaluateOnlineEligibility({ authenticatedUser, membershipStatus, permissionActive, sessionValid = true }) {
   if (!sessionValid || !authenticatedUser || !authenticatedUser.id || authenticatedUser.is_active === false) {
@@ -79,10 +87,10 @@ function createWorkerProvider({ workerUrl, sharedSecret, subjectKey, fetchImpl =
         if (!response.ok) throw new OnlineAiError(response.status === 429 ? 429 : 503,
           response.status === 429 ? 'AI_QUOTA_EXCEEDED' : 'ONLINE_AI_UNAVAILABLE', 'The online AI service is unavailable.');
         const result = await response.json();
-        if (!result || typeof result.answer !== 'string' || !result.answer.trim()) {
+        if (!result || (context ? (!result.response || typeof result.response !== 'object') : (typeof result.answer !== 'string' || !result.answer.trim()))) {
           throw new OnlineAiError(503, 'ONLINE_AI_UNAVAILABLE', 'The online AI service returned no answer.');
         }
-        return { answer: result.answer.trim(), remaining: Number.isInteger(result.remaining) ? result.remaining : null };
+        return { ...(context ? { response: result.response } : { answer: result.answer.trim() }), remaining: Number.isInteger(result.remaining) ? result.remaining : null };
       } catch (error) {
         if (error instanceof OnlineAiError) throw error;
         throw new OnlineAiError(503, 'ONLINE_AI_UNAVAILABLE', 'The online AI service is unavailable.');
@@ -95,6 +103,6 @@ function createWorkerProvider({ workerUrl, sharedSecret, subjectKey, fetchImpl =
 
 module.exports = {
   MAX_QUESTION_CHARS, ONLINE_PERMISSION_ENV, OnlineAiError,
-  validateOnlineAiBody, containsObviousSensitiveData, evaluateOnlineEligibility,
+  validateOnlineAiBody, containsObviousSensitiveData, isCrisisQuestion, evaluateOnlineEligibility,
   workerPseudonym, createWorkerProvider
 };

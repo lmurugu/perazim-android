@@ -12,6 +12,7 @@ function source(overrides = {}) {
     authorityClass: 'OFFICIAL_CONSTITUTION', scopeOfAuthority: 'Institutional governance',
     version: 'v1', status: 'APPROVED', approvalAuthority: 'Synthetic council',
     approvalReference: 'SYNTHETIC-RESOLUTION-1', approvedAt: 100,
+    publicationStatus: 'PUBLISHED',
     confidentiality: 'PUBLIC', confidentialityReviewer: 'synthetic-reviewer', confidentialityReviewedAt: 150,
     permittedAudiences: ['PUBLIC'],
     permittedUses: ['INSTITUTIONAL'], sourceLocation: 'fixture://constitution#1',
@@ -111,9 +112,35 @@ async function verifyRetrievalQueryFilters() {
   assert.equal(result.sufficient, false);
   assert.equal(calls.length, 1, 'empty registry avoids unnecessary chunk lookup');
   assert.match(calls[0].sql, /approval_status = 'APPROVED'/);
+  assert.match(calls[0].sql, /publication_status = 'PUBLISHED'/);
   assert.match(calls[0].sql, /confidentiality = 'PUBLIC'/);
   assert.match(calls[0].sql, /authority_class <> 'PERSONAL_THEOLOGY'/);
   assert.deepEqual(calls[0].params.length, 1);
+}
+
+async function verifyOneMatchingConflictSourceEscalates() {
+  const sourceRows = [
+    { source_id: 'conflict-a', version: 'v1', title: 'Synthetic A', authority_class: 'OFFICIAL_POLICY',
+      approval_status: 'APPROVED', publication_status: 'PUBLISHED', approval_reference: 'FIXTURE-A',
+      conflict_group: 'fixture-conflict', confidentiality: 'PUBLIC', permitted_audiences: ['PUBLIC'], permitted_uses: ['INSTITUTIONAL'],
+      effective_at: null, content_hash: 'a'.repeat(64) },
+    { source_id: 'conflict-b', version: 'v1', title: 'Synthetic B', authority_class: 'OFFICIAL_POLICY',
+      approval_status: 'APPROVED', publication_status: 'PUBLISHED', approval_reference: 'FIXTURE-B',
+      conflict_group: 'fixture-conflict', confidentiality: 'PUBLIC', permitted_audiences: ['PUBLIC'], permitted_uses: ['INSTITUTIONAL'],
+      effective_at: null, content_hash: 'b'.repeat(64) }
+  ];
+  const a = 'Church policy synthetic matching passage.';
+  const b = 'A different synthetic passage with no matching terms.';
+  const result = await K.retrieveInstitutionalContext(async sql => {
+    if (/FROM ai_knowledge_sources/.test(sql) && !/JOIN/.test(sql)) return { rows: sourceRows };
+    return { rows: [
+      { chunk_id: 'a'.repeat(64), source_id: 'conflict-a', source_version: 'v1', section: 'Policy', location: 'Policy A', content: a, content_hash: K.sha256(a) },
+      { chunk_id: 'b'.repeat(64), source_id: 'conflict-b', source_version: 'v1', section: 'Policy', location: 'Policy B', content: b, content_hash: K.sha256(b) }
+    ] };
+  }, 'church policy');
+  assert.equal(result.conflicts.length, 1, 'a matched member pulls its unresolved conflict into the package');
+  assert.deepEqual(result.conflicts[0].sourceIds, ['conflict-a', 'conflict-b']);
+  assert.equal(result.passages.length, 2, 'both published conflict sources are returned for escalation');
 }
 
 async function verifyIngestionDefaultsToUnverified() {
@@ -143,6 +170,7 @@ async function verifyIngestionDefaultsToUnverified() {
 
 async function main() {
   await verifyRetrievalQueryFilters();
+  await verifyOneMatchingConflictSourceEscalates();
   await verifyIngestionDefaultsToUnverified();
   const migration = fs.readFileSync(path.resolve(__dirname, '../migrations/0013_governed_ai_knowledge.sql'), 'utf8');
   assert.match(migration, /CREATE TABLE ai_knowledge_sources/);

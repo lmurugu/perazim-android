@@ -20,6 +20,8 @@ const ADMIN_CAPABILITIES = [
   'membership.record.read', 'membership.register.import', 'membership.claim.review',
   'membership.verification.confirm', 'membership.record.correct',
   'membership.verification.correct', 'membership.verification.revoke',
+  'knowledge.source.manage', 'knowledge.source.review', 'knowledge.source.publish',
+  'knowledge.scripture.import', 'knowledge.scripture.publish',
   'admin.permissions.read', 'admin.permissions.grant', 'admin.permissions.revoke', 'admin.audit.read'
 ];
 
