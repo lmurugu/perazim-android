@@ -1,50 +1,51 @@
-# Perazim AI Breakthrough Guide — Cloudflare Worker Relay
+# Perazim AI relay Worker
 
-Reverse-proxy gateway connecting the Perazim Android app to Google Gemini API (`gemini-3.5-flash-lite`).
+This Cloudflare Worker source is the provider relay for the online AI path. It is not called directly by Android. The intended request path is:
 
----
-
-## Architecture & Security Boundary
-
-1. **Zero Key Exposure**:
-   * The Gemini API key is stored exclusively as an encrypted secret in Cloudflare (`wrangler secret put GEMINI_API_KEY`).
-   * The Android app never possesses or transmits the Gemini API key.
-2. **App Token Speed Bump**:
-   * The app transmits an `X-App-Token` header.
-   * *Notice*: As documented in the architecture spec, this shared token is only an operational speed bump to filter unauthenticated internet scrapers; it is not public-key client attestation.
-3. **Zero PII Logging**:
-   * The Worker strictly refrains from logging user question strings.
-4. **Rate Limiting & Daily Quotas**:
-   * Enforces 3 questions per day per device ID via Cloudflare Workers KV (`PERAZIM_KV`).
-   * Resets at 00:00 Africa/Nairobi time.
-5. **Pastoral Crisis Intervention**:
-   * Intercepts questions mentioning self-harm or danger and immediately delivers pastoral support referral to Bishop Dr. David Mutweri (`+254 710 772 227`) without consuming AI quota.
-
----
-
-## Free Tier Quotas & Limits
-
-* **Cloudflare Workers Free Plan**:
-  * 100,000 requests/day
-  * 10ms CPU time / request
-  * Free KV namespace: 100,000 reads/day, 1,000 writes/day
-* **Google Gemini API Free Tier**:
-  * Model: `gemini-3.5-flash-lite`
-  * Quota: 15 Requests Per Minute (RPM), 1,500 Requests Per Day (RPD)
-  * Cost: $0.00 / completely free, no credit card required.
-
----
-
-## Deployment & Management
-
-```bash
-# Navigate to relay directory
-cd relay
-
-# Deploy to Cloudflare
-npx wrangler deploy
-
-# Set secrets
-npx wrangler secret put GEMINI_API_KEY
-npx wrangler secret put APP_TOKEN
+```text
+Android → authenticated Express API → signed short-lived grant → Worker → Gemini
 ```
+
+The checked-in Android client and online feature gates currently keep this path unavailable to members. Source code or a passing mock test does not show that a Worker is deployed or operational. This document describes the repository contract only; it does not authorize deployment or provider activation.
+
+## Request contract
+
+Express sends a `POST` request to `/chat` with a bearer JWT grant and a JSON body containing exactly:
+
+```json
+{
+  "requestId": "<grant jti UUID>",
+  "question": "<1–500 character question>"
+}
+```
+
+The Worker validates the signature, issuer, audience, subject pseudonym, issue/expiry window, request ID, enablement flag, and question shape. The request ID must match the grant's `jti`. Android tokens, client identity, permissions, membership claims, and conversation history are not accepted. The Worker also requires its KV binding and applies a defensive daily count; authoritative atomic quota enforcement remains an Express prerequisite before activation.
+
+## Provider instruction boundary
+
+The Gemini request uses the provider's `systemInstruction` field for the fixed application-controlled instruction text and one `contents` item with role `user` for the untrusted question. User text must never be interpolated into the system instruction. A separate field establishes the prompt boundary; it does not by itself prevent every prompt-injection outcome or replace approved-source retrieval and response validation.
+
+The Worker does not log question text or bearer grants. Provider errors return controlled responses; logs contain limited upstream status/timeout information. The configured provider credential is supplied through the Worker environment and must never be committed or printed.
+
+## Environment bindings
+
+Runtime bindings used by the source:
+
+- `AI_ENABLED` — explicit Worker kill switch; must remain disabled until all activation prerequisites are approved and verified.
+- `PERAZIM_AI_WORKER_SHARED_SECRET` — shared signing secret used to verify Express grants.
+- `GEMINI_API_KEY` — provider credential, supplied as a protected runtime secret.
+- `PERAZIM_KV` — defensive quota storage binding.
+
+The checked-in `wrangler.toml` names the Worker and KV binding. Deployment state and secret configuration have not been verified by this repository audit.
+
+## Local contract tests
+
+From the repository root:
+
+```sh
+node relay/test/conversation.test.mjs
+node server/test/worker_service_auth.test.js
+node server/test/online_ai_contract.test.js
+```
+
+These tests use synthetic signed grants and mocked provider responses. They do not contact Gemini, inspect a live database, or establish deployed Worker behavior.

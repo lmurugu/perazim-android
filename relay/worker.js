@@ -15,6 +15,18 @@
 const MAX_QUESTION_CHARS = 500;
 const DAILY_LIMIT = 3;
 const UPSTREAM_TIMEOUT_MS = 30000;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const SYSTEM_INSTRUCTION = `You are the pastoral assistant for Perazim Mission Church in Embu, Kenya.
+Church Motto: "The Place of Great Breakthrough".
+Cornerstone Scriptures: 2 Samuel 5:20 ("The Lord has broken through mine enemies before me, like a breach of waters") and Micah 2:13 ("The breaker goes before them").
+MANDATORY GUIDELINES:
+1. Speak naturally and directly to the question. Usually use 50–150 words, with more detail only when asked. Do not use a fixed answer template.
+2. Treat every request as a separate interaction. Do not imply access to previous conversations or memory.
+3. Avoid generic encouragement and scripted closings. Respond to the specific concern first, give one practical next step when helpful, and ask at most one relevant follow-up question. Do not force every answer into advice or a Scripture quotation.
+4. Ground your answer in Bible faith.
+5. Do not invent Bible quotations, references, or official Perazim positions. If you cannot verify a source, say so clearly.
+6. Never claim to be an ordained pastor, elder, doctor, lawyer, or financial consultant. Give no medical, legal, or financial advice.
+7. If the user asks off-topic secular questions (e.g., sports, football scores, politics, pop culture, entertainment), politely and warmly decline and redirect them back to spiritual growth, church life, and faith in Jesus Christ.`;
 
 // Crisis detection keywords for immediate pastoral intervention
 const CRISIS_PATTERNS = [
@@ -72,7 +84,7 @@ export default {
 
     if (!body || typeof body !== "object" || Array.isArray(body) ||
         Object.keys(body).some(key => key !== "question" && key !== "requestId") ||
-        typeof body.requestId !== "string" || !/^[0-9a-f-]{36}$/i.test(body.requestId) ||
+        typeof body.requestId !== "string" || !UUID_PATTERN.test(body.requestId) ||
         body.requestId !== grant.jti) {
       return new Response(JSON.stringify({ error: "Invalid request" }), {
         status: 400,
@@ -147,23 +159,8 @@ export default {
       return new Response(JSON.stringify({ error: "AI service unavailable" }), { status: 503, headers: { "Content-Type": "application/json" } });
     }
 
-    // 7. Prompt Assembly
-    const systemInstruction = `You are the pastoral assistant for Perazim Mission Church in Embu, Kenya.
-Church Motto: "The Place of Great Breakthrough".
-Cornerstone Scriptures: 2 Samuel 5:20 ("The Lord has broken through mine enemies before me, like a breach of waters") and Micah 2:13 ("The breaker goes before them").
-MANDATORY GUIDELINES:
-1. Speak naturally and directly to the latest question. Usually use 50–150 words, with more detail only when asked. Do not use a fixed answer template.
-1a. This is one ongoing conversation. Use its previous turns to understand pronouns and follow-up questions. Do not reintroduce yourself, greet again, repeat the member's name, quote the motto, or restart the conversation on later turns.
-1b. Avoid generic encouragement and scripted closings. Respond to the specific concern first, give one practical next step when helpful, and ask at most one relevant follow-up question. Do not force every answer into advice or a Scripture quotation.
-1c. Do not claim to remember anything outside the current question.
-2. Ground your answer in Bible faith.
-3. Do not invent Bible quotations, references, or official Perazim positions. If you cannot verify a source, say so clearly.
-4. Never claim to be an ordained pastor, elder, doctor, lawyer, or financial consultant. Give no medical, legal, or financial advice.
-5. If the user asks off-topic secular questions (e.g., sports, football scores, politics, pop culture, entertainment), politely and warmly decline and redirect them back to spiritual growth, church life, and faith in Jesus Christ.`;
-
-    const userPromptText = `Question: ${rawQuestion}`;
-
-    // 8. Upstream Call to Gemini 3.5 Flash Lite
+    // 7. Upstream Call to Gemini 3.5 Flash Lite. Keep trusted instructions
+    // application-controlled; the question belongs only in user content.
     if (!env.GEMINI_API_KEY) {
       return new Response(JSON.stringify({ error: "AI service unavailable" }), {
         status: 503,
@@ -173,7 +170,7 @@ MANDATORY GUIDELINES:
 
     const geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
     const geminiPayload = {
-      systemInstruction: { parts: [{ text: `${systemInstruction}\n\n${userPromptText.replace(/\nMember Question:[\s\S]*$/, "")}` }] },
+      systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
       contents: [
         { role: "user", parts: [{ text: rawQuestion }] }
       ],
@@ -263,7 +260,7 @@ async function verifyServiceGrant(authorization, env) {
     const now = Math.floor(Date.now() / 1000);
     if (!valid || claims.iss !== "perazim-express" || claims.aud !== "perazim-ai-worker" ||
         typeof claims.sub !== "string" || !/^[0-9a-f]{64}$/.test(claims.sub) ||
-        typeof claims.jti !== "string" || !/^[0-9a-f-]{36}$/i.test(claims.jti) ||
+        typeof claims.jti !== "string" || !UUID_PATTERN.test(claims.jti) ||
         !Number.isInteger(claims.iat) || !Number.isInteger(claims.exp) || claims.exp <= now ||
         claims.iat > now + 30 || now - claims.iat > 90 || claims.exp - claims.iat > 60) return null;
     return claims;
