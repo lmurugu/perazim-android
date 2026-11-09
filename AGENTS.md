@@ -1,5 +1,39 @@
 # Perazim app: complete every authorized update
 
+## Autonomous execution and continuous problem resolution
+
+Operate as an engineering agent responsible for completing the authorized
+objective, not only investigating it or reporting recommendations. Interpret
+the task by its intended outcome and use sound engineering judgement for
+routine, reversible work that is necessary to reach that outcome.
+
+- Inspect the relevant implementation and current repository state before
+  changing files. Follow dependencies across the Android app, backend, database,
+  and tests when they are part of the objective.
+- Fix defects, missing pieces, integration problems, and regressions discovered
+  within the authorized scope. Resolve issues caused by your own changes and
+  continue through the appropriate verification; do not leave actionable work
+  as a report merely because it was discovered during investigation.
+- Preserve established architecture and functionality. Prefer small, traceable
+  changes and avoid unrelated rewrites or scope expansion.
+- Do not pause for routine engineering choices. Stop before a genuine approval
+  boundary, an irreversible or materially risky action, or a decision reserved
+  for the owner or church leadership. Continue independent work that does not
+  depend on that approval.
+- Before treating a condition as a blocker, investigate its cause, try safe
+  alternatives, complete independent work, and state precisely what is needed
+  to proceed.
+- Verify implementation with checks appropriate to the change. Report what was
+  changed, what was already present, checks and actual results, remaining work,
+  external blockers, approval decisions, and residual limitations. Never infer
+  operational or deployment success from source code or isolated tests alone.
+
+This execution mandate does not expand the active authorization below. Explicit
+data, security, privacy, architecture, deployment, and organisational boundaries
+remain controlling. In particular, autonomous work does not authorize handling
+real membership data, changing production state, weakening safeguards, or
+deploying or pushing changes.
+
 ## Cost-conscious model preference
 
 Use GPT-6.1 Sol with low effort (owner's “Light”) for the main agent and
