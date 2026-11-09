@@ -113,6 +113,7 @@ async function main() {
   assert.match(migration, /knowledge\.source\.approve\.institutional[^\n]+FALSE/);
   assert.match(migration, /CREATE UNIQUE INDEX ai_knowledge_one_published_version/);
   assert.match(migration, /ai_knowledge_reviews_no_row_mutation/);
+  assert.match(migration, /ai_knowledge_conflict_sources_no_row_mutation/);
   assert.match(priorMigration, /ai_knowledge_events_no_row_mutation/);
   assert.match(migration, /ai_knowledge_sources_no_delete/);
   assert.doesNotMatch(migration, /INSERT INTO user_permissions/i, 'migration assigns no governance grants');

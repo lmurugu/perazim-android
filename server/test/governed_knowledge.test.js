@@ -141,6 +141,20 @@ async function verifyOneMatchingConflictSourceEscalates() {
   assert.equal(result.conflicts.length, 1, 'a matched member pulls its unresolved conflict into the package');
   assert.deepEqual(result.conflicts[0].sourceIds, ['conflict-a', 'conflict-b']);
   assert.equal(result.passages.length, 2, 'both published conflict sources are returned for escalation');
+
+  const oneSideAfterWithdrawal = await K.retrieveInstitutionalContext(async sql => {
+    if (/FROM ai_knowledge_sources/.test(sql) && !/JOIN/.test(sql)) return { rows: [sourceRows[0]] };
+    if (/FROM ai_knowledge_conflict_groups/.test(sql)) return { rows: [
+      { conflict_group: 'fixture-conflict', source_id: 'conflict-a' },
+      { conflict_group: 'fixture-conflict', source_id: 'conflict-b' }
+    ] };
+    return { rows: [
+      { chunk_id: 'a'.repeat(64), source_id: 'conflict-a', source_version: 'v1', section: 'Policy', location: 'Policy A', content: a, content_hash: K.sha256(a) }
+    ] };
+  }, 'church policy');
+  assert.equal(oneSideAfterWithdrawal.passages.length, 1, 'withdrawn material is not retrieved');
+  assert.deepEqual(oneSideAfterWithdrawal.conflicts, [{ conflictGroup: 'fixture-conflict', sourceIds: ['conflict-a','conflict-b'] }],
+    'a still-published side of an unresolved group remains conflicted when its counterpart is withdrawn or superseded');
 }
 
 async function verifyIngestionDefaultsToUnverified() {

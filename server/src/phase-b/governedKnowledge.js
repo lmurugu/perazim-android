@@ -163,7 +163,7 @@ function rankChunks(query, chunks, sources, options = {}) {
     .slice(0, Number.isSafeInteger(options.maxResults) && options.maxResults > 0 ? options.maxResults : MAX_CONTEXT_PASSAGES);
 }
 
-function buildContextPackage(query, ranked) {
+function buildContextPackage(query, ranked, unresolvedConflicts = []) {
   let total = 0;
   const passages = [];
   const groupSources = new Map();
@@ -173,7 +173,13 @@ function buildContextPackage(query, ranked) {
     if (!groupSources.has(group)) groupSources.set(group, new Set());
     groupSources.get(group).add(item.source.sourceId);
   }
-  const conflictGroups = [...groupSources.entries()].filter(([, ids]) => ids.size > 1);
+  const resolvedConflictMap = new Map([...groupSources.entries()].filter(([, ids]) => ids.size > 1));
+  const matchedGroups = new Set(ranked.map(item => item.source.conflictGroup).filter(Boolean));
+  for (const conflict of unresolvedConflicts) {
+    if (!matchedGroups.has(conflict.conflictGroup) || !Array.isArray(conflict.sourceIds) || conflict.sourceIds.length < 2) continue;
+    resolvedConflictMap.set(conflict.conflictGroup, new Set(conflict.sourceIds));
+  }
+  const conflictGroups = [...resolvedConflictMap.entries()];
   const contestedIds = new Set(conflictGroups.flatMap(([, ids]) => [...ids]));
   const prioritized = [];
   const seenContested = new Set();
@@ -345,6 +351,23 @@ async function retrieveInstitutionalContext(queryFn, question) {
   const sourceRows = sources.map(s => byIdVersion.get(`${s.source_id}\0${s.version}`));
   const options = { purpose: INSTITUTIONAL_PURPOSE, audience: 'PUBLIC', maxResults: MAX_RETRIEVAL_CANDIDATES };
   const ranked = rankChunks(question, chunks, sourceRows, options);
+  let unresolvedConflicts = [];
+  const matchedConflictGroups = [...new Set(ranked.map(item => item.source.conflictGroup).filter(Boolean))];
+  if (matchedConflictGroups.length) {
+    const { rows } = await queryFn(
+      `SELECT g.conflict_group, cs.source_id
+         FROM ai_knowledge_conflict_groups g
+         JOIN ai_knowledge_conflict_sources cs ON cs.conflict_group=g.conflict_group
+        WHERE g.status='UNRESOLVED' AND g.conflict_group = ANY($1::text[])
+        ORDER BY g.conflict_group, cs.source_id`, [matchedConflictGroups]
+    );
+    const members = new Map();
+    for (const row of rows) {
+      if (!members.has(row.conflict_group)) members.set(row.conflict_group, new Set());
+      members.get(row.conflict_group).add(row.source_id);
+    }
+    unresolvedConflicts = [...members.entries()].map(([conflictGroup, ids]) => ({ conflictGroup, sourceIds: [...ids] }));
+  }
   const activeConflictGroups = new Set(ranked.map(item => item.source.conflictGroup).filter(Boolean));
   const included = new Set(ranked.map(item => `${item.sourceId}\0${item.sourceVersion}\0${item.chunkId}`));
   for (const chunk of chunks) {
@@ -355,7 +378,7 @@ async function retrieveInstitutionalContext(queryFn, question) {
       included.add(key);
     }
   }
-  return buildContextPackage(question, ranked);
+  return buildContextPackage(question, ranked, unresolvedConflicts);
 }
 
 module.exports = {

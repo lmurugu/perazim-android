@@ -92,6 +92,25 @@ CREATE TABLE ai_knowledge_conflict_sources (
     FOREIGN KEY (source_id, source_version) REFERENCES ai_knowledge_sources(source_id, version)
 );
 
+CREATE FUNCTION reject_ai_knowledge_conflict_mutation() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION '% is immutable conflict evidence', TG_TABLE_NAME;
+END;
+$$;
+CREATE TRIGGER ai_knowledge_conflict_groups_no_row_mutation
+    BEFORE UPDATE OR DELETE ON ai_knowledge_conflict_groups
+    FOR EACH ROW EXECUTE FUNCTION reject_ai_knowledge_conflict_mutation();
+CREATE TRIGGER ai_knowledge_conflict_groups_no_truncate
+    BEFORE TRUNCATE ON ai_knowledge_conflict_groups
+    FOR EACH STATEMENT EXECUTE FUNCTION reject_ai_knowledge_conflict_mutation();
+CREATE TRIGGER ai_knowledge_conflict_sources_no_row_mutation
+    BEFORE UPDATE OR DELETE ON ai_knowledge_conflict_sources
+    FOR EACH ROW EXECUTE FUNCTION reject_ai_knowledge_conflict_mutation();
+CREATE TRIGGER ai_knowledge_conflict_sources_no_truncate
+    BEFORE TRUNCATE ON ai_knowledge_conflict_sources
+    FOR EACH STATEMENT EXECUTE FUNCTION reject_ai_knowledge_conflict_mutation();
+
 ALTER TABLE ai_knowledge_events
     DROP CONSTRAINT ai_knowledge_events_event_type_check,
     ADD CONSTRAINT ai_knowledge_events_event_type_check CHECK (event_type IN (

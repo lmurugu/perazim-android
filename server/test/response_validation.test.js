@@ -11,7 +11,8 @@ const source = { sourceId: 'constitution-fixture', title: 'Synthetic constitutio
 const scripture = { reference: 'Genesis 1:1', book: 'Genesis', chapter: 1, startVerse: 1, endVerse: 1,
   translationId: 'KJV', corpusId: 'synthetic-kjv',
   corpusVersion: 'fixture-v1', corpusHash: 'a'.repeat(64), text: 'In the beginning God created the heaven and the earth.',
-  verses: [{ verse: 1, text: 'In the beginning God created the heaven and the earth.', contentHash: 'b'.repeat(64) }] };
+  verses: [{ verse: 1, text: 'In the beginning God created the heaven and the earth.',
+    contentHash: sha256('In the beginning God created the heaven and the earth.') }] };
 const context = { passages: [source], scriptures: [scripture] };
 function candidate(overrides = {}) {
   return { category: 'PASSAGE_INTERPRETATION', answer: 'The passage opens with “In the beginning”.',
@@ -37,6 +38,20 @@ assert.equal(V.validateModelResponse(candidate({ scriptureReferences: [{ ...cand
 assert.equal(V.validateModelResponse(candidate({ answer: 'The passage says “unsupported quotation”.' }), context).code, 'UNSUPPORTED_QUOTATION');
 const noOfficial = { ...context, passages: [{ ...source, authorityClass: 'PERSONAL_THEOLOGY' }] };
 assert.equal(V.validateModelResponse(candidate({ answer: 'The church officially teaches this rule.' }), noOfficial).code, 'UNSUPPORTED_INSTITUTIONAL_CLAIM');
+const misleadingOfficial = { ...context, passages: [{ ...source,
+  text: 'Synthetic policy: marriage and ministry receive review. This section says nothing about member eligibility.',
+  contentHash: sha256('Synthetic policy: marriage and ministry receive review. This section says nothing about member eligibility.') }] };
+assert.equal(V.validateModelResponse(candidate({ answer: 'The church officially requires marriage and ministry for member eligibility.' }), misleadingOfficial).code,
+  'UNSUPPORTED_INSTITUTIONAL_CLAIM', 'lexical overlap cannot establish official policy support');
+assert.equal(V.validateModelResponse(candidate({ answer: 'According to Perazim policy, this rule is required.' }), context).code,
+  'UNSUPPORTED_INSTITUTIONAL_CLAIM', 'institutional claims framed as source attribution fail closed');
+assert.equal(V.validateModelResponse(candidate({ answer: 'Perazim says this is the only permitted view.' }), context).code,
+  'UNSUPPORTED_INSTITUTIONAL_CLAIM', 'institutional claims phrased as attribution fail closed');
+assert.equal(V.validateModelResponse(candidate(), { ...context, passages: [{ ...source, text: 'Tampered evidence.' }] }).code,
+  'UNVERIFIED_SOURCE_REFERENCE', 'a changed source passage cannot retain its old content hash');
+assert.equal(V.validateModelResponse(candidate(), { ...context, scriptures: [{ ...scripture,
+  verses: [{ ...scripture.verses[0], contentHash: 'c'.repeat(64) }] }] }).code,
+  'UNVERIFIED_SCRIPTURE_REFERENCE', 'a corrupted verse hash fails closed');
 assert.equal(V.validateModelResponse(candidate({ answer: 'You should stop taking your medication.' }), context).code, 'PROHIBITED_ADVICE');
 assert.equal(V.validateModelResponse(candidate({ answer: 'In my pastoral experience, this is true.' }), context).code, 'FABRICATED_TESTIMONY');
 assert.equal(V.validateModelResponse('{"answer":"bad"}', context).code, 'INVALID_RESPONSE');
