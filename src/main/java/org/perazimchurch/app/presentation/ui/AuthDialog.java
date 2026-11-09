@@ -167,9 +167,9 @@ public final class AuthDialog {
         etPhone.setPadding(dp(context, 12), dp(context, 10), dp(context, 12), dp(context, 10));
         formContainer.addView(etPhone);
 
-        // 4-Digit PIN field
+        // PIN field; pilot administrator setup permits PINs up to 12 digits.
         TextView lblPin = new TextView(context);
-        lblPin.setText("4-Digit Security PIN");
+        lblPin.setText("Security PIN (4–12 digits)");
         lblPin.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         lblPin.setTextSize(12);
         LinearLayout.LayoutParams pinLp = new LinearLayout.LayoutParams(
@@ -183,7 +183,7 @@ public final class AuthDialog {
         etPin.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         etPin.setTextSize(16);
         etPin.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
-        etPin.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(6) });
+        etPin.setFilters(new InputFilter[]{ new InputFilter.LengthFilter(12) });
         etPin.setBackground(PerazimTheme.createCardGradient(dp(context, 8), dp(context, 1)));
         etPin.setPadding(dp(context, 12), dp(context, 10), dp(context, 12), dp(context, 10));
         formContainer.addView(etPin);
