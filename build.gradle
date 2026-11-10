@@ -6,6 +6,35 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+// Explicit API origin injection; an omitted property leaves the variant offline.
+def configuredApiBaseUrl = { String propertyName, boolean allowLocalHttp, boolean pilotProduction ->
+    def value = providers.gradleProperty(propertyName).orElse('').get().trim()
+    if (!value) return ''
+    def uri
+    try {
+        uri = new java.net.URI(value)
+    } catch (java.net.URISyntaxException ignored) {
+        throw new GradleException("Invalid URL for ${propertyName}")
+    }
+    def host = uri.host?.toLowerCase(java.util.Locale.ROOT)
+    def loopback = host in ['localhost', '127.0.0.1', '10.0.2.2']
+    def permittedHttp = allowLocalHttp && loopback && uri.scheme == 'http'
+    if (!host || uri.rawUserInfo || uri.rawQuery || uri.rawFragment ||
+            (uri.rawPath && uri.rawPath != '/') ||
+            !(uri.scheme == 'https' || permittedHttp)) {
+        throw new GradleException("${propertyName} must be an HTTPS origin (local debug may use HTTP loopback)")
+    }
+    if (pilotProduction && (loopback || uri.port != -1 || host.endsWith('.ts.net') ||
+            host == 'trycloudflare.com' || host.endsWith('.trycloudflare.com') ||
+            host.endsWith('.invalid'))) {
+        throw new GradleException("Pilot release requires an approved stable public HTTPS origin")
+    }
+    return value.endsWith('/') ? value.substring(0, value.length() - 1) : value
+}
+def localApiBaseUrl = configuredApiBaseUrl('perazimLocalApiBaseUrl', true, false)
+def validationApiBaseUrl = configuredApiBaseUrl('perazimValidationApiBaseUrl', false, false)
+def pilotApiBaseUrl = configuredApiBaseUrl('perazimPilotApiBaseUrl', false, true)
+
 android {
     namespace 'org.perazimchurch.app'
     compileSdk 34
@@ -49,18 +78,21 @@ android {
         }
     }
     buildTypes {
+        debug {
+            buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(localApiBaseUrl)
+        }
         validation {
             initWith debug
             applicationIdSuffix '.validation'
             versionNameSuffix '-pilot'
             matchingFallbacks = ['debug']
-            buildConfigField "String", "API_BASE_URL", "\"https://fedora.taile47793.ts.net\""
+            buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(validationApiBaseUrl)
         }
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "API_BASE_URL", "\"https://fedora.taile47793.ts.net\""
+            buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(pilotApiBaseUrl)
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
@@ -77,10 +109,29 @@ android {
     }
 }
 
-tasks.register('verifyReleaseApk', Exec) {
-    def apk = layout.buildDirectory.file('outputs/apk/release/app-release.apk')
-    inputs.file(apk)
-    commandLine 'python3', file('scripts/inspect_release_apk.py').absolutePath, apk.get().asFile.absolutePath
+tasks.register('verifyReleaseApk') {
+    group = 'verification'
+    description = 'Inspect signed release or explicitly unsigned CI release APK'
+    doLast {
+        def releaseDir = layout.buildDirectory.dir('outputs/apk/release').get().asFile
+        def signedApk = new File(releaseDir, 'app-release.apk')
+        def unsignedApk = new File(releaseDir, 'app-release-unsigned.apk')
+        if (signedApk.isFile() == unsignedApk.isFile()) {
+            throw new GradleException('Expected exactly one release APK: signed OR unsigned')
+        }
+        def inspector = file('scripts/inspect_release_apk.py').absolutePath
+        if (signedApk.isFile()) {
+            if (!keystorePropertiesFile.exists() || !pilotApiBaseUrl) {
+                throw new GradleException('Signed release requires release keystore and -PperazimPilotApiBaseUrl')
+            }
+            project.exec { commandLine 'python3', inspector, signedApk.absolutePath }
+        } else {
+            if (keystorePropertiesFile.exists()) {
+                throw new GradleException('Release signing was configured but only an unsigned APK exists')
+            }
+            project.exec { commandLine 'python3', inspector, '--ci-unsigned', unsignedApk.absolutePath }
+        }
+    }
 }
 
 tasks.configureEach { task ->

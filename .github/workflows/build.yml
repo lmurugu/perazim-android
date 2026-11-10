@@ -15,6 +15,9 @@ on:
       - "phase-**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build & Test Android App
@@ -22,17 +25,17 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools'
 
@@ -45,27 +48,33 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Build Release APK
+      - name: Build and inspect unsigned CI Release APK
         run: ./gradlew assembleRelease --stacktrace
+
+      - name: Assert release artifact is unsigned in CI
+        run: |
+          test ! -e keystore.properties
+          test -f build/outputs/apk/release/app-release-unsigned.apk
+          test ! -e build/outputs/apk/release/app-release.apk
 
       - name: Upload Test Reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unit-test-reports
           path: "**/build/reports/tests/testDebugUnitTest/"
           if-no-files-found: warn
 
       - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: perazim-debug-apk
           path: "**/build/outputs/apk/debug/*.apk"
           if-no-files-found: warn
 
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
+      - name: Upload unsigned CI release (NOT FOR DISTRIBUTION)
+        uses: actions/upload-artifact@v7
         with:
-          name: perazim-release-apk
-          path: "**/build/outputs/apk/release/*.apk"
-          if-no-files-found: warn
+          name: perazim-ci-unsigned-release-NOT-FOR-DISTRIBUTION
+          path: "build/outputs/apk/release/app-release-unsigned.apk"
+          if-no-files-found: error
