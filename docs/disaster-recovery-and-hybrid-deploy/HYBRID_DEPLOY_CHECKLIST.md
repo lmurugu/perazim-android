@@ -9,7 +9,7 @@
 - [ ] Name accountable owner, backend operator, church privacy officer, finance verifier, and two independent recovery custodians.
 - [ ] Obtain written approval before publishing any API hostname/tunnel, changing provider configuration, using real member data, registering a Daraja callback, enabling AI/FCM, or distributing an APK.
 - [ ] Select ONE authoritative PostgreSQL instance and document hostname, database name, role, migration version, and approved backup destination in a private operations inventory.
-- [ ] Record source commit SHA, GitHub branch, JDK/Gradle/Android SDK versions, Node version, PostgreSQL version, test fixture IDs, and build SHA-256.
+- [ ] Verify [reconstruction-manifest.json](reconstruction-manifest.json) against the source commit; record JDK/Gradle/Android SDK, Node, PostgreSQL, Docker/Compose, age, Python, test fixtures, and artifact SHA-256. Pin floating versions in private recovery evidence.
 - [ ] Do not alter existing main app data, replace a signed main package, or use a production member database for tests. Follow root AGENTS.md and the Phase B release checklist.
 - [ ] Never put secrets, real donor records, member contact files, C2B receipts, APK signing keys, or database dumps in Git.
 
@@ -59,7 +59,15 @@ npm ci
 npm run test:unit
 ~~~
 - [ ] For full PostgreSQL-backed tests, first create a uniquely named disposable database with disposable credentials; verify each test script's connection guard and never point it to the running member database. Then run the selected test targets from server/package.json (test:pg, test:community, test:migrations, test:privacy, test:phase-e-independent). Record exact commands, database fixture, pass/fail, and test report paths.
-- [ ] Review pre-existing GitHub CI run 42645689094: Android unit tests and debug build passed; assembleRelease failed at verifyReleaseApk because the expected unsigned/no-keystore release artifact was absent. Treat this as a known baseline blocker, not a regression introduced by documentation. Do not bypass release inspection or insert signing secrets into public CI.
+- [ ] Review run 42871564178: unit tests, debug and `assembleRelease` packaging passed; root Gradle `verifyReleaseApk` failed because it expected signed `build/outputs/apk/release/app-release.apk` without a keystore. CI emits `app-release-unsigned.apk`. Verify the amended workflow explicitly inspects unsigned output without weakening signed-release verification; never rename unsigned to signed.
+- [ ] Verify `.github/workflows/build.yml` uses maintained actions and labels the unsigned release artifact NOT FOR DISTRIBUTION. A green CI build is not a signed release, physical-device test, or production approval.
+
+### Build environment contract (no embedded Tailscale/Cloudflare URL)
+
+- Local `debug`: `./gradlew assembleDebug -PperazimLocalApiBaseUrl=http://127.0.0.1:3000` only for isolated loopback testing; Android cleartext policy may still block HTTP, so prefer HTTPS or a separately reviewed debug-only exception.
+- `validation` (`.validation` app ID): `./gradlew assembleValidation -PperazimValidationApiBaseUrl=https://<approved-validation-host>`; HTTPS Tailscale is acceptable only for isolated VPN testing.
+- Pilot-production `release` (original app ID): `./gradlew assembleRelease -PperazimPilotApiBaseUrl=https://<approved-stable-public-host>` with original protected signing configuration. CI without a keystore emits **unsigned** output only; signed releases without a pilot origin fail verification.
+- These commands do not authorize API exposure, tunnel deployment, signing, or replacing the member app. Test mobile-data HTTPS access independently.
 
 ### Day 3 — local backend, synthetic only
 
@@ -92,7 +100,7 @@ curl --fail --silent http://127.0.0.1:3000/api/health
 
 ### Days 6–7 — offline sync and AI
 
-- [ ] Preserve Room v6 and its migration history; new tables require a numbered v6->v7 migration, exported schema, upgrade fixtures, and rollback policy. Never use destructive migration to introduce new tables.
+- [ ] Preserve Room v6 and its migration history; every post-pilot schema change requires a numbered, non-destructive migration (starting v6->v7), exported Room schema, old-version upgrade fixtures, and rollback/compatibility policy. Existing fallbackToDestructiveMigration is a legacy risk, NOT an acceptable way to migrate pilot member data. Preserve queues, Bible, preferences and account records.
 - [ ] Audit SyncQueueEntity/SyncQueueDao and server/src/routes/sync.js; record supported mutation types, idempotency, reject reasons, retry caps, timestamps, and authority boundaries.
 - [ ] Add WorkManager for network-constrained background retries only after design approval; WorkManager is best-effort, not an exact real-time schedule. Foreground/manual refresh remains available.
 - [ ] Test repeated mutation IDs, simultaneous client updates, duplicate Amens, server restart, 401/403/429/5xx, network interruption after server commit but before client acknowledgement, and account switching.

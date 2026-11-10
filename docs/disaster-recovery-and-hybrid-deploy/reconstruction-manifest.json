@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "repository": "lmurugu/perazim-android",
+  "observedAt": "2026-11-10",
+  "observedFromBranch": "docs/disaster-recovery-and-hybrid-deploy",
+  "note": "Version inventory only; no clean-machine rebuild has been proven. Pin floating versions before production.",
+  "android": {
+    "applicationId": "org.perazimchurch.app",
+    "javaToolchain": "17",
+    "sourceCompatibility": "11",
+    "gradleWrapper": "8.5",
+    "androidGradlePlugin": "8.2.2",
+    "compileSdk": 34,
+    "minSdk": 24,
+    "targetSdk": 34,
+    "roomSchemaVersion": 6,
+    "roomRuntime": "2.6.1",
+    "androidBuildTools": {
+      "version": null,
+      "status": "Not pinned; record resolved SDK build-tools"
+    },
+    "buildTargets": {
+      "local": {
+        "variant": "debug",
+        "apiProperty": "perazimLocalApiBaseUrl",
+        "defaultOrigin": ""
+      },
+      "validation": {
+        "variant": "validation",
+        "apiProperty": "perazimValidationApiBaseUrl",
+        "defaultOrigin": ""
+      },
+      "pilotProduction": {
+        "variant": "release",
+        "apiProperty": "perazimPilotApiBaseUrl",
+        "defaultOrigin": "",
+        "signedReleaseRequiresApprovedHttpsOrigin": true
+      }
+    },
+    "ciUnsignedArtifact": "build/outputs/apk/release/app-release-unsigned.apk",
+    "signedArtifact": "build/outputs/apk/release/app-release.apk",
+    "releaseInspector": "scripts/inspect_release_apk.py"
+  },
+  "backend": {
+    "nodeImage": "node:24-alpine",
+    "nodePin": "Major only; image digest not pinned",
+    "postgresImage": "postgres:15-alpine",
+    "postgresPin": "Major only; image digest not pinned",
+    "expressDependency": "^4.19.2",
+    "pgDependency": "^8.11.3",
+    "packageLock": "server/package-lock.json",
+    "composeFile": "server/docker-compose.yml"
+  },
+  "operatorTools": {
+    "docker": {
+      "version": null,
+      "status": "Pin tested version"
+    },
+    "dockerCompose": {
+      "version": null,
+      "status": "Pin tested version"
+    },
+    "python3": {
+      "version": null,
+      "status": "Record tested version"
+    },
+    "age": {
+      "version": null,
+      "status": "Record tested version"
+    },
+    "cloudflared": {
+      "version": null,
+      "status": "Optional, approval required"
+    }
+  },
+  "recoveryRequirements": [
+    "Record source commit SHA and artifact SHA-256",
+    "Keep signing key and age private identity in separate escrow",
+    "Encrypt and mirror database/media backups off-host",
+    "Restore to isolated PostgreSQL before cutover",
+    "Test non-destructive Room migrations against old fixtures",
+    "Verify physical Infinix Android 11 validation build before pilot"
+  ]
+}

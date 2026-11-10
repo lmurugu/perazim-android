@@ -82,10 +82,17 @@ def inspect_database(zf, entry, tempdir):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: inspect_release_apk.py <apk>")
+    ci_unsigned = len(sys.argv) == 3 and sys.argv[1] == "--ci-unsigned"
+    if ci_unsigned:
+        apk = Path(sys.argv[2])
+        if apk.name != "app-release-unsigned.apk":
+            print("FAIL: CI unsigned mode requires the explicitly unsigned release artifact")
+            return 2
+    elif len(sys.argv) == 2:
+        apk = Path(sys.argv[1])
+    else:
+        print("Usage: inspect_release_apk.py [--ci-unsigned] <apk>")
         return 2
-    apk = Path(sys.argv[1])
     if not apk.is_file():
         print("FAIL: release APK is missing")
         return 1
@@ -169,7 +176,10 @@ def main():
         failures.append("apksigner is unavailable; signature check could not run")
     else:
         verified = run([signer, "verify", str(apk)])
-        if verified.returncode != 0:
+        if ci_unsigned:
+            if verified.returncode == 0:
+                failures.append("CI unsigned artifact is unexpectedly signed")
+        elif verified.returncode != 0:
             failures.append("APK signature verification failed")
 
     if failures:
@@ -177,8 +187,12 @@ def main():
             print("FAIL:", failure)
         print("APK inspection failed; no detected values are displayed.")
         return 1
-    print("PASS: release APK inspection; no prohibited values detected or displayed.")
-    print("PASS: manifest transport policy and APK signature verified.")
+    if ci_unsigned:
+        print("PASS: explicitly unsigned CI release APK inspected; signature absence confirmed.")
+        print("NOT FOR DISTRIBUTION: unsigned CI artifact is not a signed release.")
+    else:
+        print("PASS: signed release APK inspection; no prohibited values detected or displayed.")
+        print("PASS: manifest transport policy and APK signature verified.")
     print("PASS: 20 default avatar files match their source SHA-256; privacy documents remain marked DRAFT.")
     print(f"PASS: {len(db_entries)} bundled SQLite databases checked for restricted records.")
     return 0

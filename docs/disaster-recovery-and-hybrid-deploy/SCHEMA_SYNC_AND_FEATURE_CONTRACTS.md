@@ -115,14 +115,16 @@ CREATE TABLE payment_reconciliation_events (
 );
 ~~~
 
-This sketch is intentionally incomplete until finance/privacy signoff: define secure provider event authentication, permitted nullable event IDs, external receipt matching, donor-account reference rules, amount mismatch, C2B reconciliation, ledger immutability, chargeback/refund handling, role separation, audit retention, encryption, and migrations. Use a separate append-only payment evidence store; no generic sync endpoint may write VERIFIED.
+This sketch is intentionally incomplete until finance/privacy signoff: define secure provider event admission, permitted nullable event IDs, external receipt matching, donor-account reference rules, amount mismatch, C2B reconciliation, ledger immutability, chargeback/refund handling, role separation, audit retention, encryption, and migrations.
+
+**Daraja C2B trust boundary:** Standard Safaricom C2B callbacks have no documented inbound HMAC signature. A callback alone is neither a cryptographically signed receipt nor independent proof of settlement. Use a high-entropy, environment-specific secret in the registered HTTPS callback route (never in Git, APK or logs), strict bounded JSON schema/type checks, approved Paybill/business-number matching, unique receipt ID, immutable idempotency/replay records, duplicate/out-of-order handling, and rate limits. A route key is a bearer secret that may leak and must be rotated; optional IP allowlists are defense-in-depth, not authentication. Only transition to VERIFIED after an authorized Safaricom Transaction Status inquiry **if supported and permitted for that transaction** or independently reconciled merchant/treasury evidence, matching Paybill, amount, account reference and receipt with an auditable verifier. Otherwise remain NEEDS_REVIEW; do not assume universal Transaction Status entitlement. Use a separate append-only payment evidence store; no generic sync endpoint may write VERIFIED.
 
 ### Proposed server workflow
 
 1. Authenticated user creates a giving intent (optional; users may pay outside the app). Express creates idempotent PENDING_CONFIRMATION; app opens M-Pesa handoff.
 2. Paybill transaction occurs outside Perazim. Only the provider/merchant and church treasury can establish settlement.
-3. **If separately authorized for Daraja:** register stable HTTPS C2B confirmation/validation endpoints with merchant-owner approval. Confirm provider identity by supported controls and independent reconciliation; do not assume a callback is cryptographically signed. Rate-limit, bound payload, check Paybill, receipt uniqueness, amount, account reference, and duplicates. A publicly reachable callback endpoint needs stricter validation than a member API.
-4. Commit provider event and any status transition atomically; match a member intent only with unambiguous evidence. Unmatched receipts enter a restricted treasurer review queue; do not expose donor identity publicly.
+3. **If separately authorized for Daraja:** register stable HTTPS C2B confirmation/validation endpoints with merchant-owner approval. Require a secret route key, bounded payload/schema, unique receipt, replay defense, expected Paybill/amount/reference, and independent treasury reconciliation; there is no standard inbound C2B HMAC signature.
+4. Commit unverified callback evidence atomically; promote to VERIFIED only after independent authorized provider-status or merchant-statement reconciliation, in an auditable transaction; match a member intent only with unambiguous evidence. Unmatched receipts enter a restricted treasurer review queue; do not expose donor identity publicly.
 5. Reconcile against Safaricom merchant statements/approved independent source. A verified transaction appears in the member's authenticated private view via Express; app caches read-only server status. Corrections require dual-role audit or approved finance procedure.
 6. If Daraja is not authorized, retain M-Pesa handoff and an optional user-visible UNVERIFIED intent, with treasurer manual verification; do not advertise automated receipts.
 
@@ -151,7 +153,7 @@ Before coding, commit an OpenAPI 3.x contract and synthetic JSON fixtures for: a
 
 **No executable migration in this documentation PR.** The future migration must:
 1. Allocate next PostgreSQL numbered migration without changing checksums of 0001–0012.
-2. Allocate Room v6->v7 with exported compiler schema and synthetic v4/v5/v6 upgrade coverage; preserve queued operations, Bible, saved preferences and account data.
+2. Allocate a non-destructive Room v6->v7 migration with exported compiler schema and synthetic v4/v5/v6 upgrade coverage; preserve queued operations, Bible, saved preferences and account data. All later post-pilot schema changes require the same tested non-destructive rule; destructive fallback is not an approved migration mechanism.
 3. Implement server API and unit/integration/security tests with disposable DB.
 4. Implement Android repository/WorkManager with controlled test APK, then independently implement iOS client.
 5. Verify no old client can forge VERIFIED giving, online AI entitlement, membership, or notification recipients.

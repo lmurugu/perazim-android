@@ -1,6 +1,6 @@
 # Perazim — Hybrid Deployment and Full Reconstruction Documentation
 
-**Status:** REVIEW DRAFT — documentation only; no migration, deployment, account change, data import, or mobile release authorized by this branch.
+**Status:** REVIEW DRAFT — documentation plus scoped CI/release-build and API-endpoint configuration amendments; no migration, deployment, account change, data import, or mobile release authorized.
 **Date:** 2026-11-10
 **Baseline:** phase-B-community at cad3758e5469534c01142bbdeadc62371fa4e7f6
 **Decision:** Path 3 hybrid selected for design; operational production approval remains separate.
@@ -10,8 +10,9 @@
 1. [HYBRID_DEPLOY_CHECKLIST.md](HYBRID_DEPLOY_CHECKLIST.md) — phased 14-day acceptance plan, detailed steps, evidence gates, and capacity.
 2. [SCHEMA_SYNC_AND_FEATURE_CONTRACTS.md](SCHEMA_SYNC_AND_FEATURE_CONTRACTS.md) — proposed Room/PostgreSQL/API contracts for AI, giving, notifications, and safe sync.
 3. [DISASTER_RECOVERY_RUNBOOK.md](DISASTER_RECOVERY_RUNBOOK.md) — independent backups, from-zero restoration, signing identities, Android/iOS reconstruction, and drills.
-4. Existing authority documents: [AI Decisions Register](../PERAZIM_AI_PROJECT/DECISIONS_REGISTER.md), [AI API contracts](../PERAZIM_AI_PROJECT/16_API_AND_DATABASE_CONTRACTS.md), [Privacy and retention](../PERAZIM_AI_PROJECT/15_DATA_RETENTION_AND_PRIVACY.md), [Room migration evidence](../foundation/ROOM_MIGRATIONS.md), [Phase B release gates](../phase-b/RELEASE_CANDIDATE_OPERATIONAL_CHECKLIST.md), [Server deployment preparation](../../server/deploy/README.md), and [Phase B status](../../STATUS.md).
-5. Related but separate media-hub proposal: PR #1, https://github.com/lmurugu/perazim-android/pull/1. Its draft is NOT merged into this branch.
+4. [reconstruction-manifest.json](reconstruction-manifest.json) — machine-readable observed toolchain, floating-version gaps, and API build properties.
+5. Existing authority documents: [AI Decisions Register](../PERAZIM_AI_PROJECT/DECISIONS_REGISTER.md), [AI API contracts](../PERAZIM_AI_PROJECT/16_API_AND_DATABASE_CONTRACTS.md), [Privacy and retention](../PERAZIM_AI_PROJECT/15_DATA_RETENTION_AND_PRIVACY.md), [Room migration evidence](../foundation/ROOM_MIGRATIONS.md), [Phase B release gates](../phase-b/RELEASE_CANDIDATE_OPERATIONAL_CHECKLIST.md), [Server deployment preparation](../../server/deploy/README.md), and [Phase B status](../../STATUS.md).
+6. Related but separate media-hub proposal: PR #1, https://github.com/lmurugu/perazim-android/pull/1. Its draft is NOT merged into this branch.
 
 ## One-page system map
 
@@ -66,6 +67,13 @@ Android (existing Java/Room)             iOS (NOT YET BUILT; separate client)
 
 Repository truth supersedes an outdated screenshot, README statement, or proposed feature. In particular, STATUS.md documents prior device evidence but is not proof that the same features are enabled on the current branch/build.
 
+## CI release identity and endpoint separation
+
+- The workflow is `.github/workflows/build.yml`; root `build.gradle` owns `verifyReleaseApk`. Without a signing key, CI inspects `build/outputs/apk/release/app-release-unsigned.apk` as **UNSIGNED / NOT FOR DISTRIBUTION**. Only a keystore-backed signed `app-release.apk` may pass signed-release inspection. Never rename unsigned to imply signing.
+- API origins are injected at build time: `debug` / local uses `-PperazimLocalApiBaseUrl`, `validation` uses `-PperazimValidationApiBaseUrl`, and signed `release` / pilot-production uses `-PperazimPilotApiBaseUrl`. Omission leaves the API origin empty for offline-only CI builds; signed release verification rejects an empty pilot origin.
+- Validation may use an injected HTTPS Tailscale hostname for isolated VPN testing. Pilot production requires an owner-approved stable public HTTPS origin (e.g. a named Cloudflare Tunnel hostname), never Quick Tunnel, loopback, or Tailscale. Build URL checks do not prove reachability or owner authorization.
+- Post-pilot Room changes require tested, non-destructive numbered migrations and exported schema fixtures. Existing destructive fallback is a legacy risk, not an acceptable migration strategy.
+
 ## Non-negotiable operating rules
 
 - Closed enrollment only; never make registration or account self-claims confer membership, admin role, online AI entitlement, or finance authority.
@@ -94,4 +102,4 @@ Repository truth supersedes an outdated screenshot, README statement, or propose
 
 ## Acceptance boundary
 
-This branch creates a professional **plan and reproducibility specification**, not a rebuilt app. Release approval requires verified disposable-database restore, replay-safe sync, Android physical device evidence, security/privacy signoff, payment reconciliation proof, notification delivery tests, public HTTPS reachability where applicable, and independent iOS acceptance when built.
+This branch creates a professional **plan and reproducibility specification** plus scoped CI/build-configuration hardening, not a rebuilt or deployed app. Release approval requires verified disposable-database restore, replay-safe sync, Android physical device evidence, security/privacy signoff, payment reconciliation proof, notification delivery tests, public HTTPS reachability where applicable, and independent iOS acceptance when built.

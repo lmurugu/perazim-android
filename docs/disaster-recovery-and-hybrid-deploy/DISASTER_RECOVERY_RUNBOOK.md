@@ -19,7 +19,7 @@
 |---|---|---|---|
 | Git source + history + docs | GitHub repository, approved tags/commit SHAs | Offline encrypted git bundle or mirror on separately controlled storage | Clone from bundle, verify commit SHA and build |
 | Android release identity | Original perazim-release.jks + alias/password, app ID | Encrypted escrow with two authorized custodians | Sign a disposable release and verify update signature; NEVER publish keys |
-| Android toolchain | build.gradle, Gradle wrapper, SDK/JDK versions | Version manifest, installer checksums, dependency lock/cache where lawful | Clean build |
+| Android toolchain | root build.gradle, Gradle wrapper, SDK/JDK versions | [Reconstruction manifest](reconstruction-manifest.json), installer checksums, dependency lock/cache where lawful | Clean build |
 | PostgreSQL | One production DB, versioned server migrations | Encrypted custom-format logical dumps off-host; optionally WAL for tighter RPO | Restore into disposable DB, verify rows and migrations |
 | Server uploads | Docker uploads volume or approved object store | Encrypted object/volume backup plus manifest | Recover a synthetic attachment with access control |
 | Temporary community media | Private storage, expires_at metadata | Retain only within approved policy; no accidental indefinite archive | Expiry and access tests |
@@ -135,14 +135,15 @@ git status --porcelain
 
 ### Step 7 — rebuild Android without replacing member data
 
-- Recover exact Android source SHA, JDK 17, Android SDK 34, Gradle wrapper and dependencies.
+- Recover exact Android source SHA, JDK 17, Android SDK 34, Gradle wrapper and dependencies; verify versions and floating-version gaps against [reconstruction-manifest.json](reconstruction-manifest.json).
 - Run:
 ~~~bash
 ./gradlew testDebugUnitTest assembleDebug --stacktrace
 ~~~
 - For a release, retrieve the original signing keystore and alias/password from escrow. Build using documented signing configuration only in a protected release environment; verify APK signing identity and SHA-256.
-- The existing GitHub CI baseline has a known failure at verifyReleaseApk when the expected release APK is missing without signing setup. Fix that through a separately reviewed CI/release design; never weaken the security check to make a green badge.
-- Use the isolated .validation app for device testing. Do not uninstall, clear, downgrade, replace the main app, or change account/server endpoint without owner consent.
+- GitHub run 42871564178 failed in root Gradle `verifyReleaseApk` after unsigned `assembleRelease` packaging: the finalizer expected signed `build/outputs/apk/release/app-release.apk`. CI now inspects `app-release-unsigned.apk` explicitly as NOT FOR DISTRIBUTION, while signed releases retain mandatory signature verification. Green unsigned CI does not establish release signing or device acceptance.
+- Use the isolated .validation app for device testing. Do not uninstall, clear, downgrade, replace the main app, or change account/server endpoint without owner consent. Signed pilot builds require an injected stable HTTPS origin; validation may use injected HTTPS Tailscale for isolated VPN tests. No API origin is hardcoded in build.gradle.
+- Every post-pilot Room schema change requires a numbered non-destructive migration, exported schema, and old-version upgrade/rollback fixtures. Destructive fallback must not be used to migrate member data.
 - A lost release keystore can prevent an APK update over existing installed signatures. Plan authorized key rotation/re-enrollment or store-managed app signing where applicable; this is an identity-recovery problem, not solved by GitHub.
 
 ### Step 8 — reconstruct iOS (future deliverable, not present today)
