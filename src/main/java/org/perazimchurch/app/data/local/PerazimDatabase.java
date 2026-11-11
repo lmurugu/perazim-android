@@ -202,7 +202,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
                     "`sequenceNumber` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "`id` TEXT NOT NULL, `operationType` TEXT, `entityType` TEXT, `entityId` TEXT, " +
                     "`payloadJson` TEXT, `timestampMillis` INTEGER NOT NULL, " +
-                    "`nextAttemptAt` INTEGER NOT NULL DEFAULT 0, `status` TEXT, " +
+                    "`nextAttemptAt` INTEGER NOT NULL, `status` TEXT, " +
                     "`retryCount` INTEGER NOT NULL, `lastError` TEXT)");
             db.execSQL("INSERT INTO `sync_queue_new` (`id`, `operationType`, `entityType`, `entityId`, `payloadJson`, `timestampMillis`, `nextAttemptAt`, `status`, `retryCount`, `lastError`) " +
                     "SELECT `id`, `operationType`, `entityType`, `entityId`, `payloadJson`, `timestampMillis`, 0, `status`, `retryCount`, `lastError` FROM `sync_queue` ORDER BY `timestampMillis` ASC, `id` ASC");

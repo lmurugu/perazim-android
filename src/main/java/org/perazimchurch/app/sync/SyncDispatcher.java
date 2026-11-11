@@ -357,7 +357,7 @@ public final class SyncDispatcher {
 
                     // Mark pending operations on failure
                     if (pageNumber == 1 && pendingMutations != null) {
-                        boolean isPermanent = statusCode >= 400 && statusCode < 500;
+                        boolean isPermanent = statusCode >= 400 && statusCode < 500 && statusCode != 408;
                         for (SyncQueueEntity item : pendingMutations) {
                             if (isPermanent) {
                                 queueManager.recordPermanentFailure(item.getId(), "HTTP_" + statusCode, errorMessage);
