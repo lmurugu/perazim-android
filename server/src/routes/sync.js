@@ -130,6 +130,8 @@ router.post('/', optionalAuth, async (req, res) => {
           else rejectedMutations.push({ id, reason: outcome.reason, message: outcome.message });
         } catch (itemErr) {
           console.error('Sync mutation transaction rolled back:', itemErr.message);
+          // The client receives PROCESSING_ERROR; business data, sync_events, and
+          // the receipt share this transaction, so retrying reprocesses the mutation.
           rejectedMutations.push({ id: m && m.id, reason: 'PROCESSING_ERROR', message: 'Mutation was not applied; retry is safe' });
         }
       }
