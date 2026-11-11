@@ -27,7 +27,7 @@ jobs:
           arch: x86_64
           target: google_apis
           script: >-
-            ./gradlew connectedDebugAndroidTest
+            ./gradlew connectedValidationAndroidTest
             -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.data.local.DatabaseEncryptionMigrationTest,org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest
             --stacktrace
       - name: Upload instrumentation reports
