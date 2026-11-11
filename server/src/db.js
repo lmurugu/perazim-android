@@ -87,7 +87,7 @@ async function initDb() {
         pool = null;
         isPostgres = false;
       }
-      console.error('❌ FATAL: PostgreSQL connection failed with DATABASE_URL:', err.message);
+      console.error('❌ FATAL: PostgreSQL connection failed with DATABASE_URL');
       // NEVER silently fall back to memory store when DATABASE_URL was explicitly provided
       if (isProd || !allowMemory) {
         throw new Error(`Database connection failed: ${err.message}. Refusing to fall back to transient memory.`);

@@ -192,7 +192,7 @@ public final class SyncDispatcher {
                                 if (SyncQueueManager.isPermanentFailure(reason, -1)) {
                                     // Permanent rejection: preserve user content/draft in queue, mark FAILED
                                     queueManager.recordPermanentFailure(rejId, reason, message);
-                                    Log.w(TAG, "Permanent mutation rejection for item " + rejId + " [" + reason + "]: " + message);
+                                    Log.w(TAG, "Permanent sync mutation rejected; details retained for the member's local retry state.");
                                 } else {
                                     // Transient failure: retry with exponential backoff
                                     queueManager.recordFailure(rejId, "[" + reason + "] " + message, true);
@@ -354,7 +354,7 @@ public final class SyncDispatcher {
             @Override
             public void onError(int statusCode, @NonNull String errorMessage) {
                 EXECUTOR.execute(() -> {
-                    Log.w(TAG, "Batch sync failed on page " + pageNumber + " (HTTP " + statusCode + "): " + errorMessage);
+                    Log.w(TAG, "Batch sync failed on page " + pageNumber + " (HTTP " + statusCode + ").");
 
                     // Mark pending operations on failure
                     if (pageNumber == 1 && pendingMutations != null) {

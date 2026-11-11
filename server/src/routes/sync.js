@@ -129,7 +129,7 @@ router.post('/', optionalAuth, async (req, res) => {
           if (outcome && outcome.ok) syncedIds.push(id);
           else rejectedMutations.push({ id, reason: outcome.reason, message: outcome.message });
         } catch (itemErr) {
-          console.error('Sync mutation transaction rolled back:', itemErr.message);
+          console.error('Sync mutation transaction rolled back');
           // The client receives PROCESSING_ERROR; business data, sync_events, and
           // the receipt share this transaction, so retrying reprocesses the mutation.
           rejectedMutations.push({ id: m && m.id, reason: 'PROCESSING_ERROR', message: 'Mutation was not applied; retry is safe' });
@@ -211,7 +211,7 @@ router.post('/', optionalAuth, async (req, res) => {
       updatedPrayers: sanitizedPrayers
     });
   } catch (err) {
-    console.error('Batch sync error:', err);
+    console.error('Batch sync error');
     return res.status(500).json({ error: 'Server error during batch sync' });
   }
 });

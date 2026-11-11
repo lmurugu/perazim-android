@@ -35,7 +35,7 @@ router.get('/', optionalAuth, async (req, res) => {
     const prayers = (result.rows || []).map(sanitizePrayer);
     return res.json({ prayers });
   } catch (err) {
-    console.error('Fetch prayers error:', err);
+    console.error('Fetch prayers error');
     return res.status(500).json({ error: 'Server error loading prayers' });
   }
 });
@@ -76,7 +76,7 @@ router.post('/', optionalAuth, async (req, res) => {
 
     return res.status(201).json({ prayer: sanitizePrayer(created) });
   } catch (err) {
-    console.error('Create prayer error:', err);
+    console.error('Create prayer error');
     return res.status(500).json({ error: 'Server error submitting prayer' });
   }
 });
@@ -105,7 +105,7 @@ router.post('/:id/amen', optionalAuth, async (req, res) => {
 
     return res.json({ success: true, prayerId, inserted: result.inserted });
   } catch (err) {
-    console.error('Amen prayer error:', err);
+    console.error('Amen prayer error');
     return res.status(500).json({ error: 'Server error amening prayer' });
   }
 });
@@ -134,7 +134,7 @@ router.post('/:id/testimony', requireAuth, async (req, res) => {
 
     return res.json({ success: true, prayerId, testimony: testimony.trim() });
   } catch (err) {
-    console.error('Prayer testimony error:', err);
+    console.error('Prayer testimony error');
     return res.status(500).json({ error: 'Server error recording testimony' });
   }
 });

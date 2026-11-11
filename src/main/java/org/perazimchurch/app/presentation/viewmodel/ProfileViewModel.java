@@ -156,7 +156,7 @@ public class ProfileViewModel extends ViewModel {
                     postCallback(() -> callback.accept(data));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading saved content", e);
+                Log.e(TAG, "Error loading saved content");
                 savedContentState.postValue(UiState.error(e.getMessage() != null ? e.getMessage() : "Failed to load saved content"));
                 if (callback != null) {
                     SavedContentData empty = new SavedContentData(

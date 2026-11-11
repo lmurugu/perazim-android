@@ -77,7 +77,7 @@ public class ContentDataSeeder {
             seedReflectionsIfNeeded(context, db);
             Log.i(TAG, "ContentDataSeeder seeding process completed successfully.");
         } catch (Exception e) {
-            Log.e(TAG, "Error during content seeding: " + e.getMessage(), e);
+            Log.e(TAG, "Error during content seeding", e);
             throw new RuntimeException("Content seeding failed: " + e.getMessage(), e);
         }
     }
