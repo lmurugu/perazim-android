@@ -165,6 +165,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.room:room-runtime:2.6.1'
+    implementation 'net.zetetic:sqlcipher-android:4.16.0@aar'
+    implementation 'androidx.sqlite:sqlite:2.6.2'
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.zxing:core:3.5.3'

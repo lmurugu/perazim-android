@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
 
 import org.perazimchurch.app.data.local.converter.Converters;
 import org.perazimchurch.app.data.local.dao.AnnouncementDao;
@@ -216,14 +217,16 @@ public abstract class PerazimDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (PerazimDatabase.class) {
                 if (INSTANCE == null) {
+                    Context appContext = context.getApplicationContext();
+                    byte[] databaseKey = DatabaseEncryptionManager.prepareDatabase(
+                            appContext, DATABASE_NAME, "database/perazim_database.db");
                     INSTANCE = Room.databaseBuilder(
-                            context.getApplicationContext(),
+                            appContext,
                             PerazimDatabase.class,
                             DATABASE_NAME
                     )
-                    .createFromAsset("database/perazim_database.db")
+                    .openHelperFactory(new SupportOpenHelperFactory(databaseKey))
                     .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
-                    .fallbackToDestructiveMigration()
                     .build();
                 }
             }
