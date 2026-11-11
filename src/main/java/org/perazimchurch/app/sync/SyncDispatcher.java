@@ -82,8 +82,7 @@ public final class SyncDispatcher {
                 if (authToken != null && !guestSession) {
                     for (SyncQueueEntity item : queueManager.getPendingOperations(0)) {
                         // Legacy unowned drafts are retained for manual recovery, never attributed to another member.
-                        if (syncUserId.equals(SyncQueueManager.ownerOf(item)) && pending.size() < 25
-                                && item.getTimestampMillis() <= System.currentTimeMillis()) pending.add(item);
+                        if (syncUserId.equals(SyncQueueManager.ownerOf(item)) && pending.size() < 25) pending.add(item);
                     }
                 }
                 JSONArray mutationsArray = new JSONArray();
@@ -204,7 +203,7 @@ public final class SyncDispatcher {
                             for (SyncQueueEntity item : pendingMutations) {
                                 if (!processedIds.contains(item.getId())) {
                                     Log.w(TAG, "Mutation " + item.getId() + " unacknowledged by server; scheduling retry.");
-                                    queueManager.recordFailure(item.getId(), "Unacknowledged in batch response", true);
+                                    queueManager.recordTransportFailure(item.getId(), "Unacknowledged in batch response");
                                 }
                             }
                         }
@@ -358,12 +357,12 @@ public final class SyncDispatcher {
 
                     // Mark pending operations on failure
                     if (pageNumber == 1 && pendingMutations != null) {
-                        boolean isPermanent = SyncQueueManager.isPermanentFailure(errorMessage, statusCode);
+                        boolean isPermanent = statusCode >= 400 && statusCode < 500;
                         for (SyncQueueEntity item : pendingMutations) {
                             if (isPermanent) {
                                 queueManager.recordPermanentFailure(item.getId(), "HTTP_" + statusCode, errorMessage);
                             } else {
-                                queueManager.recordFailure(item.getId(), "HTTP " + statusCode + ": " + errorMessage, true);
+                                queueManager.recordTransportFailure(item.getId(), "HTTP " + statusCode + ": " + errorMessage);
                             }
                         }
                     }

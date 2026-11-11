@@ -92,6 +92,10 @@ public class SyncQueueManager {
                 String status = existingById.getStatus();
                 if (SyncStatus.PENDING.name().equalsIgnoreCase(status)
                         || SyncStatus.SYNCING.name().equalsIgnoreCase(status)) {
+                    if (SyncStatus.PENDING.name().equalsIgnoreCase(status)) {
+                        existingById.setPayloadJson(payloadJson);
+                        syncQueueDao.update(existingById);
+                    }
                     return existingById.getId();
                 }
             }
@@ -101,6 +105,10 @@ public class SyncQueueManager {
         if (entityType != null && entityId != null && operationType != null) {
             SyncQueueEntity existingByEntity = syncQueueDao.findPendingOrSyncing(entityType, entityId, operationType);
             if (existingByEntity != null && (owner == null || owner.equals(ownerOf(existingByEntity)))) {
+                if (SyncStatus.PENDING.name().equalsIgnoreCase(existingByEntity.getStatus())) {
+                    existingByEntity.setPayloadJson(payloadJson);
+                    syncQueueDao.update(existingByEntity);
+                }
                 return existingByEntity.getId();
             }
         }
@@ -137,17 +145,17 @@ public class SyncQueueManager {
     }
 
     /**
-     * Fetches pending operations ordered by timestamp.
+     * Fetches due pending operations in their original enqueue order.
      *
      * @param limit Maximum number of records to return. If <= 0, returns all pending items.
      * @return List of pending SyncQueueEntity items.
      */
     public List<SyncQueueEntity> getPendingOperations(int limit) {
         if (limit <= 0) {
-            List<SyncQueueEntity> items = syncQueueDao.getPendingItems();
+            List<SyncQueueEntity> items = syncQueueDao.getDuePendingItems(System.currentTimeMillis());
             return items != null ? items : Collections.emptyList();
         }
-        List<SyncQueueEntity> items = syncQueueDao.getPendingOperations(limit);
+        List<SyncQueueEntity> items = syncQueueDao.getPendingOperations(limit, System.currentTimeMillis());
         return items != null ? items : Collections.emptyList();
     }
 
@@ -204,8 +212,20 @@ public class SyncQueueManager {
         } else {
             item.setStatus(SyncStatus.PENDING.name());
             long backoffDelay = (long) Math.pow(2, newRetryCount) * BASE_BACKOFF_MILLIS;
-            item.setTimestampMillis(System.currentTimeMillis() + backoffDelay);
+        item.setNextAttemptAt(System.currentTimeMillis() + backoffDelay);
         }
+        syncQueueDao.update(item);
+    }
+
+    /** Defers transport failures without consuming the server-rejection retry budget. */
+    public synchronized void recordTransportFailure(String id, String errorMessage) {
+        if (id == null) return;
+        SyncQueueEntity item = syncQueueDao.getItemById(id);
+        if (item == null) return;
+        item.setLastError(errorMessage);
+        item.setStatus(SyncStatus.PENDING.name());
+        long delay = (long) Math.pow(2, Math.min(item.getRetryCount() + 1, MAX_RETRIES)) * BASE_BACKOFF_MILLIS;
+        item.setNextAttemptAt(System.currentTimeMillis() + delay);
         syncQueueDao.update(item);
     }
 
@@ -235,6 +255,7 @@ public class SyncQueueManager {
 
         String prefix = (reason != null && !reason.trim().isEmpty()) ? "[" + reason.trim() + "] " : "";
         String msg = (errorMessage != null && !errorMessage.trim().isEmpty()) ? errorMessage.trim() : "Permanent rejection";
+        item.setRetryCount(item.getRetryCount() + 1);
         item.setLastError(prefix + msg);
         item.setStatus(SyncStatus.FAILED.name());
         syncQueueDao.update(item);
@@ -341,7 +362,9 @@ public class SyncQueueManager {
         SyncQueueEntity item = syncQueueDao.getItemById(id);
         if (item != null) {
             item.setStatus(SyncStatus.PENDING.name());
-            item.setTimestampMillis(System.currentTimeMillis());
+            item.setNextAttemptAt(0);
+            item.setRetryCount(0);
+            item.setLastError(null);
             syncQueueDao.update(item);
         }
     }

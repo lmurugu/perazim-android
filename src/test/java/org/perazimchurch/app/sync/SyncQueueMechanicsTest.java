@@ -114,7 +114,8 @@ public class SyncQueueMechanicsTest {
         SyncQueueEntity after1 = dummyDao.getItemById(id);
         assertEquals("PENDING", after1.getStatus());
         assertEquals(1, after1.getRetryCount());
-        assertTrue("Backoff delay should advance timestamp", after1.getTimestampMillis() > initialTs);
+        assertEquals("Enqueue timestamp must not change during backoff", initialTs, after1.getTimestampMillis());
+        assertTrue("Backoff is stored separately", after1.getNextAttemptAt() > initialTs);
 
         // 2nd transient failure
         queueManager.recordFailure(id, "HTTP 503: Service Unavailable", true);
@@ -127,6 +128,39 @@ public class SyncQueueMechanicsTest {
         SyncQueueEntity after3 = dummyDao.getItemById(id);
         assertEquals("FAILED", after3.getStatus());
         assertEquals(3, after3.getRetryCount());
+    }
+
+    @Test
+    public void testTransportFailureDoesNotConsumeRetryBudgetAndDuplicateEnqueueReplacesPayload() {
+        String id = queueManager.enqueue("CREATE", "PRAYER", "prayer_same", "{\"content\":\"old\"}", null);
+        long originalTimestamp = dummyDao.getItemById(id).getTimestampMillis();
+        String duplicateId = queueManager.enqueue("CREATE", "PRAYER", "prayer_same", "{\"content\":\"new\"}", null);
+        assertEquals(id, duplicateId);
+        assertEquals("{\"content\":\"new\"}", dummyDao.getItemById(id).getPayloadJson());
+
+        queueManager.recordTransportFailure(id, "timeout");
+        queueManager.recordTransportFailure(id, "network unavailable");
+        queueManager.recordTransportFailure(id, "timeout");
+        queueManager.recordTransportFailure(id, "network unavailable");
+        SyncQueueEntity deferred = dummyDao.getItemById(id);
+        assertEquals(0, deferred.getRetryCount());
+        assertEquals("PENDING", deferred.getStatus());
+        assertEquals(originalTimestamp, deferred.getTimestampMillis());
+        assertTrue(deferred.getNextAttemptAt() > System.currentTimeMillis());
+    }
+
+    @Test
+    public void manualRetryResetsServerRejectionBudgetAndKeepsPayload() {
+        String id = queueManager.enqueue("CREATE", "PRAYER", "prayer_failed", "{\"content\":\"retained\"}", null);
+        queueManager.recordPermanentFailure(id, "FORBIDDEN", "Rejected by server");
+        assertEquals("FAILED", dummyDao.getItemById(id).getStatus());
+
+        queueManager.retry(id);
+        SyncQueueEntity retried = dummyDao.getItemById(id);
+        assertEquals("PENDING", retried.getStatus());
+        assertEquals(0, retried.getRetryCount());
+        assertEquals(0, retried.getNextAttemptAt());
+        assertEquals("{\"content\":\"retained\"}", retried.getPayloadJson());
     }
 
     /**
@@ -175,6 +209,13 @@ public class SyncQueueMechanicsTest {
         }
 
         @Override
+        public List<SyncQueueEntity> getDuePendingItems(long now) {
+            List<SyncQueueEntity> result = new ArrayList<>();
+            for (SyncQueueEntity item : getPendingItems()) if (item.getNextAttemptAt() <= now) result.add(item);
+            return result;
+        }
+
+        @Override
         public List<SyncQueueEntity> getFailedItems() {
             List<SyncQueueEntity> result = new ArrayList<>();
             for (SyncQueueEntity item : storage.values()) {
@@ -214,8 +255,8 @@ public class SyncQueueMechanicsTest {
         }
 
         @Override
-        public List<SyncQueueEntity> getPendingOperations(int limit) {
-            List<SyncQueueEntity> pending = getPendingItems();
+        public List<SyncQueueEntity> getPendingOperations(int limit, long now) {
+            List<SyncQueueEntity> pending = getDuePendingItems(now);
             return pending.size() > limit ? pending.subList(0, limit) : pending;
         }
 
@@ -267,12 +308,14 @@ public class SyncQueueMechanicsTest {
 
         private SyncQueueEntity copy(SyncQueueEntity original) {
             return new SyncQueueEntity(
+                    original.getSequenceNumber(),
                     original.getId(),
                     original.getOperationType(),
                     original.getEntityType(),
                     original.getEntityId(),
                     original.getPayloadJson(),
                     original.getTimestampMillis(),
+                    original.getNextAttemptAt(),
                     original.getStatus(),
                     original.getRetryCount(),
                     original.getLastError()

@@ -29,13 +29,16 @@ public interface SyncQueueDao {
     @Query("SELECT * FROM sync_queue WHERE id = :id LIMIT 1")
     SyncQueueEntity getItemById(String id);
 
-    @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' ORDER BY timestampMillis ASC")
+    @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' ORDER BY sequenceNumber ASC")
     List<SyncQueueEntity> getPendingItems();
 
-    @Query("SELECT * FROM sync_queue WHERE status IN ('FAILED', 'REJECTED') ORDER BY timestampMillis ASC")
+    @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' AND nextAttemptAt <= :now ORDER BY sequenceNumber ASC")
+    List<SyncQueueEntity> getDuePendingItems(long now);
+
+    @Query("SELECT * FROM sync_queue WHERE status IN ('FAILED', 'REJECTED') ORDER BY sequenceNumber ASC")
     List<SyncQueueEntity> getFailedItems();
 
-    @Query("SELECT * FROM sync_queue WHERE status = 'SYNCING' ORDER BY timestampMillis ASC")
+    @Query("SELECT * FROM sync_queue WHERE status = 'SYNCING' ORDER BY sequenceNumber ASC")
     List<SyncQueueEntity> getSyncingItems();
 
     @Query("UPDATE sync_queue SET status = 'PENDING' WHERE status = 'SYNCING'")
@@ -44,10 +47,10 @@ public interface SyncQueueDao {
     @Query("SELECT COUNT(*) FROM sync_queue WHERE status = 'PENDING'")
     int getPendingCount();
 
-    @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' ORDER BY timestampMillis ASC LIMIT :limit")
-    List<SyncQueueEntity> getPendingOperations(int limit);
+    @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' AND nextAttemptAt <= :now ORDER BY sequenceNumber ASC LIMIT :limit")
+    List<SyncQueueEntity> getPendingOperations(int limit, long now);
 
-    @Query("SELECT * FROM sync_queue WHERE entityType = :entityType AND entityId = :entityId AND operationType = :operationType AND status IN ('PENDING', 'SYNCING') LIMIT 1")
+    @Query("SELECT * FROM sync_queue WHERE entityType = :entityType AND entityId = :entityId AND operationType = :operationType AND status IN ('PENDING', 'SYNCING') ORDER BY sequenceNumber ASC LIMIT 1")
     SyncQueueEntity findPendingOrSyncing(String entityType, String entityId, String operationType);
 
     @Query("DELETE FROM sync_queue WHERE status IN ('SYNCED', 'CANCELLED') AND timestampMillis <= :olderThanMillis")

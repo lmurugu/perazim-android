@@ -57,6 +57,37 @@ public class PerazimDatabaseMigrationTest {
     }
 
     @Test
+    public void migration6To7PreservesQueuePayloadAndAddsStableSequenceAndBackoff() throws IOException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        String databaseName = uniqueName("queue_6_to_7");
+        try {
+            SupportSQLiteDatabase before = helper.createDatabase(databaseName, 6);
+            seedMessageAndDraft(before);
+            before.execSQL("INSERT INTO sync_queue " +
+                            "(id, operationType, entityType, entityId, payloadJson, timestampMillis, status, retryCount, lastError) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    new Object[]{"migration-fixture-second-draft", "UPDATE", "message", "message-2",
+                            "{\"body\":\"second draft\"}", 1700000004L, "pending", 1, "timeout"});
+            before.close();
+
+            SupportSQLiteDatabase after = helper.runMigrationsAndValidate(
+                    databaseName, 7, true, PerazimDatabase.MIGRATION_6_7);
+            assertEquals(2, scalarInt(after, "SELECT COUNT(*) FROM sync_queue"));
+            assertEquals("{\"body\":\"synthetic draft\"}", firstString(after,
+                    "SELECT payloadJson FROM sync_queue WHERE id = '" + FIXTURE_QUEUE_ID + "'"));
+            assertEquals("{\"body\":\"second draft\"}", firstString(after,
+                    "SELECT payloadJson FROM sync_queue WHERE id = 'migration-fixture-second-draft'"));
+            assertEquals(0, scalarInt(after, "SELECT COUNT(*) FROM sync_queue WHERE nextAttemptAt != 0"));
+            assertTrue("Migrated rows receive monotonically increasing enqueue sequence",
+                    scalarInt(after, "SELECT MAX(sequenceNumber) FROM sync_queue") >
+                            scalarInt(after, "SELECT MIN(sequenceNumber) FROM sync_queue"));
+            after.close();
+        } finally {
+            context.deleteDatabase(databaseName);
+        }
+    }
+
+    @Test
     public void migration4To6RunsBothRoomMigrationsAndPreservesRows() throws IOException {
         assertMigrationAndRows(4, 6,
                 PerazimDatabase.MIGRATION_4_5,
@@ -94,11 +125,11 @@ public class PerazimDatabaseMigrationTest {
             rawHelper.close();
 
             upgraded = Room.databaseBuilder(context, PerazimDatabase.class, databaseName)
-                    .addMigrations(PerazimDatabase.MIGRATION_5_6)
+                    .addMigrations(PerazimDatabase.MIGRATION_5_6, PerazimDatabase.MIGRATION_6_7)
                     .build();
             SupportSQLiteDatabase after = upgraded.getOpenHelper().getWritableDatabase();
 
-            assertEquals(6, pragmaInt(after, "user_version"));
+            assertEquals(7, pragmaInt(after, "user_version"));
             assertEquals(translationCountsBefore, translationCounts(after));
             assertFixtureRowsPreserved(after, verseId, "synthetic migration note");
             assertEquals("", firstString(after,
@@ -147,7 +178,7 @@ public class PerazimDatabaseMigrationTest {
 
             restored = Room.databaseBuilder(context, PerazimDatabase.class, restoredName).build();
             SupportSQLiteDatabase restoredDb = restored.getOpenHelper().getWritableDatabase();
-            assertEquals(6, pragmaInt(restoredDb, "user_version"));
+            assertEquals(7, pragmaInt(restoredDb, "user_version"));
             assertFixtureRowsPreserved(restoredDb, FIXTURE_VERSE_ID, "synthetic private note");
             assertEquals("Database copy must not replace the separate preferences file", 73,
                     preferences.getInt(xpKey, -1));
