@@ -215,10 +215,19 @@ async function query(sql, params = []) {
         return (a.id || '').localeCompare(b.id || '');
       });
 
-      if (lower.includes('(updated_at, id) > ($1, $2)')) {
-        const cursorTime = params[0];
-        const cursorId = params[1];
-        const limit = params[2];
+      // Keep the non-PostgreSQL test adapter aligned with the route's SQL visibility predicate.
+      const applyPrayerVisibility = (items, userIndex, adminIndex) => {
+        if (!lower.includes("visibility = 'public'")) return items;
+        const userId = params[userIndex] || null;
+        const isAdmin = params[adminIndex] === true;
+        return items.filter(prayer => prayer.visibility === 'PUBLIC' || isAdmin || (userId && prayer.author_id === userId));
+      };
+      rows = applyPrayerVisibility(rows, 0, 1);
+
+      if (lower.includes('(updated_at, id) > ($3, $4)')) {
+        const cursorTime = params[2];
+        const cursorId = params[3];
+        const limit = params[4];
         rows = rows.filter(p => {
           const pTime = p.updated_at !== undefined ? p.updated_at : p.created_at;
           return (pTime > cursorTime) || (pTime === cursorTime && p.id > cursorId);
@@ -229,9 +238,9 @@ async function query(sql, params = []) {
         return { rows };
       }
 
-      if (lower.includes('updated_at > $1 or created_at > $1')) {
-        const cursorTime = params[0];
-        const limit = params[1];
+      if (lower.includes('updated_at > $3 or created_at > $3')) {
+        const cursorTime = params[2];
+        const limit = params[3];
         rows = rows.filter(p => {
           const pTime = p.updated_at !== undefined ? p.updated_at : p.created_at;
           return pTime > cursorTime || p.created_at > cursorTime;
@@ -242,9 +251,9 @@ async function query(sql, params = []) {
         return { rows };
       }
 
-      if (lower.includes('updated_at >= $1')) {
-        const minTime = params[0];
-        const limit = params[1];
+      if (lower.includes('updated_at >= $3')) {
+        const minTime = params[2];
+        const limit = params[3];
         rows = rows.filter(p => {
           const pTime = p.updated_at !== undefined ? p.updated_at : p.created_at;
           return pTime >= minTime;
@@ -265,6 +274,11 @@ async function query(sql, params = []) {
     let rows = [...memoryStore.prayers].sort((a, b) => b.created_at - a.created_at);
     if (params.length > 0 && typeof params[0] === 'number') {
       rows = rows.filter(p => p.created_at > params[0] || (p.updated_at && p.updated_at > params[0]));
+    }
+    if (lower.includes("visibility = 'public'")) {
+      const userId = params[1] || null;
+      const isAdmin = params[2] === true;
+      rows = rows.filter(prayer => prayer.visibility === 'PUBLIC' || isAdmin || (userId && prayer.author_id === userId));
     }
     return { rows };
   }

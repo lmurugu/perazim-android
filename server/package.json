@@ -5,9 +5,10 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node test/api.test.js && node test/postgres.test.js && node test/community_api.test.js",
+    "test": "node test/api.test.js && node test/postgres.test.js && node test/community_api.test.js && node test/prayer_visibility.test.js",
     "test:unit": "node test/api.test.js",
     "test:pg": "node test/postgres.test.js",
+    "test:prayer-visibility": "node test/prayer_visibility.test.js",
     "test:community": "node test/community_api.test.js",
     "test:multi-client": "node test/api_multi_client.test.js",
     "test:restart": "node test/api_process_restart.test.js",

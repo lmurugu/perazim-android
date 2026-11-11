@@ -17,13 +17,20 @@ function sanitizePrayer(prayer) {
 }
 
 // GET /api/prayers
-router.get('/', async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
     const rawSince = req.query.since || req.query.cursor;
     const since = (rawSince && !isNaN(rawSince)) ? Math.max(0, parseInt(rawSince, 10)) : 0;
+    const userId = req.user ? req.user.id : null;
+    // ADMIN is the existing administrator check used by this route for testimony writes.
+    const isAdmin = !!(req.user && req.user.role === 'ADMIN');
     const result = await query(
-      'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY created_at DESC LIMIT 100',
-      [since]
+      `SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at
+         FROM prayers
+        WHERE (visibility = 'PUBLIC' OR ($2::text IS NOT NULL AND author_id = $2) OR $3::boolean)
+          AND (updated_at > $1 OR created_at > $1)
+        ORDER BY created_at DESC LIMIT 100`,
+      [since, userId, isAdmin]
     );
     const prayers = (result.rows || []).map(sanitizePrayer);
     return res.json({ prayers });

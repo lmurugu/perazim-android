@@ -162,21 +162,31 @@ router.post('/', optionalAuth, async (req, res) => {
       }
     }
 
+    const readUserId = req.user ? req.user.id : null;
+    // Keep this aligned with the existing role-based admin check used for testimony writes.
+    const readIsAdmin = !!(req.user && req.user.role === 'ADMIN');
+    const visiblePrayer = "(visibility = 'PUBLIC' OR ($1::text IS NOT NULL AND author_id = $1) OR $2::boolean)";
     let prayersResult;
     if (cursorId) {
       prayersResult = await query(
-        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE (updated_at, id) > ($1, $2) ORDER BY updated_at ASC, id ASC LIMIT $3',
-        [cursorTime, cursorId, fetchLimit]
+        `SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at
+           FROM prayers WHERE ${visiblePrayer} AND (updated_at, id) > ($3, $4)
+           ORDER BY updated_at ASC, id ASC LIMIT $5`,
+        [readUserId, readIsAdmin, cursorTime, cursorId, fetchLimit]
       );
     } else if (cursorTime > 0) {
       prayersResult = await query(
-        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY updated_at ASC, id ASC LIMIT $2',
-        [cursorTime, fetchLimit]
+        `SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at
+           FROM prayers WHERE ${visiblePrayer} AND (updated_at > $3 OR created_at > $3)
+           ORDER BY updated_at ASC, id ASC LIMIT $4`,
+        [readUserId, readIsAdmin, cursorTime, fetchLimit]
       );
     } else {
       prayersResult = await query(
-        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at >= $1 ORDER BY updated_at ASC, id ASC LIMIT $2',
-        [0, fetchLimit]
+        `SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at
+           FROM prayers WHERE ${visiblePrayer} AND updated_at >= $3
+           ORDER BY updated_at ASC, id ASC LIMIT $4`,
+        [readUserId, readIsAdmin, 0, fetchLimit]
       );
     }
 
