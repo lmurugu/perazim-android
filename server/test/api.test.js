@@ -237,6 +237,37 @@ async function runTests() {
     assert(Array.isArray(syncRes.body.rejectedMutations) && syncRes.body.rejectedMutations.length >= 2, 'Rejected mutations list returned');
     assert(syncRes.body.prayers.some(p => p.id === 'prayer_offline_101'), 'Offline prayer replicated to server wall');
 
+    const guestMutation = await makeRequest('POST', '/api/sync', {
+      userId: 'forged-user',
+      mutations: [{
+        id: 'guest_mutation', operationType: 'CREATE', entityType: 'PRAYER', entityId: 'guest_prayer',
+        payloadJson: JSON.stringify({ title: 'Guest', content: 'Must not be stored' })
+      }]
+    });
+    assert(guestMutation.status === 401, 'Sync mutations require authentication even if the body asserts a userId');
+
+    const forgedAuthorMutation = await makeRequest('POST', '/api/sync', {
+      mutations: [{
+        id: 'forged_author', operationType: 'CREATE', entityType: 'PRAYER', entityId: 'forged_author_prayer',
+        payloadJson: JSON.stringify({ title: 'Forged', content: 'Must be rejected', authorId: 'another-user' })
+      }]
+    }, token2);
+    assert(forgedAuthorMutation.body.rejectedMutations[0].reason === 'ACTOR_MISMATCH', 'Payload authorId differing from the authenticated actor is rejected');
+
+    const forgedAmenMutation = await makeRequest('POST', '/api/sync', {
+      mutations: [{
+        id: 'forged_amen', operationType: 'CREATE', entityType: 'PRAYER_AMEN', entityId: prayerId,
+        payloadJson: JSON.stringify({ amenUserId: 'another-user' })
+      }]
+    }, token2);
+    assert(forgedAmenMutation.body.rejectedMutations[0].reason === 'ACTOR_MISMATCH', 'Payload amenUserId differing from the authenticated actor is rejected');
+
+    const forgedTopLevelActor = await makeRequest('POST', '/api/sync', {
+      userId: 'another-user',
+      mutations: [{ id: 'forged_top_level', operationType: 'UPDATE', entityType: 'USER_PROGRESS', payloadJson: '{}' }]
+    }, token2);
+    assert(forgedTopLevelActor.body.rejectedMutations[0].reason === 'ACTOR_MISMATCH', 'Top-level userId differing from the authenticated actor is rejected');
+
     // 12. Brute-Force Rate Limiting Test (5 failed attempts trigger 429 lockout)
     const bruteForcePhone = '0788000000';
     // Register account to test wrong PIN attempts

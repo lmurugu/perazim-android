@@ -19,7 +19,10 @@ function sanitizePrayer(prayer) {
 router.post('/', optionalAuth, async (req, res) => {
   try {
     const { mutations, lastSyncTimestamp, cursor, limit: reqLimit } = req.body || {};
-    const userId = req.user ? req.user.id : ((req.body && req.body.userId) || 'guest');
+    if (Array.isArray(mutations) && mutations.length > 0 && !req.user) {
+      return res.status(401).json({ error: 'Authentication required for sync mutations' });
+    }
+    const userId = req.user ? req.user.id : null;
     const syncedIds = [];
     const rejectedMutations = [];
     const now = Date.now();
@@ -35,13 +38,33 @@ router.post('/', optionalAuth, async (req, res) => {
             payload = {};
           }
 
+          const actorClaims = [
+            ['userId', req.body && req.body.userId],
+            ['authorId', req.body && req.body.authorId],
+            ['amenUserId', req.body && req.body.amenUserId],
+            ['userId', payload.userId],
+            ['authorId', payload.authorId],
+            ['amenUserId', payload.amenUserId]
+          ];
+          const mismatch = actorClaims.find(([, claimedId]) =>
+            claimedId !== undefined && claimedId !== null && String(claimedId) !== req.user.id
+          );
+          if (mismatch) {
+            rejectedMutations.push({
+              id,
+              reason: 'ACTOR_MISMATCH',
+              message: `${mismatch[0]} must match the authenticated account`
+            });
+            continue;
+          }
+
           if (entityType === 'PRAYER' && operationType === 'CREATE') {
             const prayerId = entityId || id;
             const title = payload.title || 'Prayer Request';
             const content = payload.content || '';
             const isAnon = !!payload.isAnonymous;
-            const authorId = req.user ? req.user.id : (payload.authorId || userId);
-            const authorName = isAnon ? 'Anonymous Saint' : (req.user ? req.user.name : (payload.authorName || 'Fellow Saint'));
+            const authorId = req.user.id;
+            const authorName = isAnon ? 'Anonymous Saint' : req.user.name;
 
             // REQ-05: Do NOT blindly ON CONFLICT DO NOTHING. Query existing first.
             const existingRes = await query(
@@ -108,7 +131,7 @@ router.post('/', optionalAuth, async (req, res) => {
           } else if (entityType === 'PRAYER_AMEN') {
             // REQ-04: Batch-Sync Amen Safety with transaction
             const prayerId = entityId;
-            const amenUserId = req.user ? req.user.id : (payload.userId || req.body.userId || userId);
+            const amenUserId = req.user.id;
 
             await withTransaction(async (client) => {
               const insertRes = await client.query(
