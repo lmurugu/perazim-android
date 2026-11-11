@@ -50,7 +50,7 @@ public interface SyncQueueDao {
     @Query("SELECT * FROM sync_queue WHERE status = 'PENDING' AND nextAttemptAt <= :now ORDER BY sequenceNumber ASC LIMIT :limit")
     List<SyncQueueEntity> getPendingOperations(int limit, long now);
 
-    @Query("SELECT * FROM sync_queue WHERE entityType = :entityType AND entityId = :entityId AND operationType = :operationType AND status IN ('PENDING', 'SYNCING') ORDER BY sequenceNumber ASC LIMIT 1")
+    @Query("SELECT * FROM sync_queue WHERE entityType = :entityType AND entityId = :entityId AND operationType = :operationType AND status IN ('PENDING', 'SYNCING') ORDER BY CASE WHEN status = 'PENDING' THEN 0 ELSE 1 END ASC, sequenceNumber DESC LIMIT 1")
     SyncQueueEntity findPendingOrSyncing(String entityType, String entityId, String operationType);
 
     @Query("DELETE FROM sync_queue WHERE status IN ('SYNCED', 'CANCELLED') AND timestampMillis <= :olderThanMillis")

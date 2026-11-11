@@ -85,36 +85,39 @@ public class SyncQueueManager {
                 throw new IllegalArgumentException("Queued payload must be a JSON object", e);
             }
         }
-        // 1. Check for existing pending/syncing item with same idempotencyKey
+        boolean idempotencyKeyIsInFlight = false;
+        // 1. Check for an existing mutation ID. Pending work may be coalesced;
+        // an in-flight mutation is immutable and a later edit must get a new ID.
         if (idempotencyKey != null && !idempotencyKey.trim().isEmpty()) {
             SyncQueueEntity existingById = syncQueueDao.getItemById(idempotencyKey.trim());
             if (existingById != null) {
                 String status = existingById.getStatus();
-                if (SyncStatus.PENDING.name().equalsIgnoreCase(status)
-                        || SyncStatus.SYNCING.name().equalsIgnoreCase(status)) {
-                    if (SyncStatus.PENDING.name().equalsIgnoreCase(status)) {
-                        existingById.setPayloadJson(payloadJson);
-                        syncQueueDao.update(existingById);
-                    }
+                if (SyncStatus.PENDING.name().equalsIgnoreCase(status)) {
+                    existingById.setPayloadJson(payloadJson);
+                    syncQueueDao.update(existingById);
                     return existingById.getId();
                 }
+                idempotencyKeyIsInFlight = SyncStatus.SYNCING.name().equalsIgnoreCase(status);
             }
         }
 
-        // 2. Check for existing pending/syncing item with same (entityType, entityId, operationType)
+        // 2. Prefer an existing follow-up PENDING row; never mutate a SYNCING row.
         if (entityType != null && entityId != null && operationType != null) {
             SyncQueueEntity existingByEntity = syncQueueDao.findPendingOrSyncing(entityType, entityId, operationType);
             if (existingByEntity != null && (owner == null || owner.equals(ownerOf(existingByEntity)))) {
                 if (SyncStatus.PENDING.name().equalsIgnoreCase(existingByEntity.getStatus())) {
                     existingByEntity.setPayloadJson(payloadJson);
                     syncQueueDao.update(existingByEntity);
+                    return existingByEntity.getId();
                 }
-                return existingByEntity.getId();
             }
         }
 
-        // 3. No existing pending/syncing item found; create new SyncQueueEntity
-        String id = (idempotencyKey != null && !idempotencyKey.trim().isEmpty())
+        // 3. Create a new later mutation after any in-flight item. If the caller
+        // reused the in-flight idempotency key, never reuse that mutation ID.
+        String id = idempotencyKeyIsInFlight
+                ? (owner != null ? owner + ":" : "") + UUID.randomUUID()
+                : (idempotencyKey != null && !idempotencyKey.trim().isEmpty())
                 ? idempotencyKey.trim()
                 : UUID.randomUUID().toString();
 

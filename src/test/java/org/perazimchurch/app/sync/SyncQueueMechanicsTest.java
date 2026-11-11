@@ -13,6 +13,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -163,15 +164,63 @@ public class SyncQueueMechanicsTest {
         assertEquals("{\"content\":\"retained\"}", retried.getPayloadJson());
     }
 
+    @Test
+    public void editDuringSyncingCreatesLaterMutationAndAcknowledgementLeavesItPending() {
+        String idempotencyKey = "same_mutation_key";
+        String firstId = queueManager.enqueue("UPDATE", "PRAYER", "prayer_same", "{\"content\":\"A\"}", idempotencyKey);
+        queueManager.markSyncing(firstId);
+
+        String followUpId = queueManager.enqueue("UPDATE", "PRAYER", "prayer_same", "{\"content\":\"B\"}", idempotencyKey);
+
+        assertNotEquals("A later edit must not reuse the in-flight mutation ID", firstId, followUpId);
+        SyncQueueEntity first = dummyDao.getItemById(firstId);
+        SyncQueueEntity followUp = dummyDao.getItemById(followUpId);
+        assertEquals("SYNCING", first.getStatus());
+        assertEquals("{\"content\":\"A\"}", first.getPayloadJson());
+        assertEquals("PENDING", followUp.getStatus());
+        assertEquals("{\"content\":\"B\"}", followUp.getPayloadJson());
+        assertTrue("Follow-up sequence must sort after the in-flight row", followUp.getSequenceNumber() > first.getSequenceNumber());
+
+        queueManager.markSynced(firstId);
+        List<SyncQueueEntity> next = queueManager.getPendingOperations(10);
+        assertEquals(1, next.size());
+        assertEquals(followUpId, next.get(0).getId());
+        assertEquals("{\"content\":\"B\"}", next.get(0).getPayloadJson());
+    }
+
+    @Test
+    public void entityTupleEditDuringSyncingSurvivesFailureAndRemainsNextInOrder() {
+        String firstId = queueManager.enqueue("UPDATE", "PRAYER", "prayer_retry", "{\"content\":\"A\"}", null);
+        queueManager.markSyncing(firstId);
+
+        String followUpId = queueManager.enqueue("UPDATE", "PRAYER", "prayer_retry", "{\"content\":\"B\"}", null);
+        assertNotEquals(firstId, followUpId);
+        assertEquals("{\"content\":\"A\"}", dummyDao.getItemById(firstId).getPayloadJson());
+        assertEquals("PENDING", dummyDao.getItemById(followUpId).getStatus());
+        assertTrue(dummyDao.getItemById(followUpId).getSequenceNumber() > dummyDao.getItemById(firstId).getSequenceNumber());
+
+        queueManager.recordFailure(firstId, "Synthetic permanent failure", false);
+        assertEquals("FAILED", dummyDao.getItemById(firstId).getStatus());
+        assertEquals("PENDING", dummyDao.getItemById(followUpId).getStatus());
+        List<SyncQueueEntity> next = queueManager.getPendingOperations(10);
+        assertEquals(1, next.size());
+        assertEquals("B follow-up is still the next send after A fails", followUpId, next.get(0).getId());
+        assertEquals("{\"content\":\"B\"}", next.get(0).getPayloadJson());
+    }
+
     /**
      * In-memory implementation of SyncQueueDao for unit testing.
      */
     private static class InMemorySyncQueueDao implements SyncQueueDao {
         private final Map<String, SyncQueueEntity> storage = new HashMap<>();
+        private long nextSequenceNumber = 1;
 
         @Override
         public void insert(SyncQueueEntity item) {
-            storage.put(item.getId(), copy(item));
+            SyncQueueEntity stored = copy(item);
+            if (stored.getSequenceNumber() == 0) stored.setSequenceNumber(nextSequenceNumber++);
+            else nextSequenceNumber = Math.max(nextSequenceNumber, stored.getSequenceNumber() + 1);
+            storage.put(stored.getId(), stored);
         }
 
         @Override
@@ -205,6 +254,7 @@ public class SyncQueueMechanicsTest {
                     result.add(copy(item));
                 }
             }
+            result.sort((left, right) -> Long.compare(left.getSequenceNumber(), right.getSequenceNumber()));
             return result;
         }
 
@@ -262,15 +312,19 @@ public class SyncQueueMechanicsTest {
 
         @Override
         public SyncQueueEntity findPendingOrSyncing(String entityType, String entityId, String operationType) {
+            SyncQueueEntity best = null;
             for (SyncQueueEntity item : storage.values()) {
                 if (entityType.equals(item.getEntityType())
                         && entityId.equals(item.getEntityId())
                         && operationType.equals(item.getOperationType())
                         && ("PENDING".equals(item.getStatus()) || "SYNCING".equals(item.getStatus()))) {
-                    return copy(item);
+                    boolean pending = "PENDING".equals(item.getStatus());
+                    boolean bestPending = best != null && "PENDING".equals(best.getStatus());
+                    if (best == null || pending && !bestPending || pending == bestPending
+                            && item.getSequenceNumber() > best.getSequenceNumber()) best = item;
                 }
             }
-            return null;
+            return best == null ? null : copy(best);
         }
 
         @Override
