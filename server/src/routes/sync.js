@@ -165,7 +165,7 @@ router.post('/', optionalAuth, async (req, res) => {
     let prayersResult;
     if (cursorId) {
       prayersResult = await query(
-        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE (updated_at > $1) OR (updated_at = $1 AND id > $2) ORDER BY updated_at ASC, id ASC LIMIT $3',
+        'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE (updated_at, id) > ($1, $2) ORDER BY updated_at ASC, id ASC LIMIT $3',
         [cursorTime, cursorId, fetchLimit]
       );
     } else if (cursorTime > 0) {

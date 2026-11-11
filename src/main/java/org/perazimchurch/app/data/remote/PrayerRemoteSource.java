@@ -28,7 +28,7 @@ public final class PrayerRemoteSource {
                        @NonNull JSONArray updatedPrayers,
                        long serverTime,
                        boolean hasMore,
-                       long nextCursor);
+                       @Nullable String nextCursor);
         void onError(int statusCode, @NonNull String errorMessage);
     }
 
@@ -135,14 +135,14 @@ public final class PrayerRemoteSource {
     public static void batchSync(@NonNull Context context,
                                  @NonNull JSONArray mutations,
                                  long lastSyncTimestamp,
-                                 long cursor,
+                                 @Nullable String cursor,
                                  @Nullable String authToken,
                                  @NonNull SyncCallback callback) {
         try {
             JSONObject body = new JSONObject();
             body.put("mutations", mutations != null ? mutations : new JSONArray());
             body.put("lastSyncTimestamp", lastSyncTimestamp);
-            if (cursor > 0) {
+            if (cursor != null && !cursor.isEmpty()) {
                 body.put("cursor", cursor);
             }
 
@@ -157,7 +157,7 @@ public final class PrayerRemoteSource {
                     }
                     long serverTime = json.optLong("serverTime", System.currentTimeMillis());
                     boolean hasMore = json.optBoolean("hasMore", false);
-                    long nextCursor = json.optLong("nextCursor", 0);
+                    String nextCursor = json.isNull("nextCursor") ? null : json.optString("nextCursor", null);
 
                     callback.onSuccess(
                             syncedIds != null ? syncedIds : new JSONArray(),
@@ -184,6 +184,6 @@ public final class PrayerRemoteSource {
                                  long lastSyncTimestamp,
                                  @Nullable String authToken,
                                  @NonNull SyncCallback callback) {
-        batchSync(context, mutations, lastSyncTimestamp, 0, authToken, callback);
+        batchSync(context, mutations, lastSyncTimestamp, null, authToken, callback);
     }
 }

@@ -215,7 +215,7 @@ async function query(sql, params = []) {
         return (a.id || '').localeCompare(b.id || '');
       });
 
-      if (lower.includes('updated_at = $1 and id > $2')) {
+      if (lower.includes('(updated_at, id) > ($1, $2)')) {
         const cursorTime = params[0];
         const cursorId = params[1];
         const limit = params[2];

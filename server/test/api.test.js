@@ -485,6 +485,20 @@ async function runTests() {
     const overlap = page2Res.body.prayers.some(p => page1Ids.has(p.id));
     assert(!overlap, 'REQ-07: No duplicate items across paginated pages');
 
+    const tiedTimestamp = 1700000000000;
+    for (const id of ['cursor_tie_a', 'cursor_tie_b', 'cursor_tie_c']) {
+      memoryStore.prayers.push({ id, title: id, content: '', author_id: 'cursor-test', author_name: 'Cursor Test',
+        is_anonymous: false, visibility: 'PUBLIC', prayer_count: 0, is_answered: false, testimony: '',
+        created_at: tiedTimestamp, updated_at: tiedTimestamp });
+    }
+    const tiedPage1 = await makeRequest('POST', '/api/sync', {
+      limit: 1, cursor: `${tiedTimestamp}:cursor_tie_a`
+    });
+    assert(tiedPage1.body.prayers[0].id === 'cursor_tie_b', 'REQ-07: Tuple cursor returns the next ID at the same timestamp');
+    assert(tiedPage1.body.nextCursor === `${tiedTimestamp}:cursor_tie_b`, 'REQ-07: nextCursor preserves timestamp and ID as a string');
+    const tiedPage2 = await makeRequest('POST', '/api/sync', { limit: 1, cursor: tiedPage1.body.nextCursor });
+    assert(tiedPage2.body.prayers[0].id === 'cursor_tie_c', 'REQ-07: Following tuple cursor returns the next tied row without skipping');
+
     // 17. REQ-01: Startup Validation & Database Fallback Policy
     const { execSync } = require('child_process');
     const path = require('path');

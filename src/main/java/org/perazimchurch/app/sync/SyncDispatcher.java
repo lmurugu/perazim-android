@@ -114,7 +114,7 @@ public final class SyncDispatcher {
                         pending,
                         mutationsArray,
                         lastSyncTs,
-                        0L,
+                        null,
                         1,
                         0,
                         0,
@@ -143,7 +143,7 @@ public final class SyncDispatcher {
             @Nullable List<SyncQueueEntity> pendingMutations,
             @NonNull JSONArray mutationsToSend,
             long lastSyncTs,
-            long cursor,
+            @Nullable String cursor,
             int pageNumber,
             int accumulatedSyncedCount,
             int accumulatedIngestedCount,
@@ -159,7 +159,7 @@ public final class SyncDispatcher {
                                   @NonNull JSONArray updatedPrayers,
                                   long serverTime,
                                   boolean hasMore,
-                                  long nextCursor) {
+                                  @Nullable String nextCursor) {
                 EXECUTOR.execute(() -> {
                     try {
                         int pageSyncedCount = 0;
@@ -301,16 +301,17 @@ public final class SyncDispatcher {
                         long highestServerTime = Math.max(maxServerTimeSeen, serverTime);
 
                         // Multi-page pagination evaluation (REQ-08)
-                        boolean morePages = (hasMore || (nextCursor > 0 && nextCursor != cursor)) && (updatedPrayers.length() > 0);
-                        long effectiveNextCursor = nextCursor;
-                        if (effectiveNextCursor <= 0 && updatedPrayers.length() > 0) {
+                        String effectiveNextCursor = nextCursor;
+                        if ((effectiveNextCursor == null || effectiveNextCursor.isEmpty()) && hasMore && updatedPrayers.length() > 0) {
                             JSONObject lastPrayer = updatedPrayers.optJSONObject(updatedPrayers.length() - 1);
                             if (lastPrayer != null) {
-                                effectiveNextCursor = Math.max(lastPrayer.optLong("updated_at", 0), lastPrayer.optLong("created_at", 0));
+                                effectiveNextCursor = lastPrayer.optLong("updated_at", 0) + ":" + lastPrayer.optString("id", "");
                             }
                         }
+                        boolean morePages = hasMore && effectiveNextCursor != null && !effectiveNextCursor.isEmpty()
+                                && !effectiveNextCursor.equals(cursor) && updatedPrayers.length() > 0;
 
-                        if (morePages && effectiveNextCursor > 0 && effectiveNextCursor != cursor) {
+                        if (morePages) {
                             Log.d(TAG, "Fetching next sync page " + (pageNumber + 1) + " (cursor=" + effectiveNextCursor + ")...");
                             executeSyncPage(
                                     appContext,
