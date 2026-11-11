@@ -25,33 +25,7 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
-          script: |
-            set -euo pipefail
-            node server/test/workmanager_recovery_mock_server.js >/tmp/workmanager-mock.log 2>&1 &
-            MOCK_PID=$!
-            trap 'kill "$MOCK_PID" 2>/dev/null || true' EXIT
-            for attempt in $(seq 1 20); do
-              if curl -fsS http://127.0.0.1:18080/__received >/dev/null; then break; fi
-              sleep 1
-            done
-            adb shell svc wifi disable
-            adb shell svc data disable
-            ./gradlew connectedValidationAndroidTest \
-              -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
-              --stacktrace
-            adb shell am kill org.perazimchurch.app.validation || true
-            adb shell svc wifi enable
-            adb shell svc data enable
-            received=false
-            for attempt in $(seq 1 60); do
-              if curl -fsS http://127.0.0.1:18080/__received | grep -q 'wm_process_restart_probe'; then
-                received=true
-                break
-              fi
-              sleep 2
-            done
-            test "$received" = true
-            echo 'PASS: queued synthetic mutation reached the mock API after the app process was killed, without reopening the app.'
+          script: bash server/test/workmanager_recovery_ci.sh
       - name: Upload instrumentation reports
         if: always()
         uses: actions/upload-artifact@v7
