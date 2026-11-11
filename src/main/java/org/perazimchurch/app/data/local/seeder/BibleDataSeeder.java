@@ -574,7 +574,7 @@ public final class BibleDataSeeder {
                 return sb.toString();
             }
         } catch (Exception e) {
-            Log.w(TAG, "Could not open asset file: " + assetPath + " (" + e.getMessage() + ")");
+            Log.w(TAG, "Could not open Bible asset file");
             return null;
         }
     }

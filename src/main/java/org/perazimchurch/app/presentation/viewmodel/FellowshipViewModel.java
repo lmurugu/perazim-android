@@ -374,7 +374,7 @@ public class FellowshipViewModel extends ViewModel {
                     connectionRepo.acceptConnection(connectionId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error accepting connection " + connectionId, e);
+                Log.e(TAG, "Error accepting connection");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -438,7 +438,7 @@ public class FellowshipViewModel extends ViewModel {
                     notificationRepo.markAsRead(notificationId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error marking notification as read: " + notificationId, e);
+                Log.e(TAG, "Error marking notification as read");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);

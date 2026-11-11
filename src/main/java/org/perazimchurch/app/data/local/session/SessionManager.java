@@ -411,7 +411,7 @@ public class SessionManager {
                 }
             }).start();
         }
-        Log.d(TAG, "Active user logged out. Reverted to fresh isolated guest session: " + freshGuestId);
+        Log.d(TAG, "Active user logged out. Reverted to a fresh isolated guest session.");
     }
 
     /**

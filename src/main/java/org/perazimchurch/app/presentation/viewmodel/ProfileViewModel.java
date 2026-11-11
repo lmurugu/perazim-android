@@ -109,7 +109,7 @@ public class ProfileViewModel extends ViewModel {
             try {
                 userRepo.switchCampus(campusId);
             } catch (Exception e) {
-                Log.e(TAG, "Error switching campus: " + campusId, e);
+                Log.e(TAG, "Error switching campus");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);

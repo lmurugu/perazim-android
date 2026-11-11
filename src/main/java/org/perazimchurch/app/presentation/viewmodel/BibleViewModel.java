@@ -105,7 +105,7 @@ public class BibleViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading verses for trans: " + translationId + " book: " + bookId + " ch: " + chapter, e);
+                Log.e(TAG, "Error loading Bible verses");
                 versesState.postValue(UiState.error(e.getMessage() != null ? e.getMessage() : "Failed to load verses"));
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
@@ -134,7 +134,7 @@ public class BibleViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error searching scripture for trans: " + translationId + " query: " + query, e);
+                Log.e(TAG, "Error searching scripture");
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -150,7 +150,7 @@ public class BibleViewModel extends ViewModel {
             try {
                 bibleRepo.bookmarkVerse(verseId, isBookmarked);
             } catch (Exception e) {
-                Log.e(TAG, "Error toggling bookmark for verse: " + verseId, e);
+                Log.e(TAG, "Error toggling Bible bookmark");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -167,7 +167,7 @@ public class BibleViewModel extends ViewModel {
             try {
                 bibleRepo.saveVerseNote(verseId, note);
             } catch (Exception e) {
-                Log.e(TAG, "Error saving study note for verse: " + verseId, e);
+                Log.e(TAG, "Error saving Bible study note");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);

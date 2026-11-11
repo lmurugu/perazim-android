@@ -92,7 +92,7 @@ public class SermonsViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error searching sermons for query: " + query, e);
+                Log.e(TAG, "Error searching sermons");
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -135,7 +135,7 @@ public class SermonsViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error filtering sermons by series: " + series, e);
+                Log.e(TAG, "Error filtering sermons by series");
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -153,7 +153,7 @@ public class SermonsViewModel extends ViewModel {
                 DownloadedContentEntity entity = downloadManager.enqueueDownload("SERMON", sermonId);
                 success = (entity != null);
             } catch (Exception e) {
-                Log.e(TAG, "Error requesting download for sermon: " + sermonId, e);
+                Log.e(TAG, "Error requesting sermon download");
             } finally {
                 if (callback != null) {
                     final boolean finalSuccess = success;
@@ -172,7 +172,7 @@ public class SermonsViewModel extends ViewModel {
             try {
                 success = downloadManager.deleteDownload(sermonId);
             } catch (Exception e) {
-                Log.e(TAG, "Error deleting download for sermon: " + sermonId, e);
+                Log.e(TAG, "Error deleting sermon download");
             } finally {
                 if (callback != null) {
                     final boolean finalSuccess = success;

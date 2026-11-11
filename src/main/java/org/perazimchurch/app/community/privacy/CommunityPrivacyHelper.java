@@ -55,11 +55,11 @@ public final class CommunityPrivacyHelper {
         if (connRepo == null || reporterId == null || offendingPeerId == null) {
             return;
         }
-        Log.w(TAG, reportLogMessage());
+        Log.w(TAG, "Member safety report submitted");
         connRepo.blockMember(reporterId, offendingPeerId);
     }
 
-    static String reportLogMessage() {
+    static String reportLogText() {
         return "Member safety report submitted";
     }
 }

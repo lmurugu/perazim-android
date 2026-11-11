@@ -6,6 +6,6 @@ import static org.junit.Assert.assertEquals;
 
 public class CommunityPrivacyHelperTest {
     @Test public void reportLogContainsOnlyNonIdentifyingEvent() {
-        assertEquals("Member safety report submitted", CommunityPrivacyHelper.reportLogMessage());
+        assertEquals("Member safety report submitted", CommunityPrivacyHelper.reportLogText());
     }
 }

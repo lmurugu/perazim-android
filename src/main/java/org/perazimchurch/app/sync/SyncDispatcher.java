@@ -99,7 +99,7 @@ public final class SyncDispatcher {
                             mutationsArray.put(obj);
                             queueManager.markSyncing(item.getId());
                         } catch (Exception e) {
-                            Log.w(TAG, "Error serializing sync item: " + item.getId(), e);
+                            Log.w(TAG, "Error serializing sync item");
                         }
                     }
                 }
@@ -124,7 +124,7 @@ public final class SyncDispatcher {
                         callback
                 );
             } catch (Exception e) {
-                Log.e(TAG, "Fatal error executing sync", e);
+                Log.e(TAG, "Fatal error executing sync");
                 IS_SYNCING.set(false);
                 if (callback != null) {
                     MAIN_HANDLER.post(() -> callback.onSyncComplete(false, 0, 0));
@@ -202,7 +202,7 @@ public final class SyncDispatcher {
                             // 3. Mark unacknowledged items for retry (network dropped / partial server batch)
                             for (SyncQueueEntity item : pendingMutations) {
                                 if (!processedIds.contains(item.getId())) {
-                                    Log.w(TAG, "Mutation " + item.getId() + " unacknowledged by server; scheduling retry.");
+                                    Log.w(TAG, "A sync mutation was unacknowledged; scheduling retry.");
                                     queueManager.recordTransportFailure(item.getId(), "Unacknowledged in batch response");
                                 }
                             }
@@ -312,7 +312,7 @@ public final class SyncDispatcher {
                                 && !effectiveNextCursor.equals(cursor) && updatedPrayers.length() > 0;
 
                         if (morePages) {
-                            Log.d(TAG, "Fetching next sync page " + (pageNumber + 1) + " (cursor=" + effectiveNextCursor + ")...");
+                            Log.d(TAG, "Fetching next sync page " + (pageNumber + 1) + ".");
                             executeSyncPage(
                                     appContext,
                                     queueManager,
@@ -342,7 +342,7 @@ public final class SyncDispatcher {
                             }
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, "Error ingesting sync batch into Room", e);
+                        Log.e(TAG, "Error ingesting sync batch into Room");
                         IS_SYNCING.set(false);
                         if (callback != null) {
                             MAIN_HANDLER.post(() -> callback.onSyncComplete(false, accumulatedSyncedCount, accumulatedIngestedCount));
