@@ -12,7 +12,8 @@ import static org.junit.Assert.assertEquals;
 
 public class BackupConfigurationTest {
     private static final Set<String> PRIVATE_DOMAINS = new HashSet<String>() {{
-        add("root"); add("database"); add("sharedpref"); add("file");
+        add("root"); add("database"); add("sharedpref"); add("file"); add("external");
+        add("device_root"); add("device_file"); add("device_database"); add("device_sharedpref");
     }};
 
     private Document readXml(String path) throws Exception {
