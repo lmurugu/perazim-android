@@ -452,6 +452,94 @@ async function runPostgresTests() {
     const pgP1Ids = new Set(pgPage1.body.prayers.map(p => p.id));
     assert(!pgPage2.body.prayers.some(p => pgP1Ids.has(p.id)), 'PostgreSQL REQ-07: No duplicate items across pages');
 
+    // P1: a row whose updated_at changes after page one remains reachable by the cursor.
+    const paginationBase = Date.now() + 1000;
+    const movingPrayerId = 'p1_moving_' + crypto.randomUUID();
+    const paginationIds = [movingPrayerId, 'p1_page_' + crypto.randomUUID(), 'p1_page_' + crypto.randomUUID()];
+    try {
+      for (let index = 0; index < paginationIds.length; index++) {
+        const timestamp = paginationBase + index;
+        await query(
+          `INSERT INTO prayers (id,title,content,author_id,author_name,is_anonymous,visibility,prayer_count,is_answered,testimony,created_at,updated_at)
+           VALUES ($1,$1,'synthetic pagination row',$2,'Synthetic pagination user',false,'PUBLIC',0,false,'',$3,$3)`,
+          [paginationIds[index], regUser1.body.user.id, timestamp]
+        );
+      }
+      const movingPage1 = await makeRequest('POST', '/api/sync', { limit: 1, lastSyncTimestamp: paginationBase - 1 });
+      assert(movingPage1.status === 200 && movingPage1.body.prayers[0]?.id === movingPrayerId,
+        'P1 pagination: first page starts with the oldest synthetic row');
+      await query('UPDATE prayers SET updated_at = $2 WHERE id = $1', [movingPrayerId, paginationBase + 100]);
+      let cursor = movingPage1.body.nextCursor;
+      let movingRowFound = false;
+      let pagesRead = 0;
+      while (cursor && pagesRead < 10) {
+        const page = await makeRequest('POST', '/api/sync', { limit: 1, cursor });
+        assert(page.status === 200, 'P1 pagination: continuation request succeeds after updated_at changes');
+        if (page.body.prayers.some(row => row.id === movingPrayerId && Number(row.updated_at) === paginationBase + 100)) {
+          movingRowFound = true;
+        }
+        cursor = page.body.hasMore ? page.body.nextCursor : null;
+        pagesRead++;
+      }
+      assert(movingRowFound, 'P1 pagination: changed row appears at its new cursor position');
+      assert(pagesRead < 10, 'P1 pagination: changed timestamp does not create an endless cursor loop');
+    } finally {
+      await query('DELETE FROM prayers WHERE id = ANY($1::text[])', [paginationIds]);
+    }
+
+    // P1: concurrent delivery of one (user, mutation_id) applies and audits once.
+    const concurrentMutationId = 'p1_concurrent_' + crypto.randomUUID();
+    const concurrentPrayerId = 'p1_prayer_' + crypto.randomUUID();
+    const concurrentMutation = {
+      id: concurrentMutationId,
+      operationType: 'CREATE',
+      entityType: 'PRAYER',
+      entityId: concurrentPrayerId,
+      payloadJson: JSON.stringify({ title: 'Synthetic concurrent retry', content: 'Synthetic body' })
+    };
+    const concurrentRequests = await Promise.all([
+      makeRequest('POST', '/api/sync', { mutations: [concurrentMutation] }, token1),
+      makeRequest('POST', '/api/sync', { mutations: [concurrentMutation] }, token1)
+    ]);
+    assert(concurrentRequests.every(response => response.status === 200 && response.body.syncedIds.includes(concurrentMutationId)),
+      'P1 concurrency: concurrent identical requests both receive the durable success');
+    assert((await query('SELECT COUNT(*)::int AS count FROM prayers WHERE id = $1', [concurrentPrayerId])).rows[0].count === 1,
+      'P1 concurrency: exactly one business prayer write');
+    assert((await query('SELECT COUNT(*)::int AS count FROM sync_receipts WHERE user_id = $1 AND mutation_id = $2', [regUser1.body.user.id, concurrentMutationId])).rows[0].count === 1,
+      'P1 concurrency: exactly one mutation receipt');
+    assert((await query('SELECT COUNT(*)::int AS count FROM sync_events WHERE user_id = $1 AND entity_id = $2', [regUser1.body.user.id, concurrentPrayerId])).rows[0].count === 1,
+      'P1 concurrency: exactly one sync_events row');
+
+    // P1: fail after the prayer write so transaction rollback covers business/audit/receipt rows.
+    const failingMutationId = 'p1_rollback_' + crypto.randomUUID();
+    const failingPrayerId = 'p1_rollback_prayer_' + crypto.randomUUID();
+    await query(`CREATE FUNCTION p1_test_reject_sync_event() RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN
+        IF NEW.entity_id = '${failingPrayerId}' THEN RAISE EXCEPTION 'synthetic P1 audit failure'; END IF;
+        RETURN NEW;
+      END $$`);
+    await query('CREATE TRIGGER p1_test_reject_sync_event BEFORE INSERT ON sync_events FOR EACH ROW EXECUTE FUNCTION p1_test_reject_sync_event()');
+    try {
+      const failedMutation = await makeRequest('POST', '/api/sync', { mutations: [{
+        id: failingMutationId,
+        operationType: 'CREATE',
+        entityType: 'PRAYER',
+        entityId: failingPrayerId,
+        payloadJson: JSON.stringify({ title: 'Synthetic rollback test', content: 'Synthetic content' })
+      }] }, token1);
+      assert(failedMutation.status === 200 && failedMutation.body.rejectedMutations.some(item => item.id === failingMutationId && item.reason === 'PROCESSING_ERROR'),
+        'P1 rollback: client receives PROCESSING_ERROR for the failed transaction');
+      assert((await query('SELECT COUNT(*)::int AS count FROM prayers WHERE id = $1', [failingPrayerId])).rows[0].count === 0,
+        'P1 rollback: business prayer write was rolled back');
+      assert((await query('SELECT COUNT(*)::int AS count FROM sync_events WHERE user_id = $1 AND entity_id = $2', [regUser1.body.user.id, failingPrayerId])).rows[0].count === 0,
+        'P1 rollback: audit event was rolled back');
+      assert((await query('SELECT COUNT(*)::int AS count FROM sync_receipts WHERE user_id = $1 AND mutation_id = $2', [regUser1.body.user.id, failingMutationId])).rows[0].count === 0,
+        'P1 rollback: receipt was rolled back so retry can reprocess');
+    } finally {
+      await query('DROP TRIGGER IF EXISTS p1_test_reject_sync_event ON sync_events');
+      await query('DROP FUNCTION IF EXISTS p1_test_reject_sync_event()');
+    }
+
     // 14. Brute-Force Rate Limiting Test against PostgreSQL
     const bruteForcePhone = '0777000000';
     await makeRequest('POST', '/api/auth/register', {

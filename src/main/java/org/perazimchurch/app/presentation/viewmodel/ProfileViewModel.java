@@ -109,7 +109,7 @@ public class ProfileViewModel extends ViewModel {
             try {
                 userRepo.switchCampus(campusId);
             } catch (Exception e) {
-                Log.e(TAG, "Error switching campus: " + campusId, e);
+                Log.e(TAG, "Error switching campus");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -156,7 +156,7 @@ public class ProfileViewModel extends ViewModel {
                     postCallback(() -> callback.accept(data));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading saved content", e);
+                Log.e(TAG, "Error loading saved content");
                 savedContentState.postValue(UiState.error(e.getMessage() != null ? e.getMessage() : "Failed to load saved content"));
                 if (callback != null) {
                     SavedContentData empty = new SavedContentData(

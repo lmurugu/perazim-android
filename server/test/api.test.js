@@ -237,6 +237,47 @@ async function runTests() {
     assert(Array.isArray(syncRes.body.rejectedMutations) && syncRes.body.rejectedMutations.length >= 2, 'Rejected mutations list returned');
     assert(syncRes.body.prayers.some(p => p.id === 'prayer_offline_101'), 'Offline prayer replicated to server wall');
 
+    const guestMutation = await makeRequest('POST', '/api/sync', {
+      userId: 'forged-user',
+      mutations: [{
+        id: 'guest_mutation', operationType: 'CREATE', entityType: 'PRAYER', entityId: 'guest_prayer',
+        payloadJson: JSON.stringify({ title: 'Guest', content: 'Must not be stored' })
+      }]
+    });
+    assert(guestMutation.status === 401, 'Sync mutations require authentication even if the body asserts a userId');
+
+    const forgedAuthorMutation = await makeRequest('POST', '/api/sync', {
+      mutations: [{
+        id: 'forged_author', operationType: 'CREATE', entityType: 'PRAYER', entityId: 'forged_author_prayer',
+        payloadJson: JSON.stringify({ title: 'Forged', content: 'Must be rejected', authorId: 'another-user' })
+      }]
+    }, token2);
+    assert(forgedAuthorMutation.body.rejectedMutations[0].reason === 'ACTOR_MISMATCH', 'Payload authorId differing from the authenticated actor is rejected');
+
+    const forgedAmenMutation = await makeRequest('POST', '/api/sync', {
+      mutations: [{
+        id: 'forged_amen', operationType: 'CREATE', entityType: 'PRAYER_AMEN', entityId: prayerId,
+        payloadJson: JSON.stringify({ amenUserId: 'another-user' })
+      }]
+    }, token2);
+    assert(forgedAmenMutation.body.rejectedMutations[0].reason === 'ACTOR_MISMATCH', 'Payload amenUserId differing from the authenticated actor is rejected');
+
+    const forgedTopLevelActor = await makeRequest('POST', '/api/sync', {
+      userId: 'another-user',
+      mutations: [{ id: 'forged_top_level', operationType: 'UPDATE', entityType: 'USER_PROGRESS', payloadJson: '{}' }]
+    }, token2);
+    assert(forgedTopLevelActor.body.rejectedMutations[0].reason === 'ACTOR_MISMATCH', 'Top-level userId differing from the authenticated actor is rejected');
+
+    const progressMutation = { id: 'progress_once', operationType: 'UPDATE', entityType: 'USER_PROGRESS', payloadJson: JSON.stringify({ xp: 15, streak: 2 }) };
+    const firstProgressSync = await makeRequest('POST', '/api/sync', { mutations: [progressMutation] }, token2);
+    const replayProgressSync = await makeRequest('POST', '/api/sync', {
+      mutations: [{ ...progressMutation, payloadJson: JSON.stringify({ xp: 99, streak: 9 }) }]
+    }, token2);
+    assert(firstProgressSync.body.syncedIds.includes('progress_once') && replayProgressSync.body.syncedIds.includes('progress_once'), 'A retried mutation returns its stored acknowledgement');
+    assert(memoryStore.users.find(user => user.id === regUser2.body.user.id).xp === 15, 'A replay with changed payload does not apply the progress update again');
+    assert(memoryStore.sync_receipts.filter(receipt => receipt.mutation_id === 'progress_once').length === 1, 'A mutation key has one durable receipt');
+    assert(memoryStore.sync_events.filter(event => event.entity_id === 'progress_once').length === 1, 'A replay does not add another audit event');
+
     // 12. Brute-Force Rate Limiting Test (5 failed attempts trigger 429 lockout)
     const bruteForcePhone = '0788000000';
     // Register account to test wrong PIN attempts
@@ -443,6 +484,20 @@ async function runTests() {
     const page1Ids = new Set(page1Res.body.prayers.map(p => p.id));
     const overlap = page2Res.body.prayers.some(p => page1Ids.has(p.id));
     assert(!overlap, 'REQ-07: No duplicate items across paginated pages');
+
+    const tiedTimestamp = 1700000000000;
+    for (const id of ['cursor_tie_a', 'cursor_tie_b', 'cursor_tie_c']) {
+      memoryStore.prayers.push({ id, title: id, content: '', author_id: 'cursor-test', author_name: 'Cursor Test',
+        is_anonymous: false, visibility: 'PUBLIC', prayer_count: 0, is_answered: false, testimony: '',
+        created_at: tiedTimestamp, updated_at: tiedTimestamp });
+    }
+    const tiedPage1 = await makeRequest('POST', '/api/sync', {
+      limit: 1, cursor: `${tiedTimestamp}:cursor_tie_a`
+    });
+    assert(tiedPage1.body.prayers[0].id === 'cursor_tie_b', 'REQ-07: Tuple cursor returns the next ID at the same timestamp');
+    assert(tiedPage1.body.nextCursor === `${tiedTimestamp}:cursor_tie_b`, 'REQ-07: nextCursor preserves timestamp and ID as a string');
+    const tiedPage2 = await makeRequest('POST', '/api/sync', { limit: 1, cursor: tiedPage1.body.nextCursor });
+    assert(tiedPage2.body.prayers[0].id === 'cursor_tie_c', 'REQ-07: Following tuple cursor returns the next tied row without skipping');
 
     // 17. REQ-01: Startup Validation & Database Fallback Policy
     const { execSync } = require('child_process');

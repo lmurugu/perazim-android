@@ -43,6 +43,7 @@ import androidx.core.content.FileProvider;
 import org.json.JSONObject;
 import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.data.local.entity.UserEntity;
+import org.perazimchurch.app.data.local.entity.SyncQueueEntity;
 import org.perazimchurch.app.data.remote.ApiClient;
 import org.perazimchurch.app.data.remote.CommunityRemoteSource;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
@@ -55,6 +56,8 @@ import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.presentation.viewmodel.ProfileViewModel;
 import org.perazimchurch.app.presentation.viewmodel.SavedContentData;
 import org.perazimchurch.app.sync.SheetSyncManager;
+import org.perazimchurch.app.sync.SyncDispatcher;
+import org.perazimchurch.app.sync.SyncQueueManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -472,6 +475,14 @@ public class ProfileUiBinder {
         ));
         card.addView(createHorizontalDivider());
 
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_refresh,
+                "Failed offline updates",
+                "Review saved updates and tap one to retry",
+                v -> showFailedSyncItems()
+        ));
+        card.addView(createHorizontalDivider());
+
         // Row 2: Saved / Offline Content
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_christian_bible,
@@ -526,6 +537,37 @@ public class ProfileUiBinder {
         ));
 
         return card;
+    }
+
+    private void showFailedSyncItems() {
+        new Thread(() -> {
+            List<SyncQueueEntity> failed = PerazimDatabase.getInstance(context).syncQueueDao().getFailedItems();
+            mainHandler.post(() -> {
+                if (failed == null || failed.isEmpty()) {
+                    new AlertDialog.Builder(context).setTitle("Failed offline updates")
+                            .setMessage("There are no failed offline updates.")
+                            .setPositiveButton("Close", null).show();
+                    return;
+                }
+                String[] labels = new String[failed.size()];
+                for (int i = 0; i < failed.size(); i++) {
+                    SyncQueueEntity item = failed.get(i);
+                    String detail = item.getLastError() == null ? "Needs attention" : item.getLastError();
+                    labels[i] = item.getEntityType() + " · " + item.getEntityId() + "\n" + detail + "\nTap to retry";
+                }
+                new AlertDialog.Builder(context).setTitle("Failed offline updates")
+                        .setItems(labels, (dialog, which) -> {
+                            SyncQueueEntity item = failed.get(which);
+                            new Thread(() -> {
+                                SyncQueueManager.getInstance(context).retry(item.getId());
+                                mainHandler.post(() -> {
+                                    SyncDispatcher.dispatchSync(context, null);
+                                    Toast.makeText(context, "Retry queued", Toast.LENGTH_SHORT).show();
+                                });
+                            }, "retry-sync-item").start();
+                        }).setNegativeButton("Close", null).show();
+            });
+        }, "failed-sync-list").start();
     }
 
     private View createHorizontalDivider() {

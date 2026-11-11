@@ -150,7 +150,7 @@ public class FellowshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading public prayers", e);
+                Log.e(TAG, "Error loading public prayers");
                 prayersState.postValue(UiState.error(e.getMessage() != null ? e.getMessage() : "Failed to load prayers"));
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
@@ -171,7 +171,7 @@ public class FellowshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading answered prayers", e);
+                Log.e(TAG, "Error loading answered prayers");
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -191,7 +191,7 @@ public class FellowshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading user prayers for " + userId, e);
+                Log.e(TAG, "Error loading the current member's prayers");
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -210,7 +210,7 @@ public class FellowshipViewModel extends ViewModel {
                     syncQueueManager.enqueue(SyncOperationType.CREATE, "PRAYER_AMEN", prayerId, "{}", prayerId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error amening prayer: " + prayerId, e);
+                Log.e(TAG, "Error recording prayer amen");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -238,7 +238,7 @@ public class FellowshipViewModel extends ViewModel {
                     syncQueueManager.enqueue(SyncOperationType.UPDATE, "PRAYER_TESTIMONY", prayerId, payloadJson, prayerId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error marking prayer as answered with testimony", e);
+                Log.e(TAG, "Error marking prayer as answered with testimony");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -285,7 +285,7 @@ public class FellowshipViewModel extends ViewModel {
                     syncQueueManager.enqueue(SyncOperationType.CREATE, "PRAYER", prayerId, payloadJson, prayerId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error submitting prayer", e);
+                Log.e(TAG, "Error submitting prayer");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -312,7 +312,7 @@ public class FellowshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading connections for user " + userId, e);
+                Log.e(TAG, "Error loading member connections", e);
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -334,7 +334,7 @@ public class FellowshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading pending connection requests for user " + userId, e);
+                Log.e(TAG, "Error loading pending connection requests", e);
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -355,7 +355,7 @@ public class FellowshipViewModel extends ViewModel {
                     connectionRepo.sendConnectionRequest(userId, peerId, peerName != null ? peerName : peerId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error sending connection request from " + userId + " to " + peerId, e);
+                Log.e(TAG, "Error sending connection request", e);
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -374,7 +374,7 @@ public class FellowshipViewModel extends ViewModel {
                     connectionRepo.acceptConnection(connectionId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error accepting connection " + connectionId, e);
+                Log.e(TAG, "Error accepting connection");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -401,7 +401,7 @@ public class FellowshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading notifications for user " + userId, e);
+                Log.e(TAG, "Error loading member notifications", e);
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -420,7 +420,7 @@ public class FellowshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(count));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error loading unread notification count for user " + userId, e);
+                Log.e(TAG, "Error loading unread notification count", e);
                 if (callback != null) {
                     postCallback(() -> callback.accept(0));
                 }
@@ -438,7 +438,7 @@ public class FellowshipViewModel extends ViewModel {
                     notificationRepo.markAsRead(notificationId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error marking notification as read: " + notificationId, e);
+                Log.e(TAG, "Error marking notification as read");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);
@@ -457,7 +457,7 @@ public class FellowshipViewModel extends ViewModel {
                     notificationRepo.markAllAsRead(userId);
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error marking all notifications as read for " + userId, e);
+                Log.e(TAG, "Error marking all member notifications as read", e);
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);

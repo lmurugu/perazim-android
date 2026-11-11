@@ -355,7 +355,7 @@ public class SessionManager {
                 new Thread(updateDb).start();
             }
         }
-        Log.d(TAG, "User logged in successfully: " + userId);
+        Log.d(TAG, "User logged in successfully");
     }
 
     /**
@@ -411,7 +411,7 @@ public class SessionManager {
                 }
             }).start();
         }
-        Log.d(TAG, "Active user logged out. Reverted to fresh isolated guest session: " + freshGuestId);
+        Log.d(TAG, "Active user logged out. Reverted to a fresh isolated guest session.");
     }
 
     /**
@@ -521,9 +521,9 @@ public class SessionManager {
                 }
                 GamificationStore.saveSpiritualXp(context, fromUserId, 0);
                 GamificationStore.saveStreak(context, fromUserId, 0, false);
-                Log.i(TAG, "Successfully migrated local data from " + fromUserId + " to " + toUserId);
+                Log.i(TAG, "Successfully migrated local data between account scopes");
             } catch (Exception e) {
-                Log.e(TAG, "Error migrating local data: " + e.getMessage(), e);
+                Log.e(TAG, "Error migrating local data between account scopes");
             }
         });
     }

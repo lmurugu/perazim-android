@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${res.statusCode} ${duration}ms`);
   });
   next();
 });
@@ -58,7 +58,7 @@ app.use('/api/admin', adminMembershipRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('Unhandled server error:', err);
+  console.error('Unhandled server error');
   res.status(500).json({ error: 'Internal server error' });
 });
 
@@ -69,13 +69,13 @@ function validateStartup() {
   if (isProd) {
     if (!secret) {
       const err = new Error('FATAL: A secure JWT_SECRET environment variable is strictly required in production mode. Refusing to boot.');
-      console.error(err.message);
+      console.error('Server shutdown error');
       process.exit(1);
       throw err;
     }
     if (secret.length < 32 || secret === 'perazim-secret-key-2026') {
       const err = new Error('FATAL: JWT_SECRET in production must be at least 32 characters and cannot use default placeholders.');
-      console.error(err.message);
+      console.error('Server startup error');
       process.exit(1);
       throw err;
     }
@@ -92,7 +92,7 @@ async function startServer() {
   try {
     await initDb();
   } catch (err) {
-    console.error(`FATAL: Database connection failed: ${err.message}. Actionable: Ensure PostgreSQL is running and DATABASE_URL is valid, or explicitly set ALLOW_MEMORY_STORE=true to allow local in-memory fallback.`);
+    console.error('FATAL: Database connection failed. Ensure PostgreSQL is running and DATABASE_URL is valid, or explicitly enable local in-memory fallback.');
     process.exit(1);
     throw err;
   }

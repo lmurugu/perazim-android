@@ -82,8 +82,7 @@ public final class SyncDispatcher {
                 if (authToken != null && !guestSession) {
                     for (SyncQueueEntity item : queueManager.getPendingOperations(0)) {
                         // Legacy unowned drafts are retained for manual recovery, never attributed to another member.
-                        if (syncUserId.equals(SyncQueueManager.ownerOf(item)) && pending.size() < 25
-                                && item.getTimestampMillis() <= System.currentTimeMillis()) pending.add(item);
+                        if (syncUserId.equals(SyncQueueManager.ownerOf(item)) && pending.size() < 25) pending.add(item);
                     }
                 }
                 JSONArray mutationsArray = new JSONArray();
@@ -100,7 +99,7 @@ public final class SyncDispatcher {
                             mutationsArray.put(obj);
                             queueManager.markSyncing(item.getId());
                         } catch (Exception e) {
-                            Log.w(TAG, "Error serializing sync item: " + item.getId(), e);
+                            Log.w(TAG, "Error serializing sync item");
                         }
                     }
                 }
@@ -115,7 +114,7 @@ public final class SyncDispatcher {
                         pending,
                         mutationsArray,
                         lastSyncTs,
-                        0L,
+                        null,
                         1,
                         0,
                         0,
@@ -125,7 +124,7 @@ public final class SyncDispatcher {
                         callback
                 );
             } catch (Exception e) {
-                Log.e(TAG, "Fatal error executing sync", e);
+                Log.e(TAG, "Fatal error executing sync");
                 IS_SYNCING.set(false);
                 if (callback != null) {
                     MAIN_HANDLER.post(() -> callback.onSyncComplete(false, 0, 0));
@@ -144,7 +143,7 @@ public final class SyncDispatcher {
             @Nullable List<SyncQueueEntity> pendingMutations,
             @NonNull JSONArray mutationsToSend,
             long lastSyncTs,
-            long cursor,
+            @Nullable String cursor,
             int pageNumber,
             int accumulatedSyncedCount,
             int accumulatedIngestedCount,
@@ -160,7 +159,7 @@ public final class SyncDispatcher {
                                   @NonNull JSONArray updatedPrayers,
                                   long serverTime,
                                   boolean hasMore,
-                                  long nextCursor) {
+                                  @Nullable String nextCursor) {
                 EXECUTOR.execute(() -> {
                     try {
                         int pageSyncedCount = 0;
@@ -193,7 +192,7 @@ public final class SyncDispatcher {
                                 if (SyncQueueManager.isPermanentFailure(reason, -1)) {
                                     // Permanent rejection: preserve user content/draft in queue, mark FAILED
                                     queueManager.recordPermanentFailure(rejId, reason, message);
-                                    Log.w(TAG, "Permanent mutation rejection for item " + rejId + " [" + reason + "]: " + message);
+                                    Log.w(TAG, "Permanent sync mutation rejected; details retained for the member's local retry state.");
                                 } else {
                                     // Transient failure: retry with exponential backoff
                                     queueManager.recordFailure(rejId, "[" + reason + "] " + message, true);
@@ -203,8 +202,8 @@ public final class SyncDispatcher {
                             // 3. Mark unacknowledged items for retry (network dropped / partial server batch)
                             for (SyncQueueEntity item : pendingMutations) {
                                 if (!processedIds.contains(item.getId())) {
-                                    Log.w(TAG, "Mutation " + item.getId() + " unacknowledged by server; scheduling retry.");
-                                    queueManager.recordFailure(item.getId(), "Unacknowledged in batch response", true);
+                                    Log.w(TAG, "A sync mutation was unacknowledged; scheduling retry.");
+                                    queueManager.recordTransportFailure(item.getId(), "Unacknowledged in batch response");
                                 }
                             }
                         }
@@ -302,17 +301,18 @@ public final class SyncDispatcher {
                         long highestServerTime = Math.max(maxServerTimeSeen, serverTime);
 
                         // Multi-page pagination evaluation (REQ-08)
-                        boolean morePages = (hasMore || (nextCursor > 0 && nextCursor != cursor)) && (updatedPrayers.length() > 0);
-                        long effectiveNextCursor = nextCursor;
-                        if (effectiveNextCursor <= 0 && updatedPrayers.length() > 0) {
+                        String effectiveNextCursor = nextCursor;
+                        if ((effectiveNextCursor == null || effectiveNextCursor.isEmpty()) && hasMore && updatedPrayers.length() > 0) {
                             JSONObject lastPrayer = updatedPrayers.optJSONObject(updatedPrayers.length() - 1);
                             if (lastPrayer != null) {
-                                effectiveNextCursor = Math.max(lastPrayer.optLong("updated_at", 0), lastPrayer.optLong("created_at", 0));
+                                effectiveNextCursor = lastPrayer.optLong("updated_at", 0) + ":" + lastPrayer.optString("id", "");
                             }
                         }
+                        boolean morePages = hasMore && effectiveNextCursor != null && !effectiveNextCursor.isEmpty()
+                                && !effectiveNextCursor.equals(cursor) && updatedPrayers.length() > 0;
 
-                        if (morePages && effectiveNextCursor > 0 && effectiveNextCursor != cursor) {
-                            Log.d(TAG, "Fetching next sync page " + (pageNumber + 1) + " (cursor=" + effectiveNextCursor + ")...");
+                        if (morePages) {
+                            Log.d(TAG, "Fetching next sync page " + (pageNumber + 1) + ".");
                             executeSyncPage(
                                     appContext,
                                     queueManager,
@@ -342,7 +342,7 @@ public final class SyncDispatcher {
                             }
                         }
                     } catch (Exception e) {
-                        Log.e(TAG, "Error ingesting sync batch into Room", e);
+                        Log.e(TAG, "Error ingesting sync batch into Room");
                         IS_SYNCING.set(false);
                         if (callback != null) {
                             MAIN_HANDLER.post(() -> callback.onSyncComplete(false, accumulatedSyncedCount, accumulatedIngestedCount));
@@ -354,16 +354,16 @@ public final class SyncDispatcher {
             @Override
             public void onError(int statusCode, @NonNull String errorMessage) {
                 EXECUTOR.execute(() -> {
-                    Log.w(TAG, "Batch sync failed on page " + pageNumber + " (HTTP " + statusCode + "): " + errorMessage);
+                    Log.w(TAG, "Batch sync failed on page " + pageNumber + " (HTTP " + statusCode + ").");
 
                     // Mark pending operations on failure
                     if (pageNumber == 1 && pendingMutations != null) {
-                        boolean isPermanent = SyncQueueManager.isPermanentFailure(errorMessage, statusCode);
+                        boolean isPermanent = statusCode >= 400 && statusCode < 500 && statusCode != 408;
                         for (SyncQueueEntity item : pendingMutations) {
                             if (isPermanent) {
                                 queueManager.recordPermanentFailure(item.getId(), "HTTP_" + statusCode, errorMessage);
                             } else {
-                                queueManager.recordFailure(item.getId(), "HTTP " + statusCode + ": " + errorMessage, true);
+                                queueManager.recordTransportFailure(item.getId(), "HTTP " + statusCode + ": " + errorMessage);
                             }
                         }
                     }

@@ -141,7 +141,7 @@ async function ensureSeedData() {
       console.log("✅ Seeded daily Bible challenge for " + today);
     }
   } catch (err) {
-    console.error("Seed data error:", err);
+    console.error("Seed data error");
   }
 }
 
@@ -220,7 +220,7 @@ router.get('/posts', optionalAuth, async (req, res) => {
       nextCursor
     });
   } catch (err) {
-    console.error('Error fetching community posts:', err);
+    console.error('Error fetching community posts');
     res.status(500).json({ error: 'Failed to fetch community posts' });
   }
 });
@@ -296,7 +296,7 @@ router.post('/posts', requireAuth, async (req, res) => {
       post: result.rows[0]
     });
   } catch (err) {
-    console.error('Error creating post:', err);
+    console.error('Error creating post');
     res.status(500).json({ error: 'Failed to create post' });
   }
 });
@@ -332,7 +332,7 @@ router.put('/posts/:id', requireAuth, async (req, res) => {
 
     res.json({ post: updateRes.rows[0] });
   } catch (err) {
-    console.error('Error editing post:', err);
+    console.error('Error editing post');
     res.status(500).json({ error: 'Failed to edit post' });
   }
 });
@@ -356,7 +356,7 @@ router.delete('/posts/:id', requireAuth, async (req, res) => {
 
     res.json({ success: true, message: 'Post deleted successfully' });
   } catch (err) {
-    console.error('Error deleting post:', err);
+    console.error('Error deleting post');
     res.status(500).json({ error: 'Failed to delete post' });
   }
 });
@@ -394,7 +394,7 @@ router.post('/posts/:id/amen', requireAuth, async (req, res) => {
       hasAmened: outcome.hasAmened
     });
   } catch (err) {
-    console.error('Error recording amen:', err);
+    console.error('Error recording amen');
     res.status(500).json({ error: 'Failed to record Amen' });
   }
 });
@@ -416,7 +416,7 @@ router.get('/posts/:id/comments', optionalAuth, async (req, res) => {
 
     res.json({ comments: result.rows });
   } catch (err) {
-    console.error('Error fetching comments:', err);
+    console.error('Error fetching comments');
     res.status(500).json({ error: 'Failed to fetch comments' });
   }
 });
@@ -479,7 +479,7 @@ router.post('/posts/:id/comments', requireAuth, async (req, res) => {
 
     res.status(201).json({ comment });
   } catch (err) {
-    console.error('Error adding comment:', err);
+    console.error('Error adding comment');
     res.status(500).json({ error: 'Failed to add comment' });
   }
 });
@@ -505,7 +505,7 @@ router.get('/groups', requireAuth, async (req, res) => {
 
     res.json({ groups: result.rows });
   } catch (err) {
-    console.error('Error fetching groups:', err);
+    console.error('Error fetching groups');
     res.status(500).json({ error: 'Failed to fetch groups' });
   }
 });
@@ -527,7 +527,7 @@ router.get('/groups/:id/members', requireAuth, async (req, res) => {
 
     res.json({ members: result.rows });
   } catch (err) {
-    console.error('Error fetching group members:', err);
+    console.error('Error fetching group members');
     res.status(500).json({ error: 'Failed to fetch group members' });
   }
 });
@@ -561,7 +561,7 @@ router.post('/groups', requireAuth, async (req, res) => {
 
     res.status(201).json({ group });
   } catch (err) {
-    console.error('Error creating group:', err);
+    console.error('Error creating group');
     res.status(500).json({ error: 'Failed to create group' });
   }
 });
@@ -588,7 +588,7 @@ router.post('/groups/:id/members', requireAuth, async (req, res) => {
 
     res.json({ success: true, message: 'Member added to group successfully' });
   } catch (err) {
-    console.error('Error adding member to group:', err);
+    console.error('Error adding member to group');
     res.status(500).json({ error: 'Failed to add member to group' });
   }
 });
@@ -633,7 +633,7 @@ router.get('/conversations', requireAuth, async (req, res) => {
 
     res.json({ conversations: result.rows });
   } catch (err) {
-    console.error('Error fetching conversations:', err);
+    console.error('Error fetching conversations');
     res.status(500).json({ error: 'Failed to fetch conversations' });
   }
 });
@@ -659,7 +659,7 @@ router.get('/messages/:partnerId', requireAuth, async (req, res) => {
 
     res.json({ messages: result.rows });
   } catch (err) {
-    console.error('Error fetching messages:', err);
+    console.error('Error fetching messages');
     res.status(500).json({ error: 'Failed to fetch messages' });
   }
 });
@@ -721,7 +721,7 @@ router.post('/messages', requireAuth, async (req, res) => {
 
     res.status(201).json({ message });
   } catch (err) {
-    console.error('Error sending message:', err);
+    console.error('Error sending message');
     res.status(500).json({ error: 'Failed to send message' });
   }
 });
@@ -745,7 +745,7 @@ router.post('/messages/ack', requireAuth, async (req, res) => {
 
     res.json({ updated: resUpdate.rowCount });
   } catch (err) {
-    console.error('Error acknowledging messages:', err);
+    console.error('Error acknowledging messages');
     res.status(500).json({ error: 'Failed to acknowledge messages' });
   }
 });
@@ -785,7 +785,7 @@ router.post('/media/upload', requireAuth, async (req, res) => {
       sizeBytes: validated.sizeBytes
     });
   } catch (err) {
-    console.error('Media upload validation error:', err.message);
+    console.error('Media upload validation error');
     res.status(400).json({ error: err.message });
   }
 });
@@ -837,7 +837,7 @@ router.post('/posts/:id/rsvp', requireAuth, async (req, res) => {
       declinedCount: parseInt(countRes.rows[0].declined_count, 10)
     });
   } catch (err) {
-    console.error('Error recording RSVP:', err);
+    console.error('Error recording RSVP');
     res.status(500).json({ error: 'Failed to record RSVP' });
   }
 });
@@ -870,7 +870,7 @@ router.get('/posts/:id/rsvps', optionalAuth, async (req, res) => {
       userStatus
     });
   } catch (err) {
-    console.error('Error fetching RSVPs:', err);
+    console.error('Error fetching RSVPs');
     res.status(500).json({ error: 'Failed to fetch RSVPs' });
   }
 });
@@ -909,7 +909,7 @@ router.get('/challenge/today', optionalAuth, async (req, res) => {
       isCompleted
     });
   } catch (err) {
-    console.error('Error fetching daily challenge:', err);
+    console.error('Error fetching daily challenge');
     res.status(500).json({ error: 'Failed to fetch daily challenge' });
   }
 });
@@ -971,7 +971,7 @@ router.post('/challenge/submit', requireAuth, async (req, res) => {
       xpAwarded: 20
     });
   } catch (err) {
-    console.error('Error submitting challenge:', err);
+    console.error('Error submitting challenge');
     res.status(500).json({ error: 'Failed to submit challenge' });
   }
 });
@@ -1002,7 +1002,7 @@ router.get('/notifications', requireAuth, async (req, res) => {
       unreadCount: parseInt(unreadCountRes.rows[0].count, 10)
     });
   } catch (err) {
-    console.error('Error fetching notifications:', err);
+    console.error('Error fetching notifications');
     res.status(500).json({ error: 'Failed to fetch notifications' });
   }
 });
@@ -1022,7 +1022,7 @@ router.post('/notifications/read', requireAuth, async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error('Error marking notifications as read:', err);
+    console.error('Error marking notifications as read');
     res.status(500).json({ error: 'Failed to update notifications' });
   }
 });
@@ -1067,7 +1067,7 @@ router.put('/profile', requireAuth, async (req, res) => {
 
     res.json({ user: updateRes.rows[0] });
   } catch (err) {
-    console.error('Error updating profile:', err);
+    console.error('Error updating profile');
     res.status(500).json({ error: 'Failed to update profile' });
   }
 });

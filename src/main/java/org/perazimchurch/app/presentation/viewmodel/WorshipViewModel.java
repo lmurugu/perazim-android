@@ -106,7 +106,7 @@ public class WorshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error filtering hymns by category: " + category, e);
+                Log.e(TAG, "Error filtering hymns by category");
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -126,7 +126,7 @@ public class WorshipViewModel extends ViewModel {
                     postCallback(() -> callback.accept(res));
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error searching hymns for query: " + query, e);
+                Log.e(TAG, "Error searching hymns");
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
@@ -142,7 +142,7 @@ public class WorshipViewModel extends ViewModel {
             try {
                 hymnRepo.toggleFavorite(hymnId, isFavorite);
             } catch (Exception e) {
-                Log.e(TAG, "Error toggling hymn favorite: " + hymnId, e);
+                Log.e(TAG, "Error toggling hymn favorite");
             } finally {
                 if (onDone != null) {
                     postCallback(onDone);

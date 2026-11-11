@@ -17,18 +17,25 @@ function sanitizePrayer(prayer) {
 }
 
 // GET /api/prayers
-router.get('/', async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
     const rawSince = req.query.since || req.query.cursor;
     const since = (rawSince && !isNaN(rawSince)) ? Math.max(0, parseInt(rawSince, 10)) : 0;
+    const userId = req.user ? req.user.id : null;
+    // ADMIN is the existing administrator check used by this route for testimony writes.
+    const isAdmin = !!(req.user && req.user.role === 'ADMIN');
     const result = await query(
-      'SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at FROM prayers WHERE updated_at > $1 OR created_at > $1 ORDER BY created_at DESC LIMIT 100',
-      [since]
+      `SELECT id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at
+         FROM prayers
+        WHERE (visibility = 'PUBLIC' OR ($2::text IS NOT NULL AND author_id = $2) OR $3::boolean)
+          AND (updated_at > $1 OR created_at > $1)
+        ORDER BY created_at DESC LIMIT 100`,
+      [since, userId, isAdmin]
     );
     const prayers = (result.rows || []).map(sanitizePrayer);
     return res.json({ prayers });
   } catch (err) {
-    console.error('Fetch prayers error:', err);
+    console.error('Fetch prayers error');
     return res.status(500).json({ error: 'Server error loading prayers' });
   }
 });
@@ -69,7 +76,7 @@ router.post('/', optionalAuth, async (req, res) => {
 
     return res.status(201).json({ prayer: sanitizePrayer(created) });
   } catch (err) {
-    console.error('Create prayer error:', err);
+    console.error('Create prayer error');
     return res.status(500).json({ error: 'Server error submitting prayer' });
   }
 });
@@ -98,7 +105,7 @@ router.post('/:id/amen', optionalAuth, async (req, res) => {
 
     return res.json({ success: true, prayerId, inserted: result.inserted });
   } catch (err) {
-    console.error('Amen prayer error:', err);
+    console.error('Amen prayer error');
     return res.status(500).json({ error: 'Server error amening prayer' });
   }
 });
@@ -127,7 +134,7 @@ router.post('/:id/testimony', requireAuth, async (req, res) => {
 
     return res.json({ success: true, prayerId, testimony: testimony.trim() });
   } catch (err) {
-    console.error('Prayer testimony error:', err);
+    console.error('Prayer testimony error');
     return res.status(500).json({ error: 'Server error recording testimony' });
   }
 });

@@ -90,7 +90,7 @@ public class YouTubeFeedRepository {
             in = conn.getInputStream();
             return parseAtomFeed(in);
         } catch (Exception e) {
-            Log.e(TAG, "Error fetching YouTube feed: " + e.getMessage(), e);
+            Log.e(TAG, "Error fetching YouTube feed");
             return null;
         } finally {
             if (in != null) {

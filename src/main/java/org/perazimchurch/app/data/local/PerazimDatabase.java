@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
 
 import org.perazimchurch.app.data.local.converter.Converters;
 import org.perazimchurch.app.data.local.dao.AnnouncementDao;
@@ -105,7 +106,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         EventRsvpEntity.class,
         DailyChallengeEntity.class
     },
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 @TypeConverters({Converters.class})
@@ -195,18 +196,37 @@ public abstract class PerazimDatabase extends RoomDatabase {
         }
     };
 
+    public static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            db.execSQL("CREATE TABLE `sync_queue_new` (" +
+                    "`sequenceNumber` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`id` TEXT NOT NULL, `operationType` TEXT, `entityType` TEXT, `entityId` TEXT, " +
+                    "`payloadJson` TEXT, `timestampMillis` INTEGER NOT NULL, " +
+                    "`nextAttemptAt` INTEGER NOT NULL, `status` TEXT, " +
+                    "`retryCount` INTEGER NOT NULL, `lastError` TEXT)");
+            db.execSQL("INSERT INTO `sync_queue_new` (`id`, `operationType`, `entityType`, `entityId`, `payloadJson`, `timestampMillis`, `nextAttemptAt`, `status`, `retryCount`, `lastError`) " +
+                    "SELECT `id`, `operationType`, `entityType`, `entityId`, `payloadJson`, `timestampMillis`, 0, `status`, `retryCount`, `lastError` FROM `sync_queue` ORDER BY `timestampMillis` ASC, `id` ASC");
+            db.execSQL("DROP TABLE `sync_queue`");
+            db.execSQL("ALTER TABLE `sync_queue_new` RENAME TO `sync_queue`");
+            db.execSQL("CREATE UNIQUE INDEX `index_sync_queue_id` ON `sync_queue` (`id`)");
+        }
+    };
+
     public static PerazimDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (PerazimDatabase.class) {
                 if (INSTANCE == null) {
+                    Context appContext = context.getApplicationContext();
+                    byte[] databaseKey = DatabaseEncryptionManager.prepareDatabase(
+                            appContext, DATABASE_NAME, "database/perazim_database.db");
                     INSTANCE = Room.databaseBuilder(
-                            context.getApplicationContext(),
+                            appContext,
                             PerazimDatabase.class,
                             DATABASE_NAME
                     )
-                    .createFromAsset("database/perazim_database.db")
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6)
-                    .fallbackToDestructiveMigration()
+                    .openHelperFactory(new SupportOpenHelperFactory(databaseKey))
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .build();
                 }
             }
