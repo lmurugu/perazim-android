@@ -268,6 +268,16 @@ async function runTests() {
     }, token2);
     assert(forgedTopLevelActor.body.rejectedMutations[0].reason === 'ACTOR_MISMATCH', 'Top-level userId differing from the authenticated actor is rejected');
 
+    const progressMutation = { id: 'progress_once', operationType: 'UPDATE', entityType: 'USER_PROGRESS', payloadJson: JSON.stringify({ xp: 15, streak: 2 }) };
+    const firstProgressSync = await makeRequest('POST', '/api/sync', { mutations: [progressMutation] }, token2);
+    const replayProgressSync = await makeRequest('POST', '/api/sync', {
+      mutations: [{ ...progressMutation, payloadJson: JSON.stringify({ xp: 99, streak: 9 }) }]
+    }, token2);
+    assert(firstProgressSync.body.syncedIds.includes('progress_once') && replayProgressSync.body.syncedIds.includes('progress_once'), 'A retried mutation returns its stored acknowledgement');
+    assert(memoryStore.users.find(user => user.id === regUser2.body.user.id).xp === 15, 'A replay with changed payload does not apply the progress update again');
+    assert(memoryStore.sync_receipts.filter(receipt => receipt.mutation_id === 'progress_once').length === 1, 'A mutation key has one durable receipt');
+    assert(memoryStore.sync_events.filter(event => event.entity_id === 'progress_once').length === 1, 'A replay does not add another audit event');
+
     // 12. Brute-Force Rate Limiting Test (5 failed attempts trigger 429 lockout)
     const bruteForcePhone = '0788000000';
     // Register account to test wrong PIN attempts

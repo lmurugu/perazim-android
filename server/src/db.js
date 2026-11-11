@@ -19,6 +19,7 @@ const memoryStore = {
   messages: [],
   connections: [],
   sync_events: [],
+  sync_receipts: [],
   revoked_tokens: [],
   privacy_notice_acknowledgements: [],
   privacy_presentation_receipts: [],
@@ -327,6 +328,22 @@ async function query(sql, params = []) {
     return { rows: [], rowCount: 1 };
   }
 
+  if (lower.startsWith('select') && lower.includes('from sync_receipts')) {
+    const [user_id, mutation_id] = params;
+    const receipt = memoryStore.sync_receipts.find(r => r.user_id === user_id && r.mutation_id === mutation_id);
+    return { rows: receipt ? [{ ...receipt }] : [], rowCount: receipt ? 1 : 0 };
+  }
+
+  if (lower.startsWith('insert into sync_receipts')) {
+    const [user_id, mutation_id, status, response_json, created_at] = params;
+    const exists = memoryStore.sync_receipts.some(r => r.user_id === user_id && r.mutation_id === mutation_id);
+    if (!exists) {
+      memoryStore.sync_receipts.push({ user_id, mutation_id, status, response_json, created_at });
+      return { rows: [], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 0 };
+  }
+
   // SELECT FROM revoked_tokens
   if (lower.startsWith('select') && lower.includes('from revoked_tokens')) {
     const hash = params[0];
@@ -361,11 +378,12 @@ async function withTransaction(work) {
       throw error;
     } finally { client.release(); }
   }
-  const receipts = [...memoryStore.privacy_presentation_receipts];
-  const acknowledgements = [...memoryStore.privacy_notice_acknowledgements];
+  const snapshot = Object.fromEntries(['privacy_presentation_receipts', 'privacy_notice_acknowledgements', 'prayers', 'prayer_amens', 'sync_events', 'sync_receipts', 'users']
+    .map(key => [key, memoryStore[key].map(row => ({ ...row }))]));
   try {
     return await work({ query: async (sql, params = []) => {
       const normalized = sql.trim().toLowerCase();
+      if (normalized.startsWith('select pg_advisory_xact_lock')) return { rows: [{ pg_advisory_xact_lock: null }], rowCount: 1 };
       if (normalized.startsWith('insert into privacy_presentation_receipts')) {
         const [receipt_hash,user_id,notice_version,content_hash,presented_at,expires_at] = params;
         if (memoryStore.privacy_presentation_receipts.some(item => item.receipt_hash === receipt_hash)) throw new Error('duplicate receipt');
@@ -392,8 +410,7 @@ async function withTransaction(work) {
       return query(sql, params);
     }});
   } catch (error) {
-    memoryStore.privacy_presentation_receipts = receipts;
-    memoryStore.privacy_notice_acknowledgements = acknowledgements;
+    for (const [key, rows] of Object.entries(snapshot)) memoryStore[key] = rows;
     throw error;
   }
 }

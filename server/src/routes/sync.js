@@ -3,6 +3,77 @@ const { query, withTransaction } = require('../db');
 const { optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
+const { randomUUID } = require('crypto');
+
+function parsePayload(payloadJson) {
+  if (!payloadJson) return {};
+  if (typeof payloadJson === 'object') return payloadJson;
+  return JSON.parse(payloadJson);
+}
+
+async function applyMutation(client, mutation, payload, user, now, requestBody = {}) {
+  const { id, operationType, entityType, entityId } = mutation;
+  const actorClaims = [
+    ['userId', requestBody.userId], ['authorId', requestBody.authorId], ['amenUserId', requestBody.amenUserId],
+    ['userId', payload.userId], ['authorId', payload.authorId], ['amenUserId', payload.amenUserId]
+  ];
+  const mismatch = actorClaims.find(([, claimedId]) => claimedId != null && String(claimedId) !== user.id);
+  if (mismatch) return { ok: false, reason: 'ACTOR_MISMATCH', message: `${mismatch[0]} must match the authenticated account` };
+
+  if (entityType === 'PRAYER' && operationType === 'CREATE') {
+    const prayerId = entityId || id;
+    const title = payload.title || 'Prayer Request';
+    const content = payload.content || '';
+    const isAnon = !!payload.isAnonymous;
+    const existingRes = await client.query('SELECT id, author_id, content FROM prayers WHERE id = $1', [prayerId]);
+    const existing = existingRes.rows && existingRes.rows[0];
+    if (existing && existing.author_id !== user.id) {
+      return { ok: false, reason: 'CONFLICT_MISMATCH', message: 'Prayer ID is registered to another author' };
+    }
+    if (existing && existing.content !== content) {
+      return { ok: false, reason: 'CONFLICT_MISMATCH', message: 'Prayer ID already exists with conflicting content' };
+    }
+    if (!existing) {
+      await client.query(
+        'INSERT INTO prayers (id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+        [prayerId, title, content, user.id, isAnon ? 'Anonymous Saint' : user.name, isAnon, 'PUBLIC', 0, false, '', now, now]
+      );
+    }
+    return { ok: true };
+  }
+
+  if (entityType === 'PRAYER_AMEN' && operationType === 'CREATE') {
+    const prayerId = entityId;
+    const prayer = await client.query('SELECT id FROM prayers WHERE id = $1', [prayerId]);
+    if (!prayer.rows || !prayer.rows[0]) return { ok: false, reason: 'NOT_FOUND', message: 'Prayer request not found' };
+    const inserted = await client.query(
+      'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
+      [prayerId, user.id, now]
+    );
+    if (inserted.rowCount > 0) await client.query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
+    return { ok: true };
+  }
+
+  if (entityType === 'PRAYER_TESTIMONY' && operationType === 'UPDATE') {
+    const prayerId = entityId;
+    const prayerRes = await client.query('SELECT id, author_id FROM prayers WHERE id = $1', [prayerId]);
+    const prayer = prayerRes.rows && prayerRes.rows[0];
+    if (!prayer) return { ok: false, reason: 'NOT_FOUND', message: 'Prayer request not found' };
+    if (prayer.author_id !== user.id && user.role !== 'ADMIN') {
+      return { ok: false, reason: 'FORBIDDEN', message: 'Only original prayer author may record testimony' };
+    }
+    await client.query('UPDATE prayers SET is_answered = true, testimony = $2, updated_at = $3 WHERE id = $1', [prayerId, payload.testimony || '', now]);
+    return { ok: true };
+  }
+
+  if (entityType === 'USER_PROGRESS' && operationType === 'UPDATE') {
+    if (payload.xp !== undefined) {
+      await client.query('UPDATE users SET xp = $1, streak = $2, updated_at = $3 WHERE id = $4', [payload.xp, payload.streak || 0, now, user.id]);
+    }
+    return { ok: true };
+  }
+  return { ok: false, reason: 'UNSUPPORTED_OPERATION', message: `Entity '${entityType}' or operation '${operationType}' is not supported by this server` };
+}
 
 function sanitizePrayer(prayer) {
   if (prayer && (prayer.is_anonymous || prayer.is_anonymous === 'true' || prayer.is_anonymous === 1)) {
@@ -31,169 +102,35 @@ router.post('/', optionalAuth, async (req, res) => {
       for (const m of mutations) {
         try {
           const { id, operationType, entityType, entityId, payloadJson } = m;
-          let payload = {};
-          try {
-            payload = payloadJson ? JSON.parse(payloadJson) : {};
-          } catch (e) {
-            payload = {};
-          }
-
-          const actorClaims = [
-            ['userId', req.body && req.body.userId],
-            ['authorId', req.body && req.body.authorId],
-            ['amenUserId', req.body && req.body.amenUserId],
-            ['userId', payload.userId],
-            ['authorId', payload.authorId],
-            ['amenUserId', payload.amenUserId]
-          ];
-          const mismatch = actorClaims.find(([, claimedId]) =>
-            claimedId !== undefined && claimedId !== null && String(claimedId) !== req.user.id
-          );
-          if (mismatch) {
-            rejectedMutations.push({
-              id,
-              reason: 'ACTOR_MISMATCH',
-              message: `${mismatch[0]} must match the authenticated account`
-            });
-            continue;
-          }
-
-          if (entityType === 'PRAYER' && operationType === 'CREATE') {
-            const prayerId = entityId || id;
-            const title = payload.title || 'Prayer Request';
-            const content = payload.content || '';
-            const isAnon = !!payload.isAnonymous;
-            const authorId = req.user.id;
-            const authorName = isAnon ? 'Anonymous Saint' : req.user.name;
-
-            // REQ-05: Do NOT blindly ON CONFLICT DO NOTHING. Query existing first.
-            const existingRes = await query(
-              'SELECT id, author_id, content FROM prayers WHERE id = $1',
-              [prayerId]
+          const payload = parsePayload(payloadJson);
+          const outcome = await withTransaction(async (client) => {
+            // Serialize identical user/mutation keys so concurrent retries see the first receipt.
+            await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`${userId}:${id}`]);
+            const prior = await client.query(
+              'SELECT response_json FROM sync_receipts WHERE user_id = $1 AND mutation_id = $2', [userId, id]
             );
-            const existing = existingRes.rows && existingRes.rows[0];
-
-            if (existing) {
-              if (existing.author_id !== authorId) {
-                rejectedMutations.push({
-                  id,
-                  reason: 'CONFLICT_MISMATCH',
-                  message: 'Prayer ID is registered to another author'
-                });
-                continue;
-              }
-              if (existing.content !== content) {
-                rejectedMutations.push({
-                  id,
-                  reason: 'CONFLICT_MISMATCH',
-                  message: 'Prayer ID already exists with conflicting content'
-                });
-                continue;
-              }
-              // Matching author and content: idempotent replay
-              syncedIds.push(id);
-            } else {
-              try {
-                await query(
-                  'INSERT INTO prayers (id, title, content, author_id, author_name, is_anonymous, visibility, prayer_count, is_answered, testimony, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
-                  [prayerId, title, content, authorId, authorName, isAnon, 'PUBLIC', 0, false, '', now, now]
-                );
-                syncedIds.push(id);
-              } catch (insertErr) {
-                // Handle potential race condition if another process inserted concurrently
-                if (insertErr.code === '23505' || (insertErr.message && insertErr.message.includes('duplicate key'))) {
-                  const raceRes = await query('SELECT id, author_id, content FROM prayers WHERE id = $1', [prayerId]);
-                  const raceExisting = raceRes.rows && raceRes.rows[0];
-                  if (raceExisting) {
-                    if (raceExisting.author_id !== authorId) {
-                      rejectedMutations.push({
-                        id,
-                        reason: 'CONFLICT_MISMATCH',
-                        message: 'Prayer ID is registered to another author'
-                      });
-                      continue;
-                    }
-                    if (raceExisting.content !== content) {
-                      rejectedMutations.push({
-                        id,
-                        reason: 'CONFLICT_MISMATCH',
-                        message: 'Prayer ID already exists with conflicting content'
-                      });
-                      continue;
-                    }
-                    syncedIds.push(id);
-                  }
-                } else {
-                  throw insertErr;
-                }
-              }
-            }
-          } else if (entityType === 'PRAYER_AMEN') {
-            // REQ-04: Batch-Sync Amen Safety with transaction
-            const prayerId = entityId;
-            const amenUserId = req.user.id;
-
-            await withTransaction(async (client) => {
-              const insertRes = await client.query(
-                'INSERT INTO prayer_amens (prayer_id, user_id, created_at) VALUES ($1, $2, $3) ON CONFLICT (prayer_id, user_id) DO NOTHING',
-                [prayerId, amenUserId, now]
-              );
-              if (insertRes && insertRes.rowCount > 0) {
-                await client.query('UPDATE prayers SET prayer_count = prayer_count + 1 WHERE id = $1', [prayerId]);
-              }
-            });
-            syncedIds.push(id);
-          } else if (entityType === 'PRAYER_TESTIMONY') {
-            if (!req.user) {
-              rejectedMutations.push({ id, reason: 'AUTH_REQUIRED', message: 'Authentication required to post testimony' });
-              continue;
+            if (prior.rows && prior.rows[0]) {
+              const stored = prior.rows[0].response_json;
+              return typeof stored === 'string' ? JSON.parse(stored) : stored;
             }
 
-            const prayerId = entityId;
-            const prayerRes = await query('SELECT id, author_id FROM prayers WHERE id = $1', [prayerId]);
-            const prayer = prayerRes.rows && prayerRes.rows[0];
-
-            if (!prayer) {
-              rejectedMutations.push({ id, reason: 'NOT_FOUND', message: 'Prayer request not found' });
-              continue;
-            }
-
-            // Only prayer author or ADMIN can add testimony
-            if (prayer.author_id !== req.user.id && req.user.role !== 'ADMIN') {
-              rejectedMutations.push({ id, reason: 'FORBIDDEN', message: 'Only original prayer author may record testimony' });
-              continue;
-            }
-
-            const testimony = payload.testimony || '';
-            await query('UPDATE prayers SET is_answered = true, testimony = $2, updated_at = $3 WHERE id = $1', [prayerId, testimony, now]);
-            syncedIds.push(id);
-          } else if (entityType === 'USER_PROGRESS') {
-            if (!req.user) {
-              rejectedMutations.push({ id, reason: 'AUTH_REQUIRED', message: 'Authentication required to update user progress' });
-              continue;
-            }
-
-            if (payload.xp !== undefined) {
-              await query('UPDATE users SET xp = $1, streak = $2, updated_at = $3 WHERE id = $4', [payload.xp, payload.streak || 0, now, req.user.id]);
-            }
-            syncedIds.push(id);
-          } else {
-            // Refuse to acknowledge unsupported sync operations
-            rejectedMutations.push({
-              id,
-              reason: 'UNSUPPORTED_OPERATION',
-              message: `Entity '${entityType}' or operation '${operationType}' is not supported by this server`
-            });
-            continue;
-          }
-
-          // Record sync audit
-          await query(
-            'INSERT INTO sync_events (id, user_id, entity_type, entity_id, operation_type, payload, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-            ['sync_' + now + '_' + Math.random().toString(36).substring(2, 6), userId, entityType, entityId, operationType, payloadJson || '', now]
-          );
+            const result = await applyMutation(client, m, payload, req.user, now, req.body || {});
+            await client.query(
+              'INSERT INTO sync_events (id, user_id, entity_type, entity_id, operation_type, payload, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+              [randomUUID(), userId, entityType, entityId || id, operationType, payloadJson || '', now]
+            );
+            const response = result.ok ? { ok: true } : { ok: false, reason: result.reason, message: result.message };
+            await client.query(
+              'INSERT INTO sync_receipts (user_id, mutation_id, status, response_json, created_at) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (user_id, mutation_id) DO NOTHING',
+              [userId, id, response.ok ? 'SYNCED' : 'REJECTED', JSON.stringify(response), now]
+            );
+            return response;
+          });
+          if (outcome && outcome.ok) syncedIds.push(id);
+          else rejectedMutations.push({ id, reason: outcome.reason, message: outcome.message });
         } catch (itemErr) {
-          console.warn('Error processing mutation item:', itemErr.message);
+          console.error('Sync mutation transaction rolled back:', itemErr.message);
+          rejectedMutations.push({ id: m && m.id, reason: 'PROCESSING_ERROR', message: 'Mutation was not applied; retry is safe' });
         }
       }
     }
