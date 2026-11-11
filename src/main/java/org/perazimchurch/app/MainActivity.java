@@ -263,7 +263,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         if (topGraceBadge != null) {
             topGraceBadge.setText("💜 " + graceCount);
         }
-        org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(this, null);
+        org.perazimchurch.app.sync.BackgroundSyncScheduler.enqueue(this);
     }
 
     @Override

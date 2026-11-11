@@ -95,6 +95,7 @@ public class SyncQueueManager {
                 if (SyncStatus.PENDING.name().equalsIgnoreCase(status)) {
                     existingById.setPayloadJson(payloadJson);
                     syncQueueDao.update(existingById);
+                    scheduleBackgroundSync();
                     return existingById.getId();
                 }
                 idempotencyKeyIsInFlight = SyncStatus.SYNCING.name().equalsIgnoreCase(status);
@@ -108,6 +109,7 @@ public class SyncQueueManager {
                 if (SyncStatus.PENDING.name().equalsIgnoreCase(existingByEntity.getStatus())) {
                     existingByEntity.setPayloadJson(payloadJson);
                     syncQueueDao.update(existingByEntity);
+                    scheduleBackgroundSync();
                     return existingByEntity.getId();
                 }
             }
@@ -135,7 +137,12 @@ public class SyncQueueManager {
         );
 
         syncQueueDao.insert(newEntity);
+        scheduleBackgroundSync();
         return id;
+    }
+
+    private void scheduleBackgroundSync() {
+        if (appContext != null) BackgroundSyncScheduler.enqueue(appContext);
     }
 
     /**
@@ -160,6 +167,18 @@ public class SyncQueueManager {
         }
         List<SyncQueueEntity> items = syncQueueDao.getPendingOperations(limit, System.currentTimeMillis());
         return items != null ? items : Collections.emptyList();
+    }
+
+    /** Returns the earliest pending retry time, or zero when there is no pending work. */
+    public long getNextPendingAttemptAt() {
+        List<SyncQueueEntity> pending = syncQueueDao.getPendingItems();
+        long earliest = Long.MAX_VALUE;
+        if (pending != null) {
+            for (SyncQueueEntity item : pending) {
+                earliest = Math.min(earliest, item.getNextAttemptAt());
+            }
+        }
+        return earliest == Long.MAX_VALUE ? 0L : earliest;
     }
 
     /**

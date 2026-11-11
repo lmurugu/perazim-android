@@ -1,0 +1,61 @@
+name: Background Sync WorkManager Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  background-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          java-version: '17'
+          distribution: temurin
+          cache: gradle
+      - name: Test background sync scheduler on API 34 emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          script: |
+            set -euo pipefail
+            node server/test/workmanager_recovery_mock_server.js >/tmp/workmanager-mock.log 2>&1 &
+            MOCK_PID=$!
+            trap 'kill "$MOCK_PID" 2>/dev/null || true' EXIT
+            for attempt in $(seq 1 20); do
+              if curl -fsS http://127.0.0.1:18080/__received >/dev/null; then break; fi
+              sleep 1
+            done
+            adb shell svc wifi disable
+            adb shell svc data disable
+            ./gradlew connectedValidationAndroidTest \
+              -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
+              --stacktrace
+            adb shell am kill org.perazimchurch.app.validation || true
+            adb shell svc wifi enable
+            adb shell svc data enable
+            received=false
+            for attempt in $(seq 1 60); do
+              if curl -fsS http://127.0.0.1:18080/__received | grep -q 'wm_process_restart_probe'; then
+                received=true
+                break
+              fi
+              sleep 2
+            done
+            test "$received" = true
+            echo 'PASS: queued synthetic mutation reached the mock API after the app process was killed, without reopening the app.'
+      - name: Upload instrumentation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: background-sync-instrumentation-reports
+          path: build/outputs/androidTest-results/connected/**/*.xml
+          if-no-files-found: warn

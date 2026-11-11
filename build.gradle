@@ -167,10 +167,12 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'net.zetetic:sqlcipher-android:4.16.0@aar'
     implementation 'androidx.sqlite:sqlite:2.6.2'
+    implementation 'androidx.work:work-runtime:2.9.1'
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.zxing:core:3.5.3'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.room:room-testing:2.6.1'
+    androidTestImplementation 'androidx.work:work-testing:2.9.1'
 }
