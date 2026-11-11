@@ -55,7 +55,11 @@ public final class CommunityPrivacyHelper {
         if (connRepo == null || reporterId == null || offendingPeerId == null) {
             return;
         }
-        Log.w(TAG, "Abuse report filed by [" + reporterId + "] against offending peer [" + offendingPeerId + "]. Reason: " + (reason != null ? reason : "Unspecified"));
+        Log.w(TAG, reportLogMessage());
         connRepo.blockMember(reporterId, offendingPeerId);
+    }
+
+    static String reportLogMessage() {
+        return "Member safety report submitted";
     }
 }
