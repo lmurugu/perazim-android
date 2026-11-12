@@ -148,6 +148,157 @@ async function ensureSeedData() {
 setTimeout(ensureSeedData, 1000);
 
 // ============================================================================
+// 0. MEMBER CONNECTIONS (server-authoritative; QR payloads contain an account ID)
+// ============================================================================
+
+router.get('/connections', requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT c.id,c.requester_id,c.recipient_id,c.status,c.created_at,
+              peer.id AS peer_id,peer.name AS peer_name
+         FROM connections c
+         JOIN users peer ON peer.id=CASE WHEN c.requester_id=$1 THEN c.recipient_id ELSE c.requester_id END
+        WHERE (c.requester_id=$1 OR c.recipient_id=$1)
+          AND c.status='ACCEPTED' AND peer.is_active=TRUE
+        ORDER BY c.created_at DESC`, [req.user.id]
+    );
+    return res.json({ connections: result.rows });
+  } catch (error) {
+    console.error('Error fetching member connections:', error);
+    return res.status(500).json({ error: 'Failed to fetch member connections' });
+  }
+});
+
+router.get('/connections/pending', requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT c.id,c.requester_id,c.recipient_id,c.status,c.created_at,
+              requester.id AS peer_id,requester.name AS peer_name
+         FROM connections c JOIN users requester ON requester.id=c.requester_id
+        WHERE c.recipient_id=$1 AND c.status='PENDING' AND requester.is_active=TRUE
+        ORDER BY c.created_at DESC`, [req.user.id]
+    );
+    return res.json({ requests: result.rows });
+  } catch (error) {
+    console.error('Error fetching pending member connections:', error);
+    return res.status(500).json({ error: 'Failed to fetch pending connections' });
+  }
+});
+
+router.post('/connections', requireAuth, async (req, res) => {
+  const peerId = typeof req.body?.peer_id === 'string' ? req.body.peer_id.trim() : '';
+  if (!peerId || peerId.length > 64) return res.status(400).json({ error: 'A valid member account ID is required' });
+  if (peerId === req.user.id) return res.status(400).json({ error: 'You cannot connect with yourself' });
+
+  try {
+    const outcome = await withTransaction(async client => {
+      const ids = [req.user.id, peerId].sort();
+      // Serialize both directions of a pair across Node processes and hosts sharing PostgreSQL.
+      await client.query('SELECT pg_advisory_xact_lock(hashtext($1),hashtext($2))', ids);
+      const people = await client.query(
+        'SELECT id,name FROM users WHERE id=ANY($1::text[]) AND is_active=TRUE ORDER BY id FOR SHARE',
+        [[req.user.id, peerId]]
+      );
+      const actor = people.rows.find(row => row.id === req.user.id);
+      const peer = people.rows.find(row => row.id === peerId);
+      if (!actor) return { status: 401, body: { error: 'Account is unavailable' } };
+      if (!peer) return { status: 404, body: { error: 'Member account not found' } };
+
+      const prior = await client.query(
+        `SELECT id,requester_id,recipient_id,status,created_at FROM connections
+          WHERE (requester_id=$1 AND recipient_id=$2) OR (requester_id=$2 AND recipient_id=$1)
+          ORDER BY created_at DESC FOR UPDATE`, [req.user.id, peerId]
+      );
+      if (prior.rows.some(row => row.status === 'BLOCKED')) {
+        return { status: 403, body: { error: 'This connection is unavailable' } };
+      }
+      if (prior.rows.some(row => row.status === 'ACCEPTED')) {
+        return { status: 409, body: { error: 'These members are already connected' } };
+      }
+      const pending = prior.rows.find(row => row.status === 'PENDING');
+      if (pending && pending.requester_id === req.user.id) {
+        return { status: 200, body: { connection: { ...pending, peer_id: peerId, peer_name: peer.name } } };
+      }
+      if (pending) {
+        return { status: 409, body: { error: 'An incoming request is already waiting for your response' } };
+      }
+
+      const now = Date.now();
+      const existing = prior.rows[0];
+      const saved = existing
+        ? await client.query(
+            `UPDATE connections SET requester_id=$2,recipient_id=$3,status='PENDING',created_at=$4
+              WHERE id=$1 RETURNING id,requester_id,recipient_id,status,created_at`,
+            [existing.id, req.user.id, peerId, now]
+          )
+        : await client.query(
+            `INSERT INTO connections (id,requester_id,recipient_id,status,created_at)
+             VALUES ($1,$2,$3,'PENDING',$4)
+             RETURNING id,requester_id,recipient_id,status,created_at`,
+            [crypto.randomUUID(), req.user.id, peerId, now]
+          );
+      const connection = { ...saved.rows[0], peer_id: peerId, peer_name: peer.name };
+      await client.query(
+        `INSERT INTO in_app_notifications
+          (id,user_id,actor_id,actor_name,type,target_id,title,body,is_read,created_at)
+         VALUES ($1,$2,$3,$4,'CONNECTION',$5,'Connection request', $6,FALSE,$7)`,
+        [crypto.randomUUID(), peerId, req.user.id, actor.name, connection.id,
+          `${actor.name} sent you a connection request.`, now]
+      );
+      return { status: 201, body: { connection } };
+    });
+    return res.status(outcome.status).json(outcome.body);
+  } catch (error) {
+    console.error('Error creating member connection:', error);
+    return res.status(500).json({ error: 'Failed to create connection request' });
+  }
+});
+
+router.post('/connections/:id/respond', requireAuth, async (req, res) => {
+  const decision = typeof req.body?.decision === 'string' ? req.body.decision.toUpperCase() : '';
+  if (!['ACCEPT', 'REJECT'].includes(decision)) return res.status(400).json({ error: 'Decision must be ACCEPT or REJECT' });
+  try {
+    const outcome = await withTransaction(async client => {
+      const selected = await client.query(
+        `SELECT c.id,c.requester_id,c.recipient_id,c.status,c.created_at,
+                requester.name AS requester_name,recipient.name AS recipient_name
+           FROM connections c
+           JOIN users requester ON requester.id=c.requester_id
+           JOIN users recipient ON recipient.id=c.recipient_id
+          WHERE c.id=$1 AND c.recipient_id=$2 FOR UPDATE OF c`, [req.params.id, req.user.id]
+      );
+      if (!selected.rows.length) return { status: 404, body: { error: 'Pending connection request not found' } };
+      const request = selected.rows[0];
+      if (request.status !== 'PENDING') return { status: 409, body: { error: 'Connection request is no longer pending' } };
+      const now = Date.now();
+      const status = decision === 'ACCEPT' ? 'ACCEPTED' : 'REMOVED';
+      const updated = await client.query(
+        `UPDATE connections SET status=$2 WHERE id=$1
+         RETURNING id,requester_id,recipient_id,status,created_at`, [request.id, status]
+      );
+      const title = decision === 'ACCEPT' ? 'Connection accepted' : 'Connection request declined';
+      const body = decision === 'ACCEPT'
+        ? `${request.recipient_name} accepted your connection request.`
+        : `${request.recipient_name} declined your connection request.`;
+      await client.query(
+        `INSERT INTO in_app_notifications
+          (id,user_id,actor_id,actor_name,type,target_id,title,body,is_read,created_at)
+         VALUES ($1,$2,$3,$4,'CONNECTION',$5,$6,$7,FALSE,$8)`,
+        [crypto.randomUUID(), request.requester_id, req.user.id, request.recipient_name,
+          request.id, title, body, now]
+      );
+      return { status: 200, body: { connection: {
+        ...updated.rows[0], peer_id: request.requester_id, peer_name: request.requester_name
+      } } };
+    });
+    return res.status(outcome.status).json(outcome.body);
+  } catch (error) {
+    console.error('Error responding to member connection:', error);
+    return res.status(500).json({ error: 'Failed to respond to connection request' });
+  }
+});
+
+// ============================================================================
 // 1. COMMUNITY FEED & POSTS
 // ============================================================================
 

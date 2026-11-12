@@ -119,6 +119,69 @@ async function runTests() {
     const { token: memberBToken, user: memberBUser } = await registerOrLogin(phoneMemberB, testPin, 'Synthetic Member B', 'campus_nairobi');
     console.log('✅ Synthetic member B registered');
 
+    // QR connection requests are server-authoritative across devices.
+    const anonymousPending = await request({
+      hostname: '127.0.0.1', port: 3008, path: '/api/community/connections/pending', method: 'GET'
+    });
+    assert.strictEqual(anonymousPending.status, 401, 'connection requests require authentication');
+    const selfRequest = await request({
+      hostname: '127.0.0.1', port: 3008, path: '/api/community/connections', method: 'POST',
+      headers: { 'Authorization': `Bearer ${memberAToken}` }
+    }, { peer_id: memberAUser.id });
+    assert.strictEqual(selfRequest.status, 400, 'members cannot connect to themselves');
+    const connectionRequest = await request({
+      hostname: '127.0.0.1', port: 3008, path: '/api/community/connections', method: 'POST',
+      headers: { 'Authorization': `Bearer ${memberAToken}` }
+    }, { peer_id: memberBUser.id });
+    assert.strictEqual(connectionRequest.status, 201, 'member A can request member B');
+    assert.strictEqual(connectionRequest.body.connection.status, 'PENDING');
+    assert.strictEqual(connectionRequest.body.connection.peer_name, 'Synthetic Member B', 'server supplies peer identity');
+    const connectionId = connectionRequest.body.connection.id;
+    const duplicateConnectionRequest = await request({
+      hostname: '127.0.0.1', port: 3008, path: '/api/community/connections', method: 'POST',
+      headers: { 'Authorization': `Bearer ${memberAToken}` }
+    }, { peer_id: memberBUser.id });
+    assert.strictEqual(duplicateConnectionRequest.status, 200, 'retrying a pending request is idempotent');
+    assert.strictEqual(duplicateConnectionRequest.body.connection.id, connectionId);
+    const incomingForB = await request({
+      hostname: '127.0.0.1', port: 3008, path: '/api/community/connections/pending', method: 'GET',
+      headers: { 'Authorization': `Bearer ${memberBToken}` }
+    });
+    assert.strictEqual(incomingForB.status, 200);
+    assert.strictEqual(incomingForB.body.requests.length, 1, 'only the recipient sees this incoming request');
+    assert.strictEqual(incomingForB.body.requests[0].peer_id, memberAUser.id);
+    const incomingForA = await request({
+      hostname: '127.0.0.1', port: 3008, path: '/api/community/connections/pending', method: 'GET',
+      headers: { 'Authorization': `Bearer ${memberAToken}` }
+    });
+    assert.strictEqual(incomingForA.body.requests.length, 0, 'requester does not see it as an incoming request');
+    const requestNotification = await query(
+      "SELECT COUNT(*)::int AS count FROM in_app_notifications WHERE user_id=$1 AND type='CONNECTION' AND target_id=$2",
+      [memberBUser.id, connectionId]
+    );
+    assert.strictEqual(requestNotification.rows[0].count, 1, 'recipient gets one notification despite a retry');
+    const unauthorizedResponse = await request({
+      hostname: '127.0.0.1', port: 3008, path: `/api/community/connections/${connectionId}/respond`, method: 'POST',
+      headers: { 'Authorization': `Bearer ${memberAToken}` }
+    }, { decision: 'ACCEPT' });
+    assert.strictEqual(unauthorizedResponse.status, 404, 'only the recipient may respond');
+    const accepted = await request({
+      hostname: '127.0.0.1', port: 3008, path: `/api/community/connections/${connectionId}/respond`, method: 'POST',
+      headers: { 'Authorization': `Bearer ${memberBToken}` }
+    }, { decision: 'ACCEPT' });
+    assert.strictEqual(accepted.status, 200);
+    assert.strictEqual(accepted.body.connection.status, 'ACCEPTED');
+    for (const [token, peerId] of [[memberAToken, memberBUser.id], [memberBToken, memberAUser.id]]) {
+      const acceptedConnections = await request({
+        hostname: '127.0.0.1', port: 3008, path: '/api/community/connections', method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      assert.strictEqual(acceptedConnections.status, 200);
+      assert(acceptedConnections.body.connections.some(connection => connection.peer_id === peerId),
+        'both members see the accepted connection from shared server state');
+    }
+    console.log('✅ Server-backed QR connection request, notification, recipient-only approval, and shared accepted state verified');
+
     // 2. Profile Update (Bio and Avatar)
     console.log('\n--- Step 2: Member Profile Updates ---');
     const profUpdate = await request({

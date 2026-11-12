@@ -30,7 +30,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.perazimchurch.app.community.qr.PerazimQrHelper;
+import org.perazimchurch.app.data.remote.ApiClient;
 import org.perazimchurch.app.data.local.entity.UserEntity;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.data.repository.RepositoryProvider;
@@ -361,15 +364,11 @@ public class QrConnectionDialog extends Dialog {
         }
 
         String targetPeerId;
-        String targetPeerName;
-
         PerazimQrHelper.ConnectionPayload parsed = PerazimQrHelper.parseConnectionPayload(rawInput);
         if (parsed != null && !TextUtils.isEmpty(parsed.getUserId())) {
             targetPeerId = parsed.getUserId();
-            targetPeerName = !TextUtils.isEmpty(parsed.getName()) ? parsed.getName() : "Member " + targetPeerId;
         } else {
             targetPeerId = rawInput.trim();
-            targetPeerName = "Member " + targetPeerId;
         }
 
         if (userId.equalsIgnoreCase(targetPeerId)) {
@@ -377,13 +376,28 @@ public class QrConnectionDialog extends Dialog {
             return;
         }
 
+        String token = SessionManager.getInstance(getContext()).getAuthToken();
+        if (TextUtils.isEmpty(token)) {
+            Toast.makeText(getContext(), "Sign in to send a connection request.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         try {
-            connectionRepository.sendConnectionRequest(userId, targetPeerId, targetPeerName);
-            Toast.makeText(getContext(), "✓ Connection request sent to " + targetPeerName + "!", Toast.LENGTH_LONG).show();
-            etCode.setText("");
-            refreshPendingRequests();
+            JSONObject body = new JSONObject();
+            body.put("peer_id", targetPeerId);
+            ApiClient.post(getContext(), "api/community/connections", body, token, new ApiClient.ApiCallback() {
+                @Override public void onSuccess(int statusCode, @NonNull JSONObject json) {
+                    JSONObject connection = json.optJSONObject("connection");
+                    String peerName = connection == null ? "member" : connection.optString("peer_name", "member");
+                    Toast.makeText(getContext(), "✓ Connection request sent to " + peerName + ".", Toast.LENGTH_LONG).show();
+                    etCode.setText("");
+                    refreshPendingRequests();
+                }
+                @Override public void onError(int statusCode, @NonNull String errorMessage) {
+                    Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                }
+            });
         } catch (Exception e) {
-            Toast.makeText(getContext(), "Failed to send request: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Could not prepare the connection request.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -402,29 +416,58 @@ public class QrConnectionDialog extends Dialog {
 
     private void refreshPendingRequests() {
         if (pendingContainer == null) return;
-
         pendingContainer.removeAllViews();
-
-        List<Connection> requests = null;
-        try {
-            requests = connectionRepository.getPendingRequests(userId);
-        } catch (Exception ignored) {}
-
-        if (requests == null || requests.isEmpty()) {
-            if (tvPendingEmpty == null) {
-                tvPendingEmpty = new TextView(getContext());
-                tvPendingEmpty.setText("No pending connection requests.");
-                tvPendingEmpty.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
-                tvPendingEmpty.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
-                tvPendingEmpty.setPadding(0, dp(6), 0, dp(6));
-            }
-            pendingContainer.addView(tvPendingEmpty);
+        addPendingMessage("Loading connection requests…");
+        String token = SessionManager.getInstance(getContext()).getAuthToken();
+        if (TextUtils.isEmpty(token)) {
+            addPendingMessage("Sign in to see connection requests.");
             return;
         }
+        ApiClient.get(getContext(), "api/community/connections/pending", token, new ApiClient.ApiCallback() {
+            @Override public void onSuccess(int statusCode, @NonNull JSONObject json) {
+                if (pendingContainer == null || !isShowing()) return;
+                pendingContainer.removeAllViews();
+                JSONArray requests = json.optJSONArray("requests");
+                if (requests == null || requests.length() == 0) {
+                    addPendingMessage("No pending connection requests.");
+                    return;
+                }
+                for (int i = 0; i < requests.length(); i++) {
+                    JSONObject row = requests.optJSONObject(i);
+                    Connection req = fromServerRequest(row);
+                    if (req != null) pendingContainer.addView(createPendingRequestRow(req));
+                }
+                if (pendingContainer.getChildCount() == 0) addPendingMessage("No pending connection requests.");
+            }
+            @Override public void onError(int statusCode, @NonNull String errorMessage) {
+                if (pendingContainer == null || !isShowing()) return;
+                pendingContainer.removeAllViews();
+                addPendingMessage("Could not load requests. Check your connection and refresh.");
+            }
+        });
+    }
 
-        for (Connection req : requests) {
-            View reqRow = createPendingRequestRow(req);
-            pendingContainer.addView(reqRow);
+    private void addPendingMessage(String message) {
+        TextView text = new TextView(getContext());
+        text.setText(message);
+        text.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
+        text.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
+        text.setPadding(0, dp(6), 0, dp(6));
+        pendingContainer.addView(text);
+    }
+
+    @Nullable
+    private Connection fromServerRequest(@Nullable JSONObject json) {
+        if (json == null) return null;
+        try {
+            String statusValue = json.optString("status", "PENDING");
+            Connection.Status status = Connection.Status.valueOf(statusValue.toUpperCase(java.util.Locale.ROOT));
+            long createdAt = json.optLong("created_at", 0L);
+            return new Connection(json.optString("id"), json.optString("requester_id"),
+                    json.optString("recipient_id"), json.optString("peer_name", "Fellow Saint"),
+                    status, createdAt, createdAt);
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 
@@ -492,13 +535,7 @@ public class QrConnectionDialog extends Dialog {
         lpAcc.setMargins(0, 0, dp(6), 0);
         btnAccept.setLayoutParams(lpAcc);
         btnAccept.setOnClickListener(v -> {
-            try {
-                connectionRepository.acceptConnection(req.getId());
-                Toast.makeText(getContext(), "✓ Connected with " + peerDisplayName + "!", Toast.LENGTH_SHORT).show();
-                refreshPendingRequests();
-            } catch (Exception e) {
-                Toast.makeText(getContext(), "Error accepting connection", Toast.LENGTH_SHORT).show();
-            }
+            respondToRequest(req, "ACCEPT", peerDisplayName);
         });
         actions.addView(btnAccept);
 
@@ -512,19 +549,40 @@ public class QrConnectionDialog extends Dialog {
         LinearLayout.LayoutParams lpDec = new LinearLayout.LayoutParams(0, dp(34), 1.0f);
         btnDecline.setLayoutParams(lpDec);
         btnDecline.setOnClickListener(v -> {
-            try {
-                connectionRepository.rejectConnection(req.getId());
-                Toast.makeText(getContext(), "Connection request declined", Toast.LENGTH_SHORT).show();
-                refreshPendingRequests();
-            } catch (Exception e) {
-                Toast.makeText(getContext(), "Error declining connection", Toast.LENGTH_SHORT).show();
-            }
+            respondToRequest(req, "REJECT", peerDisplayName);
         });
         actions.addView(btnDecline);
 
         row.addView(actions);
 
         return row;
+    }
+
+    private void respondToRequest(@NonNull Connection request, @NonNull String decision, @NonNull String peerName) {
+        String token = SessionManager.getInstance(getContext()).getAuthToken();
+        if (TextUtils.isEmpty(token)) {
+            Toast.makeText(getContext(), "Sign in to respond to a connection request.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            JSONObject body = new JSONObject();
+            body.put("decision", decision);
+            ApiClient.post(getContext(), "api/community/connections/" + request.getId() + "/respond",
+                    body, token, new ApiClient.ApiCallback() {
+                        @Override public void onSuccess(int statusCode, @NonNull JSONObject json) {
+                            String message = "ACCEPT".equals(decision)
+                                    ? "✓ Connected with " + peerName + "."
+                                    : "Connection request declined.";
+                            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                            refreshPendingRequests();
+                        }
+                        @Override public void onError(int statusCode, @NonNull String errorMessage) {
+                            Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Could not prepare the response.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private View createDivider() {
