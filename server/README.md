@@ -30,6 +30,53 @@ npm start   # Starts server on port 3000
 - `POST /api/prayers/:id/testimony` — Mark prayer as answered with testimony
 - `POST /api/sync` — Offline-first batch mutation sync endpoint
 
+## Offline AI knowledge export (disabled by default)
+
+`GET /api/ai/offline-package/current` exports only approved, published public
+sources explicitly permitted for offline use. Export remains unavailable unless
+all of these server-side settings are supplied:
+
+- `PERAZIM_AI_OFFLINE_PACKAGE_EXPORT_ENABLED=true`
+- `PERAZIM_AI_PACKAGE_SIGNING_KEY_ID`
+- `PERAZIM_AI_PACKAGE_PRIVATE_KEY` (PEM, supplied through a protected secret
+  store; never commit or package the private key)
+- `PERAZIM_AI_PACKAGE_MIN_APP_VERSION`
+- `PERAZIM_AI_PACKAGE_TTL_MS` (positive safe integer; the resulting expiry is
+  included in the signed package)
+
+No production signing key or trust anchor is provisioned in this checkout.
+Keep export disabled until key custody and Android trust distribution are
+approved. The TTL is intentionally an operator setting rather than a hardcoded
+retention period. When no eligible public offline source remains, the endpoint
+returns a signed `EMPTY` full snapshot instead of a 404. A client that verifies
+and installs this snapshot clears stale packaged passages after withdrawal; a
+disconnected client cannot receive the change until it synchronizes. Serialized
+envelopes are limited to 2 MiB, matching Android's bounded streaming response
+reader.
+
+`GET /api/ai/offline-package/control/current` returns the separately signed
+withdrawal/supersession control manifest. It additionally requires a positive
+`PERAZIM_AI_OFFLINE_CONTROL_TTL_MS` and migration
+`0016_offline_ai_control_sequence.sql`; the manifest includes only public
+offline source IDs, versions, and reason categories. The Android client verifies
+the signature, expiry, sequence and persisted checkpoint, then excludes
+withdrawn source versions from local retrieval. Package update checks fetch the
+control before the package, and a missing or invalid control blocks packaged
+church passages. Neither export nor control delivery is enabled by default, and
+no control TTL or migration has been configured operationally. The server does
+not apply either migration operationally in this checkout.
+
+Signed rollback authorization uses `POST /api/ai/offline-package/rollback/authorize`
+and exact-target delivery via `GET /api/ai/offline-package/rollback/current`.
+Issuance additionally requires `PERAZIM_AI_OFFLINE_ROLLBACK_AUTHORIZATION_ENABLED=true`,
+`PERAZIM_AI_ROLLBACK_TTL_MS` (positive and no more than seven days), a fresh
+privileged session, and the `knowledge.package.rollback.authorize` permission.
+No user grant is created by migration `0017_ai_offline_rollback_authorizations.sql`;
+each signed authorization and its audit event are stored append-only. The Android
+client requests authorization only for its locally verified previous package,
+then verifies and applies the exact-target signature. The rollback gate is off by
+default; no production key, permission grant, TTL, or migration is provisioned.
+
 ## Production prerequisites
 
 No deployment target or public hostname is configured in this repository. Before

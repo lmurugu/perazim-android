@@ -22,7 +22,7 @@ public final class AiPreferences {
 
     private static final String PREF_NAME = "perazim_ai_prefs";
     private static final String KEY_DEVICE_ID = "device_id";
-    private static final String KEY_CONSENT_ACCEPTED = "ai_consent_accepted";
+    private static final String KEY_CONSENT_ACCEPTED = "ai_question_only_consent_v1";
     private static final String KEY_OPT_IN_NAME = "ai_opt_in_name";
     private static final String KEY_LAST_QUESTION_DATE = "last_question_date";
     private static final String KEY_TODAY_QUESTION_COUNT = "today_question_count";

@@ -19,7 +19,9 @@ function sanitizePrayer(prayer) {
 router.post('/', optionalAuth, async (req, res) => {
   try {
     const { mutations, lastSyncTimestamp, cursor, limit: reqLimit } = req.body || {};
-    const userId = req.user ? req.user.id : ((req.body && req.body.userId) || 'guest');
+    // Sync audit attribution must use the validated session or a server-owned
+    // guest identity; request-body IDs are never identity evidence.
+    const userId = req.user ? req.user.id : 'guest';
     const syncedIds = [];
     const rejectedMutations = [];
     const now = Date.now();
@@ -40,7 +42,9 @@ router.post('/', optionalAuth, async (req, res) => {
             const title = payload.title || 'Prayer Request';
             const content = payload.content || '';
             const isAnon = !!payload.isAnonymous;
-            const authorId = req.user ? req.user.id : (payload.authorId || userId);
+            // Preserve guest offline submission while preventing a forged
+            // authorId from assigning the prayer to an existing account.
+            const authorId = req.user ? req.user.id : 'guest';
             const authorName = isAnon ? 'Anonymous Saint' : (req.user ? req.user.name : (payload.authorName || 'Fellow Saint'));
 
             // REQ-05: Do NOT blindly ON CONFLICT DO NOTHING. Query existing first.

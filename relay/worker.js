@@ -35,7 +35,11 @@ const CRISIS_PATTERNS = [
   /\b(suicide|suicidal|kill\s+myself|end\s+my\s+life|want\s+to\s+die|hang\s+myself)\b/i,
   /\b(self[\s-]?harm|cutting\s+myself|hurt\s+myself)\b/i,
   /\b(end\s+it\s+all|hopeless.*die|feel\s+like\s+giving\s+up\s+on\s+life)\b/i,
-  /\b(abused|physically\s+abused|sexual\s+assault|domestic\s+violence)\b/i
+  /\b(physically\s+abused|sexual\s+assault|domestic\s+violence)\b/i,
+  /\b(better\s+off\s+dead|(?:can['’]t|cannot)\s+go\s+on|not\s+worth\s+living|harm\s+myself|unalive\s+myself)\b/i,
+  /\b(?:(?:going\s+to|plan\s+to|want\s+to)\s+(?:kill|shoot|stab)\s+(?:someone|him|her|them)|(?:immediate|imminent)\s+danger)\b/i,
+  /\b(?:(?:my|our)\s+(?:husband|wife|spouse|partner|boyfriend|girlfriend|parent|father|mother|caregiver)\s+(?:hits?|beats?|beating|struck|choked|attacked|threatened)\s+(?:me|us|my\s+child|our\s+child)|(?:hit|hits|hitting|beat|beats|beating|struck|choked|choking|attacked|threatened)\s+(?:me|us|my\s+child|our\s+child))\b/i,
+  /\b(?:afraid|scared|fear)\s+(?:that\s+)?(?:my\s+)?(?:partner|husband|wife|spouse|parent|father|mother|caregiver)\s+(?:will|might|may|is\s+going\s+to)\s+(?:hurt|hit|beat|attack|kill)\s+(?:me|my\s+child|our\s+child)\b/i
 ];
 
 export default {

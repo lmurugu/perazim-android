@@ -19,6 +19,7 @@ app.set('trust proxy', proxyTrustSetting(process.env.TRUST_PROXY_HOPS));
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+app.use('/api/ai', aiRoutes);
 app.use(express.json({ limit: '15mb' }));
 
 // Attachment authorization is evaluated against its current post/chat scope.
@@ -47,7 +48,6 @@ app.get('/api/health', (req, res) => {
 // Mount modular routes
 app.use('/api/auth', authRoutes);
 app.use('/api/privacy', privacyRoutes);
-app.use('/api/ai', aiRoutes);
 app.use('/api/prayers', prayerRoutes);
 app.use('/api/campuses', campusRoutes);
 app.use('/api/sync', syncRoutes);

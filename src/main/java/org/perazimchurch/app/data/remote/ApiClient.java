@@ -32,6 +32,7 @@ public final class ApiClient {
     private static final String TAG = "ApiClient";
     private static final int CONNECT_TIMEOUT_MS = 10000;
     private static final int READ_TIMEOUT_MS = 10000;
+    private static final int MAX_OFFLINE_PACKAGE_RESPONSE_BYTES = 2 * 1024 * 1024;
     private static final String USER_AGENT = "Perazim-Android/2.2.0";
 
     private static final String PREFS_NAME = "perazim_server_prefs";
@@ -131,6 +132,8 @@ public final class ApiClient {
         final String path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
         final boolean carriesCredentials = authToken != null && !authToken.trim().isEmpty() ||
                 privilegedToken != null && !privilegedToken.trim().isEmpty();
+        final boolean onlineAi = "/api/ai/online".equals(path);
+        final boolean offlineKnowledgePackage = "/api/ai/offline-package/current".equals(path);
         final boolean protectedPath = requiresSecureTransport(path, carriesCredentials);
         EXECUTOR.execute(() -> {
             HttpURLConnection conn = null;
@@ -150,7 +153,7 @@ public final class ApiClient {
                 conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod(method);
                 conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
-                conn.setReadTimeout(READ_TIMEOUT_MS);
+                conn.setReadTimeout(onlineAi ? 15000 : READ_TIMEOUT_MS);
                 conn.setRequestProperty("User-Agent", USER_AGENT);
                 conn.setRequestProperty("Accept", "application/json");
                 if (protectedPath) {
@@ -183,9 +186,26 @@ public final class ApiClient {
                 if (is != null) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
                         StringBuilder sb = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            sb.append(line);
+                        if (onlineAi || offlineKnowledgePackage) {
+                            char[] buffer = new char[4096];
+                            long responseBytes = 0;
+                            int read;
+                            while ((read = reader.read(buffer)) != -1) {
+                                if (offlineKnowledgePackage) {
+                                    responseBytes += new String(buffer, 0, read).getBytes(StandardCharsets.UTF_8).length;
+                                    if (responseBytes > MAX_OFFLINE_PACKAGE_RESPONSE_BYTES) {
+                                        throw new java.io.IOException("Offline knowledge package response too large");
+                                    }
+                                } else if (sb.length() + read > 256 * 1024) {
+                                    throw new java.io.IOException("AI response too large");
+                                }
+                                sb.append(buffer, 0, read);
+                            }
+                        } else {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                sb.append(line);
+                            }
                         }
                         responseBody = sb.toString();
                     }

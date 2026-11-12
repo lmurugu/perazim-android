@@ -528,10 +528,14 @@ public class ContentDataSeeder {
         try {
             android.os.Looper.prepareMainLooper();
             try {
-                Class<?> walFlags = Class.forName("android.database.sqlite.SQLiteCompatibilityWalFlags");
-                java.lang.reflect.Field f = walFlags.getDeclaredField("sInitialized");
-                f.setAccessible(true);
-                f.setBoolean(null, true);
+                if (android.os.Build.VERSION.SDK_INT < 34) {
+    try {
+        Class<?> walFlags = Class.forName("android.database.sqlite.SQLiteCompatibilityWalFlags");
+        java.lang.reflect.Field f = walFlags.getDeclaredField("sInitialized");
+        f.setAccessible(true);
+        f.setBoolean(null, true);
+    } catch (Throwable ignored) {}
+}
             } catch (Throwable ignored) {}
 
             Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");

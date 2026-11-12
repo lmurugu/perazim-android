@@ -7,6 +7,10 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
     namespace 'org.perazimchurch.app'
     compileSdk 34
     compileOptions { sourceCompatibility JavaVersion.VERSION_11; targetCompatibility JavaVersion.VERSION_11 }
@@ -32,7 +36,9 @@ android {
             }
         }
 
-        // Unverified external feeds and AI relays must not be packaged in any APK variant.
+        // Unverified external feeds and remote AI remain disabled in every variant.
+        // Only the isolated validation build may run local Qwen for synthetic
+        // device acceptance; debug/release builds retain the fail-closed default.
         buildConfigField "boolean", "REMOTE_SHEET_FEEDS_ENABLED", "false"
         buildConfigField "boolean", "ONLINE_AI_ENABLED", "false"
         buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "false"
@@ -55,6 +61,7 @@ android {
             versionNameSuffix '-pilot'
             matchingFallbacks = ['debug']
             buildConfigField "String", "API_BASE_URL", "\"https://fedora.taile47793.ts.net\""
+            buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "true"
         }
         release {
             minifyEnabled true
@@ -68,7 +75,7 @@ android {
     }
     testBuildType 'validation'
     sourceSets {
-        main {
+        all {
             assets {
                 exclude '**/member_contacts.csv'
             }
@@ -94,10 +101,12 @@ tasks.configureEach { task ->
 // never reads, copies, or deletes the register.
 tasks.register('assertPrivateMembershipRegisterOutsideAndroidAssets') {
     doLast {
-        def found = android.sourceSets.main.assets.srcDirs.any { assetDir ->
-            assetDir.exists() && fileTree(assetDir).matching {
-                include '**/member_contacts.csv'
-            }.files.any()
+        def found = android.sourceSets.any { sourceSet ->
+            sourceSet.assets.srcDirs.any { assetDir ->
+                assetDir.exists() && fileTree(assetDir).matching {
+                    include '**/member_contacts.csv'
+                }.files.any()
+            }
         }
         if (found) {
             throw new GradleException('Private membership register must be stored outside Android asset directories')

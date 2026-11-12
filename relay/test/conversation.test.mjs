@@ -220,6 +220,9 @@ async function main() {
   const crisis = await call({ question: 'I feel hopeless and want to die.' });
   await expectStatus(crisis, 200, 'existing crisis keyword path remains available');
   assert.equal(providerCalls, crisisCallsBefore, 'crisis response does not call provider');
+  const interpersonalSafety = await call({ question: 'My husband hit me last night.' });
+  await expectStatus(interpersonalSafety, 200, 'personal violence disclosure is routed to immediate safety guidance');
+  assert.equal(providerCalls, crisisCallsBefore, 'personal violence disclosure never reaches the provider');
 
   console.log(`PASS: relay signed-grant, validation, fail-closed, quota, provider success/error/timeout, crisis, provenance-bound evidence, and ${adversarialQuestions.length} prompt-boundary cases.`);
 }

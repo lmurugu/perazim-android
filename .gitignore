@@ -72,4 +72,4 @@ server/deploy/backups/
 *.gguf
 
 # Real membership data must never be staged or packaged with Android assets.
-src/main/assets/member_contacts.csv
+member_contacts.csv

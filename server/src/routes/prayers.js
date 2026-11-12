@@ -43,7 +43,9 @@ router.post('/', optionalAuth, async (req, res) => {
 
     const prayerId = id || ('prayer_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7));
     const isAnon = !!isAnonymous;
-    const authorId = req.user ? req.user.id : (req.body.authorId || 'guest');
+    // Guest submissions remain public, but a caller cannot claim a member's
+    // identity. Authenticated ownership always comes from the validated token.
+    const authorId = req.user ? req.user.id : 'guest';
     const effAuthorName = isAnon ? 'Anonymous Saint' : (req.user ? req.user.name : (authorName || 'Fellow Saint'));
     const now = Date.now();
 

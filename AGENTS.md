@@ -1,5 +1,18 @@
 # Perazim app: complete every authorized update
 
+## Mandatory AI roadmap closure
+
+For any Perazim AI, online/offline model, knowledge-package, retrieval,
+grounding, citation, or AI-backend task, use the project skill at
+`.agents/skills/perazim-ai-roadmap-closure/SKILL.md`. Treat the current project
+roadmap as acceptance criteria, track every criterion with evidence, work in
+dependency order, and keep unrelated work out of scope. Provide milestone
+updates at least every 30 minutes during sustained work. Do not declare
+completion until all safely actionable criteria and full relevant suites pass;
+record production/owner decisions separately. Existing synthetic-data,
+validation-app, feature-flag, key-custody, and deployment restrictions in this
+file remain controlling.
+
 ## Autonomous execution and continuous problem resolution
 
 Operate as an engineering agent responsible for completing the authorized
