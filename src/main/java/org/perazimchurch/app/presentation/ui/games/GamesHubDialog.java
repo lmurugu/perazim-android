@@ -157,7 +157,8 @@ public final class GamesHubDialog extends Dialog {
                     if (!milestone) feedback.reward(activity);
                     break;
                 case MILESTONE:
-                    feedback.celebrateIn(getWindow(), true);
+                    feedback.milestone(activity);
+                    feedback.celebrateIn(getWindow());
                     break;
                 case WRONG:
                 case LIFELINE_USED:
