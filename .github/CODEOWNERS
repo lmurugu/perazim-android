@@ -1,0 +1,5 @@
+# Default reviewer for everything. Changes to legal and privacy text route here as well.
+*                       @lmurugu
+docs/legal/**           @lmurugu
+docs/security/**        @lmurugu
+server/migrations/**    @lmurugu

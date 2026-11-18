@@ -59,3 +59,14 @@ All contributors are expected to uphold our [Code of Conduct](CODE_OF_CONDUCT.md
 ## Community & Questions
 
 For questions or guidance regarding development, reach out to the development team at `info@perazimchurch.org` or open a GitHub discussion.
+
+---
+
+## Branches, commits and pull requests
+
+- **Branches:** `feat/…`, `fix/…`, `chore/…` or `docs/…`, cut from the current integration branch.
+- **Commits:** [Conventional Commits](https://www.conventionalcommits.org/), for example `fix(server): allow migrations in docker context`.
+- **One PR per task.** Keep each PR focused; mechanical moves may be larger.
+- **Merge:** squash-merge only. Linear history is required on protected branches.
+- **Never commit** keystores, `.env` files, `google-services.json`, `local.properties`, real member data, or runtime databases. Run `git diff --check` and a secret scan before committing.
+- **Personal data:** do not put personal paths, device serials or personal email addresses in tracked files.
