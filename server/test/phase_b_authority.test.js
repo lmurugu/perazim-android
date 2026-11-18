@@ -46,7 +46,8 @@ async function run() {
       name: 'Synthetic Authority Test', phone: '+254700009881', pin: '853692',
       role: 'ADMIN', membership_status: 'VERIFIED_MEMBER', permissions: ['admin.permissions.grant'],
       privacy_notice_version: notice.version, privacy_notice_hash: notice.content_hash,
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     });
     assert.equal(registration.status, 201);
     const { user, token } = registration.body;

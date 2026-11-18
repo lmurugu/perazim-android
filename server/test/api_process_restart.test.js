@@ -265,7 +265,8 @@ async function runProcessRestartTest() {
       campus_id: 'campus_embu',
       privacy_notice_version: registrationNotice.version,
       privacy_notice_hash: registrationNotice.content_hash,
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     });
     assert(regRes.status === 201, 'User registered in Process 1 (201)');
     const token = regRes.body.token;

@@ -29,6 +29,8 @@ app.use(helmet({
 }));
 const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
 app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : false }));
+// Global limit for the whole API (plan 3.5). Per-route limits are stricter where needed.
+app.use('/api', require('express-rate-limit').rateLimit({ windowMs: 60 * 1000, limit: 1000, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'Too many requests. Please slow down.' } }));
 app.use('/api/ai', aiRoutes);
 // Default JSON body limit is 100 KB. Only the media upload route accepts larger bodies (see below).
 app.use((req, res, next) => (req.path === '/api/community/media/upload' ? express.json({ limit: '15mb' })(req, res, next) : next()));

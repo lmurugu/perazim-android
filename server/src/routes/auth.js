@@ -4,6 +4,15 @@ const bcrypt = require('bcryptjs');
 const { query, withTransaction } = require('../db');
 const { requireAuth, signToken, revokeToken, hashToken } = require('../middleware/auth');
 const { checkLoginRateLimit, recordFailedLogin, clearFailedLogins } = require('../middleware/rateLimiter');
+const { rateLimit } = require('express-rate-limit');
+
+const AGE_POLICY_VERSION = '18-plus-2026-11';
+// Used to keep login timing the same when the phone number is unknown.
+const TIMING_DUMMY_HASH = bcrypt.hashSync('timing-only-not-a-pin', 12);
+
+const registerIpLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'Too many attempts. Please try again later.' } });
+const registerPhoneLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false, keyGenerator: req => `phone:${String(req.body && req.body.phone || '')}`, message: { error: 'Too many attempts. Please try again later.' } });
+const changePinLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false, keyGenerator: req => `user:${req.user ? req.user.id : req.ip}`, message: { error: 'Too many attempts. Please try again later.' } });
 const { phaseBDatabaseAllowed, phaseBTransaction, newId } = require('../phase-b/security');
 const { getCurrentNotice, recordAcknowledgement } = require('../phase-b/privacyNotice');
 
@@ -60,11 +69,14 @@ function normalizePhone(phone) {
 }
 
 // POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', registerIpLimiter, registerPhoneLimiter, async (req, res) => {
   try {
     let { phone, pin, name, campus_id } = req.body;
     if (!phone || !pin || !name) {
       return res.status(400).json({ error: 'Phone number, PIN, and full name are required' });
+    }
+    if (req.body.age_confirmed !== true) {
+      return res.status(400).json({ error: 'You must confirm that you are 18 or over to create an account.' });
     }
 
     const normPhone = validateAndNormalizePhone(phone);
@@ -109,8 +121,8 @@ router.post('/register', async (req, res) => {
 
     await withTransaction(async client => {
       await client.query(
-        'INSERT INTO users (id, phone, pin_hash, name, campus_id, role, avatar_url, xp, streak, grace_points, is_active, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
-        [userId, normPhone, pinHash, name.trim(), campus, 'MEMBER', '', 0, 0, initialGracePoints, true, now, now]
+        'INSERT INTO users (id, phone, pin_hash, name, campus_id, role, avatar_url, xp, streak, grace_points, is_active, created_at, updated_at, age_confirmed_at, age_policy_version) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)',
+        [userId, normPhone, pinHash, name.trim(), campus, 'MEMBER', '', 0, 0, initialGracePoints, true, now, now, now, AGE_POLICY_VERSION]
       );
       await recordAcknowledgement(client, userId, currentNotice, now);
     });
@@ -178,21 +190,14 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
     const ip = req.ip || req.connection.remoteAddress;
     const result = await query('SELECT * FROM users WHERE phone = $1', [normPhone]);
     const user = result.rows && result.rows[0];
+    const active = Boolean(user) && user.is_active !== false;
 
-    if (!user) {
+    // One answer for unknown numbers, disabled accounts and wrong PINs, so the
+    // response does not reveal which phone numbers are registered (audit item 20).
+    const isValid = await bcrypt.compare(pin, active ? user.pin_hash : TIMING_DUMMY_HASH);
+    if (!active || !isValid) {
       recordFailedLogin(normPhone, ip);
-      return res.status(401).json({ error: 'No account found with this phone number. Please sign up.' });
-    }
-
-    if (user.is_active === false) {
-      recordFailedLogin(normPhone, ip);
-      return res.status(401).json({ error: 'This account is unavailable. Contact the church office.' });
-    }
-
-    const isValid = await bcrypt.compare(pin, user.pin_hash);
-    if (!isValid) {
-      recordFailedLogin(normPhone, ip);
-      return res.status(401).json({ error: 'Incorrect PIN. Please try again.' });
+      return res.status(401).json({ error: 'Phone number or PIN is incorrect.' });
     }
 
     // Reset failed attempt counter on successful login
@@ -267,4 +272,32 @@ router.post('/phone-change', requireAuth, (req, res) => {
 });
 
 router.validateAndNormalizePhone = validateAndNormalizePhone;
+// POST /api/auth/change-pin: change the PIN (review item 1).
+// Requires the current PIN. Every token issued before this moment stops working.
+router.post('/change-pin', requireAuth, changePinLimiter, async (req, res) => {
+  try {
+    const current = typeof req.body?.current_pin === 'string' ? req.body.current_pin : '';
+    const next = typeof req.body?.new_pin === 'string' ? req.body.new_pin : '';
+    if (!/^\d{4,12}$/.test(current)) return res.status(400).json({ error: 'Current PIN is required.' });
+    if (!/^\d{6,12}$/.test(next)) return res.status(400).json({ error: 'New PIN must be 6 to 12 digits.' });
+    if (next === current) return res.status(400).json({ error: 'Choose a PIN different from your current one.' });
+
+    const row = await query('SELECT pin_hash FROM users WHERE id = $1 AND is_active = TRUE', [req.user.id]);
+    const user = row.rows && row.rows[0];
+    if (!user || !(await bcrypt.compare(current, user.pin_hash))) {
+      return res.status(401).json({ error: 'Current PIN is incorrect.' });
+    }
+
+    const now = Date.now();
+    const nowSeconds = Math.floor(now / 1000);
+    const newHash = await bcrypt.hash(next, 12);
+    await query('UPDATE users SET pin_hash = $2, auth_valid_after_seconds = $3, updated_at = $4 WHERE id = $1', [req.user.id, newHash, nowSeconds, now]);
+    const fresh = (await query('SELECT id, phone, name, role, campus_id FROM users WHERE id = $1', [req.user.id])).rows[0];
+    return res.json({ token: signToken(fresh) });
+  } catch (err) {
+    console.error('change-pin failed');
+    return res.status(503).json({ error: 'The PIN could not be changed right now.' });
+  }
+});
+
 module.exports = router;

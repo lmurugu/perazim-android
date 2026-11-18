@@ -27,7 +27,7 @@ function publishTestPolicy(status = 'PUBLISHED', withdrawnAt = null) {
 async function invoke(router, method, routePath, requestBody) {
   const layer = router.stack.find(item => item.route && item.route.path === routePath && item.route.methods[method]);
   assert(layer, `route ${method.toUpperCase()} ${routePath} exists`);
-  const handler = layer.route.stack[0].handle;
+  const handler = layer.route.stack[layer.route.stack.length - 1].handle;
   const response = {
     statusCode: 200,
     status(code) { this.statusCode = code; return this; },
@@ -105,7 +105,7 @@ async function run() {
     publishTestNotice('PUBLISHED');
     const current = await invoke(privacyRoutes, 'get', '/notice/current');
 
-    const registration = { phone: '0712345678', pin: '123400', name: 'Synthetic Test Member', campus_id: 'campus_embu' };
+    const registration = { phone: '0712345678', pin: '123400', name: 'Synthetic Test Member', campus_id: 'campus_embu', age_confirmed: true };
     const denied = await invoke(authRoutes, 'post', '/register', registration);
     assert.strictEqual(denied.status, 428, 'registration without acknowledgement is rejected');
     assert.strictEqual(memoryStore.users.length, 0, 'rejected registration creates no account');
@@ -121,7 +121,8 @@ async function run() {
         phone: logPhoneMarker, pin: '876500', name: { marker: logNameMarker },
         privacy_notice_version: current.json.version,
         privacy_notice_hash: current.json.sha256,
-        privacy_notice_acknowledged: true
+        privacy_notice_acknowledged: true,
+        age_confirmed: true
       });
     } finally {
       console.error = originalConsoleError;
@@ -141,7 +142,8 @@ async function run() {
       privacy_notice_version: current.json.version,
       privacy_notice_hash: current.json.sha256,
       privacy_notice_presented_at: current.json.presented_at,
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     });
     process.env.NODE_ENV = originalNodeEnv;
     assert.strictEqual(draftDenied.status, 503, 'production registration stays closed while the active notice is synthetic');
@@ -162,7 +164,8 @@ async function run() {
       privacy_notice_hash: current.json.sha256,
       // This legacy field is ignored; clients cannot supply acknowledgement time.
       privacy_notice_presented_at: 'CLIENT_FORGED_TIMESTAMP',
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     });
     assert.strictEqual(accepted.status, 201, 'registration with the current notice acknowledgement succeeds');
     assert.strictEqual(accepted.json.user.membership_status, 'REGISTERED', 'registration does not verify church membership');

@@ -132,9 +132,12 @@ async function optionalAuth(req, res, next) {
 }
 
 async function currentAccount(payload) {
-  const result = await query('SELECT id, phone, name, role, campus_id, is_active FROM users WHERE id = $1', [payload.id]);
+  const result = await query('SELECT id, phone, name, role, campus_id, is_active, auth_valid_after_seconds FROM users WHERE id = $1', [payload.id]);
   const user = result.rows && result.rows[0];
   if (!user || user.is_active === false) return null;
+  // Tokens issued before the last PIN change are rejected (review item 1).
+  const validAfter = Number(user.auth_valid_after_seconds || 0);
+  if (validAfter > 0 && (!payload.iat || payload.iat < validAfter)) return null;
 
   // Apply recovery cutoffs in every environment when the Phase B table exists.
   // Older schemas without Phase B remain compatible until migrated.

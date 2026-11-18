@@ -100,7 +100,9 @@ const EXPECTED_MIGRATIONS = [
   '0015_online_ai_daily_budget.sql',
   '0016_offline_ai_control_sequence.sql',
   '0017_ai_offline_rollback_authorizations.sql',
-  '0018_sync_mutation_receipts.sql'
+  '0018_sync_mutation_receipts.sql',
+  '0019_age_confirmation.sql',
+  '0020_session_revocation.sql'
 ];
 
 const EXPECTED_ALL_TABLES = [
@@ -401,7 +403,18 @@ async function run() {
     assert.deepStrictEqual(await tableNames(sourcePool, [LEDGER]), EXPECTED_ALL_TABLES, 'migrations produce exactly the approved combined table set');
     const checksum = (await sourcePool.query(`SELECT checksum FROM public.${LEDGER} WHERE version='0002'`)).rows[0].checksum;
     assert.match(checksum, /^[a-f0-9]{64}$/);
-    assert.strictEqual(await rowsSnapshot(sourcePool, existingTables), existingRowsBefore, 'B2 preserves every pre-existing public table row');
+    // Migrations 0019 and 0020 add nullable or defaulted user columns by design; compare the rest.
+    const ADDED_USER_COLUMNS = ['age_confirmed_at', 'age_policy_version', 'auth_valid_after_seconds'];
+    const withoutAddedColumns = json => {
+      const parsed = JSON.parse(json);
+      parsed.users = (parsed.users || []).map(row => {
+        const copy = { ...row };
+        for (const key of ADDED_USER_COLUMNS) delete copy[key];
+        return copy;
+      });
+      return JSON.stringify(parsed);
+    };
+    assert.strictEqual(withoutAddedColumns(await rowsSnapshot(sourcePool, existingTables)), withoutAddedColumns(existingRowsBefore), 'B2 preserves every pre-existing public table row');
     const migratedCatalog = JSON.parse(await catalogSnapshot(sourcePool));
     assert.deepStrictEqual(migratedCatalog.routines.map(routine => routine.name), EXPECTED_FUNCTIONS, 'migrations create exactly the approved functions');
     assert.deepStrictEqual(migratedCatalog.triggers.map(trigger => `${trigger.table_name}.${trigger.name}`), EXPECTED_TRIGGERS, 'migrations create exactly the approved triggers');
@@ -413,6 +426,13 @@ async function run() {
     const newRoutines = EXPECTED_FUNCTIONS.filter(name => name !== 'reject_admin_audit_mutation');
     assert.strictEqual(existingCatalogAfter.routines.filter(routine => newRoutines.includes(routine.name)).length, newRoutines.length);
     existingCatalogAfter.routines = existingCatalogAfter.routines.filter(routine => !newRoutines.includes(routine.name));
+    // Columns added by migrations 0019 and 0020 must exist, and nothing else may change.
+    const addedUserColumns = ['age_confirmed_at', 'age_policy_version', 'auth_valid_after_seconds'];
+    const isAdded = column => column.table_name === 'users' && addedUserColumns.includes(column.column_name);
+    assert.strictEqual(existingCatalogAfter.columns.filter(isAdded).length, addedUserColumns.length, 'the approved user columns are present');
+    existingCatalogAfter.columns = existingCatalogAfter.columns.filter(column => !isAdded(column));
+    // The NOT NULL rule on the new cutoff column is part of the same approved change.
+    existingCatalogAfter.constraints = existingCatalogAfter.constraints.filter(constraint => !(constraint.table_name === 'users' && addedUserColumns.some(column => constraint.name.includes(column))));
     assert.deepStrictEqual(existingCatalogAfter, JSON.parse(existingCatalogBefore), 'only the approved capture trigger and new routines extend the pre-existing schema');
     assert.strictEqual((await sourcePool.query('SELECT count(*)::int AS count FROM membership_account_identities')).rows[0].count, 0, 'legacy display names are not backfilled as registration identities');
     assert.strictEqual((await sourcePool.query('SELECT grace_points FROM users WHERE id=$1', [fixture.owner])).rows[0].grace_points, 0);

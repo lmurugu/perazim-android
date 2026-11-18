@@ -28,6 +28,7 @@
 ### Leadership & Secretariat Attribution
 - **Presiding Bishop**: **Dr. David Mutweri**  
 - **Church contact details**: kept in one place, `app/src/main/java/org/perazimchurch/app/config/ChurchConfig.java`  
+- **Backend URL for builds**: set the Gradle properties listed in `gradle.properties.example`  
 - **Bishop Direct Email**: `bishop@perazimchurch.org`  
 - **Church Secretariat Email**: `info@perazimchurch.org`  
 - **Central Headquarters**: Embu, Kenya  

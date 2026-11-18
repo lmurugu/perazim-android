@@ -1,0 +1,11 @@
+# Copy the keys you need into ~/.gradle/gradle.properties (or pass them with -P on the
+# command line). Never commit real values. build.gradle reads these Gradle properties.
+
+# Debug builds: optional. HTTP is allowed only for loopback, for example http://10.0.2.2:3000
+perazimLocalApiBaseUrl=
+
+# Validation builds (synthetic device testing): HTTPS origin, no trailing slash.
+perazimValidationApiBaseUrl=
+
+# Release builds: must be a stable public HTTPS origin. The release job fails without it.
+perazimPilotApiBaseUrl=https://api.example.org

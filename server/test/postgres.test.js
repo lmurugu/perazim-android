@@ -213,7 +213,8 @@ async function runPostgresTests() {
     const registrationNotice = {
       privacy_notice_version: notice.version,
       privacy_notice_hash: notice.content_hash,
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     };
     // 3. Health check
     const health = await makeRequest('GET', '/api/health');

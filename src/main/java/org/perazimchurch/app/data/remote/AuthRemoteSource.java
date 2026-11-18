@@ -35,6 +35,8 @@ public final class AuthRemoteSource {
             body.put("privacy_notice_hash", privacyNoticeHash);
             body.put("privacy_notice_presented_at", privacyNoticePresentedAt);
             body.put("privacy_notice_acknowledged", true);
+            // The member ticks an 18+ confirmation before this request is sent; the server requires it.
+            body.put("age_confirmed", true);
 
             ApiClient.post(context, "/api/auth/register", body, null, new ApiClient.ApiCallback() {
                 @Override

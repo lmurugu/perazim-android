@@ -343,8 +343,11 @@ public final class AuthDialog {
                 Toast.makeText(context, "Please enter your phone number", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (pin.length() < 6) {
-                Toast.makeText(context, "PIN must be at least 6 digits", Toast.LENGTH_SHORT).show();
+            String pinError = isRegisterMode[0]
+                    ? org.perazimchurch.app.domain.PinPolicy.validateNewPin(pin)
+                    : org.perazimchurch.app.domain.PinPolicy.validateSignInPin(pin);
+            if (pinError != null) {
+                Toast.makeText(context, pinError, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -391,6 +394,7 @@ public final class AuthDialog {
                             Toast.makeText(context, "Your secure session could not be restored. Please try again.", Toast.LENGTH_LONG).show();
                             return;
                         }
+                        PinUpgradeDialog.offerIfShort(context, authToken, pin);
                         PrivacyNoticeRemoteSource.fetchPresentation(context, authToken, new PrivacyNoticeRemoteSource.PresentationCallback() {
                             @Override public void onReady(@NonNull org.json.JSONObject presentation) {
                                 if (presentation.optBoolean("acknowledged", false)) {

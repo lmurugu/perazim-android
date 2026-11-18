@@ -56,7 +56,8 @@ async function run() {
       privacy_notice_version: currentNotice.body.version,
       privacy_notice_hash: currentNotice.body.sha256,
       privacy_notice_presented_at: currentNotice.body.presented_at,
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     };
     const login = await request('POST', '/api/auth/login', null, { phone: '+254700009882', pin });
     check(login.status, 200);

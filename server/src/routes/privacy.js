@@ -146,7 +146,8 @@ router.post('/acknowledge', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/requests', requireAuth, async (req, res) => {
+const requestsLimiter = require('express-rate-limit').rateLimit({ windowMs: 60 * 60 * 1000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false, keyGenerator: req => `user:${req.user ? req.user.id : req.ip}`, message: { error: 'Too many requests. Please try again later.' } });
+router.post('/requests', requireAuth, requestsLimiter, async (req, res) => {
   const requestType = req.body?.request_type;
   const requestId = typeof req.body?.request_id === 'string' ? req.body.request_id : '';
   if (!['ACCESS', 'CORRECTION', 'ERASURE'].includes(requestType) || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {

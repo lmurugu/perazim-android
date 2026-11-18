@@ -90,7 +90,8 @@ async function runTests() {
     registrationNotice = await getCurrentNotice().then(notice => ({
       privacy_notice_version: notice.version,
       privacy_notice_hash: notice.content_hash,
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     }));
 
     const phoneAdmin = `+2547${crypto.randomInt(0, 100000000).toString().padStart(8, '0')}`;

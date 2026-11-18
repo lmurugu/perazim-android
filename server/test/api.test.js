@@ -29,7 +29,8 @@ async function makeRequest(method, path, body = null, token = null) {
       ...body,
       privacy_notice_version: current.body.version,
       privacy_notice_hash: current.body.sha256,
-      privacy_notice_acknowledged: true
+      privacy_notice_acknowledged: true,
+      age_confirmed: true
     };
   }
   return new Promise((resolve, reject) => {
