@@ -131,6 +131,12 @@ public final class AuthDialog {
         btnReadNotice.setTextSize(13);
         btnReadNotice.setEnabled(false);
         privacyContainer.addView(btnReadNotice);
+        final CheckBox chkAdultAge = new CheckBox(context);
+        chkAdultAge.setText("I confirm that I am 18 years or older. Accounts are for adults only.");
+        chkAdultAge.setTextSize(13);
+        chkAdultAge.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        chkAdultAge.setChecked(false);
+        privacyContainer.addView(chkAdultAge);
         final CheckBox chkPrivacyAcknowledgement = new CheckBox(context);
         chkPrivacyAcknowledgement.setText("I acknowledge that PMCI has provided me with the Perazim App Privacy Notice and that I can read the full PMCI Data Protection and Privacy Policy here. I understand how to contact PMCI about my personal information.");
         chkPrivacyAcknowledgement.setTextSize(13);
@@ -320,6 +326,10 @@ public final class AuthDialog {
         btnSubmit.setOnClickListener(v -> {
             if (isRegisterMode[0] && (privacyVersion[0].isEmpty() || privacyHash[0].isEmpty() || privacyContent[0].isEmpty() || privacyPresentedAt[0] <= 0L)) {
                 Toast.makeText(context, "The current privacy notice must load before registration.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            if (isRegisterMode[0] && !chkAdultAge.isChecked()) {
+                Toast.makeText(context, "Accounts are for people aged 18 or over. Please confirm your age to create an account.", Toast.LENGTH_LONG).show();
                 return;
             }
             if (isRegisterMode[0] && !chkPrivacyAcknowledgement.isChecked()) {

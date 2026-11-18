@@ -2,6 +2,7 @@ package org.perazimchurch.app.presentation.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.widget.EditText;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -48,6 +49,7 @@ import org.perazimchurch.app.data.remote.ApiClient;
 import org.perazimchurch.app.data.remote.CommunityRemoteSource;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.data.remote.PrivacyRequestRemoteSource;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.DownloadedContent;
 import org.perazimchurch.app.domain.model.Hymn;
@@ -128,6 +130,7 @@ public class ProfileUiBinder {
     // Content Synchronization UI reference
     private TextView tvSyncStatusVal;
     private Button btnAuthAction;
+    private Button btnDeleteAccount;
 
     public ProfileUiBinder(@NonNull Activity activity, @NonNull ProfileViewModel viewModel) {
         this.activity = activity;
@@ -278,6 +281,20 @@ public class ProfileUiBinder {
         updateAuthButtonState();
         memberInfo.addView(btnAuthAction);
 
+        btnDeleteAccount = new Button(context);
+        btnDeleteAccount.setText("Delete my account");
+        btnDeleteAccount.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        btnDeleteAccount.setTypeface(Typeface.DEFAULT_BOLD);
+        btnDeleteAccount.setTextColor(0xFFB00020);
+        btnDeleteAccount.setBackgroundColor(Color.TRANSPARENT);
+        btnDeleteAccount.setPadding(dp(10), dp(2), dp(10), dp(2));
+        LinearLayout.LayoutParams lpDelete = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(32));
+        lpDelete.topMargin = dp(2);
+        btnDeleteAccount.setLayoutParams(lpDelete);
+        btnDeleteAccount.setOnClickListener(v -> showDeleteAccountFirstStep());
+        memberInfo.addView(btnDeleteAccount);
+
         card.addView(memberInfo);
         rootFrame.addView(card);
         return rootFrame;
@@ -286,6 +303,7 @@ public class ProfileUiBinder {
     private void updateAuthButtonState() {
         if (btnAuthAction == null) return;
         boolean isGuest = SessionManager.getInstance(context).isGuest();
+        if (btnDeleteAccount != null) btnDeleteAccount.setVisibility(isGuest ? View.GONE : View.VISIBLE);
         if (isGuest) {
             btnAuthAction.setText("🔑 Sign In / Register");
             btnAuthAction.setTextColor(PerazimTheme.COLOR_ORANGE_SOFT);
@@ -297,6 +315,52 @@ public class ProfileUiBinder {
             btnAuthAction.setBackgroundColor(Color.TRANSPARENT);
             btnAuthAction.setOnClickListener(v -> showLogoutConfirmationDialog());
         }
+    }
+
+    private void showDeleteAccountFirstStep() {
+        new AlertDialog.Builder(context)
+                .setTitle("Delete my account")
+                .setMessage("This will permanently remove your posts, comments, prayer requests, messages, connections, RSVPs and uploaded photos, and it will disable your sign-in.\n\n"
+                        + "Some records must be kept for legal reasons: the audit log, your consent and request history, and the decision on any membership claim (without your name or phone number). They are not used for anything else.\n\n"
+                        + "This cannot be undone.")
+                .setPositiveButton("Continue", (dialog, which) -> showDeleteAccountTypedConfirmation())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void showDeleteAccountTypedConfirmation() {
+        EditText input = new EditText(context);
+        input.setHint("Type DELETE to confirm");
+        new AlertDialog.Builder(context)
+                .setTitle("Confirm deletion")
+                .setView(input)
+                .setPositiveButton("Delete my account", (dialog, which) -> {
+                    if (!"DELETE".equals(input.getText().toString().trim())) {
+                        Toast.makeText(context, "Nothing was deleted. Type DELETE exactly to confirm.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    submitAccountDeletion();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void submitAccountDeletion() {
+        String token = SessionManager.getInstance(context).getAuthToken();
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(context, "Please sign in again before deleting your account.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        PrivacyRequestRemoteSource.requestErasure(context, token, new PrivacyRequestRemoteSource.Callback() {
+            @Override public void onSubmitted(@NonNull org.json.JSONObject response) {
+                SessionManager.getInstance(context).logout();
+                Toast.makeText(context, "Your account has been deleted.", Toast.LENGTH_LONG).show();
+                refreshProfile();
+            }
+            @Override public void onError(@NonNull String message) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void showLogoutConfirmationDialog() {
