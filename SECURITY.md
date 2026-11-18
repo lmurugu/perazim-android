@@ -34,5 +34,5 @@ Please include:
 
 ## Credential & Giving Integrity Verification
 
-- **Official M-Pesa Paybill**: The official church Paybill number hardcoded and used in all distributions is `4069983` (Account Name: Perazim Mission Church). Any variant claiming to represent the church with another business number should be reported immediately.
+- **Official M-Pesa Paybill**: The official church Paybill is defined in `app/src/main/java/org/perazimchurch/app/config/ChurchConfig.java` (Account Name: Perazim Mission Church). Any variant claiming to represent the church with another business number should be reported immediately.
 - **No Secret Storage**: This open-source repository does not and will never contain private signing keys, production keystores, or financial API secrets.

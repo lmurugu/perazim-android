@@ -6,12 +6,15 @@ let pool = null;
 let isPostgres = false;
 
 // In-memory fallback tables when PostgreSQL is not configured/available
+// Pastoral contact shown on campus records. Set in the environment; never hard-coded.
+const CHURCH_CONTACT_PHONE = process.env.CHURCH_CONTACT_PHONE || '';
+
 const memoryStore = {
   campuses: [
-    { id: 'campus_embu', name: 'Embu Headquarters', location: 'Blue Valley, Embu', contact_phone: '+254710772227', is_active: true, created_at: Date.now() },
-    { id: 'campus_nairobi', name: 'Nairobi Fellowship', location: 'CBD, Nairobi', contact_phone: '+254710772227', is_active: true, created_at: Date.now() },
-    { id: 'campus_meru', name: 'Meru Outreach', location: 'Town Center, Meru', contact_phone: '+254710772227', is_active: true, created_at: Date.now() },
-    { id: 'campus_online', name: 'Online Global Campus', location: 'Worldwide Broadcast', contact_phone: '+254710772227', is_active: true, created_at: Date.now() }
+    { id: 'campus_embu', name: 'Embu Headquarters', location: 'Blue Valley, Embu', contact_phone: CHURCH_CONTACT_PHONE, is_active: true, created_at: Date.now() },
+    { id: 'campus_nairobi', name: 'Nairobi Fellowship', location: 'CBD, Nairobi', contact_phone: CHURCH_CONTACT_PHONE, is_active: true, created_at: Date.now() },
+    { id: 'campus_meru', name: 'Meru Outreach', location: 'Town Center, Meru', contact_phone: CHURCH_CONTACT_PHONE, is_active: true, created_at: Date.now() },
+    { id: 'campus_online', name: 'Online Global Campus', location: 'Worldwide Broadcast', contact_phone: CHURCH_CONTACT_PHONE, is_active: true, created_at: Date.now() }
   ],
   users: [],
   prayers: [],

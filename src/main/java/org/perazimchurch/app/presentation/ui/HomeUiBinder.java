@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.config.ChurchConfig;
+
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -1031,7 +1033,7 @@ public class HomeUiBinder {
     public void showPrayerRequestModal() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("🙏 Submit Prayer Request");
-        builder.setMessage("Your petition will be submitted to Bishop Dr. David Mutweri and the Perazim Intercessory Prayer Team.\n\nPastoral Care: (+254) 0710 772 227 · info@perazimchurch.org");
+        builder.setMessage("Your petition will be submitted to Bishop Dr. David Mutweri and the Perazim Intercessory Prayer Team.\n\nPastoral Care: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · info@perazimchurch.org");
 
         final EditText etPrayer = new EditText(context);
         etPrayer.setHint("Write your petition or praise report here...");
@@ -1050,7 +1052,7 @@ public class HomeUiBinder {
             }
         });
         builder.setNegativeButton("Cancel", null);
-        builder.setNeutralButton("📞 Pastoral Office", (dialog, which) -> dialPhoneNumber("+254710772227"));
+        builder.setNeutralButton("📞 Pastoral Office", (dialog, which) -> dialPhoneNumber("" + ChurchConfig.PASTORAL_PHONE_E164 + ""));
         builder.show();
     }
 

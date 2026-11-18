@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.config.ChurchConfig;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.widget.EditText;
@@ -826,14 +828,14 @@ public class ProfileUiBinder {
         builder.setTitle("Pastoral Care & Headquarters");
         builder.setMessage("Bishop Dr. David Mutweri & Pastoral Team\n"
                 + "Perazim Mission Church · Embu Headquarters\n\n"
-                + "Office Line: (+254) 0710 772 227\n"
+                + "Office Line: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + "\n"
                 + "Email: info@perazimchurch.org");
 
         builder.setPositiveButton("WhatsApp", (d, w) -> {
-            ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am reaching out for pastoral care / prayer support.");
+            ChurchIntentManager.openWhatsAppChat(context, ChurchConfig.PASTORAL_PHONE_E164, "Peace be with you Bishop Dr. David Mutweri, I am reaching out for pastoral care / prayer support.");
         });
         builder.setNegativeButton("Call", (d, w) -> {
-            ChurchIntentManager.dialPhone(context, "+254710772227");
+            ChurchIntentManager.dialPhone(context, ChurchConfig.PASTORAL_PHONE_E164);
         });
         builder.setNeutralButton("Directions", (d, w) -> {
             ChurchIntentManager.openChurchMaps(context);
@@ -1446,8 +1448,8 @@ public class ProfileUiBinder {
         LinearLayout rowBishop = createInteractiveRow(
                 "👤",
                 "Presiding Bishop",
-                "Bishop Dr. David Mutweri (+254 710 772 227)",
-                v -> ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Peace be with you Bishop Dr. David Mutweri.")
+                "Bishop Dr. David Mutweri (" + ChurchConfig.PASTORAL_PHONE_SPACED + ")",
+                v -> ChurchIntentManager.openWhatsAppChat(context, ChurchConfig.PASTORAL_PHONE_E164, "Peace be with you Bishop Dr. David Mutweri.")
         );
         card.addView(rowBishop);
 
@@ -1552,13 +1554,13 @@ public class ProfileUiBinder {
         tvTag.setPadding(0, 0, 0, dp(6));
         card.addView(tvTag);
 
-        card.addView(createInteractiveRow("💬", "WhatsApp Bishop Directly", "(+254) 710 772 227 (Tap to Chat)", v -> ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Peace be with you Bishop Dr. David Mutweri. I am reaching out from the Perazim App for pastoral support.")));
-        card.addView(createInteractiveRow("📞", "Call Bishop Directly", "(+254) 710 772 227 (Native Phone Dialer)", v -> ChurchIntentManager.dialPhone(context, "+254710772227")));
-        card.addView(createInteractiveRow("✉️", "SMS Pastoral Line", "(+254) 710 772 227 (Offline SMS)", v -> ChurchIntentManager.sendSms(context, "+254710772227", "Praise God Bishop, I am requesting prayer through the Perazim App.")));
+        card.addView(createInteractiveRow("💬", "WhatsApp Bishop Directly", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY_INTL + " (Tap to Chat)", v -> ChurchIntentManager.openWhatsAppChat(context, ChurchConfig.PASTORAL_PHONE_E164, "Peace be with you Bishop Dr. David Mutweri. I am reaching out from the Perazim App for pastoral support.")));
+        card.addView(createInteractiveRow("📞", "Call Bishop Directly", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY_INTL + " (Native Phone Dialer)", v -> ChurchIntentManager.dialPhone(context, ChurchConfig.PASTORAL_PHONE_E164)));
+        card.addView(createInteractiveRow("✉️", "SMS Pastoral Line", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY_INTL + " (Offline SMS)", v -> ChurchIntentManager.sendSms(context, ChurchConfig.PASTORAL_PHONE_E164, "Praise God Bishop, I am requesting prayer through the Perazim App.")));
         card.addView(createInteractiveRow("📍", "Directions to Embu HQ", "Perazim Mission Church, Embu", v -> ChurchIntentManager.openChurchMaps(context)));
-        card.addView(createInteractiveRow("💚", "Safaricom Giving Paybill", "4069983 (Lipa na M-Pesa)", v -> ChurchIntentManager.launchMpesaGiving(context, "4069983", "OFFERING", "")));
+        card.addView(createInteractiveRow("💚", "Safaricom Giving Paybill", "" + ChurchConfig.MPESA_PAYBILL + " (Lipa na M-Pesa)", v -> ChurchIntentManager.launchMpesaGiving(context, "" + ChurchConfig.MPESA_PAYBILL + "", "OFFERING", "")));
         card.addView(createInteractiveRow("📧", "Secretariat Email", "info@perazimchurch.org", v -> ChurchIntentManager.sendEmail(context, "info@perazimchurch.org", "Perazim Church Inquiry", "")));
-        card.addView(createInteractiveRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(context, "+254710772227", "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: ")));
+        card.addView(createInteractiveRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(context, ChurchConfig.PASTORAL_PHONE_E164, "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: ")));
 
         return card;
     }

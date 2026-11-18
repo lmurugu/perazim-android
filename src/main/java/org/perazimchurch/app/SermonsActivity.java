@@ -1,5 +1,7 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.config.ChurchConfig;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -136,7 +138,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         spInfo.addView(spTitle);
 
         TextView spContact = new TextView(this);
-        spContact.setText("📞 (+254) 0710 772 227 · ✉️ bishop@perazimchurch.org");
+        spContact.setText("📞 " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · ✉️ bishop@perazimchurch.org");
         spContact.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         spContact.setTextColor(COLOR_PURPLE_MUTED);
         spContact.setPadding(0, dp(2), 0, 0);
@@ -146,13 +148,13 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
             new android.app.AlertDialog.Builder(this)
                     .setTitle("Bishop Dr. David Mutweri")
                     .setMessage("Presiding Bishop · Perazim Mission Church\n\n"
-                            + "• Direct Phone: (+254) 0710 772 227\n"
+                            + "• Direct Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + "\n"
                             + "• Bishop Email: bishop@perazimchurch.org\n"
                             + "• Church Office: info@perazimchurch.org\n"
-                            + "• Giving Paybill: 4069983")
+                            + "• Giving Paybill: " + ChurchConfig.MPESA_PAYBILL + "")
                     .setPositiveButton("📞 Call Bishop", (d, w) -> {
                         try {
-                            startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:+254710772227")));
+                            startActivity(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + ChurchConfig.PASTORAL_PHONE_E164 + "")));
                         } catch (Exception ignored) {}
                     })
                     .setNegativeButton("✉️ Email Bishop", (d, w) -> {

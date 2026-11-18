@@ -49,7 +49,7 @@
   - Device Daily Quota: 3 questions/day/member enforced at proxy layer (Cloudflare KV) and mirrored client-side (`AiPreferences`). Reset at midnight Africa/Nairobi timezone (UTC+3).
 - **Safety & Privacy Features**:
   - 500-character query limit.
-  - Immediate crisis phrase regex detection routing directly to Pastoral Care hotline (`+254 710 772 227`).
+  - Immediate crisis phrase regex detection routing directly to Pastoral Care hotline (number from `ChurchConfig.java`).
   - Strict church grounding system prompt: 2 Samuel 5:20, Micah 2:13, under 120 words, strictly Bible-grounded, no medical/financial advice, polite deflection of off-topic secular questions.
   - Zero logging of member query text.
   - Seamless offline fail-soft to `PerazimAiEngine` when quota exhausted or offline.

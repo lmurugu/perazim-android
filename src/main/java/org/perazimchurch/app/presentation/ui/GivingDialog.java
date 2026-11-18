@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.config.ChurchConfig;
+
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -43,7 +45,7 @@ import java.util.List;
  * Quiet dark contemplative design matching Perazim design guidelines:
  * - Dialog surface: darkened gradient with hairline stroke
  * - Title: "Give to Perazim Mission Church" (#F5F0F7, 18sp bold) with official logo
- * - Paybill 4069983 on surface 2 gradient
+ * - Paybill (see ChurchConfig) on surface 2 gradient
  * - Primary action button: ONE muted/darkened orange gradient "Open M-Pesa"
  * - Secondary quiet actions: SIM Toolkit, Dial *334#
  * - Mandatory trust note: "Giving is processed directly by Safaricom M-Pesa. Perazim app never asks for or stores your M-Pesa PIN."
@@ -157,7 +159,7 @@ public final class GivingDialog {
         pbRow.setPadding(0, dp(context, 6), 0, dp(context, 6));
 
         TextView tvPaybillNum = new TextView(context);
-        tvPaybillNum.setText("4069983");
+        tvPaybillNum.setText("" + ChurchConfig.MPESA_PAYBILL + "");
         tvPaybillNum.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
         tvPaybillNum.setTypeface(Typeface.DEFAULT_BOLD);
         tvPaybillNum.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
@@ -198,8 +200,8 @@ public final class GivingDialog {
         btnCopyPaybill.setOnClickListener(v -> {
             ClipboardManager cb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             if (cb != null) {
-                cb.setPrimaryClip(ClipData.newPlainText("Paybill", "4069983"));
-                Toast.makeText(context, "✓ Copied Paybill 4069983", Toast.LENGTH_SHORT).show();
+                cb.setPrimaryClip(ClipData.newPlainText("Paybill", "" + ChurchConfig.MPESA_PAYBILL + ""));
+                Toast.makeText(context, "✓ Copied Paybill " + ChurchConfig.MPESA_PAYBILL + "", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -208,8 +210,8 @@ public final class GivingDialog {
                     ? tvAccount.getText().toString().replace("Account: ", "").trim() : "PERAZIM-TITHE";
             ClipboardManager cb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             if (cb != null) {
-                cb.setPrimaryClip(ClipData.newPlainText("M-Pesa Giving", "Paybill: 4069983 | Account: " + acc));
-                Toast.makeText(context, "✓ Copied: Paybill 4069983, Account " + acc, Toast.LENGTH_SHORT).show();
+                cb.setPrimaryClip(ClipData.newPlainText("M-Pesa Giving", "Paybill: " + ChurchConfig.MPESA_PAYBILL + " | Account: " + acc));
+                Toast.makeText(context, "✓ Copied: Paybill " + ChurchConfig.MPESA_PAYBILL + ", Account " + acc, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -359,14 +361,14 @@ public final class GivingDialog {
             if (tvAccount.getText() != null) {
                 account = tvAccount.getText().toString().replace("Account: ", "").trim();
             }
-            ChurchIntentManager.launchMpesaGiving(context, "4069983", account, amt);
+            ChurchIntentManager.launchMpesaGiving(context, "" + ChurchConfig.MPESA_PAYBILL + "", account, amt);
             dlg.dismiss();
         });
 
         btnStk.setOnClickListener(v -> {
             String acc = (tvAccount.getText() != null)
                     ? tvAccount.getText().toString().replace("Account: ", "").trim() : "PERAZIM-TITHE";
-            ChurchIntentManager.openSimToolkit(context, "4069983", acc);
+            ChurchIntentManager.openSimToolkit(context, "" + ChurchConfig.MPESA_PAYBILL + "", acc);
             dlg.dismiss();
         });
 

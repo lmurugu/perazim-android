@@ -1,5 +1,7 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.config.ChurchConfig;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -1395,7 +1397,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         previewCard.addView(verseQuote);
 
         TextView pastorAttribution = new TextView(this);
-        pastorAttribution.setText("PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nBishop Dr. David Mutweri · Embu, Kenya\n📞 (+254) 0710 772 227 · ✉️ bishop@perazimchurch.org\n#GodOfTheBreakthrough");
+        pastorAttribution.setText("PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nBishop Dr. David Mutweri · Embu, Kenya\n📞 " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · ✉️ bishop@perazimchurch.org\n#GodOfTheBreakthrough");
         pastorAttribution.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         pastorAttribution.setTextColor(COLOR_ORANGE_BORDER);
         pastorAttribution.setGravity(Gravity.CENTER);
@@ -1452,10 +1454,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                         + "PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\n"
                         + "“A place where everybody is somebody, and no body is a nobody”\n\n"
                         + "Presiding Bishop Dr. David Mutweri · Embu, Kenya\n"
-                        + "📞 Phone: (+254) 0710 772 227\n"
+                        + "📞 Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + "\n"
                         + "✉️ Church: info@perazimchurch.org\n"
                         + "✉️ Bishop: bishop@perazimchurch.org\n"
-                        + "💚 Safaricom Paybill: 4069983\n\n"
+                        + "💚 Safaricom Paybill: " + ChurchConfig.MPESA_PAYBILL + "\n\n"
                         + "Theme: Baal-Perazim / God of the Breakthrough\n\n"
                         + "#BaalPerazim #GodOfTheBreakthrough #PerazimMissionChurch";
                 sendIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
@@ -1464,7 +1466,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 startActivity(sendIntent);
             } catch (Exception e) {
                 Intent chooser = new Intent(Intent.ACTION_SEND);
-                chooser.putExtra(Intent.EXTRA_TEXT, "“As waters break out, the LORD has broken out against my enemies before me.” — 2 Samuel 5:20\nPERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nPresiding Bishop Dr. David Mutweri | Phone: (+254) 0710 772 227 | Paybill: 4069983");
+                chooser.putExtra(Intent.EXTRA_TEXT, "“As waters break out, the LORD has broken out against my enemies before me.” — 2 Samuel 5:20\nPERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nPresiding Bishop Dr. David Mutweri | Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " | Paybill: " + ChurchConfig.MPESA_PAYBILL + "");
                 chooser.setType("text/plain");
                 startActivity(Intent.createChooser(chooser, "Share Breakthrough Verse"));
             }
@@ -2126,13 +2128,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         contactCard.addView(tvContactDesc);
 
         // Interactive Contact Rows
-        LinearLayout rowWa = createInteractiveContactRow("💬", "WhatsApp Pastoral Line", "(+254) 0710 772 227 (Direct Chat)", v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am reaching out from the Perazim App."));
+        LinearLayout rowWa = createInteractiveContactRow("💬", "WhatsApp Pastoral Line", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Direct Chat)", v -> ChurchIntentManager.openWhatsAppChat(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Peace be with you Bishop Dr. David Mutweri, I am reaching out from the Perazim App."));
         contactCard.addView(rowWa);
 
-        LinearLayout rowPhone = createInteractiveContactRow("📞", "Bishop's Direct Phone", "(+254) 0710 772 227 (Voice Call)", v -> ChurchIntentManager.dialPhone(this, "+254710772227"));
+        LinearLayout rowPhone = createInteractiveContactRow("📞", "Bishop's Direct Phone", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Voice Call)", v -> ChurchIntentManager.dialPhone(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + ""));
         contactCard.addView(rowPhone);
 
-        LinearLayout rowSms = createInteractiveContactRow("✉️", "SMS Pastoral Line", "(+254) 0710 772 227 (Offline / SMS)", v -> ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Pastoral Care Request: "));
+        LinearLayout rowSms = createInteractiveContactRow("✉️", "SMS Pastoral Line", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Offline / SMS)", v -> ChurchIntentManager.sendSms(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Perazim Pastoral Care Request: "));
         contactCard.addView(rowSms);
 
         LinearLayout rowMap = createInteractiveContactRow("📍", "Find Sanctuary / Directions", "Embu Headquarters (Google Maps)", v -> ChurchIntentManager.openChurchMaps(this));
@@ -2144,10 +2146,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout rowBishopEmail = createInteractiveContactRow("✉️", "Bishop's Direct Email", "bishop@perazimchurch.org", v -> sendEmail("bishop@perazimchurch.org", "Pastoral Care / Counseling"));
         contactCard.addView(rowBishopEmail);
 
-        LinearLayout rowPaybill = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "4069983 (Tap to Give)", v -> showGivingDialog());
+        LinearLayout rowPaybill = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "" + ChurchConfig.MPESA_PAYBILL + " (Tap to Give)", v -> showGivingDialog());
         contactCard.addView(rowPaybill);
 
-        LinearLayout rowFeedback = createInteractiveContactRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: "));
+        LinearLayout rowFeedback = createInteractiveContactRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: "));
         contactCard.addView(rowFeedback);
 
         // Quick Action Buttons
@@ -2156,13 +2158,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         contactButtonsRow.setPadding(0, dp(6), 0, 0);
 
         Button btnWa = createSmallButton("💬 WhatsApp", COLOR_ACCENT_ORANGE, COLOR_WHITE);
-        btnWa.setOnClickListener(v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop."));
+        btnWa.setOnClickListener(v -> ChurchIntentManager.openWhatsAppChat(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Peace be with you Bishop."));
 
         Button btnCall = createSmallButton("📞 Call", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
-        btnCall.setOnClickListener(v -> ChurchIntentManager.dialPhone(this, "+254710772227"));
+        btnCall.setOnClickListener(v -> ChurchIntentManager.dialPhone(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + ""));
 
         Button btnSms = createSmallButton("✉️ SMS", COLOR_PURPLE_DARK, COLOR_WHITE);
-        btnSms.setOnClickListener(v -> ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Prayer Request: "));
+        btnSms.setOnClickListener(v -> ChurchIntentManager.sendSms(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Perazim Prayer Request: "));
 
         Button btnMap = createSmallButton("📍 Maps", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
         btnMap.setOnClickListener(v -> ChurchIntentManager.openChurchMaps(this));
@@ -2372,7 +2374,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvChurchSlogan.setPadding(0, 0, 0, dp(8));
         churchCard.addView(tvChurchSlogan);
 
-        LinearLayout rowBishopAff = createInteractiveContactRow("👤", "Presiding Bishop", "Bishop Dr. David Mutweri", v -> dialPhoneNumber("+254710772227"));
+        LinearLayout rowBishopAff = createInteractiveContactRow("👤", "Presiding Bishop", "Bishop Dr. David Mutweri", v -> dialPhoneNumber("" + ChurchConfig.PASTORAL_PHONE_E164 + ""));
         churchCard.addView(rowBishopAff);
 
         content.addView(churchCard);
@@ -2441,13 +2443,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvPastoralDesc.setPadding(0, 0, 0, dp(8));
         pastoralCard.addView(tvPastoralDesc);
 
-        LinearLayout rowBishopWaDirect = createInteractiveContactRow("💬", "WhatsApp Bishop Directly", "(+254) 0710 772 227 (Direct Chat)", v -> ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am contacting you for pastoral support and prayer."));
-        LinearLayout rowBishopCall = createInteractiveContactRow("📞", "Call Bishop Dr. David Mutweri", "(+254) 0710 772 227", v -> ChurchIntentManager.dialPhone(this, "+254710772227"));
-        LinearLayout rowBishopSmsDirect = createInteractiveContactRow("✉️", "SMS Pastoral Line", "(+254) 0710 772 227 (Offline / SMS)", v -> ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Pastoral Care Request: "));
+        LinearLayout rowBishopWaDirect = createInteractiveContactRow("💬", "WhatsApp Bishop Directly", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Direct Chat)", v -> ChurchIntentManager.openWhatsAppChat(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Peace be with you Bishop Dr. David Mutweri, I am contacting you for pastoral support and prayer."));
+        LinearLayout rowBishopCall = createInteractiveContactRow("📞", "Call Bishop Dr. David Mutweri", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + "", v -> ChurchIntentManager.dialPhone(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + ""));
+        LinearLayout rowBishopSmsDirect = createInteractiveContactRow("✉️", "SMS Pastoral Line", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Offline / SMS)", v -> ChurchIntentManager.sendSms(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Perazim Pastoral Care Request: "));
         LinearLayout rowMapDirect = createInteractiveContactRow("📍", "Find Sanctuary / Directions", "Embu Headquarters (Google Maps)", v -> ChurchIntentManager.openChurchMaps(this));
         LinearLayout rowBishopEmailDirect = createInteractiveContactRow("✉️", "Email Bishop Directly", "bishop@perazimchurch.org", v -> sendEmail("bishop@perazimchurch.org", "Pastoral Care Request"));
         LinearLayout rowChurchEmailDirect = createInteractiveContactRow("📧", "Church Secretariat", "info@perazimchurch.org", v -> sendEmail("info@perazimchurch.org", "Church Inquiry"));
-        LinearLayout rowPaybillDirect = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "4069983 (Tap to Give)", v -> showGivingDialog());
+        LinearLayout rowPaybillDirect = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "" + ChurchConfig.MPESA_PAYBILL + " (Tap to Give)", v -> showGivingDialog());
 
         pastoralCard.addView(rowBishopWaDirect);
         pastoralCard.addView(rowBishopCall);
@@ -2554,9 +2556,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     + "Fellowship with us:\n"
                     + "🏛️ Headquarters: Perazim Mission Church, Embu, Kenya\n"
                     + "👤 Presiding Bishop: Bishop Dr. David Mutweri\n"
-                    + "📞 Phone: (+254) 0710 772 227\n"
+                    + "📞 Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + "\n"
                     + "📧 Email: info@perazimchurch.org\n"
-                    + "💚 Safaricom Paybill: 4069983\n\n"
+                    + "💚 Safaricom Paybill: " + ChurchConfig.MPESA_PAYBILL + "\n\n"
                     + "Download the official Perazim Android App for daily devotionals, sermons, and hymns!\n"
                     + "#PerazimMissionChurch #BaalPerazim #PlaceOfGreatBreakthrough";
             sendIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
@@ -2565,7 +2567,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             startActivity(sendIntent);
         } catch (Exception e) {
             Intent chooser = new Intent(Intent.ACTION_SEND);
-            chooser.putExtra(Intent.EXTRA_TEXT, "PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nPresiding Bishop Dr. David Mutweri | Phone: (+254) 0710 772 227 | Paybill: 4069983");
+            chooser.putExtra(Intent.EXTRA_TEXT, "PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\nPresiding Bishop Dr. David Mutweri | Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " | Paybill: " + ChurchConfig.MPESA_PAYBILL + "");
             chooser.setType("text/plain");
             startActivity(Intent.createChooser(chooser, "Share Perazim Invitation"));
         }
@@ -2676,7 +2678,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private void showPrayerRequestDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("🙏 Submit Prayer Request");
-        builder.setMessage("Your petition will be submitted to Bishop Dr. David Mutweri and the Perazim Intercessory Prayer Team.\n\nPastoral Office: (+254) 0710 772 227 · info@perazimchurch.org");
+        builder.setMessage("Your petition will be submitted to Bishop Dr. David Mutweri and the Perazim Intercessory Prayer Team.\n\nPastoral Office: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · info@perazimchurch.org");
 
         prayerInputDialog = new EditText(this);
         prayerInputDialog.setHint("Write your petition or praise report here...");
@@ -2857,18 +2859,18 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         container.addView(subtitle);
 
         // WhatsApp Pastoral Care
-        container.addView(createInteractiveContactRow("💬", "WhatsApp Pastoral Care", "(+254) 0710 772 227 (Direct Chat)", v -> {
-            ChurchIntentManager.openWhatsAppChat(this, "+254710772227", "Peace be with you Bishop Dr. David Mutweri, I am contacting you from the Perazim App for pastoral support and prayer.");
+        container.addView(createInteractiveContactRow("💬", "WhatsApp Pastoral Care", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Direct Chat)", v -> {
+            ChurchIntentManager.openWhatsAppChat(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Peace be with you Bishop Dr. David Mutweri, I am contacting you from the Perazim App for pastoral support and prayer.");
         }));
 
         // Phone Call Bishop
-        container.addView(createInteractiveContactRow("📞", "Call Bishop's Line", "(+254) 0710 772 227 (Tap to Call)", v -> {
-            ChurchIntentManager.dialPhone(this, "+254710772227");
+        container.addView(createInteractiveContactRow("📞", "Call Bishop's Line", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Tap to Call)", v -> {
+            ChurchIntentManager.dialPhone(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "");
         }));
 
         // SMS Pastoral Line
-        container.addView(createInteractiveContactRow("✉️", "SMS Pastoral Line", "(+254) 0710 772 227 (Offline / No Data)", v -> {
-            ChurchIntentManager.sendSms(this, "+254710772227", "Perazim Pastoral Care Request: ");
+        container.addView(createInteractiveContactRow("✉️", "SMS Pastoral Line", "" + ChurchConfig.PASTORAL_PHONE_DISPLAY + " (Offline / No Data)", v -> {
+            ChurchIntentManager.sendSms(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Perazim Pastoral Care Request: ");
         }));
 
         // Sanctuary Maps Directions
@@ -2877,7 +2879,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         }));
 
         // Lipa na M-Pesa Giving
-        container.addView(createInteractiveContactRow("💚", "Lipa na M-Pesa Giving", "Paybill 4069983 (Tap to Give)", v -> {
+        container.addView(createInteractiveContactRow("💚", "Lipa na M-Pesa Giving", "Paybill " + ChurchConfig.MPESA_PAYBILL + " (Tap to Give)", v -> {
             showGivingDialog();
         }));
 

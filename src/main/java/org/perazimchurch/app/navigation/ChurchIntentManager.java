@@ -1,5 +1,7 @@
 package org.perazimchurch.app.navigation;
 
+import org.perazimchurch.app.config.ChurchConfig;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -22,11 +24,11 @@ import androidx.annotation.Nullable;
  */
 public final class ChurchIntentManager {
 
-    public static final String BISHOP_PHONE = "+254710772227";
-    public static final String BISHOP_PHONE_CLEAN = "254710772227";
+    public static final String BISHOP_PHONE = ChurchConfig.PASTORAL_PHONE_E164;
+    public static final String BISHOP_PHONE_CLEAN = ChurchConfig.PASTORAL_PHONE_DIGITS;
     public static final String CHURCH_OFFICE_EMAIL = "info@perazimchurch.org";
     public static final String BISHOP_EMAIL = "bishop@perazimchurch.org";
-    public static final String MPESA_PAYBILL = "4069983";
+    public static final String MPESA_PAYBILL = ChurchConfig.MPESA_PAYBILL;
     public static final String DEFAULT_ACCOUNT = "PERAZIM-TITHE";
     public static final String USSD_MPESA = "*334#";
     public static final String MAPS_QUERY = "Perazim Mission Church Embu";

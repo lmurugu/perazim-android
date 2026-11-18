@@ -27,11 +27,11 @@
 
 ### Leadership & Secretariat Attribution
 - **Presiding Bishop**: **Dr. David Mutweri**  
-- **Bishop Direct Phone**: `(+254) 0710 772 227`  
+- **Church contact details**: kept in one place, `app/src/main/java/org/perazimchurch/app/config/ChurchConfig.java`  
 - **Bishop Direct Email**: `bishop@perazimchurch.org`  
 - **Church Secretariat Email**: `info@perazimchurch.org`  
 - **Central Headquarters**: Embu, Kenya  
-- **Safaricom Paybill**: `4069983`  
+- **Safaricom Paybill**: set in `ChurchConfig.java`  
 *Perazim Mission Church Global Ministries*
 
 ---
@@ -50,7 +50,7 @@
 
 ## ✨ Feature Highlights
 
-- 💚 **Safaricom M-Pesa Giving (3-Tier Cascade)**: Integrated Safaricom M-Pesa integration targeting Paybill `4069983`. Copies Paybill and account code to clipboard, checks and opens the Safaricom M-Pesa App or SIM Toolkit (`com.android.stk`), with immediate fallback to the Safaricom `*334#` USSD dialer.
+- 💚 **Safaricom M-Pesa Giving (3-Tier Cascade)**: Integrated Safaricom M-Pesa integration targeting the church Paybill set in `ChurchConfig.java`. Copies Paybill and account code to clipboard, checks and opens the Safaricom M-Pesa App or SIM Toolkit (`com.android.stk`), with immediate fallback to the Safaricom `*334#` USSD dialer.
 - 💬 **Pastoral Care via WhatsApp**: Direct one-tap messaging to the church's pastoral line (number configured in the app) for private prayer petitions, counseling, and pastoral support.
 - ✉️ **Offline Pastoral SMS**: Formatted SMS intercession link to the church's pastoral line ensuring congregants without active internet bundles can immediately submit urgent prayer needs.
 - 📍 **Sanctuary Directions (Google Maps)**: One-tap deep-link intent (`geo:0,0?q=Perazim+Mission+Church+Embu`) guiding congregants directly to Perazim Headquarters in Embu.

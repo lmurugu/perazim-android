@@ -1,3 +1,4 @@
+-- Reference snapshot of the 0001 baseline. Not executed at boot (see server/src/db.js).
 -- ============================================================================
 -- Perazim Mission Church Database Schema (PostgreSQL)
 -- ============================================================================
@@ -13,10 +14,10 @@ CREATE TABLE IF NOT EXISTS campuses (
 
 INSERT INTO campuses (id, name, location, contact_phone, is_active, created_at)
 VALUES
-    ('campus_embu', 'Embu Headquarters', 'Blue Valley, Embu', '+254710772227', TRUE, 1700000000000),
-    ('campus_nairobi', 'Nairobi Fellowship', 'CBD, Nairobi', '+254710772227', TRUE, 1700000000000),
-    ('campus_meru', 'Meru Outreach', 'Town Center, Meru', '+254710772227', TRUE, 1700000000000),
-    ('campus_online', 'Online Global Campus', 'Worldwide Broadcast', '+254710772227', TRUE, 1700000000000)
+    ('campus_embu', 'Embu Headquarters', 'Blue Valley, Embu', NULL, TRUE, 1700000000000),
+    ('campus_nairobi', 'Nairobi Fellowship', 'CBD, Nairobi', NULL, TRUE, 1700000000000),
+    ('campus_meru', 'Meru Outreach', 'Town Center, Meru', NULL, TRUE, 1700000000000),
+    ('campus_online', 'Online Global Campus', 'Worldwide Broadcast', NULL, TRUE, 1700000000000)
 ON CONFLICT (id) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS users (
