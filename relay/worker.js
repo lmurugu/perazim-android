@@ -64,6 +64,28 @@ export class QuotaCounter {
   }
 }
 
+// SQLite-backed quota object. Free-plan Durable Objects require SQLite storage.
+// The original QuotaCounter class stays exported because migration v1 references it.
+export class QuotaCounterV2 {
+  constructor(state) {
+    this.state = state;
+  }
+
+  async fetch(request) {
+    const body = await request.json().catch(() => ({}));
+    const limit = Number(body && body.limit);
+    if (!Number.isSafeInteger(limit) || limit < 1) {
+      return new Response(JSON.stringify({ error: "invalid limit" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    }
+    const stored = Number(await this.state.storage.get("count")) || 0;
+    if (stored >= limit) {
+      return new Response(JSON.stringify({ allowed: false, count: stored }), { headers: { "Content-Type": "application/json" } });
+    }
+    await this.state.storage.put("count", stored + 1);
+    return new Response(JSON.stringify({ allowed: true, count: stored + 1 }), { headers: { "Content-Type": "application/json" } });
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     // 1. Method check

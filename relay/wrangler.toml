@@ -6,8 +6,14 @@ account_id = "6dc91bb08aac16e68dad2bf860e60aaf"
 
 [[durable_objects.bindings]]
 name = "QUOTA_COUNTER"
-class_name = "QuotaCounter"
+class_name = "QuotaCounterV2"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["QuotaCounter"]
+# SQLite-backed so a fresh deploy is allowed on the free plan. If v1 was already
+# applied on Cloudflare under the old key-value class, wrangler skips it.
+new_sqlite_classes = ["QuotaCounter"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["QuotaCounterV2"]
