@@ -90,6 +90,13 @@ android {
                 signingConfig signingConfigs.release
             }
         }
+        // Validation builds: debug-like, with the on-device Qwen runtime enabled for
+        // device validation only. Release keeps OFFLINE_QWEN_ENABLED and ONLINE_AI_ENABLED off.
+        validation {
+            initWith debug
+            matchingFallbacks = ['debug']
+            buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "true"
+        }
     }
     sourceSets {
         main {
