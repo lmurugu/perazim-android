@@ -10,7 +10,9 @@ class_name = "QuotaCounterV2"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["QuotaCounter"]
+# SQLite-backed so a fresh deploy is allowed on the free plan. If v1 was already
+# applied on Cloudflare under the old key-value class, wrangler skips it.
+new_sqlite_classes = ["QuotaCounter"]
 
 [[migrations]]
 tag = "v2"
