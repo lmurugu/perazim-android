@@ -160,8 +160,8 @@ public final class PerazimTheme {
 
     public static final int RADIUS_SM = 6;
     public static final int RADIUS_MD = 10;
-    public static final int RADIUS_LG = 14;
-    public static final int RADIUS_XL = 20;
+    public static final int RADIUS_LG = 22;
+    public static final int RADIUS_XL = 28;
     public static final int RADIUS_PILL = 999;
 
     // =========================================================================
@@ -171,11 +171,52 @@ public final class PerazimTheme {
     /**
      * Vertical darkened background canvas gradient (#2E1038 -> #190720).
      */
-    public static GradientDrawable createBackgroundGradient() {
+    private static GradientDrawable createBaseBackground() {
         return new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
                 sLight ? new int[]{Color.parseColor("#F8F1FB"), Color.parseColor("#EFE0F6"), Color.parseColor("#E6D2F0")} : new int[]{Color.parseColor("#2A0F33"), Color.parseColor("#3A1346"), Color.parseColor("#160520")}
         );
+    }
+
+    /** Page background: the base gradient plus two soft glow orbs (purple top-left, orange lower-right). */
+    public static android.graphics.drawable.Drawable createBackgroundGradient() {
+        android.graphics.drawable.LayerDrawable layers = new android.graphics.drawable.LayerDrawable(
+                new android.graphics.drawable.Drawable[]{
+                        createBaseBackground(),
+                        createGlowOrb(0.15f, 0.18f, sLight ? "#55B070C8" : "#99A83CC8"),
+                        createGlowOrb(0.95f, 0.78f, sLight ? "#33E17D2F" : "#59E17D2F")
+                });
+        return layers;
+    }
+
+    private static GradientDrawable createGlowOrb(float cx, float cy, String centerColor) {
+        GradientDrawable gd = new GradientDrawable();
+        gd.setGradientType(GradientDrawable.RADIAL_GRADIENT);
+        gd.setGradientCenter(cx, cy);
+        gd.setGradientRadius(520f);
+        gd.setColors(new int[]{Color.parseColor(centerColor), Color.TRANSPARENT});
+        return gd;
+    }
+
+    /** Frosted glass pill (floating nav bar): translucent fill, light border, large rounded corners. */
+    public static GradientDrawable createGlassPill(int radiusPx, int strokePx) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                sLight ? new int[]{Color.parseColor("#E6FFFFFF"), Color.parseColor("#B3FFFFFF")}
+                       : new int[]{Color.parseColor("#33FFFFFF"), Color.parseColor("#1AFFFFFF")});
+        gd.setCornerRadius(radiusPx);
+        gd.setStroke(strokePx, Color.parseColor(sLight ? "#40681A7D" : "#40FFFFFF"));
+        return gd;
+    }
+
+    /** Raised purple circle used for the centre Give button. */
+    public static GradientDrawable createGiveOrb() {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{Color.parseColor("#8A2BA3"), Color.parseColor("#681A7D")});
+        gd.setShape(GradientDrawable.OVAL);
+        gd.setStroke(2, Color.parseColor("#66FFFFFF"));
+        return gd;
     }
 
     /**

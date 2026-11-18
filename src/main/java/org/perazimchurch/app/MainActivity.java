@@ -599,13 +599,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private View createBottomTabBar() {
         LinearLayout bottomNav = new LinearLayout(this);
         LinearLayout.LayoutParams lpNav = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(58));
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(64));
+        lpNav.setMargins(dp(16), dp(4), dp(16), dp(14));
         bottomNav.setLayoutParams(lpNav);
+        bottomNav.setClipChildren(false);
+        bottomNav.setClipToPadding(false);
         bottomNav.setOrientation(LinearLayout.HORIZONTAL);
         bottomNav.setGravity(Gravity.CENTER_VERTICAL);
         bottomNav.setPadding(0, dp(4), 0, dp(4));
 
-        bottomNav.setBackground(PerazimTheme.createBottomNavGradient(dp(1)));
+        bottomNav.setBackground(PerazimTheme.createGlassPill(dp(32), dp(1)));
 
         final int[] iconResIds = {
                 NavigationContract.TAB_ICON_RES_HOME,
@@ -622,7 +625,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 "Give"
         };
 
-        for (int i = 0; i < 5; i++) {
+        final int[] visualOrder = {0, 1, 4, 2, 3};
+        for (int pos = 0; pos < 5; pos++) {
+            final int i = visualOrder[pos];
             final int index = i;
             LinearLayout tab = new LinearLayout(this);
             tab.setOrientation(LinearLayout.VERTICAL);
@@ -635,6 +640,15 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(22), dp(22));
             ivIcon.setLayoutParams(lpIcon);
             ivIcon.setImageResource(iconResIds[i]);
+            if (i == 4) {
+                // Give: raised glowing purple orb in the middle of the bar
+                ivIcon.setBackground(PerazimTheme.createGiveOrb());
+                ivIcon.setPadding(dp(14), dp(14), dp(14), dp(14));
+                LinearLayout.LayoutParams lpOrb = new LinearLayout.LayoutParams(dp(56), dp(56));
+                lpOrb.setMargins(0, -dp(30), 0, 0);
+                ivIcon.setLayoutParams(lpOrb);
+                ivIcon.setElevation(dp(8));
+            }
 
             TextView tvLabel = new TextView(this);
             tvLabel.setText(labels[i]);
@@ -685,8 +699,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     navTabIcons[i].setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
                 }
                 if (navTabButtons[i] != null) {
-                    GradientDrawable activePill = PerazimTheme.createActivePillGradient(dp(12));
-                    navTabButtons[i].setBackground(activePill);
+                    navTabButtons[i].setBackground(null);
                 }
             } else {
                 if (navTabLabels[i] != null) {
@@ -699,6 +712,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 if (navTabButtons[i] != null) {
                     navTabButtons[i].setBackground(null);
                 }
+            }
+            if (i == 4 && navTabIcons[i] != null) {
+                navTabIcons[i].setColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_IN);
             }
         }
     }
