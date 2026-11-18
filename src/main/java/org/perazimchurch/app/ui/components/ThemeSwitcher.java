@@ -1,24 +1,39 @@
 package org.perazimchurch.app.ui.components;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 /**
- * Flips between dark (purple frosted glass) and light mode and rebuilds the current screen in place.
+ * Lets the person pick System (follows the phone), Light or Dark, and rebuilds the current screen in place.
  *
- * <p>The theme colours are read at the moment each view is built, so applying the new mode and recreating the
- * activity is enough. The app never exits, so the switch cannot look like a crash.
+ * <p>The theme colours are read when each view is built, so applying the new mode and recreating the activity is
+ * enough. The app never exits, so a switch cannot look like a crash.
  */
 public final class ThemeSwitcher {
 
     private ThemeSwitcher() {
     }
 
-    public static void toggle(Activity activity) {
-        boolean light = !PerazimTheme.isLight();
-        PerazimTheme.saveMode(activity, light);
-        PerazimTheme.applyMode(light);
-        activity.recreate();
+    public static void choose(Activity activity) {
+        final int current = PerazimTheme.savedChoice(activity);
+        String[] labels = {
+                "System (follows your phone)",
+                "Light glass",
+                "Dark purple glass"
+        };
+        new AlertDialog.Builder(activity)
+                .setTitle("Appearance")
+                .setSingleChoiceItems(labels, current, (dialog, which) -> {
+                    dialog.dismiss();
+                    if (which != current) {
+                        PerazimTheme.saveChoice(activity, which);
+                        PerazimTheme.applyPreference(activity);
+                        activity.recreate();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }

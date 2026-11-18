@@ -4,12 +4,20 @@ import android.app.Application;
 
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
-/** Loads the saved light/dark mode before any screen is built. */
+/** Loads the saved appearance (System, Light or Dark) before any screen is built. */
 public class PerazimApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
         PerazimTheme.init(this);
+        // When the phone switches light or dark, follow it if the app is set to System. Activities that
+        // are running recreate themselves, and they read the new mode when they are built.
+        registerComponentCallbacks(new android.content.ComponentCallbacks() {
+            @Override public void onConfigurationChanged(android.content.res.Configuration newConfig) {
+                PerazimTheme.applyPreference(PerazimApplication.this);
+            }
+            @Override public void onLowMemory() { }
+        });
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override public void onActivityCreated(android.app.Activity a, android.os.Bundle b) { }
             @Override public void onActivityStarted(android.app.Activity a) {
