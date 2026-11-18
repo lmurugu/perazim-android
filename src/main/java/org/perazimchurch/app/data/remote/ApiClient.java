@@ -39,7 +39,7 @@ public final class ApiClient {
     private static final String KEY_SERVER_URL = "server_base_url";
     private static final String DEBUG_DEFAULT_DEVICE_URL = "http://127.0.0.1:3000";
 
-    private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+    private static final ExecutorService EXECUTOR = org.perazimchurch.app.core.concurrency.BoundedExecutors.io();
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     public interface ApiCallback {
@@ -124,9 +124,30 @@ public final class ApiClient {
         execute(context, method, endpoint, bodyString, authToken, null, callback);
     }
 
+    /** Renews an access token after the server rejects it. The callback gets the new token, or null. */
+    public interface TokenRefresher {
+        void refreshAfter401(@NonNull Context context, @NonNull String failedToken, @NonNull RefreshCallback callback);
+    }
+
+    public interface RefreshCallback {
+        void onRefreshed(@Nullable String newToken);
+    }
+
+    private static volatile TokenRefresher tokenRefresher;
+
+    public static void setTokenRefresher(@Nullable TokenRefresher refresher) {
+        tokenRefresher = refresher;
+    }
+
     private static void execute(Context context, String method, String endpoint,
                                 @Nullable String bodyString, @Nullable String authToken,
                                 @Nullable String privilegedToken, ApiCallback callback) {
+        execute(context, method, endpoint, bodyString, authToken, privilegedToken, callback, false);
+    }
+
+    private static void execute(Context context, String method, String endpoint,
+                                @Nullable String bodyString, @Nullable String authToken,
+                                @Nullable String privilegedToken, ApiCallback callback, boolean retried) {
         final Context appContext = context.getApplicationContext();
         final String requestBaseUrl = getBaseUrl(appContext);
         final String path = endpoint.startsWith("/") ? endpoint : "/" + endpoint;
@@ -135,112 +156,127 @@ public final class ApiClient {
         final boolean onlineAi = "/api/ai/online".equals(path);
         final boolean offlineKnowledgePackage = "/api/ai/offline-package/current".equals(path);
         final boolean protectedPath = requiresSecureTransport(path, carriesCredentials);
-        EXECUTOR.execute(() -> {
-            HttpURLConnection conn = null;
-            try {
-                if (!requestBaseUrl.equals(getBaseUrl(appContext))) {
-                    MAIN_HANDLER.post(() -> callback.onError(-1, "The server changed. Try again."));
-                    return;
-                }
-                String fullUrl = requestBaseUrl.replaceAll("/+$", "") + path;
-
-                URL url = new URL(fullUrl);
-                if (protectedPath && !allowsProtectedTransport(url)) {
-                    MAIN_HANDLER.post(() -> callback.onError(-1, "This request requires a secure server connection."));
-                    return;
-                }
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setInstanceFollowRedirects(false);
-                conn.setRequestMethod(method);
-                conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
-                conn.setReadTimeout(onlineAi ? 15000 : READ_TIMEOUT_MS);
-                conn.setRequestProperty("User-Agent", USER_AGENT);
-                conn.setRequestProperty("Accept", "application/json");
-                if (protectedPath) {
-                    conn.setUseCaches(false);
-                    conn.setRequestProperty("Cache-Control", "no-store");
-                }
-
-                if (authToken != null && !authToken.trim().isEmpty()) {
-                    conn.setRequestProperty("Authorization", "Bearer " + authToken.trim());
-                }
-                if (privilegedToken != null) conn.setRequestProperty("X-Privileged-Session", privilegedToken);
-
-                if (bodyString != null && ("POST".equals(method) || "PUT".equals(method) ||
-                        "PATCH".equals(method) || "DELETE".equals(method))) {
-                    conn.setDoOutput(true);
-                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    byte[] bytes = bodyString.getBytes(StandardCharsets.UTF_8);
-                    try (OutputStream os = conn.getOutputStream()) {
-                        os.write(bytes);
-                        os.flush();
-                    }
-                }
-
-                int statusCode = conn.getResponseCode();
-                InputStream is = (statusCode >= 200 && statusCode < 400)
-                        ? conn.getInputStream()
-                        : conn.getErrorStream();
-
-                String responseBody = "";
-                if (is != null) {
-                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                        StringBuilder sb = new StringBuilder();
-                        if (onlineAi || offlineKnowledgePackage) {
-                            char[] buffer = new char[4096];
-                            long responseBytes = 0;
-                            int read;
-                            while ((read = reader.read(buffer)) != -1) {
-                                if (offlineKnowledgePackage) {
-                                    responseBytes += new String(buffer, 0, read).getBytes(StandardCharsets.UTF_8).length;
-                                    if (responseBytes > MAX_OFFLINE_PACKAGE_RESPONSE_BYTES) {
-                                        throw new java.io.IOException("Offline knowledge package response too large");
-                                    }
-                                } else if (sb.length() + read > 256 * 1024) {
-                                    throw new java.io.IOException("AI response too large");
-                                }
-                                sb.append(buffer, 0, read);
-                            }
-                        } else {
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                sb.append(line);
-                            }
-                        }
-                        responseBody = sb.toString();
-                    }
-                }
-
-                JSONObject json;
+        try {
+            EXECUTOR.execute(() -> {
+                HttpURLConnection conn = null;
                 try {
-                    json = responseBody.isEmpty() ? new JSONObject() : new JSONObject(responseBody);
-                } catch (Exception e) {
-                    json = new JSONObject();
-                    json.put("raw", responseBody);
-                }
-
-                final int finalStatus = statusCode;
-                final JSONObject finalJson = json;
-
-                MAIN_HANDLER.post(() -> {
                     if (!requestBaseUrl.equals(getBaseUrl(appContext))) {
-                        callback.onError(-1, "The server changed. Try again.");
-                    } else if (finalStatus >= 200 && finalStatus < 300) {
-                        callback.onSuccess(finalStatus, finalJson);
-                    } else {
-                        callback.onError(finalStatus, finalJson.optString("error", "Request failed with HTTP " + finalStatus));
+                        MAIN_HANDLER.post(() -> callback.onError(-1, "The server changed. Try again."));
+                        return;
                     }
-                });
-            } catch (Exception e) {
-                Log.w(TAG, "Network request failed [" + method + "]: " + e.getClass().getSimpleName());
-                String msg = "Offline or server unreachable";
-                MAIN_HANDLER.post(() -> callback.onError(-1, msg));
-            } finally {
-                if (conn != null) {
-                    conn.disconnect();
+                    String fullUrl = requestBaseUrl.replaceAll("/+$", "") + path;
+
+                    URL url = new URL(fullUrl);
+                    if (protectedPath && !allowsProtectedTransport(url)) {
+                        MAIN_HANDLER.post(() -> callback.onError(-1, "This request requires a secure server connection."));
+                        return;
+                    }
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setInstanceFollowRedirects(false);
+                    conn.setRequestMethod(method);
+                    conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
+                    conn.setReadTimeout(onlineAi ? 15000 : READ_TIMEOUT_MS);
+                    conn.setRequestProperty("User-Agent", USER_AGENT);
+                    conn.setRequestProperty("Accept", "application/json");
+                    if (protectedPath) {
+                        conn.setUseCaches(false);
+                        conn.setRequestProperty("Cache-Control", "no-store");
+                    }
+
+                    if (authToken != null && !authToken.trim().isEmpty()) {
+                        conn.setRequestProperty("Authorization", "Bearer " + authToken.trim());
+                    }
+                    if (privilegedToken != null) conn.setRequestProperty("X-Privileged-Session", privilegedToken);
+
+                    if (bodyString != null && ("POST".equals(method) || "PUT".equals(method) ||
+                            "PATCH".equals(method) || "DELETE".equals(method))) {
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                        byte[] bytes = bodyString.getBytes(StandardCharsets.UTF_8);
+                        try (OutputStream os = conn.getOutputStream()) {
+                            os.write(bytes);
+                            os.flush();
+                        }
+                    }
+
+                    int statusCode = conn.getResponseCode();
+                    InputStream is = (statusCode >= 200 && statusCode < 400)
+                            ? conn.getInputStream()
+                            : conn.getErrorStream();
+
+                    String responseBody = "";
+                    if (is != null) {
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                            StringBuilder sb = new StringBuilder();
+                            if (onlineAi || offlineKnowledgePackage) {
+                                char[] buffer = new char[4096];
+                                long responseBytes = 0;
+                                int read;
+                                while ((read = reader.read(buffer)) != -1) {
+                                    if (offlineKnowledgePackage) {
+                                        responseBytes += new String(buffer, 0, read).getBytes(StandardCharsets.UTF_8).length;
+                                        if (responseBytes > MAX_OFFLINE_PACKAGE_RESPONSE_BYTES) {
+                                            throw new java.io.IOException("Offline knowledge package response too large");
+                                        }
+                                    } else if (sb.length() + read > 256 * 1024) {
+                                        throw new java.io.IOException("AI response too large");
+                                    }
+                                    sb.append(buffer, 0, read);
+                                }
+                            } else {
+                                String line;
+                                while ((line = reader.readLine()) != null) {
+                                    sb.append(line);
+                                }
+                            }
+                            responseBody = sb.toString();
+                        }
+                    }
+
+                    JSONObject json;
+                    try {
+                        json = responseBody.isEmpty() ? new JSONObject() : new JSONObject(responseBody);
+                    } catch (Exception e) {
+                        json = new JSONObject();
+                        json.put("raw", responseBody);
+                    }
+
+                    final int finalStatus = statusCode;
+                    final JSONObject finalJson = json;
+
+                    MAIN_HANDLER.post(() -> {
+                        TokenRefresher refresher = tokenRefresher;
+                        if (finalStatus == 401 && !retried && refresher != null && authToken != null && !authToken.trim().isEmpty()
+                                && requestBaseUrl.equals(getBaseUrl(appContext))) {
+                            // The access token expired: renew it once and repeat the request with the new token.
+                            refresher.refreshAfter401(appContext, authToken.trim(), newToken -> {
+                                if (newToken == null || newToken.isEmpty()) {
+                                    callback.onError(finalStatus, finalJson.optString("error", "Please sign in again."));
+                                } else {
+                                    execute(context, method, endpoint, bodyString, newToken, privilegedToken, callback, true);
+                                }
+                            });
+                        } else if (!requestBaseUrl.equals(getBaseUrl(appContext))) {
+                            callback.onError(-1, "The server changed. Try again.");
+                        } else if (finalStatus >= 200 && finalStatus < 300) {
+                            callback.onSuccess(finalStatus, finalJson);
+                        } else {
+                            callback.onError(finalStatus, finalJson.optString("error", "Request failed with HTTP " + finalStatus));
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.w(TAG, "Network request failed [" + method + "]: " + e.getClass().getSimpleName());
+                    String msg = "Offline or server unreachable";
+                    MAIN_HANDLER.post(() -> callback.onError(-1, msg));
+                } finally {
+                    if (conn != null) {
+                        conn.disconnect();
+                    }
                 }
-            }
-        });
+            });
+        } catch (java.util.concurrent.RejectedExecutionException busy) {
+            MAIN_HANDLER.post(() -> callback.onError(-1, "The app is busy. Please try again in a moment."));
+        }
     }
 
     public static boolean requiresSecureTransport(String path) {

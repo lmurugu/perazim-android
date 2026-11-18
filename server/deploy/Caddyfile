@@ -3,6 +3,16 @@
 }
 
 {$API_DOMAIN} {
+    # Edge security headers (review fix F-05). The API sends its own headers too.
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
+        Referrer-Policy "no-referrer"
+        -Server
+        -X-Powered-By
+    }
     # Existing community code is not part of Phase A public rollout.
     @phaseB path /api/community /api/community/*
     handle @phaseB {

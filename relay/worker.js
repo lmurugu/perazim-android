@@ -5,7 +5,7 @@
  * Functions:
  * 1. Protects Gemini API key at the edge (never exposed to Android APK).
  * 2. Requires a short-lived Express-signed service grant.
- * 3. Applies a defensive KV cap; authoritative atomic quota enforcement remains
+ * 3. Applies the daily cap through a Durable Object (QuotaCounter); quota is atomic. Express remains authoritative for accounting.
  *    an Express prerequisite before activation.
  * 4. Checks a limited set of crisis keywords and returns general immediate-help guidance.
  * 5. Calls Google Gemini through an application-controlled prompt boundary.
@@ -41,6 +41,28 @@ const CRISIS_PATTERNS = [
   /\b(?:(?:my|our)\s+(?:husband|wife|spouse|partner|boyfriend|girlfriend|parent|father|mother|caregiver)\s+(?:hits?|beats?|beating|struck|choked|attacked|threatened)\s+(?:me|us|my\s+child|our\s+child)|(?:hit|hits|hitting|beat|beats|beating|struck|choked|choking|attacked|threatened)\s+(?:me|us|my\s+child|our\s+child))\b/i,
   /\b(?:afraid|scared|fear)\s+(?:that\s+)?(?:my\s+)?(?:partner|husband|wife|spouse|parent|father|mother|caregiver)\s+(?:will|might|may|is\s+going\s+to)\s+(?:hurt|hit|beat|attack|kill)\s+(?:me|my\s+child|our\s+child)\b/i
 ];
+
+
+// Durable Object that counts one member's questions for one day.
+export class QuotaCounter {
+  constructor(state) {
+    this.state = state;
+  }
+
+  async fetch(request) {
+    const body = await request.json().catch(() => ({}));
+    const limit = Number(body && body.limit);
+    if (!Number.isSafeInteger(limit) || limit < 1) {
+      return new Response(JSON.stringify({ error: "invalid limit" }), { status: 400, headers: { "Content-Type": "application/json" } });
+    }
+    const stored = Number(await this.state.storage.get("count")) || 0;
+    if (stored >= limit) {
+      return new Response(JSON.stringify({ allowed: false, count: stored }), { headers: { "Content-Type": "application/json" } });
+    }
+    await this.state.storage.put("count", stored + 1);
+    return new Response(JSON.stringify({ allowed: true, count: stored + 1 }), { headers: { "Content-Type": "application/json" } });
+  }
+}
 
 export default {
   async fetch(request, env, ctx) {
@@ -212,23 +234,28 @@ export default {
       }
     }
 
-    // 6. Defensive daily cap. Missing/failing KV fails closed; Express must
-    // enforce the authoritative atomic quota before this Worker is enabled.
-    if (!env.PERAZIM_KV) {
+    // 6. Daily cap, enforced by a Durable Object. Each member-day is one object; the
+    // object checks and increments in a single step, so concurrent requests cannot
+    // exceed the cap. A missing or failing object fails closed.
+    if (!env.QUOTA_COUNTER) {
       return new Response(JSON.stringify({ error: "AI service unavailable" }), { status: 503, headers: { "Content-Type": "application/json" } });
     }
     const nairobiDate = getNairobiDateString();
-    const kvKey = `cap:${grant.sub}:${nairobiDate}`;
-    let currentUsage = 0;
+    const quotaName = `cap:${grant.sub}:${nairobiDate}`;
+    let quota;
     try {
-      const val = await env.PERAZIM_KV.get(kvKey);
-      currentUsage = val === null ? 0 : Number(val);
-      if (!Number.isSafeInteger(currentUsage) || currentUsage < 0) throw new Error("invalid usage state");
+      const stub = env.QUOTA_COUNTER.get(env.QUOTA_COUNTER.idFromName(quotaName));
+      const reserved = await stub.fetch("https://quota.internal/reserve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ limit: DAILY_LIMIT })
+      });
+      if (!reserved.ok) throw new Error("quota object failed");
+      quota = await reserved.json();
     } catch (_) {
       return new Response(JSON.stringify({ error: "AI service unavailable" }), { status: 503, headers: { "Content-Type": "application/json" } });
     }
-
-    if (currentUsage >= DAILY_LIMIT) {
+    if (!quota || quota.allowed !== true) {
       return new Response(JSON.stringify({
         error: "Daily question cap reached",
         remaining: 0,
@@ -236,15 +263,6 @@ export default {
         status: 429,
         headers: { "Content-Type": "application/json" }
       });
-    }
-
-    // Reserve conservatively before provider dispatch. KV remains non-atomic;
-    // the authenticated Express endpoint must enforce the authoritative quota.
-    const newUsage = currentUsage + 1;
-    try {
-      await env.PERAZIM_KV.put(kvKey, newUsage.toString(), { expirationTtl: 86400 });
-    } catch (_) {
-      return new Response(JSON.stringify({ error: "AI service unavailable" }), { status: 503, headers: { "Content-Type": "application/json" } });
     }
 
     // 7. Upstream Call to Gemini 3.5 Flash Lite. Keep trusted instructions
@@ -334,7 +352,7 @@ export default {
     }
 
     // The reservation was written before upstream dispatch.
-    const remaining = Math.max(0, DAILY_LIMIT - newUsage);
+    const remaining = Math.max(0, DAILY_LIMIT - quota.count);
     return new Response(JSON.stringify(body.context !== undefined
       ? { response: structuredResponse, remaining }
       : { answer, remaining }), {

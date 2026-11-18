@@ -1,8 +1,22 @@
 const express = require('express');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const { query, withTransaction } = require('../db');
+const { query, withTransaction, isPostgresActive } = require('../db');
 const { requireAuth, signToken, revokeToken, hashToken } = require('../middleware/auth');
+
+const REFRESH_TOKEN_DAYS = 30;
+const REFRESH_REUSE_GRACE_MS = 60 * 1000;
+
+// Issues a short access token and a rotating refresh token. In memory mode
+// (no PostgreSQL) only the access token is issued, as before.
+async function issueSession(user, now = Date.now()) {
+  const token = signToken(user);
+  if (!isPostgresActive()) return { token };
+  const refreshToken = crypto.randomBytes(32).toString('base64url');
+  await query('INSERT INTO refresh_tokens (id, user_id, token_hash, created_at, expires_at) VALUES ($1, $2, $3, $4, $5)',
+    [crypto.randomUUID(), user.id, hashToken(refreshToken), now, now + REFRESH_TOKEN_DAYS * 86400000]);
+  return { token, refresh_token: refreshToken };
+}
 const { checkLoginRateLimit, recordFailedLogin, clearFailedLogins } = require('../middleware/rateLimiter');
 const { rateLimit } = require('express-rate-limit');
 
@@ -164,8 +178,8 @@ router.post('/register', registerIpLimiter, registerPhoneLimiter, async (req, re
       privacy_notice_version: currentNotice.version
     };
 
-    const token = signToken(userObj);
-    return res.status(201).json({ token, user: userObj });
+    const session = await issueSession(userObj);
+    return res.status(201).json({ ...session, user: userObj });
   } catch (err) {
     logRegistrationFailure('registration_failed', err);
     return res.status(500).json({ error: 'Server error during registration' });
@@ -215,8 +229,8 @@ router.post('/login', checkLoginRateLimit, async (req, res) => {
       grace_points: (user.grace_points !== undefined && user.grace_points !== null) ? Number(user.grace_points) : 0
     };
 
-    const token = signToken(userObj);
-    return res.json({ token, user: userObj });
+    const session = await issueSession(userObj);
+    return res.json({ ...session, user: userObj });
   } catch (err) {
     console.error(JSON.stringify({ event: 'login_failed', category: registrationErrorCategory(err?.code) }));
     return res.status(500).json({ error: 'Server error during login' });
@@ -228,6 +242,11 @@ router.post('/logout', requireAuth, async (req, res) => {
   try {
     const token = req.token;
     const tokenHash = await revokeToken(token, req.user ? req.user.id : null);
+    // The device's refresh token ends with the session. Only a matching token for this account is revoked.
+    const presented = typeof req.body?.refresh_token === 'string' ? req.body.refresh_token : '';
+    if (presented && isPostgresActive()) {
+      await query('UPDATE refresh_tokens SET revoked_at = $3 WHERE token_hash = $1 AND user_id = $2 AND revoked_at IS NULL', [hashToken(presented), req.user.id, Date.now()]);
+    }
     return res.json({
       success: true,
       message: 'Logged out successfully. Token revoked.',
@@ -272,6 +291,41 @@ router.post('/phone-change', requireAuth, (req, res) => {
 });
 
 router.validateAndNormalizePhone = validateAndNormalizePhone;
+// POST /api/auth/refresh: exchange a refresh token for a new access token and a new refresh token.
+// A refresh token is single use. Reusing one shortly after it was rotated (a race between two
+// requests on the same device) is refused. Reusing one after the grace period revokes all sessions.
+router.post('/refresh', async (req, res) => {
+  try {
+    const presented = typeof req.body?.refresh_token === 'string' ? req.body.refresh_token : '';
+    if (!presented || presented.length > 200) return res.status(401).json({ error: 'Please sign in again.' });
+    const found = await query('SELECT id, user_id, expires_at, revoked_at FROM refresh_tokens WHERE token_hash = $1', [hashToken(presented)]);
+    const row = found.rows && found.rows[0];
+    const now = Date.now();
+    if (!row) return res.status(401).json({ error: 'Please sign in again.' });
+    if (row.revoked_at) {
+      if (now - Number(row.revoked_at) > REFRESH_REUSE_GRACE_MS) {
+        await query('UPDATE refresh_tokens SET revoked_at = $2 WHERE user_id = $1 AND revoked_at IS NULL', [row.user_id, now]);
+      }
+      return res.status(401).json({ error: 'Please sign in again.' });
+    }
+    if (Number(row.expires_at) < now) return res.status(401).json({ error: 'Please sign in again.' });
+    const account = (await query('SELECT id, phone, name, role, campus_id, is_active FROM users WHERE id = $1', [row.user_id])).rows[0];
+    if (!account || account.is_active === false) return res.status(401).json({ error: 'Please sign in again.' });
+
+    const next = crypto.randomBytes(32).toString('base64url');
+    const nextId = crypto.randomUUID();
+    await withTransaction(async client => {
+      const rotated = await client.query('UPDATE refresh_tokens SET revoked_at = $2, replaced_by = $3 WHERE id = $1 AND revoked_at IS NULL', [row.id, now, nextId]);
+      if (rotated.rowCount !== 1) throw new Error('refresh token already used');
+      await client.query('INSERT INTO refresh_tokens (id, user_id, token_hash, created_at, expires_at) VALUES ($1, $2, $3, $4, $5)',
+        [nextId, account.id, hashToken(next), now, now + REFRESH_TOKEN_DAYS * 86400000]);
+    });
+    return res.json({ token: signToken(account), refresh_token: next });
+  } catch (err) {
+    return res.status(401).json({ error: 'Please sign in again.' });
+  }
+});
+
 // POST /api/auth/change-pin: change the PIN (review item 1).
 // Requires the current PIN. Every token issued before this moment stops working.
 router.post('/change-pin', requireAuth, changePinLimiter, async (req, res) => {
@@ -293,7 +347,9 @@ router.post('/change-pin', requireAuth, changePinLimiter, async (req, res) => {
     const newHash = await bcrypt.hash(next, 12);
     await query('UPDATE users SET pin_hash = $2, auth_valid_after_seconds = $3, updated_at = $4 WHERE id = $1', [req.user.id, newHash, nowSeconds, now]);
     const fresh = (await query('SELECT id, phone, name, role, campus_id FROM users WHERE id = $1', [req.user.id])).rows[0];
-    return res.json({ token: signToken(fresh) });
+    // Revoke every refresh token first: a PIN change ends all other sessions.
+    await query('UPDATE refresh_tokens SET revoked_at = $2 WHERE user_id = $1 AND revoked_at IS NULL', [req.user.id, now]).catch(() => {});
+    return res.json(await issueSession(fresh, now));
   } catch (err) {
     console.error('change-pin failed');
     return res.status(503).json({ error: 'The PIN could not be changed right now.' });

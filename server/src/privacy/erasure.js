@@ -48,6 +48,7 @@ const ERASURE_POLICY = {
   'admin_security.user_id': 'delete',
   'user_permissions.user_id': 'delete',
   'pilot_bootstrap.user_id': 'delete',
+  'refresh_tokens.user_id': 'delete',
   // Anonymised: the record stays, the identifying fields are replaced.
   'membership_claims.user_id': 'anonymise',
   // Kept with a reason (append-only history, security, or another person's record).
@@ -131,7 +132,7 @@ async function eraseMemberData(client, userId, now = Date.now()) {
   );
 
   // Rows that only exist because of this member.
-  for (const table of ['sync_events', 'sync_receipts', 'privileged_sessions', 'admin_security', 'user_permissions', 'membership_verifications', 'membership_identity_reconciliation_requests', 'pilot_bootstrap']) {
+  for (const table of ['sync_events', 'sync_receipts', 'privileged_sessions', 'admin_security', 'user_permissions', 'membership_verifications', 'membership_identity_reconciliation_requests', 'pilot_bootstrap', 'refresh_tokens']) {
     await client.query(`DELETE FROM ${table} WHERE user_id = $1`, [userId]);
   }
 

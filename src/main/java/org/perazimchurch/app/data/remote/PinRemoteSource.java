@@ -27,6 +27,8 @@ public final class PinRemoteSource {
                     if (token.isEmpty()) {
                         callback.onError("The PIN could not be changed. Please try again.");
                     } else {
+                        org.perazimchurch.app.data.local.session.SessionManager.getInstance(context)
+                                .setPendingRefreshToken(json.optString("refresh_token", ""));
                         callback.onChanged(token);
                     }
                 }

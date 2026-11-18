@@ -22,7 +22,13 @@ import java.util.List;
  * Singleton managing active user context, authentication state, and session isolation.
  * Compliant with Phase 1.7 Account Isolation specification.
  */
-public class SessionManager {
+public class SessionManager implements ApiClient.TokenRefresher {
+    // The refresh token has its own encrypted record and key (review fix F-02).
+    private static final String REFRESH_PREFERENCES = "perazim_refresh_token_v1";
+    private static final String REFRESH_KEY_ALIAS = "org.perazimchurch.app.refresh-token.v1";
+    private SessionTokenStore refreshStore;
+    private String pendingRefreshToken;
+
 
     private static final java.util.concurrent.ExecutorService MIGRATION_EXECUTOR = java.util.concurrent.Executors.newSingleThreadExecutor();
 
@@ -58,6 +64,7 @@ public class SessionManager {
                     Context appContext = context.getApplicationContext();
                     PerazimDatabase db = PerazimDatabase.getInstance(appContext);
                     INSTANCE = new SessionManager(appContext, db.userDao());
+                    ApiClient.setTokenRefresher(INSTANCE);
                 }
             }
         }
@@ -168,6 +175,9 @@ public class SessionManager {
         clearTokenCache();
         if (token == null) {
             if (tokenStore != null) tokenStore.clear();
+            SessionTokenStore rs = getRefreshStore();
+            if (rs != null) rs.clear();
+            pendingRefreshToken = null;
             if (prefs != null) prefs.edit().remove(KEY_AUTH_TOKEN).commit();
             return;
         }
@@ -183,7 +193,71 @@ public class SessionManager {
         if (!tokenStore.write(token, accountId, origin)) return;
         if (!prefs.edit().remove(KEY_AUTH_TOKEN).commit()) return;
         if (!tokenStore.unblockLegacyMigration()) return;
+        String pending = pendingRefreshToken;
+        pendingRefreshToken = null;
+        SessionTokenStore rs = getRefreshStore();
+        if (pending != null && rs != null) rs.write(pending, accountId, origin);
         cacheToken(token, accountId, origin);
+    }
+
+    private SessionTokenStore getRefreshStore() {
+        if (refreshStore == null && context != null) {
+            refreshStore = new SessionTokenStore(context, REFRESH_PREFERENCES, REFRESH_KEY_ALIAS);
+        }
+        return refreshStore;
+    }
+
+    /** Holds a refresh token from a sign-in response until the matching access token is saved. */
+    public synchronized void setPendingRefreshToken(@Nullable String refreshToken) {
+        pendingRefreshToken = (refreshToken == null || refreshToken.isEmpty()) ? null : refreshToken;
+    }
+
+    @Override
+    public synchronized void refreshAfter401(@NonNull Context requestContext, @NonNull String failedToken,
+                                             @NonNull ApiClient.RefreshCallback callback) {
+        String current = getAuthToken();
+        if (current != null && !current.equals(failedToken)) {
+            callback.onRefreshed(current); // another request already renewed the session
+            return;
+        }
+        SessionTokenStore rs = getRefreshStore();
+        String accountId = getActiveUserId();
+        String refresh = null;
+        if (rs != null && !accountId.startsWith("guest")) {
+            try {
+                refresh = rs.read(accountId, SessionTokenStore.normalizeOrigin(ApiClient.getBaseUrl(requestContext)));
+            } catch (IllegalArgumentException ignored) {
+                refresh = null;
+            }
+        }
+        if (refresh == null || refresh.isEmpty()) {
+            callback.onRefreshed(null);
+            return;
+        }
+        try {
+            JSONObject body = new JSONObject();
+            body.put("refresh_token", refresh);
+            ApiClient.post(requestContext, "/api/auth/refresh", body, null, new ApiClient.ApiCallback() {
+                @Override public void onSuccess(int statusCode, @NonNull JSONObject json) {
+                    String newAccess = json.optString("token", "");
+                    String newRefresh = json.optString("refresh_token", "");
+                    if (newAccess.isEmpty()) {
+                        callback.onRefreshed(null);
+                        return;
+                    }
+                    synchronized (SessionManager.this) {
+                        setPendingRefreshToken(newRefresh);
+                        setAuthToken(newAccess);
+                    }
+                    callback.onRefreshed(newAccess);
+                }
+                @Override public void onError(int statusCode, @NonNull String errorMessage) {
+                    callback.onRefreshed(null);
+                }
+            });
+        } catch (Exception e) {
+            callback.onRefreshed(null);
+        }
     }
 
     private void cacheToken(String token, String accountId, String origin) {

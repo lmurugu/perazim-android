@@ -44,6 +44,8 @@ public final class AuthRemoteSource {
                     String token = json.optString("token", "");
                     JSONObject user = json.optJSONObject("user");
                     if (user == null) user = new JSONObject();
+                    org.perazimchurch.app.data.local.session.SessionManager.getInstance(context)
+                            .setPendingRefreshToken(json.optString("refresh_token", ""));
                     callback.onSuccess(token, user);
                 }
 
@@ -72,6 +74,8 @@ public final class AuthRemoteSource {
                     String token = json.optString("token", "");
                     JSONObject user = json.optJSONObject("user");
                     if (user == null) user = new JSONObject();
+                    org.perazimchurch.app.data.local.session.SessionManager.getInstance(context)
+                            .setPendingRefreshToken(json.optString("refresh_token", ""));
                     callback.onSuccess(token, user);
                 }
 

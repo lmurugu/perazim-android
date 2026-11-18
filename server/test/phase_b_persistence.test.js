@@ -77,6 +77,7 @@ const EXPECTED_MIGRATION_ADDED_TABLES = [
   'privacy_presentation_receipts',
   'privacy_publication_events',
   'privileged_sessions',
+  'refresh_tokens',
   'retention_reviews',
   'retention_rules',
   'sync_receipts',
@@ -102,7 +103,8 @@ const EXPECTED_MIGRATIONS = [
   '0017_ai_offline_rollback_authorizations.sql',
   '0018_sync_mutation_receipts.sql',
   '0019_age_confirmation.sql',
-  '0020_session_revocation.sql'
+  '0020_session_revocation.sql',
+  '0021_refresh_tokens.sql'
 ];
 
 const EXPECTED_ALL_TABLES = [
@@ -164,6 +166,7 @@ const EXPECTED_ALL_TABLES = [
   'privacy_presentation_receipts',
   'privacy_publication_events',
   'privileged_sessions',
+  'refresh_tokens',
   'retention_reviews',
   'retention_rules',
   'revoked_tokens',

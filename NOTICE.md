@@ -18,7 +18,7 @@ The **source code** in this repository is licensed under the MIT License (see `L
 |---|---|---|
 | Nayuki QR Code generator (Java) | `src/main/java/org/perazimchurch/app/community/qr/qrcodegen/` | MIT (Project Nayuki), notice in each file |
 | llama.cpp native libraries | `src/main/jniLibs/arm64-v8a/` (`libllama*.so`, `libggml*.so`) | MIT (llama.cpp), licence text in `src/main/assets/licenses/llama.cpp-LICENSE.txt` |
-| `libperazim_llama.so` | `src/main/jniLibs/arm64-v8a/` | **Pending** provenance (source revision and build hash) |
+| `libperazim_llama.so` | `src/main/jniLibs/arm64-v8a/` | SHA-256 `149d13ab4c8a6890ad1a974394b4dfd3b4ed58d787fe29fdc5f2b30c6c68656b` (4592 bytes). **Pending** owner-supplied source revision and build recipe; see audit F-18 |
 
 ## Other content assets
 

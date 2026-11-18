@@ -316,7 +316,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                         return;
                     }
                     java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
-                    android.os.AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+                    org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
                         String knowledge = OfflineKnowledgeStore.knowledgeStatus(activity, trustedKeys,
                                 BuildConfig.VERSION_NAME, System.currentTimeMillis());
                         activity.runOnUiThread(() -> {
@@ -640,7 +640,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             final View indicator = showTypingIndicator();
             requestInFlight = true;
             btnSend.setEnabled(false);
-            android.os.AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+            org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
                 AiResponse scripture = OfflineScriptureLookup.answer(activity, query);
                 activity.runOnUiThread(() -> {
                     removeTypingIndicator(indicator);

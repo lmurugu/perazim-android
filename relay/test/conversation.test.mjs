@@ -8,7 +8,9 @@ const serverRequire = createRequire(new URL('../../server/package.json', import.
 const jwt = serverRequire('jsonwebtoken');
 
 const sourcePath = new URL('../worker.js', import.meta.url);
-const source = fs.readFileSync(sourcePath, 'utf8').replace('export default {', 'module.exports.default = {');
+const source = fs.readFileSync(sourcePath, 'utf8')
+  .replace('export class QuotaCounter', 'class QuotaCounter')
+  .replace('export default {', 'module.exports.default = {') + '\nmodule.exports.QuotaCounter = QuotaCounter;';
 const moduleObject = { exports: {} };
 const signingSecret = crypto.randomBytes(32).toString('base64url');
 const otherSecret = crypto.randomBytes(32).toString('base64url');
@@ -77,12 +79,31 @@ function makeRequest(token, body, { path = '/chat', method = 'POST', rawBody = f
   });
 }
 
-function makeEnv({ enabled = true, kv = { async get() { return null; }, async put() {} } } = {}) {
+// In-memory stand-in for the QuotaCounter Durable Object namespace. The real class is
+// used, so the counting rules under test are the Worker's own.
+function makeQuotaNamespace({ startCount = 0, failOnGet = false } = {}) {
+  const objects = new Map();
+  return {
+    idFromName(name) { return name; },
+    get(id) {
+      if (failOnGet) throw new Error('synthetic quota namespace error');
+      if (!objects.has(id)) {
+        const data = new Map([['count', startCount]]);
+        const storage = { async get(key) { return data.get(key); }, async put(key, value) { data.set(key, value); } };
+        objects.set(id, new moduleObject.exports.QuotaCounter({ storage }));
+      }
+      const object = objects.get(id);
+      return { fetch: (url, init) => object.fetch(new Request(url, init)) };
+    }
+  };
+}
+
+function makeEnv({ enabled = true, quota = makeQuotaNamespace() } = {}) {
   return {
     AI_ENABLED: enabled ? 'true' : 'false',
     GEMINI_API_KEY: 'synthetic-test-only-provider-key',
     PERAZIM_AI_WORKER_SHARED_SECRET: signingSecret,
-    PERAZIM_KV: kv
+    QUOTA_COUNTER: quota
   };
 }
 
@@ -126,9 +147,9 @@ async function main() {
   await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }, { path: '/other' }), makeEnv()), 404, 'unknown path is rejected');
   await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }, { method: 'GET' }), makeEnv()), 405, 'non-POST method is rejected');
   await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }), makeEnv({ enabled: false })), 503, 'disabled worker remains fail-closed');
-  await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }), { ...makeEnv(), PERAZIM_KV: undefined }), 503, 'missing quota storage remains fail-closed');
-  await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }), makeEnv({ kv: { async get() { throw new Error('synthetic KV error'); }, async put() {} } })), 503, 'quota storage errors remain fail-closed');
-  await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }), makeEnv({ kv: { async get() { return '3'; }, async put() {} } })), 429, 'daily quota remains enforced');
+  await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }), { ...makeEnv(), QUOTA_COUNTER: undefined }), 503, 'missing quota object remains fail-closed');
+  await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }), makeEnv({ quota: makeQuotaNamespace({ failOnGet: true }) })), 503, 'quota object errors remain fail-closed');
+  await expectStatus(await worker.fetch(makeRequest(validToken, { requestId: validJti, question: 'hello' }), makeEnv({ quota: makeQuotaNamespace({ startCount: 3 }) })), 429, 'daily quota remains enforced');
   assert.equal(providerCalls, initialProviderCalls, 'rejected requests never reach the provider');
 
   providerMode = 'success';

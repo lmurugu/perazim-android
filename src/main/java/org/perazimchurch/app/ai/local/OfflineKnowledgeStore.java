@@ -972,7 +972,7 @@ public final class OfflineKnowledgeStore {
             callback.onError("This build has no trusted knowledge signing key.");
             return;
         }
-        android.os.AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+        org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
             final String targetPackageId;
             final String targetDigest;
             try {

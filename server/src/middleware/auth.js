@@ -163,7 +163,7 @@ function signToken(user) {
   return jwt.sign(
     { id: user.id, phone: user.phone, name: user.name, role: user.role, campus_id: user.campus_id },
     getJwtSecret(),
-    { expiresIn: '30d' }
+    { expiresIn: '15m' }
   );
 }
 
