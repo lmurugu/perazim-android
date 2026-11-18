@@ -50,6 +50,17 @@ jobs:
             build/ui-screenshots/**
             build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
+      - name: Print small copies of the screenshots into the log
+        if: always()
+        run: |
+          [ -d build/ui-screenshots ] || exit 0
+          cd build/ui-screenshots
+          for f in *.png; do
+            convert "$f" -resize '432x3600>' -quality 70 "/tmp/${f%.png}.jpg"
+            echo "=====BEGIN ${f%.png}.jpg"
+            base64 -w 120 "/tmp/${f%.png}.jpg"
+            echo "=====END ${f%.png}.jpg"
+          done
 
   database-instrumentation:
     name: SQLCipher and Room migration suites (API 34 emulator)
