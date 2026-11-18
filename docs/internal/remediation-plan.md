@@ -25,3 +25,6 @@ This is a summary of the owner's "Portfolio-Grade Remediation & Launch Plan" (20
 - **Church name:** "Perazim Mission Church" or "PMCI".
 - **Minimum age** for accounts (plan recommends 13+ with parental consent for 13–17).
 - **Legal approval** of every published legal document.
+
+## Open toolchain items (plan 2.1)
+- `compileSdk` is 34 and the Android Gradle plugin is 8.2.2. Both are below the Play minimum. Upgrade to targetSdk 35 (or 36 if required) and AGP 8.7+ is still open.
