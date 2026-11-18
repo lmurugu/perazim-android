@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
+    <!-- Temporary: Bible audio streamed from the PC on the local network. Remove when audio moves to HTTPS hosting. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">192.168.100.10</domain>
+    </domain-config>
 </network-security-config>
