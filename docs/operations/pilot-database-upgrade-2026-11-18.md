@@ -19,3 +19,13 @@ pg_restore --clean --if-exists -d "$DATABASE_URL" server/.runtime/backups/perazi
 
 ## Commands now guarded
 `scripts/db-migrate.js` allows writes to a database whose name does not end in `_test` only with `--confirm=<name>`, `MIGRATE_CONFIRM=<name>`, and a `pg_dump` backup written first. Connections must be to loopback.
+
+## Correction: the original pilot server was not `perazim_local`
+The original server used the database in the `perazim-pilot-postgres` container, with configuration in `server/.runtime/pilot/api.env`. On 2026-11-18 the API was restarted with `backend.env` (which points at `perazim_local`), so the admin accounts in the original database were not reachable. The upgrade above was applied to `perazim_local` and did not touch the original database.
+
+Recovery:
+1. Backed up the original database: `server/.runtime/backups/pilot_before_restore_20261118_103231.dump` (335 objects, 12 accounts).
+2. An exact-schema baseline on the original database was refused (the schema has changes that are not recorded as migrations). Nothing was changed.
+3. The original code (commit `040b723`, which still boots from the schema file, a git worktree at `/home/murugu/Android/worktrees/restore-pilot`) was started with `server/.runtime/pilot/api.env`. It is healthy and serving port 3000. Logs: `server/.runtime/pilot-restore.log`.
+
+The original database still has no migration history. Moving it to the new migrations needs a decision on how to reconcile its extra schema changes.
