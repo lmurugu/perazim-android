@@ -23,6 +23,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class BackgroundSyncSchedulerTest {
+    /** Shared CI emulators are slow; the WorkManager database futures can take well over 10 seconds. */
+    private static final long WORK_MANAGER_TIMEOUT_SECONDS = 60L;
 
     @Test
     public void oneTimeSyncWorkUsesConnectedNetworkAndExponentialBackoff() {
@@ -38,16 +40,16 @@ public class BackgroundSyncSchedulerTest {
     public void enqueuePersistsOneUniqueBackgroundSyncRequest() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         WorkManager manager = WorkManager.getInstance(context);
-        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(10, TimeUnit.SECONDS);
+        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(WORK_MANAGER_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
         BackgroundSyncScheduler.enqueue(context);
 
         List<WorkInfo> work = manager.getWorkInfosForUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME)
-                .get(10, TimeUnit.SECONDS);
+                .get(WORK_MANAGER_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         assertEquals(1, work.size());
         assertTrue(work.get(0).getState() == WorkInfo.State.ENQUEUED
                 || work.get(0).getState() == WorkInfo.State.RUNNING);
         assertTrue(work.get(0).getTags().contains(BackgroundSyncScheduler.UNIQUE_WORK_NAME));
-        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(10, TimeUnit.SECONDS);
+        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(WORK_MANAGER_TIMEOUT_SECONDS, TimeUnit.SECONDS);
     }
 }

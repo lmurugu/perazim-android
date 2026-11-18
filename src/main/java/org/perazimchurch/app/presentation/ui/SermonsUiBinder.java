@@ -721,10 +721,20 @@ public class SermonsUiBinder {
         loadingBar.setVisibility(View.VISIBLE);
 
         if ("Video".equalsIgnoreCase(chip)) {
-            YouTubeFeedRepository.fetchRecentVideos(videos -> activity.runOnUiThread(() -> {
-                loadingBar.setVisibility(View.GONE);
-                renderSermonCards(videos);
-            }));
+            // Prefer the pilot server's cached feed; fall back to the public RSS feed when it is unreachable.
+            loadChurchFeed(feed -> {
+                if (feed != null && !feed.isEmpty()) {
+                    activity.runOnUiThread(() -> {
+                        loadingBar.setVisibility(View.GONE);
+                        renderSermonCards(feed);
+                    });
+                    return;
+                }
+                YouTubeFeedRepository.fetchRecentVideos(videos -> activity.runOnUiThread(() -> {
+                    loadingBar.setVisibility(View.GONE);
+                    renderSermonCards(videos);
+                }));
+            });
             return;
         }
 
@@ -775,9 +785,6 @@ public class SermonsUiBinder {
             if (sermons != null && !sermons.isEmpty() && activeSermon == null && sermons.get(0).getAudioUrl() != null && !sermons.get(0).getAudioUrl().isEmpty()) {
                 loadSermonIntoPlayer(sermons.get(0), false);
             }
-            YouTubeFeedRepository.fetchRecentVideos(videos -> {
-                Log.d("SermonsUiBinder", "Prefetched " + (videos != null ? videos.size() : 0) + " YouTube broadcasts");
-            });
         }));
     }
 
