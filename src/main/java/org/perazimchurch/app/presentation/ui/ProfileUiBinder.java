@@ -460,10 +460,11 @@ public class ProfileUiBinder {
 
         LinearLayout settings = optionGroup(groups, "SETTINGS");
         addOption(settings, "Appearance",
-                PerazimTheme.isLight() ? "Light glass · tap for dark purple glass" : "Dark purple glass · tap for light glass",
+                PerazimTheme.choiceName(PerazimTheme.savedChoice(context))
+                        + " · " + (PerazimTheme.isLight() ? "light glass" : "dark purple glass") + " · tap to change",
                 v -> {
                     if (context instanceof Activity) {
-                        org.perazimchurch.app.ui.components.ThemeSwitcher.toggle((Activity) context);
+                        org.perazimchurch.app.ui.components.ThemeSwitcher.choose((Activity) context);
                     }
                 });
         addOption(settings, "Sound, Haptics and Celebrations", "Button sounds, vibration and confetti",

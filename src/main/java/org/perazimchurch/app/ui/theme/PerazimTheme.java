@@ -86,26 +86,55 @@ public final class PerazimTheme {
     // =========================================================================
 
     private static final String PREFS = "perazim_theme";
-    private static final String KEY_LIGHT = "light_mode";
+    private static final String KEY_LIGHT = "light_mode"; // older saved choice: true = light, false = dark
+    private static final String KEY_CHOICE = "theme_choice";
+
+    /** The three appearance choices. New installs start on SYSTEM, which follows the phone. */
+    public static final int CHOICE_SYSTEM = 0;
+    public static final int CHOICE_LIGHT = 1;
+    public static final int CHOICE_DARK = 2;
+
     private static boolean sLight = false;
 
-    /** Loads the saved mode. Call once from Application.onCreate before any screen is built. */
+    /** Resolves the saved choice into the active mode. Call before any screen is built. */
     public static void init(android.content.Context context) {
-        boolean light = context.getApplicationContext()
-                .getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-                .getBoolean(KEY_LIGHT, false);
-        applyMode(light);
+        applyPreference(context);
     }
 
     public static boolean isLight() {
         return sLight;
     }
 
-    /** Saves the mode. Screens read colors when they are built, so restart the UI after calling this. */
-    public static void saveMode(android.content.Context context, boolean light) {
+    /** The choice the person made: SYSTEM, LIGHT or DARK. Older installs keep their saved light or dark pick. */
+    public static int savedChoice(android.content.Context context) {
+        android.content.SharedPreferences prefs = context.getApplicationContext()
+                .getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE);
+        if (prefs.contains(KEY_CHOICE)) {
+            return prefs.getInt(KEY_CHOICE, CHOICE_SYSTEM);
+        }
+        if (prefs.contains(KEY_LIGHT)) {
+            return prefs.getBoolean(KEY_LIGHT, false) ? CHOICE_LIGHT : CHOICE_DARK;
+        }
+        return CHOICE_SYSTEM;
+    }
+
+    public static void saveChoice(android.content.Context context, int choice) {
         context.getApplicationContext()
                 .getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
-                .edit().putBoolean(KEY_LIGHT, light).apply();
+                .edit().putInt(KEY_CHOICE, choice).apply();
+    }
+
+    public static String choiceName(int choice) {
+        return choice == CHOICE_LIGHT ? "Light" : choice == CHOICE_DARK ? "Dark" : "System";
+    }
+
+    /** Applies the saved choice. With SYSTEM, it follows the phone's current light or dark setting. */
+    public static void applyPreference(android.content.Context context) {
+        int choice = savedChoice(context);
+        boolean phoneNight = (context.getResources().getConfiguration().uiMode
+                & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        applyMode(choice == CHOICE_LIGHT || (choice == CHOICE_SYSTEM && !phoneNight));
     }
 
     /** Swaps the mode-dependent color tokens. Dark is purple frosted glass; light is pale lavender glass. */

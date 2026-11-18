@@ -178,6 +178,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     @Override
     protected void attachBaseContext(android.content.Context newBase) {
         super.attachBaseContext(newBase);
+        // Keep the mode in step with the phone (System) before any screen is built.
+        org.perazimchurch.app.ui.theme.PerazimTheme.applyPreference(newBase);
         // Size every screen like the mockups (about 390dp wide), even on phones set to a small display size.
         android.content.res.Configuration scaled = org.perazimchurch.app.ui.theme.UiScale.override(newBase);
         if (scaled != null) {
@@ -439,7 +441,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private View createTopAppBar() {
         // Mockup header: logo and "Perazim", then the light/dark switch and the glass profile button.
         return GlassKit.header(this,
-                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.toggle(this),
+                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.choose(this),
                 v -> switchTab(NavigationContract.TAB_ID_PROFILE));
     }
 
