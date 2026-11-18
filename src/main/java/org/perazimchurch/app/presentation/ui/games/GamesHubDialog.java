@@ -110,11 +110,25 @@ public final class GamesHubDialog extends Dialog {
         page.setPadding(dp(20), dp(16), dp(20), dp(28));
         scroll.addView(page, new ScrollView.LayoutParams(-1, -2));
         setContentView(scroll);
-        Button back = button(playing ? "← Games" : "Close games", false);
+        // Small round glass back button, matching the mockups (not a full-width button).
+        ImageView back = new ImageView(activity);
+        back.setImageResource(org.perazimchurch.app.R.drawable.ic_back_round);
+        back.setPadding(dp(10), dp(10), dp(10), dp(10));
+        back.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        back.setClickable(true);
+        back.setContentDescription(playing ? "Back to games" : "Close games");
+        GradientDrawable glass = new GradientDrawable();
+        glass.setShape(GradientDrawable.OVAL);
+        glass.setColor(PerazimTheme.COLOR_SURFACE_2);
+        glass.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
+        back.setBackground(glass);
         back.setOnClickListener(v -> {
             hideKeyboard();
             if (playing) hub(); else dismiss();
         });
+        LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(44), dp(44));
+        backParams.bottomMargin = dp(12);
+        page.addView(back, backParams);
         text(title, 28, true);
         text(subtitle, 15, false);
         gap(16);
