@@ -36,6 +36,8 @@ def pilotApiBaseUrl = configuredApiBaseUrl('perazimPilotApiBaseUrl', false, true
 
 android {
     namespace 'org.perazimchurch.app'
+    // Android Gradle creates connected<Variant>AndroidTest only for the test build type (default debug).
+    testBuildType "validation"
     compileSdk 36
     compileOptions { sourceCompatibility JavaVersion.VERSION_11; targetCompatibility JavaVersion.VERSION_11 }
     packagingOptions {
@@ -89,6 +91,13 @@ android {
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
+        }
+        // Validation builds: debug-like, with the on-device Qwen runtime enabled for
+        // device validation only. Release keeps OFFLINE_QWEN_ENABLED and ONLINE_AI_ENABLED off.
+        validation {
+            initWith debug
+            matchingFallbacks = ['debug']
+            buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "true"
         }
     }
     sourceSets {
