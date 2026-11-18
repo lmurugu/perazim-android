@@ -99,7 +99,7 @@ public final class GamesHubDialog extends Dialog {
         page.setPadding(dp(20), dp(16), dp(20), dp(28));
         scroll.addView(page, new ScrollView.LayoutParams(-1, -2));
         setContentView(scroll);
-        Button back = button(playing ? "Back to games" : "Close games", false);
+        Button back = button(playing ? "← Games" : "Close games", false);
         back.setOnClickListener(v -> {
             hideKeyboard();
             if (playing) hub(); else dismiss();
