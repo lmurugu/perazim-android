@@ -123,7 +123,6 @@ public final class PerazimTheme {
         COLOR_TEXT_DISABLED = Color.parseColor(light ? "#A793B0" : "#6E5C78");
         COLOR_STROKE = Color.parseColor(light ? "#33681A7D" : "#33FFFFFF");
         // Aliases that mirror the tokens above
-        COLOR_PURPLE_DEEP = COLOR_BG_DEEP;
         COLOR_BG_NEUTRAL = COLOR_BG_DEEP;
         COLOR_TEXT_MUTED = COLOR_TEXT_SECONDARY;
         COLOR_BORDER_GREY = COLOR_STROKE;

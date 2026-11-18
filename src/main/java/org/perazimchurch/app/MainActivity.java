@@ -79,10 +79,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public static final int COLOR_PURPLE_SHADOW   = Color.parseColor("#450E53"); // 3D bevel shadow
     public static final int COLOR_PURPLE_LIGHT    = Color.parseColor("#8E30A8"); // Brightened purple
     public static final int COLOR_PURPLE_SOFT     = Color.parseColor("#C896D8"); // Soft purple text
-    public static final int COLOR_BORDER_GREY     = Color.parseColor("#E7D5EC"); // Whitened purple card border
+    public static final int COLOR_BORDER_GREY     = PerazimTheme.COLOR_STROKE; // Whitened purple card border
     public static final int COLOR_PURPLE_TINT     = Color.parseColor("#F5ECF7"); // Pastel purple tint
-    public static final int COLOR_TEXT_MUTED      = Color.parseColor("#725B78"); // Muted purple-grey text
-    public static final int COLOR_TEXT_DARK       = Color.parseColor("#1A1225"); // Deep purple-black text
+    public static final int COLOR_TEXT_MUTED      = PerazimTheme.COLOR_TEXT_SECONDARY; // Muted purple-grey text
+    public static final int COLOR_TEXT_DARK       = PerazimTheme.COLOR_TEXT_PRIMARY; // Deep purple-black text
 
     public static final int COLOR_ACCENT_ORANGE   = Color.parseColor("#E17D2F"); // Secondary Brand Warm Amber/Orange
     public static final int COLOR_ORANGE_DARK     = Color.parseColor("#78350A"); // Darkened orange
@@ -91,7 +91,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public static final int COLOR_ORANGE_TINT     = Color.parseColor("#FDF5EF"); // Pastel orange tint
 
     public static final int COLOR_WHITE           = Color.parseColor("#FFFFFF"); // Card surface
-    public static final int COLOR_BG_NEUTRAL      = Color.parseColor("#FAF7FB"); // Whitened purple canvas
+    public static final int COLOR_BG_NEUTRAL      = PerazimTheme.COLOR_BG_DEEP; // Whitened purple canvas
 
     // --- STATE VARIABLES ---
     private int streakCount = 0;

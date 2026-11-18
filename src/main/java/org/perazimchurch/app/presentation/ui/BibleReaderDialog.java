@@ -71,8 +71,8 @@ public class BibleReaderDialog extends Dialog {
     private static final int COLOR_BORDER_GREY    = PerazimTheme.COLOR_BORDER_GREY;     // #E7D5EC
     private static final int COLOR_BG_NEUTRAL     = PerazimTheme.COLOR_BG_NEUTRAL;      // #FAF7FB
     private static final int COLOR_WHITE          = PerazimTheme.COLOR_WHITE;           // #FFFFFF
-    private static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1225");
-    private static final int COLOR_TEXT_MUTED     = Color.parseColor("#725B78");
+    private static final int COLOR_TEXT_DARK      = PerazimTheme.COLOR_TEXT_PRIMARY;
+    private static final int COLOR_TEXT_MUTED     = PerazimTheme.COLOR_TEXT_SECONDARY;
 
     // Canonical Fallback 66 Books
     private static final Object[][] CANONICAL_BOOKS = {
@@ -815,7 +815,7 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout container = new LinearLayout(getContext());
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(18), dp(18), dp(18), dp(18));
-        container.setBackgroundColor(COLOR_WHITE);
+        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
 
         // Title
         TextView tvTitle = new TextView(getContext());
