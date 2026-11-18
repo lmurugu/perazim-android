@@ -98,8 +98,8 @@ public final class CommunityUiBinder {
                 tile("Share a post", org.perazimchurch.app.R.drawable.gl_plus, true, () -> composePost(null, null)));
         content.addView(grid2, GlassKit.matchWrap(activity, 10));
 
-        content.addView(chipRow(new String[]{"Messages", "Classes", "Notifications", "Bible games", "Daily challenge"},
-                new Runnable[]{this::showConversations, this::showClasses, this::showNotifications,
+        content.addView(chipRow(new String[]{"Review queue", "Messages", "Classes", "Notifications", "Bible games", "Daily challenge"},
+                new Runnable[]{this::showReviewQueue, this::showConversations, this::showClasses, this::showNotifications,
                         () -> org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(activity), this::showChallenge}),
                 GlassKit.matchWrap(activity, 12));
         content.addView(chipRow(new String[]{"Saved drafts", "My profile", "PC connection", "Refresh"},
@@ -585,8 +585,75 @@ public final class CommunityUiBinder {
     private void showGroup(JSONObject group) {
         if(group==null)return;String groupId=group.optString("id");LinearLayout body=column();body.addView(text(group.optString("description"),16));
         row(body,button("Members",()->showMembers(group)),button("Schedule class",()->scheduleClass(group)));
+        if(owner.equals(group.optString("created_by"))){
+            // Owner tools: approve join requests, and choose whether anyone can join
+            row(body,button("Join requests",()->showJoinRequests(groupId)),
+                button(group.optBoolean("is_open")?"Close to new members":"Open to anyone",()->setGroupOpen(group,!group.optBoolean("is_open"))));
+        }
         LinearLayout list=column();Runnable load=()->getCached("group_"+groupId,"api/community/posts?groupId="+encode(groupId),r->renderPosts(list,r.optJSONArray("posts"),groupId));
         row(body,button("+ Group post",()->composePost(groupId,load)),button("Refresh",load));body.addView(list);panel(group.optString("name"),body);load.run();
+    }
+    // Owner screen: pending join requests, each with Approve and Decline
+    private void showJoinRequests(String groupId) {
+        LinearLayout body=column();LinearLayout list=column();body.addView(text("Members who asked to join this group.",14));body.addView(list);
+        list.addView(text("Loading requests…",14));
+        panel("Join requests",body);
+        loadJoinRequests(groupId,list);
+    }
+    private void loadJoinRequests(String groupId,LinearLayout list) {
+        get("api/community/groups/"+encode(groupId)+"/join-requests",r->{
+            list.removeAllViews();JSONArray rows=r.optJSONArray("requests");
+            if(rows==null||rows.length()==0){list.addView(text("No pending requests.",14));return;}
+            for(int i=0;i<rows.length();i++){JSONObject req=rows.optJSONObject(i);if(req==null)continue;
+                String userId=req.optString("user_id");LinearLayout card=card(list);
+                card.addView(text("Member request · "+date(req.optLong("created_at")),14));
+                row(card,button("Approve",()->decideJoinRequest(groupId,userId,"APPROVED",list)),button("Decline",()->decideJoinRequest(groupId,userId,"DECLINED",list)));
+            }
+        },(code,message)->{list.removeAllViews();list.addView(text(error(code,message),14));});
+    }
+    private void decideJoinRequest(String groupId,String userId,String status,LinearLayout list) {
+        JSONObject value=new JSONObject();postSafe(value,"status",status);
+        request("PUT","api/community/groups/"+encode(groupId)+"/join-requests/"+encode(userId),value,
+            r->{toast("APPROVED".equals(status)?"Member approved.":"Request declined.");loadJoinRequests(groupId,list);},this::showError);
+    }
+    private void setGroupOpen(JSONObject group,boolean open) {
+        JSONObject value=new JSONObject();postSafe(value,"isOpen",open);
+        request("PUT","api/community/groups/"+encode(group.optString("id"))+"/settings",value,
+            r->{postSafe(group,"is_open",open);toast(open?"Group is open to anyone.":"Group is closed to new members.");},this::showError);
+    }
+
+    // Leader screen: posts and event photos waiting for approval. The server only lets the church admin decide.
+    public void showReviewQueue() {
+        LinearLayout body=column();LinearLayout list=column();
+        body.addView(text("Posters and photos wait here until a leader approves them.",14));body.addView(list);
+        list.addView(text("Loading…",14));
+        panel("Review queue",body);
+        loadReviewQueue(list);
+    }
+    private void loadReviewQueue(LinearLayout list) {
+        get("api/community/review/pending",r->{
+            list.removeAllViews();
+            JSONArray posts=r.optJSONArray("posts"),photos=r.optJSONArray("photos");
+            boolean any=false;
+            if(posts!=null)for(int i=0;i<posts.length();i++){JSONObject p=posts.optJSONObject(i);if(p==null)continue;any=true;
+                String id=p.optString("id");LinearLayout card=card(list);
+                card.addView(text(p.optString("type")+" · "+p.optString("author_name"),12));
+                card.addView(text(p.optString("title"),16));card.addView(text(p.optString("content"),14));
+                addPhoto(card,p.optString("media_url"));
+                row(card,button("Approve",()->decideReview("api/community/posts/"+encode(id)+"/review","APPROVED",list)),button("Reject",()->decideReview("api/community/posts/"+encode(id)+"/review","REJECTED",list)));
+            }
+            if(photos!=null)for(int i=0;i<photos.length();i++){JSONObject p=photos.optJSONObject(i);if(p==null)continue;any=true;
+                String id=p.optString("id");LinearLayout card=card(list);
+                card.addView(text("Event photo",12));
+                addPhoto(card,p.optString("media_url"));
+                row(card,button("Approve",()->decideReview("api/community/photos/"+encode(id)+"/review","APPROVED",list)),button("Reject",()->decideReview("api/community/photos/"+encode(id)+"/review","REJECTED",list)));
+            }
+            if(!any)list.addView(text("Nothing waiting for review.",14));
+        },(code,message)->{list.removeAllViews();list.addView(text(error(code,message),14));});
+    }
+    private void decideReview(String endpoint,String status,LinearLayout list) {
+        JSONObject value=new JSONObject();postSafe(value,"status",status);
+        request("PUT",endpoint,value,r->{toast("APPROVED".equals(status)?"Approved.":"Rejected.");loadReviewQueue(list);},this::showError);
     }
     private void showMembers(JSONObject group) {
         String groupId=group.optString("id");LinearLayout body=column();boolean isOwner=owner.equals(group.optString("created_by"));

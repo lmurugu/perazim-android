@@ -655,7 +655,7 @@ router.get('/groups', requireAuth, async (req, res) => {
   await ensureSeedData();
   try {
     const result = await query(
-      `SELECT g.id, g.name, g.description, g.created_by, g.is_active, g.created_at,
+      `SELECT g.id, g.name, g.description, g.created_by, g.is_active, g.created_at, g.is_open,
               (SELECT COUNT(*) FROM group_memberships gm WHERE gm.group_id = g.id) AS member_count,
               (EXISTS (SELECT 1 FROM group_memberships gm WHERE gm.group_id = g.id AND gm.user_id = $1)) AS is_member
        FROM community_groups g
