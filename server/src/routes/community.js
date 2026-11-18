@@ -333,6 +333,14 @@ router.get('/posts', optionalAuth, async (req, res) => {
       params.push(parseInt(cursor, 10));
     }
 
+    // Posts waiting for leader review stay hidden from everyone except their author.
+    if (currentUserId) {
+      conditions.push(`(p.review_status = 'APPROVED' OR p.author_id = $${paramIndex++})`);
+      params.push(currentUserId);
+    } else {
+      conditions.push(`p.review_status = 'APPROVED'`);
+    }
+
     let userParamIndices = [];
     if (currentUserId) {
       userParamIndices.push(paramIndex++);
