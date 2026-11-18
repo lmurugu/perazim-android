@@ -417,10 +417,23 @@ public final class CommunityUiBinder {
 
     public void showGroups() {
         if(!signedIn())return;LinearLayout body=column();body.addView(text("Private spaces for study, fellowship, and ministry. The owner adds members.",14));
-        body.addView(button("+ Create a group",this::createGroup));LinearLayout list=column();body.addView(list);panel("My groups",body);
+        body.addView(button("+ Start a group",this::createGroup));
+        // Search filters the cards already on screen by name
+        EditText search=input("Search groups",false);body.addView(search);
+        LinearLayout list=column();body.addView(list);
+        search.addTextChangedListener(new android.text.TextWatcher(){
+            public void beforeTextChanged(CharSequence s,int a,int b,int c){}
+            public void onTextChanged(CharSequence s,int a,int b,int c){
+                String q=s.toString().trim().toLowerCase(java.util.Locale.ROOT);
+                for(int i=0;i<list.getChildCount();i++){View v=list.getChildAt(i);Object tag=v.getTag();
+                    if(tag instanceof String)v.setVisibility(((String)tag).contains(q)?View.VISIBLE:View.GONE);}
+            }
+            public void afterTextChanged(android.text.Editable s){}
+        });
+        panel("Groups",body);
         getCached("groups","api/community/groups",r->{list.removeAllViews();JSONArray rows=r.optJSONArray("groups");
             if(rows==null||rows.length()==0)list.addView(text("No groups yet. Create one, or ask a group owner to add you.",15));
-            if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject g=rows.optJSONObject(i);if(g!=null){LinearLayout card=card(list);card.addView(text(g.optString("name"),19));card.addView(text(g.optString("description"),14));card.addView(button("Open · "+g.optInt("member_count")+" members",()->showGroup(g)));}}
+            if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject g=rows.optJSONObject(i);if(g!=null){LinearLayout card=card(list);card.setTag(g.optString("name").toLowerCase(java.util.Locale.ROOT));card.addView(text(g.optString("name"),19));card.addView(text(g.optString("description"),14));card.addView(text(g.optInt("member_count")+" members",13));card.addView(button("Open group",()->showGroup(g)));}}
         });
     }
     private void createGroup() {
