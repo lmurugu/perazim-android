@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+  :root { --brand:#7B3FA0; --brand2:#E07B2F; --text:#F5F0F7; --muted:#B9A8C4; --card:#2A0F33; }
+  html, body { margin:0; height:100%; background:#1a0a20; color:var(--text); font-family: sans-serif; }
+  .wrap { padding:10px; box-sizing:border-box; }
+  .frame { position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:14px; overflow:hidden; }
+  .frame iframe, .frame #player { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .title { margin:12px 2px 2px; font-size:16px; font-weight:700; line-height:1.3; }
+  .sub { margin:0 2px 10px; font-size:12px; color:var(--muted); }
+  .seek { width:100%; -webkit-appearance:none; appearance:none; height:4px; border-radius:4px; background:#4b2a57; outline:none; }
+  .seek::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; }
+  .times { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:4px; }
+  .controls { display:flex; align-items:center; justify-content:center; gap:26px; margin-top:12px; }
+  .btn { background:none; border:0; color:var(--text); font-size:22px; width:48px; height:48px; border-radius:24px; }
+  .btn.small { font-size:14px; color:var(--muted); }
+  .play { width:68px; height:68px; border-radius:34px; background:linear-gradient(135deg,var(--brand),var(--brand2)); font-size:26px; color:#fff; box-shadow:0 6px 18px rgba(0,0,0,.4); }
+  .note { margin-top:14px; font-size:11px; color:var(--muted); text-align:center; }
+  .shield { position:absolute; inset:0; z-index:2; background:transparent; }
+  #status { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="frame">
+    <div id="player"></div>
+    <div class="shield" id="shield" aria-hidden="true"></div>
+    <div id="status">Loading…</div>
+  </div>
+  <div class="title" id="title">__TITLE__</div>
+  <div class="sub">Perazim Mission Church</div>
+  <input class="seek" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek">
+  <div class="times"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+  <div class="controls">
+    <button class="btn small" id="back" aria-label="Back 15 seconds">−15s</button>
+    <button class="btn play" id="toggle" aria-label="Play or pause">▶</button>
+    <button class="btn small" id="fwd" aria-label="Forward 30 seconds">+30s</button>
+  </div>
+  <div class="note">Video is streamed from YouTube. Playback stops when you leave this screen.</div>
+</div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+  var VIDEO_ID = "__VIDEO_ID__";
+  var player = null, timer = null, dragging = false;
+  var $ = function (id) { return document.getElementById(id); };
+  function fmt(s) {
+    s = Math.max(0, Math.floor(s || 0));
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
+    var mm = h ? String(m).padStart(2, '0') : String(m);
+    return (h ? h + ':' : '') + mm + ':' + String(x).padStart(2, '0');
+  }
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+      videoId: VIDEO_ID,
+      playerVars: { controls: 0, playsinline: 1, rel: 0, modestbranding: 1, autoplay: 0, fs: 0, iv_load_policy: 3 },
+      events: {
+        onReady: function () { $('status').style.display = 'none'; startTimer(); },
+        onStateChange: function (e) { $('toggle').textContent = (e.data === YT.PlayerState.PLAYING) ? '❚❚' : '▶'; },
+        onError: function () { $('status').style.display = 'flex'; $('status').textContent = 'This video cannot be played here.'; }
+      }
+    });
+  }
+  function startTimer() {
+    timer = setInterval(function () {
+      if (!player || !player.getDuration || dragging) return;
+      var d = player.getDuration() || 0, c = player.getCurrentTime() || 0;
+      $('dur').textContent = fmt(d);
+      $('cur').textContent = fmt(c);
+      if (d > 0) $('seek').value = Math.round((c / d) * 1000);
+    }, 500);
+  }
+  function togglePlay() {
+    if (!player) return;
+    var st = player.getPlayerState();
+    if (st === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
+  }
+  $('toggle').addEventListener('click', togglePlay);
+  // Covers YouTube's own overlay (including its 'Watch on YouTube' link) so taps stay in the app.
+  $('shield').addEventListener('click', togglePlay);
+  $('back').addEventListener('click', function () { if (player) player.seekTo(Math.max(0, player.getCurrentTime() - 15), true); });
+  $('fwd').addEventListener('click', function () { if (player) player.seekTo(player.getCurrentTime() + 30, true); });
+  $('seek').addEventListener('input', function () { dragging = true; });
+  $('seek').addEventListener('change', function () {
+    if (player && player.getDuration) {
+      player.seekTo((this.value / 1000) * player.getDuration(), true);
+    }
+    dragging = false;
+  });
+</script>
+</body>
+</html>

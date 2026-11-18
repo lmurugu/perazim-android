@@ -1089,7 +1089,7 @@ public class SermonsUiBinder {
         android.widget.FrameLayout holder = new android.widget.FrameLayout(activity);
         holder.setPadding(dp(8), dp(8), dp(8), dp(8));
         holder.addView(player, new android.widget.FrameLayout.LayoutParams(
-                android.widget.FrameLayout.LayoutParams.MATCH_PARENT, dp(240)));
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT, dp(470)));
 
         AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle(title == null || title.isEmpty() ? "Church video" : title)
@@ -1102,12 +1102,21 @@ public class SermonsUiBinder {
             player.destroy();
         });
         dialog.show();
-        // YouTube refuses embeds with no referring site (error 153); give the player a page origin.
-        String html = "<!doctype html><html><body style=\"margin:0;background:#000\">"
-                + "<iframe width=\"100%\" height=\"100%\" frameborder=\"0\" allowfullscreen "
-                + "allow=\"autoplay; encrypted-media; picture-in-picture\" "
-                + "src=\"" + embedPrefix + videoId + "?playsinline=1&amp;autoplay=1&amp;rel=0\"></iframe>"
-                + "</body></html>";
+        // Church player page (own controls around YouTube's embed). The page origin is the
+        // church domain because YouTube refuses embeds with no referring site (error 153).
+        String html;
+        try (java.io.InputStream in = activity.getAssets().open("player/church_video_player.html")) {
+            java.io.ByteArrayOutputStream buf = new java.io.ByteArrayOutputStream();
+            byte[] chunk = new byte[4096];
+            int n;
+            while ((n = in.read(chunk)) != -1) buf.write(chunk, 0, n);
+            html = buf.toString("UTF-8")
+                    .replace("__VIDEO_ID__", videoId)
+                    .replace("__TITLE__", android.text.TextUtils.htmlEncode(title == null ? "Church video" : title));
+        } catch (java.io.IOException e) {
+            Toast.makeText(activity, "Player could not be loaded", Toast.LENGTH_SHORT).show();
+            return;
+        }
         player.loadDataWithBaseURL("https://perazim.org/", html, "text/html", "UTF-8", null);
     }
 
