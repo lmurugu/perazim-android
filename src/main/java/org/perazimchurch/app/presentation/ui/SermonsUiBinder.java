@@ -1271,7 +1271,7 @@ public class SermonsUiBinder {
                 }
 
                 String remoteUrl = activeSermon != null ? activeSermon.getAudioUrl() : null;
-                if (!sourceSet && remoteUrl != null && remoteUrl.startsWith("https://")) {
+                if (!sourceSet && remoteUrl != null && (remoteUrl.startsWith("https://") || remoteUrl.startsWith("http://"))) {
                     try {
                         mediaPlayer.setDataSource(remoteUrl);
                         sourceSet = true;
