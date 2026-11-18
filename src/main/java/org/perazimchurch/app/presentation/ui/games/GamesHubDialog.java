@@ -5,8 +5,9 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -91,7 +92,8 @@ public final class GamesHubDialog extends Dialog {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Window window = getWindow();
         if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_DEEP));
+            window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+            drawBehindSystemBars(window);
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
         hub();
@@ -106,11 +108,35 @@ public final class GamesHubDialog extends Dialog {
         return same;
     }
 
+    /** Transparent status and navigation bars with the glow behind them, like MainActivity. */
+    @SuppressWarnings("deprecation")
+    private void drawBehindSystemBars(Window window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        if (PerazimTheme.isLight()) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
+        window.getDecorView().setSystemUiVisibility(flags);
+    }
+
     private void screen(String title, String subtitle, boolean playing) {
         handler.removeCallbacksAndMessages(null);
         scroll = new ScrollView(activity);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        scroll.setBackground(PerazimTheme.createBackgroundGradient());
+        // Edge to edge like the rest of the app: content is padded below the status bar and above the nav bar.
+        scroll.setClipToPadding(false);
+        scroll.setOnApplyWindowInsetsListener((v, insets) -> {
+            scroll.setPadding(0, insets.getSystemWindowInsetTop(), 0, insets.getSystemWindowInsetBottom());
+            return insets;
+        });
         page = new LinearLayout(activity);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setPadding(dp(20), dp(16), dp(20), dp(28));
