@@ -51,6 +51,12 @@ import java.util.Set;
 
 /** Three complete offline Bible games; best scores are local and account-scoped. */
 public final class GamesHubDialog extends Dialog {
+
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
     private final Activity activity;
     private final String ownerId;
     private final SharedPreferences scores;
@@ -348,7 +354,7 @@ public final class GamesHubDialog extends Dialog {
                     if (start[0] < 0) {
                         start[0] = rr; start[1] = cc;
                         cell.setBackgroundColor(PerazimTheme.COLOR_PURPLE_SOFT);
-                        feedback().click(v);
+                        feedback().gameCue(FeedbackManager.GameCue.PICK);
                         return;
                     }
                     int[][] hit = game.select(start[0], start[1], rr, cc);
@@ -356,14 +362,16 @@ public final class GamesHubDialog extends Dialog {
                     if (hit != null) {
                         for (int[] p : hit) foundCells.add(p[0] * WordSearch.SIZE + p[1]);
                         addStar();
-                        feedback().reward(activity);
+                        feedback().gameCue(FeedbackManager.GameCue.MATCH);
                         status.setText("Found " + game.found().size() + " of " + game.words().size());
                         if (game.complete()) {
                             solvedOnce("WORD_SEARCH");
+                            feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
                             feedback().celebrateIn(getWindow());
                             status.setText("All words found. Well done.");
                         }
                     } else {
+                        feedback().gameCue(FeedbackManager.GameCue.MISS);
                         Toast.makeText(activity, "Not a word in that line. Try again.", Toast.LENGTH_SHORT).show();
                     }
                     for (int r2 = 0; r2 < cells.length; r2++) {
@@ -407,7 +415,9 @@ public final class GamesHubDialog extends Dialog {
                 row.addView(tile, lp);
                 tile.setOnClickListener(v -> {
                     if (game.mismatchShowing() || !game.flip(index)) return;
-                    feedback().click(v);
+                    if (game.mismatchShowing()) feedback().gameCue(FeedbackManager.GameCue.MISS);
+                    else if (game.tiles().get(index).matched) feedback().gameCue(FeedbackManager.GameCue.MATCH);
+                    else feedback().gameCue(FeedbackManager.GameCue.PICK);
                     refreshTiles(game, tileViews);
                     status.setText("Moves: " + game.moves());
                     MemoryMatch.Tile t = game.tiles().get(index);
@@ -415,6 +425,7 @@ public final class GamesHubDialog extends Dialog {
                     if (game.complete()) {
                         addStar();
                         solvedOnce("MEMORY_MATCH");
+                        feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
                         feedback().celebrateIn(getWindow());
                         status.setText("Complete in " + game.moves() + " moves.");
                         reveal.setText("Every pair found.");
@@ -457,17 +468,18 @@ public final class GamesHubDialog extends Dialog {
                 if (game.isPlaced(index)) return;
                 if (game.tap(index)) {
                     addStar();
-                    feedback().reward(activity);
+                    feedback().gameCue(FeedbackManager.GameCue.MATCH);
                     b.setText(game.placed() + ". " + events.get(index).title + " (" + events.get(index).reference + ")");
                     b.setAlpha(0.7f);
                     status.setText("Placed " + game.placed() + " of " + game.ordered().size());
                     if (game.complete()) {
                         solvedOnce("TIMELINE");
+                        feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
                         feedback().celebrateIn(getWindow());
                         status.setText("Story in order. Mistakes: " + game.mistakes());
                     }
                 } else {
-                    feedback().click(v);
+                    feedback().gameCue(FeedbackManager.GameCue.MISS);
                     Toast.makeText(activity, "Not yet. Think about what comes first in the story.", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -532,10 +544,11 @@ public final class GamesHubDialog extends Dialog {
             if (cw.solved(typed)) {
                 addStar();
                 solvedOnce("CROSSWORD");
-                feedback().reward(activity);
+                feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
                 feedback().celebrateIn(getWindow());
                 status.setText("Solved. Every answer is right.");
             } else {
+                feedback().gameCue(FeedbackManager.GameCue.MISS);
                 status.setText(right + " of " + total + " letters are right so far.");
             }
         });
@@ -571,7 +584,7 @@ public final class GamesHubDialog extends Dialog {
         again.setVisibility(View.GONE);
         roll.setOnClickListener(v -> {
             if (game.finished()) return;
-            feedback().click(v);
+            feedback().gameCue(FeedbackManager.GameCue.PICK);
             roll.setEnabled(false);
             RoadToJerusalem.Move mine = game.turn(true);
             String line = "You rolled " + mine.roll + "." + (mine.note == null ? "" : " " + mine.note);
@@ -595,6 +608,7 @@ public final class GamesHubDialog extends Dialog {
         if ("You".equals(game.winner())) {
             addStar();
             solvedOnce("ROAD");
+            feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
             feedback().celebrateIn(getWindow());
             status.setText(status.getText() + "\nYou reached Jerusalem first.");
         } else {

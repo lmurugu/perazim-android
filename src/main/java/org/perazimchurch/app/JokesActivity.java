@@ -1,6 +1,7 @@
 package org.perazimchurch.app;
 
 import android.app.Activity;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -29,11 +30,11 @@ import android.widget.Toast;
 public class JokesActivity extends Activity implements View.OnClickListener {
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = Color.parseColor("#2D0938");
+    public static final int COLOR_PURPLE_DARK = PerazimTheme.COLOR_TEXT_PRIMARY;
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_BORDER = Color.parseColor("#E7D5EC");
+    public static final int COLOR_PURPLE_BORDER = PerazimTheme.COLOR_STROKE;
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = Color.parseColor("#725B78");
+    public static final int COLOR_PURPLE_MUTED = PerazimTheme.COLOR_TEXT_SECONDARY;
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -42,7 +43,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = Color.parseColor("#FAF7FB");
+    public static final int COLOR_CANVAS = PerazimTheme.COLOR_BG_DEEP;
 
     private Button btnBack;
     private Button btnSmile;
@@ -102,7 +103,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
         }
 
         // Header Quote Card
-        LinearLayout quoteCard = createCard(this, COLOR_WHITE, dp(14), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout quoteCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(14), COLOR_PURPLE_BORDER, dp(1));
         quoteCard.setOrientation(LinearLayout.VERTICAL);
         TextView quote = new TextView(this);
         quote.setText("“A cheerful heart is good medicine, but a crushed spirit dries up the bones.” — Proverbs 17:22");
@@ -179,7 +180,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
     }
 
     private LinearLayout createJokeCard(String badge, String title, String body, int badgeBg, int badgeText, int borderColor) {
-        LinearLayout card = createCard(this, COLOR_WHITE, dp(14), borderColor, dp(1));
+        LinearLayout card = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(14), borderColor, dp(1));
         card.setOrientation(LinearLayout.VERTICAL);
 
         TextView pill = createPillInline(badge, badgeBg, badgeText);

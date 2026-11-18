@@ -50,6 +50,12 @@ import java.util.List;
  */
 public class AiBreakthroughGuideDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     public interface AiActionListener {
         void onNavigateTab(int tabIndex);
         void onOpenGiving();
@@ -61,16 +67,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private static final int COLOR_PRIMARY_PURPLE = Color.parseColor("#681A7D");
-    private static final int COLOR_PURPLE_DARK    = Color.parseColor("#2D0938");
+    private static final int COLOR_PURPLE_DARK    = PerazimTheme.COLOR_TEXT_PRIMARY;
     private static final int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
     private static final int COLOR_PURPLE_TINT    = Color.parseColor("#F5ECF7");
-    private static final int COLOR_BORDER_GREY    = Color.parseColor("#E7D5EC");
+    private static final int COLOR_BORDER_GREY    = PerazimTheme.COLOR_STROKE;
     private static final int COLOR_ACCENT_ORANGE  = Color.parseColor("#E17D2F");
     private static final int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
     private static final int COLOR_WHITE          = Color.parseColor("#FFFFFF");
-    private static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1225");
-    private static final int COLOR_TEXT_MUTED     = Color.parseColor("#725B78");
-    private static final int COLOR_BG_NEUTRAL     = Color.parseColor("#FAF7FB");
+    private static final int COLOR_TEXT_DARK      = PerazimTheme.COLOR_TEXT_PRIMARY;
+    private static final int COLOR_TEXT_MUTED     = PerazimTheme.COLOR_TEXT_SECONDARY;
+    private static final int COLOR_BG_NEUTRAL     = PerazimTheme.COLOR_BG_DEEP;
 
     private final Activity activity;
     private final PerazimAiEngine aiEngine;
@@ -511,7 +517,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         LinearLayout layout = new LinearLayout(activity);
         layout.setOrientation(LinearLayout.VERTICAL);
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_WHITE);
+        bg.setColor(PerazimTheme.COLOR_SURFACE_SOLID);
         bg.setCornerRadius(dp(16));
         bg.setStroke(dp(1), COLOR_BORDER_GREY);
         layout.setBackground(bg);

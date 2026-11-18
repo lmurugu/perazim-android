@@ -1,6 +1,7 @@
 package org.perazimchurch.app;
 
 import android.app.Activity;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -30,13 +31,13 @@ import android.widget.Toast;
 public class ReflectionsActivity extends Activity implements View.OnClickListener {
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = Color.parseColor("#2D0938");
+    public static final int COLOR_PURPLE_DARK = PerazimTheme.COLOR_TEXT_PRIMARY;
     public static final int COLOR_PURPLE_DEEPEST = Color.parseColor("#140319");
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
     public static final int COLOR_PURPLE_SOFT = Color.parseColor("#C896D8");
-    public static final int COLOR_PURPLE_BORDER = Color.parseColor("#E7D5EC");
+    public static final int COLOR_PURPLE_BORDER = PerazimTheme.COLOR_STROKE;
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = Color.parseColor("#725B78");
+    public static final int COLOR_PURPLE_MUTED = PerazimTheme.COLOR_TEXT_SECONDARY;
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -45,7 +46,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = Color.parseColor("#FAF7FB");
+    public static final int COLOR_CANVAS = PerazimTheme.COLOR_BG_DEEP;
 
     private Button btnBack;
     private Button btnMeditate;
@@ -106,7 +107,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
         }
 
         // Covenant Devotional Card
-        LinearLayout card = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout card = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
         card.setOrientation(LinearLayout.VERTICAL);
 
         TextView pill = createPillInline("2 SAMUEL 5:20 · BAAL PERAZIM", COLOR_ORANGE_TINT, COLOR_ORANGE);
@@ -150,7 +151,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
         content.addView(card);
 
         // Prayer Card
-        LinearLayout prayerCard = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout prayerCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
         prayerCard.setOrientation(LinearLayout.VERTICAL);
 
         TextView prTitle = new TextView(this);

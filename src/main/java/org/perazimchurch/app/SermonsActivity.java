@@ -3,6 +3,7 @@ package org.perazimchurch.app;
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.Activity;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,11 +34,11 @@ import android.widget.Toast;
 public class SermonsActivity extends Activity implements View.OnClickListener {
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = Color.parseColor("#2D0938");
+    public static final int COLOR_PURPLE_DARK = PerazimTheme.COLOR_TEXT_PRIMARY;
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_BORDER = Color.parseColor("#E7D5EC");
+    public static final int COLOR_PURPLE_BORDER = PerazimTheme.COLOR_STROKE;
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = Color.parseColor("#725B78");
+    public static final int COLOR_PURPLE_MUTED = PerazimTheme.COLOR_TEXT_SECONDARY;
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -46,7 +47,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = Color.parseColor("#FAF7FB");
+    public static final int COLOR_CANVAS = PerazimTheme.COLOR_BG_DEEP;
 
     private Button btnBack;
     private Button btnWatchSeminar;
@@ -105,7 +106,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         }
 
         // Featured Speaker Header
-        LinearLayout speakerCard = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout speakerCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
         speakerCard.setOrientation(LinearLayout.HORIZONTAL);
         speakerCard.setGravity(Gravity.CENTER_VERTICAL);
 
@@ -170,7 +171,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         content.addView(speakerCard);
 
         // Featured Seminar Card
-        LinearLayout seminarCard = createCard(this, COLOR_WHITE, dp(16), COLOR_ORANGE_BORDER, dp(2));
+        LinearLayout seminarCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_ORANGE_BORDER, dp(2));
         seminarCard.setOrientation(LinearLayout.VERTICAL);
 
         TextView semTag = createPillInline("FEATURED LEADERSHIP SEMINAR", COLOR_ORANGE_TINT, COLOR_ORANGE);
@@ -212,7 +213,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         content.addView(seminarCard);
 
         // Official Channel Portal Card
-        LinearLayout channelCard = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout channelCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
         channelCard.setOrientation(LinearLayout.VERTICAL);
 
         TextView chTitle = new TextView(this);
