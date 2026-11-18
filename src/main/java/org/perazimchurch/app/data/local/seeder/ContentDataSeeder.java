@@ -40,9 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -118,11 +116,9 @@ public class ContentDataSeeder {
     public static void seedSermonsIfNeeded(@NonNull Context context, @NonNull PerazimDatabase db) throws IOException, JSONException {
         SermonDao dao = db.sermonDao();
         List<SermonEntity> existing = dao.getAllSermons();
-        Set<String> existingIds = new HashSet<>();
-        if (existing != null) {
-            for (SermonEntity sermon : existing) {
-                existingIds.add(sermon.getId());
-            }
+        if (existing != null && !existing.isEmpty()) {
+            Log.d(TAG, "Sermons table already seeded (" + existing.size() + " records). Skipping.");
+            return;
         }
 
         String jsonString = loadJsonFromAsset(context, "sermons.json");
@@ -149,21 +145,8 @@ public class ContentDataSeeder {
             entities.add(sermon);
         }
 
-        // Insert only sermons that are not already stored, so existing installs
-        // receive newly bundled entries without overwriting saved state.
-        List<SermonEntity> missing = new ArrayList<>();
-        for (SermonEntity sermon : entities) {
-            if (!existingIds.contains(sermon.getId())) {
-                missing.add(sermon);
-            }
-        }
-        if (missing.isEmpty()) {
-            Log.d(TAG, "Sermons table already contains all seeded records. Skipping.");
-            return;
-        }
-
-        dao.insertAll(missing);
-        Log.i(TAG, "Seeded " + missing.size() + " new sermons into database.");
+        dao.insertAll(entities);
+        Log.i(TAG, "Seeded " + entities.size() + " sermons into database.");
     }
 
     public static void seedHymnsIfNeeded(@NonNull Context context, @NonNull PerazimDatabase db) throws IOException, JSONException {
