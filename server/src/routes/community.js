@@ -1401,6 +1401,22 @@ router.put('/groups/:id/join-requests/:userId', requireAuth, async (req, res) =>
   }
 });
 
+// PUT /api/community/groups/:id/settings  { isOpen }  (group owner or admin): open a group to anyone or close it
+router.put('/groups/:id/settings', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!await canManageGroup(req.user, id)) return res.status(403).json({ error: 'Only this group owner or an administrator can change settings' });
+    const { isOpen } = req.body || {};
+    if (typeof isOpen !== 'boolean') return res.status(400).json({ error: 'isOpen must be true or false' });
+    const result = await query('UPDATE community_groups SET is_open = $1 WHERE id = $2 AND is_active = TRUE RETURNING id, is_open', [isOpen, id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Group not found' });
+    res.json({ success: true, isOpen: result.rows[0].is_open });
+  } catch (err) {
+    console.error('Error updating group settings');
+    res.status(500).json({ error: 'Could not update the group' });
+  }
+});
+
 // ---- Reactions, review and event photos (migrations 0023 and 0024) ----
 
 // The fixed feelings set. Anything else is rejected, so the feed stays calm.
