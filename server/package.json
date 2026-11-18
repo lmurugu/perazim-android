@@ -14,7 +14,7 @@
     "test:restart": "node test/api_process_restart.test.js",
     "test:migrations": "node test/migrations.test.js",
     "test:governed-ai:pg": "node test/governed_ai_postgres.test.js",
-    "test:privacy": "node test/privacy_privacy_gate.test.js && node test/privacy_ack_contract.test.js && node test/erasure_cascade.test.js && node test/auth_pin_age_cutoff.test.js",
+    "test:privacy": "node test/privacy_privacy_gate.test.js && node test/privacy_ack_contract.test.js && node test/erasure_cascade.test.js && node test/erasure_completeness.test.js && node test/auth_pin_age_cutoff.test.js",
     "test:admin-enrollment": "node test/admin_enrollment_file.test.js",
     "test:migration-0007-guard": "node test/migration_0007_guard.test.js && node test/migration_runner_0007_preflight.test.js",
     "test:phase-e-independent": "npm run test:privacy && npm run test:admin-enrollment && npm run test:phase-b-database-guard && npm run test:migration-0007-guard && npm run test:online-ai-contract",

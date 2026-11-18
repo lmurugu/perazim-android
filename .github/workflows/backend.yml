@@ -15,6 +15,7 @@ permissions:
 jobs:
   test:
     name: Migrations and server suites on PostgreSQL 16
+    # The isolated phase-B runner needs PostgreSQL 18 binaries; it runs on the owner's machine (see the audit notes).
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -32,8 +33,8 @@ jobs:
       NODE_ENV: test
       JWT_SECRET: ci-only-jwt-secret-that-is-at-least-32-characters
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: "24"
           cache: npm
@@ -44,20 +45,15 @@ jobs:
           PGPASSWORD: ci-only-password
         run: |
           set -e
-          for t in api postgres migration_sync_receipts_existing_data logging_privacy_scan community_api prayer_visibility privacy_privacy_gate privacy_ack_contract erasure_cascade migration_0007_guard; do
+          for t in api postgres migration_sync_receipts_existing_data logging_privacy_scan community_api prayer_visibility privacy_privacy_gate privacy_ack_contract erasure_cascade erasure_completeness auth_pin_age_cutoff migration_0007_guard; do
             db="ci_${t}_test"
             psql -h 127.0.0.1 -U postgres -qc "DROP DATABASE IF EXISTS $db" -c "CREATE DATABASE $db"
             DATABASE_URL="postgres://postgres:ci-only-password@127.0.0.1:5432/$db" node test/$t.test.js
           done
-      - name: Isolated phase-B runner
-        env:
-          PGPASSWORD: ci-only-password
-        run: bash scripts/test-phase-b-isolated.sh
-        working-directory: server
   docker:
     name: Docker image builds
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Build image
         run: docker build -t perazim-server:ci server

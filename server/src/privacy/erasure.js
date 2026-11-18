@@ -20,6 +20,76 @@
 
 const crypto = require('crypto');
 
+// Every column that can point at a person, and what erasure does with it.
+// The completeness test fails if a new person-linked column is added without an entry here.
+const ERASURE_POLICY = {
+  // Deleted: personal content and links owned by the member.
+  'community_media.owner_id': 'delete',
+  'community_posts.author_id': 'delete',
+  'post_comments.author_id': 'delete',
+  'post_amens.user_id': 'delete',
+  'event_rsvps.user_id': 'delete',
+  'group_memberships.user_id': 'delete',
+  'in_app_notifications.user_id': 'delete',
+  'in_app_notifications.actor_id': 'delete',
+  'connections.requester_id': 'delete',
+  'connections.recipient_id': 'delete',
+  'messages.sender_id': 'delete',
+  'messages.receiver_id': 'delete',
+  'prayers.author_id': 'delete',
+  'prayer_amens.user_id': 'delete',
+  'user_challenge_completions.user_id': 'delete',
+  'membership_account_identities.user_id': 'delete',
+  'membership_verifications.user_id': 'delete',
+  'membership_identity_reconciliation_requests.user_id': 'delete',
+  'sync_events.user_id': 'delete',
+  'sync_receipts.user_id': 'delete',
+  'privileged_sessions.user_id': 'delete',
+  'admin_security.user_id': 'delete',
+  'user_permissions.user_id': 'delete',
+  'pilot_bootstrap.user_id': 'delete',
+  // Anonymised: the record stays, the identifying fields are replaced.
+  'membership_claims.user_id': 'anonymise',
+  // Kept with a reason (append-only history, security, or another person's record).
+  'revoked_tokens.user_id': 'keep: revocation list until the token expires (security)',
+  'consent_events.user_id': 'keep: append-only consent history',
+  'data_subject_requests.requester_id': 'keep: append-only request history',
+  'data_subject_request_events.actor_id': 'keep: append-only request history',
+  'data_subject_request_revisions.actor_id': 'keep: append-only request history',
+  'privacy_notice_acknowledgements.user_id': 'keep: append-only acknowledgement evidence',
+  'privacy_presentation_receipts.user_id': 'keep: append-only acknowledgement evidence',
+  'privacy_publication_events.actor_id': 'keep: append-only publication history',
+  'membership_account_identity_history.user_id': 'keep: append-only identity history',
+  'membership_account_identity_history.changed_by': 'keep: append-only identity history',
+  'membership_verification_history.user_id': 'keep: append-only verification history',
+  'membership_verification_history.actor_id': 'keep: append-only verification history',
+  'membership_identity_reconciliation_events.actor_id': 'keep: append-only reconciliation history',
+  'membership_identity_reconciliation_revisions.actor_id': 'keep: append-only reconciliation history',
+  'membership_import_staging_events.actor_id': 'keep: church register import record',
+  'membership_imports.actor_id': 'keep: church register import record',
+  'membership_identity_reconciliation_requests.reviewer_id': 'keep: reviewer of another request',
+  'admin_audit_log.actor_id': 'keep: append-only administrator audit log',
+  'disposal_events.authorized_by': 'keep: append-only disposal record',
+  'disposal_events.confirmed_by': 'keep: append-only disposal record',
+  'retention_reviews.reviewed_by': 'keep: append-only retention record',
+  'community_groups.created_by': 'keep: creator link to the anonymised account',
+  'community_classes.created_by': 'keep: creator link to the anonymised account',
+  'user_permissions.granted_by': 'keep: records who granted another permission',
+  'user_permissions.revoked_by': 'keep: records who revoked another permission',
+  'ai_knowledge_conflict_groups.created_by': 'keep: governance record',
+  'ai_knowledge_events.actor_id': 'keep: append-only governance record',
+  'ai_knowledge_source_reviews.reviewer_id': 'keep: append-only governance record',
+  'ai_knowledge_sources.approval_actor_id': 'keep: governance record',
+  'ai_knowledge_sources.published_by': 'keep: governance record',
+  'ai_knowledge_sources.reviewed_by': 'keep: governance record',
+  'ai_knowledge_sources.withdrawn_by': 'keep: governance record',
+  'ai_offline_rollback_authorizations.actor_id': 'keep: append-only governance record',
+  'ai_scripture_corpora.imported_by': 'keep: governance record',
+  'ai_scripture_corpora.published_by': 'keep: governance record',
+  'ai_scripture_corpus_events.actor_id': 'keep: append-only governance record'
+};
+
+
 async function eraseMemberData(client, userId, now = Date.now()) {
   if (typeof userId !== 'string' || !userId) throw new Error('eraseMemberData requires a user id');
 
@@ -60,15 +130,20 @@ async function eraseMemberData(client, userId, now = Date.now()) {
     [userId, `erased-${crypto.createHash('sha256').update(userId).digest('hex').slice(0, 24)}`]
   );
 
-  // Account: anonymise and disable login.
+  // Rows that only exist because of this member.
+  for (const table of ['sync_events', 'sync_receipts', 'privileged_sessions', 'admin_security', 'user_permissions', 'membership_verifications', 'membership_identity_reconciliation_requests', 'pilot_bootstrap']) {
+    await client.query(`DELETE FROM ${table} WHERE user_id = $1`, [userId]);
+  }
+
+  // Account: anonymise and disable login. Tokens issued before now are rejected.
   const erasedPhone = `erased-${crypto.createHash('sha256').update(userId).digest('hex').slice(0, 24)}`;
   await client.query(
     `UPDATE users SET name = 'Erased member', phone = $2, pin_hash = $3, avatar_url = '',
-            is_active = FALSE, updated_at = $4 WHERE id = $1`,
-    [userId, erasedPhone, crypto.randomBytes(32).toString('hex'), now]
+            is_active = FALSE, auth_valid_after_seconds = $5, updated_at = $4 WHERE id = $1`,
+    [userId, erasedPhone, crypto.randomBytes(32).toString('hex'), now, Math.floor(now / 1000) + 1]
   );
 
   return { filenames };
 }
 
-module.exports = { eraseMemberData };
+module.exports = { eraseMemberData, ERASURE_POLICY };
