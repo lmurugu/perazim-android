@@ -240,9 +240,20 @@ public class PerazimDatabaseMigrationTest {
                         + "deliveryStatus, syncStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 new Object[]{FIXTURE_MESSAGE_ID, "fixture-conversation", FIXTURE_USER_ID,
                         "Synthetic Member", "Synthetic message body", 1700000002L, "pending", "pending"});
+        // Version 7 added sync_queue.nextAttemptAt (NOT NULL); version 6 does not have it.
+        boolean hasNextAttempt = false;
+        try (Cursor info = db.query("PRAGMA table_info(sync_queue)")) {
+            while (info.moveToNext()) {
+                if ("nextAttemptAt".equals(info.getString(info.getColumnIndexOrThrow("name")))) {
+                    hasNextAttempt = true;
+                }
+            }
+        }
         db.execSQL("INSERT INTO sync_queue "
                         + "(id, operationType, entityType, entityId, payloadJson, timestampMillis, "
-                        + "status, retryCount, lastError) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        + (hasNextAttempt ? "nextAttemptAt, " : "")
+                        + "status, retryCount, lastError) VALUES (?, ?, ?, ?, ?, ?, "
+                        + (hasNextAttempt ? "0, " : "") + "?, ?, ?)",
                 new Object[]{FIXTURE_QUEUE_ID, "CREATE", "message", FIXTURE_MESSAGE_ID,
                         "{\"body\":\"synthetic draft\"}", 1700000003L, "pending", 0, ""});
     }
