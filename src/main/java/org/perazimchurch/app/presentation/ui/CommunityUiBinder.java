@@ -340,6 +340,16 @@ public final class CommunityUiBinder {
             body.addView(text("When: " + date(post.optLong("event_date")) + "\nWhere: " + post.optString("event_location"), 15));
             row(body, button("I'm attending", () -> rsvp(post, "ATTENDING")), button("Can't attend", () -> rsvp(post, "DECLINED")));
         }
+        if ("EVENT".equals(post.optString("type"))) {
+            // Event page: emoji reactions and member photos, then the share action below
+            body.addView(text("How are you feeling about this?", 13));
+            LinearLayout reacts = column(); body.addView(reacts);
+            loadReactions(reacts, post);
+            body.addView(text("Photos from this event", 15));
+            LinearLayout photos = column(); body.addView(photos);
+            loadEventPhotos(photos, post);
+            body.addView(button("Add a photo (leaders approve first)", () -> pickPhoto(url -> addEventPhoto(post, url, photos))));
+        }
         body.addView(button("Share", () -> sharePost(post)));
         LinearLayout comments = column(); body.addView(comments);
         EditText input = input("Write a thoughtful comment", true); body.addView(input);
@@ -352,6 +362,79 @@ public final class CommunityUiBinder {
         }); body.addView(send);
         panel("Discussion", body); loadComments(comments, post.optString("id"));
     }
+    // The fixed feelings set. Matches the server's allowed list.
+    private static final String[] REACTIONS = {"🙏", "😇", "😊", "😢", "🙌", "🔥", "❤️"};
+
+    // One tap toggles the member's reaction; the server returns the new counts.
+    private void loadReactions(LinearLayout target, JSONObject post) {
+        target.removeAllViews();
+        android.widget.HorizontalScrollView scroll = new android.widget.HorizontalScrollView(activity);
+        scroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        scroll.addView(row);
+        target.addView(scroll);
+        final String endpoint = "api/community/posts/" + encode(post.optString("id")) + "/reactions";
+        for (String emoji : REACTIONS) {
+            Button chip = new Button(activity);
+            chip.setAllCaps(false);
+            chip.setTextSize(15);
+            chip.setMinimumWidth(0);
+            chip.setMinWidth(0);
+            chip.setPadding(dp(10), dp(4), dp(10), dp(4));
+            chip.setText(emoji);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
+            lp.setMargins(0, 0, dp(6), 0);
+            row.addView(chip, lp);
+            chip.setOnClickListener(v -> {
+                JSONObject value = new JSONObject();
+                postSafe(value, "emoji", emoji);
+                post(endpoint, value, r -> {
+                    int count = 0;
+                    JSONArray counts = r.optJSONArray("counts");
+                    if (counts != null) for (int i = 0; i < counts.length(); i++) {
+                        JSONObject c = counts.optJSONObject(i);
+                        if (c != null && emoji.equals(c.optString("emoji"))) count = c.optInt("n");
+                    }
+                    chip.setText(emoji + " " + count);
+                }, this::showError);
+            });
+        }
+    }
+
+    // Approved photos show to everyone; a member's own pending photo shows with a label.
+    private void loadEventPhotos(LinearLayout target, JSONObject post) {
+        target.removeAllViews();
+        get("api/community/posts/" + encode(post.optString("id")) + "/photos", r -> {
+            target.removeAllViews();
+            JSONArray photos = r.optJSONArray("photos");
+            if (photos == null || photos.length() == 0) {
+                target.addView(text("No photos yet. Be the first to add one.", 13));
+                return;
+            }
+            for (int i = 0; i < photos.length(); i++) {
+                JSONObject photo = photos.optJSONObject(i);
+                if (photo == null) continue;
+                if ("PENDING".equals(photo.optString("status"))) target.addView(text("Waiting for leader approval", 12));
+                addPhoto(target, photo.optString("media_url"));
+            }
+        }, (code, message) -> {
+            target.removeAllViews();
+            target.addView(text(error(code, message), 13));
+        });
+    }
+
+    private void addEventPhoto(JSONObject post, String url, LinearLayout photos) {
+        if (!signedIn()) return;
+        JSONObject value = new JSONObject();
+        postSafe(value, "mediaUrl", url);
+        request("POST", "api/community/posts/" + encode(post.optString("id")) + "/photos", value,
+                r -> {
+                    toast("Photo sent. Leaders will approve it first.");
+                    loadEventPhotos(photos, post);
+                }, this::showError);
+    }
+
     private void loadComments(LinearLayout target, String postId) {
         target.removeAllViews(); target.addView(text("Loading comments…", 14));
         get("api/community/posts/" + encode(postId) + "/comments", r -> {
