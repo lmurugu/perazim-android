@@ -175,4 +175,20 @@ async function baseline(pool, migrationsDirectory = MIGRATIONS_DIR) {
   });
 }
 
-module.exports = { LEDGER, loadMigrations, assertMigrationPlanAllowed, status, plan, migrate, baseline, verifyHistory };
+// Used by the server in production: it may start only when no migration is pending. Applying
+// migrations to live data is done through scripts/db-migrate.js migrate (backup + confirmation).
+function assertNoPendingMigrations(planResult) {
+  if (planResult.action !== 'apply') {
+    const error = new Error(`Production start refused: ${planResult.message || 'migration state needs a reviewed baseline'}. Run scripts/db-migrate.js.`);
+    error.code = 'MIGRATIONS_NOT_CLEAN';
+    throw error;
+  }
+  if (planResult.pending.length > 0) {
+    const error = new Error(`Production start refused: ${planResult.pending.length} migration(s) pending (${planResult.pending.map(m => m.version).join(', ')}). Apply them with scripts/db-migrate.js migrate, which takes a backup first.`);
+    error.code = 'MIGRATIONS_PENDING';
+    throw error;
+  }
+  return true;
+}
+
+module.exports = { LEDGER, loadMigrations, assertMigrationPlanAllowed, assertNoPendingMigrations, status, plan, migrate, baseline, verifyHistory };

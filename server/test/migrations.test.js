@@ -63,17 +63,24 @@ async function run() {
     encoding: 'utf8', env: { ...process.env, NODE_ENV: 'test', DATABASE_URL: 'postgres://local@127.0.0.1/perazim_local' }
   });
   assert.strictEqual(nonTestWrite.status, 1);
-  assert.match(nonTestWrite.stderr, /limited to disposable databases/);
+  assert.match(nonTestWrite.stderr, /Non-test database: also set MIGRATE_CONFIRM=/);
   const remoteWrite = spawnSync(process.execPath, [cli, 'migrate', '--confirm=perazim_safe_test'], {
     encoding: 'utf8', env: { ...process.env, NODE_ENV: 'test', DATABASE_URL: 'postgres://remote.example/perazim_safe_test' }
   });
   assert.strictEqual(remoteWrite.status, 1);
   assert.match(remoteWrite.stderr, /limited to local PostgreSQL connections/);
-  const productionWrite = spawnSync(process.execPath, [cli, 'baseline', '--confirm=perazim_safe_test'], {
-    encoding: 'utf8', env: { ...process.env, NODE_ENV: 'production', DATABASE_URL: 'postgres://local@127.0.0.1/perazim_safe_test' }
+  // Production CLI writes to a real (non-_test) database need MIGRATE_CONFIRM, and a backup is taken first.
+  const productionWrite = spawnSync(process.execPath, [cli, 'baseline', '--confirm=perazim_safe'], {
+    encoding: 'utf8', env: { ...process.env, NODE_ENV: 'production', DATABASE_URL: 'postgres://local@127.0.0.1/perazim_safe' }
   });
   assert.strictEqual(productionWrite.status, 1);
-  assert.match(productionWrite.stderr, /Production writes are disabled/);
+  assert.match(productionWrite.stderr, /Non-test database: also set MIGRATE_CONFIRM=/);
+
+  // Production boot never applies migrations: a pending plan refuses to start, a clean plan starts.
+  const { assertNoPendingMigrations } = require('../src/migrations');
+  assert.throws(() => assertNoPendingMigrations({ action: 'apply', pending: [{ version: '0019' }] }), { code: 'MIGRATIONS_PENDING' });
+  assert.throws(() => assertNoPendingMigrations({ action: 'baseline-check-required', pending: [] }), { code: 'MIGRATIONS_NOT_CLEAN' });
+  assert.strictEqual(assertNoPendingMigrations({ action: 'apply', pending: [] }), true);
 
   const admin = requireSafeAdminUrl();
   const adminPool = new Pool({ connectionString: admin.toString() });

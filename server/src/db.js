@@ -84,9 +84,15 @@ async function initDb() {
       // baseline, so running it would skip migrations 0002 onward.
       // The runner refuses to adopt an existing untracked schema; that needs an
       // explicit, verified baseline (scripts/db-migrate.js baseline).
-      const { migrate } = require('./migrations');
-      await migrate(pool);
-      console.log('✅ PostgreSQL migrations verified & applied');
+      const { migrate, plan, assertNoPendingMigrations } = require('./migrations');
+      if (process.env.NODE_ENV === 'production') {
+        // Production never changes data at boot. It starts only when nothing is pending.
+        assertNoPendingMigrations(await plan(pool));
+        console.log('✅ PostgreSQL migrations verified: none pending');
+      } else {
+        await migrate(pool);
+        console.log('✅ PostgreSQL migrations verified & applied');
+      }
       return;
     } catch (err) {
       if (pool) {
