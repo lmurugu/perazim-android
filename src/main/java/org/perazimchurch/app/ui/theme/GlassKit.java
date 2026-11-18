@@ -77,6 +77,10 @@ public final class GlassKit {
             d.setStroke(px(c, 1), Color.parseColor("#2EFFFFFF"));
         }
         d.setCornerRadius(px(c, radiusDp));
+        if (light()) {
+            // Light glass floats on a soft plum shadow: box-shadow 0 8px 24px rgba(61,23,73,0.12).
+            return new SoftShadow(d, Color.parseColor("#1F3D1749"), px(c, 8), px(c, 24), px(c, radiusDp));
+        }
         return d;
     }
 
@@ -294,12 +298,32 @@ public final class GlassKit {
     }
 
     /** Coloured glow under opaque buttons (Android 9+). */
+    /**
+     * The mockups' coloured glow under orange and purple controls (box-shadow 0 Npx 2.5Npx colour/0.4),
+     * drawn as a real blurred shadow rather than Android's faint grey elevation shadow.
+     */
     public static void glow(View v, int color, int elevationDp) {
-        if (Build.VERSION.SDK_INT >= 28) {
-            v.setOutlineSpotShadowColor(color);
-            v.setOutlineAmbientShadowColor(color);
+        float alpha = light() ? 0.40f : 0.45f;
+        shadow(v, withAlpha(color, alpha), elevationDp, elevationDp * 2.6f);
+    }
+
+    /** box-shadow: 0 dyDp blurDp colour, behind the view's current background (call after setBackground). */
+    public static void shadow(View v, int color, float dyDp, float blurDp) {
+        Drawable bg = v.getBackground();
+        if (bg instanceof SoftShadow) {
+            bg = ((SoftShadow) bg).getFace();
         }
-        v.setElevation(px(v.getContext(), elevationDp));
+        float radius = 0f;
+        if (bg instanceof GradientDrawable) {
+            GradientDrawable g = (GradientDrawable) bg;
+            radius = g.getShape() == GradientDrawable.OVAL ? 100000f : g.getCornerRadius();
+        }
+        v.setElevation(0f);
+        v.setBackground(new SoftShadow(bg, color, px(v.getContext(), dyDp), px(v.getContext(), blurDp), radius));
+    }
+
+    public static int withAlpha(int color, float alpha) {
+        return (Math.round(Math.max(0f, Math.min(1f, alpha)) * 255) << 24) | (color & 0x00FFFFFF);
     }
 
     /** Tags a view so GlassPolish leaves it (and its children) exactly as built. */

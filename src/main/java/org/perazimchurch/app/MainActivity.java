@@ -176,8 +176,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(newBase);
+        // Size every screen like the mockups (about 390dp wide), even on phones set to a small display size.
+        android.content.res.Configuration scaled = org.perazimchurch.app.ui.theme.UiScale.override(newBase);
+        if (scaled != null) {
+            applyOverrideConfiguration(scaled);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        org.perazimchurch.app.ui.theme.Glass.useDensity(getResources().getDisplayMetrics().density);
 
         // Initialize gamification persistence
         UserMapper.init(this);
@@ -617,7 +628,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         navBg.setCornerRadius(dp(32));
         navBg.setStroke(Math.max(1, dp(1)), Color.parseColor(PerazimTheme.isLight() ? "#F2FFFFFF" : "#2EFFFFFF"));
         bottomNav.setBackground(navBg);
-        bottomNav.setElevation(dp(10));
+        // Mockup: light bar 0 8px 24px rgba(61,23,73,0.15); the dark bar gets a deep shadow to float.
+        if (PerazimTheme.isLight()) {
+            GlassKit.shadow(bottomNav, Color.parseColor("#263D1749"), 8, 24);
+        } else {
+            GlassKit.shadow(bottomNav, Color.parseColor("#59000000"), 10, 30);
+        }
         GlassKit.keep(bottomNav);
 
         final int[] iconResIds = {
@@ -660,7 +676,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 LinearLayout.LayoutParams lpOrb = new LinearLayout.LayoutParams(dp(56), dp(56));
                 lpOrb.setMargins(0, -dp(30), 0, 0);
                 ivIcon.setLayoutParams(lpOrb);
-                GlassKit.glow(ivIcon, GlassKit.ORANGE, 12);
+                // Mockup: dark 0 0 30px rgba(225,125,47,0.8) halo; light 0 8px 22px rgba(225,125,47,0.5)
+                if (PerazimTheme.isLight()) {
+                    GlassKit.shadow(ivIcon, GlassKit.withAlpha(GlassKit.ORANGE, 0.5f), 8, 22);
+                } else {
+                    GlassKit.shadow(ivIcon, GlassKit.withAlpha(GlassKit.ORANGE, 0.8f), 0, 30);
+                }
                 ivIcon.setContentDescription("Give");
                 tab.addView(ivIcon);
             } else {
@@ -2262,6 +2283,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         col.addView(GlassKit.keep(heading));
 
         LinearLayout card = GlassKit.card(this, 28, 20);
+        if (!PerazimTheme.isLight()) {
+            // Mockup: the paybill card lifts off the page, box-shadow 0 16px 36px rgba(0,0,0,0.3)
+            GlassKit.shadow(card, Color.parseColor("#4D000000"), 16, 36);
+        }
         card.addView(GlassKit.label(this, "M-PESA PAYBILL"));
         TextView paybill = GlassKit.text(this, ChurchConfig.MPESA_PAYBILL, 40, true, GlassKit.text());
         paybill.setLetterSpacing(0.04f);

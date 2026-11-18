@@ -84,6 +84,7 @@ public final class GlassPolish {
         }
         try {
             walk(root, hasGlow(root));
+            freeShadows(root);
         } catch (RuntimeException ignored) {
             // Styling must never crash a screen.
         }
@@ -107,6 +108,25 @@ public final class GlassPolish {
             ViewGroup group = (ViewGroup) view;
             for (int i = 0; i < group.getChildCount(); i++) {
                 walk(group.getChildAt(i), glowHere);
+            }
+        }
+    }
+
+    /**
+     * Soft shadows and glows draw outside their view, so their parents must not clip them. Done here,
+     * after each layout and before drawing, so even the first frame shows the full shadow.
+     */
+    private static void freeShadows(View view) {
+        if (view.getVisibility() == View.GONE) {
+            return;
+        }
+        if (view.getBackground() instanceof SoftShadow) {
+            SoftShadow.unclip(view);
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                freeShadows(group.getChildAt(i));
             }
         }
     }

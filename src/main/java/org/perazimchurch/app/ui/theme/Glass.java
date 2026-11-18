@@ -36,8 +36,17 @@ public final class Glass {
     private Glass() {
     }
 
+    private static float density = Resources.getSystem().getDisplayMetrics().density;
+
+    /** The activity's density, which {@link UiScale} may have changed from the system's. */
+    public static void useDensity(float activityDensity) {
+        if (activityDensity > 0f) {
+            density = activityDensity;
+        }
+    }
+
     public static float dp(float value) {
-        return value * Resources.getSystem().getDisplayMetrics().density;
+        return value * density;
     }
 
     /** Works out which glass look an old fill colour should become. */
