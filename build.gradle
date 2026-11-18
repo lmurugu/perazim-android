@@ -97,11 +97,6 @@ android {
                 exclude '**/member_contacts.csv'
             }
         }
-        // Test-only host activity used by instrumentation tests; debug builds only, never in release.
-        debug {
-            java.srcDirs += 'src/validation/java'
-            manifest.srcFile 'src/validation/AndroidManifest.xml'
-        }
         androidTest.assets.srcDirs += files("$projectDir/schemas")
     }
 }
