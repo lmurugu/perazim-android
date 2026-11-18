@@ -30,11 +30,11 @@ import android.widget.Toast;
 public class HymnsActivity extends Activity implements View.OnClickListener {
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = PerazimTheme.COLOR_TEXT_PRIMARY;
+    public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_BORDER = PerazimTheme.COLOR_STROKE;
+    public static int COLOR_PURPLE_BORDER() { return PerazimTheme.COLOR_STROKE; }
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = PerazimTheme.COLOR_TEXT_SECONDARY;
+    public static int COLOR_PURPLE_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -43,7 +43,7 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = PerazimTheme.COLOR_BG_DEEP;
+    public static int COLOR_CANVAS() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private Button btnBack;
     private Button btnSingHymn1;
@@ -56,7 +56,7 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_CANVAS);
+        scrollView.setBackgroundColor(COLOR_CANVAS());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -82,7 +82,7 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
         title.setText("HYMNS & WORSHIP");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
+        title.setTextColor(COLOR_PURPLE_DARK());
         title.setPadding(dp(16), 0, 0, 0);
         navBar.addView(title);
 
@@ -105,7 +105,7 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
         }
 
         // HYMN 1: GREAT IS THY FAITHFULNESS
-        LinearLayout card1 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout card1 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         card1.setOrientation(LinearLayout.VERTICAL);
 
         TextView tag1 = createPillInline("FAITH & COVENANT", COLOR_PURPLE_TINT, COLOR_PURPLE);
@@ -115,21 +115,21 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
         h1Title.setText("Great Is Thy Faithfulness");
         h1Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         h1Title.setTypeface(Typeface.DEFAULT_BOLD);
-        h1Title.setTextColor(COLOR_PURPLE_DARK);
+        h1Title.setTextColor(COLOR_PURPLE_DARK());
         h1Title.setPadding(0, dp(6), 0, dp(2));
         card1.addView(h1Title);
 
         TextView h1Author = new TextView(this);
         h1Author.setText("Thomas O. Chisholm · Lamentations 3:22-23");
         h1Author.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        h1Author.setTextColor(COLOR_PURPLE_MUTED);
+        h1Author.setTextColor(COLOR_PURPLE_MUTED());
         h1Author.setPadding(0, 0, 0, dp(10));
         card1.addView(h1Author);
 
         TextView h1Lyrics = new TextView(this);
         h1Lyrics.setText("Great is Thy faithfulness, O God my Father,\nThere is no shadow of turning with Thee;\nThou changest not, Thy compassions, they fail not;\nAs Thou hast been Thou forever wilt be.\n\n[Chorus]\nGreat is Thy faithfulness! Great is Thy faithfulness!\nMorning by morning new mercies I see;\nAll I have needed Thy hand hath provided—\nGreat is Thy faithfulness, Lord, unto me!");
         h1Lyrics.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        h1Lyrics.setTextColor(COLOR_PURPLE_DARK);
+        h1Lyrics.setTextColor(COLOR_PURPLE_DARK());
         h1Lyrics.setLineSpacing(dp(3), 1.15f);
         h1Lyrics.setPadding(0, 0, 0, dp(14));
         card1.addView(h1Lyrics);
@@ -147,7 +147,7 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
         content.addView(card1);
 
         // HYMN 2: AMAZING GRACE
-        LinearLayout card2 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout card2 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         card2.setOrientation(LinearLayout.VERTICAL);
 
         TextView tag2 = createPillInline("REDEMPTION & HOPE", COLOR_ORANGE_TINT, COLOR_ORANGE);
@@ -157,21 +157,21 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
         h2Title.setText("Amazing Grace");
         h2Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         h2Title.setTypeface(Typeface.DEFAULT_BOLD);
-        h2Title.setTextColor(COLOR_PURPLE_DARK);
+        h2Title.setTextColor(COLOR_PURPLE_DARK());
         h2Title.setPadding(0, dp(6), 0, dp(2));
         card2.addView(h2Title);
 
         TextView h2Author = new TextView(this);
         h2Author.setText("John Newton · 1 Chronicles 17:16-17");
         h2Author.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        h2Author.setTextColor(COLOR_PURPLE_MUTED);
+        h2Author.setTextColor(COLOR_PURPLE_MUTED());
         h2Author.setPadding(0, 0, 0, dp(10));
         card2.addView(h2Author);
 
         TextView h2Lyrics = new TextView(this);
         h2Lyrics.setText("Amazing grace! how sweet the sound\nThat saved a wretch like me!\nI once was lost, but now am found,\nWas blind, but now I see.\n\n’Twas grace that taught my heart to fear,\nAnd grace my fears relieved;\nHow precious did that grace appear\nThe hour I first believed!");
         h2Lyrics.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        h2Lyrics.setTextColor(COLOR_PURPLE_DARK);
+        h2Lyrics.setTextColor(COLOR_PURPLE_DARK());
         h2Lyrics.setLineSpacing(dp(3), 1.15f);
         h2Lyrics.setPadding(0, 0, 0, dp(14));
         card2.addView(h2Lyrics);
@@ -199,14 +199,14 @@ public class HymnsActivity extends Activity implements View.OnClickListener {
         h3Title.setText("Baal Perazim — The Breakthrough Anthem");
         h3Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         h3Title.setTypeface(Typeface.DEFAULT_BOLD);
-        h3Title.setTextColor(COLOR_PURPLE_DARK);
+        h3Title.setTextColor(COLOR_PURPLE_DARK());
         h3Title.setPadding(0, dp(6), 0, dp(2));
         card3.addView(h3Title);
 
         TextView h3Lyrics = new TextView(this);
         h3Lyrics.setText("In the valley of the battle, when the enemy arose,\nDavid called upon Jehovah, conquering his greatest foes.\nLike a rushing mighty river breaking every valley wall,\nBaal Perazim went before him, causing every foe to fall!\n\n[Chorus]\nBreak out, O Lord of Glory, let Your flood of mercy surge!\nEvery barrier shatters down as Your holy saints emerge!\nBaal Perazim, our Master, on the rock our feet shall stand,\nFor the Lord of the breakthrough has claimed this holy land!");
         h3Lyrics.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        h3Lyrics.setTextColor(COLOR_PURPLE_DARK);
+        h3Lyrics.setTextColor(COLOR_PURPLE_DARK());
         h3Lyrics.setLineSpacing(dp(3), 1.15f);
         h3Lyrics.setPadding(0, 0, 0, dp(14));
         card3.addView(h3Lyrics);

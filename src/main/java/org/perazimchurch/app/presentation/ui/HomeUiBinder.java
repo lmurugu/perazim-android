@@ -81,20 +81,20 @@ import java.util.Locale;
 public class HomeUiBinder {
 
     // --- CANONICAL THEME COLORS ---
-    public static final int COLOR_PRIMARY_PURPLE = PerazimTheme.COLOR_PRIMARY_PURPLE; // #681A7D
-    public static final int COLOR_PURPLE_DARK    = PerazimTheme.COLOR_PURPLE_DEEP;     // #2D0938
-    public static final int COLOR_PURPLE_DEEPEST = PerazimTheme.COLOR_OBSIDIAN;        // #140319
-    public static final int COLOR_PURPLE_SHADOW  = PerazimTheme.COLOR_PURPLE_SHADOW;   // #450E53
-    public static final int COLOR_PURPLE_TINT    = PerazimTheme.COLOR_PURPLE_TINT;     // #F5ECF7
-    public static final int COLOR_PURPLE_SOFT    = PerazimTheme.COLOR_PURPLE_SOFT;     // #C896D8
-    public static final int COLOR_BORDER_GREY    = PerazimTheme.COLOR_BORDER_GREY;     // #E7D5EC
-    public static final int COLOR_BG_NEUTRAL     = PerazimTheme.COLOR_BG_NEUTRAL;      // #FAF7FB
-    public static final int COLOR_WHITE          = PerazimTheme.COLOR_WHITE;           // #FFFFFF
-    public static final int COLOR_ACCENT_ORANGE  = PerazimTheme.COLOR_ACCENT_ORANGE;   // #E17D2F
-    public static final int COLOR_ORANGE_DARK    = PerazimTheme.COLOR_ORANGE_DARK;     // #78350A
-    public static final int COLOR_ORANGE_SHADOW  = PerazimTheme.COLOR_ORANGE_SHADOW;   // #98450B
-    public static final int COLOR_ORANGE_BORDER  = PerazimTheme.COLOR_ORANGE_BORDER;   // #F9DFCC
-    public static final int COLOR_ORANGE_TINT    = PerazimTheme.COLOR_ORANGE_TINT;     // #FDF5EF
+    public static int COLOR_PRIMARY_PURPLE() { return PerazimTheme.COLOR_PRIMARY_PURPLE; } // #681A7D
+    public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_PURPLE_DEEP; }     // #2D0938
+    public static int COLOR_PURPLE_DEEPEST() { return PerazimTheme.COLOR_OBSIDIAN; }        // #140319
+    public static int COLOR_PURPLE_SHADOW() { return PerazimTheme.COLOR_PURPLE_SHADOW; }   // #450E53
+    public static int COLOR_PURPLE_TINT() { return PerazimTheme.COLOR_PURPLE_TINT; }     // #F5ECF7
+    public static int COLOR_PURPLE_SOFT() { return PerazimTheme.COLOR_PURPLE_SOFT; }     // #C896D8
+    public static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_BORDER_GREY; }     // #E7D5EC
+    public static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_NEUTRAL; }      // #FAF7FB
+    public static int COLOR_WHITE() { return PerazimTheme.COLOR_WHITE; }           // #FFFFFF
+    public static int COLOR_ACCENT_ORANGE() { return PerazimTheme.COLOR_ACCENT_ORANGE; }   // #E17D2F
+    public static int COLOR_ORANGE_DARK() { return PerazimTheme.COLOR_ORANGE_DARK; }     // #78350A
+    public static int COLOR_ORANGE_SHADOW() { return PerazimTheme.COLOR_ORANGE_SHADOW; }   // #98450B
+    public static int COLOR_ORANGE_BORDER() { return PerazimTheme.COLOR_ORANGE_BORDER; }   // #F9DFCC
+    public static int COLOR_ORANGE_TINT() { return PerazimTheme.COLOR_ORANGE_TINT; }     // #FDF5EF
     public static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1225");
     public static final int COLOR_TEXT_MUTED     = Color.parseColor("#725B78");
 
@@ -704,7 +704,7 @@ public class HomeUiBinder {
         tvHeader.setText("🎙️ BISHOP DR. DAVID MUTWERI · RECENT SERMONS");
         tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE());
         tvHeader.setPadding(0, 0, 0, dp(8));
         container.addView(tvHeader);
 
@@ -725,7 +725,7 @@ public class HomeUiBinder {
         sermonsCarouselContent.removeAllViews();
 
         for (final Sermon sermon : sermons) {
-            LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+            LinearLayout card = createCard(COLOR_WHITE(), dp(14), COLOR_BORDER_GREY(), dp(1));
             card.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(260), LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.setMargins(0, 0, dp(12), 0);
@@ -736,8 +736,8 @@ public class HomeUiBinder {
             tvSeries.setText(sermon.getSeriesName() != null ? sermon.getSeriesName().toUpperCase() : "BREAKTHROUGH SERIES");
             tvSeries.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
             tvSeries.setTypeface(Typeface.DEFAULT_BOLD);
-            tvSeries.setTextColor(COLOR_ACCENT_ORANGE);
-            tvSeries.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ORANGE_BORDER));
+            tvSeries.setTextColor(COLOR_ACCENT_ORANGE());
+            tvSeries.setBackground(createPillBg(COLOR_ORANGE_TINT(), COLOR_ORANGE_BORDER()));
             tvSeries.setPadding(dp(6), dp(2), dp(6), dp(2));
             card.addView(tvSeries);
 
@@ -763,7 +763,7 @@ public class HomeUiBinder {
             LinearLayout btnRow = new LinearLayout(context);
             btnRow.setOrientation(LinearLayout.HORIZONTAL);
 
-            Button btnPlay = createSmallButton("▶ Play Sermon", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+            Button btnPlay = createSmallButton("▶ Play Sermon", COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
             btnPlay.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onPlaySermon(sermon);
@@ -771,7 +771,7 @@ public class HomeUiBinder {
                 showSermonPlayerModal(sermon);
             });
 
-            Button btnDetails = createSmallButton("ℹ Details", COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE);
+            Button btnDetails = createSmallButton("ℹ Details", COLOR_PURPLE_TINT(), COLOR_PRIMARY_PURPLE());
             btnDetails.setOnClickListener(v -> showSermonDetailsModal(sermon));
 
             btnRow.addView(btnPlay);
@@ -809,7 +809,7 @@ public class HomeUiBinder {
         tvHeader.setText("📢 CHURCH BULLETINS & ANNOUNCEMENTS");
         tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE());
         tvHeader.setPadding(0, 0, 0, dp(8));
         container.addView(tvHeader);
 
@@ -873,7 +873,7 @@ public class HomeUiBinder {
         tvHeader.setText("🗓️ UPCOMING CHURCH EVENTS & GATHERINGS");
         tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvHeader.setTextColor(COLOR_PRIMARY_PURPLE());
         tvHeader.setPadding(0, 0, 0, dp(8));
         container.addView(tvHeader);
 
@@ -890,7 +890,7 @@ public class HomeUiBinder {
         eventsContainer.removeAllViews();
 
         for (final Event ev : events) {
-            LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+            LinearLayout card = createCard(COLOR_WHITE(), dp(14), COLOR_BORDER_GREY(), dp(1));
             card.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -905,8 +905,8 @@ public class HomeUiBinder {
             tagCat.setText(ev.getCategory() != null ? ev.getCategory().toUpperCase() : "CHURCH GATHERING");
             tagCat.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
             tagCat.setTypeface(Typeface.DEFAULT_BOLD);
-            tagCat.setTextColor(COLOR_ACCENT_ORANGE);
-            tagCat.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ORANGE_BORDER));
+            tagCat.setTextColor(COLOR_ACCENT_ORANGE());
+            tagCat.setBackground(createPillBg(COLOR_ORANGE_TINT(), COLOR_ORANGE_BORDER()));
             tagCat.setPadding(dp(6), dp(2), dp(6), dp(2));
             tagRow.addView(tagCat);
 
@@ -940,8 +940,8 @@ public class HomeUiBinder {
             btnRsvp.setText("🗓️ RSVP / Set Reminder (+5 XP)");
             btnRsvp.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             btnRsvp.setTypeface(Typeface.DEFAULT_BOLD);
-            btnRsvp.setTextColor(COLOR_PRIMARY_PURPLE);
-            btnRsvp.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+            btnRsvp.setTextColor(COLOR_PRIMARY_PURPLE());
+            btnRsvp.setBackground(createPillBg(COLOR_PURPLE_TINT(), COLOR_BORDER_GREY()));
             btnRsvp.setPadding(dp(8), dp(4), dp(8), dp(4));
             btnRsvp.setOnClickListener(v -> {
                 awardXp(5);
@@ -1085,7 +1085,7 @@ public class HomeUiBinder {
         LinearLayout box = new LinearLayout(context);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(18), dp(18), dp(18), dp(18));
-        box.setBackgroundColor(COLOR_WHITE);
+        box.setBackgroundColor(COLOR_WHITE());
 
         TextView tvTitle = new TextView(context);
         tvTitle.setText(sermon.getTitle());
@@ -1110,14 +1110,14 @@ public class HomeUiBinder {
         TextView tvTimes = new TextView(context);
         tvTimes.setText("03:42 / 28:15 · Data Saver: 32kbps AAC");
         tvTimes.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvTimes.setTextColor(COLOR_PRIMARY_PURPLE);
+        tvTimes.setTextColor(COLOR_PRIMARY_PURPLE());
         tvTimes.setPadding(0, dp(4), 0, dp(14));
         box.addView(tvTimes);
 
         Button btnClose = new Button(context);
         btnClose.setText("Close Player");
-        btnClose.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
-        btnClose.setTextColor(COLOR_PRIMARY_PURPLE);
+        btnClose.setBackground(createPillBg(COLOR_PURPLE_TINT(), COLOR_BORDER_GREY()));
+        btnClose.setTextColor(COLOR_PRIMARY_PURPLE());
         box.addView(btnClose);
 
         builder.setView(box);

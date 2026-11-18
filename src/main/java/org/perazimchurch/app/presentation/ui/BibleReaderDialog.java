@@ -67,19 +67,19 @@ public class BibleReaderDialog extends Dialog {
     }
 
     // --- CANONICAL THEME COLORS ---
-    private static final int COLOR_PRIMARY_PURPLE = PerazimTheme.COLOR_PRIMARY_PURPLE; // #681A7D
-    private static final int COLOR_PURPLE_DARK    = PerazimTheme.COLOR_PURPLE_DEEP;     // #2D0938
-    private static final int COLOR_PURPLE_SHADOW  = PerazimTheme.COLOR_PURPLE_SHADOW;   // #450E53
-    private static final int COLOR_PURPLE_TINT    = PerazimTheme.COLOR_PURPLE_TINT;     // #F5ECF7
-    private static final int COLOR_ACCENT_ORANGE  = PerazimTheme.COLOR_ACCENT_ORANGE;   // #E17D2F
-    private static final int COLOR_ORANGE_SHADOW  = PerazimTheme.COLOR_ORANGE_SHADOW;   // #98450B
-    private static final int COLOR_ORANGE_TINT    = PerazimTheme.COLOR_ORANGE_TINT;     // #FDF5EF
-    private static final int COLOR_ORANGE_BORDER  = PerazimTheme.COLOR_ORANGE_BORDER;   // #F9DFCC
-    private static final int COLOR_BORDER_GREY    = PerazimTheme.COLOR_BORDER_GREY;     // #E7D5EC
-    private static final int COLOR_BG_NEUTRAL     = PerazimTheme.COLOR_BG_NEUTRAL;      // #FAF7FB
-    private static final int COLOR_WHITE          = PerazimTheme.COLOR_WHITE;           // #FFFFFF
-    private static final int COLOR_TEXT_DARK      = PerazimTheme.COLOR_TEXT_PRIMARY;
-    private static final int COLOR_TEXT_MUTED     = PerazimTheme.COLOR_TEXT_SECONDARY;
+    private static int COLOR_PRIMARY_PURPLE() { return PerazimTheme.COLOR_PRIMARY_PURPLE; } // #681A7D
+    private static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_PURPLE_DEEP; }     // #2D0938
+    private static int COLOR_PURPLE_SHADOW() { return PerazimTheme.COLOR_PURPLE_SHADOW; }   // #450E53
+    private static int COLOR_PURPLE_TINT() { return PerazimTheme.COLOR_PURPLE_TINT; }     // #F5ECF7
+    private static int COLOR_ACCENT_ORANGE() { return PerazimTheme.COLOR_ACCENT_ORANGE; }   // #E17D2F
+    private static int COLOR_ORANGE_SHADOW() { return PerazimTheme.COLOR_ORANGE_SHADOW; }   // #98450B
+    private static int COLOR_ORANGE_TINT() { return PerazimTheme.COLOR_ORANGE_TINT; }     // #FDF5EF
+    private static int COLOR_ORANGE_BORDER() { return PerazimTheme.COLOR_ORANGE_BORDER; }   // #F9DFCC
+    private static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_BORDER_GREY; }     // #E7D5EC
+    private static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_NEUTRAL; }      // #FAF7FB
+    private static int COLOR_WHITE() { return PerazimTheme.COLOR_WHITE; }           // #FFFFFF
+    private static int COLOR_TEXT_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
+    private static int COLOR_TEXT_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
 
     // Canonical Fallback 66 Books
     private static final Object[][] CANONICAL_BOOKS = {
@@ -703,7 +703,7 @@ public class BibleReaderDialog extends Dialog {
         tvTitle.setText("📖 " + citation);
         tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_PURPLE_DARK);
+        tvTitle.setTextColor(COLOR_PURPLE_DARK());
         container.addView(tvTitle);
 
         // Verse Text Snippet
@@ -711,7 +711,7 @@ public class BibleReaderDialog extends Dialog {
         tvSnippet.setText("“" + verse.getText() + "”");
         tvSnippet.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvSnippet.setTypeface(Typeface.SERIF, Typeface.ITALIC);
-        tvSnippet.setTextColor(COLOR_TEXT_MUTED);
+        tvSnippet.setTextColor(COLOR_TEXT_MUTED());
         tvSnippet.setLineSpacing(dp(2), 1.15f);
         tvSnippet.setPadding(0, dp(6), 0, dp(14));
         container.addView(tvSnippet);
@@ -721,7 +721,7 @@ public class BibleReaderDialog extends Dialog {
 
         // Action 1: Bookmark / Highlight Toggle
         String bookmarkLabel = verse.isFavorite() ? "⭐ Remove Bookmark" : "☆ Bookmark / Highlight";
-        Button btnBookmark = createOptionButton(bookmarkLabel, COLOR_ACCENT_ORANGE, COLOR_WHITE);
+        Button btnBookmark = createOptionButton(bookmarkLabel, COLOR_ACCENT_ORANGE(), COLOR_WHITE());
         btnBookmark.setOnClickListener(v -> {
             boolean nextState = !verse.isFavorite();
             verse.setFavorite(nextState);
@@ -735,7 +735,7 @@ public class BibleReaderDialog extends Dialog {
 
         // Action 2: Add / Edit Study Note
         String noteLabel = !TextUtils.isEmpty(verse.getNote()) ? "📝 Edit Study Note" : "📝 Add Study Note";
-        Button btnNote = createOptionButton(noteLabel, COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+        Button btnNote = createOptionButton(noteLabel, COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
         btnNote.setOnClickListener(v -> {
             dialog.dismiss();
             showStudyNoteEditor(verse);
@@ -743,7 +743,7 @@ public class BibleReaderDialog extends Dialog {
         container.addView(btnNote);
 
         // Action 3: Copy to Clipboard
-        Button btnCopy = createOptionButton("📋 Copy to Clipboard", COLOR_PURPLE_DARK, COLOR_WHITE);
+        Button btnCopy = createOptionButton("📋 Copy to Clipboard", COLOR_PURPLE_DARK(), COLOR_WHITE());
         btnCopy.setOnClickListener(v -> {
             ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("Holy Scripture", citation + "\n\"" + verse.getText() + "\" (" + verse.getTranslationId() + ")");
@@ -757,7 +757,7 @@ public class BibleReaderDialog extends Dialog {
 
         // Action 4: In Search mode, jump to this chapter
         if (isSearchMode) {
-            Button btnGoToChapter = createOptionButton("➔ Open Chapter in Reader", COLOR_PRIMARY_PURPLE, COLOR_WHITE);
+            Button btnGoToChapter = createOptionButton("➔ Open Chapter in Reader", COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
             btnGoToChapter.setOnClickListener(v -> {
                 dialog.dismiss();
                 loadChapterVerses(verse.getBookId(), verse.getChapterNumber());
@@ -765,7 +765,7 @@ public class BibleReaderDialog extends Dialog {
             container.addView(btnGoToChapter);
         }
 
-        Button btnCancel = createOptionButton("Close", COLOR_BG_NEUTRAL, COLOR_TEXT_MUTED);
+        Button btnCancel = createOptionButton("Close", COLOR_BG_NEUTRAL(), COLOR_TEXT_MUTED());
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         container.addView(btnCancel);
 
@@ -852,8 +852,8 @@ public class BibleReaderDialog extends Dialog {
         btnTabOt.setText("Old Testament (39)");
         btnTabOt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnTabOt.setTypeface(Typeface.DEFAULT_BOLD);
-        btnTabOt.setTextColor(COLOR_WHITE);
-        btnTabOt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE, COLOR_PRIMARY_PURPLE));
+        btnTabOt.setTextColor(COLOR_WHITE());
+        btnTabOt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE(), COLOR_PRIMARY_PURPLE()));
         LinearLayout.LayoutParams lpOt = new LinearLayout.LayoutParams(0, dp(36), 1.0f);
         lpOt.setMargins(0, 0, dp(4), 0);
         btnTabOt.setLayoutParams(lpOt);
@@ -892,16 +892,16 @@ public class BibleReaderDialog extends Dialog {
         final Runnable renderBooksNt = () -> populateBooksInContainer(booksContainer, "NEW", bookDialog);
 
         btnTabOt.setOnClickListener(v -> {
-            btnTabOt.setTextColor(COLOR_WHITE);
-            btnTabOt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE, COLOR_PRIMARY_PURPLE));
+            btnTabOt.setTextColor(COLOR_WHITE());
+            btnTabOt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE(), COLOR_PRIMARY_PURPLE()));
             btnTabNt.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
             btnTabNt.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
             renderBooksOt.run();
         });
 
         btnTabNt.setOnClickListener(v -> {
-            btnTabNt.setTextColor(COLOR_WHITE);
-            btnTabNt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE, COLOR_PRIMARY_PURPLE));
+            btnTabNt.setTextColor(COLOR_WHITE());
+            btnTabNt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE(), COLOR_PRIMARY_PURPLE()));
             btnTabOt.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
             btnTabOt.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
             renderBooksNt.run();
@@ -937,7 +937,7 @@ public class BibleReaderDialog extends Dialog {
             boolean isCurrent = book.getId().equals(currentBookId);
             GradientDrawable bg = new GradientDrawable();
             bg.setColor(isCurrent ? PerazimTheme.COLOR_SURFACE_2 : PerazimTheme.COLOR_SURFACE);
-            bg.setStroke(dp(1), isCurrent ? COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_STROKE);
+            bg.setStroke(dp(1), isCurrent ? COLOR_PRIMARY_PURPLE() : PerazimTheme.COLOR_STROKE);
             bg.setCornerRadius(dp(8));
             itemRow.setBackground(bg);
 
@@ -950,7 +950,7 @@ public class BibleReaderDialog extends Dialog {
             tvBookName.setText(book.getName());
             tvBookName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             tvBookName.setTypeface(Typeface.DEFAULT_BOLD);
-            tvBookName.setTextColor(isCurrent ? COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_TEXT_PRIMARY);
+            tvBookName.setTextColor(isCurrent ? COLOR_ACCENT_ORANGE() : PerazimTheme.COLOR_TEXT_PRIMARY);
             LinearLayout.LayoutParams lpName = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
             tvBookName.setLayoutParams(lpName);
             itemRow.addView(tvBookName);
@@ -1028,11 +1028,11 @@ public class BibleReaderDialog extends Dialog {
             btnCh.setText(String.valueOf(chNum));
             btnCh.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
             btnCh.setTypeface(Typeface.DEFAULT_BOLD);
-            btnCh.setTextColor(COLOR_WHITE);
+            btnCh.setTextColor(COLOR_WHITE());
 
             GradientDrawable btnBg = new GradientDrawable();
-            btnBg.setColor(isCurrent ? COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_SURFACE_2);
-            btnBg.setStroke(dp(1), isCurrent ? COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_STROKE);
+            btnBg.setColor(isCurrent ? COLOR_PRIMARY_PURPLE() : PerazimTheme.COLOR_SURFACE_2);
+            btnBg.setStroke(dp(1), isCurrent ? COLOR_PRIMARY_PURPLE() : PerazimTheme.COLOR_STROKE);
             btnBg.setCornerRadius(dp(8));
             btnCh.setBackground(btnBg);
 

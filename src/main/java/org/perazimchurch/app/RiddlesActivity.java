@@ -30,11 +30,11 @@ import android.widget.Toast;
 public class RiddlesActivity extends Activity implements View.OnClickListener {
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = PerazimTheme.COLOR_TEXT_PRIMARY;
+    public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_BORDER = PerazimTheme.COLOR_STROKE;
+    public static int COLOR_PURPLE_BORDER() { return PerazimTheme.COLOR_STROKE; }
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = PerazimTheme.COLOR_TEXT_SECONDARY;
+    public static int COLOR_PURPLE_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -43,7 +43,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = PerazimTheme.COLOR_BG_DEEP;
+    public static int COLOR_CANVAS() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private Button btnBack;
     private Button btnRiddle1;
@@ -62,7 +62,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_CANVAS);
+        scrollView.setBackgroundColor(COLOR_CANVAS());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -88,7 +88,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         title.setText("BIBLICAL RIDDLES");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
+        title.setTextColor(COLOR_PURPLE_DARK());
         title.setPadding(dp(16), 0, 0, 0);
         navBar.addView(title);
 
@@ -111,7 +111,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         }
 
         // RIDDLE 1: ADAM
-        LinearLayout card1 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout card1 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         card1.setOrientation(LinearLayout.VERTICAL);
 
         TextView tag1 = createPillInline("CREATION RIDDLE", COLOR_PURPLE_TINT, COLOR_PURPLE);
@@ -120,7 +120,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         TextView q1 = new TextView(this);
         q1.setText("I had no mother and no father. I had no childhood years or youth. I walked in the garden before sin ever entered the world. Who am I?");
         q1.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        q1.setTextColor(COLOR_PURPLE_DARK);
+        q1.setTextColor(COLOR_PURPLE_DARK());
         q1.setLineSpacing(dp(2), 1.15f);
         q1.setPadding(0, dp(8), 0, dp(10));
         card1.addView(q1);
@@ -149,7 +149,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         TextView q2 = new TextView(this);
         q2.setText("I was wrapped in graveclothes and laid in a stone tomb for four days until a single voice called me forth to walk the earth again. Who am I?");
         q2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        q2.setTextColor(COLOR_PURPLE_DARK);
+        q2.setTextColor(COLOR_PURPLE_DARK());
         q2.setLineSpacing(dp(2), 1.15f);
         q2.setPadding(0, dp(8), 0, dp(10));
         card2.addView(q2);
@@ -169,7 +169,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         content.addView(card2);
 
         // RIDDLE 3: BAAL PERAZIM
-        LinearLayout card3 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout card3 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         card3.setOrientation(LinearLayout.VERTICAL);
 
         TextView tag3 = createPillInline("BREAKTHROUGH RIDDLE", COLOR_PURPLE_TINT, COLOR_PURPLE);
@@ -178,7 +178,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         TextView q3 = new TextView(this);
         q3.setText("When David fought the Philistines, God broke out before him like a rushing flood. What was this valley of victory named?");
         q3.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        q3.setTextColor(COLOR_PURPLE_DARK);
+        q3.setTextColor(COLOR_PURPLE_DARK());
         q3.setLineSpacing(dp(2), 1.15f);
         q3.setPadding(0, dp(8), 0, dp(10));
         card3.addView(q3);
@@ -198,7 +198,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         content.addView(card3);
 
         // RIDDLE 4: METHUSELAH
-        LinearLayout card4 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout card4 = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         card4.setOrientation(LinearLayout.VERTICAL);
 
         TextView tag4 = createPillInline("GENEALOGY RIDDLE", COLOR_ORANGE_TINT, COLOR_ORANGE);
@@ -207,7 +207,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         TextView q4 = new TextView(this);
         q4.setText("I lived longer than any other man recorded in Scripture (969 years), yet I died before my father did. How can this be?");
         q4.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        q4.setTextColor(COLOR_PURPLE_DARK);
+        q4.setTextColor(COLOR_PURPLE_DARK());
         q4.setLineSpacing(dp(2), 1.15f);
         q4.setPadding(0, dp(8), 0, dp(10));
         card4.addView(q4);
@@ -235,7 +235,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tv.setTypeface(Typeface.DEFAULT_BOLD);
-        tv.setTextColor(COLOR_PURPLE_DARK);
+        tv.setTextColor(COLOR_PURPLE_DARK());
         tv.setLineSpacing(dp(2), 1.15f);
         tv.setPadding(dp(12), dp(10), dp(12), dp(10));
         tv.setVisibility(View.GONE);
@@ -243,7 +243,7 @@ public class RiddlesActivity extends Activity implements View.OnClickListener {
         GradientDrawable gd = new GradientDrawable();
         gd.setColor(COLOR_PURPLE_TINT);
         gd.setCornerRadius(dp(8));
-        gd.setStroke(dp(1), COLOR_PURPLE_BORDER);
+        gd.setStroke(dp(1), COLOR_PURPLE_BORDER());
         tv.setBackground(gd);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
