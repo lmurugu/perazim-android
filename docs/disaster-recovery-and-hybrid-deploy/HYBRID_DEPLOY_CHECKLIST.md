@@ -42,7 +42,7 @@ git rev-parse HEAD
 git status --porcelain
 ~~~
 - [ ] Verify JDK 17, Android SDK platform 34/build tools 34, Gradle wrapper, Node/npm, PostgreSQL 15-compatible tools, and test device model/OS. Pin versions and checksums in the recovery inventory.
-- [ ] Inspect build.gradle: current build sets REMOTE_SHEET_FEEDS_ENABLED=false, ONLINE_AI_ENABLED=false, OFFLINE_QWEN_ENABLED=false; do not claim remote AI or feeds enabled in a released binary.
+- [ ] Inspect build.gradle: current build sets REMOTE_SHEET_FEEDS_ENABLED=true (shared content feed only, CONTENT_FEED_BASE_URL), ONLINE_AI_ENABLED=false, OFFLINE_QWEN_ENABLED=false; do not claim remote AI enabled in a released binary.
 - [ ] Read existing docs: docs/foundation/ROOM_MIGRATIONS.md, docs/phase-b/RELEASE_CANDIDATE_OPERATIONAL_CHECKLIST.md, server/README.md, server/docs/POSTGRES_MIGRATIONS.md, docs/PERAZIM_AI_PROJECT/DECISIONS_REGISTER.md.
 
 ### Day 2 — baseline tests (safe by default)

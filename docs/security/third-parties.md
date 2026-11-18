@@ -1,6 +1,6 @@
 # Third-party inventory
 
-Status column: **Live** (used in release), **Planned** (in the plan, not yet used), **Disabled** (present in code but off in release builds). Verified against `build.gradle` build-type flags (`ONLINE_AI_ENABLED`, `REMOTE_SHEET_FEEDS_ENABLED`, `OFFLINE_QWEN_ENABLED` are `false` in release) and the absence of analytics or crash SDKs in `build.gradle`.
+Status column: **Live** (used in release), **Planned** (in the plan, not yet used), **Disabled** (present in code but off in release builds). Verified against `build.gradle` build-type flags (`ONLINE_AI_ENABLED` and `OFFLINE_QWEN_ENABLED` are `false` in release; `REMOTE_SHEET_FEEDS_ENABLED` is on for the shared content feed) and the absence of analytics or crash SDKs in `build.gradle`.
 
 | Service | Data sent | Region | Status | Terms or DPA link | Notes |
 |---|---|---|---|---|---|
@@ -13,7 +13,8 @@ Status column: **Live** (used in release), **Planned** (in the plan, not yet use
 | Safaricom M-Pesa | Donation performed by the user in the M-Pesa app or USSD | Kenya | Live (handoff only; the app sends nothing) | Safaricom terms | The app opens the M-Pesa app or dialer only |
 | WhatsApp and SMS (user's own app) | Message the user writes, sent by the user | Global | Live (handoff only) | WhatsApp terms | The app opens a prefilled message; nothing is sent automatically |
 | Google Maps (intent) | Coordinates of the church, requested by the user | Global | Live (handoff only) | Google terms | Opens the user's map app |
-| Google Sheets and YouTube feeds | Public content fetches | Global | Disabled in release (`REMOTE_SHEET_FEEDS_ENABLED=false`) | Google terms | |
+| Shared church content feed (GitHub Pages) | Public content fetches (CSV); no user data sent | Global | Live (`REMOTE_SHEET_FEEDS_ENABLED` follows `CONTENT_FEED_BASE_URL`, owner approval 2026-11-18) | GitHub terms | Feed is `lmurugu/perazim-mission-church` `data/`, changed only through pull requests |
+| Google Sheets feeds | Public content fetches | Global | Disabled (no Sheet URLs configured) | Google terms | |
 | Firebase Crashlytics or Sentry | Crash reports | PENDING | Not present | PENDING | Plan 2.8: opt-in only, disclosed in the Privacy Policy |
 
 Any new third party must be added here, to the Privacy Policy and to the Play Data Safety form in the same change (plan C.4 and C.8).

@@ -9,7 +9,7 @@
 
 The church website repo (`lmurugu/perazim-mission-church`) now holds one shared content feed in its `data/` folder. The CSV files there use exactly the tabs and columns described below, and the website and the Perazim web app read the same files. Edit a CSV in that repo once and the change reaches all three. See `data/README.md` in that repo for the editing steps.
 
-This app's tab URLs default to `<feed>/csv/<tab>.csv`, where `<feed>` is `BuildConfig.CONTENT_FEED_BASE_URL` (Gradle property `perazimContentFeedUrl`, default `https://lmurugu.github.io/perazim-mission-church/data`). A URL saved in the app's preferences still overrides the default. Downloads only happen once `REMOTE_SHEET_FEEDS_ENABLED` is switched on, which is an owner decision.
+This app's tab URLs default to `<feed>/csv/<tab>.csv`, where `<feed>` is `BuildConfig.CONTENT_FEED_BASE_URL` (Gradle property `perazimContentFeedUrl`, default `https://lmurugu.github.io/perazim-mission-church/data`). A URL saved in the app's preferences still overrides the default. `REMOTE_SHEET_FEEDS_ENABLED` is on whenever that URL is set (owner approval, 2026-11-18); build with `-PperazimContentFeedUrl=` (empty) to ship without remote content. The column contract is `data/SCHEMA.md` in the website repo.
 
 The Google Sheet below remains a valid alternative source with the same columns.
 
