@@ -174,7 +174,7 @@ public final class PerazimTheme {
     private static GradientDrawable createBaseBackground() {
         return new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                sLight ? new int[]{Color.parseColor("#F8F1FB"), Color.parseColor("#EFE0F6"), Color.parseColor("#E6D2F0")} : new int[]{Color.parseColor("#2A0F33"), Color.parseColor("#3A1346"), Color.parseColor("#160520")}
+                sLight ? new int[]{Color.parseColor("#F8F1FB"), Color.parseColor("#EFE0F6"), Color.parseColor("#E6D2F0")} : new int[]{Color.parseColor("#2A0F33"), Color.parseColor("#160520")}
         );
     }
 
@@ -182,9 +182,11 @@ public final class PerazimTheme {
     public static android.graphics.drawable.Drawable createBackgroundGradient() {
         return new GlowBackground(new android.graphics.drawable.Drawable[]{
                 createBaseBackground(),
-                createGlowOrb(0.05f, 0.10f, 0.95f, sLight ? "#66C58BDB" : "#B3A132C4"),
-                createGlowOrb(1.00f, 0.42f, 0.70f, sLight ? "#4DF3B37A" : "#80E17D2F"),
-                createGlowOrb(0.15f, 0.88f, 0.85f, sLight ? "#40B070C8" : "#998A2BA3")
+                // Mockup glows: purple top-left rgba(139,50,170,0.75), orange lower-right rgba(225,125,47,0.45),
+                // on a dark #2A0F33 -> #160520 base so the bottom of the page stays deep, as drawn.
+                createGlowOrb(0.20f, 0.13f, 0.62f, sLight ? "#66C58BDB" : "#BF8B32AA"),
+                createGlowOrb(0.87f, 0.62f, 0.58f, sLight ? "#4DF3B37A" : "#73E17D2F"),
+                createGlowOrb(0.15f, 0.88f, 0.85f, sLight ? "#40B070C8" : "#00000000")
         });
     }
 
