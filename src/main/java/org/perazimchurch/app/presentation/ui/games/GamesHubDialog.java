@@ -90,13 +90,33 @@ public final class GamesHubDialog extends Dialog {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        builtLight = PerazimTheme.isLight();
+        applyWindow();
         Window window = getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
-            drawBehindSystemBars(window);
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        }
+        if (window != null) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         hub();
+    }
+
+    private boolean builtLight;
+
+    private void applyWindow() {
+        Window window = getWindow();
+        if (window == null) return;
+        window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+        drawBehindSystemBars(window);
+    }
+
+    /**
+     * The phone's light or dark setting can flip while the hub is open (System appearance).
+     * When the window regains focus, rebuild in the new colours. A game in progress restarts its screen.
+     */
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && PerazimTheme.isLight() != builtLight) {
+            builtLight = PerazimTheme.isLight();
+            applyWindow();
+            hub();
+        }
     }
 
     private boolean activeOwner() {
