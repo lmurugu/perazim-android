@@ -325,8 +325,6 @@ public final class GlassKit {
     public static int withAlpha(int color, float alpha) {
         return (Math.round(Math.max(0f, Math.min(1f, alpha)) * 255) << 24) | (color & 0x00FFFFFF);
     }
-        v.setElevation(px(v.getContext(), elevationDp));
-    }
 
     /** Tags a view so GlassPolish leaves it (and its children) exactly as built. */
     public static <T extends View> T keep(T v) {
