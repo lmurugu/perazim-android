@@ -32,6 +32,8 @@ jobs:
   ui-screenshots:
     name: UI screenshots (Robolectric)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
@@ -50,16 +52,21 @@ jobs:
             build/ui-screenshots/**
             build/reports/tests/testDebugUnitTest/**
           if-no-files-found: warn
-      - name: Print small copies of the screenshots into the log
+      - name: Publish small copies to a review ref (not a branch)
         if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           [ -d build/ui-screenshots/small ] || exit 0
-          cd build/ui-screenshots/small
-          for f in *.jpg; do
-            echo "=====BEGIN $f"
-            base64 -w 120 "$f"
-            echo "=====END $f"
-          done
+          tmp=$(mktemp -d)
+          cp build/ui-screenshots/small/*.jpg "$tmp"/
+          cd "$tmp"
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -qm "UI screenshots for ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/ui-screenshots/latest
 
   database-instrumentation:
     name: SQLCipher and Room migration suites (API 34 emulator)
