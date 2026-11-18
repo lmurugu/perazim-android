@@ -6,6 +6,24 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+// Backend origin for validation/release builds. Set `perazim.apiBaseUrl` in local.properties
+// (see local.properties.example) or as a -P Gradle property. Empty by default, so no
+// personal host is ever committed.
+def localPropertiesFile = file("local.properties")
+def localProperties = new Properties()
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+def apiBaseUrl = localProperties.getProperty('perazim.apiBaseUrl') ?: (project.findProperty('perazim.apiBaseUrl') ?: '')
+
+// Fail release builds that would ship without an HTTPS backend. Validation builds may stay empty.
+gradle.taskGraph.whenReady { graph ->
+    boolean releaseRequested = graph.allTasks.any { it.name ==~ /(assemble|bundle)Release/ }
+    if (releaseRequested && !(apiBaseUrl ==~ /https:\/\/\S+/)) {
+        throw new GradleException("perazim.apiBaseUrl must be an https:// URL for release builds. Set it in local.properties or with -Pperazim.apiBaseUrl=...")
+    }
+}
+
 android {
     lint {
         baseline = file("lint-baseline.xml")
@@ -60,14 +78,14 @@ android {
             applicationIdSuffix '.validation'
             versionNameSuffix '-pilot'
             matchingFallbacks = ['debug']
-            buildConfigField "String", "API_BASE_URL", "\"https://fedora.taile47793.ts.net\""
+            buildConfigField "String", "API_BASE_URL", "\"${apiBaseUrl}\""
             buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "true"
         }
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "API_BASE_URL", "\"https://fedora.taile47793.ts.net\""
+            buildConfigField "String", "API_BASE_URL", "\"${apiBaseUrl}\""
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
