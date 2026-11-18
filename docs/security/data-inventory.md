@@ -18,6 +18,12 @@ Sensitivity: **P** personal, **S** sensitive (religious belief or health), **C**
 | `community_media` | Uploaded image metadata and owner | Photo uploads | P | Owner, participants, and post audience (checked on every request) | PENDING |
 | `in_app_notifications` | Notification text, recipient | Notifications | P | Recipient | PENDING |
 | `daily_challenges`, `user_challenge_completions` | Completion records | Devotional progress | P | Owner | PENDING |
+| `game_leaderboard_profiles` (migration 0022) | `opt_in` flag and update time; the first name is taken from `users.name` when shown | Church games leaderboard. Off by default. | P | Only members who have opted in appear, by first name; each member sees their own rank | Until the member opts out or deletes the account (erasure removes the row) |
+| `game_score_weeks`, `game_score_events` (migration 0022) | Weekly star totals per member, and one row per uploaded batch (run id, game, points) | Church games leaderboard | P | Totals appear on the board only for opted-in members; the server does not expose run ids | Weekly totals and batch rows are kept until the member deletes the account (erasure removes them) |
+| `post_reactions`, `comment_reactions` (draft, migration 0023 in PR 31, not yet on main) | Emoji reaction, user identifier, time | Reactions on posts and comments | P | Members who can see the post or comment | PENDING |
+| `event_photos` (draft, migration 0024 in PR 31, not yet on main) | Uploaded photo URL, uploader, review status, reviewer, review time | Member photos on events, shown only after leader approval | P | Post audience once approved; uploader and leaders while pending | PENDING |
+| `group_join_requests` (draft, migration 0025 in PR 31, not yet on main) | Requesting member, group, decision and decider | Requests to join closed groups | P | Group leaders; the requesting member | PENDING |
+| `community_posts.review_status` (draft, migration 0023 in PR 31, not yet on main) | Review state of a post | Community moderation | O | Per post audience | PENDING |
 | `campuses` | Campus name, address, contact | Church information | O | Public | Ongoing |
 | `membership_records`, `membership_record_revisions`, `membership_imports`, `membership_import_staging_rows` | Member identity fields from the church register | Membership verification | S | Administrators with membership permissions only | PENDING (import is gated by L8) |
 | `membership_claims`, `membership_verifications`, `membership_verification_history`, `membership_claim_rate_limits` | Claim details, review decision, rate-limit counters | Membership claims and review | S | Claimant (receipt) and reviewers | PENDING |
@@ -38,6 +44,7 @@ Sensitivity: **P** personal, **S** sensitive (religious belief or health), **C**
 | `MessageEntity` (`messages`) | `senderId`, `senderName`, `content`, `mediaUrl` | Offline messages | Synced to server |
 | `ConnectionEntity` (`connections`) | `peerName`, `userId`, `peerId` | QR connections | |
 | `NotificationEntity`, `CommentEntity`, `GroupEntity`, `GroupMemberEntity`, `EventRsvpEntity`, `ReflectionEntity`, `DailyChallengeEntity` | Community content and progress | Offline community data | |
+| Bible games stars and streaks (`SharedPreferences` file `perazim_game_scores_v1`, keys per account) | Stars earned, pending upload batch (run id and points), day streak, best scores | Games progress on this phone; stars upload to the church leaderboard for signed-in members | Keys are a one-way hash of the account id. Not in Room. Removed when the app data is cleared. |
 | `SyncQueueEntity` (`sync_queue`) | Payload JSON of pending writes | Offline sync | Deleted when the account is removed from the device |
 | `SyncMetadataEntity`, `AppConfigEntity`, `DownloadedContentEntity` | Operational | Sync and configuration | |
 | Bible, hymn, sermon, joke, riddle, verse and event entities | None | Church content | Public content |

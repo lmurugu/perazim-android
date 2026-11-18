@@ -25,6 +25,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.data.remote.GamesLeaderboardRemoteSource;
+import org.json.JSONObject;
+import androidx.annotation.NonNull;
 import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
@@ -145,6 +148,8 @@ public final class GamesHubDialog extends Dialog {
         round = null;
         screen("Bible Games", "Learn, remember and enjoy. All nine games work without internet.", false);
         statsBar();
+        leaderboardCard();
+        flushStars();
         gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
         gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
@@ -164,7 +169,7 @@ public final class GamesHubDialog extends Dialog {
         customCard(org.perazimchurch.app.R.drawable.ic_game_road, org.perazimchurch.app.R.drawable.ic_char_explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
                 "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
                 solvedLine("ROAD"), this::roadToJerusalem);
-        text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
+        text("Stars stay on this phone. They go to the church leaderboard only for signed-in members, and your name shows only if you turn it on. Games do not change XP, streaks or Grace points.", 14, false);
     }
 
     private void statsBar() {
@@ -219,7 +224,243 @@ public final class GamesHubDialog extends Dialog {
     // ---- Stars and daily streak (local to this phone and account) ----
 
     private int stars() { return scores.getInt(scorePrefix + "stars", 0); }
-    private void addStar() { scores.edit().putInt(scorePrefix + "stars", stars() + 1).apply(); }
+    private void addStar() {
+        scores.edit().putInt(scorePrefix + "stars", stars() + 1)
+                .putInt(scorePrefix + "pendingStars", scores.getInt(scorePrefix + "pendingStars", 0) + 1).apply();
+    }
+
+    // ---- Church leaderboard (opt-in, first name only) ----
+
+    private static final int MAX_STARS_PER_UPLOAD = 60;
+    private boolean uploading;
+
+    /**
+     * Sends stars earned on this phone to the church leaderboard. Each batch keeps its run id until the server
+     * confirms it, so a retry after a dropped connection is never counted twice. Guests keep their stars locally.
+     */
+    private void flushStars() {
+        SessionManager session = SessionManager.getInstance(activity);
+        if (uploading || session.isGuest()) return;
+        String token = session.getAuthToken();
+        String runKey = scorePrefix + "batchRunId", pointsKey = scorePrefix + "batchPoints";
+        String runId = scores.getString(runKey, null);
+        int points = scores.getInt(pointsKey, 0);
+        if (runId == null) {
+            int pending = scores.getInt(scorePrefix + "pendingStars", 0);
+            if (pending <= 0) return;
+            points = Math.min(pending, MAX_STARS_PER_UPLOAD);
+            runId = java.util.UUID.randomUUID().toString().replace("-", "");
+            scores.edit().putString(runKey, runId).putInt(pointsKey, points)
+                    .putInt(scorePrefix + "pendingStars", pending - points).apply();
+        }
+        uploading = true;
+        GamesLeaderboardRemoteSource.uploadStars(activity, token, runId, points, new GamesLeaderboardRemoteSource.Callback() {
+            @Override public void onSuccess(@NonNull JSONObject json) {
+                uploading = false;
+                scores.edit().remove(runKey).remove(pointsKey).apply();
+                if (scores.getInt(scorePrefix + "pendingStars", 0) > 0) flushStars();
+            }
+            @Override public void onError(int statusCode, @NonNull String message) {
+                uploading = false;
+                // A 400 means the batch itself was refused; drop it rather than retry forever.
+                if (statusCode == 400) scores.edit().remove(runKey).remove(pointsKey).apply();
+            }
+        });
+    }
+
+    private void leaderboardCard() {
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setPadding(dp(16), dp(14), dp(16), dp(14));
+        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        card.addView(icon(org.perazimchurch.app.R.drawable.ic_game_trophy, 48), new LinearLayout.LayoutParams(dp(48), dp(48)));
+        LinearLayout words = new LinearLayout(activity);
+        words.setOrientation(LinearLayout.VERTICAL);
+        words.setPadding(dp(12), 0, 0, 0);
+        addText(words, "Church leaderboard", 19, true);
+        addText(words, "See who is climbing this week. You choose whether your first name appears.", 14, false);
+        card.addView(words, new LinearLayout.LayoutParams(0, -2, 1f));
+        card.setClickable(true);
+        card.setContentDescription("Open the church leaderboard");
+        card.setOnClickListener(v -> leaderboard(false));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(16);
+        page.addView(card, params);
+    }
+
+    private void leaderboard(boolean allTime) {
+        if (!activeOwner()) return;
+        flushStars();
+        screen("Leaderboard", allTime ? "All-time stars from the whole church" : "Stars earned this week across the church", true);
+        LinearLayout tabs = new LinearLayout(activity);
+        tabs.setOrientation(LinearLayout.HORIZONTAL);
+        page.addView(tabs, new LinearLayout.LayoutParams(-1, -2));
+        for (int i = 0; i < 2; i++) {
+            boolean tabAll = i == 1;
+            Button tab = new Button(activity);
+            styleButton(tab, tabAll ? "All time" : "This week", tabAll == allTime);
+            tab.setOnClickListener(v -> { if (tabAll != allTime) leaderboard(tabAll); });
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+            params.setMargins(dp(2), 0, dp(2), dp(8));
+            tabs.addView(tab, params);
+        }
+        SessionManager session = SessionManager.getInstance(activity);
+        boolean guest = session.isGuest();
+        String token = guest ? null : session.getAuthToken();
+        if (guest) {
+            text("Sign in from Profile to add your stars to the church leaderboard.", 15, false);
+        } else {
+            optInRow(token);
+        }
+        LinearLayout board = new LinearLayout(activity);
+        board.setOrientation(LinearLayout.VERTICAL);
+        page.addView(board, new LinearLayout.LayoutParams(-1, -2));
+        addText(board, "Loading the leaderboard…", 15, false);
+        GamesLeaderboardRemoteSource.leaderboard(activity, token, allTime, new GamesLeaderboardRemoteSource.Callback() {
+            @Override public void onSuccess(@NonNull JSONObject json) {
+                if (!isShowing()) return;
+                board.removeAllViews();
+                renderBoard(board, json);
+            }
+            @Override public void onError(int statusCode, @NonNull String message) {
+                if (!isShowing()) return;
+                board.removeAllViews();
+                addText(board, "The leaderboard needs an internet connection. Your stars are saved on this phone and will be added when you're back online.", 15, false);
+            }
+        });
+    }
+
+    private void optInRow(String token) {
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(14), dp(10), dp(14), dp(10));
+        row.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        TextView label = new TextView(activity);
+        label.setText("Show my first name on the leaderboard");
+        label.setTextSize(15);
+        label.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        row.addView(label, new LinearLayout.LayoutParams(0, -2, 1f));
+        android.widget.Switch toggle = new android.widget.Switch(activity);
+        toggle.setEnabled(false);
+        toggle.setContentDescription("Show my first name on the leaderboard");
+        row.addView(toggle);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(12);
+        page.addView(row, params);
+        GamesLeaderboardRemoteSource.profile(activity, token, new GamesLeaderboardRemoteSource.Callback() {
+            @Override public void onSuccess(@NonNull JSONObject json) {
+                toggle.setChecked(json.optBoolean("optIn", false));
+                String name = json.optString("displayName", "");
+                if (!name.isEmpty()) label.setText("Show me as \u201c" + name + "\u201d on the leaderboard");
+                toggle.setEnabled(true);
+                toggle.setOnCheckedChangeListener((button, checked) -> {
+                    toggle.setEnabled(false);
+                    GamesLeaderboardRemoteSource.setOptIn(activity, token, checked, new GamesLeaderboardRemoteSource.Callback() {
+                        @Override public void onSuccess(@NonNull JSONObject result) { if (isShowing()) leaderboard(false); }
+                        @Override public void onError(int statusCode, @NonNull String message) {
+                            toggle.setOnCheckedChangeListener(null);
+                            toggle.setChecked(!checked);
+                            toggle.setEnabled(true);
+                            Toast.makeText(activity, "Could not save. Check your connection and try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+            }
+            @Override public void onError(int statusCode, @NonNull String message) {
+                label.setText("Connect to the internet to choose whether your name appears.");
+            }
+        });
+    }
+
+    private void renderBoard(LinearLayout board, JSONObject json) {
+        org.json.JSONArray entries = json.optJSONArray("entries");
+        int count = entries == null ? 0 : entries.length();
+        if (count == 0) {
+            addText(board, "No one has joined the leaderboard yet. Turn on your name above and be the first to climb.", 15, false);
+        } else {
+            podium(board, entries);
+            for (int i = 0; i < count; i++) {
+                JSONObject e = entries.optJSONObject(i);
+                if (e != null) boardRow(board, e);
+            }
+        }
+        JSONObject me = json.optJSONObject("me");
+        if (me != null) addText(board, "You are #" + me.optInt("rank") + " with " + me.optInt("points") + " stars.", 15, true);
+    }
+
+    /** Top three on raised glass steps: second, first (tallest, with a crown), third. */
+    private void podium(LinearLayout board, org.json.JSONArray entries) {
+        LinearLayout steps = new LinearLayout(activity);
+        steps.setOrientation(LinearLayout.HORIZONTAL);
+        steps.setGravity(Gravity.BOTTOM);
+        int[] order = {1, 0, 2};
+        int[] heights = {96, 128, 76};
+        for (int k = 0; k < 3; k++) {
+            int index = order[k];
+            LinearLayout column = new LinearLayout(activity);
+            column.setOrientation(LinearLayout.VERTICAL);
+            column.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+            JSONObject e = index < entries.length() ? entries.optJSONObject(index) : null;
+            if (e != null) {
+                if (index == 0) column.addView(icon(org.perazimchurch.app.R.drawable.ic_game_crown, 40), new LinearLayout.LayoutParams(dp(40), dp(40)));
+                TextView name = new TextView(activity);
+                name.setText(e.optString("name"));
+                name.setTextSize(15);
+                name.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                name.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                name.setGravity(Gravity.CENTER);
+                name.setSingleLine(true);
+                column.addView(name, new LinearLayout.LayoutParams(-1, -2));
+                TextView step = new TextView(activity);
+                step.setText(e.optInt("rank") + "\n" + e.optInt("points") + " \u2605");
+                step.setTextSize(16);
+                step.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                step.setGravity(Gravity.CENTER);
+                step.setTextColor(index == 0 ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
+                step.setBackground(shape(index == 0 ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE));
+                column.addView(step, new LinearLayout.LayoutParams(-1, dp(heights[k])));
+            }
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+            params.setMargins(dp(4), 0, dp(4), 0);
+            steps.addView(column, params);
+        }
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(16);
+        board.addView(steps, params);
+    }
+
+    private void boardRow(LinearLayout board, JSONObject e) {
+        boolean me = e.optBoolean("me", false);
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(14), dp(12), dp(14), dp(12));
+        row.setBackground(shape(me ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE));
+        int ink = me ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY;
+        TextView rank = new TextView(activity);
+        rank.setText("#" + e.optInt("rank"));
+        rank.setTextSize(16);
+        rank.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        rank.setTextColor(ink);
+        row.addView(rank, new LinearLayout.LayoutParams(dp(48), -2));
+        TextView name = new TextView(activity);
+        name.setText(e.optString("name") + (me ? " (you)" : ""));
+        name.setTextSize(16);
+        name.setTextColor(ink);
+        row.addView(name, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView points = new TextView(activity);
+        points.setText(e.optInt("points") + " \u2605");
+        points.setTextSize(16);
+        points.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        points.setTextColor(ink);
+        row.addView(points);
+        row.setContentDescription("Rank " + e.optInt("rank") + ", " + e.optString("name") + (me ? ", you" : "") + ", " + e.optInt("points") + " stars");
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(8);
+        board.addView(row, params);
+    }
     private static long today() {
         long now = System.currentTimeMillis();
         return (now + java.util.TimeZone.getDefault().getOffset(now)) / 86_400_000L;
