@@ -27,7 +27,7 @@ Sensitivity: **P** personal, **S** sensitive (religious belief or health), **C**
 | `data_subject_requests`, `data_subject_request_events`, `data_subject_request_revisions` | Request type, status, history | Access, correction and erasure requests | P | Requester; privacy administrators | PENDING |
 | `disposal_events`, `retention_rules`, `retention_reviews`, `legal_holds` | Disposal records and holds | Retention enforcement | O | Privacy administrators | Ongoing |
 | `admin_audit_log`, `privileged_sessions`, `admin_security`, `permissions`, `user_permissions` | Administrator actions, step-up sessions, TOTP counter (`totp_last_counter`) and secret (`totp_secret_cipher`, encrypted) | Administrative accountability and security | C/O | Administrators | PENDING |
-| AI governance tables (migrations 0013–0017, `ai_*` and knowledge tables) | Question and context text as configured, daily budget counters, source approvals | Governed AI (off in release) | P | Administrators | PENDING |
+| AI governance tables (migrations 0013–0017 on the local `phase-B-community` line only) | Question and context text as configured, daily budget counters, source approvals | Governed AI (off in release) | P | Administrators | PENDING |
 
 ## Android (Room) entities
 
@@ -43,6 +43,9 @@ Sensitivity: **P** personal, **S** sensitive (religious belief or health), **C**
 | Bible, hymn, sermon, joke, riddle, verse and event entities | None | Church content | Public content |
 
 Session tokens are stored in the Android Keystore-backed store and excluded from backup (`data_extraction_rules.xml`). Audit finding S-01 in `docs/security/audit-2026-11.md` covers the Room database backup rule.
+
+## Branch caveat
+This inventory was written against the working tree of `fix/perazim-remediation-start`, which is based on `origin/phase-B-community`. On that base, migration 0013 is `sync_mutation_receipts`; the governed-AI migrations (0013–0017) exist only on the local `phase-B-community` line. The two lines diverge and must be reconciled by the owner before this inventory is final.
 
 ## Open items (owner)
 - Retention period for every row marked PENDING.
