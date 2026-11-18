@@ -205,13 +205,19 @@ public class FellowshipUiBinder {
         rootContainer.addView(offlineBannerView);
         updateOfflineBannerVisibility();
 
-        // 3. Segmented Control: Wall | Mine
+        // 3. Prayer wall intro, then Wall | Mine
+        TextView wallIntro = new TextView(context);
+        wallIntro.setText("Share a need, or lift up someone else's.");
+        wallIntro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        wallIntro.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        wallIntro.setPadding(dp(4), 0, dp(4), dp(10));
+        rootContainer.addView(wallIntro);
         View segmentedControl = createSegmentedControl();
         rootContainer.addView(segmentedControl);
 
-        // 4. Single Primary Orange CTA: "+ Share a prayer"
+        // 4. Single Primary Orange CTA: "Ask for prayer"
         Button btnSharePrayer = new Button(context);
-        btnSharePrayer.setText("+ Share a prayer");
+        btnSharePrayer.setText("Ask for prayer");
         btnSharePrayer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         btnSharePrayer.setTypeface(Typeface.DEFAULT_BOLD);
         btnSharePrayer.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
@@ -334,7 +340,7 @@ public class FellowshipUiBinder {
         segmented.setLayoutParams(lp);
 
         btnTabWall = new Button(context);
-        btnTabWall.setText("Prayer Wall");
+        btnTabWall.setText("All requests");
         btnTabWall.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         btnTabWall.setTypeface(Typeface.DEFAULT_BOLD);
         btnTabWall.setPadding(dp(12), dp(8), dp(12), dp(8));
@@ -573,7 +579,7 @@ public class FellowshipUiBinder {
                 viewModel.amenPrayer(prayer.getId(), activeUserId, () -> {
                     org.perazimchurch.app.sync.SyncDispatcher.dispatchSync(context, null);
                 });
-                Toast.makeText(context, "Amen! Joined in prayer.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Thank you. You're praying with them.", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, "You are already standing in prayer for this petition.", Toast.LENGTH_SHORT).show();
             }
@@ -588,7 +594,7 @@ public class FellowshipUiBinder {
     }
 
     private void updateAmenStyle(Button btn, int count, boolean hasAmened) {
-        String label = (hasAmened ? "✓ Joined in Prayer (" : "🙏 Amen (") + count + ")";
+        String label = (hasAmened ? "✓ Praying (" : "🙏 I'm praying (") + count + ")";
         btn.setText(label);
         if (hasAmened) {
             btn.setBackground(createCardBackground(PerazimTheme.COLOR_PURPLE_GHOST, 16, PerazimTheme.COLOR_PURPLE_SOFT, 1));
