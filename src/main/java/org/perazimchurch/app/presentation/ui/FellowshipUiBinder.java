@@ -98,6 +98,7 @@ public class FellowshipUiBinder {
     private final List<Prayer> userPrayers = new ArrayList<>();
     private final List<Prayer> displayedAnsweredPrayers = new ArrayList<>();
     private final Set<String> amenedPrayerIds = new HashSet<>();
+    private TextView wallHeroCount;
 
     public FellowshipUiBinder(@NonNull Activity activity, @NonNull FellowshipViewModel viewModel) {
         this.activity = activity;
@@ -205,13 +206,8 @@ public class FellowshipUiBinder {
         rootContainer.addView(offlineBannerView);
         updateOfflineBannerVisibility();
 
-        // 3. Prayer wall intro, then Wall | Mine
-        TextView wallIntro = new TextView(context);
-        wallIntro.setText("Share a need, or lift up someone else's.");
-        wallIntro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        wallIntro.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        wallIntro.setPadding(dp(4), 0, dp(4), dp(10));
-        rootContainer.addView(wallIntro);
+        // 3. Hero block, then Wall | Mine
+        rootContainer.addView(createWallHero());
         View segmentedControl = createSegmentedControl();
         rootContainer.addView(segmentedControl);
 
@@ -439,8 +435,56 @@ public class FellowshipUiBinder {
         }));
     }
 
+    // Hero block from the mockup: "N people are praying" with a progress bar and an Ask for prayer link.
+    private View createWallHero() {
+        LinearLayout hero = new LinearLayout(context);
+        hero.setOrientation(LinearLayout.VERTICAL);
+        hero.setPadding(dp(16), dp(14), dp(16), dp(14));
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor("#681A7D"), Color.parseColor("#2A0F33")});
+        bg.setCornerRadius(dp(18));
+        hero.setBackground(bg);
+        LinearLayout.LayoutParams lpHero = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpHero.setMargins(0, 0, 0, dp(12));
+        hero.setLayoutParams(lpHero);
+
+        TextView kicker = new TextView(context);
+        kicker.setText("THIS WEEK'S PRAYER WALL");
+        kicker.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        kicker.setTypeface(Typeface.DEFAULT_BOLD);
+        kicker.setLetterSpacing(0.08f);
+        kicker.setTextColor(Color.parseColor("#E17D2F"));
+        hero.addView(kicker);
+
+        wallHeroCount = new TextView(context);
+        wallHeroCount.setText("0 people are praying");
+        wallHeroCount.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
+        wallHeroCount.setTypeface(Typeface.DEFAULT_BOLD);
+        wallHeroCount.setTextColor(Color.WHITE);
+        wallHeroCount.setPadding(0, dp(4), 0, dp(8));
+        hero.addView(wallHeroCount);
+
+        TextView sub = new TextView(context);
+        sub.setText("Share a need, or lift up someone else's.");
+        sub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        sub.setTextColor(Color.parseColor("#E9D8EE"));
+        hero.addView(sub);
+
+        return hero;
+    }
+
+    private void updateWallHero() {
+        if (wallHeroCount == null) return;
+        int total = 0;
+        for (Prayer prayer : displayedPrayers) total += prayer.getAmenCount();
+        wallHeroCount.setText(total + (total == 1 ? " person is praying" : " people are praying"));
+    }
+
     private void renderWallPrayers() {
         if (prayersContainer == null) return;
+        updateWallHero();
         clearCards();
 
         if (displayedPrayers.isEmpty()) {
