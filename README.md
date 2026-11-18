@@ -1,190 +1,103 @@
-# PERAZIM MISSION CHURCH — Official Android Application
+# Perazim
 
-[![Build Status](https://github.com/lmurugu/perazim-android/actions/workflows/build.yml/badge.svg)](https://github.com/lmurugu/perazim-android/actions)
-[![Platform](https://img.shields.io/badge/Platform-Android%20API%2024--34-brightgreen.svg)](https://developer.android.com)
-[![Version](https://img.shields.io/badge/Version-v2.2.0%20(Build%204)-purple.svg)](https://github.com/lmurugu/perazim-android)
-[![Language](https://img.shields.io/badge/Language-Java%2011%20%2F%2021-orange.svg)](https://www.oracle.com/java/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Package](https://img.shields.io/badge/Package-org.perazimchurch.app-blue.svg)](https://github.com/lmurugu/perazim-android)
+A church companion app for Perazim Mission Church (Embu, Kenya): scripture, sermons, worship, prayer and community, built to work offline first.
 
-> **Motto**: *“The Place of Great Breakthrough”*  
-> **Slogan**: *“A place where everybody is somebody, and no body is a nobody”*
+> **Status:** pilot in development. Not yet released to the public. See [Status](#status).
 
----
-
-## 🏛️ Church Foundation & Canonical Identity
-
-**PERAZIM MISSION CHURCH** is established on the covenant foundation of David's breakthrough at Baal-Perazim (*“As waters break out, the LORD has broken out against my enemies before me” — 2 Samuel 5:20*), headquartered in Embu, Kenya, and reaching the global community.
-
-- **Church Name**: **PERAZIM MISSION CHURCH**
-- **Motto**: *“The Place of Great Breakthrough”*
-- **Slogan**: *“A place where everybody is somebody, and no body is a nobody”*
-- **Vision**: *“To be a Center for Missions”*
-- **Mission Statement**: *“Perazim exists to draw people to Christ, to disciple them to belong to His family, and to have them glorify GOD with their lives and their services.”*
-- **Core Values**: `Evangelism` • `Discipleship` • `Fellowship` • `Worship` • `Ministry`
-
----
-
-### Leadership & Secretariat Attribution
-- **Presiding Bishop**: **Dr. David Mutweri**  
-- **Church contact details**: kept in one place, `app/src/main/java/org/perazimchurch/app/config/ChurchConfig.java`  
-- **Backend URL for builds**: set the Gradle properties listed in `gradle.properties.example`  
-- **Bishop Direct Email**: `bishop@perazimchurch.org`  
-- **Church Secretariat Email**: `info@perazimchurch.org`  
-- **Central Headquarters**: Embu, Kenya  
-- **Safaricom Paybill**: set in `ChurchConfig.java`  
-*Perazim Mission Church Global Ministries*
-
----
-
-## 📱 Visual Showcase (100-Member Pilot on Physical Device)
-
-| Home & Daily Routine | Lipa na M-Pesa Giving | Profile & Pastoral Suite | Prayer Petition & WhatsApp Intercession |
-| :---: | :---: | :---: | :---: |
-| <a href="docs/screenshots/live_screen_home.png"><img src="docs/screenshots/live_screen_home.png" width="200" alt="Home Screen"/></a> | <a href="docs/screenshots/live_screen_giving_modal.png"><img src="docs/screenshots/live_screen_giving_modal.png" width="200" alt="Giving Modal"/></a> | <a href="docs/screenshots/live_screen_profile.png"><img src="docs/screenshots/live_screen_profile.png" width="200" alt="Profile Screen"/></a> | <a href="docs/screenshots/live_screen_prayer_dialog.png"><img src="docs/screenshots/live_screen_prayer_dialog.png" width="200" alt="Prayer Wall"/></a> |
-
-| Sermons & Media Stream | Worship & Chords | Scripture Reader |
-| :---: | :---: | :---: |
-| <a href="docs/screenshots/live_screen_sermons.png"><img src="docs/screenshots/live_screen_sermons.png" width="200" alt="Sermons Screen"/></a> | <a href="docs/screenshots/live_screen_worship.png"><img src="docs/screenshots/live_screen_worship.png" width="200" alt="Worship Chords"/></a> | <a href="docs/screenshots/live_screen_passage.png"><img src="docs/screenshots/live_screen_passage.png" width="200" alt="Scripture Reader"/></a> |
-
----
-
-## ✨ Feature Highlights
-
-- 💚 **Safaricom M-Pesa Giving (3-Tier Cascade)**: Integrated Safaricom M-Pesa integration targeting the church Paybill set in `ChurchConfig.java`. Copies Paybill and account code to clipboard, checks and opens the Safaricom M-Pesa App or SIM Toolkit (`com.android.stk`), with immediate fallback to the Safaricom `*334#` USSD dialer.
-- 💬 **Pastoral Care via WhatsApp**: Direct one-tap messaging to the church's pastoral line (number configured in the app) for private prayer petitions, counseling, and pastoral support.
-- ✉️ **Offline Pastoral SMS**: Formatted SMS intercession link to the church's pastoral line ensuring congregants without active internet bundles can immediately submit urgent prayer needs.
-- 📍 **Sanctuary Directions (Google Maps)**: One-tap deep-link intent (`geo:0,0?q=Perazim+Mission+Church+Embu`) guiding congregants directly to Perazim Headquarters in Embu.
-- 🛠️ **In-App Feedback & Issue Reporting**: Direct channel connecting pilot members with the App Administrator via WhatsApp with device model, Android OS version, and app version diagnostics prefilled.
-- 📖 **Offline Holy Bible**: Offline Bible text stored in a Room SQLite database for instant retrieval. The bundled database currently includes King James Version (public domain), Swahili Union Version, and NIV, ESV and NKJV. NIV, ESV and NKJV are copyrighted and are scheduled for removal pending licence review; see `NOTICE`.
-- ⚡ **Dynamic 3-Minute Breakthrough Routine**: Habit-building devotional module (Read Word, Reflect, Pray) that dynamically updates progress (`0%` -> `33%` -> `66%` -> `100% / +40 XP`), backed by streak tracking and Grace Tokens.
-- 🤖 **On-Device AI Breakthrough Guide**: Offline deterministic guide that routes members through scriptures, hymns and fellowship. It runs without a network connection. An optional online AI mode sends questions to a relay that calls Google Gemini; it is disabled in release builds by default.
-- 🎵 **Hymnal & Chord Browser**: Offline hymnal library featuring chord charts (guitar and piano) for timeless hymns, Swahili choruses, and contemporary worship songs.
-
----
-
-## 🏛️ Architecture & Tech Stack
+## Architecture
 
 ```mermaid
 flowchart LR
-  subgraph Device[Android client - Java, Views, Room]
-    UI[Activities and screens] --> VM[ViewModels and repositories]
-    VM --> DB[(Room SQLite offline store)]
-    VM --> SYNC[Sync queue]
+  subgraph Device
+    A[Android app<br/>Java, Room, sync queue]
   end
-  SYNC -->|HTTPS, bearer token| API[Express API]
-  API --> PG[(PostgreSQL)]
-  API -->|HTTPS| RELAY[Cloudflare Worker AI relay]
-  RELAY --> GEM[Google Gemini]
+  subgraph PC or server
+    B[Express API<br/>Node 24]
+    D[(PostgreSQL<br/>migrations 0001-0018)]
+  end
+  subgraph Cloudflare
+    R[AI relay Worker]
+  end
+  G[Gemini API]
+  A -->|HTTPS, per-user token| B
+  B --> D
+  B -->|service grant| R
+  R --> G
 ```
 
-The API (`server/`) enforces authorisation and the privacy gate on each request. The relay (`relay/`) holds the provider key and quota. Client roles never establish server authority.
+- **Android client** (`src/`): offline-first. Content and user actions are stored on the device in Room, and changes are queued and synced when the server is reachable. Session tokens are kept in the Android Keystore.
+- **Backend** (`server/`): Express routes and modules for accounts, prayer, community, membership, privacy and AI governance. The database is built from ordered, checksum-verified migrations at startup.
+- **AI relay** (`relay/`): a Cloudflare Worker that forwards authorised requests to Gemini and keeps the provider key out of the app. Disabled in release builds.
 
+## Engineering highlights
 
-- **Application ID & Namespace**: `org.perazimchurch.app`
-- **Core Language**: Java 11 / Java 21 LTS
-- **Persistence Layer**: Room SQLite (`androidx.room:room-runtime:2.6.1`) for users, prayers, offline sermons, bookmarks, and Bible verses.
-- **Intent Orchestration**: `ChurchIntentManager.java` managing all native Android OS handoffs (M-Pesa, WhatsApp, SMS, Calls, Maps, Share Sheet).
-- **Target SDK**: Android 34 (Android 14) with backward compatibility down to Android 7.0 (API 24).
-- **Security & Privacy**: ProGuard/R8 rules enabled; sensitive credentials and keystores excluded from version control.
+- **Offline-first sync:** queued mutations with idempotency receipts (migration 0018) and replay on reconnect.
+- **Safe migrations:** a migration runner with an advisory lock, checksum drift detection and gap detection. Tests run only against disposable databases.
+- **Privacy by design:** versioned privacy notices with acknowledgement records, consent purposes, data-subject requests (access, correction, erasure), and erasure that removes content and disables sign-in.
+- **Hardening:** `helmet` headers, default-deny CORS, 100 KB request limit (uploads have their own limit), per-IP and per-account rate limits, bcrypt cost 12, 6-digit PINs, random identifiers, and step-up TOTP for administrators.
+- **Governed AI:** knowledge sources need approval before use, and responses carry source references.
 
----
+## Tech stack
 
-## 🛠️ Build & Installation Guide
+| Area | Technology |
+|---|---|
+| Android | Java 11, Room 2.6, Android Gradle Plugin 8.9.1, Gradle 8.11.1, compileSdk/targetSdk 36 |
+| Backend | Node.js 24, Express 4, PostgreSQL 16, bcryptjs, jsonwebtoken, helmet, express-rate-limit |
+| Relay | Cloudflare Workers, Gemini API |
+| Operations | Docker, Caddy (TLS), encrypted nightly backups (AES-256, PBKDF2) |
 
-### Prerequisites
-- **Java Development Kit**: JDK 21 or JDK 17
-- **Android SDK**: Build-tools `34.0.0`, Platforms `android-34`
-- **Gradle**: Gradle 8.5+ (Wrapper included)
+## Quick start
 
-### 1. Building the Debug APK
-```bash
-git clone https://github.com/lmurugu/perazim-android.git
-cd perazim-android
-
-./gradlew assembleDebug
-
-# Output APK: build/outputs/apk/debug/app-debug.apk
-```
-
-### 2. Building the Signed Production Release APK (100-Member Pilot)
-
-For a production release, the APK must be signed with a persistent release keystore so that future updates can install cleanly over previous versions without signature mismatch errors.
-
-#### Keystore Setup
-1. Generate your production release keystore (keep this safe and backed up):
-```bash
-keytool -genkeypair -v -keystore /path/to/perazim-release.jks \
-  -alias perazim-release \
-  -keyalg RSA \
-  -keysize 2048 \
-  -validity 10000 \
-  -dname "CN=Perazim Mission Church, OU=IT Ministry, O=Perazim Mission Church, L=Embu, ST=Eastern, C=KE"
-```
-
-2. Configure `keystore.properties` in your project root (this file is excluded by `.gitignore`):
-```properties
-storeFile=/path/to/perazim-release.jks
-storePassword=YOUR_STORE_PASSWORD
-keyAlias=perazim-release
-keyPassword=YOUR_KEY_PASSWORD
-```
-
-3. Build the signed release APK with Gradle:
-```bash
-./gradlew assembleRelease
-
-# The signed production APK will be located at:
-# build/outputs/apk/release/app-release.apk
-```
-
-### 3. Deploying to Physical Device via ADB
+**Android** (requires JDK 17 and the Android SDK):
 
 ```bash
-# Verify connected device
-adb devices
-
-# Install Signed Release APK
-adb install -r build/outputs/apk/release/app-release.apk
-
-# Launch App
-adb shell am start -n org.perazimchurch.app/.MainActivity
+./gradlew testDebugUnitTest
+./gradlew assembleValidation -Pperazim.apiBaseUrl=https://your-server.example
 ```
 
----
+Copy `gradle.properties.example` to `~/.gradle/gradle.properties` and set the server address for each build type. Release builds refuse to build without an HTTPS address.
 
-## 📂 Project Structure
+**Backend** (requires Node 24 and PostgreSQL 16):
 
-```
-perazim-android/
-├── docs/
-│   └── screenshots/
-│       ├── live_screen_home.png
-│       ├── live_screen_giving_modal.png
-│       ├── live_screen_profile.png
-│       ├── live_screen_prayer_dialog.png
-│       ├── live_screen_passage.png
-│       ├── live_screen_sermons.png
-│       └── live_screen_worship.png
-├── src/main/
-│   ├── AndroidManifest.xml
-│   ├── assets/              # Offline church banners, campus art, hymnal chords
-│   ├── java/org/perazimchurch/app/
-│   │   ├── MainActivity.java
-│   │   ├── ai/              # On-device AI Breakthrough Guide
-│   │   ├── data/            # Room SQLite database, DAOs, repositories, mappers
-│   │   ├── domain/          # Clean architecture domain models
-│   │   ├── navigation/      # ChurchIntentManager (M-Pesa, WhatsApp, SMS, Maps)
-│   │   └── presentation/    # UI binders, ViewModels, and dialogs
-│   └── res/                 # Vector drawables, themes, strings
-├── build.gradle
-├── keystore.properties      # Local signing config (gitignored)
-└── settings.gradle
+```bash
+cd server
+npm ci
+export DATABASE_URL=postgres://user@127.0.0.1:5432/your_disposable_db
+export JWT_SECRET=$(openssl rand -hex 32)
+npm start
 ```
 
----
+Use a disposable local database for development. The server refuses to start without a database in production mode.
 
-## 📄 License
+**Relay:** see `relay/README.md`.
 
-This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.  
-Copyright © 2026 Perazim Mission Church & Contributors.
+## Tests
+
+- **Android unit tests:** `./gradlew testDebugUnitTest`
+- **Backend:** `cd server && npm run test:unit`, and `npm run test:privacy` against a disposable PostgreSQL database
+- **Isolated database suites:** `server/scripts/test-phase-b-isolated.sh` creates and removes its own temporary PostgreSQL cluster
+
+## Repository layout
+
+```
+src/              Android app (Java)
+server/           Express API, migrations, tests, deployment files
+relay/            Cloudflare Worker for the AI relay
+docs/             Architecture notes, legal drafts, security audit, product plans
+scripts/          Asset and content build tools
+```
+
+## Status
+
+- The app and backend run together on a single PC for a closed pilot with a small group of testers.
+- Public deployment, app-store release and hosted infrastructure are not done.
+- The security audit is partial. Its findings and their status are in [`docs/security/audit-2026-11.md`](docs/security/audit-2026-11.md).
+- The privacy policy is a draft awaiting review. See [`docs/legal/`](docs/legal/).
+
+## About the client
+
+Perazim Mission Church, Embu, Kenya. The app is built for the church's members, and church contact details come from one configuration file (`src/main/java/org/perazimchurch/app/config/ChurchConfig.java`).
+
+## Licence
+
+Code is licensed under the MIT Licence (see [`LICENSE`](LICENSE)). Bible texts, hymns and media assets are not covered by that licence. Their status is recorded in [`docs/bible-source.md`](docs/bible-source.md).

@@ -2,7 +2,7 @@
 
 ## Outcome
 
-The primary checkout is `/home/murugu/Android/app`, branch `phase-B-community`, at HEAD `cad3758e5469534c01142bbdeadc62371fa4e7f6` before this work. PostgreSQL Community verification is **BLOCKED — DEPENDENCY REQUIRED**: the operating system denied both TCP and Unix-domain socket creation (`Operation not permitted`). The disposable cluster initialized but never started; no application test database was created and no migration was applied.
+The primary checkout is `<repo>`, branch `phase-B-community`, at HEAD `cad3758e5469534c01142bbdeadc62371fa4e7f6` before this work. PostgreSQL Community verification is **BLOCKED — DEPENDENCY REQUIRED**: the operating system denied both TCP and Unix-domain socket creation (`Operation not permitted`). The disposable cluster initialized but never started; no application test database was created and no migration was applied.
 
 The production score remains **35.20%**. Source integration and focused route tests do not establish PostgreSQL persistence, cross-account operation, Android acceptance, or production acceptance.
 

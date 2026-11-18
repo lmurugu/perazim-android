@@ -2,7 +2,7 @@
 
 | Document | Version | Status | Approved by |
 |---|---|---|---|
-| [Privacy Policy](privacy-policy.md) | 0.1 | Draft | Pending owner |
+| [Privacy Policy](privacy-policy.md) | 0.2 | Draft | Pending owner |
 | [Terms of Service](terms-of-service.md) | 0.1 | Draft | Pending owner |
 | [Community Guidelines](community-guidelines.md) | 0.1 | Draft | Pending owner |
 | [Giving Policy](giving-policy.md) | 0.1 | Draft | Pending owner |
