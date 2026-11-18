@@ -9,8 +9,8 @@ const jwt = serverRequire('jsonwebtoken');
 
 const sourcePath = new URL('../worker.js', import.meta.url);
 const source = fs.readFileSync(sourcePath, 'utf8')
-  .replace('export class QuotaCounter', 'class QuotaCounter')
-  .replace('export default {', 'module.exports.default = {') + '\nmodule.exports.QuotaCounter = QuotaCounter;';
+  .replace(/^export class /gm, 'class ')
+  .replace('export default {', 'module.exports.default = {') + '\nmodule.exports.QuotaCounter = QuotaCounter;\nmodule.exports.QuotaCounterV2 = QuotaCounterV2;';
 const moduleObject = { exports: {} };
 const signingSecret = crypto.randomBytes(32).toString('base64url');
 const otherSecret = crypto.randomBytes(32).toString('base64url');
@@ -90,7 +90,7 @@ function makeQuotaNamespace({ startCount = 0, failOnGet = false } = {}) {
       if (!objects.has(id)) {
         const data = new Map([['count', startCount]]);
         const storage = { async get(key) { return data.get(key); }, async put(key, value) { data.set(key, value); } };
-        objects.set(id, new moduleObject.exports.QuotaCounter({ storage }));
+        objects.set(id, new moduleObject.exports.QuotaCounterV2({ storage }));
       }
       const object = objects.get(id);
       return { fetch: (url, init) => object.fetch(new Request(url, init)) };
