@@ -224,6 +224,12 @@ public class SermonsUiBinder {
             ivEmpty.setImageBitmap(emptyHillBmp);
             ivEmpty.setScaleType(ImageView.ScaleType.FIT_CENTER);
             ivEmpty.setAlpha(0.85f);
+            // Rounded tile so the illustration's dark square sits softly on the glow.
+            android.graphics.drawable.GradientDrawable emptyShape = new android.graphics.drawable.GradientDrawable();
+            emptyShape.setCornerRadius(dp(24));
+            emptyShape.setColor(android.graphics.Color.TRANSPARENT);
+            ivEmpty.setBackground(emptyShape);
+            ivEmpty.setClipToOutline(true);
             LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(dp(110), dp(110));
             lpImg.setMargins(0, 0, 0, dp(12));
             ivEmpty.setLayoutParams(lpImg);
