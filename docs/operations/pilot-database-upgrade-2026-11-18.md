@@ -29,3 +29,10 @@ Recovery:
 3. The original code (commit `040b723`, which still boots from the schema file, a git worktree at `/home/murugu/Android/worktrees/restore-pilot`) was started with `server/.runtime/pilot/api.env`. It is healthy and serving port 3000. Logs: `server/.runtime/pilot-restore.log`.
 
 The original database still has no migration history. Moving it to the new migrations needs a decision on how to reconcile its extra schema changes.
+
+## Cutover to the current code (decision, 2026-11-18)
+The original database was adopted into the migration history rather than rebuilt, because it already held the 0001 to 0012 tables and their columns (checked against a freshly migrated database: the only differences in shared tables were the three user columns added by 0019 and 0020).
+1. Backup taken: `server/.runtime/backups/pilot_before_cutover_*.dump` (339 objects). A rehearsal on a restored copy passed before this was done on the real database.
+2. Migrations 0001 to 0012 recorded in the history table with their file checksums.
+3. `scripts/db-migrate.js migrate` applied 0013 to 0021 (ledger: 21, accounts: 12, admins: 4 active).
+4. The current code runs on port 3000 with `server/.runtime/pilot/api.env`. Health check passes.
