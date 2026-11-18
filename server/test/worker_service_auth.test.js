@@ -7,7 +7,9 @@ const crypto = require('node:crypto');
 const jwt = require('jsonwebtoken');
 
 const sourcePath = require('node:path').resolve(__dirname, '../../relay/worker.js');
-const source = fs.readFileSync(sourcePath, 'utf8').replace('export default {', 'module.exports.default = {');
+const source = fs.readFileSync(sourcePath, 'utf8')
+  .replace('export default {', 'module.exports.default = {')
+  .replace(/^export class /gm, 'class ');
 const moduleObject = { exports: {} };
 let upstreamCalls = 0;
 let upstreamBody = null;
@@ -65,8 +67,8 @@ async function run() {
   assert.equal(await status(noKv), 503, 'quota dependency absence fails closed before Gemini');
   assert.equal(upstreamCalls, 0);
 
-  const kv = { async get() { return null; }, async put() {} };
-  const response = await worker.fetch(request(token, { question: 'What is a psalm?', requestId: jwt.decode(token).jti }), { ...envBase, PERAZIM_KV: kv });
+  const quotaCounter = { idFromName(name) { return name; }, get(id) { return { async fetch(_url, options) { const { limit } = JSON.parse(options.body); const count = quotaCounter.counts.get(id) || 0; if (count >= limit) return new Response(JSON.stringify({ allowed: false, count })); quotaCounter.counts.set(id, count + 1); return new Response(JSON.stringify({ allowed: true, count: count + 1 })); } }; }, counts: new Map() };
+  const response = await worker.fetch(request(token, { question: 'What is a psalm?', requestId: jwt.decode(token).jti }), { ...envBase, QUOTA_COUNTER: quotaCounter });
   assert.equal(await status(response), 200);
   const result = await response.json();
   assert.equal(result.answer, 'Synthetic grounded answer');
@@ -74,7 +76,7 @@ async function run() {
   assert.equal(JSON.stringify(upstreamBody).includes('deviceId'), false);
   assert.equal(JSON.stringify(upstreamBody).includes('Member Name'), false);
   assert.equal(JSON.stringify(upstreamBody).includes('streak'), false);
-  process.stdout.write('PASS: Worker rejects the old client token and identity substitution, fails closed without KV, and forwards only a minimally scoped question under a signed synthetic service grant.\n');
+  process.stdout.write('PASS: Worker rejects the old client token and identity substitution, fails closed without a quota object, and forwards only a minimally scoped question under a signed synthetic service grant.\n');
 }
 
 run().catch(error => { console.error(error); process.exitCode = 1; });
