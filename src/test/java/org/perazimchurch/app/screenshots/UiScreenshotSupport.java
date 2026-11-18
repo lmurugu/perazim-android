@@ -52,7 +52,7 @@ final class UiScreenshotSupport {
         instance.setAccessible(true);
         instance.set(null, db);
 
-        PerazimTheme.saveMode(ctx, light);
+        PerazimTheme.saveChoice(ctx, light ? PerazimTheme.CHOICE_LIGHT : PerazimTheme.CHOICE_DARK);
         PerazimTheme.applyMode(light);
 
         ActivityController<MainActivity> controller = Robolectric.buildActivity(MainActivity.class).setup();
