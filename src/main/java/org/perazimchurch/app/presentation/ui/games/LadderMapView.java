@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 
 import org.perazimchurch.app.R;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 /**
  * The Ladder of Faith drawn as a winding path from rung 1 at the bottom to the crown at the top.
@@ -99,6 +100,11 @@ final class LadderMapView extends View {
 
     @Override protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        // Read theme colours on every draw so the map follows the light/dark switch.
+        int ink = PerazimTheme.COLOR_TEXT_PRIMARY;
+        pathPaint.setColor(withAlpha(ink, 0x77));
+        pillPaint.setColor(withAlpha(ink, 0x26));
+        pillText.setColor(ink);
         // Path from the bottom rung up to the crown.
         Path path = new Path();
         path.moveTo(nodeX(1), nodeY(1));
@@ -139,7 +145,7 @@ final class LadderMapView extends View {
         int top, bottom;
         if (passed) { top = 0xFF86EB94; bottom = 0xFF169A45; }
         else if (here) { top = 0xFFFFC46B; bottom = 0xFFE0600A; }
-        else { top = 0x99FFFFFF; bottom = 0x55FFFFFF; }
+        else { top = withAlpha(PerazimTheme.COLOR_TEXT_PRIMARY, 0x55); bottom = withAlpha(PerazimTheme.COLOR_TEXT_PRIMARY, 0x30); }
         if (here) {
             ringPaint.setColor(0x55FFB25A);
             ringPaint.setStrokeWidth(dp(10));
@@ -148,7 +154,7 @@ final class LadderMapView extends View {
         nodePaint.setShader(new LinearGradient(x, y - radius, x, y + radius, top, bottom, Shader.TileMode.CLAMP));
         canvas.drawCircle(x, y, radius, nodePaint);
         nodePaint.setShader(null);
-        ringPaint.setColor(0xCCFFFFFF);
+        ringPaint.setColor(withAlpha(PerazimTheme.COLOR_TEXT_PRIMARY, 0x99));
         ringPaint.setStrokeWidth(dp(2.5f));
         canvas.drawCircle(x, y, radius, ringPaint);
 
@@ -184,6 +190,8 @@ final class LadderMapView extends View {
     }
 
     @Override public boolean performClick() { return super.performClick(); }
+
+    private static int withAlpha(int color, int alpha) { return (color & 0x00FFFFFF) | (alpha << 24); }
 
     private float dp(float v) { return v * density; }
 }
