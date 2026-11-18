@@ -2,6 +2,8 @@ package org.perazimchurch.app.games;
 
 import org.junit.Test;
 import org.perazimchurch.app.domain.games.MemoryMatch;
+import org.perazimchurch.app.domain.games.MiniCrossword;
+import org.perazimchurch.app.domain.games.RoadToJerusalem;
 import org.perazimchurch.app.domain.games.TimelineSort;
 import org.perazimchurch.app.domain.games.WordSearch;
 
@@ -80,5 +82,33 @@ public class GamingGamesTest {
             assertTrue(t.tap(idx));
         }
         assertTrue(t.complete());
+    }
+
+    @Test public void crosswordAnswersCrossCorrectly() {
+        MiniCrossword cw = new MiniCrossword();
+        String[][] solution = new String[MiniCrossword.SIZE][MiniCrossword.SIZE];
+        for (int r = 0; r < MiniCrossword.SIZE; r++)
+            for (int c = 0; c < MiniCrossword.SIZE; c++)
+                solution[r][c] = cw.isLetter(r, c) ? String.valueOf(cw.answer(r, c)) : "";
+        assertTrue(cw.solved(solution));
+        assertEquals("MOSES", "" + cw.answer(0,0) + cw.answer(0,1) + cw.answer(0,2) + cw.answer(0,3) + cw.answer(0,4));
+        assertEquals("MANNA", "" + cw.answer(0,0) + cw.answer(1,0) + cw.answer(2,0) + cw.answer(3,0) + cw.answer(4,0));
+        assertEquals("SAUL", "" + cw.answer(0,4) + cw.answer(1,4) + cw.answer(2,4) + cw.answer(3,4));
+        assertEquals("ABEL", "" + cw.answer(4,0) + cw.answer(4,1) + cw.answer(4,2) + cw.answer(4,3));
+        assertFalse(cw.matches(1, 1, "A"));
+        assertTrue(cw.matches(0, 0, "m"));
+    }
+
+    @Test public void roadMovesEachTurnAndEndsAtJerusalem() {
+        RoadToJerusalem road = new RoadToJerusalem(3);
+        int turns = 0;
+        while (!road.finished() && turns < 500) {
+            RoadToJerusalem.Move m = road.turn(turns % 2 == 0);
+            assertTrue(m.roll >= 1 && m.roll <= 6);
+            assertTrue(m.to >= 0 && m.to <= RoadToJerusalem.FINISH);
+            turns++;
+        }
+        assertTrue(road.finished());
+        assertNotNull(road.winner());
     }
 }

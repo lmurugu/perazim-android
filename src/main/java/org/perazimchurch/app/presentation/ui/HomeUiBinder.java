@@ -521,7 +521,7 @@ public class HomeUiBinder {
                 "backgrounds/church/community_congregation.jpg",
                 PerazimTheme.COLOR_ORANGE_MUTED, PerazimTheme.COLOR_BG_DEEP,
                 v -> { if (listener != null) listener.onNavigateToTab(3); }));
-        container.addView(createPhotoTile("Bible games", "Seven free offline games, no ads",
+        container.addView(createPhotoTile("Bible games", "Nine free offline games, no ads",
                 PerazimTheme.COLOR_PURPLE_MUTED, PerazimTheme.COLOR_TEXT_PRIMARY,
                 v -> {
                     if (context instanceof android.app.Activity) {

@@ -29,6 +29,8 @@ import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.MemoryMatch;
+import org.perazimchurch.app.domain.games.MiniCrossword;
+import org.perazimchurch.app.domain.games.RoadToJerusalem;
 import org.perazimchurch.app.domain.games.TimelineSort;
 import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
@@ -121,7 +123,7 @@ public final class GamesHubDialog extends Dialog {
     private void hub() {
         if (!activeOwner()) return;
         round = null;
-        screen("Bible Games", "Learn, remember and enjoy. All seven games work without internet.", false);
+        screen("Bible Games", "Learn, remember and enjoy. All nine games work without internet.", false);
         statsBar();
         gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
@@ -136,6 +138,12 @@ public final class GamesHubDialog extends Dialog {
         customCard(org.perazimchurch.app.R.drawable.ic_game_timeline, "Story Timeline",
                 "Tap the Bible events in the order they happen in the story.",
                 solvedLine("TIMELINE"), this::timeline);
+        customCard(org.perazimchurch.app.R.drawable.ic_game_crossword, "Mini Crossword",
+                "A five-by-five Bible crossword. Four clues cross: Moses, Abel, manna and Saul.",
+                solvedLine("CROSSWORD"), this::miniCrossword);
+        customCard(org.perazimchurch.app.R.drawable.ic_game_road, "Road to Jerusalem",
+                "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
+                solvedLine("ROAD"), this::roadToJerusalem);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
     }
 
@@ -448,6 +456,144 @@ public final class GamesHubDialog extends Dialog {
             });
         }
         button("New timeline", false).setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); timeline(); });
+    }
+
+    private void miniCrossword() {
+        MiniCrossword cw = new MiniCrossword();
+        screen("Mini Crossword", "Fill in the grid from the clues below. Tap Check to see which letters are right.", true);
+        EditText[][] cells = new EditText[MiniCrossword.SIZE][MiniCrossword.SIZE];
+        LinearLayout grid = new LinearLayout(activity);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        grid.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        grid.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int r = 0; r < MiniCrossword.SIZE; r++) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (int c = 0; c < MiniCrossword.SIZE; c++) {
+                if (!cw.isLetter(r, c)) {
+                    View black = new View(activity);
+                    black.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+                    row.addView(black, new LinearLayout.LayoutParams(0, dp(52), 1f));
+                    continue;
+                }
+                EditText cell = new EditText(activity);
+                cell.setGravity(Gravity.CENTER);
+                cell.setSingleLine(true);
+                cell.setTextSize(20);
+                cell.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                cell.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                cell.setPadding(0, 0, 0, 0);
+                cell.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                cell.setFilters(new android.text.InputFilter[]{
+                        new android.text.InputFilter.AllCaps(), new android.text.InputFilter.LengthFilter(1)});
+                cell.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+                cells[r][c] = cell;
+                row.addView(cell, new LinearLayout.LayoutParams(0, dp(52), 1f));
+            }
+            grid.addView(row);
+        }
+        page.addView(grid, wrapParams(12));
+        for (MiniCrossword.Clue clue : cw.clues()) {
+            text(clue.number + " " + clue.direction + ": " + clue.text, 15, false);
+        }
+        TextView status = text("", 16, true);
+        button("Check my answers", true).setOnClickListener(v -> {
+            feedback().click(v);
+            String[][] typed = new String[MiniCrossword.SIZE][MiniCrossword.SIZE];
+            int right = 0, total = 0;
+            for (int r = 0; r < MiniCrossword.SIZE; r++) {
+                for (int c = 0; c < MiniCrossword.SIZE; c++) {
+                    if (cells[r][c] == null) { typed[r][c] = ""; continue; }
+                    typed[r][c] = cells[r][c].getText().toString();
+                    total++;
+                    boolean ok = cw.matches(r, c, typed[r][c]);
+                    if (ok) right++;
+                    cells[r][c].setBackgroundColor(typed[r][c].isEmpty() ? PerazimTheme.COLOR_SURFACE
+                            : ok ? 0x6610B981 : 0x66EF4444);
+                }
+            }
+            if (cw.solved(typed)) {
+                addStar();
+                solvedOnce("CROSSWORD");
+                feedback().reward(activity);
+                feedback().celebrateIn(getWindow());
+                status.setText("Solved. Every answer is right.");
+            } else {
+                status.setText(right + " of " + total + " letters are right so far.");
+            }
+        });
+    }
+
+    private void roadToJerusalem() {
+        RoadToJerusalem game = new RoadToJerusalem(seed);
+        screen("Road to Jerusalem", "Roll the die to move. The phone travels too. First to square 20 wins.", true);
+        TextView status = text("Roll to begin your journey.", 16, true);
+        TextView[] squares = new TextView[RoadToJerusalem.FINISH + 1];
+        LinearLayout board = new LinearLayout(activity);
+        board.setOrientation(LinearLayout.VERTICAL);
+        board.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        board.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int first = 0; first <= RoadToJerusalem.FINISH; first += 5) {
+            LinearLayout line = new LinearLayout(activity);
+            line.setOrientation(LinearLayout.HORIZONTAL);
+            for (int sq = first; sq < first + 5 && sq <= RoadToJerusalem.FINISH; sq++) {
+                TextView t = new TextView(activity);
+                t.setGravity(Gravity.CENTER);
+                t.setTextSize(12);
+                t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                t.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                squares[sq] = t;
+                line.addView(t, new LinearLayout.LayoutParams(0, dp(58), 1f));
+            }
+            board.addView(line);
+        }
+        page.addView(board, wrapParams(12));
+        refreshRoad(game, squares);
+        Button roll = button("Roll the die", true);
+        Button again = button("New road", false);
+        again.setVisibility(View.GONE);
+        roll.setOnClickListener(v -> {
+            if (game.finished()) return;
+            feedback().click(v);
+            roll.setEnabled(false);
+            RoadToJerusalem.Move mine = game.turn(true);
+            String line = "You rolled " + mine.roll + "." + (mine.note == null ? "" : " " + mine.note);
+            status.setText(line);
+            refreshRoad(game, squares);
+            if (game.finished()) { finishRoad(game, status, roll, again); return; }
+            handler.postDelayed(() -> {
+                RoadToJerusalem.Move theirs = game.turn(false);
+                status.setText(line + "\nThe phone rolled " + theirs.roll + "." + (theirs.note == null ? "" : " " + theirs.note));
+                refreshRoad(game, squares);
+                if (game.finished()) finishRoad(game, status, roll, again);
+                else roll.setEnabled(true);
+            }, 900);
+        });
+        again.setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); roadToJerusalem(); });
+    }
+
+    private void finishRoad(RoadToJerusalem game, TextView status, Button roll, Button again) {
+        roll.setEnabled(false);
+        again.setVisibility(View.VISIBLE);
+        if ("You".equals(game.winner())) {
+            addStar();
+            solvedOnce("ROAD");
+            feedback().celebrateIn(getWindow());
+            status.setText(status.getText() + "\nYou reached Jerusalem first.");
+        } else {
+            status.setText(status.getText() + "\nThe phone reached Jerusalem first. Try a new road.");
+        }
+    }
+
+    private void refreshRoad(RoadToJerusalem game, TextView[] squares) {
+        for (int i = 0; i < squares.length; i++) {
+            StringBuilder label = new StringBuilder();
+            label.append(i == 0 ? "Start" : i == RoadToJerusalem.FINISH ? "Jerusalem" : String.valueOf(i));
+            if (game.playerAt() == i) label.append("\nYou");
+            if (game.computerAt() == i) label.append("\nPhone");
+            squares[i].setText(label.toString());
+            squares[i].setBackground(shape(game.hasNote(i) ? PerazimTheme.COLOR_ORANGE_GHOST : PerazimTheme.COLOR_SURFACE));
+        }
     }
 
     private LinearLayout.LayoutParams wrapParams(int bottomDp) {
