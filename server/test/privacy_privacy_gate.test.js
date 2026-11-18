@@ -105,7 +105,7 @@ async function run() {
     publishTestNotice('PUBLISHED');
     const current = await invoke(privacyRoutes, 'get', '/notice/current');
 
-    const registration = { phone: '0712345678', pin: '1234', name: 'Synthetic Test Member', campus_id: 'campus_embu' };
+    const registration = { phone: '0712345678', pin: '123400', name: 'Synthetic Test Member', campus_id: 'campus_embu' };
     const denied = await invoke(authRoutes, 'post', '/register', registration);
     assert.strictEqual(denied.status, 428, 'registration without acknowledgement is rejected');
     assert.strictEqual(memoryStore.users.length, 0, 'rejected registration creates no account');
@@ -118,7 +118,7 @@ async function run() {
     let malformedRegistration;
     try {
       malformedRegistration = await invoke(authRoutes, 'post', '/register', {
-        phone: logPhoneMarker, pin: '8765', name: { marker: logNameMarker },
+        phone: logPhoneMarker, pin: '876500', name: { marker: logNameMarker },
         privacy_notice_version: current.json.version,
         privacy_notice_hash: current.json.sha256,
         privacy_notice_acknowledged: true

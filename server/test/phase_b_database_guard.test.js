@@ -100,7 +100,14 @@ async function verifyStartupPreflight() {
   const priorConsole = [console.log, console.warn, console.error];
   console.log = console.warn = console.error = () => {};
   try {
-    await db.initDb();
+    // The stub pool only records connection options. Boot now runs the migration
+    // runner, which needs pool.connect(), so the stub may fail after the pool is
+    // created. The assertion below is about the captured destination, not boot.
+    try {
+      await db.initDb();
+    } catch (error) {
+      if (!/Database connection failed/.test(error.message)) throw error;
+    }
     assert.deepEqual(capturedPoolOptions, {
       host: '127.0.0.1', port: 55431, database: 'perazim_phaseb_abcdef123456_test',
       user: 'postgres', password: undefined, ssl: false

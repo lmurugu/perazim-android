@@ -103,7 +103,7 @@ async function runAcceptanceChecks() {
   // Register Client A
   const regA = await makeRequest('POST', '/api/auth/register', {
     phone: phoneA,
-    pin: '1234',
+    pin: '123400',
     name: 'Brother Peter (Embu)',
     campus_id: 'campus_embu'
   });
@@ -117,7 +117,7 @@ async function runAcceptanceChecks() {
   // Register Client B
   const regB = await makeRequest('POST', '/api/auth/register', {
     phone: phoneB,
-    pin: '5678',
+    pin: '567800',
     name: 'Sister Grace (Nairobi)',
     campus_id: 'campus_nairobi'
   });
@@ -133,12 +133,12 @@ async function runAcceptanceChecks() {
   assert(userA.id !== userB.id, `User IDs are distinct (Client A: ${userA.id}, Client B: ${userB.id})`);
 
   // Verify login for Client A
-  const loginA = await makeRequest('POST', '/api/auth/login', { phone: phoneA, pin: '1234' });
+  const loginA = await makeRequest('POST', '/api/auth/login', { phone: phoneA, pin: '123400' });
   assert(loginA.status === 200, 'Client A logs in successfully with PIN 1234 (HTTP 200)');
   assert(loginA.body.user.id === userA.id, 'Client A login returns matching user ID');
 
   // Verify login for Client B
-  const loginB = await makeRequest('POST', '/api/auth/login', { phone: phoneB, pin: '5678' });
+  const loginB = await makeRequest('POST', '/api/auth/login', { phone: phoneB, pin: '567800' });
   assert(loginB.status === 200, 'Client B logs in successfully with PIN 5678 (HTTP 200)');
   assert(loginB.body.user.id === userB.id, 'Client B login returns matching user ID');
 
@@ -252,7 +252,7 @@ async function runAcceptanceChecks() {
   const brutePhone = `0788${String(ts).slice(-6)}`;
   await makeRequest('POST', '/api/auth/register', {
     phone: brutePhone,
-    pin: '7777',
+    pin: '777700',
     name: 'Brute Target Member',
     campus_id: 'campus_embu'
   });
@@ -260,14 +260,14 @@ async function runAcceptanceChecks() {
   for (let i = 1; i <= 5; i++) {
     const failRes = await makeRequest('POST', '/api/auth/login', {
       phone: brutePhone,
-      pin: '0000'
+      pin: '000000'
     });
     assert(failRes.status === 401, `Failed PIN attempt ${i}/5 correctly returns HTTP 401 Unauthorized`);
   }
 
   const lockedRes = await makeRequest('POST', '/api/auth/login', {
     phone: brutePhone,
-    pin: '0000'
+    pin: '000000'
   });
   assert(lockedRes.status === 429, '6th failed PIN attempt triggers HTTP 429 Too Many Requests lockout');
   assert(lockedRes.body.error !== undefined && lockedRes.body.error.includes('Too many failed login attempts'), 'Lockout error message returned');

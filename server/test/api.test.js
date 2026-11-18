@@ -135,7 +135,7 @@ async function runTests() {
     // 3. User 1 Registration (Phone + PIN)
     const regUser1 = await makeRequest('POST', '/api/auth/register', {
       phone: '0711000001',
-      pin: '1234',
+      pin: '123400',
       name: 'Brother John (Embu)',
       campus_id: 'campus_embu'
     });
@@ -147,7 +147,7 @@ async function runTests() {
     // 4. User 1 Login
     const loginUser1 = await makeRequest('POST', '/api/auth/login', {
       phone: '0711000001',
-      pin: '1234'
+      pin: '123400'
     });
     assert(loginUser1.status === 200, 'User 1 logged in successfully with PIN (200)');
     assert(loginUser1.body.user.name === 'Brother John (Embu)', 'User profile verified');
@@ -155,7 +155,7 @@ async function runTests() {
     // 5. User 2 Registration
     const regUser2 = await makeRequest('POST', '/api/auth/register', {
       phone: '0711000002',
-      pin: '5678',
+      pin: '567800',
       name: 'Sister Mary (Nairobi)',
       campus_id: 'campus_nairobi'
     });
@@ -333,7 +333,7 @@ async function runTests() {
     // Register account to test wrong PIN attempts
     await makeRequest('POST', '/api/auth/register', {
       phone: bruteForcePhone,
-      pin: '1234',
+      pin: '123400',
       name: 'Rate Limit Target',
       campus_id: 'campus_embu'
     });
@@ -341,14 +341,14 @@ async function runTests() {
     for (let i = 1; i <= 5; i++) {
       const failRes = await makeRequest('POST', '/api/auth/login', {
         phone: bruteForcePhone,
-        pin: '9999'
+        pin: '999900'
       });
       assert(failRes.status === 401, `Failed attempt ${i} returns 401 Incorrect PIN`);
     }
 
     const lockedRes = await makeRequest('POST', '/api/auth/login', {
       phone: bruteForcePhone,
-      pin: '9999'
+      pin: '999900'
     });
     assert(lockedRes.status === 429, '6th failed attempt triggers HTTP 429 Too Many Requests rate limit');
     assert(lockedRes.body.error.includes('Too many failed login attempts'), 'Rate limit error message returned');
@@ -584,27 +584,27 @@ async function runTests() {
     // Phone validation
     const invalidPhoneRes1 = await makeRequest('POST', '/api/auth/register', {
       phone: '0201234567',
-      pin: '1234',
+      pin: '123400',
       name: 'Invalid Phone User'
     });
     assert(invalidPhoneRes1.status === 400, 'REQ-02: Invalid phone prefix (020) rejected with HTTP 400');
 
     const invalidPhoneRes2 = await makeRequest('POST', '/api/auth/register', {
       phone: '12345',
-      pin: '1234',
+      pin: '123400',
       name: 'Short Phone User'
     });
     assert(invalidPhoneRes2.status === 400, 'REQ-02: Short phone number (12345) rejected with HTTP 400');
 
     const invalidPhoneLogin = await makeRequest('POST', '/api/auth/login', {
       phone: '+1234567890',
-      pin: '1234'
+      pin: '123400'
     });
     assert(invalidPhoneLogin.status === 400, 'REQ-02: Non-Kenyan phone login rejected with HTTP 400');
 
     const valid01Reg = await makeRequest('POST', '/api/auth/register', {
       phone: '0111000003',
-      pin: '1234',
+      pin: '123400',
       name: 'Kenyan 01 Prefix User',
       campus_id: 'campus_meru'
     });
@@ -622,7 +622,7 @@ async function runTests() {
     // 19. REQ-03: Stored-Zero Metric Preservation & Defaults
     const zeroGraceUser = await makeRequest('POST', '/api/auth/register', {
       phone: '0711000004',
-      pin: '4321',
+      pin: '432100',
       name: 'Zero Grace Point Brother',
       campus_id: 'campus_embu',
       grace_points: 999
@@ -632,7 +632,7 @@ async function runTests() {
 
     const zeroLogin = await makeRequest('POST', '/api/auth/login', {
       phone: '0711000004',
-      pin: '4321'
+      pin: '432100'
     });
     assert(zeroLogin.status === 200, 'REQ-03: Zero grace user logged in (200)');
     assert(zeroLogin.body.user.grace_points === 0, 'REQ-03: Stored 0 grace points preserved on login (NOT reset to 2)');

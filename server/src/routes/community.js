@@ -748,8 +748,12 @@ router.post('/groups/:id/members', requireAuth, async (req, res) => {
 // 3. PRIVATE 1-TO-1 MESSAGING
 // ============================================================================
 
+// Existing conversations keep their readable id. A pair whose joined id would not
+// fit the 64-character column gets a stable hashed id instead (both sides derive the same value).
 function getConversationId(u1, u2) {
-  return [u1, u2].sort().join('_');
+  const joined = [u1, u2].sort().join('_');
+  if (joined.length <= 64) return joined;
+  return 'c_' + require('crypto').createHash('sha256').update(joined).digest('hex').slice(0, 62);
 }
 
 // GET /api/community/conversations

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const { initDb } = require('./db');
 const { proxyTrustSetting } = require('./config/proxy');
 
@@ -18,9 +19,20 @@ const app = express();
 app.set('trust proxy', proxyTrustSetting(process.env.TRUST_PROXY_HOPS));
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Security headers and CORS (plan 3.5 / audit S-02, S-03).
+// The mobile client does not need CORS. Browser origins are allowed only when listed in ALLOWED_ORIGINS.
+app.disable('x-powered-by');
+app.use(helmet({
+  contentSecurityPolicy: { directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] } },
+  crossOriginResourcePolicy: { policy: 'same-origin' },
+  referrerPolicy: { policy: 'no-referrer' }
+}));
+const allowedOrigins = String(process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean);
+app.use(cors({ origin: allowedOrigins.length ? allowedOrigins : false }));
 app.use('/api/ai', aiRoutes);
-app.use(express.json({ limit: '15mb' }));
+// Default JSON body limit is 100 KB. Only the media upload route accepts larger bodies (see below).
+app.use((req, res, next) => (req.path === '/api/community/media/upload' ? express.json({ limit: '15mb' })(req, res, next) : next()));
+app.use(express.json({ limit: '100kb' }));
 
 // Attachment authorization is evaluated against its current post/chat scope.
 app.get('/uploads/:filename', communityRoutes.serveMedia);

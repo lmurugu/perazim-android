@@ -24,7 +24,7 @@ async function main() {
   let phone = 1;
   async function member(name) {
     const number = `010${String(Date.now()).slice(-5)}${String(phone++).padStart(2,'0')}`;
-    const r = await call('/api/auth/register', null, 'POST', { phone: number, pin: '7462', name, campusId: 'campus_embu' });
+    const r = await call('/api/auth/register', null, 'POST', { phone: number, pin: '746200', name, campusId: 'campus_embu' });
     assert.equal(r.status, 201, JSON.stringify(r.body));
     return r.body;
   }

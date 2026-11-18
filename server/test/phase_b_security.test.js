@@ -135,7 +135,7 @@ async function main() {
     // Inactive users cannot log in or keep using an existing bearer token.
     const inactiveToken = token(users.inactive);
     await query('UPDATE users SET is_active=FALSE WHERE id=$1', [users.inactive.id]);
-    response = await request(port, 'POST', '/api/auth/login', null, { phone: users.inactive.phone, pin: '7351' });
+    response = await request(port, 'POST', '/api/auth/login', null, { phone: users.inactive.phone, pin: '735100' });
     assert.strictEqual(response.status, 401, 'inactive account cannot log in');
     response = await request(port, 'GET', '/api/community/groups', inactiveToken);
     assert.strictEqual(response.status, 401, 'inactive account cannot use an existing token');

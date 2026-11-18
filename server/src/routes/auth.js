@@ -90,8 +90,8 @@ router.post('/register', async (req, res) => {
       return res.status(428).json({ error: 'Please review and acknowledge the current Perazim App Privacy Notice before registering.' });
     }
 
-    if (typeof pin !== 'string' || pin.length < 4) {
-      return res.status(400).json({ error: 'PIN must be at least 4 digits' });
+    if (typeof pin !== 'string' || !/^\d{6,12}$/.test(pin)) {
+      return res.status(400).json({ error: 'PIN must be 6 to 12 digits' });
     }
 
     // Check existing
@@ -100,8 +100,8 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ error: 'An account with this phone number already exists. Please log in.' });
     }
 
-    const pinHash = await bcrypt.hash(pin, 10);
-    const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    const pinHash = await bcrypt.hash(pin, 12);
+    const userId = 'user_' + crypto.randomUUID();
     const now = Date.now();
     const campus = campus_id || 'campus_embu';
     // Starting allowance is server-owned; clients cannot grant themselves points.

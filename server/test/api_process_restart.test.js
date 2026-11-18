@@ -257,7 +257,7 @@ async function runProcessRestartTest() {
 
     // Register test user
     const testPhone = TEST_PHONE;
-    const testPin = '1234';
+    const testPin = '001234';
     const regRes = await makeRequest('POST', '/api/auth/register', {
       phone: testPhone,
       pin: testPin,

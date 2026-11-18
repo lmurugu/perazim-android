@@ -343,8 +343,8 @@ public final class AuthDialog {
                 Toast.makeText(context, "Please enter your phone number", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (pin.length() < 4) {
-                Toast.makeText(context, "PIN must be at least 4 digits", Toast.LENGTH_SHORT).show();
+            if (pin.length() < 6) {
+                Toast.makeText(context, "PIN must be at least 6 digits", Toast.LENGTH_SHORT).show();
                 return;
             }
 

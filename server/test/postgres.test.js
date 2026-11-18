@@ -222,7 +222,7 @@ async function runPostgresTests() {
     // 4. Register Brother John in real PostgreSQL
     const regUser1 = await makeRequest('POST', '/api/auth/register', {
       phone: '0711000001',
-      pin: '1234',
+      pin: '123400',
       name: 'Brother John (Embu)',
       campus_id: 'campus_embu',
       grace_points: 999,
@@ -236,7 +236,7 @@ async function runPostgresTests() {
     // 5. Test UNIQUE phone constraint in real PostgreSQL
     const duplicateReg = await makeRequest('POST', '/api/auth/register', {
       phone: '0711000001',
-      pin: '9999',
+      pin: '999900',
       name: 'Duplicate Brother John',
       campus_id: 'campus_embu',
       ...registrationNotice
@@ -246,7 +246,7 @@ async function runPostgresTests() {
     // 6. User 1 Login against bcrypt hash in PostgreSQL
     const loginUser1 = await makeRequest('POST', '/api/auth/login', {
       phone: '0711000001',
-      pin: '1234'
+      pin: '123400'
     });
     assert(loginUser1.status === 200, 'User 1 authenticated against PostgreSQL hash (200)');
     assert(loginUser1.body.user.name === 'Brother John (Embu)', 'User profile matches PostgreSQL record');
@@ -254,7 +254,7 @@ async function runPostgresTests() {
     // 7. Register Sister Mary
     const regUser2 = await makeRequest('POST', '/api/auth/register', {
       phone: '0711000002',
-      pin: '5678',
+      pin: '567800',
       name: 'Sister Mary (Nairobi)',
       campus_id: 'campus_nairobi',
       ...registrationNotice
@@ -544,7 +544,7 @@ async function runPostgresTests() {
     const bruteForcePhone = '0777000000';
     await makeRequest('POST', '/api/auth/register', {
       phone: bruteForcePhone,
-      pin: '4321',
+      pin: '432100',
       name: 'PG Rate Limit Target',
       campus_id: 'campus_nairobi',
       ...registrationNotice
@@ -553,14 +553,14 @@ async function runPostgresTests() {
     for (let i = 1; i <= 5; i++) {
       const fail = await makeRequest('POST', '/api/auth/login', {
         phone: bruteForcePhone,
-        pin: '0000'
+        pin: '000000'
       });
       assert(fail.status === 401, `Failed attempt ${i} returns 401`);
     }
 
     const lockout = await makeRequest('POST', '/api/auth/login', {
       phone: bruteForcePhone,
-      pin: '0000'
+      pin: '000000'
     });
     assert(lockout.status === 429, '6th failed attempt triggers HTTP 429 lockout');
 
@@ -574,7 +574,7 @@ async function runPostgresTests() {
     await query('UPDATE users SET grace_points = 0 WHERE phone = $1', ['+254711000002']);
     const loginUser2Zero = await makeRequest('POST', '/api/auth/login', {
       phone: '0711000002',
-      pin: '5678'
+      pin: '567800'
     });
     assert(loginUser2Zero.status === 200, 'User 2 logged in (200)');
     assert(loginUser2Zero.body.user.grace_points === 0, 'Stored 0 grace points preserved on login (NOT reset to 2)');
