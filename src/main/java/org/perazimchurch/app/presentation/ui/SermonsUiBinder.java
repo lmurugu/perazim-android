@@ -1086,21 +1086,57 @@ public class SermonsUiBinder {
             }
         });
 
-        android.widget.FrameLayout holder = new android.widget.FrameLayout(activity);
-        holder.setPadding(dp(8), dp(8), dp(8), dp(8));
-        holder.addView(player, new android.widget.FrameLayout.LayoutParams(
-                android.widget.FrameLayout.LayoutParams.MATCH_PARENT, dp(470)));
+        // Full-screen dark "Now Playing" screen (no stock dialog frame or footer).
+        android.widget.LinearLayout root = new android.widget.LinearLayout(activity);
+        root.setOrientation(android.widget.LinearLayout.VERTICAL);
+        root.setBackgroundColor(android.graphics.Color.parseColor("#1A0A20"));
 
-        AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle(title == null || title.isEmpty() ? "Church video" : title)
-                .setView(holder)
-                .setNegativeButton("Close", null)
-                .create();
+        android.widget.LinearLayout topBar = new android.widget.LinearLayout(activity);
+        topBar.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+        topBar.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        topBar.setPadding(dp(8), dp(12), dp(8), dp(8));
+
+        android.widget.Button closeBtn = new android.widget.Button(activity);
+        closeBtn.setText("\u2304");
+        closeBtn.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 22);
+        closeBtn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        closeBtn.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        closeBtn.setContentDescription("Close player");
+        topBar.addView(closeBtn, new android.widget.LinearLayout.LayoutParams(dp(56), dp(48)));
+
+        android.widget.TextView topTitle = new android.widget.TextView(activity);
+        topTitle.setText("Now Playing");
+        topTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        topTitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 15);
+        topTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        topTitle.setGravity(android.view.Gravity.CENTER);
+        topBar.addView(topTitle, new android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        View topSpacer = new View(activity);
+        topBar.addView(topSpacer, new android.widget.LinearLayout.LayoutParams(dp(56), dp(48)));
+        root.addView(topBar);
+
+        root.addView(player, new android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+
+        android.app.Dialog dialog = new android.app.Dialog(activity, org.perazimchurch.app.R.style.PerazimPlayerDialog);
+        dialog.setContentView(root);
+        if (dialog.getWindow() != null) {
+            // Full-screen player: hide the status bar so no activity background shows above the controls.
+            dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            dialog.getWindow().setStatusBarColor(android.graphics.Color.parseColor("#1A0A20"));
+            dialog.getWindow().setNavigationBarColor(android.graphics.Color.parseColor("#1A0A20"));
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#1A0A20")));
+        }
+        final int previousStatusColor = activity.getWindow().getStatusBarColor();
+        activity.getWindow().setStatusBarColor(android.graphics.Color.parseColor("#1A0A20"));
         dialog.setOnDismissListener(d -> {
+            activity.getWindow().setStatusBarColor(previousStatusColor);
             player.stopLoading();
             player.loadUrl("about:blank");
             player.destroy();
         });
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
         // Church player page (own controls around YouTube's embed). The page origin is the
         // church domain because YouTube refuses embeds with no referring site (error 153).
