@@ -382,7 +382,20 @@ public final class CommunityUiBinder {
             chip.setMinimumWidth(0);
             chip.setMinWidth(0);
             chip.setPadding(dp(10), dp(4), dp(10), dp(4));
-            chip.setText(emoji);
+            // Start from the server's counts, and mark the reactions this member already gave
+            int startCount = 0;
+            JSONArray serverCounts = post.optJSONArray("reaction_counts");
+            if (serverCounts != null) for (int i = 0; i < serverCounts.length(); i++) {
+                JSONObject c = serverCounts.optJSONObject(i);
+                if (c != null && emoji.equals(c.optString("emoji"))) startCount = c.optInt("n");
+            }
+            boolean mine = false;
+            JSONArray myReactions = post.optJSONArray("my_reactions");
+            if (myReactions != null) for (int i = 0; i < myReactions.length(); i++) {
+                if (emoji.equals(myReactions.optString(i))) mine = true;
+            }
+            chip.setText(emoji + " " + startCount);
+            if (mine) chip.setBackgroundColor(Color.parseColor("#E17D2F"));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
             lp.setMargins(0, 0, dp(6), 0);
             row.addView(chip, lp);
@@ -397,6 +410,7 @@ public final class CommunityUiBinder {
                         if (c != null && emoji.equals(c.optString("emoji"))) count = c.optInt("n");
                     }
                     chip.setText(emoji + " " + count);
+                    chip.setBackgroundColor(r.optBoolean("reacted") ? Color.parseColor("#E17D2F") : Color.TRANSPARENT);
                 }, this::showError);
             });
         }
@@ -513,12 +527,54 @@ public final class CommunityUiBinder {
             }
             public void afterTextChanged(android.text.Editable s){}
         });
+        // Open groups anyone can join; closed groups show a request button instead
+        body.addView(text("Open groups", 15));
+        LinearLayout discover=column();body.addView(discover);
+        loadDiscover(discover);
         panel("Groups",body);
         getCached("groups","api/community/groups",r->{list.removeAllViews();JSONArray rows=r.optJSONArray("groups");
             if(rows==null||rows.length()==0)list.addView(text("No groups yet. Create one, or ask a group owner to add you.",15));
             if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject g=rows.optJSONObject(i);if(g!=null){LinearLayout card=card(list);card.setTag(g.optString("name").toLowerCase(java.util.Locale.ROOT));card.addView(text(g.optString("name"),19));card.addView(text(g.optString("description"),14));card.addView(text(g.optInt("member_count")+" members",13));card.addView(button("Open group",()->showGroup(g)));}}
         });
     }
+    private void loadDiscover(LinearLayout discover) {
+        get("api/community/groups/discover", r -> {
+            discover.removeAllViews();
+            JSONArray rows = r.optJSONArray("groups");
+            if (rows == null || rows.length() == 0) {
+                discover.addView(text("No open groups right now.", 13));
+                return;
+            }
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject g = rows.optJSONObject(i);
+                if (g == null) continue;
+                LinearLayout card = card(discover);
+                card.addView(text(g.optString("name"), 16));
+                card.addView(text(g.optString("description"), 13));
+                card.addView(text(g.optInt("member_count") + " members", 12));
+                if (g.optBoolean("is_member")) {
+                    card.addView(button("Joined ✓", () -> {}));
+                } else if ("PENDING".equals(g.optString("my_request"))) {
+                    card.addView(button("Requested · waiting for approval", () -> {}));
+                } else {
+                    String groupId = g.optString("id");
+                    card.addView(button("Join", () -> joinGroup(groupId, discover)));
+                }
+            }
+        }, (code, message) -> {
+            discover.removeAllViews();
+            discover.addView(text(error(code, message), 13));
+        });
+    }
+
+    private void joinGroup(String groupId, LinearLayout discover) {
+        if (!signedIn()) return;
+        post("api/community/groups/" + encode(groupId) + "/join", new JSONObject(), r -> {
+            toast("JOINED".equals(r.optString("status")) ? "You joined the group." : "Request sent. The group owner will decide.");
+            loadDiscover(discover);
+        }, this::showError);
+    }
+
     private void createGroup() {
         LinearLayout body=column();EditText name=input("Group name",false),description=input("What is this group for?",true);body.addView(name);body.addView(description);
         AlertDialog dialog=panel("Create a private group",body);body.addView(button("Create group",()->{
