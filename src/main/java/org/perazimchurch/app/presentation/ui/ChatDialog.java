@@ -58,6 +58,12 @@ import java.util.UUID;
  */
 public class ChatDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     private final MessageRepository messageRepository;
     private final ConnectionRepository connectionRepository;
     private final SyncQueueManager syncQueueManager;

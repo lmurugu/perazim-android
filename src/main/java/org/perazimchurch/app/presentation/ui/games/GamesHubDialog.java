@@ -39,6 +39,12 @@ import java.util.Locale;
 
 /** Three complete offline Bible games; best scores are local and account-scoped. */
 public final class GamesHubDialog extends Dialog {
+
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
     private final Activity activity;
     private final String ownerId;
     private final SharedPreferences scores;
@@ -95,7 +101,16 @@ public final class GamesHubDialog extends Dialog {
         page.setPadding(dp(20), dp(16), dp(20), dp(28));
         scroll.addView(page, new ScrollView.LayoutParams(-1, -2));
         setContentView(scroll);
-        Button back = button(playing ? "← Games" : "Close games", false);
+        Button back = button(playing ? "Games" : "Close games", false);
+        // A vector arrow: the "←" character drew as a broken glyph on some phones.
+        android.graphics.drawable.Drawable arrow = activity.getDrawable(org.perazimchurch.app.R.drawable.gl_back);
+        if (arrow != null) {
+            arrow = arrow.mutate();
+            arrow.setTint(PerazimTheme.COLOR_TEXT_PRIMARY);
+            arrow.setBounds(0, 0, dp(20), dp(20));
+            back.setCompoundDrawablesRelative(arrow, null, null, null);
+            back.setCompoundDrawablePadding(dp(6));
+        }
         back.setOnClickListener(v -> {
             hideKeyboard();
             if (playing) hub(); else dismiss();
