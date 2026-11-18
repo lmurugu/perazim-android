@@ -94,8 +94,19 @@ public final class FeedbackManager {
         if (!isCelebrationsEnabled() || activity == null || activity.isFinishing()) {
             return;
         }
-        final ViewGroup decor = (ViewGroup) activity.getWindow().getDecorView();
-        final ConfettiView confetti = new ConfettiView(activity);
+        celebrateIn(activity.getWindow());
+    }
+
+    /**
+     * Confetti over any window, for example a dialog such as the Games screen, which sits above the
+     * activity window. Respects the celebrations switch. Plays no sound.
+     */
+    public void celebrateIn(android.view.Window window) {
+        if (!isCelebrationsEnabled() || window == null) {
+            return;
+        }
+        final ViewGroup decor = (ViewGroup) window.getDecorView();
+        final ConfettiView confetti = new ConfettiView(decor.getContext());
         confetti.setClickable(false);
         confetti.setFocusable(false);
         decor.addView(confetti, new FrameLayout.LayoutParams(
