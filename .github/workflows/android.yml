@@ -29,6 +29,28 @@ jobs:
           name: app-debug
           path: build/outputs/apk/debug/app-debug.apk
 
+  ui-screenshots:
+    name: UI screenshots (Robolectric)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Render main tabs in dark and light mode
+        run: ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: ui-screenshots
+          path: |
+            build/ui-screenshots/**
+            build/reports/tests/testDebugUnitTest/**
+          if-no-files-found: warn
+
   database-instrumentation:
     name: SQLCipher and Room migration suites (API 34 emulator)
     runs-on: ubuntu-latest
