@@ -580,14 +580,16 @@ public final class CommunityUiBinder {
         if(!url.matches("/uploads/att_[a-zA-Z0-9_.-]+"))return;
         android.widget.ImageView view=new android.widget.ImageView(activity);view.setAdjustViewBounds(true);view.setMaxHeight(dp(280));view.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);view.setContentDescription("Community photo");android.graphics.drawable.GradientDrawable photoShape=new android.graphics.drawable.GradientDrawable();photoShape.setCornerRadius(dp(18));photoShape.setColor(0x14FFFFFF);view.setBackground(photoShape);view.setClipToOutline(true);GlassKit.keep(view);LinearLayout.LayoutParams photoLp=new LinearLayout.LayoutParams(-1,dp(200));photoLp.topMargin=dp(10);target.addView(view,photoLp);
         String expectedOwner=owner,expectedServer=server,token=session().getAuthToken();
-        images.execute(()->{java.net.HttpURLConnection connection=null;try{
+        images.execute(()->{android.graphics.Bitmap[] loaded={null};java.net.HttpURLConnection connection=null;try{
             java.net.URL photoUrl=new java.net.URL(expectedServer+url);if(!ApiClient.allowsProtectedTransport(photoUrl))return;
             connection=(java.net.HttpURLConnection)photoUrl.openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(10000);connection.setReadTimeout(10000);
             if(token!=null&&!token.isEmpty())connection.setRequestProperty("Authorization","Bearer "+token);
             if(connection.getResponseCode()!=200)return;
-            android.graphics.Bitmap bitmap;try(java.io.InputStream in=connection.getInputStream()){bitmap=android.graphics.BitmapFactory.decodeStream(in);}
-            activity.runOnUiThread(()->{if(expectedOwner.equals(owner)&&expectedServer.equals(server)&&sameScope()&&!activity.isFinishing())view.setImageBitmap(bitmap);});
-        }catch(Exception ignored){}finally{if(connection!=null)connection.disconnect();}});
+            try(java.io.InputStream in=connection.getInputStream()){loaded[0]=android.graphics.BitmapFactory.decodeStream(in);}
+        }catch(Exception ignored){}finally{if(connection!=null)connection.disconnect();
+            // A photo that could not be loaded leaves no empty box behind.
+            activity.runOnUiThread(()->{if(!expectedOwner.equals(owner)||!expectedServer.equals(server)||!sameScope()||activity.isFinishing())return;
+                if(loaded[0]!=null)view.setImageBitmap(loaded[0]);else if(view.getParent()==target)target.removeView(view);});}});
     }
     private void saveAndSend(String endpoint,JSONObject value,String label,Result after) {
         if(!signedIn()||!sameScope())return;store.saveDraft(endpoint,value,label);

@@ -673,9 +673,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 orb.setStroke(Math.max(1, dp(1)), Color.parseColor("#66FFFFFF"));
                 ivIcon.setBackground(orb);
                 ivIcon.setPadding(dp(16), dp(16), dp(16), dp(16));
-                LinearLayout.LayoutParams lpOrb = new LinearLayout.LayoutParams(dp(56), dp(56));
-                lpOrb.setMargins(0, -dp(30), 0, 0);
-                ivIcon.setLayoutParams(lpOrb);
+                // The tab fills the whole bar so every tap on the orb reaches Give; the orb itself
+                // is lifted above the bar with a translation (a negative margin left its top outside the tab).
+                tab.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+                ivIcon.setLayoutParams(new LinearLayout.LayoutParams(dp(56), dp(56)));
+                ivIcon.setTranslationY(-dp(15));
                 // Mockup: dark 0 0 30px rgba(225,125,47,0.8) halo; light 0 8px 22px rgba(225,125,47,0.5)
                 if (PerazimTheme.isLight()) {
                     GlassKit.shadow(ivIcon, GlassKit.withAlpha(GlassKit.ORANGE, 0.5f), 8, 22);
