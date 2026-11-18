@@ -76,10 +76,14 @@ async function initDb() {
         }
       }
 
-      // Initialize schema
-      const schemaSql = fs.readFileSync(path.join(__dirname, '../schema.sql'), 'utf8');
-      await pool.query(schemaSql);
-      console.log('✅ PostgreSQL schema verified & updated');
+      // Initialize schema through the verified, ordered migration runner.
+      // schema.sql is no longer executed at boot: it only reflects the 0001
+      // baseline, so running it would skip migrations 0002 onward.
+      // The runner refuses to adopt an existing untracked schema; that needs an
+      // explicit, verified baseline (scripts/db-migrate.js baseline).
+      const { migrate } = require('./migrations');
+      await migrate(pool);
+      console.log('✅ PostgreSQL migrations verified & applied');
       return;
     } catch (err) {
       if (pool) {
