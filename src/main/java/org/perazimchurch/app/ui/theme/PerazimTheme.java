@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 
 /**
+ * Frosted-glass look: surfaces are translucent white over the deep purple canvas with light borders.
  * Design System Contract for Perazim Mission Church.
  * Single source of truth for canonical brand colors, typography, spacing, and elevation tokens.
  * Compliant with Phase 0.3 of the Perazim Android Master Build Guidebook V2.
@@ -21,10 +22,13 @@ public final class PerazimTheme {
     // Purple Family
     /** App Background Canvas (#2A0F33) */
     public static final int COLOR_BG_DEEP       = Color.parseColor("#2A0F33");
+    /** Opaque fallbacks for dialogs, popups and full-screen containers where glass would show through */
+    public static final int COLOR_SURFACE_SOLID   = Color.parseColor("#3D1749");
+    public static final int COLOR_SURFACE_2_SOLID = Color.parseColor("#4F1E5C");
     /** Cards and Content Containers (#3D1749) */
-    public static final int COLOR_SURFACE       = Color.parseColor("#3D1749");
+    public static final int COLOR_SURFACE       = Color.parseColor("#26FFFFFF");
     /** Elevated Surfaces, Text Inputs, Search Bars (#4F1E5C) */
-    public static final int COLOR_SURFACE_2     = Color.parseColor("#4F1E5C");
+    public static final int COLOR_SURFACE_2     = Color.parseColor("#33FFFFFF");
     /** Inactive Nav, Secondary Icons, Outline Borders (#8B5A9A) */
     public static final int COLOR_PURPLE_MUTED  = Color.parseColor("#8B5A9A");
     /** Active Nav, Links, Selected Chips (#681A7D) */
@@ -52,7 +56,7 @@ public final class PerazimTheme {
     /** Disabled Text and Placeholders (#6E5C78) */
     public static final int COLOR_TEXT_DISABLED  = Color.parseColor("#6E5C78");
     /** Card Borders and Structural Dividers (#4A3554) */
-    public static final int COLOR_STROKE         = Color.parseColor("#4A3554");
+    public static final int COLOR_STROKE         = Color.parseColor("#33FFFFFF");
 
     // =========================================================================
     // LEGACY ALIASES (Backwards Compatibility)
@@ -123,7 +127,7 @@ public final class PerazimTheme {
     public static GradientDrawable createBackgroundGradient() {
         return new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#2E1038"), Color.parseColor("#190720")}
+                new int[]{Color.parseColor("#2A0F33"), Color.parseColor("#3A1346"), Color.parseColor("#160520")}
         );
     }
 
@@ -133,7 +137,7 @@ public final class PerazimTheme {
     public static GradientDrawable createTopBarGradient(int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#32123D"), Color.parseColor("#220A2B")}
+                new int[]{Color.parseColor("#33FFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         if (strokePx > 0) {
             gd.setStroke(strokePx, COLOR_STROKE);
@@ -147,7 +151,7 @@ public final class PerazimTheme {
     public static GradientDrawable createBottomNavGradient(int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#260C2E"), Color.parseColor("#18061F")}
+                new int[]{Color.parseColor("#2EFFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         if (strokePx > 0) {
             gd.setStroke(strokePx, COLOR_STROKE);
@@ -161,7 +165,7 @@ public final class PerazimTheme {
     public static GradientDrawable createCardGradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.parseColor("#421950"), Color.parseColor("#31113E")}
+                new int[]{Color.parseColor("#2EFFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -176,7 +180,7 @@ public final class PerazimTheme {
     public static GradientDrawable createSurface2Gradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.parseColor("#541F63"), Color.parseColor("#3E164A")}
+                new int[]{Color.parseColor("#3DFFFFFF"), Color.parseColor("#1FFFFFFF")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -203,11 +207,11 @@ public final class PerazimTheme {
     public static GradientDrawable createHeroGradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.parseColor("#4A1B59"), Color.parseColor("#2F0D39")}
+                new int[]{Color.parseColor("#668B32AA"), Color.parseColor("#33E17D2F")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
-            gd.setStroke(strokePx, Color.parseColor("#583B65"));
+            gd.setStroke(strokePx, Color.parseColor("#47FFFFFF"));
         }
         return gd;
     }
@@ -233,7 +237,7 @@ public final class PerazimTheme {
     public static GradientDrawable createActivePillGradient(int radiusPx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.parseColor("#751E8D"), Color.parseColor("#521264")}
+                new int[]{Color.parseColor("#8A2BA3"), Color.parseColor("#681A7D")}
         );
         gd.setCornerRadius(radiusPx);
         return gd;
@@ -245,7 +249,7 @@ public final class PerazimTheme {
     public static GradientDrawable createMutedPillGradient(int radiusPx, int strokeColor, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#361241"), Color.parseColor("#280C31")}
+                new int[]{Color.parseColor("#26FFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {

@@ -432,7 +432,7 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout nav = new LinearLayout(getContext());
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setGravity(Gravity.CENTER_VERTICAL);
-        nav.setBackgroundColor(PerazimTheme.COLOR_SURFACE_2);
+        nav.setBackgroundColor(PerazimTheme.COLOR_SURFACE_2_SOLID);
         nav.setPadding(dp(12), dp(6), dp(12), dp(6));
 
         btnPrevChapter = new Button(getContext());
@@ -945,7 +945,7 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout container = new LinearLayout(getContext());
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(16), dp(16), dp(16), dp(16));
-        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
 
         // Header Title
         TextView tvTitle = new TextView(getContext());
@@ -1095,7 +1095,7 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout container = new LinearLayout(getContext());
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(16), dp(16), dp(16), dp(16));
-        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
 
         // Header Title
         TextView tvTitle = new TextView(getContext());

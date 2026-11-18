@@ -585,6 +585,15 @@ public class ProfileUiBinder {
         ));
         card.addView(createHorizontalDivider());
 
+        // Sound, haptics and celebrations settings
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_christian_praying_hands,
+                "Sound, Haptics & Celebrations",
+                "Turn button sounds, vibration and confetti on or off",
+                v -> showFeedbackSettingsDialog()
+        ));
+        card.addView(createHorizontalDivider());
+
         // Row 6: Pastoral Care
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_phone,
@@ -603,6 +612,44 @@ public class ProfileUiBinder {
         ));
 
         return card;
+    }
+
+    private void showFeedbackSettingsDialog() {
+        final org.perazimchurch.app.ui.components.FeedbackManager fm =
+                org.perazimchurch.app.ui.components.FeedbackManager.get(context);
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(20), dp(12), dp(20), dp(4));
+
+        android.widget.Switch swSound = new android.widget.Switch(context);
+        swSound.setText("Sounds (buttons, rewards, milestones)");
+        swSound.setChecked(fm.isSoundEnabled());
+        swSound.setPadding(0, dp(10), 0, dp(10));
+        swSound.setOnCheckedChangeListener((b, on) -> {
+            fm.setSoundEnabled(on);
+            if (on) fm.reward(null);
+        });
+        box.addView(swSound);
+
+        android.widget.Switch swHaptics = new android.widget.Switch(context);
+        swHaptics.setText("Haptic feedback (vibration)");
+        swHaptics.setChecked(fm.isHapticsEnabled());
+        swHaptics.setPadding(0, dp(10), 0, dp(10));
+        swHaptics.setOnCheckedChangeListener((b, on) -> fm.setHapticsEnabled(on));
+        box.addView(swHaptics);
+
+        android.widget.Switch swCelebrate = new android.widget.Switch(context);
+        swCelebrate.setText("Celebrations (confetti)");
+        swCelebrate.setChecked(fm.isCelebrationsEnabled());
+        swCelebrate.setPadding(0, dp(10), 0, dp(10));
+        swCelebrate.setOnCheckedChangeListener((b, on) -> fm.setCelebrationsEnabled(on));
+        box.addView(swCelebrate);
+
+        new AlertDialog.Builder(context)
+                .setTitle("Sound, Haptics & Celebrations")
+                .setView(box)
+                .setPositiveButton("Done", null)
+                .show();
     }
 
     private void showFailedSyncItems() {
@@ -930,7 +977,7 @@ public class ProfileUiBinder {
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(16));
-        content.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        content.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
 
         // Tab Row: Riddles | Jokes
         LinearLayout tabRow = new LinearLayout(context);

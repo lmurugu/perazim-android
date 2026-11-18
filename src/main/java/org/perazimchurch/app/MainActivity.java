@@ -166,6 +166,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private FrameLayout splashContainer;
 
     @Override
+    public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+        if (ev.getActionMasked() == android.view.MotionEvent.ACTION_UP) {
+            org.perazimchurch.app.ui.components.FeedbackManager.get(this).clickAt(this, ev.getRawX(), ev.getRawY());
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -1055,6 +1063,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 xpCount += 5;
                 GamificationStore.saveSpiritualXp(this, resolveGamificationUserId(), xpCount);
                 updateHud();
+                org.perazimchurch.app.ui.components.FeedbackManager.get(this).reward(this);
                 btnRsvp.setText("✓ RSVP Confirmed!");
                 btnRsvp.setEnabled(false);
                 Toast.makeText(this, "Reminder set for " + ev[0] + "! (+5 XP)", Toast.LENGTH_SHORT).show();
@@ -1136,6 +1145,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             progressTextView.setText("100% completed — All daily devotions accomplished! 🎉");
             updateRoutineView();
 
+            org.perazimchurch.app.ui.components.FeedbackManager.get(this).milestone(this);
             new AlertDialog.Builder(this)
                     .setTitle("🎉 3-Minute Breakthrough Complete!")
                     .setMessage("Hallelujah! You completed your daily breakthrough routine!\n\n"
