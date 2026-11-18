@@ -43,6 +43,7 @@ import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.presentation.viewmodel.BibleViewModel;
 import org.perazimchurch.app.presentation.viewmodel.ViewModelFactory;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.ArrayList;
@@ -124,17 +125,17 @@ public class BibleReaderDialog extends Dialog {
 
     // UI View References
     private TextView tvTranslationBadge;
-    private Button btnBookChapterTitle;
-    private Button btnToggleSearch;
-    private Button btnCloseDialog;
+    private TextView btnBookChapterTitle;
+    private View btnToggleSearch;
+    private View btnCloseDialog;
     private LinearLayout searchBarLayout;
     private EditText etSearchQuery;
     private Button btnExecuteSearch;
     private Button btnClearSearch;
     private LinearLayout chapterNavBar;
-    private Button btnPrevChapter;
+    private TextView btnPrevChapter;
     private TextView tvChapterProgress;
-    private Button btnNextChapter;
+    private TextView btnNextChapter;
     private ScrollView versesScrollView;
     private LinearLayout versesContainer;
     private ProgressBar loadingProgress;
@@ -190,7 +191,7 @@ public class BibleReaderDialog extends Dialog {
 
         if (getWindow() != null) {
             getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            getWindow().setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_DEEP));
+            getWindow().setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().setStatusBarColor(PerazimTheme.COLOR_BG_DEEP);
                 getWindow().setNavigationBarColor(PerazimTheme.COLOR_BG_DEEP);
@@ -220,174 +221,125 @@ public class BibleReaderDialog extends Dialog {
     // =========================================================================
 
     private View buildReaderLayout() {
+        // Mockup board "Bible reader": glass header pills, one glass card of serif verses, Previous / Next.
+        FrameLayout frame = new FrameLayout(getContext());
+        frame.setBackground(PerazimTheme.createBackgroundGradient());
+
         LinearLayout root = new LinearLayout(getContext());
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
 
-        // 1. Top Header Bar
-        View topHeader = createHeaderBar();
-        root.addView(topHeader);
+        root.addView(createHeaderBar());
 
-        // 2. Search Mode Bar (Collapsible)
         searchBarLayout = createSearchBarLayout();
         searchBarLayout.setVisibility(View.GONE);
         root.addView(searchBarLayout);
 
-        // 3. Quick Chapter Navigation Bar
-        chapterNavBar = createChapterNavBar();
-        root.addView(chapterNavBar);
-
-        // 4. Verses Content Container inside ScrollView
         versesScrollView = new ScrollView(getContext());
         versesScrollView.setFillViewport(true);
+        versesScrollView.setClipToPadding(false);
+        versesScrollView.setPadding(0, 0, 0, dp(96));
         LinearLayout.LayoutParams lpScroll = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
         versesScrollView.setLayoutParams(lpScroll);
 
-        versesContainer = new LinearLayout(getContext());
-        versesContainer.setOrientation(LinearLayout.VERTICAL);
-        versesContainer.setPadding(dp(16), dp(16), dp(16), dp(32));
+        LinearLayout scrollColumn = new LinearLayout(getContext());
+        scrollColumn.setOrientation(LinearLayout.VERTICAL);
+        scrollColumn.setPadding(dp(16), dp(14), dp(16), dp(16));
 
-        // Loading ProgressBar
+        versesContainer = GlassKit.card(getContext(), 28, 0);
+        versesContainer.setPadding(dp(20), dp(22), dp(20), dp(22));
+
         loadingProgress = new ProgressBar(getContext());
         loadingProgress.setVisibility(View.GONE);
         LinearLayout.LayoutParams lpProgress = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpProgress.gravity = Gravity.CENTER_HORIZONTAL;
-        lpProgress.setMargins(0, dp(40), 0, dp(20));
+        lpProgress.setMargins(0, dp(24), 0, dp(24));
         loadingProgress.setLayoutParams(lpProgress);
         versesContainer.addView(loadingProgress);
 
-        // Empty / Status TextView
-        tvEmptyState = new TextView(getContext());
-        tvEmptyState.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvEmptyState.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tvEmptyState.setTypeface(Typeface.DEFAULT_BOLD);
+        tvEmptyState = GlassKit.text(getContext(), "", 13, true, GlassKit.text());
         tvEmptyState.setGravity(Gravity.CENTER);
-        tvEmptyState.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE, PerazimTheme.COLOR_STROKE));
-        tvEmptyState.setPadding(dp(16), dp(20), dp(16), dp(20));
-        tvEmptyState.setLineSpacing(dp(4), 1.2f);
+        tvEmptyState.setPadding(dp(8), dp(16), dp(8), dp(16));
+        tvEmptyState.setLineSpacing(0f, 1.3f);
         tvEmptyState.setVisibility(View.GONE);
         versesContainer.addView(tvEmptyState);
 
-        versesScrollView.addView(versesContainer);
+        scrollColumn.addView(versesContainer, new LinearLayout.LayoutParams(-1, -2));
+        versesScrollView.addView(scrollColumn);
         root.addView(versesScrollView);
+        frame.addView(root, new FrameLayout.LayoutParams(-1, -1));
 
-        return root;
+        chapterNavBar = createChapterNavBar();
+        FrameLayout.LayoutParams lpNav = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM);
+        lpNav.setMargins(dp(16), 0, dp(16), dp(24));
+        frame.addView(chapterNavBar, lpNav);
+        return frame;
     }
 
     private View createHeaderBar() {
-        FrameLayout headerFrame = new FrameLayout(getContext());
-        headerFrame.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(116)));
+        // Back circle, chapter pill (opens the book picker), KJV pill, search circle
+        LinearLayout row = new LinearLayout(getContext());
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(16), dp(16), 0);
 
-        Bitmap scrollBmp = loadAssetBitmap("backgrounds/bg_reader_scroll.png", 720);
-        if (scrollBmp != null) {
-            ImageView ivBg = new ImageView(getContext());
-            ivBg.setImageBitmap(scrollBmp);
-            ivBg.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            headerFrame.addView(ivBg, new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        FrameLayout back = GlassKit.circleIcon(getContext(), org.perazimchurch.app.R.drawable.gl_back, 44, 20, "Back");
+        back.setOnClickListener(v -> dismiss());
+        btnCloseDialog = back;
+        row.addView(back);
 
-            View bottomScrim = new View(getContext());
-            GradientDrawable scrimGrad = new GradientDrawable(
-                    GradientDrawable.Orientation.TOP_BOTTOM,
-                    new int[]{Color.parseColor("#80140319"), Color.parseColor("#E6140319")});
-            bottomScrim.setBackground(scrimGrad);
-            headerFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        }
-
-        LinearLayout header = new LinearLayout(getContext());
-        header.setOrientation(LinearLayout.VERTICAL);
-        header.setPadding(dp(14), dp(8), dp(14), dp(8));
-        header.setLayoutParams(new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_VERTICAL));
-
-        // Top Row: Translation Badge + Close Button
-        LinearLayout topRow = new LinearLayout(getContext());
-        topRow.setOrientation(LinearLayout.HORIZONTAL);
-        topRow.setGravity(Gravity.CENTER_VERTICAL);
-
-        tvTranslationBadge = new TextView(getContext());
-        updateTranslationBadge();
-        tvTranslationBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvTranslationBadge.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTranslationBadge.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tvTranslationBadge.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-        tvTranslationBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
-        tvTranslationBadge.setOnClickListener(v -> showTranslationSelectorDialog());
-        topRow.addView(tvTranslationBadge);
-
-        View space = new View(getContext());
-        topRow.addView(space, new LinearLayout.LayoutParams(0, 1, 1.0f));
-
-        btnToggleSearch = new Button(getContext());
-        btnToggleSearch.setText("🔍 Search");
-        btnToggleSearch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnToggleSearch.setTypeface(Typeface.DEFAULT_BOLD);
-        btnToggleSearch.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnToggleSearch.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-        btnToggleSearch.setPadding(dp(10), dp(4), dp(10), dp(4));
-        btnToggleSearch.setOnClickListener(v -> toggleSearchMode());
-        LinearLayout.LayoutParams lpSearchBtn = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(32));
-        lpSearchBtn.setMargins(0, 0, dp(6), 0);
-        btnToggleSearch.setLayoutParams(lpSearchBtn);
-        topRow.addView(btnToggleSearch);
-
-        btnCloseDialog = new Button(getContext());
-        btnCloseDialog.setText("✕");
-        btnCloseDialog.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        btnCloseDialog.setTypeface(Typeface.DEFAULT_BOLD);
-        btnCloseDialog.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnCloseDialog.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-        LinearLayout.LayoutParams lpClose = new LinearLayout.LayoutParams(dp(36), dp(32));
-        btnCloseDialog.setLayoutParams(lpClose);
-        btnCloseDialog.setOnClickListener(v -> dismiss());
-        topRow.addView(btnCloseDialog);
-
-        header.addView(topRow);
-
-        // Bottom Row: Current Book & Chapter Selector Button (Default: "2 Samuel 5 · Baal-perazim")
-        btnBookChapterTitle = new Button(getContext());
-        updateHeaderTitle();
-        btnBookChapterTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        btnBookChapterTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        btnBookChapterTitle.setTextColor(COLOR_WHITE);
-        btnBookChapterTitle.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 2));
-        btnBookChapterTitle.setPadding(dp(14), dp(8), dp(14), dp(8));
-        LinearLayout.LayoutParams lpTitleBtn = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpTitleBtn.setMargins(0, dp(6), 0, 0);
-        btnBookChapterTitle.setLayoutParams(lpTitleBtn);
+        btnBookChapterTitle = GlassKit.text(getContext(), "", 13, true, GlassKit.light() ? Color.parseColor("#2A0F33") : Color.WHITE);
+        btnBookChapterTitle.setGravity(Gravity.CENTER);
+        btnBookChapterTitle.setMaxLines(1);
+        btnBookChapterTitle.setEllipsize(TextUtils.TruncateAt.END);
+        btnBookChapterTitle.setPadding(dp(12), 0, dp(12), 0);
+        GradientDrawable pill = new GradientDrawable();
+        pill.setCornerRadius(dp(22));
+        pill.setColor(GlassKit.light() ? Color.parseColor("#CCFFFFFF") : Color.parseColor("#1FFFFFFF"));
+        pill.setStroke(Math.max(1, dp(1)), GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#40FFFFFF"));
+        btnBookChapterTitle.setBackground(pill);
+        btnBookChapterTitle.setClickable(true);
         btnBookChapterTitle.setOnClickListener(v -> showBookSelectorDialog());
-        header.addView(btnBookChapterTitle);
+        updateHeaderTitle();
+        LinearLayout.LayoutParams lpTitle = new LinearLayout.LayoutParams(0, dp(44), 1f);
+        lpTitle.setMargins(dp(8), 0, dp(8), 0);
+        row.addView(btnBookChapterTitle, lpTitle);
 
-        headerFrame.addView(header);
-        return headerFrame;
+        tvTranslationBadge = GlassKit.glassButton(getContext(), "", 12);
+        tvTranslationBadge.setPadding(dp(14), 0, dp(14), 0);
+        updateTranslationBadge();
+        tvTranslationBadge.setOnClickListener(v -> showTranslationSelectorDialog());
+        row.addView(tvTranslationBadge, new LinearLayout.LayoutParams(-2, dp(44)));
+
+        FrameLayout search = GlassKit.circleIcon(getContext(), org.perazimchurch.app.R.drawable.gl_search, 44, 18, "Search the Bible");
+        search.setOnClickListener(v -> toggleSearchMode());
+        ((LinearLayout.LayoutParams) search.getLayoutParams()).leftMargin = dp(8);
+        btnToggleSearch = search;
+        row.addView(search);
+        return GlassKit.keep(row);
     }
 
     private LinearLayout createSearchBarLayout() {
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setGravity(Gravity.CENTER_VERTICAL);
-        layout.setPadding(dp(12), dp(8), dp(12), dp(8));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(PerazimTheme.COLOR_SURFACE_2);
-        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        layout.setBackground(bg);
+        layout.setPadding(dp(16), 0, dp(6), 0);
+        layout.setBackground(GlassKit.glass(getContext(), 24));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(48));
+        lp.setMargins(dp(16), dp(12), dp(16), 0);
+        layout.setLayoutParams(lp);
+        GlassKit.keep(layout);
 
         etSearchQuery = new EditText(getContext());
-        etSearchQuery.setHint("Search Holy Scripture (e.g. Baal-perazim, break, faith)...");
-        etSearchQuery.setHintTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        etSearchQuery.setHint("Search the Bible, e.g. Baal-perazim, faith");
+        etSearchQuery.setHintTextColor(GlassKit.muted());
         etSearchQuery.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        etSearchQuery.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        etSearchQuery.setTextColor(GlassKit.text());
+        etSearchQuery.setBackground(null);
         etSearchQuery.setSingleLine(true);
         etSearchQuery.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        LinearLayout.LayoutParams lpEt = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        etSearchQuery.setLayoutParams(lpEt);
+        etSearchQuery.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
         etSearchQuery.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 performSearch(etSearchQuery.getText().toString().trim());
@@ -398,88 +350,84 @@ public class BibleReaderDialog extends Dialog {
         });
         layout.addView(etSearchQuery);
 
-        btnExecuteSearch = new Button(getContext());
-        btnExecuteSearch.setText("Search");
-        btnExecuteSearch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnExecuteSearch.setTypeface(Typeface.DEFAULT_BOLD);
-        btnExecuteSearch.setTextColor(COLOR_WHITE);
-        btnExecuteSearch.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 8, 2));
-        LinearLayout.LayoutParams lpExec = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(34));
-        lpExec.setMargins(dp(6), 0, dp(4), 0);
-        btnExecuteSearch.setLayoutParams(lpExec);
-        btnExecuteSearch.setOnClickListener(v -> {
+        TextView go = GlassKit.orangeButton(getContext(), "Search", 12);
+        go.setPadding(dp(14), 0, dp(14), 0);
+        go.setOnClickListener(v -> {
             performSearch(etSearchQuery.getText().toString().trim());
             hideKeyboard(etSearchQuery);
         });
-        layout.addView(btnExecuteSearch);
+        LinearLayout.LayoutParams lpGo = new LinearLayout.LayoutParams(-2, dp(36));
+        lpGo.leftMargin = dp(6);
+        layout.addView(go, lpGo);
 
-        btnClearSearch = new Button(getContext());
-        btnClearSearch.setText("✕");
-        btnClearSearch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnClearSearch.setTypeface(Typeface.DEFAULT_BOLD);
-        btnClearSearch.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnClearSearch.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE, PerazimTheme.COLOR_STROKE));
-        LinearLayout.LayoutParams lpClr = new LinearLayout.LayoutParams(dp(34), dp(34));
-        btnClearSearch.setLayoutParams(lpClr);
-        btnClearSearch.setOnClickListener(v -> {
+        TextView clear = GlassKit.text(getContext(), "Close", 12, true, GlassKit.muted());
+        clear.setPadding(dp(10), dp(8), dp(10), dp(8));
+        clear.setClickable(true);
+        clear.setOnClickListener(v -> {
             if (!TextUtils.isEmpty(etSearchQuery.getText())) {
                 etSearchQuery.setText("");
             } else {
                 toggleSearchMode();
             }
         });
-        layout.addView(btnClearSearch);
-
+        layout.addView(clear);
         return layout;
     }
 
     private LinearLayout createChapterNavBar() {
+        // Previous (glass) · "Chapter 5 of 24" with A− A+ · Next (orange)
         LinearLayout nav = new LinearLayout(getContext());
         nav.setOrientation(LinearLayout.HORIZONTAL);
         nav.setGravity(Gravity.CENTER_VERTICAL);
-        nav.setBackgroundColor(PerazimTheme.COLOR_SURFACE_2_SOLID);
-        nav.setPadding(dp(12), dp(6), dp(12), dp(6));
+        nav.setClipChildren(false);
+        nav.setClipToPadding(false);
+        GlassKit.keep(nav);
 
-        btnPrevChapter = new Button(getContext());
-        btnPrevChapter.setText("◀ Prev Ch");
-        btnPrevChapter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        btnPrevChapter.setTypeface(Typeface.DEFAULT_BOLD);
-        btnPrevChapter.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnPrevChapter.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE, PerazimTheme.COLOR_STROKE));
-        LinearLayout.LayoutParams lpPrev = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(30));
-        btnPrevChapter.setLayoutParams(lpPrev);
+        btnPrevChapter = GlassKit.glassButton(getContext(), "Previous", 13);
+        btnPrevChapter.setPadding(dp(22), 0, dp(22), 0);
         btnPrevChapter.setOnClickListener(v -> navigateChapter(-1));
-        nav.addView(btnPrevChapter);
+        nav.addView(btnPrevChapter, new LinearLayout.LayoutParams(-2, dp(48)));
 
-        tvChapterProgress = new TextView(getContext());
-        tvChapterProgress.setText("Chapter " + currentChapter + " of " + currentChapterCount);
-        tvChapterProgress.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvChapterProgress.setTypeface(Typeface.DEFAULT_BOLD);
-        tvChapterProgress.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        LinearLayout middle = new LinearLayout(getContext());
+        middle.setOrientation(LinearLayout.VERTICAL);
+        middle.setGravity(Gravity.CENTER);
+        tvChapterProgress = GlassKit.text(getContext(), "Chapter " + currentChapter + " of " + currentChapterCount, 11, false, GlassKit.muted());
         tvChapterProgress.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams lpProg = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        tvChapterProgress.setLayoutParams(lpProg);
-        nav.addView(tvChapterProgress);
+        middle.addView(tvChapterProgress);
+        LinearLayout sizes = new LinearLayout(getContext());
+        sizes.setOrientation(LinearLayout.HORIZONTAL);
+        sizes.setGravity(Gravity.CENTER);
+        TextView smaller = GlassKit.text(getContext(), "A−", 12, true, GlassKit.muted());
+        smaller.setPadding(dp(8), dp(4), dp(8), dp(4));
+        smaller.setContentDescription("Smaller text");
+        smaller.setClickable(true);
+        smaller.setOnClickListener(v -> changeVerseSize(-2f));
+        TextView larger = GlassKit.text(getContext(), "A+", 12, true, GlassKit.muted());
+        larger.setPadding(dp(8), dp(4), dp(8), dp(4));
+        larger.setContentDescription("Larger text");
+        larger.setClickable(true);
+        larger.setOnClickListener(v -> changeVerseSize(2f));
+        sizes.addView(smaller);
+        sizes.addView(larger);
+        middle.addView(sizes);
+        nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
-        btnNextChapter = new Button(getContext());
-        btnNextChapter.setText("Next Ch ▶");
-        btnNextChapter.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        btnNextChapter.setTypeface(Typeface.DEFAULT_BOLD);
-        btnNextChapter.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnNextChapter.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE, PerazimTheme.COLOR_STROKE));
-        LinearLayout.LayoutParams lpNext = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(30));
-        btnNextChapter.setLayoutParams(lpNext);
+        btnNextChapter = GlassKit.orangeButton(getContext(), "Next", 13);
+        btnNextChapter.setPadding(dp(22), 0, dp(22), 0);
         btnNextChapter.setOnClickListener(v -> navigateChapter(1));
-        nav.addView(btnNextChapter);
-
+        nav.addView(btnNextChapter, new LinearLayout.LayoutParams(-2, dp(48)));
         return nav;
     }
 
+    private float verseTextSp = 18f;
+
+    private void changeVerseSize(float delta) {
+        verseTextSp = Math.max(14f, Math.min(28f, verseTextSp + delta));
+        renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+    }
+
     private void updateHeaderTitle() {
-        String title = "📖 " + currentBookName + " " + currentChapter;
+        String title = currentBookName + " " + currentChapter;
         if ("2SA".equals(currentBookId) && currentChapter == 5) {
             title += " · Baal-perazim ▾";
         } else {
@@ -495,7 +443,7 @@ public class BibleReaderDialog extends Dialog {
 
     private void updateTranslationBadge() {
         if (tvTranslationBadge != null) {
-            tvTranslationBadge.setText("📜 " + currentTranslation + " ▾");
+            tvTranslationBadge.setText(currentTranslation);
         }
     }
 
@@ -660,144 +608,71 @@ public class BibleReaderDialog extends Dialog {
 
     private void renderVerseList(@NonNull List<BibleVerse> verses, boolean isSearchResult) {
         clearVerseViews();
-
         if (isSearchResult) {
-            TextView searchSummary = new TextView(getContext());
-            searchSummary.setText("Found " + verses.size() + " verses matching keyword query");
-            searchSummary.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            searchSummary.setTypeface(Typeface.DEFAULT_BOLD);
-            searchSummary.setTextColor(COLOR_ACCENT_ORANGE);
-            searchSummary.setBackground(createPillBg(COLOR_ORANGE_TINT, COLOR_ORANGE_BORDER));
-            searchSummary.setPadding(dp(10), dp(6), dp(10), dp(6));
-            LinearLayout.LayoutParams lpSumm = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lpSumm.setMargins(0, 0, 0, dp(12));
-            searchSummary.setLayoutParams(lpSumm);
+            TextView searchSummary = GlassKit.text(getContext(), "Found " + verses.size() + " verses", 11, true, GlassKit.accent());
+            searchSummary.setLetterSpacing(0.06f);
+            searchSummary.setPadding(0, 0, 0, dp(12));
             versesContainer.addView(searchSummary);
-        } else {
-            // Chapter Title Header
-            TextView chapterHeader = new TextView(getContext());
-            chapterHeader.setText(currentBookName.toUpperCase() + " · CHAPTER " + currentChapter);
-            chapterHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            chapterHeader.setTypeface(Typeface.DEFAULT_BOLD);
-            chapterHeader.setTextColor(COLOR_PRIMARY_PURPLE);
-            chapterHeader.setPadding(0, 0, 0, dp(10));
-            versesContainer.addView(chapterHeader);
         }
-
         for (final BibleVerse verse : verses) {
-            View verseRow = createVerseRow(verse, isSearchResult);
-            versesContainer.addView(verseRow);
+            versesContainer.addView(createVerseRow(verse, isSearchResult));
         }
-
         versesScrollView.post(() -> versesScrollView.scrollTo(0, 0));
     }
 
     private View createVerseRow(final BibleVerse verse, final boolean isSearchResult) {
+        // Serif verse, line height 1.7, with the verse number as a small bold orange label (mockup)
         LinearLayout row = new LinearLayout(getContext());
         row.setOrientation(LinearLayout.VERTICAL);
-        row.setPadding(dp(12), dp(10), dp(12), dp(10));
-
-        // Highlight Cornerstone Verse (2 Samuel 5:20) or Bookmarked Verses
         boolean isCornerstone = "2SA".equals(verse.getBookId()) && verse.getChapterNumber() == 5 && verse.getVerseNumber() == 20;
-        GradientDrawable rowBg = new GradientDrawable();
-        if (isCornerstone) {
-            rowBg.setColor(PerazimTheme.COLOR_PURPLE_GHOST);
-            rowBg.setStroke(dp(1), COLOR_PRIMARY_PURPLE);
-            rowBg.setCornerRadius(dp(10));
-        } else if (verse.isFavorite()) {
-            rowBg.setColor(PerazimTheme.COLOR_ORANGE_GHOST);
-            rowBg.setStroke(dp(1), COLOR_ACCENT_ORANGE);
-            rowBg.setCornerRadius(dp(8));
-        } else {
-            rowBg.setColor(PerazimTheme.COLOR_SURFACE);
-            rowBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-            rowBg.setCornerRadius(dp(8));
+        if (verse.isFavorite()) {
+            GradientDrawable mark = new GradientDrawable();
+            mark.setCornerRadius(dp(12));
+            mark.setColor(Color.parseColor("#26E17D2F"));
+            row.setBackground(mark);
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
         }
-        row.setBackground(rowBg);
+        GlassKit.keep(row);
+
+        String label = isSearchResult ? formatCitation(verse) : String.valueOf(verse.getVerseNumber());
+        android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder();
+        sb.append(label);
+        int end = sb.length();
+        float numberScale = 11f / verseTextSp;
+        sb.setSpan(new android.text.style.RelativeSizeSpan(numberScale), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#C06119" : "#F8A95A")),
+                0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.setSpan(new android.text.style.TypefaceSpan("sans-serif"), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.append(isSearchResult ? "  " : " ");
+        int textStart = sb.length();
+        sb.append(verse.getText() != null ? verse.getText() : "");
+        if (isCornerstone) {
+            sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), textStart, sb.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
+        TextView tvVerseText = new TextView(getContext());
+        tvVerseText.setText(sb);
+        tvVerseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, verseTextSp);
+        tvVerseText.setTypeface(Typeface.SERIF);
+        tvVerseText.setTextColor(GlassKit.text());
+        tvVerseText.setLineSpacing(0f, 1.45f);
+        GlassKit.keep(tvVerseText);
+        row.addView(tvVerseText);
+
+        if (!TextUtils.isEmpty(verse.getNote())) {
+            TextView tvNoteContent = GlassKit.text(getContext(), "Note: " + verse.getNote(), 12, false, GlassKit.muted());
+            tvNoteContent.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+            row.addView(tvNoteContent, GlassKit.matchWrap(getContext(), 6));
+        }
 
         LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpRow.setMargins(0, 0, 0, dp(8));
+        lpRow.setMargins(0, 0, 0, dp(14));
         row.setLayoutParams(lpRow);
-
-        // Verse Header: Citation or Verse Number + Indicators
-        LinearLayout topVerseInfo = new LinearLayout(getContext());
-        topVerseInfo.setOrientation(LinearLayout.HORIZONTAL);
-        topVerseInfo.setGravity(Gravity.CENTER_VERTICAL);
-
-        String citation = formatCitation(verse);
-        TextView tvVerseNumber = new TextView(getContext());
-        if (isSearchResult) {
-            tvVerseNumber.setText("📖 " + citation);
-        } else {
-            tvVerseNumber.setText("Verse " + verse.getVerseNumber());
-        }
-        tvVerseNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvVerseNumber.setTypeface(Typeface.DEFAULT_BOLD);
-        tvVerseNumber.setTextColor(isCornerstone ? PerazimTheme.COLOR_PURPLE_SOFT : COLOR_ACCENT_ORANGE);
-        topVerseInfo.addView(tvVerseNumber);
-
-        View spring = new View(getContext());
-        topVerseInfo.addView(spring, new LinearLayout.LayoutParams(0, 1, 1.0f));
-
-        if (verse.isFavorite()) {
-            TextView favBadge = new TextView(getContext());
-            favBadge.setText("⭐ Saved");
-            favBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            favBadge.setTextColor(COLOR_ACCENT_ORANGE);
-            favBadge.setPadding(dp(4), 0, dp(4), 0);
-            topVerseInfo.addView(favBadge);
-        }
-
-        if (!TextUtils.isEmpty(verse.getNote())) {
-            TextView noteBadge = new TextView(getContext());
-            noteBadge.setText("📝 Study Note");
-            noteBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            noteBadge.setTextColor(COLOR_PRIMARY_PURPLE);
-            noteBadge.setPadding(dp(4), 0, dp(4), 0);
-            topVerseInfo.addView(noteBadge);
-        }
-
-        row.addView(topVerseInfo);
-
-        // Verse Text Body
-        TextView tvVerseText = new TextView(getContext());
-        tvVerseText.setText(verse.getText());
-        tvVerseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, isCornerstone ? 15 : 14);
-        tvVerseText.setTypeface(Typeface.SERIF, isCornerstone ? Typeface.BOLD : Typeface.NORMAL);
-        tvVerseText.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tvVerseText.setLineSpacing(dp(3), 1.2f);
-        tvVerseText.setPadding(0, dp(6), 0, dp(4));
-        row.addView(tvVerseText);
-
-        // Study Note Preview Box if Present
-        if (!TextUtils.isEmpty(verse.getNote())) {
-            TextView tvNoteContent = new TextView(getContext());
-            tvNoteContent.setText("“" + verse.getNote() + "”");
-            tvNoteContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            tvNoteContent.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            tvNoteContent.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-            tvNoteContent.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-            tvNoteContent.setPadding(dp(8), dp(4), dp(8), dp(4));
-            LinearLayout.LayoutParams lpNote = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lpNote.setMargins(0, dp(4), 0, dp(2));
-            tvNoteContent.setLayoutParams(lpNote);
-            row.addView(tvNoteContent);
-        }
-
-        // Tap Hint
-        TextView tvTapHint = new TextView(getContext());
-        tvTapHint.setText("Tap for Bookmark · Study Note · Copy");
-        tvTapHint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
-        tvTapHint.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        tvTapHint.setPadding(0, dp(4), 0, 0);
-        row.addView(tvTapHint);
-
-        // Interactive Verse Click: Opens Options Modal
+        row.setClickable(true);
+        row.setContentDescription("Verse " + verse.getVerseNumber() + ". Tap to bookmark, add a note or copy.");
         row.setOnClickListener(v -> showVerseOptionsModal(verse));
-
         return row;
     }
 
