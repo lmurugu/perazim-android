@@ -45,6 +45,7 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
+          emulator-boot-timeout: 900
           script: >-
             ./gradlew connectedValidationAndroidTest
             -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.data.local.DatabaseEncryptionMigrationTest,org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest
@@ -75,6 +76,7 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
+          emulator-boot-timeout: 900
           script: bash server/test/workmanager_recovery_ci.sh
       - name: Upload instrumentation reports
         if: always()
