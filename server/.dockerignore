@@ -1,9 +1,12 @@
-# Allow only runtime inputs into the build. In particular, never copy .runtime,
+# Deny by default, then allow only what the image needs. Never copy .runtime,
 # .env, local databases, logs, tests, uploads, or workstation node_modules.
 **
 !Dockerfile
 !package.json
 !package-lock.json
 !schema.sql
+!migrations/
+!migrations/**
+!scripts/db-migrate.js
 !src/
 !src/**
