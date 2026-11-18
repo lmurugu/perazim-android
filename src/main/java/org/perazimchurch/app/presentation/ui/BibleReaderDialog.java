@@ -59,6 +59,12 @@ import java.util.Map;
  */
 public class BibleReaderDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     // --- CANONICAL THEME COLORS ---
     private static final int COLOR_PRIMARY_PURPLE = PerazimTheme.COLOR_PRIMARY_PURPLE; // #681A7D
     private static final int COLOR_PURPLE_DARK    = PerazimTheme.COLOR_PURPLE_DEEP;     // #2D0938

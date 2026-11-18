@@ -39,6 +39,12 @@ import java.util.Locale;
 
 /** Three complete offline Bible games; best scores are local and account-scoped. */
 public final class GamesHubDialog extends Dialog {
+
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
     private final Activity activity;
     private final String ownerId;
     private final SharedPreferences scores;

@@ -180,20 +180,26 @@ public final class PerazimTheme {
 
     /** Page background: the base gradient plus two soft glow orbs (purple top-left, orange lower-right). */
     public static android.graphics.drawable.Drawable createBackgroundGradient() {
-        android.graphics.drawable.LayerDrawable layers = new android.graphics.drawable.LayerDrawable(
-                new android.graphics.drawable.Drawable[]{
-                        createBaseBackground(),
-                        createGlowOrb(0.15f, 0.18f, sLight ? "#55B070C8" : "#99A83CC8"),
-                        createGlowOrb(0.95f, 0.78f, sLight ? "#33E17D2F" : "#59E17D2F")
-                });
-        return layers;
+        return new GlowBackground(new android.graphics.drawable.Drawable[]{
+                createBaseBackground(),
+                createGlowOrb(0.05f, 0.10f, 0.95f, sLight ? "#66C58BDB" : "#B3A132C4"),
+                createGlowOrb(1.00f, 0.42f, 0.70f, sLight ? "#4DF3B37A" : "#80E17D2F"),
+                createGlowOrb(0.15f, 0.88f, 0.85f, sLight ? "#40B070C8" : "#998A2BA3")
+        });
     }
 
-    private static GradientDrawable createGlowOrb(float cx, float cy, String centerColor) {
+    /** Marker type so screens and {@link GlassPolish} can tell the glowing page background apart. */
+    public static final class GlowBackground extends android.graphics.drawable.LayerDrawable {
+        GlowBackground(android.graphics.drawable.Drawable[] layers) {
+            super(layers);
+        }
+    }
+
+    private static GradientDrawable createGlowOrb(float cx, float cy, float radiusOfWidth, String centerColor) {
         GradientDrawable gd = new GradientDrawable();
         gd.setGradientType(GradientDrawable.RADIAL_GRADIENT);
         gd.setGradientCenter(cx, cy);
-        gd.setGradientRadius(520f);
+        gd.setGradientRadius(android.content.res.Resources.getSystem().getDisplayMetrics().widthPixels * radiusOfWidth);
         gd.setColors(new int[]{Color.parseColor(centerColor), Color.TRANSPARENT});
         return gd;
     }

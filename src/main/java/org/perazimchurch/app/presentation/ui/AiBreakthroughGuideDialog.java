@@ -50,6 +50,12 @@ import java.util.List;
  */
 public class AiBreakthroughGuideDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     public interface AiActionListener {
         void onNavigateTab(int tabIndex);
         void onOpenGiving();

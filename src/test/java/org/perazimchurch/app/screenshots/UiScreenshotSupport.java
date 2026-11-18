@@ -97,9 +97,12 @@ final class UiScreenshotSupport {
 
     private static Bitmap renderWindow(Activity activity) {
         View root = activity.getWindow().getDecorView();
-        root.measure(View.MeasureSpec.makeMeasureSpec(WIDTH_PX, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(HEIGHT_PX, View.MeasureSpec.EXACTLY));
-        root.layout(0, 0, WIDTH_PX, HEIGHT_PX);
+        for (int pass = 0; pass < 2; pass++) {
+            root.measure(View.MeasureSpec.makeMeasureSpec(WIDTH_PX, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(HEIGHT_PX, View.MeasureSpec.EXACTLY));
+            root.layout(0, 0, WIDTH_PX, HEIGHT_PX);
+            org.perazimchurch.app.ui.theme.GlassPolish.apply(root);
+        }
         Bitmap bitmap = Bitmap.createBitmap(WIDTH_PX, HEIGHT_PX, Bitmap.Config.ARGB_8888);
         root.draw(new Canvas(bitmap));
         return bitmap;
@@ -111,6 +114,7 @@ final class UiScreenshotSupport {
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         int h = Math.max(1, Math.min(content.getMeasuredHeight(), 12000));
         content.layout(0, 0, WIDTH_PX, h);
+        org.perazimchurch.app.ui.theme.GlassPolish.apply(content);
         Bitmap bitmap = Bitmap.createBitmap(WIDTH_PX, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         android.graphics.drawable.Drawable bg = PerazimTheme.createBackgroundGradient();
