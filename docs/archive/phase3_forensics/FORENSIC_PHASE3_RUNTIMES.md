@@ -2,7 +2,7 @@
 # Auditor: Hermes Agent (independent; read-only; no source edit; no repair; no commits)
 # Phase 0/1/2 held PROVEN and provisionally closed per user directive (not reopened — no new contradiction evidence found).
 # Phase 0–2 NOT reopened: confirmed by live git state (main=3ac4f8c; tags intact; no new edits to Phase 0–2 source paths during this session).
-# Project: /home/murugu/Android/app ; Remote: git@github.com:lmurugu/perazim-android.git ; HEAD: 854a6b2 (phase-3/community-fellowship)
+# Project: <repo> ; Remote: git@github.com:lmurugu/perazim-android.git ; HEAD: 854a6b2 (phase-3/community-fellowship)
 # Device (independent): Infinix X689C / Android 11 (API 30); adb responsive; package=org.perazimchurch.app
 # Rules respected: no-write (§28); independence (§4); source/running distinction preserved; STOP-at-finding (no defect found → proceed with evidence, never invent); repair only with authorization (none needed — none authorized);
 # Every entry below uses ONLY: PROVEN / PARTIALLY PROVEN / NOT PROVEN / CONTRADICTED / NOT TESTABLE WITH AVAILABLE ACCESS.

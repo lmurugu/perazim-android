@@ -82,13 +82,13 @@ The audit was conducted strictly inside an isolated worktree to prevent collisio
 
 ```text
 === Git Worktrees ===
-/home/murugu/Android/app                         7ffb489 [phase-B-community]
-/home/murugu/Android/worktrees/antigravity-audit 7ffb489 [antigravity/phase-b-audit]
+<repo>                         7ffb489 [phase-B-community]
+<home>/Android/worktrees/antigravity-audit 7ffb489 [antigravity/phase-b-audit]
 
-=== Primary Worktree Status (/home/murugu/Android/app) ===
+=== Primary Worktree Status (<repo>) ===
 Untouched by Antigravity. Holds Codex's ongoing implementation files.
 
-=== Audit Worktree Status (/home/murugu/Android/worktrees/antigravity-audit) ===
+=== Audit Worktree Status (<home>/Android/worktrees/antigravity-audit) ===
 ?? docs/phase-b/ANTIGRAVITY_FINAL_SECURITY_CERTIFICATION.md
 ?? docs/phase-b/INDEPENDENT_THREAT_MODEL.md
 ?? docs/phase-b/SEC-01_RATE_LIMITING_REQUIREMENTS.md

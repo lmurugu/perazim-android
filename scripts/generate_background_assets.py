@@ -15,7 +15,7 @@ Constraints:
 import os
 from PIL import Image, ImageEnhance, ImageOps
 
-ASSETS_DIR = "/home/murugu/Android/app/src/main/assets"
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src", "main", "assets")
 BG_DIR = os.path.join(ASSETS_DIR, "backgrounds")
 os.makedirs(BG_DIR, exist_ok=True)
 

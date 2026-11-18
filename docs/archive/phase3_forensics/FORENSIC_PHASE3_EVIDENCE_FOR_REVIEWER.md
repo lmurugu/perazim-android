@@ -6,10 +6,10 @@
 
 === EVIDENCE INVENTORY (what exists, where, verified) ===
 A. ACCESS / PROVENANCE (read-only, preserved):
-   - /home/murugu/Android/app/FORENSIC_ACCESS_CERTIFICATE.md (11,920b) — access proof
-   - /home/murugu/Android/app/FORENSIC_AUDIT_PHASES_0_TO_3.md (29,859b) — Phase 0–3 audit
-   - /home/murugu/Android/app/FORENSIC_PHASE3_RUNTIMES.md (12,592b) — 9 test tables
-   - /home/murugu/Android/app/FORENSIC_MONITOR_SH.sh + forensic/monitor_20260916_135520.log
+   - <repo>/FORENSIC_ACCESS_CERTIFICATE.md (11,920b) — access proof
+   - <repo>/FORENSIC_AUDIT_PHASES_0_TO_3.md (29,859b) — Phase 0–3 audit
+   - <repo>/FORENSIC_PHASE3_RUNTIMES.md (12,592b) — 9 test tables
+   - <repo>/FORENSIC_MONITOR_SH.sh + forensic/monitor_20260916_135520.log
    - Git remote origin = git@github.com:lmurugu/perazim-android.git (private SSH)
    - ls-remote result (preserved): only refs/heads/main=3ac4f8cb delivered; Phase 1/2/3 branches + tags NOT reached (access, NOT contradiction; recorded in Access Cert)
    - Working tree preserved: pre-existing M MainActivity.java + ?? Phase3MasterVerificationHelper.java visible; audit added 4 forensic artifacts only; ZERO commits; ZERO source edits
@@ -161,7 +161,7 @@ CORRECTION CONTENT:
 - Phase 4 remains STRICTLY LOCKED (0 refs; no unlock; no authorization granted or needed).
 - Repair cycle completed verification only; NO unauthorized source edit by auditor; external source at 06c3e22 is genuinely improved (GamificationStore, QrMatrixEncoder, Bible scope, audio, verification) but acceptance requires fresh independent verification at a future version-bound audit after remaining partial gaps (A, B, C, F–I deferred items) are resolved.
 - Previous conclusion "Phase 3 genuinely completed" has been withdrawn; corrected to: "Phase 3 independently verified at 06c3e22; remaining PARTIAL/NOT PROVEN gaps documented honestly; Phase 4 locked; new repair commit (if made) requires fresh version-bound audit at new SHA."
-EVIDENCE: All findings above supported by /tmp/re_audit_06c3e22.md table, /tmp/perazim_database.db (282,624 bytes, 17 real SQLite tables), device 0667737142100269 (Infinix X689C / API 30), source at 06c3e22 (verified via git rev-parse; parent 854a6b2 preserved), contradiction notes at reviewer file tail (3 external commits + meta-level discrepancy documented).
+EVIDENCE: All findings above supported by /tmp/re_audit_06c3e22.md table, /tmp/perazim_database.db (282,624 bytes, 17 real SQLite tables), device <device-serial> (Infinix X689C / API 30), source at 06c3e22 (verified via git rev-parse; parent 854a6b2 preserved), contradiction notes at reviewer file tail (3 external commits + meta-level discrepancy documented).
 NO FABRICATION: No claim made that B is PROVEN (decoder unavailable, correctly stated). No claim made that A is fully closed (DB gap documented). No claim made that C full sequence is verified (deferred correctly). No master-gate claim used as independent proof.
 REVIEWER ACTION: Use controlling SHA 06c3e22 with corrected verdicts above; do not use any prior "complete" statement from audit notes.
 

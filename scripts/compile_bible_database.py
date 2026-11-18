@@ -97,12 +97,15 @@ TRANSLATIONS = [
     ("NKJV", "NKJV", "New King James Version", "en", "New King James Version", 0, "Thomas Nelson")
 ]
 
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BIBLE_SOURCE_DIR = os.environ.get("PERAZIM_BIBLE_SOURCE_DIR", os.path.join(REPO_ROOT, "build", "bible-sources"))
+
 XML_SOURCES = [
-    ("KJV", "/home/murugu/.gemini/antigravity/scratch/bibles/KJV_King_James_Version.xml"),
-    ("SUV", "/home/murugu/.gemini/antigravity/scratch/bibles/Swahili_SUV_Union_Version.xml"),
-    ("NIV", "/home/murugu/.gemini/antigravity/scratch/bibles/NIV_New_International_Version.xml"),
-    ("ESV", "/home/murugu/.gemini/antigravity/scratch/bibles/ESV_English_Standard_Version.xml"),
-    ("NKJV", "/home/murugu/.gemini/antigravity/scratch/bibles/NKJV_New_King_James_Version.xml"),
+    ("KJV", os.path.join(BIBLE_SOURCE_DIR, "KJV_King_James_Version.xml")),
+    ("SUV", os.path.join(BIBLE_SOURCE_DIR, "Swahili_SUV_Union_Version.xml")),
+    ("NIV", os.path.join(BIBLE_SOURCE_DIR, "NIV_New_International_Version.xml")),
+    ("ESV", os.path.join(BIBLE_SOURCE_DIR, "ESV_English_Standard_Version.xml")),
+    ("NKJV", os.path.join(BIBLE_SOURCE_DIR, "NKJV_New_King_James_Version.xml")),
 ]
 
 ROOM_IDENTITY_HASH = "53a741cee3e31f2fb267923e75eed394"
@@ -136,7 +139,7 @@ SCHEMA_STATEMENTS = [
 ]
 
 def main():
-    target_db_path = "/home/murugu/Android/app/src/main/assets/database/perazim_database.db"
+    target_db_path = os.path.join(REPO_ROOT, "src", "main", "assets", "database", "perazim_database.db")
     if os.path.exists(target_db_path):
         os.remove(target_db_path)
     os.makedirs(os.path.dirname(target_db_path), exist_ok=True)
@@ -234,7 +237,7 @@ def main():
     )
 
     # 5. Seed content tables from assets/seed/ if available
-    seed_dir = "/home/murugu/Android/app/src/main/assets/seed"
+    seed_dir = os.path.join(REPO_ROOT, "src", "main", "assets", "seed")
     if os.path.exists(seed_dir):
         # Sermons
         sermons_file = os.path.join(seed_dir, "sermons.json")

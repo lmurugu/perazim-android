@@ -98,7 +98,7 @@ Share `docs/CONTENT_GUIDE.md` with the church secretary. The secretary only need
 Levi does not need to edit code to manage the AI Guide. All settings are controlled via web dashboards.
 
 ### A. Cloudflare Workers Dashboard
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) and log in with `perazim.hq@gmail.com`.
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) and log in with the church Cloudflare account (credentials held by the owner).
 2. Under **Compute (Workers & Pages)**, select **`perazim-ai-relay`**.
 3. **Emergency Kill-Switch**:
    - Go to **Settings > Variables and Secrets**.

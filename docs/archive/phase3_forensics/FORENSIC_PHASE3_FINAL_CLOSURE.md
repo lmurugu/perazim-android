@@ -3,7 +3,7 @@
 **Controlling Commit:** `a35977e579327f595acbf41a20aa5795a06859b6`  
 **Parent Commit:** `71e8d8c2aa5b217ff0f1e0e7a2b91873ea890940`  
 **Branch:** `phase-3/community-fellowship`  
-**Target Hardware:** Infinix HOT 10T (`0667737142100269`, Android 11 / API 30, X689C)  
+**Target Hardware:** Infinix HOT 10T (`<device-serial>`, Android 11 / API 30, X689C)  
 **Database Inspection Target:** `/data/data/org.perazimchurch.app/databases/perazim_database.db` (WAL Mode)  
 **Phase 4 Boundary:** STRICTLY LOCKED (0 remote HTTP calls, 0 unapproved network boundaries; 53 offline mutations securely queued in `sync_queue`)  
 **Audit Mode:** Forensic Empirical Audit & Harness Hardening Verification  
@@ -32,7 +32,7 @@ Verification evidence is strictly classified across three distinct operational m
    - Clean implementation of pure-Java algorithms (e.g. `QrMatrixEncoder.java` 27KB ISO/IEC 18004 encoder).
    - Zero critical placeholders or stubbed APIs in production codebase.
 
-2. **Physical Hardware Verification (Infinix HOT 10T - `0667737142100269`):**
+2. **Physical Hardware Verification (Infinix HOT 10T - `<device-serial>`):**
    - Streamed installation of signed debug APK (`app-debug.apk`).
    - Execution of master gate suites on physical Android 11 device:
      - Logcat token: `[PERAZIM ALL PHASES 1-3 MASTER GROUNDING: HARDWARE ACCEPTANCE VERIFIED]`.
@@ -52,7 +52,7 @@ Verification evidence is strictly classified across three distinct operational m
 ### A1.5: Devotional Flow & Gamification Persistence — PROVEN / COMPLETE
 * **Claim Tested**: Daily devotional flow and reflection steps persist durably across process death and cold restart.
 * **Empirical Verification**:
-  - In [`HomeUiBinder.java`](file:///home/murugu/Android/app/src/main/java/org/perazimchurch/app/presentation/ui/HomeUiBinder.java), daily reflection routines progress through Steps 1 $\rightarrow$ 2 $\rightarrow$ 3 $\rightarrow$ 4.
+  - In [`HomeUiBinder.java`](file://<repo>/src/main/java/org/perazimchurch/app/presentation/ui/HomeUiBinder.java), daily reflection routines progress through Steps 1 $\rightarrow$ 2 $\rightarrow$ 3 $\rightarrow$ 4.
   - State persistence is committed synchronously via `.commit()` into `perazim_routine` SharedPreferences.
   - On Step 3 completion (`🙏 COMPLETE REFLECTION (+20 XP)`), the button disables to prevent double-submission, updates state inside `onSuccess`, and commits `routine_step = 4`.
   - Cold restart verification: After `am force-stop org.perazimchurch.app` and fresh `am start`, the UI restored directly to Step 4 with completed indicators and HUD showing `🔥 17`, `⭐ 690`, `💜 50`.
@@ -141,7 +141,7 @@ Throughout the forensic verification lifecycle, governance records have honestly
    - Resolved transaction race condition in `advanceReflectionStep()`: button disabled during async execution, Step 4 committed strictly upon database `onSuccess`.
    - Implemented strict `try ... finally` baseline restoration across all verification helpers to eliminate test pollution.
    - Cleaned up invalid test artifact `src/androidTest/java/org/perazimchurch/app/A1_8_TestHarness.java` for 100% repository hygiene.
-10. **Hardware Acceptance Verification**: Full unbroken physical execution sequence from S0 through S4 executed on physical Infinix HOT 10T (`0667737142100269`), with 7 photographic receipts establishing unconditional empirical proof for A1.6 and A1.8.
+10. **Hardware Acceptance Verification**: Full unbroken physical execution sequence from S0 through S4 executed on physical Infinix HOT 10T (`<device-serial>`), with 7 photographic receipts establishing unconditional empirical proof for A1.6 and A1.8.
 
 ---
 

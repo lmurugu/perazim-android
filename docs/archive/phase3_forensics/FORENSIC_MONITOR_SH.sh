@@ -1,8 +1,8 @@
 #!/bin/bash
 # PERAZIM ANDROID — Independent Forensic Monitoring (post-audit)
 # Read-only repeatable. Invoke after each workstream / phase / significant refactor.
-# Source: /home/murugu/Android/app (repo root)
-REPO=/home/murugu/Android/app; mkdir -p $REPO/forensic
+# Source: <repo> (repo root)
+REPO=<repo>; mkdir -p $REPO/forensic
 DATE=$(date +%Y%m%d_%H%M%S)
 echo "=== FORENSIC SNAPSHOT $DATE ===" >> $REPO/forensic/monitor_$DATE.log
 (cd $REPO && echo "HEAD=$(git rev-parse HEAD) BRANCH=$(git branch --show-current)" >> $REPO/forensic/monitor_$DATE.log)

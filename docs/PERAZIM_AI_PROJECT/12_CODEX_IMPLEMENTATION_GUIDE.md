@@ -65,7 +65,7 @@ Codex must not treat its own technical recommendations as automatically approved
 
 The authoritative project specification folder is:
 
-`/home/murugu/Android/app/docs/PERAZIM_AI_PROJECT/`
+`<repo>/docs/PERAZIM_AI_PROJECT/`
 
 Codex must read the complete contents of this folder before beginning implementation.
 

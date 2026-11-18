@@ -16,8 +16,9 @@ import subprocess
 import xml.etree.ElementTree as ET
 import re
 
-APP_DATA_DIR = "/home/murugu/.gemini/antigravity/brain/398ec6fe-4556-4323-ad7a-11c4a5b3504b"
-REPO_ROOT = "/home/murugu/Android/app"
+REPO_ROOT_DEFAULT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+APP_DATA_DIR = os.environ.get("PERAZIM_CAPTURE_DATA_DIR", os.path.join(REPO_ROOT_DEFAULT, "build", "capture-data"))
+REPO_ROOT = REPO_ROOT_DEFAULT
 DOCS_SCREENSHOTS = os.path.join(REPO_ROOT, "docs/screenshots")
 
 os.makedirs(DOCS_SCREENSHOTS, exist_ok=True)

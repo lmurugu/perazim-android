@@ -1,6 +1,6 @@
 ================================================================================
 PERAZIM MISSION CHURCH — PHYSICAL DEVICE UI AUTOMATOR PROOF
-Target: Infinix X689C (Android 11, ID 0667737142100269)
+Target: Infinix X689C (Android 11, ID <device-serial>)
 Screen: Worship (Hymnal & Chord Browser, Category Chips)
 Artifact: docs/review/ui-redesign-03-worship.png
 ================================================================================

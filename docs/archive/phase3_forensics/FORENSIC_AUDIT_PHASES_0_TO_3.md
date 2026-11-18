@@ -1,6 +1,6 @@
 # PERAZIM ANDROID — PHASE 0–3 INDEPENDENT FORENSIC AUDIT
 # Independent Auditor: Hermes Agent (adversarial, fair — NOT Antigravity's self-check)
-# Project repo (live): /home/murugu/Android/app ; remote: git@github.com:lmurugu/perazim-android.git
+# Project repo (live): <repo> ; remote: git@github.com:lmurugu/perazim-android.git
 # Audit date: 2026-09-16 (EAT). Mode: READ-ONLY (§28) — zero production-source modifications.
 # Cross-reference: FORENSIC_ACCESS_CERTIFICATE.md (access proof, same session, independent commands)
 
@@ -13,9 +13,9 @@ PHASE 3 — COMMUNITY & FELLOWSHIP:        PARTIALLY PROVEN (source REAL — 517
 Note on "PROVEN" standard (§31): distinction used — Phase 0/1/2: implemented + tested + device-verified (Phase 2 device-verified by screenshots + ADB live process); Phase 3: implemented + repository-tested + code-verified; NOT yet device-corroborated independently (no Phase 3 device screenshot captured at audit time). Phase 3 is NOT "not implemented"; it is NOT "fully independently verified at device level" either — the evidence supports PARTIALLY PROVEN.
 
 === 1. HERME ACCESS / ANTIGRAVITY WORKSPACE (§3) ===
-ANTIGRAVITY WORKSPACE FOUND: YES — /home/murugu/Android/app (actual native Android repo, not the Grok workspace ~/perazim-app-repo which was independently identified as separate)
+ANTIGRAVITY WORKSPACE FOUND: YES — <repo> (actual native Android repo, not the Grok workspace ~/perazim-app-repo which was independently identified as separate)
 ANDROID PROJECT FOUND: YES — src/main/java/org/perazimchurch/app/; gradlew; build.gradle; AndroidManifest.xml
-REPOSITORY ROOT: /home/murugu/Android/app (git rev-parse --show-toplevel)
+REPOSITORY ROOT: <repo> (git rev-parse --show-toplevel)
 REPOSITORY_ACCESS = VERIFIED (git status / rev-parse / branch / log / remote / ls-tree all executed; results in Access Certificate)
 
 === 2. GIT PROVENANCE (§5, §22) ===
@@ -30,7 +30,7 @@ PROVENANCE DISCREPANCY (independent finding): Phase 3 HEAD not on main; main sti
 CODE CHANGED AFTER TEST → PREVIOUS TEST DOES NOT AUTO-VERIFY NEW CODE (§22): This audit verifies source at HEAD 854a6b2. If source is modified after 2026-09-16, affected verifications become stale — re-run this audit (FORENSIC_MONITOR_SH.sh assists).
 
 === 3. DEVICE / RUNTIME (§7, §10) ===
-DEVICE: Infinix X689C; Android 11 (API 30); ADB responsive; 0667737142100269 device.
+DEVICE: Infinix X689C; Android 11 (API 30); ADB responsive; <device-serial> device.
 APP PACKAGE: org.perazimchurch.app (installed, process PID 17748 live during audit).
 LOGCAT: accessible; no fatal Perazim errors in captured window (system WiFi/vendor errors present — unrelated).
 OBSERVATION: verified (app observed running; NOT started/stopped/modified by auditor).
@@ -162,7 +162,7 @@ Search executed independently (not from Antigravity report). Only occurrences in
   GIVING / M-PESA integration (from GitHub description / project context): source-level verification of M-Pesa integration NOT executed in this audit (would require separate financial-flow inspection; not claimed as completed in Phase 0–3 audit scope — noted as deferred/undetermined, NOT fabricated).
 
 === 10. EVIDENCE INVENTORY (§29) ===
-Level 1 (actual source / runtime / device) — verified live: git repo at /home/murugu/Android/app; git HEAD 854a6b2; ADB device Infinix X689C / API 30; app process PID 17748; logcat readable; file checksums computed live; NavigationContract.java read; domain/ purity verified; RoomMessageRepository account-scoping verified; 517-line Phase 3 verification file verified; Phase 2 device screenshots (2) verified at disk with timestamps.
+Level 1 (actual source / runtime / device) — verified live: git repo at <repo>; git HEAD 854a6b2; ADB device Infinix X689C / API 30; app process PID 17748; logcat readable; file checksums computed live; NavigationContract.java read; domain/ purity verified; RoomMessageRepository account-scoping verified; 517-line Phase 3 verification file verified; Phase 2 device screenshots (2) verified at disk with timestamps.
 Level 2 (reproducible tests / commands) — verified: git commands; adb commands; sha256sum commands; grep/ls commands; FORENSIC_MONITOR_SH.sh executed (first snapshot produced; read-only; writes forensic/ only).
 Level 3 (documentation / records) — verified: NavigationContract.java (contract doc); docs/screenshots/ (9 images); Phase 2/3 master verification source files (document assertions); Git tags (phase-0/1/2-accepted); GitHub repo page (attached context) — used as reference only, NOT as proof.
 Level 4 (agent assertions / Antigravity claims) — EXPLICITLY NOT USED AS PROOF: Antigravity's verbal claims; acceptance-record status fields; master-gate claim text alone; Phase 3 "completed" statement — all treated as claims requiring independent Level 1–2 verification. Where Level 1–2 corroboration exists (Phase 2 screenshots + source; Phase 3 source + ADB + repository wiring), claim is PROVEN/PARTIALLY PROVEN accordingly; where corroboration missing (Phase 3 device screenshot; Phase 3 merge-to-main), claim is flagged PARTIAL / NOT PROVEN honestly.

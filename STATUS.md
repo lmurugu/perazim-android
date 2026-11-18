@@ -98,7 +98,7 @@
   - Multi-Device Intercession Amen: [`20_sister_mary_amen.png`](docs/review/phase_A/20_sister_mary_amen.png)
   - Offline Sync Recovery (Both Prayers Synced): [`22_prayer_wall_synced.png`](docs/review/phase_A/22_prayer_wall_synced.png)
 
-### 2.4 Physical Hardware Verification on Infinix HOT 10T (`0667737142100269`) — `WORKING`
+### 2.4 Physical Hardware Verification on Infinix HOT 10T (serial withheld) — `WORKING`
 - **Audit Date**: November 5, 2026
 - **Branch**: `phase-A-server`
 - **Device Specifications**: Physical Infinix HOT 10T (`Infinix_X689C`), Android 11 (API 30), Screen Resolution 720x1640 (tall aspect ratio).
@@ -148,7 +148,7 @@
      - Validates PostgreSQL table existence, `UNIQUE` constraint enforcement, idempotent prayer amens (`ON CONFLICT (prayer_id, user_id) DO NOTHING`), row ownership checks, rate limiting lockouts, and multi-mutation batch sync.
      - Total test suite: 26 automated tests (12 unit + 14 real PostgreSQL integration tests) passing with 100% success rate.
 - **Physical Hardware Verification**:
-  - Live reverse port tunnel (`adb -s 0667737142100269 reverse tcp:3000 tcp:3000`) connected to the hardened server running on real PostgreSQL.
+  - Live reverse port tunnel (`adb -s <device-serial> reverse tcp:3000 tcp:3000`) connected to the hardened server running on real PostgreSQL.
   - Physical Infinix phone successfully loaded live prayers from PostgreSQL and confirmed synchronized prayer state.
 
 ---

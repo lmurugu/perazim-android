@@ -6,7 +6,7 @@ SERVER_DIR="$ROOT_DIR/server"
 DEPS_DIR="${AUDIT_NODE_MODULES:-$SERVER_DIR/node_modules}"
 # This checkout intentionally has no vendored runtime. These are tool binaries
 # only; all application source and tests are resolved from ROOT_DIR above.
-SHARED_TOOL_ROOT="${AUDIT_PG_RUNTIME:-/home/murugu/Android/app/server/.runtime/pgsql/usr}"
+SHARED_TOOL_ROOT="${AUDIT_PG_RUNTIME:-$SERVER_DIR/.runtime/pgsql/usr}"
 PG_TOOLS="$SHARED_TOOL_ROOT/bin"
 NODE_BIN="${AUDIT_NODE_BIN:-$(command -v node)}"
 TIMEOUT_BIN="$(command -v timeout)"

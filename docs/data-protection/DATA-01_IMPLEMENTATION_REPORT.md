@@ -4,7 +4,7 @@
 
 ## Repository and concurrency
 
-Work is in `/home/murugu/Android/app`, branch `phase-B-community`, based on HEAD `93e24bc1232cf2c5a21b8107459460dc8899fe36`. No commit, push, or merge was made. The audit thread was idle during preflight, but it had uncommitted changes in the shared checkout. Its backend security, membership routes, tests, migrations 0003/0004 and scripts were preserved. The existing untracked `docs/PERAZIM_AI_PROJECT/` specifications were also preserved.
+Work is in `<repo>`, branch `phase-B-community`, based on HEAD `93e24bc1232cf2c5a21b8107459460dc8899fe36`. No commit, push, or merge was made. The audit thread was idle during preflight, but it had uncommitted changes in the shared checkout. Its backend security, membership routes, tests, migrations 0003/0004 and scripts were preserved. The existing untracked `docs/PERAZIM_AI_PROJECT/` specifications were also preserved.
 
 ## Documents
 
@@ -26,7 +26,7 @@ The new migrations were not applied to any PostgreSQL database. The existing Pha
 
 ## Real CSV protection
 
-The CSV was verified as a regular 2,667-byte file without opening or printing its rows. Its SHA-256 was recorded in the owner-only preflight report. At the current DATA-01 instruction, the file was moved byte-for-byte to `/home/murugu/Android/private-member-data/member_contacts.csv`; the directory is mode `700` and file mode `600`, and the hash matched after relocation. The repository asset path is absent and ignored if recreated. At-rest disk encryption was not verified, and no extra CSV backup was made.
+The CSV was verified as a regular 2,667-byte file without opening or printing its rows. Its SHA-256 was recorded in the owner-only preflight report. At the current DATA-01 instruction, the file was moved byte-for-byte to `<home>/Android/private-member-data/member_contacts.csv`; the directory is mode `700` and file mode `600`, and the hash matched after relocation. The repository asset path is absent and ignored if recreated. At-rest disk encryption was not verified, and no extra CSV backup was made.
 
 The debug APK was opened as an archive. It contains the two public privacy documents and no member CSV or similarly named contact CSV. The Gradle source-set exclusion and explicit merged-asset filter both protect future APK builds.
 
@@ -39,14 +39,14 @@ The debug APK was opened as an archive. It contains the two public privacy docum
 - APK archive integrity passed; the membership CSV was absent from the final APK.
 - `npm run test:migrations` could not run because `MIGRATIONS_TEST_ADMIN_URL` is not configured. No PostgreSQL tests or Phase B security audit suites were run. No Android device or emulator was connected, so the native screen was compiled but not exercised on-device.
 
-APK: `/home/murugu/Android/app/build/outputs/apk/debug/app-debug.apk`
+APK: `<repo>/build/outputs/apk/debug/app-debug.apk`
 SHA-256: `a3b4c409d516bb933757aca47447c205ce22b8056112d0ea8abd1e0f1f3f4c10`
 
 ## Backups
 
-A pre-change source backup is at `/home/murugu/Android/backups/perazim_DATA-01_prechange_20261108_224332_EAT.tar.gz`. Its SHA-256 sidecar and gzip integrity check passed. It excludes the private CSV, Git metadata, local secrets, local databases, and ignored build artifacts.
+A pre-change source backup is at `<home>/Android/backups/perazim_DATA-01_prechange_20261108_224332_EAT.tar.gz`. Its SHA-256 sidecar and gzip integrity check passed. It excludes the private CSV, Git metadata, local secrets, local databases, and ignored build artifacts.
 
-The prior final archive is `/home/murugu/Android/backups/perazim_DATA-01_final_20261108_231838_EAT.tar.gz`. After Addendum 2 changes, a refreshed archive was created at `/home/murugu/Android/backups/perazim_DATA-01_addendum2_20261108_233830_EAT.tar.gz`; its SHA-256 is `ce14e77a052608d6849f2acce2bc41e062339b0b51c7008668036edf0b74266d`. A final archive was also captured after this report text was saved. Its matching archive, manifest and SHA-256 sidecar are in `/home/murugu/Android/backups/`. The archives exclude the private CSV, Git metadata, secrets, local databases, build output, caches, screenshots and logs. Archive integrity, an isolated restoration of all 829 files, and CSV absence were verified.
+The prior final archive is `<home>/Android/backups/perazim_DATA-01_final_20261108_231838_EAT.tar.gz`. After Addendum 2 changes, a refreshed archive was created at `<home>/Android/backups/perazim_DATA-01_addendum2_20261108_233830_EAT.tar.gz`; its SHA-256 is `ce14e77a052608d6849f2acce2bc41e062339b0b51c7008668036edf0b74266d`. A final archive was also captured after this report text was saved. Its matching archive, manifest and SHA-256 sidecar are in `<home>/Android/backups/`. The archives exclude the private CSV, Git metadata, secrets, local databases, build output, caches, screenshots and logs. Archive integrity, an isolated restoration of all 829 files, and CSV absence were verified.
 
 ## Remaining requirements and next action
 
@@ -118,7 +118,7 @@ This section records implementation evidence separately from institutional decis
 
 ### APK and AI-boundary verification
 
-**Independent verification (prior to this addendum's server-only edits):** the debug APK at `/home/murugu/Android/app/build/outputs/apk/debug/app-debug.apk` was inspected as an archive; its SHA-256 was `a3b4c409d516bb933757aca47447c205ce22b8056112d0ea8abd1e0f1f3f4c10`. The archive contained the two public privacy assets and no member CSV or similarly named contact CSV. The prior Gradle build completed with 67 Android unit tests passing, 0 failures, 0 errors, 0 skipped. No Android source or asset-packaging configuration changed in this addendum, so the APK was not rebuilt. No full register was found in Room, AI/offline assets, prompts or caches by the earlier source/package inspection; this does not constitute a comprehensive runtime cache audit.
+**Independent verification (prior to this addendum's server-only edits):** the debug APK at `<repo>/build/outputs/apk/debug/app-debug.apk` was inspected as an archive; its SHA-256 was `a3b4c409d516bb933757aca47447c205ce22b8056112d0ea8abd1e0f1f3f4c10`. The archive contained the two public privacy assets and no member CSV or similarly named contact CSV. The prior Gradle build completed with 67 Android unit tests passing, 0 failures, 0 errors, 0 skipped. No Android source or asset-packaging configuration changed in this addendum, so the APK was not rebuilt. No full register was found in Room, AI/offline assets, prompts or caches by the earlier source/package inspection; this does not constitute a comprehensive runtime cache audit.
 
 ### Tests run for Addendum 2
 

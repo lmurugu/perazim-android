@@ -8,12 +8,12 @@
 1. ANTIGRAVITY WORKSPACE
 ==================================================
 ANTIGRAVITY WORKSPACE FOUND: YES
-ACTUAL PROJECT ROOT (verified, not assumed): /home/murugu/Android/app
+ACTUAL PROJECT ROOT (verified, not assumed): <repo>
 NOTE: ~/perazim-app-repo (Grok/web workspace, package.json/.grok/, commit e51014b) is NOT the native Android repo. Confirmed independent before audit.
 
 PROJECT FILESYSTEM ACCESS: YES — src/main/java/org/perazimchurch/app/ fully traversable; docs/screenshots/ (9 captures); build/ present; gradlew executable.
 
-REPOSITORY ROOT (verified): /home/murugu/Android/app (git rev-parse --show-toplevel)
+REPOSITORY ROOT (verified): <repo> (git rev-parse --show-toplevel)
 
 REPOSITORY_ACCESS = VERIFIED (read-only checks executed: git status, git rev-parse HEAD, git branch --show-current, git log -n 10 --oneline --decorate, git remote -v, git ls-tree -r HEAD)
 GIT HISTORY ACCESS = VERIFIED (all 4 phase tags + HEAD resolved; linear graph confirmed)
@@ -46,19 +46,19 @@ PROVENANCE DISCREPANCY (independent): Phase 3 claims "accepted / completed" per 
 3. BUILD ENVIRONMENT
 ==================================================
 BUILD ENVIRONMENT ACCESS: VERIFIED (non-destructive checks only; zero rebuild executed during audit — per §28 no-write forensic mode)
-Gradle wrapper: /home/murugu/Android/app/gradlew — executable, present
-Gradle distribution: /home/murugu/Android/app/gradle-8.5-bin.zip / gradle-8.5-all (unpacked, ready)
-Java: /home/murugu/.local/jdks/jdk-21.0.12.1/bin/java — version "21.0.12.1" LTS (verified java -version)
-Android SDK: /home/murugu/Android/sdk — build-tools/, cmdline-tools/, emulator/, licenses/ present
+Gradle wrapper: <repo>/gradlew — executable, present
+Gradle distribution: <repo>/gradle-8.5-bin.zip / gradle-8.5-all (unpacked, ready)
+Java: <home>/.local/jdks/jdk-21.0.12.1/bin/java — version "21.0.12.1" LTS (verified java -version)
+Android SDK: <home>/Android/sdk — build-tools/, cmdline-tools/, emulator/, licenses/ present
 Build outputs (compiled APK): NOT PRESENT at app/build/outputs/apk/debug/app-debug.apk or release/ at audit time → build NOT independently reproduced as part of this audit; environment is capable but unverified at artifact level.
 ADB ACCESS: VERIFIED
-ADB binary: /home/murugu/Android/sdk/platform-tools/adb — version 1.0.41
+ADB binary: <home>/Android/sdk/platform-tools/adb — version 1.0.41
 Android SDK ACCESS: VERIFIED
 
 ==================================================
 4. PHYSICAL DEVICE
 ==================================================
-DEVICE DETECTED: YES (adb devices shows 0667737142100269 device — responsive, not unauthorized)
+DEVICE DETECTED: YES (adb devices shows <device-serial> device — responsive, not unauthorized)
 DEVICE MODEL: Infinix X689C (verified via adb shell getprop ro.product.model)
 ANDROID VERSION: 11 (API 30, verified via ro.build.version.sdk = 30) — matches expected Infinix HOT 10T / X689C / Android 11 class
 ADB RESPONSIVE: YES
@@ -108,7 +108,7 @@ Limitation honestly stated: true continuous background monitoring requires a per
 ==================================================
 8. OVERALL FORENSIC ACCESS DECISION
 ==================================================
-Antigravity workspace access:       YES  (/home/murugu/Android/app verified independently; perazim-app-repo identified as separate web workspace)
+Antigravity workspace access:       YES  (<repo> verified independently; perazim-app-repo identified as separate web workspace)
 Project filesystem access:          YES
 Git repository access:              YES
 Git history access:                 YES (all claimed commits reachable; provenance graph linear; tags verified)

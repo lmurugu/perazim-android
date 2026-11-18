@@ -6,7 +6,7 @@
 **Controlling Feature Source**: `854a6b2f77ecf1164f4c440cbd4d78fcabef406a`  
 **Verification Harness Commit**: `7bb0c8e9f5e3fec029e0da765e94b0d014bc08d8`  
 **Current Branch HEAD**: `eec6f98436440baadcf63897ca4f84c82ef9ff8c`  
-**Target Hardware**: `Infinix X689C` / `Infinix HOT 10T` (`0667737142100269`, Android 11 / API 30)  
+**Target Hardware**: `Infinix X689C` / `Infinix HOT 10T` (`<device-serial>`, Android 11 / API 30)  
 **Database Inspection Target**: `/data/data/org.perazimchurch.app/databases/perazim_database.db` (WAL Mode)  
 **Date**: 2026-09-16  
 

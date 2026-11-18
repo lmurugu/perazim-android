@@ -3,7 +3,7 @@
 Produced by Hermes executor (Antigravity = supervisor only).
 
 {
-  "HANDSHAKE_RESOLVED": "ALL MATCH (HEAD 61029de matches expected; branch phase-3/community-fellowship; workspace /home/murugu/Android/app; remote git@github.com:lmurugu/perazim-android.git; status clean; package org.perazimchurch.app already correct \u2014 NO rename needed); M1 v2.1 verified complete; CI green asserted per governance; I am executor, Antigravity supervisor only.",
+  "HANDSHAKE_RESOLVED": "ALL MATCH (HEAD 61029de matches expected; branch phase-3/community-fellowship; workspace <repo>; remote git@github.com:lmurugu/perazim-android.git; status clean; package org.perazimchurch.app already correct \u2014 NO rename needed); M1 v2.1 verified complete; CI green asserted per governance; I am executor, Antigravity supervisor only.",
   "COMPLETION_REPORT_M1_SLICE1": {
     "slice": "Milestone 1 \u2014 Hygiene + CI Verification + Minify Verification + Quarantine",
     "changes": [
@@ -44,7 +44,7 @@ Produced by Hermes executor (Antigravity = supervisor only).
 
 ## Verification evidence (real, not fabricated)
 
-- Quarantine dir: /home/murugu/Android/app/docs/archive/quarantine
+- Quarantine dir: <repo>/docs/archive/quarantine
 - Quarantined files (6): FORENSIC_ACCESS_CERTIFICATE.md, FORENSIC_AUDIT_PHASES_0_TO_3.md, FORENSIC_PHASE3_EVIDENCE_FOR_REVIEWER.md, FORENSIC_PHASE3_EVIDENCE_GAP_CLOSURE.md, FORENSIC_PHASE3_FINAL_CLOSURE.md, FORENSIC_PHASE3_RUNTIMES.md
 - Remaining in forensic dir: ['FORENSIC_MONITOR_SH.sh', 'forensic']
 - New VerificationHelpers (should be 0): 0
