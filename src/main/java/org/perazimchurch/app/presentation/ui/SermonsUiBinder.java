@@ -744,7 +744,7 @@ public class SermonsUiBinder {
             return;
         }
 
-        viewModel.loadSermons(sermons -> activity.runOnUiThread(() -> {
+        loadAllSermons(sermons -> activity.runOnUiThread(() -> {
             loadingBar.setVisibility(View.GONE);
             renderSermonCards(sermons);
         }));
@@ -769,10 +769,10 @@ public class SermonsUiBinder {
 
     public void loadInitialData() {
         loadingBar.setVisibility(View.VISIBLE);
-        viewModel.loadSermons(sermons -> activity.runOnUiThread(() -> {
+        loadAllSermons(sermons -> activity.runOnUiThread(() -> {
             loadingBar.setVisibility(View.GONE);
             renderSermonCards(sermons);
-            if (sermons != null && !sermons.isEmpty() && activeSermon == null) {
+            if (sermons != null && !sermons.isEmpty() && activeSermon == null && sermons.get(0).getAudioUrl() != null && !sermons.get(0).getAudioUrl().isEmpty()) {
                 loadSermonIntoPlayer(sermons.get(0), false);
             }
             YouTubeFeedRepository.fetchRecentVideos(videos -> {
@@ -893,7 +893,8 @@ public class SermonsUiBinder {
         boolean isSample = (sermon.getLocalAudioPath() == null || sermon.getLocalAudioPath().isEmpty()) && (sermon.getAudioUrl() == null || sermon.getAudioUrl().isEmpty());
         if (isSample) {
             TextView tvSample = new TextView(activity);
-            tvSample.setText("Sample Audio Preview");
+            boolean watchOnly = sermon.getVideoUrl() != null && !sermon.getVideoUrl().isEmpty();
+            tvSample.setText(watchOnly ? "Watch on YouTube" : "Sample Audio Preview");
             tvSample.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
             tvSample.setTypeface(Typeface.DEFAULT_BOLD);
             tvSample.setTextColor(PerazimTheme.COLOR_ORANGE_BRAND);
@@ -1050,7 +1051,64 @@ public class SermonsUiBinder {
 
     public void startPlayback(Sermon sermon) {
         if (sermon == null) return;
+        boolean hasAudio = sermon.getAudioUrl() != null && !sermon.getAudioUrl().isEmpty();
+        String watch = sermon.getVideoUrl();
+        if (!hasAudio && watch != null && watch.startsWith("https://")) {
+            // Church YouTube uploads have no separate audio file: open the video.
+            try {
+                activity.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(watch)));
+            } catch (Exception e) {
+                Toast.makeText(activity, "No app found to open this video", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
         loadSermonIntoPlayer(sermon, true);
+    }
+
+    /**
+     * Loads the church's YouTube uploads from the pilot server. Calls back with null when the
+     * feed is unavailable, so callers can fall back to the bundled list.
+     */
+    private void loadChurchFeed(java.util.function.Consumer<List<Sermon>> callback) {
+        org.perazimchurch.app.data.remote.ApiClient.get(activity, "/api/media/church-feed", null,
+                new org.perazimchurch.app.data.remote.ApiClient.ApiCallback() {
+                    @Override
+                    public void onSuccess(int statusCode, org.json.JSONObject json) {
+                        List<Sermon> out = new ArrayList<>();
+                        org.json.JSONArray items = json.optJSONArray("items");
+                        if (items != null) {
+                            for (int i = 0; i < items.length(); i++) {
+                                org.json.JSONObject it = items.optJSONObject(i);
+                                if (it == null) continue;
+                                Sermon s = new Sermon();
+                                s.setId("yt-" + it.optString("videoId"));
+                                s.setTitle(it.optString("title"));
+                                s.setPreacher("Perazim Mission Church");
+                                s.setVideoUrl(it.optString("watchUrl"));
+                                s.setThumbnailUrl(it.optString("thumbnailUrl"));
+                                s.setDatePreached(it.optString("publishedAt"));
+                                out.add(s);
+                            }
+                        }
+                        callback.accept(out);
+                    }
+
+                    @Override
+                    public void onError(int statusCode, String errorMessage) {
+                        callback.accept(null);
+                    }
+                });
+    }
+
+    /** Church feed first; bundled Room list if the feed is empty or unreachable. */
+    private void loadAllSermons(java.util.function.Consumer<List<Sermon>> callback) {
+        loadChurchFeed(feed -> {
+            if (feed != null && !feed.isEmpty()) {
+                callback.accept(feed);
+            } else {
+                viewModel.loadSermons(callback::accept);
+            }
+        });
     }
 
     private void loadSermonIntoPlayer(Sermon sermon, boolean autoPlay) {
