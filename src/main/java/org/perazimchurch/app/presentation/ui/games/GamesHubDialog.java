@@ -76,7 +76,11 @@ public final class GamesHubDialog extends Dialog {
         GamesHubDialog dialog = new GamesHubDialog(activity);
         dialog.show();
         Window window = dialog.getWindow();
-        if (window != null) window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            // The Dialog's default theme draws its own (light) window frame; paint the decor in the app's current mode too.
+            window.getDecorView().setBackground(PerazimTheme.createBackgroundGradient());
+        }
     }
 
     private GamesHubDialog(Activity activity) {
