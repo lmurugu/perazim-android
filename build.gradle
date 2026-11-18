@@ -36,6 +36,8 @@ def pilotApiBaseUrl = configuredApiBaseUrl('perazimPilotApiBaseUrl', false, true
 
 android {
     namespace 'org.perazimchurch.app'
+    // Android Gradle creates connected<Variant>AndroidTest only for the test build type (default debug).
+    testBuildType "validation"
     compileSdk 36
     compileOptions { sourceCompatibility JavaVersion.VERSION_11; targetCompatibility JavaVersion.VERSION_11 }
     packagingOptions {
