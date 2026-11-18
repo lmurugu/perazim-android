@@ -109,7 +109,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     // Navigation Shell Views
     private FrameLayout tabContainer;
-    private ScrollView[] tabViews = new ScrollView[5];
+    private ScrollView[] tabViews = new ScrollView[6];
     private LinearLayout[] navTabButtons = new LinearLayout[5];
     private TextView[] navTabLabels = new TextView[5];
     private ImageView[] navTabIcons = new ImageView[5];
@@ -209,8 +209,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tabViews[1] = buildSermonsScreen();
         tabViews[2] = buildWorshipScreen();
         tabViews[3] = buildFellowshipScreen();
-        tabViews[4] = buildProfileScreen();
-        for (int i = 0; i < 5; i++) {
+        tabViews[4] = buildGivingScreen();
+        tabViews[5] = buildProfileScreen();
+        for (int i = 0; i < tabViews.length; i++) {
             tabContainer.addView(tabViews[i]);
             tabViews[i].setVisibility(i == 0 ? View.VISIBLE : View.GONE);
         }
@@ -366,19 +367,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             }
         }
         if (intent.getBooleanExtra("open_about_dialog", false)) {
-            switchTab(4);
+            switchTab(5);
             if (profileUiBinder != null) {
                 profileUiBinder.showAboutDialog();
             }
         }
         if (intent.getBooleanExtra("open_fellowship_extras", false)) {
-            switchTab(4);
+            switchTab(5);
             if (profileUiBinder != null) {
                 profileUiBinder.showFellowshipExtrasDialog();
             }
         }
         if (intent.getBooleanExtra("open_saved_content", false)) {
-            switchTab(4);
+            switchTab(5);
             if (profileUiBinder != null) {
                 profileUiBinder.showSavedContentDialog();
             }
@@ -429,6 +430,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout.LayoutParams lpSpacer = new LinearLayout.LayoutParams(0, 0, 1.0f);
         spacer.setLayoutParams(lpSpacer);
         header.addView(spacer);
+
+        // Profile ("Me") moved from the bottom bar to the header, so Giving can have its own tab.
+        ImageView meButton = new ImageView(this);
+        meButton.setImageResource(NavigationContract.TAB_ICON_RES_ME);
+        meButton.setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
+        meButton.setPadding(dp(8), dp(8), dp(8), dp(8));
+        meButton.setContentDescription("My profile");
+        meButton.setLayoutParams(new LinearLayout.LayoutParams(dp(40), dp(40)));
+        meButton.setOnClickListener(v -> switchTab(NavigationContract.TAB_ID_PROFILE));
+        header.addView(meButton);
 
         return header;
     }
@@ -583,14 +594,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 NavigationContract.TAB_ICON_RES_SERMONS,
                 NavigationContract.TAB_ICON_RES_WORSHIP,
                 NavigationContract.TAB_ICON_RES_PRAYER,
-                NavigationContract.TAB_ICON_RES_ME
+                org.perazimchurch.app.R.drawable.ic_give
         };
         final String[] labels = {
                 NavigationContract.TAB_TITLE_HOME,
                 NavigationContract.TAB_TITLE_SERMONS,
                 NavigationContract.TAB_TITLE_WORSHIP,
                 "Community",
-                NavigationContract.TAB_TITLE_ME
+                "Give"
         };
 
         for (int i = 0; i < 5; i++) {
@@ -635,7 +646,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         }
         currentTabIndex = index;
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < tabViews.length; i++) {
             tabViews[i].setVisibility(i == currentTabIndex ? View.VISIBLE : View.GONE);
         }
         refreshTabStyles();
@@ -2184,6 +2195,73 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
     // TAB 4: PROFILE SCREEN (Guidebook §73 Layout Contract)
     // =========================================================================
+
+    private ScrollView buildGivingScreen() {
+        ScrollView scroll = new ScrollView(this);
+        scroll.setBackground(PerazimTheme.createBackgroundGradient());
+        LinearLayout col = new LinearLayout(this);
+        col.setOrientation(LinearLayout.VERTICAL);
+        col.setPadding(dp(16), dp(16), dp(16), dp(32));
+
+        TextView title = new TextView(this);
+        title.setText("Give");
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        col.addView(title);
+
+        TextView intro = new TextView(this);
+        intro.setText("Your giving supports the work of Perazim Mission Church.");
+        intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        intro.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        intro.setPadding(0, dp(4), 0, dp(16));
+        col.addView(intro);
+
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(16), dp(16), dp(16), dp(16));
+        GradientDrawable cardBg = new GradientDrawable();
+        cardBg.setColor(PerazimTheme.COLOR_SURFACE);
+        cardBg.setCornerRadius(dp(14));
+        card.setBackground(cardBg);
+
+        TextView label = new TextView(this);
+        label.setText("M-Pesa Paybill");
+        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        label.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
+        card.addView(label);
+
+        TextView paybill = new TextView(this);
+        paybill.setText(ChurchConfig.MPESA_PAYBILL);
+        paybill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        paybill.setTypeface(Typeface.DEFAULT_BOLD);
+        paybill.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        paybill.setPadding(0, dp(4), 0, dp(12));
+        card.addView(paybill);
+
+        Button give = new Button(this);
+        give.setText("Give now");
+        give.setAllCaps(false);
+        give.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        give.setTypeface(Typeface.DEFAULT_BOLD);
+        give.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(14)));
+        give.setMinHeight(dp(56));
+        give.setOnClickListener(v -> showGivingDialog());
+        card.addView(give, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+        col.addView(card);
+
+        TextView note = new TextView(this);
+        note.setText("Giving is completed through M-Pesa, outside this app. The app does not store payment details.");
+        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        note.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        note.setPadding(0, dp(16), 0, 0);
+        col.addView(note);
+
+        scroll.addView(col);
+        return scroll;
+    }
 
     private ScrollView buildProfileScreen() {
         if (factory == null) {

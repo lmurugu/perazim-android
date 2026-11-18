@@ -23,8 +23,9 @@ public final class NavigationContract {
     public static final int TAB_ID_SERMONS = 1;
     public static final int TAB_ID_WORSHIP = 2;
     public static final int TAB_ID_FELLOWSHIP = 3;
-    public static final int TAB_ID_PROFILE = 4;
-    public static final int TOTAL_TAB_COUNT = 5;
+    public static final int TAB_ID_GIVE = 4;
+    public static final int TAB_ID_PROFILE = 5;
+    public static final int TOTAL_TAB_COUNT = 6;
 
     // =========================================================================
     // TAB TITLES (§2 Contract: Home | Sermons | Worship | Prayer | Me)

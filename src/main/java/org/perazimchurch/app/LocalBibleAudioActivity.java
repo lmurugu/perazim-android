@@ -207,8 +207,9 @@ public class LocalBibleAudioActivity extends Activity {
         String name = displayName(uri);
         if (pendingPersistable) {
             try {
-                int flags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                getContentResolver().takePersistableUriPermission(uri, flags & Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                if ((data.getFlags() & Intent.FLAG_GRANT_READ_URI_PERMISSION) != 0) {
+                    getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
             } catch (SecurityException ignored) {
                 Toast.makeText(this, "The selected file may need to be added again later.", Toast.LENGTH_LONG).show();
             }

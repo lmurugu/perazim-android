@@ -1,4 +1,4 @@
-plugins { id 'com.android.application' version '8.7.3' }
+plugins { id 'com.android.application' version '8.9.1' }
 
 def keystorePropertiesFile = file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -24,7 +24,7 @@ def configuredApiBaseUrl = { String propertyName, boolean allowLocalHttp, boolea
             !(uri.scheme == 'https' || permittedHttp)) {
         throw new GradleException("${propertyName} must be an HTTPS origin (local debug may use HTTP loopback)")
     }
-    if (pilotProduction && (loopback || uri.port != -1 || host.endsWith('.ts.net') ||
+    if (pilotProduction && (loopback || uri.port != -1 ||
             host == 'trycloudflare.com' || host.endsWith('.trycloudflare.com') ||
             host.endsWith('.invalid'))) {
         throw new GradleException("Pilot release requires an approved stable public HTTPS origin")
@@ -32,7 +32,6 @@ def configuredApiBaseUrl = { String propertyName, boolean allowLocalHttp, boolea
     return value.endsWith('/') ? value.substring(0, value.length() - 1) : value
 }
 def localApiBaseUrl = configuredApiBaseUrl('perazimLocalApiBaseUrl', true, false)
-def validationApiBaseUrl = configuredApiBaseUrl('perazimValidationApiBaseUrl', false, false)
 def pilotApiBaseUrl = configuredApiBaseUrl('perazimPilotApiBaseUrl', false, true)
 
 android {
@@ -79,14 +78,8 @@ android {
     }
     buildTypes {
         debug {
-            buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(localApiBaseUrl)
-        }
-        validation {
-            initWith debug
-            applicationIdSuffix '.validation'
-            versionNameSuffix '-pilot'
-            matchingFallbacks = ['debug']
-            buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(validationApiBaseUrl)
+            // One app: the debug build used on the phone talks to the pilot when it is configured.
+            buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(pilotApiBaseUrl ?: localApiBaseUrl)
         }
         release {
             minifyEnabled true
@@ -98,7 +91,6 @@ android {
             }
         }
     }
-    testBuildType 'validation'
     sourceSets {
         main {
             assets {

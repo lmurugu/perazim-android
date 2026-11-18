@@ -48,6 +48,7 @@ import androidx.annotation.Nullable;
 import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.data.local.entity.DailyVerseEntity;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
+import org.perazimchurch.app.data.local.entity.UserEntity;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.model.Announcement;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
@@ -123,6 +124,8 @@ public class HomeUiBinder {
     private Button btnRoutineNext;
     private LinearLayout routineInlineContainer;
     private Button btnBeginRoutine;
+    private TextView tvGreeting;
+    private TextView tvContinueStep;
 
     // Progress State
     private int streakCount = 0;
@@ -319,12 +322,22 @@ public class HomeUiBinder {
         headerContainer.addView(headerBanner);
         contentContainer.addView(headerContainer);
 
+        // 1b. Personal greeting: a person speaking to a person, not a menu.
+        tvGreeting = new TextView(context);
+        tvGreeting.setText(buildGreeting());
+        tvGreeting.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        tvGreeting.setTypeface(Typeface.DEFAULT_BOLD);
+        tvGreeting.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvGreeting.setPadding(dp(4), dp(4), dp(4), dp(12));
+        contentContainer.addView(tvGreeting);
+        refreshGreetingNameAsync();
+
         // 2. Single "Today" Card (Hero Darkened Gradient)
         View todayCard = createTodayCard();
         contentContainer.addView(todayCard);
 
-        // 3. Four Quiet Doors (2x2 Grid on Surface Gradient)
-        View doorsGrid = createFourDoorsGrid();
+        // 3. Photo tiles: Sermons, Events and Community
+        View doorsGrid = createPhotoTiles();
         contentContainer.addView(doorsGrid);
 
         // 4. Optional Single Announcement Line at bottom
@@ -333,7 +346,56 @@ public class HomeUiBinder {
         announcementsContainer.setPadding(0, dp(8), 0, 0);
         contentContainer.addView(announcementsContainer);
 
+        // 5. Flexible spacer pushes the main action into the thumb zone at the bottom.
+        View spacer = new View(context);
+        contentContainer.addView(spacer, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+
+        // 6. Primary action, full width, bottom of the screen (bottom ~35% of the viewport).
+        contentContainer.addView(createPrimaryActionPanel());
+
         rootScrollView.addView(contentContainer);
+    }
+
+    private View createPrimaryActionPanel() {
+        LinearLayout panel = new LinearLayout(context);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setPadding(0, dp(12), 0, 0);
+        btnBeginRoutine.setMinHeight(dp(56));
+        btnBeginRoutine.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        btnBeginRoutine.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(56)));
+        panel.addView(btnBeginRoutine);
+        return panel;
+    }
+
+    private String buildGreeting() {
+        return greetingText(null);
+    }
+
+    private String greetingText(String firstName) {
+        int hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY);
+        String part = hour < 12 ? "Good morning" : (hour < 17 ? "Good afternoon" : "Good evening");
+        return firstName == null ? part + "." : part + ", " + firstName + ".";
+    }
+
+    /** Reads the member's first name from the database off the main thread, then updates the greeting. */
+    private void refreshGreetingNameAsync() {
+        new Thread(() -> {
+            String firstName = null;
+            try {
+                UserEntity user = SessionManager.getInstance(context).getCurrentUser();
+                if (user != null && user.getName() != null && !user.getName().trim().isEmpty()) {
+                    firstName = user.getName().trim().split("\\s+")[0];
+                }
+            } catch (RuntimeException ignored) {
+                // Keep the plain greeting if the name cannot be read.
+            }
+            final String resolved = firstName;
+            if (tvGreeting != null) {
+                tvGreeting.post(() -> tvGreeting.setText(greetingText(resolved)));
+            }
+        }, "home-greeting").start();
     }
 
     private View createTodayCard() {
@@ -346,21 +408,26 @@ public class HomeUiBinder {
         lp.setMargins(0, 0, 0, dp(16));
         card.setLayoutParams(lp);
 
-        // Header: Date + "DAILY VERSE"
+        // Header: continue label for today's reading
         LinearLayout dateRow = new LinearLayout(context);
         dateRow.setOrientation(LinearLayout.HORIZONTAL);
         dateRow.setGravity(Gravity.CENTER_VERTICAL);
         dateRow.setPadding(0, 0, 0, dp(6));
 
-        String dateStr = new SimpleDateFormat("EEEE, MMMM d", Locale.ROOT).format(new Date());
         TextView tvDate = new TextView(context);
-        tvDate.setText(dateStr.toUpperCase(Locale.ROOT) + " · DAILY VERSE");
+        tvDate.setText("CONTINUE TODAY'S READING");
         tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvDate.setTypeface(Typeface.DEFAULT_BOLD);
         tvDate.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
         tvDate.setLetterSpacing(0.04f);
         dateRow.addView(tvDate);
         card.addView(dateRow);
+
+        tvContinueStep = new TextView(context);
+        tvContinueStep.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvContinueStep.setTextColor(PerazimTheme.COLOR_ORANGE_SOFT);
+        tvContinueStep.setPadding(0, 0, 0, dp(6));
+        card.addView(tvContinueStep);
 
         // Verse Reference (e.g. 2 Samuel 5:20)
         tvCornerstoneHeader = new TextView(context);
@@ -430,12 +497,11 @@ public class HomeUiBinder {
         lpBtn.setMargins(0, dp(8), 0, 0);
         btnBeginRoutine.setLayoutParams(lpBtn);
         btnBeginRoutine.setOnClickListener(v -> toggleOrAdvanceRoutine());
-        card.addView(btnBeginRoutine);
-
+        // The primary button is placed at the bottom of the screen by initUi().
         return card;
     }
 
-    private View createFourDoorsGrid() {
+    private View createPhotoTiles() {
         LinearLayout container = new LinearLayout(context);
         container.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -443,90 +509,100 @@ public class HomeUiBinder {
         lp.setMargins(0, 0, 0, dp(16));
         container.setLayoutParams(lp);
 
-        TextView tvSection = new TextView(context);
-        tvSection.setText("SANCTUARY DOORS");
-        tvSection.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSection.setTypeface(Typeface.DEFAULT_BOLD);
-        tvSection.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvSection.setLetterSpacing(0.04f);
-        tvSection.setPadding(dp(2), 0, 0, dp(8));
-        container.addView(tvSection);
-
-        // Row 1: Bible & Sermons
-        LinearLayout row1 = new LinearLayout(context);
-        row1.setOrientation(LinearLayout.HORIZONTAL);
-        row1.setPadding(0, 0, 0, dp(8));
-        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_bible, "Bible", "Read scripture", v -> parseAndOpenScripture(currentCornerstoneRef)));
-        View sep1 = new View(context);
-        sep1.setLayoutParams(new LinearLayout.LayoutParams(dp(8), 0));
-        row1.addView(sep1);
-        row1.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_candle, "Sermons", "Recent messages", v -> {
-            if (listener != null) listener.onNavigateToTab(1);
-        }));
-        container.addView(row1);
-
-        // Row 2: Worship & Prayer
-        LinearLayout row2 = new LinearLayout(context);
-        row2.setOrientation(LinearLayout.HORIZONTAL);
-        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_lyre, "Worship", "Hymns & praise", v -> {
-            if (listener != null) listener.onNavigateToTab(2);
-        }));
-        View sep2 = new View(context);
-        sep2.setLayoutParams(new LinearLayout.LayoutParams(dp(8), 0));
-        row2.addView(sep2);
-        row2.addView(createDoorCard(org.perazimchurch.app.R.drawable.ic_christian_praying_hands, "Prayer", "Share & intercede", v -> {
-            if (listener != null) listener.onNavigateToTab(3);
-        }));
-        container.addView(row2);
-
+        container.addView(createPhotoTile("Sermons", "Watch and listen to recent messages",
+                "backgrounds/church/sermons_pastor.jpg",
+                PerazimTheme.COLOR_PURPLE_MUTED, PerazimTheme.COLOR_TEXT_PRIMARY,
+                v -> { if (listener != null) listener.onNavigateToTab(1); }));
+        container.addView(createPhotoTile("Events", "What is happening at Perazim",
+                "backgrounds/church/events_choir.jpg",
+                PerazimTheme.COLOR_SURFACE, PerazimTheme.COLOR_TEXT_PRIMARY,
+                v -> { if (listener != null) listener.onNavigateToTab(3); }));
+        container.addView(createPhotoTile("Community", "Prayer, friends and conversation",
+                "backgrounds/church/community_congregation.jpg",
+                PerazimTheme.COLOR_ORANGE_MUTED, PerazimTheme.COLOR_BG_DEEP,
+                v -> { if (listener != null) listener.onNavigateToTab(3); }));
         return container;
     }
 
-    private View createDoorCard(int iconRes, String title, String subtitle, View.OnClickListener onClickListener) {
-        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, dp(12), PerazimTheme.COLOR_STROKE, dp(1));
-        card.setOrientation(LinearLayout.HORIZONTAL);
-        card.setGravity(Gravity.CENTER_VERTICAL);
-        card.setPadding(dp(12), dp(12), dp(10), dp(12));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        card.setLayoutParams(lp);
+    private View createPhotoTile(String title, String subtitle, String assetPath, int fillColor,
+                                 int textColor, View.OnClickListener onClick) {
+        Bitmap photo = loadAssetBitmap(assetPath, 720);
+        if (photo == null) {
+            return createPhotoTile(title, subtitle, fillColor, textColor, onClick);
+        }
+        FrameLayout tile = new FrameLayout(context);
+        tile.setClipToOutline(true);
+        GradientDrawable tileBg = new GradientDrawable();
+        tileBg.setCornerRadius(dp(14));
+        tile.setBackground(tileBg);
+        tile.setClickable(true);
+        tile.setOnClickListener(onClick);
+        LinearLayout.LayoutParams lpTile = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(128));
+        lpTile.setMargins(0, 0, 0, dp(10));
+        tile.setLayoutParams(lpTile);
 
-        ImageView icon = new ImageView(context);
-        icon.setImageResource(iconRes);
-        icon.setColorFilter(PerazimTheme.COLOR_PURPLE_SOFT, PorterDuff.Mode.SRC_IN);
-        LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(22), dp(22));
-        lpIcon.setMargins(0, 0, dp(10), 0);
-        icon.setLayoutParams(lpIcon);
-        card.addView(icon);
+        ImageView iv = new ImageView(context);
+        iv.setImageBitmap(photo);
+        iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        tile.addView(iv, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
-        LinearLayout textCol = new LinearLayout(context);
-        textCol.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        textCol.setLayoutParams(lpText);
+        View scrim = new View(context);
+        scrim.setBackgroundColor(Color.parseColor("#B32A0F33"));
+        tile.addView(scrim, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+        LinearLayout labels = new LinearLayout(context);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.setGravity(Gravity.BOTTOM);
+        labels.setPadding(dp(16), dp(14), dp(16), dp(14));
+        TextView tvTitle = new TextView(context);
+        tvTitle.setText(title);
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        labels.addView(tvTitle);
+        TextView tvSub = new TextView(context);
+        tvSub.setText(subtitle);
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvSub.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        labels.addView(tvSub);
+        tile.addView(labels, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        return tile;
+    }
+
+    private View createPhotoTile(String title, String subtitle, int fillColor, int textColor,
+                                 View.OnClickListener onClick) {
+        LinearLayout tile = new LinearLayout(context);
+        tile.setOrientation(LinearLayout.VERTICAL);
+        tile.setGravity(Gravity.BOTTOM);
+        tile.setPadding(dp(16), dp(14), dp(16), dp(14));
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(fillColor);
+        bg.setCornerRadius(dp(14));
+        tile.setBackground(bg);
+        tile.setClickable(true);
+        tile.setOnClickListener(onClick);
+        LinearLayout.LayoutParams lpTile = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(128));
+        lpTile.setMargins(0, 0, 0, dp(10));
+        tile.setLayoutParams(lpTile);
 
         TextView tvTitle = new TextView(context);
         tvTitle.setText(title);
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        textCol.addView(tvTitle);
+        tvTitle.setTextColor(textColor);
+        tile.addView(tvTitle);
 
         TextView tvSub = new TextView(context);
         tvSub.setText(subtitle);
-        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        tvSub.setMaxLines(1);
-        textCol.addView(tvSub);
-        card.addView(textCol);
-
-        ImageView chevron = new ImageView(context);
-        chevron.setImageResource(org.perazimchurch.app.R.drawable.ic_chevron_right);
-        chevron.setColorFilter(PerazimTheme.COLOR_PURPLE_MUTED, PorterDuff.Mode.SRC_IN);
-        LinearLayout.LayoutParams lpChev = new LinearLayout.LayoutParams(dp(14), dp(14));
-        chevron.setLayoutParams(lpChev);
-        card.addView(chevron);
-
-        card.setOnClickListener(onClickListener);
-        return card;
+        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tvSub.setTextColor(textColor);
+        tile.addView(tvSub);
+        return tile;
     }
 
     private void toggleOrAdvanceRoutine() {
@@ -540,15 +616,17 @@ public class HomeUiBinder {
     }
 
     private void updateBeginRoutineButtonText() {
+        if (tvContinueStep != null) {
+            tvContinueStep.setText(routineStep >= 4
+                    ? "Finished for today"
+                    : "Step " + Math.max(routineStep, 1) + " of 3 · about 3 minutes");
+        }
         if (btnBeginRoutine == null) return;
         if (routineStep >= 4) {
-            btnBeginRoutine.setText("Routine completed today ✓");
-            btnBeginRoutine.setEnabled(true);
-        } else if (routineStep > 1) {
-            btnBeginRoutine.setText("Continue routine (Step " + routineStep + " of 3)");
+            btnBeginRoutine.setText("Done for today. Thank you for sitting with God.");
             btnBeginRoutine.setEnabled(true);
         } else {
-            btnBeginRoutine.setText("Begin 3-minute routine");
+            btnBeginRoutine.setText("Pick up where you left off");
             btnBeginRoutine.setEnabled(true);
         }
     }

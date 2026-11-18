@@ -523,6 +523,8 @@ public class ContentDataSeeder {
     // CLI VERIFICATION ENTRY POINT
     // =========================================================================
 
+    // The reflective WAL-flag reset below only runs when SDK_INT < 34, where the hidden field is still reachable.
+    @android.annotation.SuppressLint("SoonBlockedPrivateApi")
     public static void main(String[] args) {
         System.out.println(">>> Starting ContentDataSeeder CLI Verification...");
         try {
