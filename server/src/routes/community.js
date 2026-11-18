@@ -1302,6 +1302,20 @@ router.delete('/classes/:id', requireAuth, async (req, res) => {
   } catch (error) { res.status(500).json({ error: 'Could not cancel class' }); }
 });
 
+// Church admins, and any account granted the community.review permission, can approve posts and photos.
+async function canReviewCommunity(user) {
+  if (!user) return false;
+  if (user.role === 'ADMIN') return true;
+  const grant = await query(
+    `SELECT 1 FROM user_permissions up JOIN permissions p ON p.code = up.permission_code
+      WHERE up.user_id = $1 AND up.permission_code = 'community.review' AND p.active = TRUE
+        AND up.revoked_at IS NULL AND up.effective_at <= $2 AND (up.expires_at IS NULL OR up.expires_at > $2)
+      LIMIT 1`,
+    [user.id, Date.now()]
+  );
+  return grant.rows.length > 0;
+}
+
 // ---- Open groups and join requests (migration 0025) ----
 
 // GET /api/community/groups/discover: open groups for anyone signed in. Only name, description and
@@ -1467,7 +1481,7 @@ router.post('/comments/:id/reactions', requireAuth, async (req, res) => {
 // GET /api/community/review/pending  (church admin only): posts and event photos waiting for approval
 router.get('/review/pending', requireAuth, async (req, res) => {
   try {
-    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only the church admin can review posts' });
+    if (!await canReviewCommunity(req.user)) return res.status(403).json({ error: 'You need community review access to approve posts' });
     const posts = await query(`SELECT id, author_name, type, title, content, media_url, created_at
       FROM community_posts WHERE review_status = 'PENDING' ORDER BY created_at ASC LIMIT 100`);
     const photos = await query(`SELECT p.id, p.post_id, p.uploader_id, p.media_url, p.created_at
@@ -1482,7 +1496,7 @@ router.get('/review/pending', requireAuth, async (req, res) => {
 // PUT /api/community/posts/:id/review  { status: 'APPROVED' | 'REJECTED' }  (church admin only)
 router.put('/posts/:id/review', requireAuth, async (req, res) => {
   try {
-    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only the church admin can review posts' });
+    if (!await canReviewCommunity(req.user)) return res.status(403).json({ error: 'You need community review access to approve posts' });
     const { status } = req.body || {};
     if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or REJECTED' });
     const result = await query('UPDATE community_posts SET review_status = $1, updated_at = $2 WHERE id = $3 RETURNING id', [status, Date.now(), req.params.id]);
@@ -1531,7 +1545,7 @@ router.get('/posts/:id/photos', optionalAuth, async (req, res) => {
 // PUT /api/community/photos/:id/review  { status }  (church admin only)
 router.put('/photos/:id/review', requireAuth, async (req, res) => {
   try {
-    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only the church admin can review photos' });
+    if (!await canReviewCommunity(req.user)) return res.status(403).json({ error: 'You need community review access to approve photos' });
     const { status } = req.body || {};
     if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or REJECTED' });
     const result = await query('UPDATE event_photos SET status = $1, reviewed_by = $2, reviewed_at = $3 WHERE id = $4 RETURNING id',
