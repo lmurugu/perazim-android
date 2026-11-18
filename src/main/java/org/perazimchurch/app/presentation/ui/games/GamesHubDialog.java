@@ -28,6 +28,7 @@ import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
+import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.nio.charset.StandardCharsets;
@@ -114,7 +115,7 @@ public final class GamesHubDialog extends Dialog {
         gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
         gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
-        gameCard(Mode.LADDER, "Ladder of Faith", "Climb 20 rungs with three lives. Use 50/50, Verse Peek or Pass once each per run.");
+        gameCard(Mode.LADDER, "Ladder of Faith", "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.");
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
     }
 
@@ -146,12 +147,31 @@ public final class GamesHubDialog extends Dialog {
 
     // ---- Ladder of Faith ----
 
-    /** Receives feedback events (correct, wrong, milestone, lifeline, finish) for sound and haptics. Bound to the shared feedback system when it lands. */
-    interface LadderFeedback { void onEvents(List<LadderOfFaith.Event> events); }
-    private LadderFeedback ladderFeedback = events -> { };
+    /** Maps game events onto the app-wide FeedbackManager, so the user's sound, haptics and celebration switches apply. */
+    private void announce(List<LadderOfFaith.Event> events) {
+        FeedbackManager feedback = FeedbackManager.get(activity);
+        boolean milestone = events.contains(LadderOfFaith.Event.MILESTONE);
+        for (LadderOfFaith.Event event : events) {
+            switch (event) {
+                case CORRECT:
+                    if (!milestone) feedback.reward(activity);
+                    break;
+                case MILESTONE:
+                    feedback.celebrateIn(getWindow(), true);
+                    break;
+                case WRONG:
+                case LIFELINE_USED:
+                    if (scroll != null) feedback.click(scroll);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
     private void startLadder() {
-        ladder = new LadderOfFaith();
+        seed = System.nanoTime();
+        ladder = new LadderOfFaith(seed);
         ladderQuestion();
     }
 
@@ -159,7 +179,7 @@ public final class GamesHubDialog extends Dialog {
         if (!activeOwner()) return;
         if (ladder.finished()) { ladderFinished(); return; }
         Card card = ladder.current();
-        screen("Ladder of Faith", "Rung " + ladder.position() + " of " + LadderOfFaith.RUNGS + " · Score " + ladder.score() + " · Lives " + ladder.lives(), true);
+        screen("Ladder of Faith", "Rung " + ladder.position() + " of " + LadderOfFaith.RUNGS + " · " + tierName(LadderOfFaith.tierOf(ladder.position())) + " · Score " + ladder.score() + " · Lives " + ladder.lives(), true);
         text(card.prompt, 23, true);
         if (ladder.peeked()) text("Verse Peek: " + card.reference, 16, true);
         Button hint = button("Show a hint", false);
@@ -173,15 +193,15 @@ public final class GamesHubDialog extends Dialog {
         Button fifty = new Button(activity);
         styleButton(fifty, "50/50", false);
         fifty.setEnabled(ladder.fiftyAvailable());
-        fifty.setOnClickListener(v -> { ladder.useFiftyFifty(); ladderFeedback.onEvents(ladder.drainEvents()); ladderQuestion(); });
+        fifty.setOnClickListener(v -> { ladder.useFiftyFifty(); announce(ladder.drainEvents()); ladderQuestion(); });
         Button peek = new Button(activity);
         styleButton(peek, "Verse Peek", false);
         peek.setEnabled(ladder.peekAvailable());
-        peek.setOnClickListener(v -> { ladder.usePeek(); ladderFeedback.onEvents(ladder.drainEvents()); ladderQuestion(); });
+        peek.setOnClickListener(v -> { ladder.usePeek(); announce(ladder.drainEvents()); ladderQuestion(); });
         Button pass = new Button(activity);
         styleButton(pass, "Pass", false);
         pass.setEnabled(ladder.passAvailable());
-        pass.setOnClickListener(v -> { ladder.usePass(); ladderFeedback.onEvents(ladder.drainEvents()); ladderQuestion(); });
+        pass.setOnClickListener(v -> { ladder.usePass(); announce(ladder.drainEvents()); ladderQuestion(); });
         for (Button b : new Button[] { fifty, peek, pass }) {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
             params.setMargins(dp(2), dp(3), dp(2), dp(3));
@@ -198,13 +218,17 @@ public final class GamesHubDialog extends Dialog {
         }
     }
 
+    private static String tierName(int tier) {
+        return tier == 1 ? "Easy" : tier == 2 ? "Medium" : "Hard";
+    }
+
     private void ladderAnswer(String value) {
         if (!activeOwner() || ladder.answered()) return;
         hideKeyboard();
         Card card = ladder.current();
         ladder.answer(value);
         List<LadderOfFaith.Event> events = ladder.drainEvents();
-        ladderFeedback.onEvents(events);
+        announce(events);
         boolean milestone = ladder.milestone();
         String headline = ladder.correct()
                 ? (milestone ? "Milestone reached!" : "Well done!")

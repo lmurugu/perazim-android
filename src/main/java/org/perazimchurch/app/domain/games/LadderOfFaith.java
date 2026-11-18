@@ -1,14 +1,16 @@
 package org.perazimchurch.app.domain.games;
 
 import org.perazimchurch.app.domain.games.BibleGames.Card;
-import org.perazimchurch.app.domain.games.BibleGames.Mode;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 /**
  * One run of Ladder of Faith: 20 rungs in climbing order, three lives, and one use each of three lifelines.
+ * Each run draws its questions at random from a large bank: rungs 1-7 from the easy tier, 8-14 from the medium
+ * tier and 15-20 from the hard tier, so runs differ but always get harder as you climb.
  * A wrong answer costs a life; the run ends when lives run out or the top rung is answered.
  * Pure domain logic with no Android types, so the rules are covered by unit tests.
  */
@@ -17,6 +19,9 @@ public final class LadderOfFaith {
     public static final int LIVES = 3;
     /** Rungs that trigger a milestone celebration when answered correctly. */
     public static final int[] MILESTONES = {5, 10, 15, 20};
+    /** Rungs 1-7 are easy, 8-14 medium, 15-20 hard. */
+    public static final int EASY_RUNGS = 7;
+    public static final int MEDIUM_RUNGS = 7;
 
     /** Things the UI may celebrate or announce. Sound and haptics are chosen by the feedback layer. */
     public enum Event { CORRECT, WRONG, MILESTONE, LIFE_LOST, LIFELINE_USED, RUN_COMPLETE }
@@ -37,9 +42,28 @@ public final class LadderOfFaith {
     /** Set once the top rung has been answered, right or wrong; the run is then over. */
     private boolean topAnswered;
 
-    public LadderOfFaith() {
-        rungs = BibleGames.cards(Mode.LADDER);
-        if (rungs.size() != RUNGS) throw new IllegalStateException("Ladder must have " + RUNGS + " rungs");
+    public LadderOfFaith() { this(System.nanoTime()); }
+
+    /** The same seed always produces the same run, which keeps tests and replays predictable. */
+    public LadderOfFaith(long seed) {
+        Random random = new Random(seed);
+        List<Card> draw = new ArrayList<>();
+        draw.addAll(pick(LadderBank.EASY, EASY_RUNGS, random));
+        draw.addAll(pick(LadderBank.MEDIUM, MEDIUM_RUNGS, random));
+        draw.addAll(pick(LadderBank.HARD, RUNGS - EASY_RUNGS - MEDIUM_RUNGS, random));
+        rungs = Collections.unmodifiableList(draw);
+    }
+
+    private static List<Card> pick(List<Card> tier, int count, Random random) {
+        List<Card> shuffled = new ArrayList<>(tier);
+        Collections.shuffle(shuffled, random);
+        return shuffled.subList(0, count);
+    }
+
+    /** Difficulty tier of a 1-based rung: 1 easy, 2 medium, 3 hard. */
+    public static int tierOf(int position) {
+        if (position <= EASY_RUNGS) return 1;
+        return position <= EASY_RUNGS + MEDIUM_RUNGS ? 2 : 3;
     }
 
     public Card current() {

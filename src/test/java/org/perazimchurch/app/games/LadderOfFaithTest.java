@@ -7,20 +7,58 @@ import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.LadderOfFaith.Event;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class LadderOfFaithTest {
 
-    @Test public void everyRungHasAnswerAmongFourOptions() {
-        List<Card> rungs = BibleGames.cards(Mode.LADDER);
-        assertEquals(LadderOfFaith.RUNGS, rungs.size());
-        for (Card card : rungs) {
+    @Test public void bankIsLargeAndEveryQuestionIsWellFormed() {
+        List<Card> bank = BibleGames.cards(Mode.LADDER);
+        assertTrue("bank too small: " + bank.size(), bank.size() >= 250);
+        Set<String> prompts = new HashSet<>();
+        for (Card card : bank) {
+            assertTrue("duplicate question: " + card.prompt, prompts.add(card.prompt));
             assertEquals("options for: " + card.prompt, 4, card.options.size());
+            assertEquals("repeated option for: " + card.prompt, 4, new HashSet<>(card.options).size());
             assertTrue("answer not among options: " + card.prompt, card.options.contains(card.answer));
-            assertFalse("empty reference: " + card.prompt, card.reference.isEmpty());
+            assertFalse("empty reference: " + card.prompt, card.reference.trim().isEmpty());
+            assertFalse("empty explanation: " + card.prompt, card.explanation.trim().isEmpty());
         }
+    }
+
+    @Test public void runHasTwentyUniqueRungsAndSameSeedRepeats() {
+        List<String> first = prompts(new LadderOfFaith(42L));
+        List<String> again = prompts(new LadderOfFaith(42L));
+        assertEquals(LadderOfFaith.RUNGS, first.size());
+        assertEquals(LadderOfFaith.RUNGS, new HashSet<>(first).size());
+        assertEquals(first, again);
+    }
+
+    @Test public void differentSeedsGiveDifferentRuns() {
+        assertNotEquals(prompts(new LadderOfFaith(1L)), prompts(new LadderOfFaith(2L)));
+    }
+
+    @Test public void difficultyRisesAcrossTheLadder() {
+        assertEquals(1, LadderOfFaith.tierOf(1));
+        assertEquals(1, LadderOfFaith.tierOf(7));
+        assertEquals(2, LadderOfFaith.tierOf(8));
+        assertEquals(2, LadderOfFaith.tierOf(14));
+        assertEquals(3, LadderOfFaith.tierOf(15));
+        assertEquals(3, LadderOfFaith.tierOf(20));
+    }
+
+    private static List<String> prompts(LadderOfFaith run) {
+        List<String> result = new ArrayList<>();
+        while (!run.finished()) {
+            result.add(run.current().prompt);
+            run.answer(run.current().answer);
+            if (!run.finished()) run.next();
+        }
+        return result;
     }
 
     @Test public void correctAnswerAdvancesAndScores() {
