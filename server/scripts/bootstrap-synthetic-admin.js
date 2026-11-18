@@ -25,6 +25,11 @@ function args(argv) {
       result.createAccount = true;
       continue;
     }
+    if (key === '--recover-interactive') {
+      if (result.recoverInteractive) throw new Error('Duplicate interactive recovery option');
+      result.recoverInteractive = true;
+      continue;
+    }
     if (['--bootstrap', '--recover'].includes(key)) {
       if (result.mode) throw new Error('Choose one mode');
       result.mode = key.slice(2);
@@ -103,6 +108,14 @@ function promptHidden(question) {
     input.resume();
     input.on('data', onData);
   });
+}
+
+async function promptPinPair(prompt = promptHidden) {
+  const pin = await prompt('Choose a new 6–12 digit PIN (hidden): ');
+  if (typeof pin !== 'string' || !/^\d{6,12}$/.test(pin)) throw new Error('PIN must contain 6–12 digits');
+  const confirmation = await prompt('Re-enter the new PIN (hidden): ');
+  if (pin !== confirmation) throw new Error('PIN entries did not match');
+  return pin;
 }
 
 async function readPublishedTestNotice(pool) {
@@ -341,13 +354,67 @@ async function setupInteractiveAdmin(options, env = process.env) {
   }
 }
 
+async function setupInteractiveRecovery(options, env = process.env) {
+  const dbName = assertSafety(env, options.confirm, options.db);
+  if (!validPilotId(options.account) || !validApproval(options.approval)) {
+    throw new Error('Recovery requires the exact synthetic pilot account and a fresh approval reference');
+  }
+  const target = validatePhaseBTestDatabaseUrl(env.DATABASE_URL || '');
+  if (Number(env.PHASE_B_TEST_EXPECTED_PORT) !== target.port || !env.PHASE_B_TEST_EXPECTED_DATA_DIR ||
+      !fs.existsSync(env.PHASE_B_TEST_EXPECTED_DATA_DIR)) {
+    throw new Error('The exact disposable test cluster port and data directory must be configured');
+  }
+  if (!env.PHASE_B_ADMIN_KEY) throw new Error('The local TOTP encryption key is not configured');
+
+  const newPin = await promptPinPair();
+  const pool = new Pool(target);
+  let tempDir = null;
+  let enrollmentFile = null;
+  try {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'perazim-test-admin-recovery-'));
+    fs.chmodSync(tempDir, 0o700);
+    enrollmentFile = path.join(tempDir, 'enrollment.json');
+    const result = await recover(pool, { ...options, newPin }, env);
+    writeEnrollmentFile(enrollmentFile, {
+      account_id: result.account_id,
+      approval_ref: result.approval_ref,
+      totp_secret: result.totp_secret,
+      created_at: new Date().toISOString(),
+      note: 'Synthetic test recovery; add the TOTP key to an authenticator, then delete this temporary file.'
+    });
+    if ((fs.statSync(enrollmentFile).mode & 0o777) !== 0o600) {
+      throw new Error('Temporary TOTP enrollment file is not owner-only');
+    }
+    const enrollment = JSON.parse(fs.readFileSync(enrollmentFile, 'utf8'));
+    process.stdout.write(`\nNew TOTP key (displayed once; add it to your authenticator now):\n${enrollment.totp_secret}\n`);
+    await promptVisible('After adding the key to your authenticator, press Enter to delete the temporary file: ');
+    process.stdout.write('\x1b[2J\x1b[H\x1b[3J');
+    return { success: true, account_id: result.account_id, approval_ref: result.approval_ref,
+      auth_not_before: result.auth_not_before, enrollment_file_deleted_after_confirmation: true };
+  } finally {
+    if (enrollmentFile) {
+      try { fs.unlinkSync(enrollmentFile); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    }
+    if (tempDir) {
+      try { fs.rmdirSync(tempDir); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+    }
+    await pool.end();
+  }
+}
+
 async function main() {
   const options = args(process.argv.slice(2));
-  if (!options.mode || !process.env.DATABASE_URL) throw new Error('Usage: --bootstrap|--recover --db NAME --confirm NAME --account synthetic_pilot_<suffix> --approval REF --enrollment-file /absolute/path [--pin-file /absolute/path]');
+  if (!options.mode || !process.env.DATABASE_URL) throw new Error('Usage: --bootstrap|--recover [--create-account|--recover-interactive] --db NAME --confirm NAME --account synthetic_pilot_<suffix> --approval REF [--enrollment-file /absolute/path [--pin-file /absolute/path]]');
   assertSafety(process.env, options.confirm, options.db);
   if (options.createAccount) {
     if (options.mode !== 'bootstrap') throw new Error('--create-account is available only with --bootstrap');
     const result = await setupInteractiveAdmin(options);
+    process.stdout.write(`${JSON.stringify(result)}\n`);
+    return;
+  }
+  if (options.recoverInteractive) {
+    if (options.mode !== 'recover') throw new Error('--recover-interactive is available only with --recover');
+    const result = await setupInteractiveRecovery(options);
     process.stdout.write(`${JSON.stringify(result)}\n`);
     return;
   }
@@ -378,4 +445,4 @@ if (require.main === module) main().catch(() => {
   process.exitCode = 1;
 });
 
-module.exports = { args, assertSafety, verifyActualDatabase, bootstrap, recover, writeEnrollmentFile, readPrivatePinFile };
+module.exports = { args, assertSafety, verifyActualDatabase, bootstrap, recover, writeEnrollmentFile, readPrivatePinFile, promptPinPair };

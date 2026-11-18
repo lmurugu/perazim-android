@@ -1,0 +1,6 @@
+# Copy to local.properties (gitignored) and fill in. Never commit real values.
+sdk.dir=/path/to/Android/Sdk
+
+# Backend origin for validation and release builds (HTTPS, no trailing slash).
+# Empty is allowed for debug/validation builds; release builds fail without an https:// value.
+perazim.apiBaseUrl=https://api.example.org

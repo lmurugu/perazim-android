@@ -5,7 +5,9 @@ const path = require('path');
 const MIGRATIONS_DIR = path.join(__dirname, '../migrations');
 const LEDGER = 'perazim_schema_migrations';
 const LOCK_KEY = '723448319116047';
-const PROHIBITED_VERSION = '0007';
+// Migration 0007 is applied by decision (see docs/adr/0002-apply-migration-0007.md).
+// Set this to a version string only to refuse a plan containing that migration.
+const PROHIBITED_VERSION = null;
 
 function loadMigrations(directory = MIGRATIONS_DIR) {
   const sqlFiles = fs.readdirSync(directory).filter(name => name.endsWith('.sql'));
@@ -27,6 +29,7 @@ function loadMigrations(directory = MIGRATIONS_DIR) {
 }
 
 function assertMigrationPlanAllowed(migrations, prohibitedVersion = PROHIBITED_VERSION) {
+  if (prohibitedVersion === null) return migrations;
   const prohibited = migrations.find(migration => migration.version === prohibitedVersion);
   if (prohibited) {
     const error = new Error(`Migration ${prohibited.version} (${prohibited.name}) is prohibited in this execution context; refusing before database access.`);

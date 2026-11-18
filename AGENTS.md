@@ -29,38 +29,93 @@ Agents must not, without a separate owner decision:
 - Do not activate a real administrator account. Use synthetic accounts only.
 - Preserve existing accounts, local data and the untracked project specifications.
 
-The owner wants changes followed through without reminders. Apply this workflow
-at the end of each authorized implementation task in this repository.
+## Mandatory AI roadmap closure
 
-1. Inspect the working tree first. Preserve unrelated work, existing accounts,
-   local configuration, and device data. Stage only the task's intended changes.
-2. Run checks appropriate to the change and `git diff --check`. For Android
-   code/resources, run `./gradlew testDebugUnitTest assembleDebug --offline` when
-   dependencies are available. For backend changes, run the applicable npm
-   suites; use the disposable test database, never the live app database.
-3. When Android changes, update the connected, authorized phone in place with
-   `adb install -r build/outputs/apk/debug/app-debug.apk`. Select an explicit
-   device if more than one is connected. Never uninstall, clear data, downgrade,
-   log out, or interrupt unrelated actions beyond opening/testing this app as authorized above. Verify the installed
-   base APK's SHA-256 matches the built APK; a version label alone is insufficient.
-4. When backend code changes, restart the configured local PC backend using
-   `server/scripts/local-backend.sh stop` then `start`, and verify
-   `http://127.0.0.1:3000/api/health`. Preserve `server/.runtime/` and its data.
-   Re-establish `adb reverse tcp:3000 tcp:3000` for the connected development
-   phone when its configured backend is localhost. Never silently change an
-   account's server endpoint or publish the PC backend to the internet.
-5. After successful relevant checks, commit the completed task on the current
-   working branch without asking for another reminder or confirmation. Review
-   staged files for secrets and personal captures. Keep credentials, runtime
-   databases, signing keys, APKs, and local configuration out of Git. Do not
-   include unrelated unfinished work, amend existing commits, merge into main,
-   force-push, or push remotely unless that action is separately authorized.
-6. Report the commit hash, check results, working-tree status, phone installation
-   status, backend health, and whether the commit was pushed. If a phone is
-   disconnected, a check fails, or access is unavailable, finish independent work
-   and state the exact remaining update; never claim everything is synchronized.
+For any Perazim AI, online/offline model, knowledge-package, retrieval,
+grounding, citation, or AI-backend task, use the project skill at
+`.agents/skills/perazim-ai-roadmap-closure/SKILL.md`. Treat the current project
+roadmap as acceptance criteria, track every criterion with evidence, work in
+dependency order, and keep unrelated work out of scope. Provide milestone
+updates at least every 30 minutes during sustained work. Do not declare
+completion until all safely actionable criteria and full relevant suites pass;
+record production/owner decisions separately. Existing synthetic-data,
+validation-app, feature-flag, key-custody, and deployment restrictions in this
+file remain controlling.
 
-These are standing instructions for agents working in the repository. They do
-not install a background watcher, commit unfinished edits on every file save, or
-update an offline phone. Documentation-only changes need no app rebuild/reinstall
-or backend restart when their running code already matches the verified build.
+## Autonomous execution and continuous problem resolution
+
+Operate as an engineering agent responsible for completing the authorized
+objective, not only investigating it or reporting recommendations. Interpret
+the task by its intended outcome and use sound engineering judgement for
+routine, reversible work that is necessary to reach that outcome.
+
+- Inspect the relevant implementation and current repository state before
+  changing files. Follow dependencies across the Android app, backend, database,
+  and tests when they are part of the objective.
+- Fix defects, missing pieces, integration problems, and regressions discovered
+  within the authorized scope. Resolve issues caused by your own changes and
+  continue through the appropriate verification; do not leave actionable work
+  as a report merely because it was discovered during investigation.
+- Preserve established architecture and functionality. Prefer small, traceable
+  changes and avoid unrelated rewrites or scope expansion.
+- Do not pause for routine engineering choices. Stop before a genuine approval
+  boundary, an irreversible or materially risky action, or a decision reserved
+  for the owner or church leadership. Continue independent work that does not
+  depend on that approval.
+- Before treating a condition as a blocker, investigate its cause, try safe
+  alternatives, complete independent work, and state precisely what is needed
+  to proceed.
+- Verify implementation with checks appropriate to the change. Report what was
+  changed, what was already present, checks and actual results, remaining work,
+  external blockers, approval decisions, and residual limitations. Never infer
+  operational or deployment success from source code or isolated tests alone.
+
+This execution mandate does not expand a valid task authorisation. Explicit
+data, security, privacy, architecture, deployment, and organisational boundaries
+remain controlling. In particular, autonomous work does not authorize handling
+real membership data, changing production state, weakening safeguards, or
+deploying or pushing changes.
+
+## Instruction precedence and authorisation validity
+
+Apply instructions in this order:
+
+1. Latest explicit owner instruction.
+2. Latest verified task-specific authorisation and restrictions.
+3. Latest owner-approved PERAZIM master project memory bank.
+4. Current repository instructions and technical specifications.
+5. Historical instructions and previous agent reports.
+6. General autonomous execution principles.
+
+A newer explicit restriction overrides a broader standing mandate. Dated
+authorisations are historical records, not permanent authority. Before relying
+on one, verify it against the latest approved project memory and owner decisions.
+Silence never authorises a new phase or consequential/restricted action. If the
+current approved memory version cannot be identified, use explicit current
+session instructions and verified repository evidence; do not silently treat a
+draft or stale memory file as approved.
+
+## Continuity and data-protection safeguards
+
+At the start of each new implementation session, read the latest approved
+master project memory bank and these repository instructions, inspect the actual
+repository/working tree, and reconcile historical claims against current source.
+Identify what is completed, incomplete, superseded, and awaiting a decision.
+After a significant implementation task, update the relevant continuity record
+with verified outcomes. Preserve history and mark superseded decisions rather
+than silently deleting them. Never claim memory was updated unless the file was
+actually changed and checked.
+
+Never expose credentials, API keys, passwords, signing material, access tokens,
+private member information, or sensitive runtime data in reports, commits, logs,
+or generated files. Never use real membership records for testing, debugging,
+demonstration, or synthetic-fixture generation. Do not send personal or
+sensitive church data to a new external processor without required owner
+approval and privacy assessment. Preserve authentication, authorisation, data
+isolation, rate limiting, safeguarding, and existing privacy controls.
+
+Autonomy permits technical problem-solving within the assigned objective. It
+does not authorise unrelated feature expansion or changing established
+requirements. Every additional change must directly support the intended
+outcome. Distinguish source implementation, automated tests, device checks,
+local operational verification, and production acceptance in completion reports.

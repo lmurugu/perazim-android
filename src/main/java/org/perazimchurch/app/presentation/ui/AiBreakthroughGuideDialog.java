@@ -33,10 +33,14 @@ import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.AiPreferences;
 import org.perazimchurch.app.ai.remote.AiRelayClient;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
+import org.perazimchurch.app.ai.local.OfflineKnowledgeStore;
+import org.perazimchurch.app.ai.local.OfflineScriptureLookup;
 import org.perazimchurch.app.ai.local.OnDeviceAi;
 import org.perazimchurch.app.BuildConfig;
+import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,11 +82,11 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private EditText etInput;
     private Button btnSend;
     private TextView tvSub;
-    private final ConversationHistory onlineHistory = new ConversationHistory();
     private boolean requestInFlight;
     private final ConversationHistory localHistory = new ConversationHistory();
     private Button btnMode;
     private boolean localRequest;
+    private int knowledgeStatusGeneration;
     private String guideMode() {
         return activity.getSharedPreferences("perazim_guide_mode", Context.MODE_PRIVATE).getString("mode", "guide");
     }
@@ -113,8 +117,11 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
 
         // Welcome is shown once and is never sent as model conversation history.
+        String welcome = BuildConfig.OFFLINE_QWEN_ENABLED
+                ? "Perazim AI’s on-phone Qwen is enabled in this validation build. Answers use verified local passages and cannot access live information. Online AI is unavailable in this build."
+                : "Generative AI is unavailable in this build. Perazim Guide can still help you use the app and retrieve local KJV passages.";
         displayAiMessage(AiResponse.plainText(
-                "What would you like to explore? Ask about using the app or find a built-in shortcut.\n\nGenerative AI is unavailable in this build: on-device answers are not yet limited to approved sources, and an authenticated church AI service has not been verified.",
+                "What would you like to explore? Ask about using the app or find a built-in shortcut.\n\n" + welcome,
                 java.util.Arrays.asList("Open the Bible", "Find my groups", "Start a reflection")), "Perazim Guide");
         updateSubtitle();
 
@@ -287,19 +294,46 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void updateSubtitle() {
         if (tvSub == null) return;
+        int statusGeneration = ++knowledgeStatusGeneration;
         String mode = guideMode();
         if (btnMode != null) btnMode.setText("local".equals(mode)
-                ? "On-phone AI unavailable · Change mode"
-                : ("online".equals(mode) ? "Online AI unavailable · Change mode" : "Offline app guide · Change mode"));
+                ? "On-phone AI · Change mode"
+                : ("online".equals(mode) ? "Online AI · Change mode" : "Offline app guide · Change mode"));
         if ("local".equals(mode)) {
-            tvSub.setText("Unavailable until approved-source controls are implemented");
+            if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
+                tvSub.setText("Unavailable until approved knowledge trust is provisioned");
+            } else if (!OnDeviceAi.runtimeAvailable(activity)) {
+                tvSub.setText("Qwen · llama.cpp runtime unavailable on this device");
+            } else if (!OnDeviceAi.isInstalled(activity)) {
+                tvSub.setText("Qwen · Model download required");
+            } else {
+                tvSub.setText("Qwen · Verifying the installed model…");
+                OnDeviceAi.checkModel(activity, modelVerified -> {
+                    if (statusGeneration != knowledgeStatusGeneration || !isShowing()
+                            || !"local".equals(guideMode()) || tvSub == null) return;
+                    if (!modelVerified) {
+                        tvSub.setText("Qwen · Model integrity check failed · download to repair");
+                        return;
+                    }
+                    java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
+                    android.os.AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+                        String knowledge = OfflineKnowledgeStore.knowledgeStatus(activity, trustedKeys,
+                                BuildConfig.VERSION_NAME, System.currentTimeMillis());
+                        activity.runOnUiThread(() -> {
+                            if (statusGeneration != knowledgeStatusGeneration || !isShowing()
+                                    || !"local".equals(guideMode()) || tvSub == null) return;
+                            tvSub.setText("Qwen · " + knowledge);
+                        });
+                    });
+                });
+            }
             tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-            tvSub.setOnClickListener(v -> showModeOptions());
+            tvSub.setOnClickListener(v -> { if (!requestInFlight) showModeOptions(); });
             return;
         }
         if ("guide".equals(mode)) {
             tvSub.setText("Built-in app help · Not a generative model");
-            tvSub.setOnClickListener(v -> showModeOptions());
+            tvSub.setOnClickListener(v -> { if (!requestInFlight) showModeOptions(); });
             return;
         }
         if ("online".equals(mode) && !BuildConfig.ONLINE_AI_ENABLED) {
@@ -308,58 +342,142 @@ public class AiBreakthroughGuideDialog extends Dialog {
             tvSub.setOnClickListener(null);
             return;
         }
-        if (!AiPreferences.hasConsented(activity)) {
-            tvSub.setText("Online AI unavailable in this build");
-            tvSub.setTextColor(COLOR_TEXT_MUTED);
-            tvSub.setOnClickListener(null);
-        } else if (!AiPreferences.isAiEnabled(activity)) {
-            tvSub.setText("📱 Offline Guide • AI Resting");
-            tvSub.setTextColor(COLOR_TEXT_MUTED);
-            tvSub.setOnClickListener(null);
-        } else {
-            int remaining = AiPreferences.getRemainingQuestions(activity);
-            if (remaining > 0) {
-                tvSub.setText("⚡ Breakthrough AI • " + remaining + " questions left today");
-                tvSub.setTextColor(COLOR_ACCENT_ORANGE);
-            } else {
-                tvSub.setText("📱 Offline Guide • Daily limit reached");
-                tvSub.setTextColor(COLOR_TEXT_MUTED);
-            }
-            tvSub.setOnClickListener(null);
-        }
+        tvSub.setText("Online AI · Church service");
+        tvSub.setTextColor(COLOR_ACCENT_ORANGE);
+        tvSub.setOnClickListener(v -> { if (!requestInFlight) showConsentDialog(); });
     }
 
     private void showModeOptions() {
+        boolean canUpdateKnowledge = BuildConfig.OFFLINE_QWEN_ENABLED
+                && !OfflineKnowledgeStore.trustedKeys(activity).isEmpty();
+        List<String> choices = new ArrayList<>();
+        choices.add(BuildConfig.OFFLINE_QWEN_ENABLED ? "On-phone AI" : "On-phone AI — unavailable");
+        choices.add(BuildConfig.OFFLINE_QWEN_ENABLED ? "Model download" : "Model download — disabled");
+        choices.add(BuildConfig.ONLINE_AI_ENABLED ? "Online AI" : "Online AI — unavailable");
+        choices.add("Offline app help");
+        int updateIndex = -1;
+        int rollbackIndex = -1;
+        if (canUpdateKnowledge) {
+            updateIndex = choices.size();
+            choices.add("Update approved offline knowledge");
+            if (OfflineKnowledgeStore.hasRollbackCandidate(activity)) {
+                rollbackIndex = choices.size();
+                choices.add("Restore previous signed knowledge package");
+            }
+        }
+        choices.add("Clear this conversation");
+        final int selectedUpdateIndex = updateIndex;
+        final int selectedRollbackIndex = rollbackIndex;
         new AlertDialog.Builder(activity).setTitle("Choose your guide")
-                .setItems(new String[]{"On-phone AI — unavailable pending approved-source controls", "Model download — disabled", "Online AI — unavailable pending authenticated service", "Offline app help — built-in shortcuts", "Clear this conversation"}, (dialog, which) -> {
+                .setItems(choices.toArray(new String[0]), (dialog, which) -> {
                     if (which == 0) setGuideMode("local");
                     else if (which == 1) showModelDownload();
                     else if (which == 2) setGuideMode("online");
                     else if (which == 3) setGuideMode("guide");
+                    else if (which == selectedUpdateIndex) showKnowledgeUpdate();
+                    else if (which == selectedRollbackIndex) showKnowledgeRollback();
                     else {
-                        localHistory.clear(); onlineHistory.clear();
+                        localHistory.clear();
                         messagesContainer.removeAllViews();
                         displayAiMessage(AiResponse.plainText("Conversation cleared. What would you like to discuss?", null), "Perazim Guide");
                     }
                 }).setNegativeButton("Close", null).show();
     }
 
-    private void showModelDownload() {
-        if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
-            new AlertDialog.Builder(activity)
-                    .setMessage("On-device AI downloads are disabled until approved-source controls are implemented and verified.")
+    private void showKnowledgeRollback() {
+        java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
+        String sessionToken = SessionManager.getInstance(activity).getAuthToken();
+        if (trustedKeys.isEmpty()) {
+            new AlertDialog.Builder(activity).setMessage("This build has no trusted knowledge signing key.")
                     .setPositiveButton("OK", null).show();
             return;
         }
-        if (OnDeviceAi.isInstalled(activity)) {
-            setGuideMode("local");
-            new AlertDialog.Builder(activity).setMessage("The on-phone model is installed. Questions and answers stay on this phone in this mode.").setPositiveButton("Done", null).show();
+        if (sessionToken == null || sessionToken.trim().isEmpty()) {
+            new AlertDialog.Builder(activity).setMessage("Sign in before checking for an authorized knowledge rollback.")
+                    .setPositiveButton("OK", null).show();
             return;
         }
+        AlertDialog progress = new AlertDialog.Builder(activity)
+                .setTitle("Checking authorized rollback")
+                .setMessage("Verifying the signed authorization for the previous package…")
+                .setCancelable(false).create();
+        progress.show();
+        OfflineKnowledgeStore.downloadAndInstallAuthorizedRollback(activity, sessionToken, trustedKeys,
+                new OfflineKnowledgeStore.UpdateCallback() {
+                    @Override public void onInstalled(OfflineKnowledgeStore.VerifiedPackage restored) {
+                        progress.dismiss();
+                        if (!isShowing()) return;
+                        setGuideMode("local");
+                        displayAiMessage(AiResponse.plainText(
+                                "The authorized previous knowledge package was verified and restored.", null),
+                                "Offline knowledge rollback · " + restored.version);
+                    }
+
+                    @Override public void onError(String message) {
+                        progress.dismiss();
+                        if (isShowing()) new AlertDialog.Builder(activity).setMessage(message)
+                                .setPositiveButton("OK", null).show();
+                    }
+                });
+    }
+
+    private void showKnowledgeUpdate() {
+        java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
+        if (trustedKeys.isEmpty()) {
+            new AlertDialog.Builder(activity).setMessage("This build has no trusted knowledge signing key.")
+                    .setPositiveButton("OK", null).show();
+            return;
+        }
+        String sessionToken = SessionManager.getInstance(activity).getAuthToken();
+        if (sessionToken == null || sessionToken.trim().isEmpty()) {
+            new AlertDialog.Builder(activity).setMessage("Sign in before downloading approved offline knowledge.")
+                    .setPositiveButton("OK", null).show();
+            return;
+        }
+        OfflineKnowledgeStore.UpdateStatus previous = OfflineKnowledgeStore.lastUpdateStatus(activity);
+        String previousSuccess = previous.lastSuccessVersion.isEmpty()
+                ? "No successful knowledge update is recorded."
+                : "Last successful sync: "
+                + java.text.DateFormat.getDateTimeInstance().format(new java.util.Date(previous.lastSuccessAt))
+                + " (verified package version " + previous.lastSuccessVersion + ").";
+        AlertDialog progress = new AlertDialog.Builder(activity)
+                .setTitle("Updating offline knowledge")
+                .setMessage(previousSuccess + "\n\nDownloading and verifying the signed package…")
+                .setCancelable(false).create();
+        progress.show();
+        OfflineKnowledgeStore.downloadAndInstall(activity, sessionToken, trustedKeys,
+                new OfflineKnowledgeStore.UpdateCallback() {
+                    @Override public void onInstalled(OfflineKnowledgeStore.VerifiedPackage installed) {
+                        progress.dismiss();
+                        if (!isShowing()) return;
+                        setGuideMode("local");
+                        displayAiMessage(AiResponse.plainText(
+                                "Approved offline knowledge was verified and installed. It is now available to on-phone AI.", null),
+                                "Offline knowledge updated · " + installed.version);
+                    }
+
+                    @Override public void onError(String message) {
+                        progress.dismiss();
+                        if (isShowing()) new AlertDialog.Builder(activity).setMessage(message)
+                                .setPositiveButton("OK", null).show();
+                    }
+                });
+    }
+
+    private void showModelDownload() {
+        if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
+            new AlertDialog.Builder(activity)
+                    .setMessage("On-device AI downloads are disabled until an approved knowledge package and trusted signing key are provisioned.")
+                    .setPositiveButton("OK", null).show();
+            return;
+        }
+        String modelMessage = "validation".equals(BuildConfig.BUILD_TYPE)
+                ? "Validation only: verifies or repairs the installed model from the locally staged Qwen artifact and uses a synthetic signed knowledge passage."
+                : "This checks the installed model integrity first. If it is missing or damaged, the verified model is downloaded and installed.";
         new AlertDialog.Builder(activity).setTitle("Download on-phone AI")
-                .setMessage("On-device AI downloads are disabled until approved-source controls are implemented and verified.")
+                .setMessage(modelMessage)
                 .setNegativeButton("Not now", null)
-                .setPositiveButton("Download", (dialog, which) -> {
+                .setPositiveButton("Check / download", (dialog, which) -> {
                     AlertDialog progress = new AlertDialog.Builder(activity).setTitle("Downloading on-phone model")
                             .setMessage("Starting…").setCancelable(false).setNegativeButton("Pause", (d,w) -> OnDeviceAi.cancel()).create();
                     progress.show();
@@ -373,7 +491,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     @Override public void dismiss() {
         if (localRequest) OnDeviceAi.cancel();
-        localHistory.clear(); onlineHistory.clear();
+        localHistory.clear();
         super.dismiss();
     }
 
@@ -407,7 +525,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         layout.addView(title);
 
         TextView body = new TextView(activity);
-        body.setText("Google's AI generates online answers. Your question and up to 6 recent question-and-answer exchanges from this chat are sent through the church relay to Google. Offline-guide messages are not sent. This chat history is kept only while this window is open. On the free service, Google may use questions to improve its models; avoid private details.\n\nThe online service currently allows 3 questions per day.");
+        body.setText("Online AI sends your current question to the church service. If the request is eligible, Gemini may process it with approved source excerpts. Keep personal, prayer and counselling details out of online questions.");
         body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         body.setTextColor(COLOR_TEXT_DARK);
         body.setPadding(0, dp(12), 0, dp(10));
@@ -419,13 +537,6 @@ public class AiBreakthroughGuideDialog extends Dialog {
         cbConsent.setTextColor(COLOR_PURPLE_DARK);
         cbConsent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         layout.addView(cbConsent);
-
-        final CheckBox cbName = new CheckBox(activity);
-        cbName.setText("Address me by my first name");
-        cbName.setChecked(AiPreferences.isFirstNameOptedIn(activity));
-        cbName.setTextColor(COLOR_TEXT_MUTED);
-        cbName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        layout.addView(cbName);
 
         LinearLayout btnRow = new LinearLayout(activity);
         btnRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -439,7 +550,6 @@ public class AiBreakthroughGuideDialog extends Dialog {
         btnDecline.setBackground(null);
         btnDecline.setOnClickListener(v -> {
             AiPreferences.setConsent(activity, false);
-            onlineHistory.clear();
             consentDlg.dismiss();
             updateSubtitle();
         });
@@ -462,7 +572,6 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         btnAccept.setOnClickListener(v -> {
             AiPreferences.setConsent(activity, true);
-            AiPreferences.setFirstNameOptedIn(activity, cbName.isChecked());
             consentDlg.dismiss();
             updateSubtitle();
         });
@@ -487,10 +596,18 @@ public class AiBreakthroughGuideDialog extends Dialog {
         // 1. Render User Message Bubble
         displayUserMessage(query);
 
+        // Safety routing is mode-independent: selecting Qwen or cloud mode must not
+        // bypass the deterministic immediate-support response.
+        if (PerazimAiEngine.isCrisisQuery(query)) {
+            localHistory.clear();
+            displayAiMessage(aiEngine.processQuery(query), "Safety guidance · on-device");
+            return;
+        }
+
         String mode = guideMode();
         if ("local".equals(mode)) {
             if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
-                displayAiMessage(AiResponse.plainText("On-device AI is unavailable until approved-source controls are implemented and verified. Built-in app help remains available.", null), "On-phone AI unavailable");
+                displayAiMessage(AiResponse.plainText("On-device AI is unavailable until an approved knowledge package and trusted signing key are provisioned. Built-in app help remains available.", null), "On-phone AI unavailable");
                 return;
             }
             if (!OnDeviceAi.isInstalled(activity)) {
@@ -502,21 +619,40 @@ public class AiBreakthroughGuideDialog extends Dialog {
             if (btnMode != null) btnMode.setText("Stop response");
             OnDeviceAi.ask(activity, query, localHistory.snapshot(), new OnDeviceAi.Callback() {
                 public void onSuccess(String answer) {
-                    removeTypingIndicator(indicator); localRequest = false; updateSubtitle();
+                    removeTypingIndicator(indicator); localRequest = false; finishInFlight(); updateSubtitle();
                     if (!isShowing()) return;
                     String result = ConversationHistory.withoutRepeatedGreeting(answer, !localHistory.isEmpty());
                     localHistory.addExchange(query, result);
                     displayAiMessage(AiResponse.plainText(result, null), "On-phone AI · Qwen · Offline");
                 }
                 public void onError(String error) {
-                    removeTypingIndicator(indicator); localRequest = false; updateSubtitle();
+                    removeTypingIndicator(indicator); localRequest = false; finishInFlight(); updateSubtitle();
                     if (isShowing()) displayAiMessage(AiResponse.plainText(error, null), "On-phone model notice");
                 }
             });
             return;
         }
         if ("guide".equals(mode)) {
-            displayAiMessage(aiEngine.processQuery(query), "Offline app help · Built-in rules");
+            if (!OfflineScriptureLookup.matchesRequest(query)) {
+                displayAiMessage(aiEngine.processQuery(query), "Offline app help · Built-in rules");
+                return;
+            }
+            final View indicator = showTypingIndicator();
+            requestInFlight = true;
+            btnSend.setEnabled(false);
+            android.os.AsyncTask.THREAD_POOL_EXECUTOR.execute(() -> {
+                AiResponse scripture = OfflineScriptureLookup.answer(activity, query);
+                activity.runOnUiThread(() -> {
+                    removeTypingIndicator(indicator);
+                    finishInFlight();
+                    if (!isShowing()) return;
+                    if (scripture != null) {
+                        displayAiMessage(scripture, "Offline Bible lookup");
+                    } else {
+                        displayAiMessage(aiEngine.processQuery(query), "Offline app help · Built-in rules");
+                    }
+                });
+            });
             return;
         }
 
@@ -525,75 +661,38 @@ public class AiBreakthroughGuideDialog extends Dialog {
             return;
         }
 
-        // 2. Check consent
         if (!AiPreferences.hasConsented(activity)) {
-            // Answer immediately on device; online consent is available from the subtitle.
-            AiResponse offlineResp = aiEngine.processQuery(query);
-            displayAiMessage(offlineResp, "📱 Offline Guide (Consent Required for Online AI)");
+            displayAiMessage(AiResponse.plainText(
+                    "Review the online AI disclosure before sending your question.", null), "Online AI");
+            showConsentDialog();
             return;
         }
 
-        // 3. Check AI kill-switch and client quota
-        if (!AiPreferences.isAiEnabled(activity)) {
-            AiResponse offlineResp = aiEngine.processQuery(query);
-            displayAiMessage(offlineResp, "📱 Offline Guide (Cloud AI Inactive)");
-            updateSubtitle();
-            return;
-        }
-
-        int remaining = AiPreferences.getRemainingQuestions(activity);
-        if (remaining <= 0) {
-            AiResponse offlineResp = aiEngine.processQuery(query);
-            displayAiMessage(offlineResp, "📱 Offline Guide (Daily Cloud Quota Reached · 3/3 Used)");
-            updateSubtitle();
-            return;
-        }
-
-        // 4. Show typing/pondering indicator
         final View typingIndicator = showTypingIndicator();
         requestInFlight = true;
         btnSend.setEnabled(false);
-
-        // 5. Query Cloudflare Relay
-        AiRelayClient.askQuestion(activity, query, onlineHistory.snapshot(), new AiRelayClient.RelayCallback() {
-            @Override
-            public void onSuccess(@NonNull String answer, int remainingQuestionsToday) {
+        AiRelayClient.askQuestion(activity, query, new AiRelayClient.RelayCallback() {
+            @Override public void onSuccess(@NonNull String answer, int remaining, boolean generated) {
                 removeTypingIndicator(typingIndicator);
+                finishInFlight();
                 if (!isShowing()) return;
-                updateSubtitle();
-
-                String badge = "⚡ Online Cloud AI (Gemini · " + remainingQuestionsToday + " questions left today)";
-                String conversationalAnswer = ConversationHistory.withoutRepeatedGreeting(answer, !onlineHistory.isEmpty());
-                onlineHistory.addExchange(query, conversationalAnswer);
-                AiResponse response = AiResponse.plainText(conversationalAnswer, null);
-                displayAiMessage(response, badge);
+                String badge = generated ? "Online AI · Gemini" : "Church service notice";
+                if (remaining >= 0) badge += " · " + remaining + " questions left";
+                displayAiMessage(AiResponse.plainText(answer, null), badge);
             }
 
-            @Override
-            public void onQuotaExceeded(int remainingQuestionsToday) {
+            @Override public void onError(@NonNull String message) {
                 removeTypingIndicator(typingIndicator);
-                if (!isShowing()) return;
-                updateSubtitle();
-
-                AiResponse offlineResp = aiEngine.processQuery(query);
-                displayAiMessage(offlineResp, "📱 Offline Guide (Daily Cloud Quota Reached · 3/3 Used)");
-            }
-
-            @Override
-            public void onError(@NonNull String errorMessage, boolean shouldFallbackOffline) {
-                removeTypingIndicator(typingIndicator);
-                if (!isShowing()) return;
-                updateSubtitle();
-
-                if (shouldFallbackOffline) {
-                    AiResponse offlineResp = aiEngine.processQuery(query);
-                    displayAiMessage(offlineResp, "📱 Offline Guide (Internet / Cloud Relay Unavailable)");
-                } else {
-                    AiResponse errResp = AiResponse.plainText("⚠️ " + errorMessage, null);
-                    displayAiMessage(errResp, "⚠️ System Notice");
-                }
+                finishInFlight();
+                if (isShowing()) displayAiMessage(AiResponse.plainText(message, null), "Online AI");
             }
         });
+    }
+
+    private void finishInFlight() {
+        requestInFlight = false;
+        if (btnSend != null) btnSend.setEnabled(true);
+        if (btnMode != null) btnMode.setText("Change mode");
     }
 
     private View showTypingIndicator() {

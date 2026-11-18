@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
 import org.perazimchurch.app.data.local.session.SessionManager;
 
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Built-in offline app-navigation guide. This is a rules engine, not a language model.
@@ -23,6 +25,40 @@ import java.util.Locale;
  * - Strict domain boundary guardrails locking the assistant exclusively to church topics.
  */
 public class PerazimAiEngine {
+
+    private static final Pattern CRISIS_PATTERN = Pattern.compile(
+            "\\b(suicid(?:e|al)|kill myself|end my life|want to die|better off dead|" +
+            "self[ -]?harm|hurt myself|harm myself|cutting myself|unalive myself|" +
+            "end it all|can't go on|cannot go on|not worth living|sexual assault|" +
+            "domestic violence|physically abused|(?:going to|plan to|want to) (?:kill|shoot|stab) (?:someone|him|her|them)|(?:immediate|imminent) danger)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CRISIS_DISCLOSURE_PATTERN = Pattern.compile(
+            "\\b(?:(?:my|our) (?:husband|wife|spouse|partner|boyfriend|girlfriend|parent|father|mother|caregiver) " +
+                    "(?:hits?|beats?|beating|struck|choked|attacked|threatened) (?:me|us|my child|our child)|" +
+                    "(?:hit|hits|hitting|beat|beats|beating|struck|choked|choking|attacked|threatened) (?:me|us|my child|our child))\\b|" +
+                    "\\b(?:afraid|scared|fear) (?:that )?(?:my )?(?:partner|husband|wife|spouse|parent|father|mother|caregiver) " +
+                    "(?:will|might|may|is going to) (?:hurt|hit|beat|attack|kill) (?:me|my child|our child)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern SENSITIVE_PASTORAL_REQUEST = Pattern.compile(
+            "\\b(?:keep (?:this|it) confidential|keep (?:this|it) secret|don't tell anyone|do not tell anyone|" +
+                    "please don't share this|please do not share this|pastoral intervention)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern PERSONAL_CONTEXT = Pattern.compile(
+            "\\b(?:i am|i'm|i feel|i felt|i have been|i was|my|our|we|my friend|someone close to me)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern SENSITIVE_PASTORAL_TOPIC = Pattern.compile(
+            "\\b(?:abuse|assault|rape|violence|hit me|beating|marital conflict|family conflict|divorce|" +
+                    "separation|trauma|grief|bereavement|mourning|depress(?:ion|ed)?|anx(?:iety|ious)|" +
+                    "panic attack|self[ -]?harm|suicid(?:e|al)|addict(?:ion|ed)|overdose|confession|" +
+                    "confidential|secret)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern[] CLEARLY_OUT_OF_SCOPE_PATTERNS = {
+            Pattern.compile("\\b(?:which|what)\\s+(?:stock|stocks|share|shares|cryptocurrency|crypto|bitcoin|forex|bond|bonds)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:buy|sell|trade|invest in)\\b.{0,70}\\b(?:stock|stocks|share|shares|cryptocurrency|crypto|bitcoin|forex|bond|bonds)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:should i|recommend|help me choose|help me pick)\\b.{0,70}\\b(?:investment portfolio|retirement portfolio|personal budget|payday loan|mortgage|credit card|tax return|insurance policy)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:what|which|recommend|prescribe)\\b.{0,50}\\b(?:medicine|medication|drug|dosage|dose|treatment)\\b|\\b(?:diagnose me|diagnose my|medical advice|prescribe medication)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:give me legal advice|should i sue|how (?:do|can) i sue|file (?:a )?lawsuit|draft (?:a )?(?:legal )?contract|represent me in court)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:who won|latest score|current score|score of)\\b.{0,60}\\b(?:football|match|game|election|sports?)\\b|\\b(?:write|draft) (?:me )?a campaign speech\\b", Pattern.CASE_INSENSITIVE)
+    };
 
     private final Context context;
 
@@ -42,10 +78,16 @@ public class PerazimAiEngine {
         String q = rawQuery.trim().toLowerCase(Locale.US);
 
         // 0. CRISIS & PASTORAL CARE INTERVENTION
-        if (containsAny(q, "suicide", "suicidal", "kill myself", "end my life", "want to die", "hang myself",
-                "self harm", "self-harm", "cutting myself", "hurt myself", "end it all", "hopeless",
-                "giving up", "abused", "abuse")) {
+        if (isCrisisQuery(q)) {
             return handleCrisisQuery();
+        }
+
+        if (isSensitivePastoralDisclosure(rawQuery)) {
+            return sensitivePastoralResponse();
+        }
+
+        if (isClearlyOutOfScopeQuery(rawQuery)) {
+            return outOfScopeResponse();
         }
 
         // 1. BIBLE RIDDLES & TRIVIA
@@ -64,11 +106,14 @@ public class PerazimAiEngine {
         }
 
         // 4. MEDIA & SERMONS: YouTube Live, Broadcast, Video, Audio Messages
-        if (containsAny(q, "live", "livestream", "broadcast", "youtube", "video", "sermon", "preach", "message", "recording")) {
+        if (containsAny(q, "livestream", "live stream", "broadcast", "youtube", "video", "sermon", "preach", "recording")) {
             return handleSermonsQuery(q);
         }
 
         // 5. HOLY BIBLE: Scripture, Chapters, KJV, SUV, Swahili
+        if (containsAny(q, "daily verse", "verse of the day", "today's verse", "todays verse")) {
+            return handleDailyVerseQuery();
+        }
         if (containsAny(q, "bible", "scripture", "verse", "chapter", "read word", "kjv", "suv", "swahili bible", "genesis", "exodus", "samuel")) {
             return handleBibleQuery(q);
         }
@@ -79,18 +124,18 @@ public class PerazimAiEngine {
         }
 
         // 7. FELLOWSHIP & PRAYER: Community, Wall, Cell Group, Testimony
-        if (containsAny(q, "prayer", "pray", "prayer wall", "fellowship", "testimony", "cell group", "community", "intercede")) {
+        if (containsAny(q, "prayer", "prayers", "pray", "praying", "fellowship", "testimony", "cell group", "community", "intercede")) {
             return handleFellowshipQuery();
         }
 
         // 8. GAMIFICATION: XP, Level, Streaks, Grace Tokens
-        if (containsAny(q, "xp", "experience point", "level", "points", "score", "rank")) {
+        if (containsAny(q, "xp", "experience point", "experience points", "my level", "level up", "my points", "my score", "my rank")) {
             return handleXpQuery(q);
         }
-        if (containsAny(q, "streak", "fire", "consecutive", "freeze", "frozen", "shield")) {
+        if (containsAny(q, "streak", "consecutive days", "streak freeze", "freeze", "frozen", "shield")) {
             return handleStreakQuery(q);
         }
-        if (containsAny(q, "grace", "token", "purple heart", "grace point")) {
+        if (containsAny(q, "grace token", "grace tokens", "grace point", "grace points", "purple heart")) {
             return handleGraceQuery(q);
         }
 
@@ -100,7 +145,7 @@ public class PerazimAiEngine {
         }
 
         // 10. CHURCH IDENTITY & LEADERSHIP: Bishop Mutweri, Campuses, Times
-        if (containsAny(q, "bishop", "mutweri", "pastor", "overseer", "church", "campus", "headquarters", "embu", "service time", "time", "location")) {
+        if (containsAny(q, "campus", "campuses", "headquarters", "service time", "church location", "church address", "church contact")) {
             return handleChurchInfoQuery();
         }
 
@@ -119,14 +164,58 @@ public class PerazimAiEngine {
     }
 
     private AiResponse handleCrisisQuery() {
-        String msg = "❤️ **You Are Precious and Deeply Loved**\n\n"
-                + "You do not have to carry this burden alone. God has not given up on you, and neither has your Perazim family.\n\n"
-                + "Please reach out immediately to our pastoral care team at **+254 710 772 227** (Call, SMS, or WhatsApp). Bishop Dr. David Mutweri and the church leadership are ready to stand with you in prayer and support.";
-        return AiResponse.plainText(msg, Arrays.asList(
-                "📞 Pastoral Line: +254 710 772 227",
-                "🙏 Request Prayer on Wall",
-                "📖 Read Comfort Scripture"
-        ));
+        return crisisResponse();
+    }
+
+    public static AiResponse crisisResponse() {
+        String msg = "I'm sorry you're facing this. If you or someone else may be in immediate danger, contact local emergency services or go to the nearest hospital now. If you can, tell a trusted person nearby and ask them to stay with you. For ongoing distress, contact a qualified local health professional.\n\n"
+                + "You can also use the app's prayer feature or a church contact shown in the app, if you choose. This guide cannot provide emergency monitoring or confirm that a pastoral contact is available.";
+        return AiResponse.plainText(msg, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
+    /** Conservative local safety gate used before guide, Qwen, and online routing. */
+    public static boolean isCrisisQuery(@Nullable String query) {
+        if (query == null) return false;
+        String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
+        return CRISIS_PATTERN.matcher(normalized).find() || CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find();
+    }
+
+    /** Conservative pre-model route for personal pastoral disclosures; not a risk diagnosis. */
+    public static boolean isSensitivePastoralDisclosure(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return false;
+        return SENSITIVE_PASTORAL_REQUEST.matcher(query).find()
+                || (PERSONAL_CONTEXT.matcher(query).find() && SENSITIVE_PASTORAL_TOPIC.matcher(query).find());
+    }
+
+    public static AiResponse sensitivePastoralResponse() {
+        return AiResponse.plainText(
+                "I'm sorry you're dealing with this. This AI cannot promise confidentiality or notify a pastor, and this message has not been sent for pastoral follow-up. If you want human support, choose a pastoral contact route shown in the app; I will not send it for you. If anyone is in immediate danger, contact local emergency services or go to a hospital now and tell a trusted person nearby.",
+                Arrays.asList("🙏 Open pastoral contacts", "🙏 Open prayer support"));
+    }
+
+    /** Deterministically blocks clear unrelated professional/general-interest advice requests. */
+    public static boolean isClearlyOutOfScopeQuery(@Nullable String query) {
+        if (query == null) return false;
+        String normalized = query.replace('’', '\'').replaceAll("\\s+", " ").trim();
+        for (Pattern pattern : CLEARLY_OUT_OF_SCOPE_PATTERNS) {
+            if (pattern.matcher(normalized).find()) return true;
+        }
+        return false;
+    }
+
+    @NonNull
+    public static AiResponse outOfScopeResponse() {
+        return AiResponse.plainText(
+                "I can help with Christian faith, approved Perazim information, and using this app. I cannot provide investment, medical, or legal advice, or answer unrelated general-interest questions. Please consult a qualified professional for those matters; for a spiritual or church concern, speak with an authorised human leader.",
+                Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
+    }
+
+    /** Word-boundary matcher exposed for deterministic intent regression tests. */
+    public static boolean containsIntentTerm(@Nullable String text, @NonNull String term) {
+        if (text == null || text.trim().isEmpty() || term.trim().isEmpty()) return false;
+        String normalizedText = text.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]+", " ").trim();
+        String normalizedTerm = term.toLowerCase(Locale.ROOT).replaceAll("[^\\p{L}\\p{N}]+", " ").trim();
+        return (" " + normalizedText + " ").contains(" " + normalizedTerm + " ");
     }
 
     private String getEffectiveUserId() {
@@ -143,8 +232,8 @@ public class PerazimAiEngine {
         String telemetryLine = (streak > 0)
                 ? "You currently have **⭐ " + xp + " Spiritual XP** and an active **🔥 " + streak + "-day streak**."
                 : (xp > 0)
-                ? "You currently have **⭐ " + xp + " Spiritual XP**. Start your devotional streak today!"
-                : "Welcome! Complete today's 3-minute reflection to earn your first Spiritual XP and start a devotional streak.";
+                ? "You currently have **⭐ " + xp + " Spiritual XP**."
+                : "Your app progress is ready whenever you want to explore today's reflection or other activities.";
 
         String msg = "🔥 **Shalom & Welcome to Perazim Breakthrough Guide!**\n\n"
                 + "I am your personal in-app assistant. " + telemetryLine + "\n\n"
@@ -152,11 +241,11 @@ public class PerazimAiEngine {
 
         List<String> chips = Arrays.asList(
                 "⭐ Check my XP & Level",
-                streak > 0 ? "🔥 Protect my " + streak + "-day streak" : "⚡ Start Daily Reflection (+10 XP)",
+                streak > 0 ? "🔥 Check my " + streak + "-day streak" : "⚡ Open Daily Reflection",
                 "🎥 Watch YouTube Live",
                 "📖 Read Swahili Bible",
                 "💚 Give Tithe via M-Pesa",
-                "🧩 Play Bible Riddle (+20 XP)"
+                "🧩 Play Bible Riddle"
         );
 
         return AiResponse.plainText(msg, chips);
@@ -176,17 +265,17 @@ public class PerazimAiEngine {
                     + "• **Current XP:** " + xp + " XP\n"
                     + "• **Rank:** Level " + level + " (" + levelName + ")\n"
                     + "• **Progress to Level " + (level + 1) + ":** " + remaining + " XP needed.\n\n"
-                    + "💡 *Tip: Complete today's 3-minute prayer reflection (+10 XP) or solve a Bible Riddle (+20 XP) to level up!*";
+                    + "💡 *Open the app's activities to review current progress rules. This guide only reads your displayed XP; it does not award points.*";
         } else {
             msg = "⭐ **Spiritual XP Telemetry:**\n\n"
                     + "• **Current XP:** 0 XP\n"
                     + "• **Rank:** Level 1 (" + levelName + ")\n"
                     + "• **Progress to Level 2:** 250 XP needed.\n\n"
-                    + "💡 *Tip: Complete today's 3-minute prayer reflection (+10 XP) or solve a Bible Riddle (+20 XP) to earn your first Spiritual XP!*";
+                    + "💡 *Open the app's activities to review current progress rules. This guide only reads your displayed XP; it does not award points.*";
         }
 
-        List<String> chips = Arrays.asList("⚡ 3-Min Reflection (+10 XP)", "🧩 Solve Riddle (+20 XP)", "🔥 Check Streak");
-        return AiResponse.withAction(msg, AiResponse.INTENT_REFLECTIONS, "⚡ Start Reflection (+10 XP)", null, chips);
+        List<String> chips = Arrays.asList("⚡ Open Reflection", "🧩 Open Riddles", "🔥 Check Streak");
+        return AiResponse.withAction(msg, AiResponse.INTENT_REFLECTIONS, "⚡ Open Reflection", null, chips);
     }
 
     private AiResponse handleStreakQuery(String q) {
@@ -220,46 +309,43 @@ public class PerazimAiEngine {
         String userId = getEffectiveUserId();
         int grace = GamificationStore.getGracePoints(context, userId, 0);
 
-        String msg = "💜 **Grace Tokens (Unmerited Spiritual Protection):**\n\n"
+        String msg = "💜 **Grace Points in the app:**\n\n"
                 + "You currently have **" + grace + " Grace Tokens**.\n\n"
-                + "Unlike other apps that harshly punish missed days, Perazim models God's unmerited favor. If life, travel, or work causes you to miss a day, **1 Grace Token** is automatically redeemed to shield your devotional streak fire from resetting to Day 1!";
+                + "These are an app progress feature and are not a measure of God's grace. Check the current Profile screen for how your streak is handled.";
 
         List<String> chips = Arrays.asList("🔥 Check Streak Status", "⭐ Earn More XP", "👤 Go to Profile");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "❄️ Manage Streak Protection", null, chips);
     }
 
     private AiResponse handleGivingQuery() {
-        String msg = "💚 **Perazim Tithes & Giving (M-Pesa):**\n\n"
-                + "• **Headquarters:** Embu Central Sanctuary\n"
-                + "• **Scripture:** *\"Bring ye all the tithes into the storehouse... and prove me now herewith, saith the LORD of hosts.\"* — Malachi 3:10\n\n"
-                + "You can give your Tithes, General Offerings, Building Fund, or Thanksgiving seed directly via M-Pesa inside the app.";
+        String msg = "💚 **Giving information:**\n\n"
+                + "Open the Giving area to review the current options and instructions shown in this app. Verify the recipient and payment details in the app before making a payment.";
 
         List<String> chips = Arrays.asList("💚 Open Giving Dialog", "🏛️ Church Campuses", "🎥 Watch Sermons");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_GIVING, "💚 Open Giving / Tithe Modal", null, chips);
     }
 
     private AiResponse handleSermonsQuery(String q) {
-        String msg = "🎥 **Perazim Media & Live Broadcasts:**\n\n"
-                + "• **Official Channel:** @perazimchurchembu\n"
-                + "• **Presiding Bishop:** Bishop Dr. David Mutweri\n"
-                + "• **Latest Series:** *Breakthrough 2026*, *Walking in Faith*, *Deliverance*\n\n"
-                + "You can watch live broadcasts, stream video recordings, listen to sermon audio, or download study notes (PDF).";
+        String msg = "🎥 **Sermons and worship media:**\n\n"
+                + "Open the Sermons section to see the resources currently available in this app. Availability of live streams, recordings, audio, and downloads can vary.";
 
         List<String> chips = Arrays.asList("▶ Watch Live Broadcast", "📥 Offline Downloads", "💬 Share Sermon");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_LIVE, "🎥 Open Perazim Live & Video", null, chips);
     }
 
     private AiResponse handleBibleQuery(String q) {
-        String version = q.contains("swahili") || q.contains("suv") ? "Swahili SUV" : "King James Version (KJV)";
-
         String msg = "📖 **Holy Scripture Reader:**\n\n"
-                + "The Perazim Bible works **100% offline with zero data consumption**.\n"
-                + "• **Available Versions:** KJV (King James) & Swahili Union Version (SUV)\n"
-                + "• **Coverage:** Complete Old & New Testaments (66 Books, instant lookup)\n\n"
-                + "Tap below to launch the reader in " + version + ".";
+                + "Open the reader and choose a translation shown in this build. Translation availability and licensing vary; check the reader's own list before choosing.";
 
         List<String> chips = Arrays.asList("📖 Read 2 Samuel 5", "📖 Read Psalms", "⭐ Check Devotion XP");
         return AiResponse.withAction(msg, AiResponse.INTENT_OPEN_BIBLE, "📖 Open Holy Bible Reader", null, chips);
+    }
+
+    private AiResponse handleDailyVerseQuery() {
+        String msg = "📖 **Daily verse:**\n\n"
+                + "Open the app's Home or Bible area to see the verse currently provided in this build. I will not reconstruct a quotation when the verse text is unavailable.";
+        return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_HOME, "🏠 Open Home", null,
+                Arrays.asList("📖 Open Bible", "⚡ Open Reflections"));
     }
 
     private AiResponse handleWorshipQuery() {
@@ -273,11 +359,8 @@ public class PerazimAiEngine {
     }
 
     private AiResponse handleFellowshipQuery() {
-        String msg = "🤝 **Community Fellowship & Prayer Wall:**\n\n"
-                + "Connect with your spiritual family in Embu and across campuses:\n"
-                + "• Post prayer requests to the wall (+15 XP)\n"
-                + "• Intercede for brethren with 'AMEN'\n"
-                + "• Testify of God's breakthroughs (+50 XP)";
+        String msg = "🤝 **Prayer and fellowship:**\n\n"
+                + "The app has prayer and community features. Open them to review what is available and the privacy information before sharing personal details. This guide does not submit a prayer or award progress points.";
 
         List<String> chips = Arrays.asList("✍️ Submit Prayer Request", "🌟 Praise Reports", "💬 Direct Chat");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_FELLOWSHIP, "🙏 Go to Prayer Wall", null, chips);
@@ -285,43 +368,38 @@ public class PerazimAiEngine {
 
     private AiResponse handleRiddlesQuery() {
         String msg = "🧩 **Bible Trivia & Riddles Challenge:**\n\n"
-                + "Test your scriptural knowledge, earn **+20 Spiritual XP** for correct answers, and discover biblical wisdom!\n\n"
-                + "*\"A gentle answer turns away wrath, but a harsh word stirs up anger.\"* — Proverbs 15:1";
+                + "Open the game to see the current questions and rules. This guide does not award points; any game progress is handled by the game itself.";
 
         List<String> chips = Arrays.asList("🧩 Start Bible Riddle", "😄 Christian Jokes", "⭐ Check My XP");
-        return AiResponse.withAction(msg, AiResponse.INTENT_LAUNCH_RIDDLES, "🧩 Play Bible Riddles (+20 XP)", null, chips);
+        return AiResponse.withAction(msg, AiResponse.INTENT_LAUNCH_RIDDLES, "🧩 Play Bible Riddles", null, chips);
     }
 
     private AiResponse handleJokesQuery() {
-        String msg = "😄 **Clean Christian Fellowship Humor:**\n\n"
-                + "Enjoy lighthearted biblical humor to bring joy to your heart!\n\n"
-                + "*\"A merry heart doeth good like a medicine: but a broken spirit drieth the bones.\"* — Proverbs 17:22";
+        String msg = "😄 **Christian jokes:**\n\n"
+                + "Open the jokes section to see the items currently available in this app.";
 
         List<String> chips = Arrays.asList("😄 Read Bible Jokes", "🧩 Play Bible Riddle", "🤝 Fellowship");
         return AiResponse.withAction(msg, AiResponse.INTENT_LAUNCH_JOKES, "😄 Open Christian Jokes", null, chips);
     }
 
     private AiResponse handleReflectionsQuery() {
-        String msg = "⚡ **3-Minute Breakthrough Daily Altar:**\n\n"
-                + "A quick, focused 3-step devotion to align your day:\n"
-                + "1. **Read (30s):** Cornerstone scripture (2 Samuel 5:20)\n"
-                + "2. **Reflect (60s):** Spiritual takeaway on breaking limitations\n"
-                + "3. **Pray (90s):** Breakthrough prayer (+10 XP)";
+        String msg = "⚡ **Daily reflection:**\n\n"
+                + "Open the Reflections section to read today's material and its Scripture reference. The guide does not create a devotional, state an official interpretation, or award points.";
 
-        List<String> chips = Arrays.asList("⚡ Start Routine (+10 XP)", "🔥 Check Streak", "📖 Open Bible");
-        return AiResponse.withAction(msg, AiResponse.INTENT_REFLECTIONS, "⚡ Start 3-Min Devotion", null, chips);
+        List<String> chips = Arrays.asList("⚡ Start a Reflection", "🔥 Check Streak", "📖 Open Bible");
+        return AiResponse.withAction(msg, AiResponse.INTENT_REFLECTIONS, "⚡ Open Reflections", null, chips);
     }
 
     private AiResponse handleChurchInfoQuery() {
-        String msg = "🏛️ **Perazim Mission Church (PMC):**\n\n"
-                + "• **Motto:** *\"The Place of Great Breakthrough\"*\n"
-                + "• **Overseer:** Bishop Dr. David Mutweri\n"
-                + "• **Headquarters:** Embu Central Sanctuary, Kenya\n"
-                + "• **Main Service:** Sunday 9:00 AM – 1:00 PM\n"
-                + "• **Cornerstone Scripture:** 2 Samuel 5:20 (*\"The LORD hath broken forth upon mine enemies...\"*)";
+        return churchInfoResponse();
+    }
+
+    static AiResponse churchInfoResponse() {
+        String msg = "🏛️ **Church and campus information:**\n\n"
+                + "This guide does not have a verified source for the church's official identity, locations, contacts, or service schedule. Check the Church or Campus information currently shown in the app, or contact an authorised church representative.";
 
         List<String> chips = Arrays.asList("🎥 Watch Livestream", "💚 Give Tithe", "📖 Read Scripture");
-        return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "🏛️ View Church Profile", null, chips);
+        return AiResponse.plainText(msg, chips);
     }
 
     private AiResponse handleProfileQuery() {
@@ -329,16 +407,19 @@ public class PerazimAiEngine {
                 + "Manage your spiritual credentials and offline storage.\n"
                 + "• View downloaded sermon audios and hymnals.\n"
                 + "• Toggle Grace streak freeze protection.\n"
-                + "• Pastoral care & direct support contacts.";
+                + "• Use only contact routes currently displayed in the app and verify them before sharing sensitive information.";
 
         List<String> chips = Arrays.asList("📦 Manage Offline Audio", "🔥 Check Streak", "⭐ View XP");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "👤 Go to My Profile", null, chips);
     }
 
     private AiResponse handleOffTopicGuardrail(String rawQuery) {
+        String generativeAvailability = openEndedModeNotice(
+                BuildConfig.OFFLINE_QWEN_ENABLED, BuildConfig.ONLINE_AI_ENABLED);
         String msg = "📱 **Offline Church Guide (On-Device Rules):**\n\n"
                 + "I could not find an offline match for \"" + (rawQuery != null ? rawQuery : "") + "\".\n\n"
-                + "As an offline guide, I operate on built-in church rules for Scripture, Sermons, Hymns, Giving, and Devotionals. For broader open-ended Bible questions, please connect to the internet to chat with our online Cloud AI (Google Gemini).\n\n"
+                + "As an offline guide, I operate on built-in church rules for Scripture, Sermons, Hymns, Giving, and Devotionals. "
+                + generativeAvailability + "\n\n"
                 + "Here are some things I can help you with right now offline:";
 
         List<String> chips = Arrays.asList(
@@ -350,6 +431,16 @@ public class PerazimAiEngine {
         );
 
         return AiResponse.plainText(msg, chips);
+    }
+
+    static String openEndedModeNotice(boolean offlineQwenEnabled, boolean onlineAiEnabled) {
+        if (onlineAiEnabled) {
+            return "For broader questions, you can switch to Online AI when you are signed in, have consented, and your account is eligible.";
+        }
+        if (offlineQwenEnabled) {
+            return "For broader questions, you can switch to on-phone Qwen. It requires the local model and verified supporting knowledge, and it has no live internet access.";
+        }
+        return "Generative AI is not enabled in this build. You can still open the Bible for local Scripture lookup or use the built-in app guide.";
     }
 
     private int calculateLevel(int xp) {
@@ -370,7 +461,7 @@ public class PerazimAiEngine {
 
     private boolean containsAny(String text, String... words) {
         for (String w : words) {
-            if (text.contains(w.toLowerCase(Locale.US))) {
+        if (containsIntentTerm(text, w)) {
                 return true;
             }
         }

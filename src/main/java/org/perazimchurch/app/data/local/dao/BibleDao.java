@@ -90,6 +90,9 @@ public interface BibleDao {
     @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
     List<BibleVerseEntity> searchVerses(String translationId, String query);
 
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :firstTerm || '%' AND text LIKE '%' || :secondTerm || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
+    List<BibleVerseEntity> searchVersesByTerms(String translationId, String firstTerm, String secondTerm);
+
     @Query("SELECT * FROM bible_verses WHERE (translationId = 'KJV' OR translationId IS NULL) AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
     List<BibleVerseEntity> searchVerses(String query);
 

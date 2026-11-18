@@ -161,6 +161,7 @@ async function runTests() {
     });
     assert(regUser2.status === 201, 'User 2 registered with phone + PIN (201)');
     const token2 = regUser2.body.token;
+    const user2Id = regUser2.body.user.id;
 
     // 6. User 1 posts prayer petition
     const postPrayerRes = await makeRequest('POST', '/api/prayers', {
@@ -171,6 +172,51 @@ async function runTests() {
     assert(postPrayerRes.status === 201, 'User 1 submitted prayer petition (201)');
     const prayerId = postPrayerRes.body.prayer.id;
     assert(postPrayerRes.body.prayer.author_name === 'Brother John (Embu)', 'Prayer author correctly attributed');
+    assert(memoryStore.prayers.find(p => p.id === prayerId).author_id === user1Id, 'Authenticated prayer ownership comes from validated account identity');
+
+    const forgedMemberPrayer = await makeRequest('POST', '/api/prayers', {
+      id: 'prayer_forged_direct_guest',
+      title: 'Guest request with forged author',
+      content: 'Synthetic guest prayer for identity regression coverage.',
+      authorId: user2Id,
+      authorName: 'Forged Member Name'
+    });
+    assert(forgedMemberPrayer.status === 201, 'Unauthenticated guest prayer remains available');
+    assert(memoryStore.prayers.find(p => p.id === 'prayer_forged_direct_guest').author_id === 'guest', 'Direct guest authorId is replaced with server-assigned guest identity');
+
+    const forgedMemberSync = await makeRequest('POST', '/api/sync', {
+      userId: user2Id,
+      mutations: [{
+        id: 'sync_forged_guest_author',
+        operationType: 'CREATE',
+        entityType: 'PRAYER',
+        entityId: 'prayer_forged_guest_sync',
+        payloadJson: JSON.stringify({
+          title: 'Guest offline request',
+          content: 'Synthetic offline guest prayer for identity regression coverage.',
+          authorId: user2Id,
+          authorName: 'Forged Member Name'
+        })
+      }]
+    });
+    assert(forgedMemberSync.status === 401, 'Unauthenticated sync mutations are rejected; sync requires an authenticated account');
+    assert(!memoryStore.prayers.find(p => p.id === 'prayer_forged_guest_sync'), 'A rejected unauthenticated sync creates no prayer');
+
+    const forgedReplay = await makeRequest('POST', '/api/sync', {
+      userId: user2Id,
+      mutations: [{
+        id: 'sync_forged_replay',
+        operationType: 'CREATE',
+        entityType: 'PRAYER',
+        entityId: prayerId,
+        payloadJson: JSON.stringify({
+          title: 'Prayer for healing in Embu',
+          content: 'Please stand with our family in prayer for breakthrough and healing.',
+          authorId: user1Id
+        })
+      }]
+    });
+    assert(forgedReplay.status === 401, 'Unauthenticated sync replay is rejected');
 
     // 7. User 2 fetches public prayers — verifies multi-client HTTP contract visibility
     const fetchPrayersRes = await makeRequest('GET', '/api/prayers');
@@ -192,6 +238,10 @@ async function runTests() {
       testimony: 'Unauthorized attempt to alter prayer'
     }, token2);
     assert(unauthorizedTestimonyRes.status === 403, 'Unauthorized user testimony rejected with 403 Forbidden');
+    const guestTestimonyRes = await makeRequest('POST', '/api/prayers/prayer_forged_direct_guest/testimony', {
+      testimony: 'Guest must not impersonate the forged member owner.'
+    }, token2);
+    assert(guestTestimonyRes.status === 403, 'Member account cannot claim testimony ownership of a guest prayer');
 
     // 10. Legitimate Author Testimony (User 1 posts testimony)
     const testimonyRes = await makeRequest('POST', `/api/prayers/${prayerId}/testimony`, {
