@@ -29,6 +29,12 @@ const ERASURE_POLICY = {
   'post_comments.author_id': 'delete',
   'post_amens.user_id': 'delete',
   'event_rsvps.user_id': 'delete',
+  'post_reactions.user_id': 'delete',
+  'comment_reactions.user_id': 'delete',
+  'event_photos.uploader_id': 'delete',
+  'event_photos.reviewed_by': 'keep: review record, reviewer link to the anonymised account',
+  'group_join_requests.user_id': 'delete',
+  'group_join_requests.decided_by': 'keep: decision record, decider link to the anonymised account',
   'group_memberships.user_id': 'delete',
   'in_app_notifications.user_id': 'delete',
   'in_app_notifications.actor_id': 'delete',
@@ -113,6 +119,10 @@ async function eraseMemberData(client, userId, now = Date.now()) {
   await client.query('DELETE FROM post_comments WHERE author_id = $1', [userId]);
   await client.query('DELETE FROM post_amens WHERE user_id = $1', [userId]);
   await client.query('DELETE FROM event_rsvps WHERE user_id = $1', [userId]);
+  await client.query('DELETE FROM post_reactions WHERE user_id = $1', [userId]);
+  await client.query('DELETE FROM comment_reactions WHERE user_id = $1', [userId]);
+  await client.query('DELETE FROM event_photos WHERE uploader_id = $1', [userId]);
+  await client.query('DELETE FROM group_join_requests WHERE user_id = $1', [userId]);
   await client.query('DELETE FROM group_memberships WHERE user_id = $1', [userId]);
 
   // Messages, connections and notifications the member sent, received or triggered.

@@ -333,6 +333,14 @@ router.get('/posts', optionalAuth, async (req, res) => {
       params.push(parseInt(cursor, 10));
     }
 
+    // Posts waiting for leader review stay hidden from everyone except their author.
+    if (currentUserId) {
+      conditions.push(`(p.review_status = 'APPROVED' OR p.author_id = $${paramIndex++})`);
+      params.push(currentUserId);
+    } else {
+      conditions.push(`p.review_status = 'APPROVED'`);
+    }
+
     let userParamIndices = [];
     if (currentUserId) {
       userParamIndices.push(paramIndex++);
@@ -352,7 +360,10 @@ router.get('/posts', optionalAuth, async (req, res) => {
         p.amen_count, p.comment_count, p.created_at, p.updated_at,
         u.avatar_url AS author_avatar,
         ${currentUserId ? `(EXISTS (SELECT 1 FROM post_amens pa WHERE pa.post_id = p.id AND pa.user_id = $${userParamIndices[0]}))` : 'FALSE'} AS user_has_amened,
-        ${currentUserId ? `(SELECT er.status FROM event_rsvps er WHERE er.post_id = p.id AND er.user_id = $${userParamIndices[1]})` : 'NULL'} AS user_rsvp_status
+        ${currentUserId ? `(SELECT er.status FROM event_rsvps er WHERE er.post_id = p.id AND er.user_id = $${userParamIndices[1]})` : 'NULL'} AS user_rsvp_status,
+        (SELECT COALESCE(json_agg(json_build_object('emoji', rc.emoji, 'n', rc.n)), '[]'::json)
+           FROM (SELECT pr.emoji, COUNT(*)::int AS n FROM post_reactions pr WHERE pr.post_id = p.id GROUP BY pr.emoji) rc) AS reaction_counts,
+        ${currentUserId ? `(SELECT COALESCE(json_agg(mr.emoji), '[]'::json) FROM post_reactions mr WHERE mr.post_id = p.id AND mr.user_id = $${userParamIndices[1]})` : "'[]'::json"} AS my_reactions
       FROM community_posts p
       LEFT JOIN users u ON p.author_id = u.id
       ${whereClause}
@@ -644,7 +655,7 @@ router.get('/groups', requireAuth, async (req, res) => {
   await ensureSeedData();
   try {
     const result = await query(
-      `SELECT g.id, g.name, g.description, g.created_by, g.is_active, g.created_at,
+      `SELECT g.id, g.name, g.description, g.created_by, g.is_active, g.created_at, g.is_open,
               (SELECT COUNT(*) FROM group_memberships gm WHERE gm.group_id = g.id) AS member_count,
               (EXISTS (SELECT 1 FROM group_memberships gm WHERE gm.group_id = g.id AND gm.user_id = $1)) AS is_member
        FROM community_groups g
@@ -1289,6 +1300,262 @@ router.delete('/classes/:id', requireAuth, async (req, res) => {
     if (!result.rows.length) return res.status(403).json({ error: 'Only the teacher can cancel this class' });
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: 'Could not cancel class' }); }
+});
+
+// Church admins, and any account granted the community.review permission, can approve posts and photos.
+async function canReviewCommunity(user) {
+  if (!user) return false;
+  if (user.role === 'ADMIN') return true;
+  const grant = await query(
+    `SELECT 1 FROM user_permissions up JOIN permissions p ON p.code = up.permission_code
+      WHERE up.user_id = $1 AND up.permission_code = 'community.review' AND p.active = TRUE
+        AND up.revoked_at IS NULL AND up.effective_at <= $2 AND (up.expires_at IS NULL OR up.expires_at > $2)
+      LIMIT 1`,
+    [user.id, Date.now()]
+  );
+  return grant.rows.length > 0;
+}
+
+// ---- Open groups and join requests (migration 0025) ----
+
+// GET /api/community/groups/discover: open groups for anyone signed in. Only name, description and
+// member count are shown; closed groups never appear here.
+router.get('/groups/discover', requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT g.id, g.name, g.description, g.is_open,
+              (SELECT COUNT(*)::int FROM group_memberships gm WHERE gm.group_id = g.id) AS member_count,
+              (EXISTS (SELECT 1 FROM group_memberships gm WHERE gm.group_id = g.id AND gm.user_id = $1)) AS is_member,
+              (SELECT jr.status FROM group_join_requests jr WHERE jr.group_id = g.id AND jr.user_id = $1) AS my_request
+         FROM community_groups g
+        WHERE g.is_active = TRUE AND g.is_open = TRUE
+        ORDER BY g.created_at ASC`,
+      [req.user.id]
+    );
+    res.json({ groups: result.rows });
+  } catch (err) {
+    console.error('Error loading open groups');
+    res.status(500).json({ error: 'Could not load groups' });
+  }
+});
+
+// POST /api/community/groups/:id/join: an open group adds the member at once; a closed group
+// records a request for the owner to approve.
+router.post('/groups/:id/join', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const group = await query('SELECT is_open FROM community_groups WHERE id = $1 AND is_active = TRUE', [id]);
+    if (!group.rows.length) return res.status(404).json({ error: 'Group not found' });
+    const now = Date.now();
+    if (group.rows[0].is_open) {
+      await query(
+        `INSERT INTO group_memberships (group_id, user_id, role, joined_at) VALUES ($1, $2, 'MEMBER', $3)
+         ON CONFLICT (group_id, user_id) DO NOTHING`,
+        [id, req.user.id, now]
+      );
+      return res.json({ success: true, status: 'JOINED' });
+    }
+    await query(
+      `INSERT INTO group_join_requests (group_id, user_id, status, created_at) VALUES ($1, $2, 'PENDING', $3)
+       ON CONFLICT (group_id, user_id) DO NOTHING`,
+      [id, req.user.id, now]
+    );
+    res.status(202).json({ success: true, status: 'PENDING' });
+  } catch (err) {
+    console.error('Error joining group');
+    res.status(500).json({ error: 'Could not join the group' });
+  }
+});
+
+// GET /api/community/groups/:id/join-requests (group owner or admin): pending requests
+router.get('/groups/:id/join-requests', requireAuth, async (req, res) => {
+  try {
+    if (!await canManageGroup(req.user, req.params.id)) return res.status(403).json({ error: 'Only this group owner or an administrator can see requests' });
+    const result = await query(
+      `SELECT jr.user_id, jr.created_at FROM group_join_requests jr
+        WHERE jr.group_id = $1 AND jr.status = 'PENDING' ORDER BY jr.created_at ASC`,
+      [req.params.id]
+    );
+    res.json({ requests: result.rows });
+  } catch (err) {
+    console.error('Error loading join requests');
+    res.status(500).json({ error: 'Could not load requests' });
+  }
+});
+
+// PUT /api/community/groups/:id/join-requests/:userId  { status: 'APPROVED' | 'DECLINED' }
+router.put('/groups/:id/join-requests/:userId', requireAuth, async (req, res) => {
+  try {
+    const { id, userId } = req.params;
+    if (!await canManageGroup(req.user, id)) return res.status(403).json({ error: 'Only this group owner or an administrator can decide requests' });
+    const { status } = req.body || {};
+    if (!['APPROVED', 'DECLINED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or DECLINED' });
+    const now = Date.now();
+    const outcome = await withTransaction(async (client) => {
+      const updated = await client.query(
+        `UPDATE group_join_requests SET status = $1, decided_by = $2, decided_at = $3
+          WHERE group_id = $4 AND user_id = $5 AND status = 'PENDING' RETURNING user_id`,
+        [status, req.user.id, now, id, userId]
+      );
+      if (!updated.rows.length) return false;
+      if (status === 'APPROVED') {
+        await client.query(
+          `INSERT INTO group_memberships (group_id, user_id, role, joined_at) VALUES ($1, $2, 'MEMBER', $3)
+           ON CONFLICT (group_id, user_id) DO NOTHING`,
+          [id, userId, now]
+        );
+      }
+      return true;
+    });
+    if (!outcome) return res.status(404).json({ error: 'No pending request from this member' });
+    res.json({ success: true, status });
+  } catch (err) {
+    console.error('Error deciding join request');
+    res.status(500).json({ error: 'Could not update the request' });
+  }
+});
+
+// PUT /api/community/groups/:id/settings  { isOpen }  (group owner or admin): open a group to anyone or close it
+router.put('/groups/:id/settings', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!await canManageGroup(req.user, id)) return res.status(403).json({ error: 'Only this group owner or an administrator can change settings' });
+    const { isOpen } = req.body || {};
+    if (typeof isOpen !== 'boolean') return res.status(400).json({ error: 'isOpen must be true or false' });
+    const result = await query('UPDATE community_groups SET is_open = $1 WHERE id = $2 AND is_active = TRUE RETURNING id, is_open', [isOpen, id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Group not found' });
+    res.json({ success: true, isOpen: result.rows[0].is_open });
+  } catch (err) {
+    console.error('Error updating group settings');
+    res.status(500).json({ error: 'Could not update the group' });
+  }
+});
+
+// ---- Reactions, review and event photos (migrations 0023 and 0024) ----
+
+// The fixed feelings set. Anything else is rejected, so the feed stays calm.
+const ALLOWED_REACTIONS = ['🙏', '😇', '😊', '😢', '🙌', '🔥', '❤️'];
+
+// POST /api/community/posts/:id/reactions  { emoji }  toggles the caller's reaction
+router.post('/posts/:id/reactions', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { emoji } = req.body || {};
+    if (!ALLOWED_REACTIONS.includes(emoji)) return res.status(400).json({ error: 'Choose a reaction from the list' });
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
+    const outcome = await withTransaction(async (client) => {
+      const removed = await client.query('DELETE FROM post_reactions WHERE post_id = $1 AND user_id = $2 AND emoji = $3 RETURNING 1', [id, req.user.id, emoji]);
+      if (!removed.rows.length) {
+        await client.query('INSERT INTO post_reactions (post_id, user_id, emoji, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING', [id, req.user.id, emoji, Date.now()]);
+      }
+      const counts = await client.query('SELECT emoji, COUNT(*)::int AS n FROM post_reactions WHERE post_id = $1 GROUP BY emoji', [id]);
+      return { mine: removed.rows.length ? false : true, counts: counts.rows };
+    });
+    res.json({ success: true, emoji, reacted: outcome.mine, counts: outcome.counts });
+  } catch (err) {
+    console.error('Error toggling post reaction');
+    res.status(500).json({ error: 'Could not save reaction' });
+  }
+});
+
+// POST /api/community/comments/:id/reactions  { emoji }  toggles the caller's reaction on a comment
+router.post('/comments/:id/reactions', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { emoji } = req.body || {};
+    if (!ALLOWED_REACTIONS.includes(emoji)) return res.status(400).json({ error: 'Choose a reaction from the list' });
+    const comment = await query('SELECT post_id FROM post_comments WHERE id = $1', [id]);
+    if (!comment.rows.length) return res.status(404).json({ error: 'Comment not found' });
+    if (!await canAccessPost(req.user, comment.rows[0].post_id)) return res.status(404).json({ error: 'Comment unavailable' });
+    const removed = await query('DELETE FROM comment_reactions WHERE comment_id = $1 AND user_id = $2 AND emoji = $3 RETURNING 1', [id, req.user.id, emoji]);
+    if (!removed.rows.length) {
+      await query('INSERT INTO comment_reactions (comment_id, user_id, emoji, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING', [id, req.user.id, emoji, Date.now()]);
+    }
+    res.json({ success: true, emoji, reacted: removed.rows.length === 0 });
+  } catch (err) {
+    console.error('Error toggling comment reaction');
+    res.status(500).json({ error: 'Could not save reaction' });
+  }
+});
+
+// GET /api/community/review/pending  (church admin only): posts and event photos waiting for approval
+router.get('/review/pending', requireAuth, async (req, res) => {
+  try {
+    if (!await canReviewCommunity(req.user)) return res.status(403).json({ error: 'You need community review access to approve posts' });
+    const posts = await query(`SELECT id, author_name, type, title, content, media_url, created_at
+      FROM community_posts WHERE review_status = 'PENDING' ORDER BY created_at ASC LIMIT 100`);
+    const photos = await query(`SELECT p.id, p.post_id, p.uploader_id, p.media_url, p.created_at
+      FROM event_photos p WHERE p.status = 'PENDING' ORDER BY p.created_at ASC LIMIT 100`);
+    res.json({ posts: posts.rows, photos: photos.rows });
+  } catch (err) {
+    console.error('Error loading review queue');
+    res.status(500).json({ error: 'Could not load the review queue' });
+  }
+});
+
+// PUT /api/community/posts/:id/review  { status: 'APPROVED' | 'REJECTED' }  (church admin only)
+router.put('/posts/:id/review', requireAuth, async (req, res) => {
+  try {
+    if (!await canReviewCommunity(req.user)) return res.status(403).json({ error: 'You need community review access to approve posts' });
+    const { status } = req.body || {};
+    if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or REJECTED' });
+    const result = await query('UPDATE community_posts SET review_status = $1, updated_at = $2 WHERE id = $3 RETURNING id', [status, Date.now(), req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Post not found' });
+    res.json({ success: true, status });
+  } catch (err) {
+    console.error('Error reviewing post');
+    res.status(500).json({ error: 'Could not update review' });
+  }
+});
+
+// POST /api/community/posts/:id/photos  { mediaUrl }  a member adds a photo to an event; it waits for approval
+router.post('/posts/:id/photos', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { mediaUrl } = req.body || {};
+    const post = await query("SELECT type FROM community_posts WHERE id = $1", [id]);
+    if (!post.rows.length || post.rows[0].type !== 'EVENT') return res.status(404).json({ error: 'Event not found' });
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Event unavailable' });
+    if (!await ownsMedia(req.user.id, mediaUrl) || !mediaUrl) return res.status(400).json({ error: 'Choose a photo uploaded by your account' });
+    const photoId = 'photo_' + crypto.randomBytes(12).toString('hex');
+    await query('INSERT INTO event_photos (id, post_id, uploader_id, media_url, status, created_at) VALUES ($1, $2, $3, $4, $5, $6)',
+      [photoId, id, req.user.id, mediaUrl, 'PENDING', Date.now()]);
+    res.status(201).json({ success: true, id: photoId, status: 'PENDING' });
+  } catch (err) {
+    console.error('Error adding event photo');
+    res.status(500).json({ error: 'Could not add the photo' });
+  }
+});
+
+// GET /api/community/posts/:id/photos: approved photos, plus the caller's own pending ones
+router.get('/posts/:id/photos', optionalAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Event unavailable' });
+    const userId = req.user ? req.user.id : '';
+    const result = await query(`SELECT id, uploader_id, media_url, status, created_at FROM event_photos
+      WHERE post_id = $1 AND (status = 'APPROVED' OR uploader_id = $2) ORDER BY created_at ASC`, [id, userId]);
+    res.json({ photos: result.rows });
+  } catch (err) {
+    console.error('Error loading event photos');
+    res.status(500).json({ error: 'Could not load photos' });
+  }
+});
+
+// PUT /api/community/photos/:id/review  { status }  (church admin only)
+router.put('/photos/:id/review', requireAuth, async (req, res) => {
+  try {
+    if (!await canReviewCommunity(req.user)) return res.status(403).json({ error: 'You need community review access to approve photos' });
+    const { status } = req.body || {};
+    if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or REJECTED' });
+    const result = await query('UPDATE event_photos SET status = $1, reviewed_by = $2, reviewed_at = $3 WHERE id = $4 RETURNING id',
+      [status, req.user.id, Date.now(), req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Photo not found' });
+    res.json({ success: true, status });
+  } catch (err) {
+    console.error('Error reviewing photo');
+    res.status(500).json({ error: 'Could not update review' });
+  }
 });
 
 module.exports = router;

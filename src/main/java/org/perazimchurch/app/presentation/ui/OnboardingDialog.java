@@ -37,6 +37,12 @@ import org.perazimchurch.app.ui.theme.PerazimTheme;
  */
 public class OnboardingDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     public static final String PREFS_NAME = "perazim_onboarding_prefs";
     public static final String KEY_ONBOARDING_COMPLETED = "onboarding_completed";
 

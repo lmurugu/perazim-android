@@ -51,6 +51,12 @@ import java.util.concurrent.Executors;
  */
 public class NotificationDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     private final NotificationRepository notificationRepo;
     private final String userId;
     private final Runnable onDismissCallback;

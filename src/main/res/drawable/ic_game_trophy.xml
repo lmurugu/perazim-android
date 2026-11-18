@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original Perazim game icon (generated). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M16,12 H8 C8,24 12,30 20,30 M48,12 H56 C56,24 52,30 44,30"
+        android:strokeColor="#7A4A00"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"/>
+    <path android:pathData="M16,8 H48 V22 C48,32 41,40 32,40 C23,40 16,32 16,22 Z"
+        android:strokeColor="#7A4A00"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#FFE88A" android:endColor="#F5A100"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M28,40 H36 V48 H28 Z"
+        android:strokeColor="#7A4A00"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#FFE88A" android:endColor="#F5A100"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M19,48 H45 Q48,48 48,51 V55 Q48,58 45,58 H19 Q16,58 16,55 V51 Q16,48 19,48 Z"
+        android:strokeColor="#3E1E06"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#A0602A" android:endColor="#6A3A12"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M21,12 H26 V24 C24,28 22,26 21,22 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.45"/>
+</vector>
