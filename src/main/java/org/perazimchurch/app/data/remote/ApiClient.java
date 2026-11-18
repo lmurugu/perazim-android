@@ -33,7 +33,7 @@ public final class ApiClient {
     private static final int CONNECT_TIMEOUT_MS = 10000;
     private static final int READ_TIMEOUT_MS = 10000;
     private static final int MAX_OFFLINE_PACKAGE_RESPONSE_BYTES = 2 * 1024 * 1024;
-    private static final String USER_AGENT = "Perazim-Android/2.2.0";
+    private static final String USER_AGENT = "Perazim-Android/" + org.perazimchurch.app.BuildConfig.VERSION_NAME;
 
     private static final String PREFS_NAME = "perazim_server_prefs";
     private static final String KEY_SERVER_URL = "server_base_url";

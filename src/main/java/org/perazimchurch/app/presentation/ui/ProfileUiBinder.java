@@ -598,7 +598,7 @@ public class ProfileUiBinder {
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_christian_church,
                 "About Perazim Mission Church",
-                "Vision, leadership & version 2.2.0 (Build 4)",
+                "Vision, leadership & version " + org.perazimchurch.app.BuildConfig.VERSION_NAME + " (Build " + org.perazimchurch.app.BuildConfig.VERSION_CODE + ")",
                 v -> showAboutDialog()
         ));
 
@@ -903,7 +903,7 @@ public class ProfileUiBinder {
         tvContent.setText("\nLeadership: Bishop Dr. David Mutweri\n"
                 + "Embu Headquarters, Kenya\n"
                 + "Mission: Spreading the Gospel of Christ across Kenya & Beyond\n\n"
-                + "App Version: 2.2.0 (Build 4)\n"
+                + "App Version: " + org.perazimchurch.app.BuildConfig.VERSION_NAME + " (Build " + org.perazimchurch.app.BuildConfig.VERSION_CODE + ")\n"
                 + "Faithful offline-first faith companion.");
         tvContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvContent.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
@@ -1560,7 +1560,7 @@ public class ProfileUiBinder {
         card.addView(createInteractiveRow("📍", "Directions to Embu HQ", "Perazim Mission Church, Embu", v -> ChurchIntentManager.openChurchMaps(context)));
         card.addView(createInteractiveRow("💚", "Safaricom Giving Paybill", "" + ChurchConfig.MPESA_PAYBILL + " (Lipa na M-Pesa)", v -> ChurchIntentManager.launchMpesaGiving(context, "" + ChurchConfig.MPESA_PAYBILL + "", "OFFERING", "")));
         card.addView(createInteractiveRow("📧", "Secretariat Email", "info@perazimchurch.org", v -> ChurchIntentManager.sendEmail(context, "info@perazimchurch.org", "Perazim Church Inquiry", "")));
-        card.addView(createInteractiveRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(context, ChurchConfig.PASTORAL_PHONE_E164, "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: ")));
+        card.addView(createInteractiveRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(context, ChurchConfig.PASTORAL_PHONE_E164, "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: " + org.perazimchurch.app.BuildConfig.VERSION_NAME + "\nFeedback / Bug: ")));
 
         return card;
     }

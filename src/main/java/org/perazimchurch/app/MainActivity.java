@@ -2160,7 +2160,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout rowPaybill = createInteractiveContactRow("💚", "Safaricom Giving Paybill", "" + ChurchConfig.MPESA_PAYBILL + " (Tap to Give)", v -> showGivingDialog());
         contactCard.addView(rowPaybill);
 
-        LinearLayout rowFeedback = createInteractiveContactRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: 2.2.0\nFeedback / Bug: "));
+        LinearLayout rowFeedback = createInteractiveContactRow("🛠️", "Feedback & Report Issue", "WhatsApp App Admin (Bug reports & suggestions)", v -> ChurchIntentManager.openWhatsAppChat(this, "" + ChurchConfig.PASTORAL_PHONE_E164 + "", "Perazim App Pilot Feedback:\n\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + " (Android " + android.os.Build.VERSION.RELEASE + ")\nVersion: " + org.perazimchurch.app.BuildConfig.VERSION_NAME + "\nFeedback / Bug: "));
         contactCard.addView(rowFeedback);
 
         // Quick Action Buttons
@@ -2612,7 +2612,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvInfo = new TextView(this);
         tvInfo.setText("Audio Mode: " + (isDataSaverActive ? "📶 32kbps AAC (Data-Saver Active)" : "🎧 HD Audio") + "\n\n" +
                 "Offline Cache: 24.8 MB preserved\n\n" +
-                "App Version: 2.1.0 (Build 3)");
+                "App Version: " + org.perazimchurch.app.BuildConfig.VERSION_NAME + " (Build " + org.perazimchurch.app.BuildConfig.VERSION_CODE + ")");
         tvInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvInfo.setTextColor(COLOR_TEXT_DARK);
         tvInfo.setLineSpacing(dp(3), 1.2f);

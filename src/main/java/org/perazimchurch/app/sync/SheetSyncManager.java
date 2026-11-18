@@ -653,7 +653,7 @@ public final class SheetSyncManager {
         conn.setRequestMethod("GET");
         conn.setConnectTimeout(TIMEOUT_MILLIS);
         conn.setReadTimeout(TIMEOUT_MILLIS);
-        conn.setRequestProperty("User-Agent", "Perazim-Android/2.2.0");
+        conn.setRequestProperty("User-Agent", "Perazim-Android/" + org.perazimchurch.app.BuildConfig.VERSION_NAME);
 
         int responseCode = conn.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK) {
