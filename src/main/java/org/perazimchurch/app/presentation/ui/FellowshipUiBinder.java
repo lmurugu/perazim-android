@@ -501,29 +501,57 @@ public class FellowshipUiBinder {
         lpCard.setMargins(0, 0, 0, dp(12));
         card.setLayoutParams(lpCard);
 
-        // Header: Author & Time
-        LinearLayout metaRow = new LinearLayout(context);
-        metaRow.setOrientation(LinearLayout.HORIZONTAL);
-        metaRow.setGravity(Gravity.CENTER_VERTICAL);
-        metaRow.setPadding(0, 0, 0, dp(6));
-
+        // Header: initial avatar, author and time, then a status tag (Prayer or Answered)
         String author = prayer.getAuthorName() != null && !prayer.getAuthorName().trim().isEmpty()
                 ? prayer.getAuthorName().trim()
                 : "Anonymous";
+        LinearLayout metaRow = new LinearLayout(context);
+        metaRow.setOrientation(LinearLayout.HORIZONTAL);
+        metaRow.setGravity(Gravity.CENTER_VERTICAL);
+        metaRow.setPadding(0, 0, 0, dp(8));
+
+        TextView avatar = new TextView(context);
+        avatar.setText(author.substring(0, 1).toUpperCase(java.util.Locale.ROOT));
+        avatar.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        avatar.setTypeface(Typeface.DEFAULT_BOLD);
+        avatar.setTextColor(Color.WHITE);
+        avatar.setGravity(Gravity.CENTER);
+        android.graphics.drawable.GradientDrawable avatarBg = new android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                new int[]{PerazimTheme.COLOR_PURPLE_SOFT, Color.parseColor("#E17D2F")});
+        avatarBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        avatar.setBackground(avatarBg);
+        LinearLayout.LayoutParams lpAvatar = new LinearLayout.LayoutParams(dp(34), dp(34));
+        lpAvatar.setMargins(0, 0, dp(10), 0);
+        metaRow.addView(avatar, lpAvatar);
+
+        LinearLayout who = new LinearLayout(context);
+        who.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams lpWho = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+        metaRow.addView(who, lpWho);
+
         TextView tvAuthor = new TextView(context);
         tvAuthor.setText(author);
         tvAuthor.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvAuthor.setTypeface(Typeface.DEFAULT_BOLD);
-        tvAuthor.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        LinearLayout.LayoutParams lpAuthor = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        tvAuthor.setLayoutParams(lpAuthor);
-        metaRow.addView(tvAuthor);
+        tvAuthor.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        who.addView(tvAuthor);
 
         TextView tvTime = new TextView(context);
         tvTime.setText(formatRelativeTime(prayer.getCreatedAt()));
         tvTime.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvTime.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        metaRow.addView(tvTime);
+        who.addView(tvTime);
+
+        TextView tvStatus = new TextView(context);
+        tvStatus.setText(prayer.isAnswered() ? "ANSWERED" : "PRAYER");
+        tvStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        tvStatus.setTypeface(Typeface.DEFAULT_BOLD);
+        tvStatus.setLetterSpacing(0.06f);
+        tvStatus.setPadding(dp(8), dp(4), dp(8), dp(4));
+        tvStatus.setTextColor(prayer.isAnswered() ? Color.parseColor("#2A0F33") : PerazimTheme.COLOR_PURPLE_SOFT);
+        tvStatus.setBackground(createCardBackground(prayer.isAnswered() ? Color.parseColor("#E17D2F") : PerazimTheme.COLOR_PURPLE_GHOST, 999, PerazimTheme.COLOR_STROKE, 0));
+        metaRow.addView(tvStatus);
 
         card.addView(metaRow);
 
@@ -594,13 +622,14 @@ public class FellowshipUiBinder {
     }
 
     private void updateAmenStyle(Button btn, int count, boolean hasAmened) {
-        String label = (hasAmened ? "✓ Praying (" : "🙏 I'm praying (") + count + ")";
+        String label = (hasAmened ? "✓ Praying · " : "🙏 I'm praying · ") + count;
         btn.setText(label);
         if (hasAmened) {
-            btn.setBackground(createCardBackground(PerazimTheme.COLOR_PURPLE_GHOST, 16, PerazimTheme.COLOR_PURPLE_SOFT, 1));
-            btn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            // Praying is the orange pill from the mockup, so the user's own tap is easy to see
+            btn.setBackground(createCardBackground(Color.parseColor("#E17D2F"), 999, Color.parseColor("#E17D2F"), 1));
+            btn.setTextColor(Color.parseColor("#2A0F33"));
         } else {
-            btn.setBackground(createCardBackground(Color.TRANSPARENT, 16, PerazimTheme.COLOR_STROKE, 1));
+            btn.setBackground(createCardBackground(Color.TRANSPARENT, 999, PerazimTheme.COLOR_STROKE, 1));
             btn.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         }
     }
