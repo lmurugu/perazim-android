@@ -24,6 +24,7 @@ import android.widget.Toast;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
+import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
@@ -48,6 +49,7 @@ public final class GamesHubDialog extends Dialog {
     private Round round;
     private Mode mode;
     private VersePuzzle puzzle;
+    private LadderOfFaith ladder;
     private long seed;
 
     public static void show(Activity activity) {
@@ -112,6 +114,7 @@ public final class GamesHubDialog extends Dialog {
         gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
         gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
+        gameCard(Mode.LADDER, "Ladder of Faith", "Climb 20 rungs with three lives. Use 50/50, Verse Peek or Pass once each per run.");
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
     }
 
@@ -126,7 +129,8 @@ public final class GamesHubDialog extends Dialog {
         addText(card, title, 21, true);
         addText(card, description, 16, false);
         String key = scorePrefix + selected.name();
-        addText(card, scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/5" : "Your best: not played yet", 14, false);
+        int total = selected == Mode.LADDER ? LadderOfFaith.RUNGS : 5;
+        addText(card, scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/" + total : "Your best: not played yet", 14, false);
         Button start = new Button(activity);
         styleButton(start, "Play " + title, selected == Mode.QUIZ);
         card.addView(start, new LinearLayout.LayoutParams(-1, -2));
@@ -134,9 +138,98 @@ public final class GamesHubDialog extends Dialog {
             if (!activeOwner()) return;
             mode = selected;
             seed = System.nanoTime();
+            if (mode == Mode.LADDER) { startLadder(); return; }
             round = new Round(mode, seed);
             question();
         });
+    }
+
+    // ---- Ladder of Faith ----
+
+    /** Receives feedback events (correct, wrong, milestone, lifeline, finish) for sound and haptics. Bound to the shared feedback system when it lands. */
+    interface LadderFeedback { void onEvents(List<LadderOfFaith.Event> events); }
+    private LadderFeedback ladderFeedback = events -> { };
+
+    private void startLadder() {
+        ladder = new LadderOfFaith();
+        ladderQuestion();
+    }
+
+    private void ladderQuestion() {
+        if (!activeOwner()) return;
+        if (ladder.finished()) { ladderFinished(); return; }
+        Card card = ladder.current();
+        screen("Ladder of Faith", "Rung " + ladder.position() + " of " + LadderOfFaith.RUNGS + " · Score " + ladder.score() + " · Lives " + ladder.lives(), true);
+        text(card.prompt, 23, true);
+        if (ladder.peeked()) text("Verse Peek: " + card.reference, 16, true);
+        Button hint = button("Show a hint", false);
+        TextView hintText = text("", 16, false);
+        hintText.setVisibility(View.GONE);
+        hint.setOnClickListener(v -> { hintText.setText(card.hint); hintText.setVisibility(View.VISIBLE); hint.setEnabled(false); });
+
+        LinearLayout lifelines = new LinearLayout(activity);
+        lifelines.setOrientation(LinearLayout.HORIZONTAL);
+        page.addView(lifelines, new LinearLayout.LayoutParams(-1, -2));
+        Button fifty = new Button(activity);
+        styleButton(fifty, "50/50", false);
+        fifty.setEnabled(ladder.fiftyAvailable());
+        fifty.setOnClickListener(v -> { ladder.useFiftyFifty(); ladderFeedback.onEvents(ladder.drainEvents()); ladderQuestion(); });
+        Button peek = new Button(activity);
+        styleButton(peek, "Verse Peek", false);
+        peek.setEnabled(ladder.peekAvailable());
+        peek.setOnClickListener(v -> { ladder.usePeek(); ladderFeedback.onEvents(ladder.drainEvents()); ladderQuestion(); });
+        Button pass = new Button(activity);
+        styleButton(pass, "Pass", false);
+        pass.setEnabled(ladder.passAvailable());
+        pass.setOnClickListener(v -> { ladder.usePass(); ladderFeedback.onEvents(ladder.drainEvents()); ladderQuestion(); });
+        for (Button b : new Button[] { fifty, peek, pass }) {
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+            params.setMargins(dp(2), dp(3), dp(2), dp(3));
+            lifelines.addView(b, params);
+        }
+        gap(8);
+
+        List<String> hidden = ladder.hiddenOptions();
+        List<String> options = new ArrayList<>(card.options);
+        Collections.shuffle(options, new java.util.Random(seed + ladder.position()));
+        for (String option : options) {
+            if (hidden.contains(option)) continue;
+            button(option, false).setOnClickListener(v -> ladderAnswer(option));
+        }
+    }
+
+    private void ladderAnswer(String value) {
+        if (!activeOwner() || ladder.answered()) return;
+        hideKeyboard();
+        Card card = ladder.current();
+        ladder.answer(value);
+        List<LadderOfFaith.Event> events = ladder.drainEvents();
+        ladderFeedback.onEvents(events);
+        boolean milestone = ladder.milestone();
+        String headline = ladder.correct()
+                ? (milestone ? "Milestone reached!" : "Well done!")
+                : "Let's learn this one";
+        screen(headline, "Score " + ladder.score() + " · Lives " + ladder.lives(), true);
+        text(card.answer, 24, true);
+        text(card.reference, 17, false);
+        text(card.explanation, 18, false);
+        boolean last = ladder.finished();
+        button(last ? "See results" : "Next rung", true).setOnClickListener(v -> {
+            if (!last && ladder.next()) ladderQuestion(); else ladderFinished();
+        });
+    }
+
+    private void ladderFinished() {
+        if (!activeOwner()) return;
+        String key = scorePrefix + Mode.LADDER.name();
+        int best = Math.max(scores.getInt(key, 0), ladder.score());
+        scores.edit().putInt(key, best).apply();
+        screen("Ladder complete", "Ladder of Faith", true);
+        text(ladder.score() + " / " + LadderOfFaith.RUNGS, 40, true);
+        text(ladder.score() == LadderOfFaith.RUNGS ? "You climbed the whole ladder. Keep putting what you learn into practice." : "Every rung is a chance to learn. Read the references and climb again.", 19, false);
+        text("Your best on this phone: " + best + "/" + LadderOfFaith.RUNGS, 17, false);
+        button("Climb again", true).setOnClickListener(v -> startLadder());
+        button("Choose another game", false).setOnClickListener(v -> hub());
     }
 
     private String modeTitle() {

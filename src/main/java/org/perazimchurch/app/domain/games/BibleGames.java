@@ -10,7 +10,7 @@ import java.util.Random;
 
 /** Offline learning games. Scores belong to these games, never member rewards. */
 public final class BibleGames {
-    public enum Mode { QUIZ, WHO_AM_I, VERSE_ORDER }
+    public enum Mode { QUIZ, WHO_AM_I, VERSE_ORDER, LADDER }
 
     public static final class Card {
         public final String prompt;
@@ -130,6 +130,7 @@ public final class BibleGames {
             case QUIZ: return QUIZ;
             case WHO_AM_I: return PEOPLE;
             case VERSE_ORDER: return VERSES;
+            case LADDER: return LADDER;
             default: throw new IllegalArgumentException("Unknown game");
         }
     }
@@ -162,6 +163,30 @@ public final class BibleGames {
         c("I travelled widely to share the gospel after once persecuting Christians. Who am I?", "Paul", "Acts 9:1–22", "Paul's encounter with Jesus changed the direction of his life.", "I was also called Saul.", "", "Saul|Paulo"),
         c("I heard God calling my name as a child in the sanctuary. Who am I?", "Samuel", "1 Samuel 3", "With Eli's help, Samuel learned to recognise and answer God's call.", "My mother was Hannah.", "", "Samweli"),
         c("I met Jesus at a well and told my town about him. Who am I?", "The Samaritan woman", "John 4:4–30", "John does not give her name; her testimony led others to meet Jesus.", "The conversation happened in Samaria.", "", "Samaritan woman|Woman at the well|The woman at the well|Samaritan")
+    ));
+
+    /** Ladder of Faith: 20 rungs in climbing order. Written for this app; no third-party content. */
+    static final List<Card> LADDER = Collections.unmodifiableList(Arrays.asList(
+        c("Who was swallowed by a great fish after running from God's call?", "Jonah", "Jonah 1:17", "Jonah was swallowed by a great fish and later preached in Nineveh.", "He was sent to Nineveh.", "Jonah|Elijah|Ezekiel|Hosea", ""),
+        c("How many days did rain fall during Noah's flood?", "Forty days", "Genesis 7:12", "Rain fell for forty days and forty nights before the flood waters rose.", "Count the days and nights mentioned.", "Seven days|Forty days|Ninety days|One hundred fifty days", ""),
+        c("Which book is the first in the New Testament?", "Matthew", "Matthew 1:1", "Matthew opens the New Testament with the genealogy of Jesus.", "It comes right after the Old Testament.", "Mark|Matthew|Acts|Romans", ""),
+        c("Who was the first man God created?", "Adam", "Genesis 2:7", "God formed the man from the dust of the ground and breathed life into him.", "His name means 'man' or 'mankind' in Hebrew.", "Abel|Adam|Enoch|Seth", ""),
+        c("Which king built the first temple in Jerusalem?", "Solomon", "1 Kings 6:1", "Solomon began building the temple in the fourth year of his reign.", "He was David's son.", "David|Solomon|Hezekiah|Josiah", ""),
+        c("Which disciple agreed to betray Jesus for thirty pieces of silver?", "Judas Iscariot", "Matthew 26:14–15", "Judas went to the chief priests and agreed on the payment.", "He carried the money bag for the group.", "Judas Iscariot|Thomas|Simon the Zealot|Matthias", "Judas"),
+        c("Who was the mother of John the Baptist?", "Elisabeth", "Luke 1:57", "Elisabeth gave birth to John, as the angel had said to Zacharias.", "Her husband was a priest named Zacharias.", "Elisabeth|Anna|Mary Magdalene|Salome", "Elizabeth"),
+        c("Which disciple walked toward Jesus on the water?", "Peter", "Matthew 14:28–29", "Peter stepped out of the boat, but he began to sink when he looked at the wind.", "He was a fisherman from Galilee.", "Peter|Andrew|James|Philip", ""),
+        c("Which prophet was taken up to heaven in a whirlwind?", "Elijah", "2 Kings 2:11", "A chariot of fire separated Elijah from Elisha, and he went up by a whirlwind.", "Elisha received a double portion of his spirit.", "Elijah|Elisha|Micah|Amos", ""),
+        c("Which book of the Bible is named after a Moabite woman?", "Ruth", "Ruth 1:16", "Ruth pledged loyalty to Naomi and went with her to Bethlehem.", "Her story is short and sits between Judges and 1 Samuel.", "Ruth|Esther|Judith|Joel", ""),
+        c("Which city's walls did Nehemiah help rebuild?", "Jerusalem", "Nehemiah 2:17", "Nehemiah urged the people to rebuild the broken walls so they would no longer be a disgrace.", "He had served as cupbearer to a Persian king.", "Jerusalem|Babylon|Nineveh|Jericho", ""),
+        c("Which apostle wrote the most letters in the New Testament?", "Paul", "Romans 1:1", "Paul wrote many letters to churches and to individuals.", "He was once known as Saul.", "Paul|Peter|John|James", ""),
+        c("Which Roman governor presided over Jesus' trial?", "Pontius Pilate", "Matthew 27:2", "Pilate handed Jesus over to be crucified after questioning him.", "He ruled Judea for the Roman Empire.", "Pontius Pilate|Herod Antipas|Felix|Festus", "Pilate"),
+        c("What did Peter cut off with his sword in the garden?", "A servant's ear", "John 18:10", "Peter struck the high priest's servant, and Jesus healed the man's ear.", "The servant's name was Malchus.", "A servant's ear|A soldier's helmet|A torch|A fishing net", "An ear"),
+        c("Which judge's strength was tied to uncut hair?", "Samson", "Judges 16:17", "Samson told Delilah the secret of his vow to God, and his strength left him.", "He fought the Philistines.", "Gideon|Samson|Jephthah|Ehud", ""),
+        c("Which apostle was also called Didymus, meaning 'twin'?", "Thomas", "John 11:16", "Thomas was ready to go to Judea with Jesus, even if it meant death.", "He doubted until he saw Jesus' wounds.", "Thomas|Matthew|Bartholomew|Thaddaeus", "Didymus"),
+        c("In which city was the apostle Paul born?", "Tarsus", "Acts 21:39", "Paul described himself as a Jew of Tarsus, a city in Cilicia.", "The city lay in what is now southern Turkey.", "Tarsus|Antioch|Ephesus|Corinth", ""),
+        c("Which prophet saw a valley of dry bones come to life?", "Ezekiel", "Ezekiel 37:1–10", "The Lord showed Ezekiel a vision of dry bones receiving breath and standing up.", "He was a priest taken into exile in Babylon.", "Ezekiel|Jeremiah|Daniel|Joel", ""),
+        c("Which prophet anointed Saul as Israel's first king?", "Samuel", "1 Samuel 10:1", "Samuel poured oil on Saul's head to show that God had chosen him.", "He was raised in the temple at Shiloh.", "Samuel|Nathan|Eli|Gad", ""),
+        c("Who was king of Judah when Babylon destroyed Jerusalem and its temple?", "Zedekiah", "2 Kings 25:1–8", "Zedekiah rebelled against Babylon, and Jerusalem fell about 586 BC.", "He was the last king of Judah.", "Zedekiah|Jehoiakim|Josiah|Manasseh", "")
     ));
 
     // Short public-domain KJV passages; these games do not require downloaded translations.
