@@ -849,7 +849,7 @@ public class SermonsUiBinder {
         btnPlayCircle.setLayoutParams(lpCircle);
         btnPlayCircle.setOnClickListener(v -> {
             if (sermon.hasVideo() && (sermon.getAudioUrl() == null || sermon.getAudioUrl().isEmpty())) {
-                YouTubeFeedRepository.openVideo(activity, sermon.getVideoUrl());
+                showInAppVideo(sermon.getVideoUrl(), sermon.getTitle());
             } else {
                 startPlayback(sermon);
             }
@@ -958,7 +958,7 @@ public class SermonsUiBinder {
 
         card.setOnClickListener(v -> {
             if (sermon.hasVideo() && !isLocalAudio) {
-                YouTubeFeedRepository.openVideo(activity, sermon.getVideoUrl());
+                showInAppVideo(sermon.getVideoUrl(), sermon.getTitle());
             } else {
                 startPlayback(sermon);
             }
@@ -1054,15 +1054,61 @@ public class SermonsUiBinder {
         boolean hasAudio = sermon.getAudioUrl() != null && !sermon.getAudioUrl().isEmpty();
         String watch = sermon.getVideoUrl();
         if (!hasAudio && watch != null && watch.startsWith("https://")) {
-            // Church YouTube uploads have no separate audio file: open the video.
-            try {
-                activity.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(watch)));
-            } catch (Exception e) {
-                Toast.makeText(activity, "No app found to open this video", Toast.LENGTH_SHORT).show();
-            }
+            // Church YouTube uploads have no separate audio file: play the video inside the app.
+            showInAppVideo(watch, sermon.getTitle());
             return;
         }
         loadSermonIntoPlayer(sermon, true);
+    }
+
+    /** Plays a YouTube video in an in-app player so the member stays in the app. */
+    private void showInAppVideo(String watchUrl, String title) {
+        String videoId = android.net.Uri.parse(watchUrl).getQueryParameter("v");
+        if (videoId == null || !videoId.matches("[A-Za-z0-9_-]{6,20}")) {
+            Toast.makeText(activity, "This video cannot be played in the app", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final String embedPrefix = "https://www.youtube-nocookie.com/embed/";
+
+        android.webkit.WebView player = new android.webkit.WebView(activity);
+        android.webkit.WebSettings settings = player.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setMediaPlaybackRequiresUserGesture(false);
+        settings.setAllowFileAccess(false);
+        settings.setAllowContentAccess(false);
+        player.setWebChromeClient(new android.webkit.WebChromeClient());
+        player.setWebViewClient(new android.webkit.WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(android.webkit.WebView view, android.webkit.WebResourceRequest request) {
+                // Only the embedded player may load; anything else stays out of the app.
+                return !request.getUrl().toString().startsWith(embedPrefix);
+            }
+        });
+
+        android.widget.FrameLayout holder = new android.widget.FrameLayout(activity);
+        holder.setPadding(dp(8), dp(8), dp(8), dp(8));
+        holder.addView(player, new android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT, dp(240)));
+
+        AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setTitle(title == null || title.isEmpty() ? "Church video" : title)
+                .setView(holder)
+                .setNegativeButton("Close", null)
+                .create();
+        dialog.setOnDismissListener(d -> {
+            player.stopLoading();
+            player.loadUrl("about:blank");
+            player.destroy();
+        });
+        dialog.show();
+        // YouTube refuses embeds with no referring site (error 153); give the player a page origin.
+        String html = "<!doctype html><html><body style=\"margin:0;background:#000\">"
+                + "<iframe width=\"100%\" height=\"100%\" frameborder=\"0\" allowfullscreen "
+                + "allow=\"autoplay; encrypted-media; picture-in-picture\" "
+                + "src=\"" + embedPrefix + videoId + "?playsinline=1&amp;autoplay=1&amp;rel=0\"></iframe>"
+                + "</body></html>";
+        player.loadDataWithBaseURL("https://perazim.org/", html, "text/html", "UTF-8", null);
     }
 
     /**
