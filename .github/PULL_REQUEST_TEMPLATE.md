@@ -27,3 +27,9 @@ Closes #(issue number)
 - [ ] I have commented my code where necessary, particularly in complex logic
 - [ ] My changes generate no new warnings or build failures
 - [ ] I have agreed to the Code of Conduct
+
+## Privacy and compliance (plan C.8)
+- [ ] This change adds no new personal data, or the data inventory (`docs/security/data-inventory.md`) is updated.
+- [ ] This change adds no new third party, or `docs/security/third-parties.md` and the Privacy Policy are updated.
+- [ ] This change adds no new consent purpose, pricing or data sharing, or the consent flow and legal text are updated in this PR.
+- [ ] No real member data, secrets or personal paths are included.

@@ -1,0 +1,22 @@
+name: legal-docs
+
+on:
+  pull_request:
+    paths:
+      - "docs/legal/**"
+      - "scripts/check_legal_docs.sh"
+  push:
+    branches: [phase-B-community, main]
+    paths:
+      - "docs/legal/**"
+      - "scripts/check_legal_docs.sh"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/check_legal_docs.sh
