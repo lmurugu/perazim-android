@@ -360,7 +360,10 @@ router.get('/posts', optionalAuth, async (req, res) => {
         p.amen_count, p.comment_count, p.created_at, p.updated_at,
         u.avatar_url AS author_avatar,
         ${currentUserId ? `(EXISTS (SELECT 1 FROM post_amens pa WHERE pa.post_id = p.id AND pa.user_id = $${userParamIndices[0]}))` : 'FALSE'} AS user_has_amened,
-        ${currentUserId ? `(SELECT er.status FROM event_rsvps er WHERE er.post_id = p.id AND er.user_id = $${userParamIndices[1]})` : 'NULL'} AS user_rsvp_status
+        ${currentUserId ? `(SELECT er.status FROM event_rsvps er WHERE er.post_id = p.id AND er.user_id = $${userParamIndices[1]})` : 'NULL'} AS user_rsvp_status,
+        (SELECT COALESCE(json_agg(json_build_object('emoji', rc.emoji, 'n', rc.n)), '[]'::json)
+           FROM (SELECT pr.emoji, COUNT(*)::int AS n FROM post_reactions pr WHERE pr.post_id = p.id GROUP BY pr.emoji) rc) AS reaction_counts,
+        ${currentUserId ? `(SELECT COALESCE(json_agg(mr.emoji), '[]'::json) FROM post_reactions mr WHERE mr.post_id = p.id AND mr.user_id = $${userParamIndices[1]})` : "'[]'::json"} AS my_reactions
       FROM community_posts p
       LEFT JOIN users u ON p.author_id = u.id
       ${whereClause}
@@ -1297,6 +1300,105 @@ router.delete('/classes/:id', requireAuth, async (req, res) => {
     if (!result.rows.length) return res.status(403).json({ error: 'Only the teacher can cancel this class' });
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: 'Could not cancel class' }); }
+});
+
+// ---- Open groups and join requests (migration 0025) ----
+
+// GET /api/community/groups/discover: open groups for anyone signed in. Only name, description and
+// member count are shown; closed groups never appear here.
+router.get('/groups/discover', requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT g.id, g.name, g.description, g.is_open,
+              (SELECT COUNT(*)::int FROM group_memberships gm WHERE gm.group_id = g.id) AS member_count,
+              (EXISTS (SELECT 1 FROM group_memberships gm WHERE gm.group_id = g.id AND gm.user_id = $1)) AS is_member,
+              (SELECT jr.status FROM group_join_requests jr WHERE jr.group_id = g.id AND jr.user_id = $1) AS my_request
+         FROM community_groups g
+        WHERE g.is_active = TRUE AND g.is_open = TRUE
+        ORDER BY g.created_at ASC`,
+      [req.user.id]
+    );
+    res.json({ groups: result.rows });
+  } catch (err) {
+    console.error('Error loading open groups');
+    res.status(500).json({ error: 'Could not load groups' });
+  }
+});
+
+// POST /api/community/groups/:id/join: an open group adds the member at once; a closed group
+// records a request for the owner to approve.
+router.post('/groups/:id/join', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const group = await query('SELECT is_open FROM community_groups WHERE id = $1 AND is_active = TRUE', [id]);
+    if (!group.rows.length) return res.status(404).json({ error: 'Group not found' });
+    const now = Date.now();
+    if (group.rows[0].is_open) {
+      await query(
+        `INSERT INTO group_memberships (group_id, user_id, role, joined_at) VALUES ($1, $2, 'MEMBER', $3)
+         ON CONFLICT (group_id, user_id) DO NOTHING`,
+        [id, req.user.id, now]
+      );
+      return res.json({ success: true, status: 'JOINED' });
+    }
+    await query(
+      `INSERT INTO group_join_requests (group_id, user_id, status, created_at) VALUES ($1, $2, 'PENDING', $3)
+       ON CONFLICT (group_id, user_id) DO NOTHING`,
+      [id, req.user.id, now]
+    );
+    res.status(202).json({ success: true, status: 'PENDING' });
+  } catch (err) {
+    console.error('Error joining group');
+    res.status(500).json({ error: 'Could not join the group' });
+  }
+});
+
+// GET /api/community/groups/:id/join-requests (group owner or admin): pending requests
+router.get('/groups/:id/join-requests', requireAuth, async (req, res) => {
+  try {
+    if (!await canManageGroup(req.user, req.params.id)) return res.status(403).json({ error: 'Only this group owner or an administrator can see requests' });
+    const result = await query(
+      `SELECT jr.user_id, jr.created_at FROM group_join_requests jr
+        WHERE jr.group_id = $1 AND jr.status = 'PENDING' ORDER BY jr.created_at ASC`,
+      [req.params.id]
+    );
+    res.json({ requests: result.rows });
+  } catch (err) {
+    console.error('Error loading join requests');
+    res.status(500).json({ error: 'Could not load requests' });
+  }
+});
+
+// PUT /api/community/groups/:id/join-requests/:userId  { status: 'APPROVED' | 'DECLINED' }
+router.put('/groups/:id/join-requests/:userId', requireAuth, async (req, res) => {
+  try {
+    const { id, userId } = req.params;
+    if (!await canManageGroup(req.user, id)) return res.status(403).json({ error: 'Only this group owner or an administrator can decide requests' });
+    const { status } = req.body || {};
+    if (!['APPROVED', 'DECLINED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or DECLINED' });
+    const now = Date.now();
+    const outcome = await withTransaction(async (client) => {
+      const updated = await client.query(
+        `UPDATE group_join_requests SET status = $1, decided_by = $2, decided_at = $3
+          WHERE group_id = $4 AND user_id = $5 AND status = 'PENDING' RETURNING user_id`,
+        [status, req.user.id, now, id, userId]
+      );
+      if (!updated.rows.length) return false;
+      if (status === 'APPROVED') {
+        await client.query(
+          `INSERT INTO group_memberships (group_id, user_id, role, joined_at) VALUES ($1, $2, 'MEMBER', $3)
+           ON CONFLICT (group_id, user_id) DO NOTHING`,
+          [id, userId, now]
+        );
+      }
+      return true;
+    });
+    if (!outcome) return res.status(404).json({ error: 'No pending request from this member' });
+    res.json({ success: true, status });
+  } catch (err) {
+    console.error('Error deciding join request');
+    res.status(500).json({ error: 'Could not update the request' });
+  }
 });
 
 // ---- Reactions, review and event photos (migrations 0023 and 0024) ----
