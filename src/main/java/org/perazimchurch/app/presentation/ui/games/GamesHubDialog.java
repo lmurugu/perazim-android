@@ -143,19 +143,19 @@ public final class GamesHubDialog extends Dialog {
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
         gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
         gameCard(Mode.LADDER, "Ladder of Faith", "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.");
-        customCard(org.perazimchurch.app.R.drawable.ic_game_grid, "Word Search",
+        customCard(org.perazimchurch.app.R.drawable.ic_game_grid, org.perazimchurch.app.R.drawable.ic_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Word Search",
                 "Find Bible names hidden in the letters. Tap a start letter, then the end letter of the word.",
                 solvedLine("WORD_SEARCH"), this::wordSearch);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_cards, "Memory Match",
+        customCard(org.perazimchurch.app.R.drawable.ic_game_cards, org.perazimchurch.app.R.drawable.ic_char_dove, PerazimTheme.COLOR_PURPLE_SOFT, "Memory Match",
                 "Flip two tiles at a time and match the Bible symbols. Each match shows its verse.",
                 solvedLine("MEMORY_MATCH"), this::memoryMatch);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_timeline, "Story Timeline",
+        customCard(org.perazimchurch.app.R.drawable.ic_game_timeline, org.perazimchurch.app.R.drawable.ic_char_explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
                 "Tap the Bible events in the order they happen in the story.",
                 solvedLine("TIMELINE"), this::timeline);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_crossword, "Mini Crossword",
+        customCard(org.perazimchurch.app.R.drawable.ic_game_crossword, org.perazimchurch.app.R.drawable.ic_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Mini Crossword",
                 "A five-by-five Bible crossword. Four clues cross: Moses, Abel, manna and Saul.",
                 solvedLine("CROSSWORD"), this::miniCrossword);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_road, "Road to Jerusalem",
+        customCard(org.perazimchurch.app.R.drawable.ic_game_road, org.perazimchurch.app.R.drawable.ic_char_explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
                 "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
                 solvedLine("ROAD"), this::roadToJerusalem);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
@@ -271,11 +271,13 @@ public final class GamesHubDialog extends Dialog {
 
     // ---- Word Search, Memory Match and Story Timeline ----
 
-    private void customCard(int iconRes, String title, String description, String bestLine, Runnable start) {
+    private void customCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
         LinearLayout card = new LinearLayout(activity);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dp(16), dp(12), dp(16), dp(16));
-        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        GradientDrawable cardBg = shape(PerazimTheme.COLOR_SURFACE);
+        cardBg.setStroke(dp(2), accent);
+        card.setBackground(cardBg);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
         params.bottomMargin = dp(16);
         page.addView(card, params);
@@ -289,7 +291,8 @@ public final class GamesHubDialog extends Dialog {
         titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         titleView.setPadding(dp(12), 0, 0, 0);
-        head.addView(titleView);
+        head.addView(titleView, new LinearLayout.LayoutParams(0, -2, 1f));
+        head.addView(icon(characterRes, 44), new LinearLayout.LayoutParams(dp(44), dp(44)));
         LinearLayout.LayoutParams headParams = new LinearLayout.LayoutParams(-1, -2);
         headParams.bottomMargin = dp(8);
         card.addView(head, headParams);
