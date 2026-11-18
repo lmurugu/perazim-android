@@ -67,6 +67,7 @@ app.use('/api/campuses', campusRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/classroom-calls', require('./routes/classroomCalls'));
+app.use('/api/media', require('./routes/mediaFeed').createMediaFeedRouter());
 app.use('/api', membershipRoutes);
 app.use('/api/admin', adminMembershipRoutes);
 app.use('/api/admin/ai-sources', require('./routes/knowledgeGovernance'));
