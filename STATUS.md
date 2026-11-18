@@ -1,5 +1,8 @@
 # Perazim Mission Church Android App — Feature Status & Honesty Audit
 
+> **Read this first (2026-11-18).** The tables below are the audit of branch `feature/dynamic-community` (v2.2.0, 3 Nov 2026), not of `main`. On `main` (v2.2.1) these build flags are `false` in every variant: `REMOTE_SHEET_FEEDS_ENABLED` (Google Sheet sync for sermons, hymns, jokes, riddles, verses, events), `ONLINE_AI_ENABLED` and `OFFLINE_QWEN_ENABLED`. Those rows are therefore **not active** on `main`. Push notifications (no FCM) and automated M-Pesa (no Daraja) are not implemented. See `docs/internal/remediation-plan.md` for the current plan.
+
+
 > **Target Version**: `2.2.0` (VersionCode `4`)  
 > **Package ID**: `org.perazimchurch.app`  
 > **Target Audience**: 100-Member Pilot (Embu Headquarters & Satellite Campuses)  
