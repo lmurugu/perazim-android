@@ -1,4 +1,4 @@
-plugins { id 'com.android.application' version '8.2.2' }
+plugins { id 'com.android.application' version '8.7.3' }
 
 def keystorePropertiesFile = file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -37,7 +37,7 @@ def pilotApiBaseUrl = configuredApiBaseUrl('perazimPilotApiBaseUrl', false, true
 
 android {
     namespace 'org.perazimchurch.app'
-    compileSdk 34
+    compileSdk 36
     compileOptions { sourceCompatibility JavaVersion.VERSION_11; targetCompatibility JavaVersion.VERSION_11 }
     packagingOptions {
         jniLibs {
@@ -51,7 +51,7 @@ android {
     defaultConfig {
         applicationId "org.perazimchurch.app"
         minSdk 24
-        targetSdk 34
+        targetSdk 36
         versionCode 5
         versionName "2.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

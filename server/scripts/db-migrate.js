@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
+const { execFileSync } = require('child_process');
 const { status, plan, migrate, baseline, loadMigrations, assertMigrationPlanAllowed } = require('../src/migrations');
 
 async function main() {
@@ -8,7 +11,6 @@ async function main() {
   if (!commands[command]) throw new Error('Usage: node scripts/db-migrate.js [status|plan|migrate|baseline]');
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required.');
   if (command === 'migrate' || command === 'baseline') {
-    if (process.env.NODE_ENV === 'production') throw new Error('Production writes are disabled in this foundation release.');
     const confirmation = process.argv[3];
     const databaseUrl = new URL(process.env.DATABASE_URL);
     const host = (databaseUrl.searchParams.get('host') || databaseUrl.hostname).replace(/^\[|\]$/g, '').toLowerCase();
@@ -16,9 +18,20 @@ async function main() {
       throw new Error('Write commands are limited to local PostgreSQL connections in this foundation release.');
     }
     const target = decodeURIComponent(databaseUrl.pathname.slice(1));
-    if (!target.endsWith('_test')) throw new Error('Write commands are limited to disposable databases ending in _test in this foundation release.');
     if (confirmation !== `--confirm=${target}`) {
       throw new Error(`Write command requires the exact target confirmation: --confirm=${target}`);
+    }
+    // Real local databases (not *_test) need a second confirmation through the
+    // environment and a fresh pg_dump backup taken before any change (plan 3.1).
+    if (!target.endsWith('_test')) {
+      if (process.env.MIGRATE_CONFIRM !== target) {
+        throw new Error(`Non-test database: also set MIGRATE_CONFIRM=${target}`);
+      }
+      const backupDir = path.join(__dirname, '../.runtime/backups');
+      fs.mkdirSync(backupDir, { recursive: true });
+      const backupFile = path.join(backupDir, `${target}_before_${command}_${new Date().toISOString().replace(/[:.]/g, '-')}.dump`);
+      execFileSync('pg_dump', [process.env.DATABASE_URL, '-Fc', '-f', backupFile], { stdio: 'inherit' });
+      console.error(`Backup written: ${backupFile}`);
     }
   }
   if (command === 'migrate') assertMigrationPlanAllowed(loadMigrations());
