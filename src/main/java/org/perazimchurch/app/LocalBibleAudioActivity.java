@@ -36,6 +36,11 @@ import java.util.Locale;
 
 /** Plays audio files the user selects from this phone, with persisted SAF access. */
 public class LocalBibleAudioActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(org.perazimchurch.app.ui.theme.UiScale.wrap(newBase));
+    }
+
     private static final int REQUEST_AUDIO = 4817;
     private static final int REQUEST_AUDIO_PERMISSION = 4818;
     private static final long MAX_FALLBACK_AUDIO_BYTES = 25L * 1024L * 1024L;

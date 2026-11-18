@@ -467,6 +467,14 @@ public class ProfileUiBinder {
                         org.perazimchurch.app.ui.components.ThemeSwitcher.choose((Activity) context);
                     }
                 });
+        addOption(settings, "Display",
+                "App size " + org.perazimchurch.app.ui.theme.DisplaySettings.APP_LABELS[org.perazimchurch.app.ui.theme.DisplaySettings.appSize(context)]
+                        + " · Text " + org.perazimchurch.app.ui.theme.DisplaySettings.TEXT_LABELS[org.perazimchurch.app.ui.theme.DisplaySettings.textSize(context)],
+                v -> {
+                    if (context instanceof Activity) {
+                        org.perazimchurch.app.ui.components.DisplaySettingsDialog.show((Activity) context);
+                    }
+                });
         addOption(settings, "Sound, Haptics and Celebrations", "Button sounds, vibration and confetti",
                 v -> showFeedbackSettingsDialog());
 

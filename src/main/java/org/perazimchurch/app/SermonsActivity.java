@@ -32,6 +32,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SermonsActivity extends Activity implements View.OnClickListener {
+    @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(org.perazimchurch.app.ui.theme.UiScale.wrap(newBase));
+    }
+
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
     public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
