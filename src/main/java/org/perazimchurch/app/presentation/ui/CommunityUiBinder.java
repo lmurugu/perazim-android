@@ -577,7 +577,7 @@ public final class CommunityUiBinder {
     }
     private void addPhoto(LinearLayout target,String url) {
         if(!url.matches("/uploads/att_[a-zA-Z0-9_.-]+"))return;
-        android.widget.ImageView view=new android.widget.ImageView(activity);view.setAdjustViewBounds(true);view.setMaxHeight(dp(280));view.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);view.setContentDescription("Community photo");target.addView(view,new LinearLayout.LayoutParams(-1,dp(220)));
+        android.widget.ImageView view=new android.widget.ImageView(activity);view.setAdjustViewBounds(true);view.setMaxHeight(dp(280));view.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);view.setContentDescription("Community photo");android.graphics.drawable.GradientDrawable photoShape=new android.graphics.drawable.GradientDrawable();photoShape.setCornerRadius(dp(18));photoShape.setColor(0x14FFFFFF);view.setBackground(photoShape);view.setClipToOutline(true);GlassKit.keep(view);LinearLayout.LayoutParams photoLp=new LinearLayout.LayoutParams(-1,dp(200));photoLp.topMargin=dp(10);target.addView(view,photoLp);
         String expectedOwner=owner,expectedServer=server,token=session().getAuthToken();
         images.execute(()->{java.net.HttpURLConnection connection=null;try{
             java.net.URL photoUrl=new java.net.URL(expectedServer+url);if(!ApiClient.allowsProtectedTransport(photoUrl))return;

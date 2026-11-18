@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.TypedValue;
@@ -202,7 +203,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         rootLayout.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         rootLayout.setOrientation(LinearLayout.VERTICAL);
-        rootLayout.setBackground(PerazimTheme.createBackgroundGradient());
+        // The glow sits on the root window so it also runs behind the status and navigation bars.
+        rootWindow.setBackground(PerazimTheme.createBackgroundGradient());
+        drawBehindSystemBars(rootWindow);
 
         // 1. Top App Bar
         View topBar = createTopAppBar();
@@ -563,6 +566,38 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // 3. BOTTOM TAB BAR NAVIGATION
     // =========================================================================
 
+    /**
+     * Transparent status and navigation bars with the glow behind them, as in the mockups. Content is
+     * padded by the bar insets so nothing hides under the clock or the system buttons. Icons turn dark in
+     * light mode so they stay readable.
+     */
+    @SuppressWarnings("deprecation")
+    private void drawBehindSystemBars(FrameLayout root) {
+        android.view.Window window = getWindow();
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        if (PerazimTheme.isLight()) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) {
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+        }
+        window.getDecorView().setSystemUiVisibility(flags);
+        root.setOnApplyWindowInsetsListener((v, insets) -> {
+            v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
+                    insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+            return insets.consumeSystemWindowInsets();
+        });
+        root.requestApplyInsets();
+    }
+
     private View createBottomTabBar() {
         LinearLayout bottomNav = new LinearLayout(this);
         LinearLayout.LayoutParams lpNav = new LinearLayout.LayoutParams(
@@ -577,8 +612,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         // Frosted bar: content scrolling underneath is washed out, as a backdrop blur would.
         GradientDrawable navBg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
                 PerazimTheme.isLight()
-                        ? new int[]{Color.parseColor("#EBFFFFFF"), Color.parseColor("#DEFFFFFF")}
-                        : new int[]{Color.parseColor("#E83A1A45"), Color.parseColor("#F02A0F33")});
+                        ? new int[]{Color.parseColor("#FAFFFFFF"), Color.parseColor("#F5FFFFFF")}
+                        : new int[]{Color.parseColor("#FA3A1A45"), Color.parseColor("#FC2A0F33")});
         navBg.setCornerRadius(dp(32));
         navBg.setStroke(Math.max(1, dp(1)), Color.parseColor(PerazimTheme.isLight() ? "#F2FFFFFF" : "#2EFFFFFF"));
         bottomNav.setBackground(navBg);

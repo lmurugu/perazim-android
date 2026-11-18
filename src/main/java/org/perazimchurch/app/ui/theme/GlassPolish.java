@@ -93,6 +93,10 @@ public final class GlassPolish {
         if (view.getVisibility() == View.GONE || GlassKit.isKept(view)) {
             return;
         }
+        int id = view.getId();
+        if (id == android.R.id.statusBarBackground || id == android.R.id.navigationBarBackground) {
+            return; // the system bar scrims are not cards: glassing them hid the clock and battery icons
+        }
         boolean glowHere = glowAbove || view.getBackground() instanceof PerazimTheme.GlowBackground;
         restyleBackground(view, glowHere);
         glowHere = glowHere || view.getBackground() instanceof PerazimTheme.GlowBackground;
