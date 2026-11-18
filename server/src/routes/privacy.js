@@ -9,6 +9,8 @@ const { requireAuth } = require('../middleware/auth');
 const { PhaseBError, newId, requireAdminAuthority } = require('../phase-b/security');
 const { ACKNOWLEDGEMENT_TEXT, getCurrentNotice, recordAcknowledgement } = require('../phase-b/privacyNotice');
 const { recordConsentChoice } = require('../phase-b/data01Governance');
+const { eraseMemberData } = require('../privacy/erasure');
+const UPLOADS_DIR_FOR_ERASURE = path.join(__dirname, '../../uploads');
 
 const router = express.Router();
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
@@ -159,15 +161,32 @@ router.post('/requests', requireAuth, async (req, res) => {
       const hold = await query(`SELECT 1 FROM legal_holds WHERE subject_ref=$1 AND status='ACTIVE' LIMIT 1`, [req.user.id]);
       if (hold.rows.length) { status = 'DEFERRED'; reasonCode = 'ACTIVE_HOLD'; }
     }
+    let erasedFiles = [];
     if (isPostgresActive()) {
-      await withTransaction(async client => {
+      erasedFiles = await withTransaction(async client => {
         await client.query(`INSERT INTO data_subject_requests (id,request_id,requester_id,request_type,status,decision_reason_code,submitted_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$7)`,
           [id, requestId, req.user.id, requestType, status, reasonCode, now]);
         await client.query(`INSERT INTO data_subject_request_events (id,request_id,actor_id,event,reason_code,created_at) VALUES ($1,$2,$3,$4,$5,$6)`,
           [newId(), id, req.user.id, status === 'DEFERRED' ? 'DEFERRED' : 'SUBMITTED', reasonCode || 'REQUEST_RECEIVED', now]);
         await client.query(`INSERT INTO data_subject_request_revisions (request_id,revision,request_type,actor_id,created_at) VALUES ($1,1,$2,$3,$4)`,
           [id, requestType, req.user.id, now]);
+        if (requestType === 'ERASURE' && status !== 'DEFERRED') {
+          // Carry out the erasure in the same transaction as the request record.
+          const { filenames } = await eraseMemberData(client, req.user.id, now);
+          await client.query(`UPDATE data_subject_requests SET status='COMPLETED', decision_reason_code='ERASURE_COMPLETED', updated_at=$2 WHERE id=$1`, [id, now]);
+          await client.query(`INSERT INTO data_subject_request_events (id,request_id,actor_id,event,reason_code,created_at) VALUES ($1,$2,$3,'COMPLETED','ERASURE_COMPLETED',$4)`,
+            [newId(), id, req.user.id, now]);
+          return filenames;
+        }
+        return [];
       });
+      // Remove uploaded files only after the database commit.
+      for (const filename of erasedFiles) {
+        if (/^att_[a-zA-Z0-9_.-]+$/.test(filename)) fs.unlink(path.join(UPLOADS_DIR_FOR_ERASURE, filename), () => {});
+      }
+      if (requestType === 'ERASURE' && status !== 'DEFERRED') {
+        return res.status(200).json({ received: true, request_id: requestId, status: 'completed' });
+      }
     } else {
       memoryStore.data_subject_requests.push({ id, request_id: requestId, requester_id: req.user.id, request_type: requestType, status, decision_reason_code: reasonCode, submitted_at: now, updated_at: now });
       memoryStore.data_subject_request_events.push({ id: newId(), request_id: id, actor_id: req.user.id, event: status === 'DEFERRED' ? 'DEFERRED' : 'SUBMITTED', reason_code: reasonCode || 'REQUEST_RECEIVED', created_at: now });
