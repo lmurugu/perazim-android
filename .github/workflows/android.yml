@@ -53,13 +53,12 @@ jobs:
       - name: Print small copies of the screenshots into the log
         if: always()
         run: |
-          [ -d build/ui-screenshots ] || exit 0
-          cd build/ui-screenshots
-          for f in *.png; do
-            convert "$f" -resize '432x3600>' -quality 70 "/tmp/${f%.png}.jpg"
-            echo "=====BEGIN ${f%.png}.jpg"
-            base64 -w 120 "/tmp/${f%.png}.jpg"
-            echo "=====END ${f%.png}.jpg"
+          [ -d build/ui-screenshots/small ] || exit 0
+          cd build/ui-screenshots/small
+          for f in *.jpg; do
+            echo "=====BEGIN $f"
+            base64 -w 120 "$f"
+            echo "=====END $f"
           done
 
   database-instrumentation:

@@ -130,5 +130,19 @@ final class UiScreenshotSupport {
         try (FileOutputStream out = new FileOutputStream(file)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
         }
+        // Small JPEG copy (432px wide, at most 3600px tall) that CI prints into its log for quick review.
+        File smallDir = new File(file.getParentFile(), "small");
+        //noinspection ResultOfMethodCallIgnored
+        smallDir.mkdirs();
+        int w = 432;
+        int h = Math.round(bitmap.getHeight() * (w / (float) bitmap.getWidth()));
+        Bitmap scaled = Bitmap.createScaledBitmap(bitmap, w, h, true);
+        if (h > 3600) {
+            scaled = Bitmap.createBitmap(scaled, 0, 0, w, 3600);
+        }
+        String name = file.getName().replace(".png", ".jpg");
+        try (FileOutputStream out = new FileOutputStream(new File(smallDir, name))) {
+            scaled.compress(Bitmap.CompressFormat.JPEG, 72, out);
+        }
     }
 }
