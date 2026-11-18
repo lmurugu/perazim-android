@@ -245,7 +245,8 @@ public final class CommunityUiBinder {
                 bg.setCornerRadius(dp(24));
                 bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#26FFFFFF"));
                 card.setBackground(bg);
-                card.setElevation(dp(6));
+                // Mockup: box-shadow 0 12px 28px rgba(61,23,73,0.3) (deeper on the dark page)
+                GlassKit.shadow(card, Color.parseColor(GlassKit.light() ? "#4D3D1749" : "#4D000000"), 12, 28);
             } else {
                 card.setBackground(GlassKit.glass(activity, 24));
             }

@@ -335,10 +335,18 @@ public class HomeUiBinder {
         rim.setBackground(rimBg);
         hero.addView(GlassKit.keep(rim), new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        hero.setElevation(dp(6));
         hero.setClickable(true);
         hero.setOnClickListener(v -> { if (listener != null) listener.onNavigateToTab(3); });
-        return hero;
+        // The photo clips to its rounded outline, so its shadow (0 12px 30px rgba(0,0,0,0.35)) sits on a holder.
+        FrameLayout holder = new FrameLayout(context);
+        GradientDrawable holderShape = new GradientDrawable();
+        holderShape.setCornerRadius(dp(26));
+        holderShape.setColor(Color.TRANSPARENT);
+        holder.setBackground(holderShape);
+        GlassKit.shadow(holder, Color.parseColor(PerazimTheme.isLight() ? "#403D1749" : "#59000000"), 12, 30);
+        holder.addView(hero, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        return GlassKit.keep(holder);
     }
 
     private String buildGreeting() {
