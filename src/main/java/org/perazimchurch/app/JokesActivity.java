@@ -30,11 +30,11 @@ import android.widget.Toast;
 public class JokesActivity extends Activity implements View.OnClickListener {
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = PerazimTheme.COLOR_TEXT_PRIMARY;
+    public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_BORDER = PerazimTheme.COLOR_STROKE;
+    public static int COLOR_PURPLE_BORDER() { return PerazimTheme.COLOR_STROKE; }
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = PerazimTheme.COLOR_TEXT_SECONDARY;
+    public static int COLOR_PURPLE_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -43,7 +43,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = PerazimTheme.COLOR_BG_DEEP;
+    public static int COLOR_CANVAS() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private Button btnBack;
     private Button btnSmile;
@@ -54,7 +54,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_CANVAS);
+        scrollView.setBackgroundColor(COLOR_CANVAS());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -80,7 +80,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
         title.setText("CHRISTIAN JOY & HUMOR");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
+        title.setTextColor(COLOR_PURPLE_DARK());
         title.setPadding(dp(16), 0, 0, 0);
         navBar.addView(title);
 
@@ -103,7 +103,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
         }
 
         // Header Quote Card
-        LinearLayout quoteCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(14), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout quoteCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(14), COLOR_PURPLE_BORDER(), dp(1));
         quoteCard.setOrientation(LinearLayout.VERTICAL);
         TextView quote = new TextView(this);
         quote.setText("“A cheerful heart is good medicine, but a crushed spirit dries up the bones.” — Proverbs 17:22");
@@ -121,7 +121,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
                 "Noah! He floated his entire stock successfully while the rest of the world was in total liquidation!",
                 COLOR_PURPLE_TINT,
                 COLOR_PURPLE,
-                COLOR_PURPLE_BORDER
+                COLOR_PURPLE_BORDER()
         ));
 
         // JOKE 2
@@ -141,7 +141,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
                 "Because the ravens delivered his meals by the Brook Cherith every single day — with zero fees and top ratings!",
                 COLOR_PURPLE_TINT,
                 COLOR_PURPLE,
-                COLOR_PURPLE_BORDER
+                COLOR_PURPLE_BORDER()
         ));
 
         // JOKE 4
@@ -161,7 +161,7 @@ public class JokesActivity extends Activity implements View.OnClickListener {
                 "Pastor: 'Usher, wake up that brother snoring in row four!'\nUsher: 'Pastor, you put him to sleep, you wake him up!'",
                 COLOR_PURPLE_TINT,
                 COLOR_PURPLE,
-                COLOR_PURPLE_BORDER
+                COLOR_PURPLE_BORDER()
         ));
 
         // Interactive Button
@@ -190,14 +190,14 @@ public class JokesActivity extends Activity implements View.OnClickListener {
         tvTitle.setText(title);
         tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_PURPLE_DARK);
+        tvTitle.setTextColor(COLOR_PURPLE_DARK());
         tvTitle.setPadding(0, dp(6), 0, dp(4));
         card.addView(tvTitle);
 
         TextView tvBody = new TextView(this);
         tvBody.setText(body);
         tvBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvBody.setTextColor(COLOR_PURPLE_MUTED);
+        tvBody.setTextColor(COLOR_PURPLE_MUTED());
         tvBody.setLineSpacing(dp(2), 1.15f);
         card.addView(tvBody);
 

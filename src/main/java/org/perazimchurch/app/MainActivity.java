@@ -81,10 +81,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public static final int COLOR_PURPLE_SHADOW   = Color.parseColor("#450E53"); // 3D bevel shadow
     public static final int COLOR_PURPLE_LIGHT    = Color.parseColor("#8E30A8"); // Brightened purple
     public static final int COLOR_PURPLE_SOFT     = Color.parseColor("#C896D8"); // Soft purple text
-    public static final int COLOR_BORDER_GREY     = PerazimTheme.COLOR_STROKE; // Whitened purple card border
+    public static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_STROKE; } // Whitened purple card border
     public static final int COLOR_PURPLE_TINT     = Color.parseColor("#F5ECF7"); // Pastel purple tint
-    public static final int COLOR_TEXT_MUTED      = PerazimTheme.COLOR_TEXT_SECONDARY; // Muted purple-grey text
-    public static final int COLOR_TEXT_DARK       = PerazimTheme.COLOR_TEXT_PRIMARY; // Deep purple-black text
+    public static int COLOR_TEXT_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; } // Muted purple-grey text
+    public static int COLOR_TEXT_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; } // Deep purple-black text
 
     public static final int COLOR_ACCENT_ORANGE   = Color.parseColor("#E17D2F"); // Secondary Brand Warm Amber/Orange
     public static final int COLOR_ORANGE_DARK     = Color.parseColor("#78350A"); // Darkened orange
@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public static final int COLOR_ORANGE_TINT     = Color.parseColor("#FDF5EF"); // Pastel orange tint
 
     public static final int COLOR_WHITE           = Color.parseColor("#FFFFFF"); // Card surface
-    public static final int COLOR_BG_NEUTRAL      = PerazimTheme.COLOR_BG_DEEP; // Whitened purple canvas
+    public static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_DEEP; } // Whitened purple canvas
 
     // --- STATE VARIABLES ---
     private int streakCount = 0;
@@ -807,7 +807,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacyHomeScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -832,7 +832,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(tvSubGreeting);
 
         // Quick Actions Grid (Give / Tithe, Full Scripture, Submit Prayer)
-        LinearLayout quickActionsCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout quickActionsCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         quickActionsCard.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams lpQuick = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -854,7 +854,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(quickActionsCard);
 
         // 2. Daily Devotion Progress Track
-        LinearLayout progressCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout progressCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         progressCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpProgressCard = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -891,7 +891,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             progressTextView.setText(progressPercent + "% completed — Step " + routineStep + " of 3 in progress");
         }
         progressTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        progressTextView.setTextColor(COLOR_TEXT_DARK);
+        progressTextView.setTextColor(COLOR_TEXT_DARK());
         progressTextView.setPadding(0, dp(4), 0, dp(8));
         progressCard.addView(progressTextView);
 
@@ -1007,22 +1007,22 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         stepBox.setOrientation(LinearLayout.VERTICAL);
         stepBox.setPadding(dp(12), dp(10), dp(12), dp(10));
         GradientDrawable sbBg = new GradientDrawable();
-        sbBg.setColor(COLOR_BG_NEUTRAL);
+        sbBg.setColor(COLOR_BG_NEUTRAL());
         sbBg.setCornerRadius(dp(10));
-        sbBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        sbBg.setStroke(dp(1), COLOR_BORDER_GREY());
         stepBox.setBackground(sbBg);
 
         tvRoutineStepTitle = new TextView(this);
         tvRoutineStepTitle.setText("Step 1 of 3: Read Today's Word (30s)");
         tvRoutineStepTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvRoutineStepTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvRoutineStepTitle.setTextColor(COLOR_TEXT_DARK);
+        tvRoutineStepTitle.setTextColor(COLOR_TEXT_DARK());
         stepBox.addView(tvRoutineStepTitle);
 
         tvRoutineStepContent = new TextView(this);
         tvRoutineStepContent.setText("“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20");
         tvRoutineStepContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvRoutineStepContent.setTextColor(COLOR_TEXT_MUTED);
+        tvRoutineStepContent.setTextColor(COLOR_TEXT_MUTED());
         tvRoutineStepContent.setPadding(0, dp(4), 0, dp(10));
         tvRoutineStepContent.setLineSpacing(dp(2), 1.15f);
         stepBox.addView(tvRoutineStepContent);
@@ -1057,7 +1057,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         };
 
         for (final String[] ev : churchEvents) {
-            LinearLayout evCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+            LinearLayout evCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
             evCard.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams lpEv = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1083,7 +1083,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             TextView tvDate = new TextView(this);
             tvDate.setText(ev[1]);
             tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvDate.setTextColor(COLOR_TEXT_MUTED);
+            tvDate.setTextColor(COLOR_TEXT_MUTED());
             tagRow.addView(tvDate);
             evCard.addView(tagRow);
 
@@ -1091,14 +1091,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             evTitle.setText(ev[0]);
             evTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             evTitle.setTypeface(Typeface.DEFAULT_BOLD);
-            evTitle.setTextColor(COLOR_TEXT_DARK);
+            evTitle.setTextColor(COLOR_TEXT_DARK());
             evTitle.setPadding(0, dp(4), 0, dp(2));
             evCard.addView(evTitle);
 
             TextView evDesc = new TextView(this);
             evDesc.setText(ev[3]);
             evDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            evDesc.setTextColor(COLOR_TEXT_MUTED);
+            evDesc.setTextColor(COLOR_TEXT_MUTED());
             evDesc.setLineSpacing(dp(2), 1.15f);
             evDesc.setPadding(0, 0, 0, dp(8));
             evCard.addView(evDesc);
@@ -1108,7 +1108,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             btnRsvp.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             btnRsvp.setTypeface(Typeface.DEFAULT_BOLD);
             btnRsvp.setTextColor(COLOR_PRIMARY_PURPLE);
-            btnRsvp.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+            btnRsvp.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
             btnRsvp.setPadding(dp(8), dp(4), dp(8), dp(4));
             btnRsvp.setOnClickListener(v -> {
                 xpCount += 5;
@@ -1161,9 +1161,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             bg.setStroke(dp(1), COLOR_ACCENT_ORANGE);
             tv.setTextColor(COLOR_ACCENT_ORANGE);
         } else {
-            bg.setColor(COLOR_BG_NEUTRAL);
-            bg.setStroke(dp(1), COLOR_BORDER_GREY);
-            tv.setTextColor(COLOR_TEXT_MUTED);
+            bg.setColor(COLOR_BG_NEUTRAL());
+            bg.setStroke(dp(1), COLOR_BORDER_GREY());
+            tv.setTextColor(COLOR_TEXT_MUTED());
         }
         bg.setCornerRadius(dp(12));
         tv.setBackground(bg);
@@ -1215,12 +1215,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             stepIndicatorRead.setTextColor(COLOR_ACCENT_ORANGE);
 
             stepIndicatorReflect.setText("2. Reflect");
-            stepIndicatorReflect.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
-            stepIndicatorReflect.setTextColor(COLOR_TEXT_MUTED);
+            stepIndicatorReflect.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
+            stepIndicatorReflect.setTextColor(COLOR_TEXT_MUTED());
 
             stepIndicatorPray.setText("3. Pray");
-            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
-            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED);
+            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
+            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED());
 
             tvRoutineStepTitle.setText("Step 1: Read Today's Word (30s)");
             tvRoutineStepContent.setText("“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20");
@@ -1237,8 +1237,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             stepIndicatorReflect.setTextColor(COLOR_ACCENT_ORANGE);
 
             stepIndicatorPray.setText("3. Pray");
-            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
-            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED);
+            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
+            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED());
 
             tvRoutineStepTitle.setText("Step 2: Bishop's Key Insight (1 min)");
             tvRoutineStepContent.setText("“Breakthrough is not accidental; it is covenantal. At Baal-Perazim, David stood in faith and saw God burst through his obstacles like rushing waters. Whatever mountain you face today, God is breaking through!” — Bishop Dr. David Mutweri");
@@ -1324,7 +1324,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvSub = new TextView(this);
         tvSub.setText("The Account of David's Breakthrough in the Valley of Rephaim");
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSub.setTextColor(COLOR_TEXT_MUTED);
+        tvSub.setTextColor(COLOR_TEXT_MUTED());
         tvSub.setPadding(0, dp(2), 0, dp(12));
         container.addView(tvSub);
 
@@ -1351,7 +1351,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             TextView tvText = new TextView(this);
             tvText.setText(v[1]);
             tvText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            tvText.setTextColor(COLOR_TEXT_DARK);
+            tvText.setTextColor(COLOR_TEXT_DARK());
             tvText.setLineSpacing(dp(2), 1.15f);
             if (v[0].equals("20")) {
                 tvText.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1366,7 +1366,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout commBox = new LinearLayout(this);
         commBox.setOrientation(LinearLayout.VERTICAL);
         commBox.setPadding(dp(12), dp(10), dp(12), dp(10));
-        commBox.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
+        commBox.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
         LinearLayout.LayoutParams lpComm = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpComm.setMargins(0, dp(14), 0, dp(14));
@@ -1382,7 +1382,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView commBody = new TextView(this);
         commBody.setText("The Valley of Rephaim ('Valley of the Giants') was a strategic agricultural corridor outside Jerusalem. The Philistines mobilized their full army to crush David before his kingdom was unified.\n\nDavid did not depend on past military intellect; he inquired of the LORD. God answered with swift, overwhelming breakthrough—like a burst dam sweeping away all barriers. This is the divine lineage of Perazim Mission Church: whatever giant opposes you, God will burst forth as a flood of breakthrough!");
         commBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        commBody.setTextColor(COLOR_TEXT_MUTED);
+        commBody.setTextColor(COLOR_TEXT_MUTED());
         commBody.setPadding(0, dp(4), 0, 0);
         commBody.setLineSpacing(dp(2), 1.15f);
         commBox.addView(commBody);
@@ -1421,7 +1421,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvModalSub = new TextView(this);
         tvModalSub.setText("Formatted 9:16 portrait story for WhatsApp Status");
         tvModalSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvModalSub.setTextColor(COLOR_TEXT_MUTED);
+        tvModalSub.setTextColor(COLOR_TEXT_MUTED());
         tvModalSub.setPadding(0, dp(2), 0, dp(12));
         container.addView(tvModalSub);
 
@@ -1487,7 +1487,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable thmBg = new GradientDrawable();
         thmBg.setColor(COLOR_PURPLE_TINT);
         thmBg.setCornerRadius(dp(8));
-        thmBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        thmBg.setStroke(dp(1), COLOR_BORDER_GREY());
         btnTheme.setBackground(thmBg);
         LinearLayout.LayoutParams lpBtnTheme = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1553,7 +1553,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable copyBg = new GradientDrawable();
         copyBg.setColor(COLOR_WHITE);
         copyBg.setCornerRadius(dp(8));
-        copyBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        copyBg.setStroke(dp(1), COLOR_BORDER_GREY());
         btnCopy.setBackground(copyBg);
         btnCopy.setOnClickListener(v -> {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -1600,7 +1600,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView desc = new TextView(this);
         desc.setText("In God's kingdom, grace exceeds the law. Grace Points allow you to protect your devotional streak when life, travel, or ministry takes you away from your phone.");
         desc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        desc.setTextColor(COLOR_TEXT_MUTED);
+        desc.setTextColor(COLOR_TEXT_MUTED());
         desc.setPadding(0, 0, 0, dp(14));
         container.addView(desc);
 
@@ -1728,13 +1728,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacySermonsScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(32));
 
-        LinearLayout liveCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout liveCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         liveCard.setOrientation(LinearLayout.VERTICAL);
 
         LinearLayout liveBadgeRow = new LinearLayout(this);
@@ -1758,14 +1758,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvSermonTitle.setText("Walking in Faith: Overcoming Fear in Difficult Times");
         tvSermonTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         tvSermonTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvSermonTitle.setTextColor(COLOR_TEXT_DARK);
+        tvSermonTitle.setTextColor(COLOR_TEXT_DARK());
         tvSermonTitle.setPadding(0, dp(8), 0, dp(4));
         liveCard.addView(tvSermonTitle);
 
         TextView tvSpeaker = new TextView(this);
         tvSpeaker.setText("Speaker: Bishop Dr. David Mutweri | Central Campus");
         tvSpeaker.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvSpeaker.setTextColor(COLOR_TEXT_MUTED);
+        tvSpeaker.setTextColor(COLOR_TEXT_MUTED());
         tvSpeaker.setPadding(0, 0, 0, dp(12));
         liveCard.addView(tvSpeaker);
 
@@ -1809,7 +1809,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private LinearLayout createSermonCard(String title, String metadata, String assetThumbnail) {
-        LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -1837,13 +1837,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvTitle.setText(title);
         tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_TEXT_DARK);
+        tvTitle.setTextColor(COLOR_TEXT_DARK());
         textCol.addView(tvTitle);
 
         TextView tvMeta = new TextView(this);
         tvMeta.setText(metadata);
         tvMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvMeta.setTextColor(COLOR_TEXT_MUTED);
+        tvMeta.setTextColor(COLOR_TEXT_MUTED());
         tvMeta.setPadding(0, dp(3), 0, 0);
         textCol.addView(tvMeta);
 
@@ -1898,7 +1898,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacyFellowshipScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -1941,7 +1941,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             final String prayerText = prayerData[i][2];
             final int initialCount = Integer.parseInt(prayerData[i][3]);
 
-            LinearLayout pCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+            LinearLayout pCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
             pCard.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams lpP = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1952,20 +1952,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             tvTitle.setText("🙏 " + prayerTitle);
             tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-            tvTitle.setTextColor(COLOR_TEXT_DARK);
+            tvTitle.setTextColor(COLOR_TEXT_DARK());
             pCard.addView(tvTitle);
 
             TextView tvAuthor = new TextView(this);
             tvAuthor.setText("Submitted by: " + prayerAuthor + " · Embu Community");
             tvAuthor.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            tvAuthor.setTextColor(COLOR_TEXT_MUTED);
+            tvAuthor.setTextColor(COLOR_TEXT_MUTED());
             tvAuthor.setPadding(0, dp(2), 0, dp(6));
             pCard.addView(tvAuthor);
 
             TextView tvDesc = new TextView(this);
             tvDesc.setText(prayerText);
             tvDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            tvDesc.setTextColor(COLOR_TEXT_DARK);
+            tvDesc.setTextColor(COLOR_TEXT_DARK());
             tvDesc.setLineSpacing(dp(2), 1.15f);
             tvDesc.setPadding(0, 0, 0, dp(10));
             pCard.addView(tvDesc);
@@ -2012,7 +2012,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(createInteractiveRiddleCard("Geography", "Where did Elijah contest against the 450 prophets of Baal?", "Mount Carmel (1 Kings 18:19)", 25));
 
         // Section: Biblical Humor & Joy Card
-        LinearLayout humorCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout humorCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         humorCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpHumor = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2030,7 +2030,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvJokeQ.setText("Q: Who was the greatest financier in the Bible?");
         tvJokeQ.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         tvJokeQ.setTypeface(Typeface.DEFAULT_BOLD);
-        tvJokeQ.setTextColor(COLOR_TEXT_DARK);
+        tvJokeQ.setTextColor(COLOR_TEXT_DARK());
         tvJokeQ.setPadding(0, dp(8), 0, dp(4));
         humorCard.addView(tvJokeQ);
 
@@ -2045,7 +2045,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         final TextView tvJokeA = new TextView(this);
         tvJokeA.setText("A: Noah! He was floating his stock while everyone else was in liquidation! 🌊🚢\n\nBonus: Who was the greatest babysitter? David, because he rocked Goliath to sleep! 😴");
         tvJokeA.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvJokeA.setTextColor(COLOR_TEXT_DARK);
+        tvJokeA.setTextColor(COLOR_TEXT_DARK());
         tvJokeA.setTypeface(Typeface.SERIF, Typeface.ITALIC);
         tvJokeA.setPadding(0, dp(6), 0, 0);
         tvJokeA.setVisibility(View.GONE);
@@ -2105,12 +2105,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvSlogan.setText("Slogan: “A place where everybody is somebody, and no body is a nobody”");
         tvSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvSlogan.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-        tvSlogan.setTextColor(COLOR_TEXT_DARK);
+        tvSlogan.setTextColor(COLOR_TEXT_DARK());
         tvSlogan.setPadding(0, 0, 0, dp(8));
         identityCard.addView(tvSlogan);
 
         View sepId = new View(this);
-        sepId.setBackgroundColor(COLOR_BORDER_GREY);
+        sepId.setBackgroundColor(COLOR_BORDER_GREY());
         LinearLayout.LayoutParams lpSepId = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(1));
         lpSepId.setMargins(0, dp(2), 0, dp(8));
@@ -2128,7 +2128,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvMission = new TextView(this);
         tvMission.setText("Mission: “Perazim exists to draw people to Christ, to disciple them to belong to His family, and to have them glorify GOD with their lives and their services.”");
         tvMission.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvMission.setTextColor(COLOR_TEXT_DARK);
+        tvMission.setTextColor(COLOR_TEXT_DARK());
         tvMission.setLineSpacing(dp(2), 1.15f);
         tvMission.setPadding(0, 0, 0, dp(8));
         identityCard.addView(tvMission);
@@ -2146,7 +2146,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvValues.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvValues.setTypeface(Typeface.DEFAULT_BOLD);
         tvValues.setTextColor(COLOR_PURPLE_DARK);
-        tvValues.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        tvValues.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
         tvValues.setPadding(dp(8), dp(6), dp(8), dp(6));
         identityCard.addView(tvValues);
 
@@ -2197,7 +2197,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvLeaderTitle = new TextView(this);
         tvLeaderTitle.setText("Presiding Bishop · Perazim Mission Church");
         tvLeaderTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvLeaderTitle.setTextColor(COLOR_TEXT_MUTED);
+        tvLeaderTitle.setTextColor(COLOR_TEXT_MUTED());
         leaderDetails.addView(tvLeaderTitle);
         leaderRow.addView(leaderDetails);
         contactCard.addView(leaderRow);
@@ -2205,7 +2205,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvContactDesc = new TextView(this);
         tvContactDesc.setText("Reach out directly for pastoral care, prayer covenants, church administration, or giving support:");
         tvContactDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvContactDesc.setTextColor(COLOR_TEXT_DARK);
+        tvContactDesc.setTextColor(COLOR_TEXT_DARK());
         tvContactDesc.setLineSpacing(dp(2), 1.15f);
         tvContactDesc.setPadding(0, 0, 0, dp(10));
         contactCard.addView(tvContactDesc);
@@ -2365,14 +2365,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacyProfileScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(32));
 
         // 1. MEMBER PROFILE HEADER CARD
-        LinearLayout profileHeaderCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout profileHeaderCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         profileHeaderCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpProfHeader = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2420,7 +2420,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvMemberSub = new TextView(this);
         tvMemberSub.setText("Perazim Mission Church · Embu Headquarters");
         tvMemberSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvMemberSub.setTextColor(COLOR_TEXT_MUTED);
+        tvMemberSub.setTextColor(COLOR_TEXT_MUTED());
         tvMemberSub.setPadding(0, dp(2), 0, dp(6));
         memberInfo.addView(tvMemberSub);
 
@@ -2430,7 +2430,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvCovenantBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvCovenantBadge.setTypeface(Typeface.DEFAULT_BOLD);
         tvCovenantBadge.setTextColor(COLOR_PRIMARY_PURPLE);
-        tvCovenantBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        tvCovenantBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
         tvCovenantBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
         memberInfo.addView(tvCovenantBadge);
 
@@ -2439,7 +2439,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         // Divider
         View divHeader = new View(this);
-        divHeader.setBackgroundColor(COLOR_BORDER_GREY);
+        divHeader.setBackgroundColor(COLOR_BORDER_GREY());
         LinearLayout.LayoutParams lpDiv = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
         lpDiv.setMargins(0, 0, 0, dp(12));
@@ -2506,7 +2506,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(actionsRow2);
 
         // 4. CHURCH IDENTITY & AFFILIATION CARD (Guidebook §73.2)
-        LinearLayout churchCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout churchCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         churchCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpChurch = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2539,7 +2539,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvChurchSlogan = new TextView(this);
         tvChurchSlogan.setText("“A place where everybody is somebody, and no body is a nobody”");
         tvChurchSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvChurchSlogan.setTextColor(COLOR_TEXT_MUTED);
+        tvChurchSlogan.setTextColor(COLOR_TEXT_MUTED());
         tvChurchSlogan.setPadding(0, 0, 0, dp(8));
         churchCard.addView(tvChurchSlogan);
 
@@ -2549,7 +2549,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(churchCard);
 
         // 5. PERSONAL CONTENT & OFFLINE CACHE STATUS CARD (Guidebook §73.4)
-        LinearLayout cacheCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout cacheCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         cacheCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpCache = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2590,7 +2590,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(cacheCard);
 
         // 6. PASTORAL CARE DIRECT ACTIONS CARD (Guidebook §73.5)
-        LinearLayout pastoralCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout pastoralCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         pastoralCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpPastoral = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2608,7 +2608,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvPastoralDesc = new TextView(this);
         tvPastoralDesc.setText("Reach out directly for counseling, prayer covenants, or pastoral blessings:");
         tvPastoralDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvPastoralDesc.setTextColor(COLOR_TEXT_DARK);
+        tvPastoralDesc.setTextColor(COLOR_TEXT_DARK());
         tvPastoralDesc.setPadding(0, 0, 0, dp(8));
         pastoralCard.addView(tvPastoralDesc);
 
@@ -2642,7 +2642,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(bgColor);
         bg.setCornerRadius(dp(10));
-        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), COLOR_BORDER_GREY());
         card.setBackground(bg);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
@@ -2661,7 +2661,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvLbl.setText(label);
         tvLbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvLbl.setTypeface(Typeface.DEFAULT_BOLD);
-        tvLbl.setTextColor(COLOR_TEXT_DARK);
+        tvLbl.setTextColor(COLOR_TEXT_DARK());
         tvLbl.setGravity(Gravity.CENTER);
         tvLbl.setPadding(0, dp(2), 0, dp(1));
         card.addView(tvLbl);
@@ -2669,7 +2669,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvSub = new TextView(this);
         tvSub.setText(sublabel);
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
-        tvSub.setTextColor(COLOR_TEXT_MUTED);
+        tvSub.setTextColor(COLOR_TEXT_MUTED());
         tvSub.setGravity(Gravity.CENTER);
         card.addView(tvSub);
 
@@ -2705,7 +2705,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 "Offline Cache: 24.8 MB preserved\n\n" +
                 "App Version: " + org.perazimchurch.app.BuildConfig.VERSION_NAME + " (Build " + org.perazimchurch.app.BuildConfig.VERSION_CODE + ")");
         tvInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvInfo.setTextColor(COLOR_TEXT_DARK);
+        tvInfo.setTextColor(COLOR_TEXT_DARK());
         tvInfo.setLineSpacing(dp(3), 1.2f);
         layout.addView(tvInfo);
 
@@ -2743,7 +2743,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private LinearLayout createInteractiveRiddleCard(String category, String question, final String answer, final int xpReward) {
-        final LinearLayout card = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        final LinearLayout card = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2759,7 +2759,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         catTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         catTag.setTypeface(Typeface.DEFAULT_BOLD);
         catTag.setTextColor(COLOR_PRIMARY_PURPLE);
-        catTag.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        catTag.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
         catTag.setPadding(dp(8), dp(4), dp(8), dp(4));
         badgeRow.addView(catTag);
 
@@ -2780,7 +2780,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvQuestion.setText(question);
         tvQuestion.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         tvQuestion.setTypeface(Typeface.DEFAULT_BOLD);
-        tvQuestion.setTextColor(COLOR_TEXT_DARK);
+        tvQuestion.setTextColor(COLOR_TEXT_DARK());
         tvQuestion.setPadding(0, dp(8), 0, dp(8));
         tvQuestion.setLineSpacing(dp(3), 1.15f);
         card.addView(tvQuestion);
@@ -2798,9 +2798,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         answerBox.setOrientation(LinearLayout.VERTICAL);
         answerBox.setPadding(dp(12), dp(10), dp(12), dp(10));
         GradientDrawable ansBg = new GradientDrawable();
-        ansBg.setColor(COLOR_BG_NEUTRAL);
+        ansBg.setColor(COLOR_BG_NEUTRAL());
         ansBg.setCornerRadius(dp(10));
-        ansBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        ansBg.setStroke(dp(1), COLOR_BORDER_GREY());
         answerBox.setBackground(ansBg);
         answerBox.setVisibility(View.GONE);
 
@@ -2814,7 +2814,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView ansText = new TextView(this);
         ansText.setText(answer);
         ansText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        ansText.setTextColor(COLOR_TEXT_DARK);
+        ansText.setTextColor(COLOR_TEXT_DARK());
         ansText.setPadding(0, dp(2), 0, 0);
         answerBox.addView(ansText);
         card.addView(answerBox);
@@ -2896,13 +2896,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         t.setText(sermonTitle);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         t.setTypeface(Typeface.DEFAULT_BOLD);
-        t.setTextColor(COLOR_TEXT_DARK);
+        t.setTextColor(COLOR_TEXT_DARK());
         box.addView(t);
 
         TextView s = new TextView(this);
         s.setText(speaker);
         s.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        s.setTextColor(COLOR_TEXT_MUTED);
+        s.setTextColor(COLOR_TEXT_MUTED());
         s.setPadding(0, dp(2), 0, dp(14));
         box.addView(s);
 
@@ -3023,7 +3023,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView subtitle = new TextView(this);
         subtitle.setText("Perazim Mission Church Headquarters, Embu\nPresiding Bishop: Bishop Dr. David Mutweri\n\nTap an action below to connect instantly:");
         subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        subtitle.setTextColor(COLOR_TEXT_MUTED);
+        subtitle.setTextColor(COLOR_TEXT_MUTED());
         subtitle.setPadding(0, dp(4), 0, dp(14));
         container.addView(subtitle);
 
@@ -3076,7 +3076,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(COLOR_PURPLE_TINT);
         bg.setCornerRadius(dp(8));
-        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), COLOR_BORDER_GREY());
         row.setBackground(bg);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3098,7 +3098,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvLabel.setText(label.toUpperCase());
         tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
         tvLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        tvLabel.setTextColor(COLOR_TEXT_MUTED);
+        tvLabel.setTextColor(COLOR_TEXT_MUTED());
         textCol.addView(tvLabel);
 
         TextView tvVal = new TextView(this);

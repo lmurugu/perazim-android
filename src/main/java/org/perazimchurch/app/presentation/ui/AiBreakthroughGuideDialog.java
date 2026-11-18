@@ -67,16 +67,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private static final int COLOR_PRIMARY_PURPLE = Color.parseColor("#681A7D");
-    private static final int COLOR_PURPLE_DARK    = PerazimTheme.COLOR_TEXT_PRIMARY;
+    private static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     private static final int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
     private static final int COLOR_PURPLE_TINT    = Color.parseColor("#F5ECF7");
-    private static final int COLOR_BORDER_GREY    = PerazimTheme.COLOR_STROKE;
+    private static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_STROKE; }
     private static final int COLOR_ACCENT_ORANGE  = Color.parseColor("#E17D2F");
     private static final int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
     private static final int COLOR_WHITE          = Color.parseColor("#FFFFFF");
-    private static final int COLOR_TEXT_DARK      = PerazimTheme.COLOR_TEXT_PRIMARY;
-    private static final int COLOR_TEXT_MUTED     = PerazimTheme.COLOR_TEXT_SECONDARY;
-    private static final int COLOR_BG_NEUTRAL     = PerazimTheme.COLOR_BG_DEEP;
+    private static int COLOR_TEXT_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
+    private static int COLOR_TEXT_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
+    private static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private final Activity activity;
     private final PerazimAiEngine aiEngine;
@@ -344,7 +344,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
         if ("online".equals(mode) && !BuildConfig.ONLINE_AI_ENABLED) {
             tvSub.setText("Online AI unavailable in this build");
-            tvSub.setTextColor(COLOR_TEXT_MUTED);
+            tvSub.setTextColor(COLOR_TEXT_MUTED());
             tvSub.setOnClickListener(null);
             return;
         }
@@ -519,7 +519,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(PerazimTheme.COLOR_SURFACE_SOLID);
         bg.setCornerRadius(dp(16));
-        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), COLOR_BORDER_GREY());
         layout.setBackground(bg);
         layout.setPadding(dp(20), dp(20), dp(20), dp(20));
 
@@ -527,20 +527,20 @@ public class AiBreakthroughGuideDialog extends Dialog {
         title.setText("🤖 Google Gemini AI Guide");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
+        title.setTextColor(COLOR_PURPLE_DARK());
         layout.addView(title);
 
         TextView body = new TextView(activity);
         body.setText("Online AI sends your current question to the church service. If the request is eligible, Gemini may process it with approved source excerpts. Keep personal, prayer and counselling details out of online questions.");
         body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        body.setTextColor(COLOR_TEXT_DARK);
+        body.setTextColor(COLOR_TEXT_DARK());
         body.setPadding(0, dp(12), 0, dp(10));
         body.setLineSpacing(dp(2), 1.1f);
         layout.addView(body);
 
         final CheckBox cbConsent = new CheckBox(activity);
         cbConsent.setText("I understand and agree");
-        cbConsent.setTextColor(COLOR_PURPLE_DARK);
+        cbConsent.setTextColor(COLOR_PURPLE_DARK());
         cbConsent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         layout.addView(cbConsent);
 
@@ -552,7 +552,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         Button btnDecline = new Button(activity);
         btnDecline.setText("Offline Guide");
         btnDecline.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnDecline.setTextColor(COLOR_TEXT_MUTED);
+        btnDecline.setTextColor(COLOR_TEXT_MUTED());
         btnDecline.setBackground(null);
         btnDecline.setOnClickListener(v -> {
             AiPreferences.setConsent(activity, false);
