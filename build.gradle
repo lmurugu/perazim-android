@@ -35,6 +35,22 @@ def localApiBaseUrl = configuredApiBaseUrl('perazimLocalApiBaseUrl', true, false
 def validationApiBaseUrl = configuredApiBaseUrl('perazimValidationApiBaseUrl', false, false)
 def pilotApiBaseUrl = configuredApiBaseUrl('perazimPilotApiBaseUrl', false, true)
 
+// Shared church content feed (website repo lmurugu/perazim-mission-church, data/).
+// The same feed drives the website and the Perazim web app. Tabs are read from
+// <base>/csv/<tab>.csv. REMOTE_SHEET_FEEDS_ENABLED follows this URL; enabling it was
+// approved by the owner on 2026-11-18. Override with -PperazimContentFeedUrl=https://...
+// or pass -PperazimContentFeedUrl= (empty) to build without remote content.
+def contentFeedBaseUrl = {
+    def value = providers.gradleProperty('perazimContentFeedUrl')
+            .orElse('https://lmurugu.github.io/perazim-mission-church/data').get().trim()
+    if (!value) return ''
+    def uri = new java.net.URI(value)
+    if (uri.scheme != 'https' || !uri.host || uri.rawUserInfo || uri.rawQuery || uri.rawFragment) {
+        throw new GradleException('perazimContentFeedUrl must be an HTTPS URL without query or credentials')
+    }
+    return value.endsWith('/') ? value.substring(0, value.length() - 1) : value
+}()
+
 android {
     namespace 'org.perazimchurch.app'
     compileSdk 34
@@ -61,11 +77,14 @@ android {
             }
         }
 
-        // Unverified external feeds and AI relays must not be packaged in any APK variant.
-        buildConfigField "boolean", "REMOTE_SHEET_FEEDS_ENABLED", "false"
+        // Content sync reads the shared church content feed (CONTENT_FEED_BASE_URL),
+        // which is reviewed through pull requests in lmurugu/perazim-mission-church.
+        // Owner approved enabling it on 2026-11-18. Generative AI relays stay off.
+        buildConfigField "boolean", "REMOTE_SHEET_FEEDS_ENABLED", groovy.json.JsonOutput.toJson(contentFeedBaseUrl as boolean)
         buildConfigField "boolean", "ONLINE_AI_ENABLED", "false"
         buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "false"
         buildConfigField "String", "API_BASE_URL", "\"\""
+        buildConfigField "String", "CONTENT_FEED_BASE_URL", groovy.json.JsonOutput.toJson(contentFeedBaseUrl)
     }
     signingConfigs {
         release {

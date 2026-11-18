@@ -6,39 +6,63 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.perazimchurch.app.BuildConfig;
+
 /**
- * Client-side remote feed URLs are deliberately absent until every feed's
- * publication status, contents and access controls have been reviewed.
+ * Where each content tab is downloaded from.
+ *
+ * By default every tab points at the shared church content feed
+ * (BuildConfig.CONTENT_FEED_BASE_URL). A URL saved in preferences overrides it.
+ * Nothing is fetched while BuildConfig.REMOTE_SHEET_FEEDS_ENABLED is false.
  */
 public final class SheetConfig {
 
     private static final String PREFS_NAME = "perazim_sheet_config";
 
     public enum Tab {
-        ANNOUNCEMENTS("sheet_url_announcements"),
-        EVENTS("sheet_url_events"),
-        HYMNS("sheet_url_hymns"),
-        RIDDLES("sheet_url_riddles"),
-        JOKES("sheet_url_jokes"),
-        SERMONS("sheet_url_sermons"),
-        VERSES("sheet_url_verses"),
-        CONFIG("sheet_url_config");
+        ANNOUNCEMENTS("sheet_url_announcements", "announcements"),
+        EVENTS("sheet_url_events", "events"),
+        HYMNS("sheet_url_hymns", "hymns"),
+        RIDDLES("sheet_url_riddles", "riddles"),
+        JOKES("sheet_url_jokes", "jokes"),
+        SERMONS("sheet_url_sermons", "sermons"),
+        VERSES("sheet_url_verses", "verses"),
+        CONFIG("sheet_url_config", "config");
 
         private final String prefKey;
-        private final String defaultUrl;
+        private final String feedName;
 
-        Tab(String prefKey) {
+        Tab(String prefKey, String feedName) {
             this.prefKey = prefKey;
-            this.defaultUrl = "";
+            this.feedName = feedName;
         }
 
         public String getPrefKey() {
             return prefKey;
         }
 
-        public String getDefaultUrl() {
-            return defaultUrl;
+        /** Tab name in the shared content feed, e.g. "hymns" for csv/hymns.csv. */
+        public String getFeedName() {
+            return feedName;
         }
+
+        /**
+         * The shared content feed URL for this tab, or "" when no feed is configured.
+         * The feed is the website repo's data/ folder, which the website and the
+         * Perazim web app also read, so one edit reaches all three.
+         */
+        public String getDefaultUrl() {
+            return defaultUrlFor(BuildConfig.CONTENT_FEED_BASE_URL, feedName);
+        }
+    }
+
+    /** Builds base + "/csv/" + tab + ".csv"; returns "" for a blank base. */
+    @NonNull
+    static String defaultUrlFor(@Nullable String baseUrl, @NonNull String feedName) {
+        if (baseUrl == null || baseUrl.trim().isEmpty()) return "";
+        String base = baseUrl.trim();
+        while (base.endsWith("/")) base = base.substring(0, base.length() - 1);
+        return base + "/csv/" + feedName + ".csv";
     }
 
     private SheetConfig() {}
@@ -54,7 +78,7 @@ public final class SheetConfig {
      */
     @NonNull
     public static String getTabUrl(@NonNull Context context, @NonNull Tab tab) {
-        if (!org.perazimchurch.app.BuildConfig.REMOTE_SHEET_FEEDS_ENABLED) return "";
+        if (!BuildConfig.REMOTE_SHEET_FEEDS_ENABLED) return "";
         String url = getPrefs(context).getString(tab.getPrefKey(), "");
         if (url == null || url.trim().isEmpty()) {
             url = tab.getDefaultUrl();

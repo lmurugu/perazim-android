@@ -2,7 +2,9 @@
 # Format: https://docs.google.com/spreadsheets/d/e/<SPREADSHEET_ID>/pub?gid=<TAB_GID>&single=true&output=csv
 #
 # Levi sends the 8 URLs in chat and Antigravity enters them.
-# If these properties are empty, the app gracefully falls back to local pre-seeded database content.
+# If these properties are empty, each tab uses the shared church content feed
+# (BuildConfig.CONTENT_FEED_BASE_URL + "/csv/<tab>.csv"); see docs/CONTENT_GUIDE.md.
+# If the feed cannot be reached, the app keeps its local pre-seeded content.
 
 sheet_url_announcements=
 sheet_url_events=
