@@ -6,7 +6,7 @@ Status: Draft (not approved). Version 0.1. Last reviewed: 2026-11-18.
 By creating an account or using the app you agree to these terms and to the Privacy Policy and Community Guidelines.
 
 ## 2. Who may use the app
-[PENDING OWNER INPUT: minimum age, and how under-age users are handled.] You must provide accurate information. You may have one account.
+You must be 18 or older to create an account. Reading content in the app does not require an account, and anyone may do so. By creating an account you confirm that you are 18 or older. You must give accurate information and may have one account. If we find that an account belongs to a person under 18, we will close it.
 
 ## 3. Your account
 Keep your PIN private. You are responsible for activity on your account. Tell us promptly if you suspect misuse. We may suspend an account that breaches these terms.

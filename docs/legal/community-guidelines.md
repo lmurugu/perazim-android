@@ -17,7 +17,7 @@ Perazim is a church community. These guidelines apply to posts, comments, prayer
 Share prayer requests and testimonies only with the audience you intend. Anonymous posts are still visible to the service and to moderators.
 
 ## Children
-[PENDING OWNER INPUT: rules for direct messages with minors and the parental-consent process.]
+Only adults aged 18 or over may hold an account, post, comment or send messages. Accounts that belong to a person under 18 are closed. If you see content that puts a child at risk, report it at once. We will remove it and report it to the authorities as the law requires.
 
 ## Reporting and blocking
 Use **Report** on any post, comment or message, and **Block** on any user. Reports are reviewed by church moderators. We aim to act on reports within 24 hours and to tell you the outcome.

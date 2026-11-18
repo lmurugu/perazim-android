@@ -48,7 +48,7 @@ You can, from Settings → Privacy & data:
 You can also make a request through the public web form linked from the app. We respond within the time set by law. You may complain to the Office of the Data Protection Commissioner, Kenya.
 
 ## 11. Children
-[PENDING OWNER INPUT: minimum age and parental-consent rule.] Reading the Bible, hymns and sermons does not require an account.
+You must be 18 or older to create an account. Under Article 260 of the Constitution of Kenya, a child is a person under 18. We do not create accounts for children, so we do not collect children's personal data through the app. If we learn that an account belongs to a person under 18, we close it and delete its personal data. A parent or guardian who believes a child has given us information can contact us, and we will delete it. Reading the Bible, hymns and sermons does not require an account and does not involve personal data.
 
 ## 12. Security
 We use encryption in transit, hashed credentials, role-based access checks on the server, and an encrypted session-token store on the device. No system is perfectly secure. Report a suspected security problem through the process in `SECURITY.md`.
