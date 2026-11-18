@@ -6,30 +6,32 @@ import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
 /**
- * Sizes the app like the mockups on every phone.
+ * Sizes the app the same way on every phone, and lets the person adjust it.
  *
- * <p>The mockups are drawn for a phone about 390dp wide. Phones set to a small "display size" report far
- * more dp (one test phone reports about 600dp), so every card, button and word comes out small and the
- * screens look half empty. On phones only, this scales the activity's density so the screen is
- * {@link #MOCKUP_WIDTH_DP} wide: the layout then fills the screen in the same proportions as the mockups.
- * Tablets and phones already at or below the mockup width are left exactly as they are.
+ * <p>Every phone lays the screen out {@link #BASE_WIDTH_DP} dp wide, scaled by the person's chosen app size
+ * (see {@link DisplaySettings}). A narrow phone therefore gets the same proportions as a wide one, and nothing
+ * stretches or shrinks with the phone's own display-size setting. The text size is set separately. Tablets keep the
+ * system's density, and the text size still applies.
  */
 public final class UiScale {
 
-    /** Width the mockups were drawn at (390) plus a hair, in dp. */
-    public static final float MOCKUP_WIDTH_DP = 392f;
+    /** Width the layout is designed for at the standard app size, in dp. A notch smaller than the 392dp mockups. */
+    public static final float BASE_WIDTH_DP = 420f;
 
-    /** Anything physically wider than this (inches, short side) is treated as a tablet and left alone. */
+    /** Anything physically wider than this (inches, short side) is treated as a tablet and keeps its density. */
     private static final float MAX_PHONE_WIDTH_INCHES = 3.7f;
 
     private UiScale() {
     }
 
-    /**
-     * The configuration override for an activity created on {@code base}, or null to keep the system's.
-     * Use from {@code attachBaseContext}: {@code applyOverrideConfiguration(UiScale.override(base))}.
-     */
-    public static Configuration override(Context base) {
+    /** Wraps a base context so the activity is laid out at the chosen size. Use from {@code attachBaseContext}. */
+    public static Context wrap(Context base) {
+        Configuration c = configuration(base);
+        return (base == null || c == null) ? base : base.createConfigurationContext(c);
+    }
+
+    /** The configuration override for the chosen sizes, or null when nothing changes. */
+    public static Configuration configuration(Context base) {
         if (base == null) {
             return null;
         }
@@ -40,22 +42,31 @@ public final class UiScale {
         if (shortPx <= 0 || dm.density <= 0f) {
             return null;
         }
+        Context app = base.getApplicationContext() != null ? base.getApplicationContext() : base;
+        Configuration c = new Configuration();
+        boolean changed = false;
+
+        // Text size: 0 means "undefined", which keeps the phone's own text setting.
+        c.fontScale = DisplaySettings.fontScale(DisplaySettings.textSize(app));
+        if (c.fontScale != 0f) {
+            changed = true;
+        }
+
         float shortDp = shortPx / dm.density;
         float xdpi = dm.xdpi;
         float inches = (xdpi > 100f && xdpi < 1200f) ? shortPx / xdpi : shortDp / 160f;
-        if (inches > MAX_PHONE_WIDTH_INCHES || shortDp <= MOCKUP_WIDTH_DP + 8f) {
-            return null;
+        if (inches <= MAX_PHONE_WIDTH_INCHES) {
+            float width = BASE_WIDTH_DP / DisplaySettings.appScale(DisplaySettings.appSize(app));
+            int dpi = Math.round(shortPx * 160f / width);
+            boolean portrait = dm.widthPixels <= dm.heightPixels;
+            int shortSide = Math.round(shortPx * 160f / dpi);
+            int longSide = Math.round(longPx * 160f / dpi);
+            c.densityDpi = dpi;
+            c.screenWidthDp = portrait ? shortSide : longSide;
+            c.screenHeightDp = portrait ? longSide : shortSide;
+            c.smallestScreenWidthDp = shortSide;
+            changed = true;
         }
-        int dpi = Math.round(shortPx * 160f / MOCKUP_WIDTH_DP);
-        Configuration c = new Configuration();
-        c.fontScale = 0f; // undefined: keep the person's own text size setting
-        c.densityDpi = dpi;
-        boolean portrait = dm.widthPixels <= dm.heightPixels;
-        int shortSide = Math.round(shortPx * 160f / dpi);
-        int longSide = Math.round(longPx * 160f / dpi);
-        c.screenWidthDp = portrait ? shortSide : longSide;
-        c.screenHeightDp = portrait ? longSide : shortSide;
-        c.smallestScreenWidthDp = shortSide;
-        return c;
+        return changed ? c : null;
     }
 }
