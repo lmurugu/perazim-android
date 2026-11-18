@@ -64,6 +64,7 @@ import org.perazimchurch.app.presentation.viewmodel.SermonsViewModel;
 import org.perazimchurch.app.presentation.viewmodel.ViewModelFactory;
 import org.perazimchurch.app.presentation.viewmodel.WorshipViewModel;
 import org.perazimchurch.app.sync.SheetSyncManager;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -220,20 +221,31 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tabViews[4] = buildGivingScreen();
         tabViews[5] = buildProfileScreen();
         for (int i = 0; i < tabViews.length; i++) {
+            // One glow behind the whole screen (header included), and room under the floating nav bar.
+            tabViews[i].setBackground(null);
+            tabViews[i].setClipToPadding(false);
+            tabViews[i].setPadding(tabViews[i].getPaddingLeft(), tabViews[i].getPaddingTop(),
+                    tabViews[i].getPaddingRight(), tabViews[i].getPaddingBottom() + dp(104));
             tabContainer.addView(tabViews[i]);
             tabViews[i].setVisibility(i == 0 ? View.VISIBLE : View.GONE);
         }
         rootLayout.addView(tabContainer);
-
-        // 3. Persistent Mini-Player (Subsplash pattern)
-        View miniPlayer = createMiniPlayer();
-        rootLayout.addView(miniPlayer);
-
-        // 4. Bottom Navigation Bar
-        View bottomBar = createBottomTabBar();
-        rootLayout.addView(bottomBar);
-
         rootWindow.addView(rootLayout);
+
+        // 3 + 4. Mini-player and the floating glass nav bar sit over the content, as in the mockups.
+        LinearLayout bottomDock = new LinearLayout(this);
+        bottomDock.setOrientation(LinearLayout.VERTICAL);
+        bottomDock.setClipChildren(false);
+        bottomDock.setClipToPadding(false);
+        View miniPlayer = createMiniPlayer();
+        LinearLayout.LayoutParams lpMini = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpMini.setMargins(dp(16), 0, dp(16), dp(8));
+        bottomDock.addView(miniPlayer, lpMini);
+        View bottomBar = createBottomTabBar();
+        bottomDock.addView(bottomBar);
+        rootWindow.addView(bottomDock, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 
         // 5. Illustrated Quiet-Dark Splash Overlay
         splashContainer = createSplashScreen();
@@ -411,55 +423,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private View createTopAppBar() {
-        LinearLayout header = new LinearLayout(this);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-        header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setBackground(PerazimTheme.createTopBarGradient(dp(1)));
-        header.setPadding(dp(16), dp(10), dp(16), dp(10));
-
-        // Official Church Logo
-        ImageView logo = new ImageView(this);
-        logo.setImageResource(R.drawable.ic_perazim_logo);
-        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(28), dp(28));
-        lpLogo.setMargins(0, 0, dp(10), 0);
-        logo.setLayoutParams(lpLogo);
-        header.addView(logo);
-
-        // Wordmark "Perazim"
-        TextView wordmark = new TextView(this);
-        wordmark.setText("Perazim");
-        wordmark.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        wordmark.setTypeface(Typeface.DEFAULT_BOLD);
-        wordmark.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        wordmark.setLetterSpacing(0.04f);
-        header.addView(wordmark);
-
-        View spacer = new View(this);
-        LinearLayout.LayoutParams lpSpacer = new LinearLayout.LayoutParams(0, 0, 1.0f);
-        spacer.setLayoutParams(lpSpacer);
-        header.addView(spacer);
-
-        // Light / dark switch, available on every screen because it lives in the top bar
-        TextView themeToggle = new TextView(this);
-        themeToggle.setText(PerazimTheme.isLight() ? "🌙" : "☀️");
-        themeToggle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        themeToggle.setGravity(Gravity.CENTER);
-        themeToggle.setContentDescription(PerazimTheme.isLight() ? "Switch to dark mode" : "Switch to light mode");
-        themeToggle.setLayoutParams(new LinearLayout.LayoutParams(dp(40), dp(40)));
-        themeToggle.setOnClickListener(v -> org.perazimchurch.app.ui.components.ThemeSwitcher.toggle(this));
-        header.addView(themeToggle);
-
-        // Profile ("Me") moved from the bottom bar to the header, so Giving can have its own tab.
-        ImageView meButton = new ImageView(this);
-        meButton.setImageResource(NavigationContract.TAB_ICON_RES_ME);
-        meButton.setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
-        meButton.setPadding(dp(8), dp(8), dp(8), dp(8));
-        meButton.setContentDescription("My profile");
-        meButton.setLayoutParams(new LinearLayout.LayoutParams(dp(40), dp(40)));
-        meButton.setOnClickListener(v -> switchTab(NavigationContract.TAB_ID_PROFILE));
-        header.addView(meButton);
-
-        return header;
+        // Mockup header: logo and "Perazim", then the light/dark switch and the glass profile button.
+        return GlassKit.header(this,
+                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.toggle(this),
+                v -> switchTab(NavigationContract.TAB_ID_PROFILE));
     }
 
     private void persistGamification() {
@@ -600,22 +567,30 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout bottomNav = new LinearLayout(this);
         LinearLayout.LayoutParams lpNav = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(64));
-        lpNav.setMargins(dp(16), dp(4), dp(16), dp(14));
+        lpNav.setMargins(dp(16), dp(28), dp(16), dp(18));
         bottomNav.setLayoutParams(lpNav);
         bottomNav.setClipChildren(false);
         bottomNav.setClipToPadding(false);
         bottomNav.setOrientation(LinearLayout.HORIZONTAL);
         bottomNav.setGravity(Gravity.CENTER_VERTICAL);
-        bottomNav.setPadding(0, dp(4), 0, dp(4));
 
-        bottomNav.setBackground(PerazimTheme.createGlassPill(dp(32), dp(1)));
+        // Frosted bar: content scrolling underneath is washed out, as a backdrop blur would.
+        GradientDrawable navBg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                PerazimTheme.isLight()
+                        ? new int[]{Color.parseColor("#EBFFFFFF"), Color.parseColor("#DEFFFFFF")}
+                        : new int[]{Color.parseColor("#E83A1A45"), Color.parseColor("#F02A0F33")});
+        navBg.setCornerRadius(dp(32));
+        navBg.setStroke(Math.max(1, dp(1)), Color.parseColor(PerazimTheme.isLight() ? "#F2FFFFFF" : "#2EFFFFFF"));
+        bottomNav.setBackground(navBg);
+        bottomNav.setElevation(dp(10));
+        GlassKit.keep(bottomNav);
 
         final int[] iconResIds = {
-                NavigationContract.TAB_ICON_RES_HOME,
-                NavigationContract.TAB_ICON_RES_SERMONS,
-                NavigationContract.TAB_ICON_RES_WORSHIP,
-                NavigationContract.TAB_ICON_RES_PRAYER,
-                org.perazimchurch.app.R.drawable.ic_give
+                R.drawable.gl_home,
+                R.drawable.gl_mic,
+                R.drawable.gl_music,
+                R.drawable.gl_people,
+                R.drawable.gl_give
         };
         final String[] labels = {
                 NavigationContract.TAB_TITLE_HOME,
@@ -632,36 +607,42 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             LinearLayout tab = new LinearLayout(this);
             tab.setOrientation(LinearLayout.VERTICAL);
             tab.setGravity(Gravity.CENTER);
+            tab.setClipChildren(false);
+            tab.setClipToPadding(false);
             LinearLayout.LayoutParams lpTab = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
             tab.setLayoutParams(lpTab);
-            tab.setPadding(dp(4), dp(4), dp(4), dp(4));
 
             ImageView ivIcon = new ImageView(this);
-            LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(22), dp(22));
-            ivIcon.setLayoutParams(lpIcon);
             ivIcon.setImageResource(iconResIds[i]);
             if (i == 4) {
-                // Give: raised glowing purple orb in the middle of the bar
-                ivIcon.setBackground(PerazimTheme.createGiveOrb());
-                ivIcon.setPadding(dp(14), dp(14), dp(14), dp(14));
+                // Give: the raised orange orb in the middle of the bar
+                GradientDrawable orb = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                        new int[]{GlassKit.ORANGE_TOP, GlassKit.ORANGE_BOTTOM});
+                orb.setShape(GradientDrawable.OVAL);
+                orb.setStroke(Math.max(1, dp(1)), Color.parseColor("#66FFFFFF"));
+                ivIcon.setBackground(orb);
+                ivIcon.setPadding(dp(16), dp(16), dp(16), dp(16));
                 LinearLayout.LayoutParams lpOrb = new LinearLayout.LayoutParams(dp(56), dp(56));
                 lpOrb.setMargins(0, -dp(30), 0, 0);
                 ivIcon.setLayoutParams(lpOrb);
-                ivIcon.setElevation(dp(8));
+                GlassKit.glow(ivIcon, GlassKit.ORANGE, 12);
+                ivIcon.setContentDescription("Give");
+                tab.addView(ivIcon);
+            } else {
+                ivIcon.setLayoutParams(new LinearLayout.LayoutParams(dp(20), dp(20)));
+                TextView tvLabel = new TextView(this);
+                tvLabel.setText(labels[i]);
+                tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+                tvLabel.setGravity(Gravity.CENTER);
+                tvLabel.setIncludeFontPadding(false);
+                tvLabel.setPadding(0, dp(3), 0, 0);
+                tab.addView(ivIcon);
+                tab.addView(tvLabel);
+                navTabLabels[i] = tvLabel;
             }
-
-            TextView tvLabel = new TextView(this);
-            tvLabel.setText(labels[i]);
-            tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            tvLabel.setGravity(Gravity.CENTER);
-            tvLabel.setPadding(0, dp(2), 0, 0);
-
-            tab.addView(ivIcon);
-            tab.addView(tvLabel);
             tab.setOnClickListener(v -> switchTab(index));
 
             navTabButtons[i] = tab;
-            navTabLabels[i] = tvLabel;
             navTabIcons[i] = ivIcon;
 
             bottomNav.addView(tab);
@@ -688,33 +669,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void refreshTabStyles() {
+        int on = GlassKit.light() ? Color.parseColor("#3D1749") : Color.WHITE;
+        int off = GlassKit.muted();
         for (int i = 0; i < 5; i++) {
             boolean isSelected = (i == currentTabIndex);
-            if (isSelected) {
-                if (navTabLabels[i] != null) {
-                    navTabLabels[i].setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-                    navTabLabels[i].setTypeface(Typeface.DEFAULT_BOLD);
-                }
-                if (navTabIcons[i] != null) {
-                    navTabIcons[i].setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
-                }
-                if (navTabButtons[i] != null) {
-                    navTabButtons[i].setBackground(null);
-                }
-            } else {
-                if (navTabLabels[i] != null) {
-                    navTabLabels[i].setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
-                    navTabLabels[i].setTypeface(Typeface.DEFAULT);
-                }
-                if (navTabIcons[i] != null) {
-                    navTabIcons[i].setColorFilter(PerazimTheme.COLOR_PURPLE_MUTED, PorterDuff.Mode.SRC_IN);
-                }
-                if (navTabButtons[i] != null) {
-                    navTabButtons[i].setBackground(null);
-                }
+            if (navTabLabels[i] != null) {
+                navTabLabels[i].setTextColor(isSelected ? on : off);
+                navTabLabels[i].setTypeface(isSelected ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
             }
-            if (i == 4 && navTabIcons[i] != null) {
-                navTabIcons[i].setColorFilter(0xFFFFFFFF, PorterDuff.Mode.SRC_IN);
+            if (navTabIcons[i] != null) {
+                navTabIcons[i].setColorFilter(i == 4 ? Color.WHITE : (isSelected ? on : off), PorterDuff.Mode.SRC_IN);
+            }
+            if (navTabButtons[i] != null) {
+                navTabButtons[i].setBackground(null);
             }
         }
     }
@@ -2244,67 +2211,82 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private ScrollView buildGivingScreen() {
+        // Mockup board "Give (dark glass)"
         ScrollView scroll = new ScrollView(this);
         scroll.setBackground(PerazimTheme.createBackgroundGradient());
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
-        col.setPadding(dp(16), dp(16), dp(16), dp(32));
+        col.setPadding(0, dp(8), 0, dp(16));
 
-        TextView title = new TextView(this);
-        title.setText("Give");
-        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        col.addView(title);
+        LinearLayout heading = new LinearLayout(this);
+        heading.setOrientation(LinearLayout.VERTICAL);
+        heading.setPadding(dp(20), 0, dp(20), 0);
+        heading.addView(GlassKit.text(this, "Give", 26, true, GlassKit.text()));
+        heading.addView(GlassKit.text(this, "Your giving supports the work of Perazim Mission Church.", 13, false,
+                GlassKit.muted()), GlassKit.matchWrap(this, 3));
+        col.addView(GlassKit.keep(heading));
 
-        TextView intro = new TextView(this);
-        intro.setText("Your giving supports the work of Perazim Mission Church.");
-        intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        intro.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        intro.setPadding(0, dp(4), 0, dp(16));
-        col.addView(intro);
+        LinearLayout card = GlassKit.card(this, 28, 20);
+        card.addView(GlassKit.label(this, "M-PESA PAYBILL"));
+        TextView paybill = GlassKit.text(this, ChurchConfig.MPESA_PAYBILL, 40, true, GlassKit.text());
+        paybill.setLetterSpacing(0.04f);
+        card.addView(paybill, GlassKit.matchWrap(this, 6));
 
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(16), dp(16), dp(16), dp(16));
-        GradientDrawable cardBg = new GradientDrawable();
-        cardBg.setColor(PerazimTheme.COLOR_SURFACE);
-        cardBg.setCornerRadius(dp(14));
-        card.setBackground(cardBg);
-
-        TextView label = new TextView(this);
-        label.setText("M-Pesa Paybill");
-        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        label.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        card.addView(label);
-
-        TextView paybill = new TextView(this);
-        paybill.setText(ChurchConfig.MPESA_PAYBILL);
-        paybill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        paybill.setTypeface(Typeface.DEFAULT_BOLD);
-        paybill.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        paybill.setPadding(0, dp(4), 0, dp(12));
-        card.addView(paybill);
-
-        Button give = new Button(this);
-        give.setText("Give now");
-        give.setAllCaps(false);
-        give.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        give.setTypeface(Typeface.DEFAULT_BOLD);
-        give.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(14)));
-        give.setMinHeight(dp(56));
+        TextView give = GlassKit.orangeButton(this, "GIVE NOW", 14);
         give.setOnClickListener(v -> showGivingDialog());
-        card.addView(give, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        card.addView(give, GlassKit.matchHeight(this, 50, 18));
 
-        col.addView(card);
+        TextView copy = GlassKit.glassButton(this, "COPY PAYBILL NUMBER", 12);
+        copy.setOnClickListener(v -> {
+            android.content.ClipboardManager cm =
+                    (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if (cm != null) {
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("M-Pesa Paybill", ChurchConfig.MPESA_PAYBILL));
+                Toast.makeText(this, "Paybill " + ChurchConfig.MPESA_PAYBILL + " copied", Toast.LENGTH_SHORT).show();
+            }
+        });
+        card.addView(copy, GlassKit.matchHeight(this, 44, 10));
+        LinearLayout.LayoutParams lpCard = GlassKit.matchWrap(this, 20);
+        lpCard.leftMargin = dp(16);
+        lpCard.rightMargin = dp(16);
+        col.addView(card, lpCard);
 
-        TextView note = new TextView(this);
-        note.setText("Giving is completed through M-Pesa, outside this app. The app does not store payment details.");
-        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        note.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        note.setPadding(0, dp(16), 0, 0);
-        col.addView(note);
+        LinearLayout how = GlassKit.card(this, 26, 16);
+        how.addView(GlassKit.label(this, "HOW TO GIVE"));
+        String[] steps = {
+                "Open M-Pesa on your phone",
+                "Choose Lipa na M-Pesa, then Paybill",
+                "Enter business number " + ChurchConfig.MPESA_PAYBILL
+                        + ", add your account details and confirm with your M-Pesa PIN"
+        };
+        for (int i = 0; i < steps.length; i++) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            TextView num = GlassKit.text(this, String.valueOf(i + 1), 12, true, Color.WHITE);
+            num.setGravity(Gravity.CENTER);
+            num.setBackground(GlassKit.purple(this, 13));
+            row.addView(num, new LinearLayout.LayoutParams(dp(26), dp(26)));
+            TextView tv = GlassKit.text(this, steps[i], 13, false, GlassKit.text());
+            tv.setLineSpacing(0f, 1.3f);
+            LinearLayout.LayoutParams lpTv = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            lpTv.leftMargin = dp(12);
+            row.addView(tv, lpTv);
+            how.addView(GlassKit.keep(row), GlassKit.matchWrap(this, 12));
+        }
+        LinearLayout.LayoutParams lpHow = GlassKit.matchWrap(this, 20);
+        lpHow.leftMargin = dp(16);
+        lpHow.rightMargin = dp(16);
+        col.addView(how, lpHow);
+
+        TextView note = GlassKit.text(this,
+                "Giving is completed through M-Pesa, outside this app. The app does not store payment details.",
+                11, false, GlassKit.muted());
+        note.setLineSpacing(0f, 1.35f);
+        LinearLayout.LayoutParams lpNote = GlassKit.matchWrap(this, 18);
+        lpNote.leftMargin = dp(24);
+        lpNote.rightMargin = dp(24);
+        col.addView(note, lpNote);
 
         scroll.addView(col);
         return scroll;
@@ -3185,6 +3167,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         splash.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         splash.setBackgroundColor(Color.parseColor("#140319"));
+        // Swallow taps while the splash shows, so nothing behind it (such as the light/dark switch) gets pressed.
+        splash.setClickable(true);
+        splash.setFocusable(true);
 
         Bitmap splashBmp = loadAssetBitmap("backgrounds/bg_splash_breakthrough.png", 720);
         if (splashBmp != null) {

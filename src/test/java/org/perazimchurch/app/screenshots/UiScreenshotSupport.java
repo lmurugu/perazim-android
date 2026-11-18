@@ -88,7 +88,46 @@ final class UiScreenshotSupport {
                         new File(outDir, name + "_full.png"));
             }
         }
+        captureDailyReading(activity, mode, outDir);
         controller.pause().stop().destroy();
+    }
+
+    /** The Daily reading screen opened from Home's "Pick up where you left off". */
+    private static void captureDailyReading(MainActivity activity, String mode, File outDir) {
+        try {
+            switchTab(activity, 0);
+            Field binderField = MainActivity.class.getDeclaredField("homeUiBinder");
+            binderField.setAccessible(true);
+            Object binder = binderField.get(activity);
+            Method show = binder.getClass().getDeclaredMethod("showDailyReading");
+            show.setAccessible(true);
+            show.invoke(binder);
+            idle();
+            android.app.Dialog dialog = org.robolectric.shadows.ShadowDialog.getLatestDialog();
+            if (dialog != null && dialog.getWindow() != null) {
+                View root = dialog.getWindow().getDecorView();
+                for (int pass = 0; pass < 2; pass++) {
+                    root.measure(View.MeasureSpec.makeMeasureSpec(WIDTH_PX, View.MeasureSpec.EXACTLY),
+                            View.MeasureSpec.makeMeasureSpec(HEIGHT_PX, View.MeasureSpec.EXACTLY));
+                    root.layout(0, 0, WIDTH_PX, HEIGHT_PX);
+                    org.perazimchurch.app.ui.theme.GlassPolish.apply(root);
+                }
+                Bitmap bitmap = Bitmap.createBitmap(WIDTH_PX, HEIGHT_PX, Bitmap.Config.ARGB_8888);
+                root.draw(new Canvas(bitmap));
+                writePng(bitmap, new File(outDir, mode + "_6_reading.png"));
+                dialog.dismiss();
+                idle();
+            }
+        } catch (Exception e) {
+            System.err.println("Daily reading screenshot skipped: " + e);
+        }
+    }
+
+    private static void switchTab(MainActivity activity, int index) throws Exception {
+        Method m = MainActivity.class.getDeclaredMethod("switchTab", int.class);
+        m.setAccessible(true);
+        m.invoke(activity, index);
+        idle();
     }
 
     private static void idle() {

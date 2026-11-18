@@ -90,7 +90,7 @@ public final class GlassPolish {
     }
 
     private static void walk(View view, boolean glowAbove) {
-        if (view.getVisibility() == View.GONE) {
+        if (view.getVisibility() == View.GONE || GlassKit.isKept(view)) {
             return;
         }
         boolean glowHere = glowAbove || view.getBackground() instanceof PerazimTheme.GlowBackground;

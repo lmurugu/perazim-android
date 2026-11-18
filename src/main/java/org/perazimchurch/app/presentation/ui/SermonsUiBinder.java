@@ -180,10 +180,10 @@ public class SermonsUiBinder {
         tvSub.setPadding(0, dp(2), 0, 0);
         headerRow.addView(tvSub);
 
-        Button localBibleAudio = new Button(activity);
-        localBibleAudio.setText("Bible audio on this phone");
+        TextView localBibleAudio = org.perazimchurch.app.ui.theme.GlassKit.glassButton(activity, "Bible audio on this phone", 12);
+        localBibleAudio.setPadding(dp(16), 0, dp(16), 0);
         localBibleAudio.setOnClickListener(v -> activity.startActivity(new Intent(activity, LocalBibleAudioActivity.class)));
-        LinearLayout.LayoutParams localAudioLp = new LinearLayout.LayoutParams(-2, -2);
+        LinearLayout.LayoutParams localAudioLp = new LinearLayout.LayoutParams(-2, dp(40));
         localAudioLp.topMargin = dp(8);
         headerRow.addView(localBibleAudio, localAudioLp);
 
