@@ -23,7 +23,7 @@ This is a summary of the owner's "Portfolio-Grade Remediation & Launch Plan" (20
 - **D3:** Push and merge of `phase-B-community` into `main`.
 - **D4:** Bible texts. Plan recommends removing NIV, ESV and NKJV; confirm Swahili Union Version rights.
 - **Church name:** "Perazim Mission Church" or "PMCI".
-- **Minimum age** for accounts (plan recommends 13+ with parental consent for 13–17).
+- **Minimum age** for accounts: **decided, 18 and over (owner approved 2026-11-18).** Enforced by the server (migration 0019) and by the app at sign-up. Reading content without an account stays open to everyone.
 - **Legal approval** of every published legal document.
 
 ## Open toolchain items (plan 2.1)
