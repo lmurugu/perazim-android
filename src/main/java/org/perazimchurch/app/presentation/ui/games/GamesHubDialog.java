@@ -111,7 +111,7 @@ public final class GamesHubDialog extends Dialog {
     private void hub() {
         if (!activeOwner()) return;
         round = null;
-        screen("Bible Games", "Learn, remember and enjoy. All three games work without internet.", false);
+        screen("Bible Games", "Learn, remember and enjoy. All four games work without internet.", false);
         gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
         gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
