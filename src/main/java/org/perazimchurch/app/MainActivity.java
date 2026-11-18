@@ -439,6 +439,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         spacer.setLayoutParams(lpSpacer);
         header.addView(spacer);
 
+        // Light / dark switch, available on every screen because it lives in the top bar
+        TextView themeToggle = new TextView(this);
+        themeToggle.setText(PerazimTheme.isLight() ? "🌙" : "☀️");
+        themeToggle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        themeToggle.setGravity(Gravity.CENTER);
+        themeToggle.setContentDescription(PerazimTheme.isLight() ? "Switch to dark mode" : "Switch to light mode");
+        themeToggle.setLayoutParams(new LinearLayout.LayoutParams(dp(40), dp(40)));
+        themeToggle.setOnClickListener(v -> org.perazimchurch.app.ui.components.ThemeSwitcher.toggle(this));
+        header.addView(themeToggle);
+
         // Profile ("Me") moved from the bottom bar to the header, so Giving can have its own tab.
         ImageView meButton = new ImageView(this);
         meButton.setImageResource(NavigationContract.TAB_ICON_RES_ME);

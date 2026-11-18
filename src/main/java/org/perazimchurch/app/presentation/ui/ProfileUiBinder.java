@@ -585,6 +585,18 @@ public class ProfileUiBinder {
         ));
         card.addView(createHorizontalDivider());
 
+        card.addView(createOptionRow(
+                org.perazimchurch.app.R.drawable.ic_christian_church,
+                "Appearance",
+                PerazimTheme.isLight() ? "Light mode · tap for dark purple glass" : "Dark purple glass · tap for light mode",
+                v -> {
+                    if (context instanceof Activity) {
+                        org.perazimchurch.app.ui.components.ThemeSwitcher.toggle((Activity) context);
+                    }
+                }
+        ));
+        card.addView(createHorizontalDivider());
+
         // Sound, haptics and celebrations settings
         card.addView(createOptionRow(
                 org.perazimchurch.app.R.drawable.ic_christian_praying_hands,

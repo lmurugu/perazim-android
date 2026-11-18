@@ -21,65 +21,113 @@ public final class PerazimTheme {
 
     // Purple Family
     /** App Background Canvas (#2A0F33) */
-    public static final int COLOR_BG_DEEP       = Color.parseColor("#2A0F33");
+    public static int COLOR_BG_DEEP       = Color.parseColor("#2A0F33");
     /** Opaque fallbacks for dialogs, popups and full-screen containers where glass would show through */
-    public static final int COLOR_SURFACE_SOLID   = Color.parseColor("#3D1749");
-    public static final int COLOR_SURFACE_2_SOLID = Color.parseColor("#4F1E5C");
+    public static int COLOR_SURFACE_SOLID   = Color.parseColor("#3D1749");
+    public static int COLOR_SURFACE_2_SOLID = Color.parseColor("#4F1E5C");
     /** Cards and Content Containers (#3D1749) */
-    public static final int COLOR_SURFACE       = Color.parseColor("#26FFFFFF");
+    public static int COLOR_SURFACE       = Color.parseColor("#26FFFFFF");
     /** Elevated Surfaces, Text Inputs, Search Bars (#4F1E5C) */
-    public static final int COLOR_SURFACE_2     = Color.parseColor("#33FFFFFF");
+    public static int COLOR_SURFACE_2     = Color.parseColor("#33FFFFFF");
     /** Inactive Nav, Secondary Icons, Outline Borders (#8B5A9A) */
-    public static final int COLOR_PURPLE_MUTED  = Color.parseColor("#8B5A9A");
+    public static int COLOR_PURPLE_MUTED  = Color.parseColor("#8B5A9A");
     /** Active Nav, Links, Selected Chips (#681A7D) */
-    public static final int COLOR_PURPLE_BRAND  = Color.parseColor("#681A7D");
+    public static int COLOR_PURPLE_BRAND  = Color.parseColor("#681A7D");
     /** Soft Labels and Supporting Text (#A67BB3) */
-    public static final int COLOR_PURPLE_SOFT   = Color.parseColor("#A67BB3");
+    public static int COLOR_PURPLE_SOFT   = Color.parseColor("#A67BB3");
     /** Selection Wash with 20% alpha */
-    public static final int COLOR_PURPLE_GHOST  = Color.parseColor("#33681A7D");
+    public static int COLOR_PURPLE_GHOST  = Color.parseColor("#33681A7D");
 
     // Orange Family
     /** ONLY the Single Primary CTA on a screen (#E17D2F) */
-    public static final int COLOR_ORANGE_BRAND  = Color.parseColor("#E17D2F");
+    public static int COLOR_ORANGE_BRAND  = Color.parseColor("#E17D2F");
     /** Rare Secondary Accent (#C4894F) */
-    public static final int COLOR_ORANGE_MUTED  = Color.parseColor("#C4894F");
+    public static int COLOR_ORANGE_MUTED  = Color.parseColor("#C4894F");
     /** Pressed / Focus on Orange CTA (#E8A86A) */
-    public static final int COLOR_ORANGE_SOFT   = Color.parseColor("#E8A86A");
+    public static int COLOR_ORANGE_SOFT   = Color.parseColor("#E8A86A");
     /** Orange Selection Wash with 24% alpha */
-    public static final int COLOR_ORANGE_GHOST  = Color.parseColor("#3DE17D2F");
+    public static int COLOR_ORANGE_GHOST  = Color.parseColor("#3DE17D2F");
 
     // Neutrals
     /** Primary High-Contrast Text on Dark Surfaces (#F5F0F7) */
-    public static final int COLOR_TEXT_PRIMARY   = Color.parseColor("#F5F0F7");
+    public static int COLOR_TEXT_PRIMARY   = Color.parseColor("#F5F0F7");
     /** Secondary Subtitle / Metadata Text (#B9A8C0) */
-    public static final int COLOR_TEXT_SECONDARY = Color.parseColor("#B9A8C0");
+    public static int COLOR_TEXT_SECONDARY = Color.parseColor("#B9A8C0");
     /** Disabled Text and Placeholders (#6E5C78) */
-    public static final int COLOR_TEXT_DISABLED  = Color.parseColor("#6E5C78");
+    public static int COLOR_TEXT_DISABLED  = Color.parseColor("#6E5C78");
     /** Card Borders and Structural Dividers (#4A3554) */
-    public static final int COLOR_STROKE         = Color.parseColor("#33FFFFFF");
+    public static int COLOR_STROKE         = Color.parseColor("#33FFFFFF");
 
     // =========================================================================
     // LEGACY ALIASES (Backwards Compatibility)
     // =========================================================================
 
-    public static final int COLOR_PRIMARY_PURPLE = COLOR_PURPLE_BRAND;
-    public static final int COLOR_ACCENT_ORANGE  = COLOR_ORANGE_BRAND;
-    public static final int COLOR_WARM_CREAM     = Color.parseColor("#FAF6EE");
-    public static final int COLOR_PURPLE_DEEP    = COLOR_BG_DEEP;
-    public static final int COLOR_OBSIDIAN       = Color.parseColor("#140319");
-    public static final int COLOR_WHITE          = Color.parseColor("#FFFFFF");
-    public static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1A1A");
-    public static final int COLOR_TEXT_MUTED     = COLOR_TEXT_SECONDARY;
-    public static final int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_TINT    = COLOR_PURPLE_GHOST;
-    public static final int COLOR_BORDER_GREY    = COLOR_STROKE;
-    public static final int COLOR_BG_NEUTRAL     = COLOR_BG_DEEP;
-    public static final int COLOR_ORANGE_DARK    = Color.parseColor("#78350A");
-    public static final int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
-    public static final int COLOR_ORANGE_BORDER  = COLOR_ORANGE_MUTED;
-    public static final int COLOR_ORANGE_TINT    = COLOR_ORANGE_GHOST;
-    public static final int COLOR_SUCCESS        = Color.parseColor("#10B981");
-    public static final int COLOR_ERROR          = Color.parseColor("#EF4444");
+    public static int COLOR_PRIMARY_PURPLE = COLOR_PURPLE_BRAND;
+    public static int COLOR_ACCENT_ORANGE  = COLOR_ORANGE_BRAND;
+    public static int COLOR_WARM_CREAM     = Color.parseColor("#FAF6EE");
+    public static int COLOR_PURPLE_DEEP    = COLOR_BG_DEEP;
+    public static int COLOR_OBSIDIAN       = Color.parseColor("#140319");
+    public static int COLOR_WHITE          = Color.parseColor("#FFFFFF");
+    public static int COLOR_TEXT_DARK      = Color.parseColor("#1A1A1A");
+    public static int COLOR_TEXT_MUTED     = COLOR_TEXT_SECONDARY;
+    public static int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
+    public static int COLOR_PURPLE_TINT    = COLOR_PURPLE_GHOST;
+    public static int COLOR_BORDER_GREY    = COLOR_STROKE;
+    public static int COLOR_BG_NEUTRAL     = COLOR_BG_DEEP;
+    public static int COLOR_ORANGE_DARK    = Color.parseColor("#78350A");
+    public static int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
+    public static int COLOR_ORANGE_BORDER  = COLOR_ORANGE_MUTED;
+    public static int COLOR_ORANGE_TINT    = COLOR_ORANGE_GHOST;
+    public static int COLOR_SUCCESS        = Color.parseColor("#10B981");
+    public static int COLOR_ERROR          = Color.parseColor("#EF4444");
+
+    // =========================================================================
+    // LIGHT / DARK MODE
+    // =========================================================================
+
+    private static final String PREFS = "perazim_theme";
+    private static final String KEY_LIGHT = "light_mode";
+    private static boolean sLight = false;
+
+    /** Loads the saved mode. Call once from Application.onCreate before any screen is built. */
+    public static void init(android.content.Context context) {
+        boolean light = context.getApplicationContext()
+                .getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
+                .getBoolean(KEY_LIGHT, false);
+        applyMode(light);
+    }
+
+    public static boolean isLight() {
+        return sLight;
+    }
+
+    /** Saves the mode. Screens read colors when they are built, so restart the UI after calling this. */
+    public static void saveMode(android.content.Context context, boolean light) {
+        context.getApplicationContext()
+                .getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
+                .edit().putBoolean(KEY_LIGHT, light).apply();
+    }
+
+    /** Swaps the mode-dependent color tokens. Dark is purple frosted glass; light is pale lavender glass. */
+    public static void applyMode(boolean light) {
+        sLight = light;
+        COLOR_BG_DEEP = Color.parseColor(light ? "#F6EEFA" : "#2A0F33");
+        COLOR_SURFACE = Color.parseColor(light ? "#99FFFFFF" : "#26FFFFFF");
+        COLOR_SURFACE_2 = Color.parseColor(light ? "#CCFFFFFF" : "#33FFFFFF");
+        COLOR_SURFACE_SOLID = Color.parseColor(light ? "#FFFFFF" : "#3D1749");
+        COLOR_SURFACE_2_SOLID = Color.parseColor(light ? "#F1E4F6" : "#4F1E5C");
+        COLOR_PURPLE_MUTED = Color.parseColor(light ? "#7B5A88" : "#8B5A9A");
+        COLOR_PURPLE_SOFT = Color.parseColor(light ? "#7A3E8F" : "#A67BB3");
+        COLOR_TEXT_PRIMARY = Color.parseColor(light ? "#2A0F33" : "#F5F0F7");
+        COLOR_TEXT_SECONDARY = Color.parseColor(light ? "#5E4A68" : "#B9A8C0");
+        COLOR_TEXT_DISABLED = Color.parseColor(light ? "#A793B0" : "#6E5C78");
+        COLOR_STROKE = Color.parseColor(light ? "#33681A7D" : "#33FFFFFF");
+        // Aliases that mirror the tokens above
+        COLOR_PURPLE_DEEP = COLOR_BG_DEEP;
+        COLOR_BG_NEUTRAL = COLOR_BG_DEEP;
+        COLOR_TEXT_MUTED = COLOR_TEXT_SECONDARY;
+        COLOR_BORDER_GREY = COLOR_STROKE;
+    }
 
     // =========================================================================
     // SPACING GUIDELINES (dp)
@@ -127,7 +175,7 @@ public final class PerazimTheme {
     public static GradientDrawable createBackgroundGradient() {
         return new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#2A0F33"), Color.parseColor("#3A1346"), Color.parseColor("#160520")}
+                sLight ? new int[]{Color.parseColor("#F8F1FB"), Color.parseColor("#EFE0F6"), Color.parseColor("#E6D2F0")} : new int[]{Color.parseColor("#2A0F33"), Color.parseColor("#3A1346"), Color.parseColor("#160520")}
         );
     }
 
@@ -137,7 +185,7 @@ public final class PerazimTheme {
     public static GradientDrawable createTopBarGradient(int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#33FFFFFF"), Color.parseColor("#14FFFFFF")}
+                sLight ? new int[]{Color.parseColor("#CCFFFFFF"), Color.parseColor("#99FFFFFF")} : new int[]{Color.parseColor("#33FFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         if (strokePx > 0) {
             gd.setStroke(strokePx, COLOR_STROKE);
@@ -151,7 +199,7 @@ public final class PerazimTheme {
     public static GradientDrawable createBottomNavGradient(int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#2EFFFFFF"), Color.parseColor("#14FFFFFF")}
+                sLight ? new int[]{Color.parseColor("#D9FFFFFF"), Color.parseColor("#A6FFFFFF")} : new int[]{Color.parseColor("#2EFFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         if (strokePx > 0) {
             gd.setStroke(strokePx, COLOR_STROKE);
@@ -165,7 +213,7 @@ public final class PerazimTheme {
     public static GradientDrawable createCardGradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.parseColor("#2EFFFFFF"), Color.parseColor("#14FFFFFF")}
+                sLight ? new int[]{Color.parseColor("#B3FFFFFF"), Color.parseColor("#80FFFFFF")} : new int[]{Color.parseColor("#2EFFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -180,7 +228,7 @@ public final class PerazimTheme {
     public static GradientDrawable createSurface2Gradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.parseColor("#3DFFFFFF"), Color.parseColor("#1FFFFFFF")}
+                sLight ? new int[]{Color.parseColor("#CCFFFFFF"), Color.parseColor("#99FFFFFF")} : new int[]{Color.parseColor("#3DFFFFFF"), Color.parseColor("#1FFFFFFF")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -207,11 +255,11 @@ public final class PerazimTheme {
     public static GradientDrawable createHeroGradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{Color.parseColor("#668B32AA"), Color.parseColor("#33E17D2F")}
+                sLight ? new int[]{Color.parseColor("#66B070C8"), Color.parseColor("#33E17D2F")} : new int[]{Color.parseColor("#668B32AA"), Color.parseColor("#33E17D2F")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
-            gd.setStroke(strokePx, Color.parseColor("#47FFFFFF"));
+            gd.setStroke(strokePx, Color.parseColor(sLight ? "#40681A7D" : "#47FFFFFF"));
         }
         return gd;
     }
@@ -222,7 +270,7 @@ public final class PerazimTheme {
     public static GradientDrawable createDialogGradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#3D154A"), Color.parseColor("#24092C")}
+                sLight ? new int[]{Color.parseColor("#FFFFFFFF"), Color.parseColor("#FFF3E8F8")} : new int[]{Color.parseColor("#3D154A"), Color.parseColor("#24092C")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -249,7 +297,7 @@ public final class PerazimTheme {
     public static GradientDrawable createMutedPillGradient(int radiusPx, int strokeColor, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.parseColor("#26FFFFFF"), Color.parseColor("#14FFFFFF")}
+                sLight ? new int[]{Color.parseColor("#B3FFFFFF"), Color.parseColor("#80FFFFFF")} : new int[]{Color.parseColor("#26FFFFFF"), Color.parseColor("#14FFFFFF")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {

@@ -48,6 +48,7 @@
     </queries>
 
     <application
+        android:name=".PerazimApplication"
         android:label="Perazim"
         android:icon="@drawable/ic_launcher"
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
