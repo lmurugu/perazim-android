@@ -88,17 +88,18 @@ public final class CommunityUiBinder {
                 GlassKit.matchWrap(activity, 3));
         content.addView(GlassKit.keep(heading));
 
+        // Hub (concept C): each tile opens its own session. Share a post is the orange action.
         LinearLayout grid1 = tileRow(
-                tile("Prayer wall", org.perazimchurch.app.R.drawable.gl_prayer, false, openPrayer),
-                tile("Groups", org.perazimchurch.app.R.drawable.gl_people, false, this::showGroups));
+                tile("Groups", org.perazimchurch.app.R.drawable.gl_people, false, this::showGroups),
+                tile("Events", org.perazimchurch.app.R.drawable.gl_calendar, false, this::showEvents));
         content.addView(grid1, GlassKit.matchWrap(activity, 18));
         LinearLayout grid2 = tileRow(
-                tile("Messages", org.perazimchurch.app.R.drawable.gl_chat, false, this::showConversations),
+                tile("Prayer wall", org.perazimchurch.app.R.drawable.gl_prayer, false, openPrayer),
                 tile("Share a post", org.perazimchurch.app.R.drawable.gl_plus, true, () -> composePost(null, null)));
         content.addView(grid2, GlassKit.matchWrap(activity, 10));
 
-        content.addView(chipRow(new String[]{"Classes", "Notifications", "Bible games", "Daily challenge"},
-                new Runnable[]{this::showClasses, this::showNotifications,
+        content.addView(chipRow(new String[]{"Messages", "Classes", "Notifications", "Bible games", "Daily challenge"},
+                new Runnable[]{this::showConversations, this::showClasses, this::showNotifications,
                         () -> org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(activity), this::showChallenge}),
                 GlassKit.matchWrap(activity, 12));
         content.addView(chipRow(new String[]{"Saved drafts", "My profile", "PC connection", "Refresh"},
@@ -339,6 +340,7 @@ public final class CommunityUiBinder {
             body.addView(text("When: " + date(post.optLong("event_date")) + "\nWhere: " + post.optString("event_location"), 15));
             row(body, button("I'm attending", () -> rsvp(post, "ATTENDING")), button("Can't attend", () -> rsvp(post, "DECLINED")));
         }
+        body.addView(button("Share", () -> sharePost(post)));
         LinearLayout comments = column(); body.addView(comments);
         EditText input = input("Write a thoughtful comment", true); body.addView(input);
         Button send = button("Send comment", () -> {
@@ -391,6 +393,28 @@ public final class CommunityUiBinder {
         if(!signedIn())return;JSONObject body=new JSONObject();postSafe(body,"status",state);
         post("api/community/posts/"+encode(event.optString("id"))+"/rsvp",body,r->toast("RSVP saved · "+r.optInt("attendingCount")+" attending"),this::showError);
     }
+    // Events session: its own list of event posts, with the same cards and posters as the feed.
+    public void showEvents() {
+        LinearLayout body = column();
+        LinearLayout list = column();
+        body.addView(text("Upcoming events", 19));
+        body.addView(list);
+        list.addView(text("Loading events…", 14));
+        panel("Events", body);
+        get("api/community/posts?limit=30&type=EVENT", response -> renderPosts(list, response.optJSONArray("posts"), null),
+                (code, message) -> { list.removeAllViews(); list.addView(text(error(code, message), 14)); });
+    }
+
+    // Share a post as plain text through the phone's share sheet.
+    private void sharePost(JSONObject post) {
+        String title = post.optString("title");
+        String text = post.optString("content");
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.setType("text/plain");
+        send.putExtra(Intent.EXTRA_TEXT, (title.isEmpty() ? "" : title + "\n") + text + "\n\nShared from the Perazim app");
+        activity.startActivity(Intent.createChooser(send, "Share post"));
+    }
+
     public void showGroups() {
         if(!signedIn())return;LinearLayout body=column();body.addView(text("Private spaces for study, fellowship, and ministry. The owner adds members.",14));
         body.addView(button("+ Create a group",this::createGroup));LinearLayout list=column();body.addView(list);panel("My groups",body);
