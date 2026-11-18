@@ -1,40 +1,33 @@
-# Perazim app: complete every authorized update
+# Perazim app: agent instructions
 
-## Cost-conscious model preference
+## Current authorization (2026-11-17)
 
-Use GPT-6.1 Sol with low effort (owner's “Light”) for the main agent and
-Luna with high effort for bounded sub-agent tasks. This session exposes
-`gpt-6-luna`, not `gpt-6.1-luna`; report that distinction rather than silently
-claiming an unavailable version. Keep delegation minimal and avoid duplicate
-reads/tests. Do not escalate model/effort automatically without the owner's approval.
+The owner's Portfolio-Grade Remediation & Launch Plan is the current authority. It supersedes the older "no deployment / no Phase C / validation-only" limits that used to be here. The dated instructions are in `docs/internal/agents-history.md`. The plan's summary and status are in `docs/internal/remediation-plan.md`.
 
-## Active authorisation: Phase B B1–B7 (2026-11-07)
+Under this authority, agents may:
+- follow the plan's phases in order, committing each task on a feature branch;
+- draft legal, privacy and compliance text, marked as unapproved until the owner approves it.
 
-The owner explicitly authorised membership verification and explicit permissions,
-including synthetic persistence, current backend authority, private claims/review,
-synthetic administrator security, Android integration and isolated acceptance tests.
-Do not process real membership records or activate any real administrator. Do not
-migrate/adopt an existing member database, deploy, push, restart live services,
-change provider configuration, or begin Phase C. All security/migration fixtures
-must use uniquely named disposable test databases. Preserve the untracked project
-specifications, Decisions Register, baseline migration checksum and existing data.
-Only the separate validation app may be used for device tests; do not install a
-new main-app build or connect validation to the running member backend.
-Room destructive fallback remains until historical support is resolved and its
-removal separately approved. Public/offline and ordinary registered features must
-remain available; client roles and snapshots never establish current authority.
-This instruction supersedes the historical automatic restart/install workflow.
+Agents must not, without a separate owner decision:
+- merge into `main`, force-push, rewrite published history, or push to `phase-B-community`;
+- delete branches or tags, or change branch protection;
+- deploy, publish a backend, purchase hosting, or change provider configuration;
+- make the decisions the plan reserves for the owner (migration 0007, Bible licensing, minimum age, registration and legal approval, church name).
 
-## Historical development scope (owner instruction, 2026-11-06)
+## Mandatory gates
 
-The owner has deferred public deployment and authorized community development:
-feed, groups, classes, private chat, games and better AI. The previous Phase A-only
-hold is superseded. Do not purchase hosting or publish the PC backend. Preserve
-zero starting grace points and the progress-helper safeguards. Public acceptance
-remains unverified; local tests are development evidence, not internet acceptance.
-The owner explicitly authorizes opening the app over YouTube or other personal
-apps on the connected test phone. Preserve accounts and data; never clear data
-or log out except after a deliberate user-selected account/server change.
+- No real member data in tests, fixtures, commits or logs.
+- No secrets, keystores, `.env` files, `google-services.json`, `local.properties` or runtime databases in Git.
+- No production launch until every Launch Gate in the plan is checked.
+- Generative AI stays off in release builds unless gate L7 passes.
+- Steps marked [OWNER] stop for a human action or decision.
+
+## Data protection
+
+- Do not process, import or adopt a real membership database until gates L4 and L8 pass.
+- Use uniquely named disposable databases for tests. Never point tests at the live application database.
+- Do not activate a real administrator account. Use synthetic accounts only.
+- Preserve existing accounts, local data and the untracked project specifications.
 
 The owner wants changes followed through without reminders. Apply this workflow
 at the end of each authorized implementation task in this repository.

@@ -51,18 +51,34 @@
 ## ✨ Feature Highlights
 
 - 💚 **Safaricom M-Pesa Giving (3-Tier Cascade)**: Integrated Safaricom M-Pesa integration targeting Paybill `4069983`. Copies Paybill and account code to clipboard, checks and opens the Safaricom M-Pesa App or SIM Toolkit (`com.android.stk`), with immediate fallback to the Safaricom `*334#` USSD dialer.
-- 💬 **Pastoral Care via WhatsApp**: Direct one-tap messaging to Presiding Bishop Dr. David Mutweri (`+254710772227`) for private prayer petitions, counseling, and pastoral support.
-- ✉️ **Offline Pastoral SMS**: Formatted SMS intercession link via `smsto:+254710772227` ensuring congregants without active internet bundles can immediately submit urgent prayer needs.
+- 💬 **Pastoral Care via WhatsApp**: Direct one-tap messaging to the church's pastoral line (number configured in the app) for private prayer petitions, counseling, and pastoral support.
+- ✉️ **Offline Pastoral SMS**: Formatted SMS intercession link to the church's pastoral line ensuring congregants without active internet bundles can immediately submit urgent prayer needs.
 - 📍 **Sanctuary Directions (Google Maps)**: One-tap deep-link intent (`geo:0,0?q=Perazim+Mission+Church+Embu`) guiding congregants directly to Perazim Headquarters in Embu.
 - 🛠️ **In-App Feedback & Issue Reporting**: Direct channel connecting pilot members with the App Administrator via WhatsApp with device model, Android OS version, and app version diagnostics prefilled.
-- 📖 **Offline Multi-Translation Holy Bible**: Complete offline biblical library containing 5 translations (King James Version, Swahili SUV, NIV, ESV, NKJV) backed by Room SQLite with instant sub-millisecond retrieval.
+- 📖 **Offline Holy Bible**: Offline Bible text stored in a Room SQLite database for instant retrieval. The bundled database currently includes King James Version (public domain), Swahili Union Version, and NIV, ESV and NKJV. NIV, ESV and NKJV are copyrighted and are scheduled for removal pending licence review; see `NOTICE`.
 - ⚡ **Dynamic 3-Minute Breakthrough Routine**: Habit-building devotional module (Read Word, Reflect, Pray) that dynamically updates progress (`0%` -> `33%` -> `66%` -> `100% / +40 XP`), backed by streak tracking and Grace Tokens.
-- 🤖 **On-Device AI Breakthrough Guide**: Offline conversational assistant routing members through scriptures, giving guidance, hymns, and fellowship without external cloud API dependencies.
+- 🤖 **On-Device AI Breakthrough Guide**: Offline deterministic guide that routes members through scriptures, hymns and fellowship. It runs without a network connection. An optional online AI mode sends questions to a relay that calls Google Gemini; it is disabled in release builds by default.
 - 🎵 **Hymnal & Chord Browser**: Offline hymnal library featuring chord charts (guitar and piano) for timeless hymns, Swahili choruses, and contemporary worship songs.
 
 ---
 
 ## 🏛️ Architecture & Tech Stack
+
+```mermaid
+flowchart LR
+  subgraph Device[Android client - Java, Views, Room]
+    UI[Activities and screens] --> VM[ViewModels and repositories]
+    VM --> DB[(Room SQLite offline store)]
+    VM --> SYNC[Sync queue]
+  end
+  SYNC -->|HTTPS, bearer token| API[Express API]
+  API --> PG[(PostgreSQL)]
+  API -->|HTTPS| RELAY[Cloudflare Worker AI relay]
+  RELAY --> GEM[Google Gemini]
+```
+
+The API (`server/`) enforces authorisation and the privacy gate on each request. The relay (`relay/`) holds the provider key and quota. Client roles never establish server authority.
+
 
 - **Application ID & Namespace**: `org.perazimchurch.app`
 - **Core Language**: Java 11 / Java 21 LTS
