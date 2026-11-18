@@ -328,6 +328,8 @@ public class SermonsUiBinder {
         }
 
         LinearLayout liveCard = new LinearLayout(activity);
+        // Hidden until a live stream URL is configured; avoids showing a broadcast that is not running.
+        liveCard.setVisibility(View.GONE);
         liveCard.setPadding(dp(14), dp(14), dp(14), dp(14));
         liveCard.setOrientation(LinearLayout.VERTICAL);
         liveCard.setLayoutParams(new FrameLayout.LayoutParams(
@@ -404,7 +406,7 @@ public class SermonsUiBinder {
         headerRow.setGravity(Gravity.CENTER_VERTICAL);
 
         TextView tvHeader = new TextView(activity);
-        tvHeader.setText("AUDIO CONTROLLER · SAMPLE AUDIO PREVIEW");
+        tvHeader.setText("AUDIO CONTROLLER");
         tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
         tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
@@ -1119,7 +1121,18 @@ public class SermonsUiBinder {
                     }
                 }
 
-                if (!sourceSet) {
+                String remoteUrl = activeSermon != null ? activeSermon.getAudioUrl() : null;
+                if (!sourceSet && remoteUrl != null && remoteUrl.startsWith("https://")) {
+                    try {
+                        mediaPlayer.setDataSource(remoteUrl);
+                        sourceSet = true;
+                    } catch (Exception e) {
+                        Log.w("SermonsUiBinder", "Failed to set remote audio source", e);
+                    }
+                }
+
+                boolean isSampleSermon = activeSermon == null || "sample-sermon-1".equals(activeSermon.getId());
+                if (!sourceSet && isSampleSermon) {
                     try {
                         AssetFileDescriptor afd = activity.getAssets().openFd("audio/sample_sermon.mp3");
                         mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
@@ -1128,6 +1141,16 @@ public class SermonsUiBinder {
                     } catch (Exception e) {
                         Log.w("SermonsUiBinder", "Failed to load audio/sample_sermon.mp3 asset", e);
                     }
+                }
+
+                if (!sourceSet) {
+                    // No audio file for this message yet: do not play unrelated sample audio.
+                    mediaPlayer.release();
+                    mediaPlayer = null;
+                    isPlaying = false;
+                    btnPlayPause.setText("Play Sermon");
+                    Toast.makeText(activity, "Audio for this message is not available yet", Toast.LENGTH_LONG).show();
+                    return;
                 }
 
                 if (sourceSet) {

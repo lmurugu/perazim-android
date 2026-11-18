@@ -472,7 +472,7 @@ public class HomeUiBinder {
         routineInlineContainer.addView(tvRoutineStepContent);
 
         btnRoutineNext = new Button(context);
-        btnRoutineNext.setText("Next Step →");
+        btnRoutineNext.setText("Next Step");
         btnRoutineNext.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnRoutineNext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnRoutineNext.setTypeface(Typeface.DEFAULT_BOLD);
@@ -690,7 +690,7 @@ public class HomeUiBinder {
                     : "“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20";
             if (tvRoutineStepContent != null) tvRoutineStepContent.setText(text);
             if (btnRoutineNext != null) {
-                btnRoutineNext.setText("Proceed to Reflection →");
+                btnRoutineNext.setText("Proceed to Reflection");
                 btnRoutineNext.setEnabled(true);
             }
         } else if (routineStep == 2) {
@@ -700,7 +700,7 @@ public class HomeUiBinder {
                     : "When David faced the Philistine host in the Valley of Rephaim, he inquired of the Lord. God burst forth like waters through a shattered dam. Whatever wall confronts you today, declare that the Lord of the Breakthrough is rising on your behalf.";
             if (tvRoutineStepContent != null) tvRoutineStepContent.setText(comm);
             if (btnRoutineNext != null) {
-                btnRoutineNext.setText("Proceed to Prayer →");
+                btnRoutineNext.setText("Proceed to Prayer");
                 btnRoutineNext.setEnabled(true);
             }
         } else if (routineStep == 3) {

@@ -1814,9 +1814,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         fellowshipUiBinder = new FellowshipUiBinder(this, factory.createFellowshipViewModel());
         communityUiBinder = new CommunityUiBinder(this, () -> {
             ScrollView prayer = fellowshipUiBinder.bind();
-            AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Prayer wall")
+            TextView prayerTitle = new TextView(this);
+            prayerTitle.setText("Prayer wall");
+            prayerTitle.setTextColor(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_TEXT_PRIMARY);
+            prayerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+            prayerTitle.setTypeface(Typeface.DEFAULT_BOLD);
+            prayerTitle.setPadding(dp(20), dp(16), dp(20), dp(8));
+            prayerTitle.setBackgroundColor(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_BG_DEEP);
+            AlertDialog dialog = new AlertDialog.Builder(this).setCustomTitle(prayerTitle)
                     .setView(prayer).setNegativeButton("Close", null).create();
             dialog.show();
+            if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_BG_DEEP));
+            android.widget.Button closeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+            if (closeButton != null) closeButton.setTextColor(COLOR_PURPLE_SOFT);
             if (dialog.getWindow() != null) dialog.getWindow().setLayout(
                     ViewGroup.LayoutParams.MATCH_PARENT, (int)(getResources().getDisplayMetrics().heightPixels * 0.90));
         });
