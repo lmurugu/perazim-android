@@ -1291,5 +1291,132 @@ router.delete('/classes/:id', requireAuth, async (req, res) => {
   } catch (error) { res.status(500).json({ error: 'Could not cancel class' }); }
 });
 
+// ---- Reactions, review and event photos (migrations 0023 and 0024) ----
+
+// The fixed feelings set. Anything else is rejected, so the feed stays calm.
+const ALLOWED_REACTIONS = ['🙏', '😇', '😊', '😢', '🙌', '🔥', '❤️'];
+
+// POST /api/community/posts/:id/reactions  { emoji }  toggles the caller's reaction
+router.post('/posts/:id/reactions', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { emoji } = req.body || {};
+    if (!ALLOWED_REACTIONS.includes(emoji)) return res.status(400).json({ error: 'Choose a reaction from the list' });
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
+    const outcome = await withTransaction(async (client) => {
+      const removed = await client.query('DELETE FROM post_reactions WHERE post_id = $1 AND user_id = $2 AND emoji = $3 RETURNING 1', [id, req.user.id, emoji]);
+      if (!removed.rows.length) {
+        await client.query('INSERT INTO post_reactions (post_id, user_id, emoji, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING', [id, req.user.id, emoji, Date.now()]);
+      }
+      const counts = await client.query('SELECT emoji, COUNT(*)::int AS n FROM post_reactions WHERE post_id = $1 GROUP BY emoji', [id]);
+      return { mine: removed.rows.length ? false : true, counts: counts.rows };
+    });
+    res.json({ success: true, emoji, reacted: outcome.mine, counts: outcome.counts });
+  } catch (err) {
+    console.error('Error toggling post reaction');
+    res.status(500).json({ error: 'Could not save reaction' });
+  }
+});
+
+// POST /api/community/comments/:id/reactions  { emoji }  toggles the caller's reaction on a comment
+router.post('/comments/:id/reactions', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { emoji } = req.body || {};
+    if (!ALLOWED_REACTIONS.includes(emoji)) return res.status(400).json({ error: 'Choose a reaction from the list' });
+    const comment = await query('SELECT post_id FROM post_comments WHERE id = $1', [id]);
+    if (!comment.rows.length) return res.status(404).json({ error: 'Comment not found' });
+    if (!await canAccessPost(req.user, comment.rows[0].post_id)) return res.status(404).json({ error: 'Comment unavailable' });
+    const removed = await query('DELETE FROM comment_reactions WHERE comment_id = $1 AND user_id = $2 AND emoji = $3 RETURNING 1', [id, req.user.id, emoji]);
+    if (!removed.rows.length) {
+      await query('INSERT INTO comment_reactions (comment_id, user_id, emoji, created_at) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING', [id, req.user.id, emoji, Date.now()]);
+    }
+    res.json({ success: true, emoji, reacted: removed.rows.length === 0 });
+  } catch (err) {
+    console.error('Error toggling comment reaction');
+    res.status(500).json({ error: 'Could not save reaction' });
+  }
+});
+
+// GET /api/community/review/pending  (church admin only): posts and event photos waiting for approval
+router.get('/review/pending', requireAuth, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only the church admin can review posts' });
+    const posts = await query(`SELECT id, author_name, type, title, content, media_url, created_at
+      FROM community_posts WHERE review_status = 'PENDING' ORDER BY created_at ASC LIMIT 100`);
+    const photos = await query(`SELECT p.id, p.post_id, p.uploader_id, p.media_url, p.created_at
+      FROM event_photos p WHERE p.status = 'PENDING' ORDER BY p.created_at ASC LIMIT 100`);
+    res.json({ posts: posts.rows, photos: photos.rows });
+  } catch (err) {
+    console.error('Error loading review queue');
+    res.status(500).json({ error: 'Could not load the review queue' });
+  }
+});
+
+// PUT /api/community/posts/:id/review  { status: 'APPROVED' | 'REJECTED' }  (church admin only)
+router.put('/posts/:id/review', requireAuth, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only the church admin can review posts' });
+    const { status } = req.body || {};
+    if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or REJECTED' });
+    const result = await query('UPDATE community_posts SET review_status = $1, updated_at = $2 WHERE id = $3 RETURNING id', [status, Date.now(), req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Post not found' });
+    res.json({ success: true, status });
+  } catch (err) {
+    console.error('Error reviewing post');
+    res.status(500).json({ error: 'Could not update review' });
+  }
+});
+
+// POST /api/community/posts/:id/photos  { mediaUrl }  a member adds a photo to an event; it waits for approval
+router.post('/posts/:id/photos', requireAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { mediaUrl } = req.body || {};
+    const post = await query("SELECT type FROM community_posts WHERE id = $1", [id]);
+    if (!post.rows.length || post.rows[0].type !== 'EVENT') return res.status(404).json({ error: 'Event not found' });
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Event unavailable' });
+    if (!await ownsMedia(req.user.id, mediaUrl) || !mediaUrl) return res.status(400).json({ error: 'Choose a photo uploaded by your account' });
+    const photoId = 'photo_' + crypto.randomBytes(12).toString('hex');
+    await query('INSERT INTO event_photos (id, post_id, uploader_id, media_url, status, created_at) VALUES ($1, $2, $3, $4, $5, $6)',
+      [photoId, id, req.user.id, mediaUrl, 'PENDING', Date.now()]);
+    res.status(201).json({ success: true, id: photoId, status: 'PENDING' });
+  } catch (err) {
+    console.error('Error adding event photo');
+    res.status(500).json({ error: 'Could not add the photo' });
+  }
+});
+
+// GET /api/community/posts/:id/photos: approved photos, plus the caller's own pending ones
+router.get('/posts/:id/photos', optionalAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Event unavailable' });
+    const userId = req.user ? req.user.id : '';
+    const result = await query(`SELECT id, uploader_id, media_url, status, created_at FROM event_photos
+      WHERE post_id = $1 AND (status = 'APPROVED' OR uploader_id = $2) ORDER BY created_at ASC`, [id, userId]);
+    res.json({ photos: result.rows });
+  } catch (err) {
+    console.error('Error loading event photos');
+    res.status(500).json({ error: 'Could not load photos' });
+  }
+});
+
+// PUT /api/community/photos/:id/review  { status }  (church admin only)
+router.put('/photos/:id/review', requireAuth, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only the church admin can review photos' });
+    const { status } = req.body || {};
+    if (!['APPROVED', 'REJECTED'].includes(status)) return res.status(400).json({ error: 'Status must be APPROVED or REJECTED' });
+    const result = await query('UPDATE event_photos SET status = $1, reviewed_by = $2, reviewed_at = $3 WHERE id = $4 RETURNING id',
+      [status, req.user.id, Date.now(), req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Photo not found' });
+    res.json({ success: true, status });
+  } catch (err) {
+    console.error('Error reviewing photo');
+    res.status(500).json({ error: 'Could not update review' });
+  }
+});
+
 module.exports = router;
 module.exports.serveMedia = serveMedia;
