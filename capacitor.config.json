@@ -1,0 +1,8 @@
+{
+  "appId": "org.perazimchurch.app",
+  "appName": "Perazim",
+  "webDir": "web",
+  "server": {
+    "androidScheme": "https"
+  }
+}

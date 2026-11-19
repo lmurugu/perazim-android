@@ -1,0 +1,18 @@
+{
+  "name": "perazim-store-shell",
+  "private": true,
+  "description": "Store wrappers (Capacitor) for the Perazim web client in web/. Native projects are added on a machine with the Android SDK and, for iOS, Xcode.",
+  "scripts": {
+    "cap:sync": "cap sync",
+    "cap:android": "cap add android",
+    "cap:ios": "cap add ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.0.0",
+    "@capacitor/core": "8.0.0",
+    "@capacitor/ios": "8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.0.0"
+  }
+}
