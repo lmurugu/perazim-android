@@ -18,6 +18,7 @@ import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.InterlinearWord;
 import org.perazimchurch.app.data.interlinear.GreekInterlinearStore;
+import org.perazimchurch.app.data.interlinear.HebrewInterlinearStore;
 import org.perazimchurch.app.data.interlinear.StrongsStore;
 import org.perazimchurch.app.domain.model.StrongsEntry;
 import org.perazimchurch.app.domain.model.VerseLocation;
@@ -115,7 +116,9 @@ public class RoomBibleRepository implements BibleRepository {
         int bookNumber = resolveBookNumber(resolvedTranslation, bookId);
         List<BibleVerse> verses;
         if (GREEK_INTERLINEAR.equals(resolvedTranslation)) {
-            verses = greekInterlinearChapter(bookNumber, chapterNumber, bookId);
+            verses = interlinearChapter(bookNumber, chapterNumber, bookId, true);
+        } else if (HEBREW_INTERLINEAR.equals(resolvedTranslation)) {
+            verses = interlinearChapter(bookNumber, chapterNumber, bookId, false);
         } else {
             List<BibleVerseEntity> entities = bibleDao.getVerses(resolvedTranslation, bookNumber, chapterNumber);
             verses = BibleMapper.toDomainVerseList(entities, resolvedTranslation, bookId);
@@ -256,6 +259,9 @@ public class RoomBibleRepository implements BibleRepository {
     /** Pseudo-translation id for the Greek New Testament interlinear. */
     public static final String GREEK_INTERLINEAR = "GRK";
 
+    /** Pseudo-translation id for the Hebrew Old Testament interlinear. */
+    public static final String HEBREW_INTERLINEAR = "HEB";
+
     @Override
     public List<BibleTranslation> getTranslationsWithText() {
         ensureAssetsReady();
@@ -268,17 +274,23 @@ public class RoomBibleRepository implements BibleRepository {
         }
         BibleTranslation greek = new BibleTranslation(GREEK_INTERLINEAR, "Greek Interlinear (New Testament)", "el", true);
         readable.add(greek);
+        BibleTranslation hebrew = new BibleTranslation(HEBREW_INTERLINEAR, "Hebrew Interlinear (Old Testament)", "he", true);
+        readable.add(hebrew);
         return readable;
     }
 
-    /** Verse list for the Greek interlinear: each verse shows its words with Strong's numbers and parsing. */
-    private List<BibleVerse> greekInterlinearChapter(int bookNumber, int chapterNumber, String bookId) {
+    /**
+     * Verse list for an interlinear version. The verse text lists each word with its gloss in brackets;
+     * the full word-by-word view (transliteration, gloss, Strong's number, parsing) opens from the verse.
+     */
+    private List<BibleVerse> interlinearChapter(int bookNumber, int chapterNumber, String bookId, boolean greek) {
         List<BibleVerse> verses = new ArrayList<>();
-        if (bookNumber < 40) {
+        if (greek ? bookNumber < 40 : bookNumber > 39) {
             return verses;
         }
+        String translationId = greek ? GREEK_INTERLINEAR : HEBREW_INTERLINEAR;
         for (BibleVerseEntity entity : bibleDao.getVerses("KJV", bookNumber, chapterNumber)) {
-            List<InterlinearWord> words = GreekInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, entity.getVerseNumber());
+            List<InterlinearWord> words = interlinearWords(greek, bookNumber, chapterNumber, entity.getVerseNumber());
             if (words.isEmpty()) {
                 continue;
             }
@@ -288,18 +300,21 @@ public class RoomBibleRepository implements BibleRepository {
                     text.append(' ');
                 }
                 text.append(word.getOriginal());
-                if (word.getStrongsNumber() > 0) {
-                    text.append(" G").append(word.getStrongsNumber());
-                }
-                if (!word.getMorphology().isEmpty()) {
-                    text.append(" (").append(word.getMorphology()).append(')');
+                if (!word.getGloss().isEmpty()) {
+                    text.append(" (").append(word.getGloss()).append(')');
                 }
             }
-            BibleVerse verse = BibleMapper.toDomain(entity, GREEK_INTERLINEAR, bookId);
+            BibleVerse verse = BibleMapper.toDomain(entity, translationId, bookId);
             verse.setText(text.toString());
             verses.add(verse);
         }
         return verses;
+    }
+
+    private List<InterlinearWord> interlinearWords(boolean greek, int bookNumber, int chapterNumber, int verseNumber) {
+        return greek
+                ? GreekInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, verseNumber)
+                : HebrewInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, verseNumber);
     }
 
     @Override
@@ -373,12 +388,12 @@ public class RoomBibleRepository implements BibleRepository {
     }
 
     @Override
-    public List<InterlinearWord> getGreekInterlinear(String bookId, int chapterNumber, int verseNumber) {
+    public List<InterlinearWord> getInterlinear(String bookId, int chapterNumber, int verseNumber) {
         int bookNumber = resolveBookNumber(null, bookId);
-        if (bookNumber < 40) {
-            return Collections.emptyList();
+        if (bookNumber >= 40) {
+            return GreekInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, verseNumber);
         }
-        return GreekInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, verseNumber);
+        return HebrewInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, verseNumber);
     }
 
     @Override

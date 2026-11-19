@@ -39,8 +39,8 @@ public interface BibleRepository {
     /** The same verse in every translation that has text, in picker order. */
     List<BibleVerse> getVerseInAllTranslations(String bookId, int chapterNumber, int verseNumber);
 
-    /** Greek interlinear words of a New Testament verse, or an empty list when none is bundled. */
-    List<InterlinearWord> getGreekInterlinear(String bookId, int chapterNumber, int verseNumber);
+    /** Interlinear words of a verse (Greek for New Testament, Hebrew for Old Testament), or an empty list. */
+    List<InterlinearWord> getInterlinear(String bookId, int chapterNumber, int verseNumber);
 
     /** Offline Strong's dictionary entry for a code such as G3056 or H430, or null. */
     StrongsEntry getStrongsEntry(String code);

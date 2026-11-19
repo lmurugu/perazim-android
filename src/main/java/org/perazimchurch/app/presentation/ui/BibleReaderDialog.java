@@ -907,9 +907,7 @@ public class BibleReaderDialog extends Dialog {
         final LinearLayout secondary = barRow();
         secondary.setVisibility(View.GONE);
         secondary.addView(barIcon("\u21c4", "Compare", v -> showCompareDialog(verse, citation)));
-        if (newTestament) {
-            secondary.addView(barIcon("\u0391\u03b2", "Interlinear", v -> showInterlinearDialog(verse, citation)));
-        }
+        secondary.addView(barIcon("\u0391\u03b2", "Interlinear", v -> showInterlinearDialog(verse, citation, newTestament)));
         secondary.addView(barIcon("#", "Topic", v -> showTopicPicker(verse)));
         if (isSearchMode) {
             secondary.addView(barIcon("\u27a4", "Open chapter", v -> {
@@ -1105,54 +1103,111 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
-    /** Word-by-word Greek with Strong's numbers and morphology for a New Testament verse. */
-    private void showInterlinearDialog(final BibleVerse verse, final String citation) {
-        bibleViewModel.loadGreekInterlinear(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), words -> {
+    /**
+     * Word-by-word view of a verse, laid out like a printed interlinear: each column is one original word
+     * with its transliteration, English gloss, tappable Strong's number and plain-English parsing.
+     * Hebrew columns run right to left.
+     */
+    private void showInterlinearDialog(final BibleVerse verse, final String citation, final boolean newTestament) {
+        bibleViewModel.loadInterlinear(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), words -> {
             if (words == null || words.isEmpty()) {
                 Toast.makeText(getContext(), "No interlinear is available for this verse.", Toast.LENGTH_SHORT).show();
                 return;
             }
+            final boolean hebrew = !newTestament;
+            LinearLayout row = new LinearLayout(getContext());
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setLayoutDirection(hebrew ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
+            for (org.perazimchurch.app.domain.model.InterlinearWord word : words) {
+                row.addView(interlinearColumn(word, hebrew));
+            }
+            HorizontalScrollView scroll = new HorizontalScrollView(getContext());
+            scroll.setLayoutDirection(hebrew ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
+            scroll.addView(row);
             LinearLayout box = new LinearLayout(getContext());
             box.setOrientation(LinearLayout.VERTICAL);
-            box.setPadding(dp(18), dp(8), dp(18), dp(12));
-            for (org.perazimchurch.app.domain.model.InterlinearWord word : words) {
-                LinearLayout cell = new LinearLayout(getContext());
-                cell.setOrientation(LinearLayout.VERTICAL);
-                cell.setPadding(0, dp(6), 0, dp(6));
-                if (word.getStrongsNumber() > 0) {
-                    final int strongs = word.getStrongsNumber();
-                    cell.setClickable(true);
-                    cell.setContentDescription("Strong's G" + strongs + " for " + word.getOriginal());
-                    cell.setOnClickListener(v -> showStrongsDialog("G" + strongs, strongs));
-                }
-                TextView greek = new TextView(getContext());
-                greek.setText(word.getOriginal());
-                greek.setTypeface(Typeface.SERIF);
-                greek.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                greek.setTextColor(GlassKit.text());
-                cell.addView(greek);
-                TextView meta = new TextView(getContext());
-                String strong = word.getStrongsNumber() > 0 ? "G" + word.getStrongsNumber() : "";
-                meta.setText((strong + (strong.isEmpty() || word.getMorphology().isEmpty() ? "" : " \u00b7 ") + word.getMorphology()).trim());
-                meta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-                meta.setTextColor(COLOR_TEXT_MUTED());
-                cell.addView(meta);
-                box.addView(cell);
-            }
+            box.setPadding(dp(8), dp(8), dp(8), dp(12));
+            box.addView(scroll);
             TextView note = new TextView(getContext());
-            note.setText("Robinson-Pierpont style parsing from the Antoniades 1904/1912 text (public domain). Strong's numbers identify the lemma.");
+            note.setText(hebrew
+                    ? "Hebrew text and morphology: Open Scriptures Hebrew Bible (CC BY 4.0). Glosses and Strong's entries: Strong's dictionary. Tap a Strong's number for its entry."
+                    : "Greek text and parsing: Antoniades 1904/1912 (public domain). Glosses and Strong's entries: Strong's dictionary (public domain). Tap a Strong's number for its entry and occurrences.");
             note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             note.setTextColor(COLOR_TEXT_MUTED());
-            note.setPadding(0, dp(10), 0, 0);
+            note.setPadding(dp(8), dp(10), dp(8), 0);
             box.addView(note);
-            ScrollView scroll = new ScrollView(getContext());
-            scroll.addView(box);
             AppDialogs.builder(getContext())
-                    .setTitle(citation + " · Greek Interlinear")
-                    .setView(scroll)
+                    .setTitle(citation + (hebrew ? " \u00b7 Hebrew Interlinear" : " \u00b7 Greek Interlinear"))
+                    .setView(box)
                     .setPositiveButton("Close", null)
                     .show();
         });
+    }
+
+    /** One interlinear column: the word, its transliteration, gloss, Strong's number and parsing. */
+    private View interlinearColumn(final org.perazimchurch.app.domain.model.InterlinearWord word, boolean hebrew) {
+        LinearLayout column = new LinearLayout(getContext());
+        column.setOrientation(LinearLayout.VERTICAL);
+        column.setGravity(Gravity.CENTER_HORIZONTAL);
+        column.setPadding(dp(8), dp(8), dp(8), dp(8));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(132), ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 0, dp(6), 0);
+        column.setLayoutParams(params);
+        GradientDrawable panel = new GradientDrawable();
+        panel.setCornerRadius(dp(10));
+        panel.setColor(0x14000000 | (COLOR_TEXT_MUTED() & 0x00ffffff));
+        column.setBackground(panel);
+
+        TextView original = new TextView(getContext());
+        original.setText(word.getOriginal());
+        original.setTypeface(Typeface.SERIF);
+        original.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        original.setTextColor(GlassKit.text());
+        original.setGravity(Gravity.CENTER);
+        original.setTextDirection(hebrew ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
+        column.addView(original);
+
+        TextView translit = new TextView(getContext());
+        translit.setText(word.getTransliteration().isEmpty() ? "" : word.getTransliteration());
+        translit.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+        translit.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        translit.setTextColor(COLOR_TEXT_MUTED());
+        translit.setGravity(Gravity.CENTER);
+        column.addView(translit);
+
+        TextView gloss = new TextView(getContext());
+        gloss.setText(word.getGloss().isEmpty() ? "\u2014" : word.getGloss());
+        gloss.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        gloss.setTextColor(GlassKit.text());
+        gloss.setGravity(Gravity.CENTER);
+        gloss.setPadding(0, dp(4), 0, dp(4));
+        column.addView(gloss);
+
+        if (word.getStrongsNumber() > 0) {
+            final String code = (hebrew ? "H" : "G") + word.getStrongsNumber();
+            final int number = word.getStrongsNumber();
+            TextView strongs = new TextView(getContext());
+            strongs.setText(code);
+            strongs.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            strongs.setTextColor(COLOR_ACCENT_ORANGE());
+            strongs.setPaintFlags(strongs.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+            strongs.setGravity(Gravity.CENTER);
+            strongs.setPadding(dp(6), dp(4), dp(6), dp(4));
+            strongs.setClickable(true);
+            strongs.setContentDescription("Strong's " + code + " for " + word.getOriginal());
+            strongs.setOnClickListener(v -> showStrongsDialog(code, number));
+            column.addView(strongs);
+        }
+
+        TextView parsing = new TextView(getContext());
+        String text = word.getParsing().isEmpty() ? word.getMorphology() : word.getParsing();
+        parsing.setText(text);
+        parsing.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        parsing.setTextColor(COLOR_TEXT_MUTED());
+        parsing.setGravity(Gravity.CENTER);
+        parsing.setPadding(0, dp(4), 0, 0);
+        column.addView(parsing);
+        return column;
     }
 
     /** Strong's dictionary entry and the New Testament occurrences of the same number. */

@@ -37,3 +37,13 @@ The **source code** in this repository is licensed under the MIT License (see `L
 ## Build-time dependencies
 
 Dependencies are listed in `build.gradle` and `server/package.json`. Their licences are the licences of the upstream projects.
+
+## Interlinear glosses, transliterations and parsing (added with the interlinear update)
+
+| Item | Source and licence | Notes |
+|---|---|---|
+| Hebrew Old Testament text, lemmas and morphology (`hebrew_ot.tsv.gz`) | Open Scriptures Hebrew Bible (OSHB, morphhb). **CC BY 4.0**; WLC text public domain | Attribution shown in the Interlinear screen |
+| Glosses and Strong's entries for Greek words | Strong's 1890 dictionary text, public domain (via the bundled Strong's dictionary) | Gloss is the first English rendering in the Strong's entry for the lemma |
+| Glosses for Hebrew words | Strong's Hebrew entries, from openscriptures HebrewStrong.xml, **CC BY 4.0** | Same source as the Strong's dictionary above |
+| Transliterations | Computed by `scripts/bible/enrich_interlinear.py` from a fixed letter table written for this project | No outside data |
+| Plain-English parsing | Written for this project (`GrammarDescriber`) from the Robinson and OSHB code schemes | No outside data |
