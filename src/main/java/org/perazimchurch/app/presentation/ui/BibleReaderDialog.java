@@ -1282,7 +1282,7 @@ public class BibleReaderDialog extends Dialog {
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
         GradientDrawable glass = new GradientDrawable();
         glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F5201030"));
+        glass.setColor(Color.parseColor("#F0241238"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         panel.setBackground(glass);
         // Higher than the verse card, so the verses cannot draw over the Notes card.
@@ -1303,13 +1303,13 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout header = new LinearLayout(getContext());
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title = GlassKit.text(getContext(), "Notes", 16, true, GlassKit.text());
+        TextView title = GlassKit.text(getContext(), "Notes", 16, true, Color.parseColor("#F5EEFF"));
         header.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
         TextView add = GlassKit.orangeButton(getContext(), "New note", 12);
         add.setPadding(dp(14), 0, dp(14), 0);
         add.setOnClickListener(v -> showNoteEditor(null));
         header.addView(add, new LinearLayout.LayoutParams(-2, dp(34)));
-        TextView close = GlassKit.text(getContext(), "\u2715", 16, true, GlassKit.muted());
+        TextView close = GlassKit.text(getContext(), "\u2715", 16, true, Color.parseColor("#D9C9F2"));
         close.setPadding(dp(12), dp(4), dp(4), dp(4));
         close.setOnClickListener(v -> dismissNotesPanel());
         header.addView(close);
@@ -1365,11 +1365,11 @@ public class BibleReaderDialog extends Dialog {
             notesPanelList.removeAllViews();
             if (notes.isEmpty()) {
                 notesPanelList.addView(GlassKit.text(getContext(),
-                        "No notes yet. Write a note and link the verses it talks about.", 13, false, COLOR_TEXT_MUTED()));
+                        "No notes yet. Write a note and link the verses it talks about.", 13, false, Color.parseColor("#D9C9F2")));
             }
             for (final org.perazimchurch.app.domain.model.BibleNote note : notes) {
                 TextView body = GlassKit.text(getContext(), note.getBody().length() > 140
-                        ? note.getBody().substring(0, 140) + "..." : note.getBody(), 14, false, GlassKit.text());
+                        ? note.getBody().substring(0, 140) + "..." : note.getBody(), 14, false, Color.parseColor("#F5EEFF"));
                 body.setOnClickListener(v -> showNoteEditor(note));
                 body.setPadding(0, dp(10), 0, dp(4));
                 notesPanelList.addView(body);
