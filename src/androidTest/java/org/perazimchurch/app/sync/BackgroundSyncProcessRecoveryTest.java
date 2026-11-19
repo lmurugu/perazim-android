@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /** Prepares synthetic queued work; CI kills this app process before restoring network. */
 @RunWith(AndroidJUnit4.class)
@@ -43,5 +44,15 @@ public class BackgroundSyncProcessRecoveryTest {
                 .getWorkInfosForUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME)
                 .get(10, TimeUnit.SECONDS);
         assertFalse("WorkManager must retain the queued one-time sync", work.isEmpty());
+        // The network is off here, so the queued sync must still be waiting, not finished or failed.
+        StringBuilder states = new StringBuilder();
+        boolean pending = false;
+        for (WorkInfo info : work) {
+            states.append(info.getState()).append(' ');
+            if (info.getState() == WorkInfo.State.ENQUEUED || info.getState() == WorkInfo.State.BLOCKED) {
+                pending = true;
+            }
+        }
+        assertTrue("queued sync must still be pending before the process is killed, states: " + states, pending);
     }
 }

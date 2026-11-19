@@ -37,11 +37,25 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
 
 # Kill the app process, not force-stop it, so JobScheduler may restart persisted work.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
-# Record the process id around the kill so the job log shows whether the process really died.
-echo "app pid before kill: $(adb shell pidof org.perazimchurch 2>/dev/null || echo none)"
+# Start the app in the background so a real process exists for the kill. am kill does not
+# touch a process with a visible activity, so send HOME after launch. Network stays off here.
+adb shell monkey -p org.perazimchurch.app -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || true
+sleep 5
+adb shell input keyevent KEYCODE_HOME || true
+app_pid=''
+for _ in $(seq 1 15); do
+  app_pid=$(adb shell pidof org.perazimchurch.app 2>/dev/null | tr -d '\r' || true)
+  [[ -n "$app_pid" ]] && break
+  sleep 2
+done
+echo "app pid before kill: ${app_pid:-none}"
+if [[ -z "$app_pid" ]]; then
+  echo 'FAIL: app process is not running before the kill, so the process-death check proves nothing.' >&2
+  exit 1
+fi
 adb shell am kill org.perazimchurch.app
 sleep 3
-echo "app pid after kill: $(adb shell pidof org.perazimchurch 2>/dev/null || echo none)"
+echo "app pid after kill: $(adb shell pidof org.perazimchurch.app 2>/dev/null | tr -d '\r' || echo none)"
 adb shell svc wifi enable
 adb shell svc data enable || true
 
