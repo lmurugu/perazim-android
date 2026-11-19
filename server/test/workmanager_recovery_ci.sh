@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Right after boot the package service can lag behind sys.boot_completed; wait for it.
-wait_for_package_service() {
-  timeout 300 bash -c 'until adb shell service check package 2>/dev/null | grep -q "package: found"; do sleep 2; done'
+# Right after boot the system services can lag behind sys.boot_completed; wait for them.
+wait_for_system_services() {
+  timeout 300 bash -c 'for svc in package mount activity; do until adb shell service check "$svc" 2>/dev/null | grep -q ": found"; do sleep 2; done; done'
 }
-wait_for_package_service
+wait_for_system_services
 
 pm_list=$(adb shell pm list packages 2>/dev/null | tr -d '\r' || true)
 echo "packages matching perazim: $(echo "$pm_list" | grep -i perazim | tr '\n' ' ')"
@@ -53,19 +53,19 @@ if [[ -z "$app_apk" || -z "$test_apk" ]]; then
   exit 1
 fi
 
-# The package service can drop again after a long Gradle build, so wait for it before each install
-# and retry a failed install up to three times.
+# The emulator's system services can fail an install even when the package service answers, and a
+# long Gradle build can leave them unready. Wait for them before each install and retry up to five times.
 install_apk() {
   local apk=$1
-  for attempt in 1 2 3; do
-    wait_for_package_service
+  for attempt in 1 2 3 4 5; do
+    wait_for_system_services
     if adb install -r "$apk"; then
       return 0
     fi
-    echo "install attempt $attempt failed for $apk; retrying after the package service is back"
-    sleep 5
+    echo "install attempt $attempt failed for $apk; waiting 20 seconds before retrying"
+    sleep 20
   done
-  echo "FAIL: could not install $apk after three attempts." >&2
+  echo "FAIL: could not install $apk after five attempts." >&2
   return 1
 }
 install_apk "$app_apk"
