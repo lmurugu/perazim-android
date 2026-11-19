@@ -186,7 +186,9 @@ public class BibleReaderDialog extends Dialog {
     @Override
     public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
         if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
-            if (isSearchMode) {
+            if (actionBarView != null) {
+                dismissActionBar();
+            } else if (isSearchMode) {
                 hideKeyboard(etSearchQuery);
                 toggleSearchMode();
             } else {
@@ -228,6 +230,11 @@ public class BibleReaderDialog extends Dialog {
         loadChapterVerses(currentBookId, currentChapter);
     }
 
+    private FrameLayout readerFrame;
+    private View actionBarView;
+    private BibleVerse actionVerse;
+    private int focusedVerseNumber = 0;
+
     private void initFallbackBooks() {
         booksList.clear();
         bookMap.clear();
@@ -250,6 +257,7 @@ public class BibleReaderDialog extends Dialog {
         // Mockup board "Bible reader": glass header pills, one glass card of serif verses, Previous / Next.
         FrameLayout frame = new FrameLayout(getContext());
         frame.setBackground(PerazimTheme.createBackgroundGradient());
+        readerFrame = frame;
 
         LinearLayout root = new LinearLayout(getContext());
         root.setOrientation(LinearLayout.VERTICAL);
@@ -739,8 +747,11 @@ public class BibleReaderDialog extends Dialog {
         row.setContentDescription("Verse " + verse.getVerseNumber() + ". Tap to highlight, bookmark, add a note, copy, share or compare.");
         if (!isSearchResult) {
             verseRows.put(verse.getVerseNumber(), row);
+            if (focusedVerseNumber > 0 && verse.getVerseNumber() != focusedVerseNumber) {
+                row.setAlpha(0.35f);
+            }
         }
-        row.setOnClickListener(v -> showVerseOptionsModal(verse));
+        row.setOnClickListener(v -> showVerseActionBar(verse));
         return row;
     }
 
@@ -771,148 +782,231 @@ public class BibleReaderDialog extends Dialog {
     // INTERACTIVE VERSE OPTIONS MODAL
     // =========================================================================
 
-    private void showVerseOptionsModal(final BibleVerse verse) {
-        final String citation = formatCitation(verse);
-        AlertDialog.Builder builder = AppDialogs.builder(getContext());
-
-        LinearLayout container = new LinearLayout(getContext());
-        container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(dp(18), dp(18), dp(18), dp(18));
-        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
-
-        // Title
-        TextView tvTitle = new TextView(getContext());
-        tvTitle.setText("📖 " + citation);
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_PURPLE_DARK());
-        container.addView(tvTitle);
-
-        // Verse Text Snippet
-        TextView tvSnippet = new TextView(getContext());
-        tvSnippet.setText("\u201c" + verse.getText() + "\u201d");
-        tvSnippet.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvSnippet.setTypeface(Typeface.SERIF, Typeface.ITALIC);
-        tvSnippet.setTextColor(COLOR_TEXT_MUTED());
-        tvSnippet.setLineSpacing(dp(2), 1.15f);
-        tvSnippet.setPadding(0, dp(6), 0, dp(14));
-        container.addView(tvSnippet);
-
-        builder.setView(container);
-        final AlertDialog dialog = builder.create();
-
-        // Highlight colours: tap a swatch to highlight, tap the current colour to clear it.
-        TextView tvHighlightLabel = new TextView(getContext());
-        tvHighlightLabel.setText("HIGHLIGHT");
-        tvHighlightLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvHighlightLabel.setLetterSpacing(0.12f);
-        tvHighlightLabel.setTextColor(COLOR_TEXT_MUTED());
-        container.addView(tvHighlightLabel);
-
-        LinearLayout swatchRow = new LinearLayout(getContext());
-        swatchRow.setOrientation(LinearLayout.HORIZONTAL);
-        swatchRow.setPadding(0, dp(8), 0, dp(14));
-        for (final HighlightColors.Colour colour : HighlightColors.ALL) {
-            View swatch = new View(getContext());
-            GradientDrawable dot = new GradientDrawable();
-            dot.setShape(GradientDrawable.OVAL);
-            dot.setColor(Color.parseColor(colour.swatch));
-            boolean active = colour.name.equals(verse.getHighlightColor());
-            dot.setStroke(active ? dp(3) : dp(1), active ? COLOR_PURPLE_DARK() : Color.parseColor("#33000000"));
-            swatch.setBackground(dot);
-            swatch.setContentDescription(colour.name + " highlight" + (active ? ", selected" : ""));
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(40), dp(40));
-            lp.setMargins(0, 0, dp(12), 0);
-            swatch.setOnClickListener(v -> {
-                dialog.dismiss();
-                applyHighlight(verse, active ? null : colour.name);
-            });
-            swatchRow.addView(swatch, lp);
+    /**
+     * Floating action bar over the text: no card, icons float at the bottom. Swipe up to reveal
+     * the second row; every button works on its own.
+     */
+    private void showVerseActionBar(final BibleVerse verse) {
+        dismissActionBar();
+        actionVerse = verse;
+        focusedVerseNumber = verse.getVerseNumber();
+        renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+        if (readerFrame == null) {
+            return;
         }
-        container.addView(swatchRow);
+        final String citation = formatCitation(verse);
+        final boolean newTestament = BibleMapper.resolveBookNumber(verse.getBookId()) >= 40;
 
-        // Action 1: Bookmark (saved verse)
-        String bookmarkLabel = verse.isFavorite() ? "⭐ Remove Bookmark" : "☆ Bookmark Verse";
-        Button btnBookmark = createOptionButton(bookmarkLabel, COLOR_ACCENT_ORANGE(), COLOR_WHITE());
-        btnBookmark.setOnClickListener(v -> {
+        final SwipeUpBar bar = new SwipeUpBar(getContext());
+        bar.setOrientation(LinearLayout.VERTICAL);
+        bar.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        // Colour palette: major colours, muted versions, spectrum and clear.
+        final LinearLayout palette = new LinearLayout(getContext());
+        palette.setOrientation(LinearLayout.VERTICAL);
+        palette.setGravity(Gravity.CENTER_HORIZONTAL);
+        palette.setVisibility(View.GONE);
+        LinearLayout majorRow = new LinearLayout(getContext());
+        majorRow.setGravity(Gravity.CENTER);
+        for (HighlightColors.Colour colour : HighlightColors.ALL) {
+            majorRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                    v -> applyHighlight(verse, colour.name)));
+        }
+        LinearLayout mutedRow = new LinearLayout(getContext());
+        mutedRow.setGravity(Gravity.CENTER);
+        for (HighlightColors.Colour colour : HighlightColors.MUTED) {
+            mutedRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                    v -> applyHighlight(verse, colour.name)));
+        }
+        palette.addView(majorRow);
+        palette.addView(mutedRow);
+        palette.addView(spectrumView(verse));
+        bar.addView(palette, GlassKit.matchWrap(getContext(), 6));
+
+        LinearLayout primary = barRow();
+        primary.addView(barIcon("\u25cf", "Highlight", v -> palette.setVisibility(palette.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE)));
+        primary.addView(barIcon(verse.isFavorite() ? "\u2605" : "\u2606", "Bookmark", v -> {
             boolean nextState = !verse.isFavorite();
             verse.setFavorite(nextState);
-            bibleViewModel.toggleBookmark(verse.getId(), nextState, () -> {
-                Toast.makeText(getContext(), nextState ? "✓ Verse bookmarked!" : "Bookmark removed", Toast.LENGTH_SHORT).show();
-            });
-            dialog.dismiss();
+            bibleViewModel.toggleBookmark(verse.getId(), nextState, () ->
+                    Toast.makeText(getContext(), nextState ? "Bookmarked" : "Bookmark removed", Toast.LENGTH_SHORT).show());
             renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
-        });
-        container.addView(btnBookmark);
-
-        // Action 2: Add / Edit Study Note
-        String noteLabel = !TextUtils.isEmpty(verse.getNote()) ? "📝 Edit Study Note" : "📝 Add Study Note";
-        Button btnNote = createOptionButton(noteLabel, COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
-        btnNote.setOnClickListener(v -> {
-            dialog.dismiss();
+        }));
+        primary.addView(barIcon("\u270e", "Note", v -> {
+            dismissActionBar();
             showStudyNoteEditor(verse);
-        });
-        container.addView(btnNote);
+        }));
+        primary.addView(barIcon("\u2398", "Copy", v -> copyVerse(verse, citation)));
+        primary.addView(barIcon("\u2197", "Share", v -> shareVerse(verse, citation)));
+        bar.addView(primary);
 
-        // Action 3: Copy with reference and translation
-        Button btnCopy = createOptionButton("📋 Copy Verse", COLOR_PURPLE_DARK(), COLOR_WHITE());
-        btnCopy.setOnClickListener(v -> {
-            ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Holy Scripture", verseShareText(verse, citation));
-            if (cm != null) {
-                cm.setPrimaryClip(clip);
-                Toast.makeText(getContext(), "✓ Copied " + citation + " to clipboard!", Toast.LENGTH_SHORT).show();
+        final LinearLayout secondary = barRow();
+        secondary.setVisibility(View.GONE);
+        secondary.addView(barIcon("\u21c4", "Compare", v -> showCompareDialog(verse, citation)));
+        if (newTestament) {
+            secondary.addView(barIcon("\u0391\u03b2", "Interlinear", v -> showInterlinearDialog(verse, citation)));
+        }
+        secondary.addView(barIcon("\u2715", "Close", v -> dismissActionBar()));
+        bar.addView(secondary);
+
+        bar.setOnSwipeUp(() -> secondary.setVisibility(View.VISIBLE));
+        bar.setOnSwipeDown(() -> secondary.setVisibility(View.GONE));
+        TextView hint = GlassKit.text(getContext(), "swipe up for more", 10, false, COLOR_TEXT_MUTED());
+        hint.setGravity(Gravity.CENTER);
+        bar.addView(hint);
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        lp.setMargins(dp(12), 0, dp(12), dp(16));
+        readerFrame.addView(bar, lp);
+        actionBarView = bar;
+    }
+
+    private void dismissActionBar() {
+        if (actionBarView != null && readerFrame != null) {
+            readerFrame.removeView(actionBarView);
+        }
+        actionBarView = null;
+        if (focusedVerseNumber != 0) {
+            focusedVerseNumber = 0;
+            renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+        }
+    }
+
+    private LinearLayout barRow() {
+        LinearLayout row = new LinearLayout(getContext());
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+        return row;
+    }
+
+    /** Circular floating icon with a label for screen readers. */
+    private TextView barIcon(String glyph, String label, View.OnClickListener onClick) {
+        TextView icon = new TextView(getContext());
+        icon.setText(glyph);
+        icon.setGravity(Gravity.CENTER);
+        icon.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        icon.setTextColor(GlassKit.text());
+        GradientDrawable circle = new GradientDrawable();
+        circle.setShape(GradientDrawable.OVAL);
+        circle.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#D9201830"));
+        circle.setStroke(dp(1), Color.parseColor("#33000000"));
+        icon.setBackground(circle);
+        icon.setContentDescription(label);
+        icon.setOnClickListener(onClick);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(48), dp(48));
+        lp.setMargins(dp(5), dp(6), dp(5), dp(6));
+        icon.setLayoutParams(lp);
+        return icon;
+    }
+
+    private View swatchView(String hex, boolean active, View.OnClickListener onClick) {
+        View swatch = new View(getContext());
+        GradientDrawable dot = new GradientDrawable();
+        dot.setShape(GradientDrawable.OVAL);
+        dot.setColor(Color.parseColor(hex));
+        dot.setStroke(active ? dp(3) : dp(1), active ? COLOR_PURPLE_DARK() : Color.parseColor("#33000000"));
+        swatch.setBackground(dot);
+        swatch.setOnClickListener(onClick);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(30), dp(30));
+        lp.setMargins(dp(4), dp(4), dp(4), dp(4));
+        swatch.setLayoutParams(lp);
+        return swatch;
+    }
+
+    /** RGB spectrum: drag or tap across the hue bar to pick any colour. */
+    private View spectrumView(final BibleVerse verse) {
+        final View spectrum = new View(getContext());
+        GradientDrawable hues = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
+                0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000});
+        hues.setCornerRadius(dp(10));
+        spectrum.setBackground(hues);
+        spectrum.setContentDescription("Pick any colour from the spectrum");
+        spectrum.setOnTouchListener((v, event) -> {
+            int action = event.getActionMasked();
+            if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
+                    || action == android.view.MotionEvent.ACTION_UP) {
+                float frac = Math.max(0f, Math.min(1f, event.getX() / Math.max(1, v.getWidth())));
+                int rgb = Color.HSVToColor(new float[]{frac * 359f, 0.55f, 0.98f});
+                String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
+                if (action == android.view.MotionEvent.ACTION_UP) {
+                    applyHighlight(verse, hex);
+                }
             }
-            dialog.dismiss();
+            return true;
         });
-        container.addView(btnCopy);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(260), dp(20));
+        lp.setMargins(0, dp(8), 0, dp(4));
+        spectrum.setLayoutParams(lp);
+        return spectrum;
+    }
 
-        // Action 4: Share the verse with its reference
-        Button btnShare = createOptionButton("↗ Share Verse", COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
-        btnShare.setOnClickListener(v -> {
-            dialog.dismiss();
-            shareVerse(verse, citation);
-        });
-        container.addView(btnShare);
+    /** Stays in front of the verses; swipe up reveals more actions, swipe down hides them. */
+    private static final class SwipeUpBar extends LinearLayout {
+        private float downY;
+        private boolean swiping;
+        private Runnable onUp;
+        private Runnable onDown;
 
-        // Action 5: Compare the verse across every readable translation
-        Button btnCompare = createOptionButton("⇄ Compare Translations", COLOR_PURPLE_DARK(), COLOR_WHITE());
-        btnCompare.setOnClickListener(v -> {
-            dialog.dismiss();
-            showCompareDialog(verse, citation);
-        });
-        container.addView(btnCompare);
-
-        // Greek interlinear, for New Testament verses
-        if (verse.getBookId() != null && BibleMapper.resolveBookNumber(verse.getBookId()) >= 40) {
-            Button btnInterlinear = createOptionButton("\u0391\u03b2 Greek Interlinear", COLOR_PURPLE_DARK(), COLOR_WHITE());
-            btnInterlinear.setOnClickListener(v -> {
-                dialog.dismiss();
-                showInterlinearDialog(verse, citation);
-            });
-            container.addView(btnInterlinear);
+        SwipeUpBar(android.content.Context context) {
+            super(context);
         }
 
-        // Action 6: In Search mode, jump to this chapter
-        if (isSearchMode) {
-            Button btnGoToChapter = createOptionButton("➔ Open Chapter in Reader", COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
-            btnGoToChapter.setOnClickListener(v -> {
-                dialog.dismiss();
-                loadChapterVerses(verse.getBookId(), verse.getChapterNumber());
-            });
-            container.addView(btnGoToChapter);
+        void setOnSwipeUp(Runnable r) { onUp = r; }
+        void setOnSwipeDown(Runnable r) { onDown = r; }
+
+        @Override
+        public boolean onInterceptTouchEvent(android.view.MotionEvent ev) {
+            float slop = getResources().getDisplayMetrics().density * 24;
+            switch (ev.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    downY = ev.getY();
+                    swiping = false;
+                    return false;
+                case android.view.MotionEvent.ACTION_MOVE:
+                    if (Math.abs(ev.getY() - downY) > slop) {
+                        swiping = true;
+                        return true;
+                    }
+                    return false;
+                default:
+                    return false;
+            }
         }
 
-        Button btnCancel = createOptionButton("Close", COLOR_BG_NEUTRAL(), COLOR_TEXT_MUTED());
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-        container.addView(btnCancel);
+        @Override
+        public boolean onTouchEvent(android.view.MotionEvent ev) {
+            if (!swiping) {
+                return false;
+            }
+            if (ev.getActionMasked() == android.view.MotionEvent.ACTION_UP
+                    || ev.getActionMasked() == android.view.MotionEvent.ACTION_CANCEL) {
+                if (ev.getY() < downY && onUp != null) {
+                    onUp.run();
+                } else if (ev.getY() > downY && onDown != null) {
+                    onDown.run();
+                }
+                swiping = false;
+            }
+            return true;
+        }
+    }
 
-        dialog.show();
+    private void copyVerse(BibleVerse verse, String citation) {
+        ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("Holy Scripture", verseShareText(verse, citation));
+        if (cm != null) {
+            cm.setPrimaryClip(clip);
+            Toast.makeText(getContext(), "Copied " + citation, Toast.LENGTH_SHORT).show();
+        }
     }
 
     /** Sets or clears a verse highlight, updates the loaded verse lists and redraws. */
     private void applyHighlight(final BibleVerse verse, @Nullable final String colour) {
         verse.setHighlightColor(colour);
+        if (actionVerse != null) {
+            dismissActionBar();
+        }
         for (BibleVerse loaded : currentVerses) {
             if (loaded.getVerseNumber() == verse.getVerseNumber() && loaded.getChapterNumber() == verse.getChapterNumber()) {
                 loaded.setHighlightColor(colour);
