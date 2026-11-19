@@ -85,8 +85,8 @@ public final class CommunityUiBinder {
         LinearLayout heading = new LinearLayout(activity);
         heading.setOrientation(LinearLayout.VERTICAL);
         heading.setPadding(dp(4), 0, dp(4), 0);
-        heading.addView(GlassKit.text(activity, "Community", 26, true, GlassKit.text()));
-        heading.addView(GlassKit.text(activity, "Faith grows when we share life together.", 13, false, GlassKit.muted()),
+        heading.addView(GlassKit.text(activity, "Community", 22, true, GlassKit.text()));
+        heading.addView(GlassKit.text(activity, "Faith grows when we share life together.", 12, false, GlassKit.muted()),
                 GlassKit.matchWrap(activity, 3));
         content.addView(GlassKit.keep(heading));
 

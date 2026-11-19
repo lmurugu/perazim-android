@@ -129,8 +129,8 @@ public class WorshipUiBinder {
         LinearLayout headerRow = new LinearLayout(activity);
         headerRow.setOrientation(LinearLayout.VERTICAL);
         headerRow.setPadding(dp(4), 0, dp(4), dp(18));
-        headerRow.addView(GlassKit.text(activity, "Worship", 26, true, GlassKit.text()));
-        headerRow.addView(GlassKit.text(activity, "Expanded Hymnal and Chord Browser", 13, false, GlassKit.muted()),
+        headerRow.addView(GlassKit.text(activity, "Worship", 22, true, GlassKit.text()));
+        headerRow.addView(GlassKit.text(activity, "Expanded Hymnal and Chord Browser", 12, false, GlassKit.muted()),
                 GlassKit.matchWrap(activity, 3));
         contentLayout.addView(GlassKit.keep(headerRow));
 

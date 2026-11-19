@@ -687,7 +687,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 ivIcon.setContentDescription("Give");
                 tab.addView(ivIcon);
             } else {
-                ivIcon.setLayoutParams(new LinearLayout.LayoutParams(dp(20), dp(20)));
+                ivIcon.setLayoutParams(new LinearLayout.LayoutParams(dp(22), dp(22)));
                 TextView tvLabel = new TextView(this);
                 tvLabel.setText(labels[i]);
                 // Nav labels stay on one line: text size is capped at 1.1x so "Community" never wraps at Larger text.
@@ -696,12 +696,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     navFont = 1f;
                 }
                 tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        10f * getResources().getDisplayMetrics().density * Math.min(navFont, 1.1f));
+                        11f * getResources().getDisplayMetrics().density * Math.min(navFont, 1.1f));
                 tvLabel.setSingleLine(true);
                 tvLabel.setEllipsize(android.text.TextUtils.TruncateAt.END);
                 tvLabel.setGravity(Gravity.CENTER);
                 tvLabel.setIncludeFontPadding(false);
-                tvLabel.setPadding(0, dp(3), 0, 0);
+                tvLabel.setPadding(0, dp(2), 0, 0);
                 tab.addView(ivIcon);
                 tab.addView(tvLabel);
                 navTabLabels[i] = tvLabel;
