@@ -414,33 +414,75 @@ public class HomeUiBinder {
         return card;
     }
 
+    /**
+     * Home's lower section: three full-width photo cards that fill the page with imagery instead of
+     * small empty tiles, then the free Bible games card.
+     */
     private View createPhotoTiles() {
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.addView(createGlassTile("Sermons", R.drawable.gl_mic,
-                v -> { if (listener != null) listener.onNavigateToTab(1); }), tileParams(0));
-        row.addView(createGlassTile("Events", R.drawable.gl_calendar,
-                v -> { if (listener != null) listener.onNavigateToTab(3); }), tileParams(10));
-        row.addView(createGlassTile("Community", R.drawable.gl_people,
-                v -> { if (listener != null) listener.onNavigateToTab(3); }), tileParams(10));
         LinearLayout column = new LinearLayout(context);
         column.setOrientation(LinearLayout.VERTICAL);
-        column.addView(GlassKit.keep(row));
+        column.addView(createPhotoCard("Sermons", "Listen to and watch the latest messages",
+                "backgrounds/church/sermons_pastor.jpg",
+                v -> { if (listener != null) listener.onNavigateToTab(1); }), photoParams(0));
+        column.addView(createPhotoCard("Events", "Services, meetings and what is coming up",
+                "backgrounds/church/events_choir.jpg",
+                v -> { if (listener != null) listener.onNavigateToTab(3); }), photoParams(12));
+        column.addView(createPhotoCard("Community", "Fellowship, prayer and church life",
+                "backgrounds/church/community_congregation.jpg",
+                v -> { if (listener != null) listener.onNavigateToTab(3); }), photoParams(12));
         View gamesTile = createGlassTile("Bible games: free and offline", R.drawable.gl_star, v -> {
             if (context instanceof android.app.Activity) {
                 org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show((android.app.Activity) context);
             }
         });
         LinearLayout.LayoutParams gamesParams = new LinearLayout.LayoutParams(-1, dp(96));
-        gamesParams.topMargin = dp(10);
+        gamesParams.topMargin = dp(12);
         column.addView(gamesTile, gamesParams);
         return column;
     }
 
-    private LinearLayout.LayoutParams tileParams(int leftDp) {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(110), 1f);
-        lp.leftMargin = dp(leftDp);
+    private LinearLayout.LayoutParams photoParams(int topDp) {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(112));
+        lp.topMargin = dp(topDp);
         return lp;
+    }
+
+    /** A full-width photo card with a frosted caption along the bottom, like the hero above it. */
+    private View createPhotoCard(String title, String subtitle, String photoAsset, View.OnClickListener onClick) {
+        FrameLayout card = new FrameLayout(context);
+        GradientDrawable shape = new GradientDrawable();
+        shape.setCornerRadius(dp(22));
+        shape.setColor(PerazimTheme.COLOR_SURFACE_SOLID);
+        card.setBackground(shape);
+        card.setClipToOutline(true);
+        GlassKit.keep(card);
+
+        Bitmap photo = loadAssetBitmap(photoAsset, 900);
+        if (photo != null) {
+            ImageView iv = new ImageView(context);
+            iv.setImageBitmap(photo);
+            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            card.addView(iv, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
+        FrostPane caption = new FrostPane(context, photo, 0.5f, dp(16),
+                Color.parseColor("#731E0A28"), Color.parseColor("#33FFFFFF"));
+        LinearLayout captionText = new LinearLayout(context);
+        captionText.setOrientation(LinearLayout.VERTICAL);
+        captionText.setPadding(dp(14), dp(10), dp(14), dp(10));
+        captionText.addView(GlassKit.text(context, title, 15, true, Color.WHITE));
+        captionText.addView(GlassKit.text(context, subtitle, 12, false, Color.parseColor("#E6D8EE")),
+                GlassKit.matchWrap(context, 2));
+        caption.addView(GlassKit.keep(captionText));
+        FrameLayout.LayoutParams lpCaption = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        lpCaption.setMargins(dp(10), 0, dp(10), dp(10));
+        card.addView(caption, lpCaption);
+
+        card.setClickable(true);
+        card.setOnClickListener(onClick);
+        return card;
     }
 
     /** Mockup tile: 110dp glass, 24dp corners, 44dp purple icon square, 12sp label. */
