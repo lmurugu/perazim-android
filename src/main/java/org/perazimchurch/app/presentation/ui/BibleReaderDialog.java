@@ -352,6 +352,14 @@ public class BibleReaderDialog extends Dialog {
         window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.TRANSPARENT);
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            // Let the reader draw into the camera-cutout strip at the top, so no other screen shows there.
+            android.view.WindowManager.LayoutParams attrs = window.getAttributes();
+            attrs.layoutInDisplayCutoutMode = android.os.Build.VERSION.SDK_INT >= 30
+                    ? android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+                    : android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            window.setAttributes(attrs);
+        }
         if (android.os.Build.VERSION.SDK_INT >= 29) {
             // Stop the system painting a contrast scrim over the transparent bars.
             window.setStatusBarContrastEnforced(false);
