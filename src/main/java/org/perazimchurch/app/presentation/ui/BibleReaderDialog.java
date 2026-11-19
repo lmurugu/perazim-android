@@ -228,15 +228,62 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
-    /** Opens Appearance (Light, Dark or System), the same choice as on the home page. */
+    /** The three appearance choices, shown side by side in the header; System is the default. */
+    private View themeRowView;
+    private LinearLayout readerColumn;
+
     private void toggleAppearance() {
-        Context ctx = getContext();
-        while (ctx instanceof android.content.ContextWrapper && !(ctx instanceof android.app.Activity)) {
-            ctx = ((android.content.ContextWrapper) ctx).getBaseContext();
+        if (themeRowView != null) {
+            if (readerColumn != null) {
+                readerColumn.removeView(themeRowView);
+            }
+            themeRowView = null;
+            return;
         }
-        if (ctx instanceof android.app.Activity) {
-            org.perazimchurch.app.ui.components.ThemeSwitcher.choose((android.app.Activity) ctx);
+        if (readerColumn == null) {
+            return;
         }
+        LinearLayout row = new LinearLayout(getContext());
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+        row.setPadding(dp(16), dp(8), dp(16), 0);
+        int current = PerazimTheme.savedChoice(getContext());
+        String[] labels = {"System", "Light", "Dark"};
+        for (int choice = 0; choice < labels.length; choice++) {
+            final int picked = choice;
+            TextView pill = GlassKit.text(getContext(), labels[choice], 13, true,
+                    choice == current ? GlassKit.accent() : GlassKit.text());
+            pill.setGravity(Gravity.CENTER);
+            pill.setPadding(dp(14), dp(8), dp(14), dp(8));
+            GradientDrawable chip = new GradientDrawable();
+            chip.setCornerRadius(dp(18));
+            chip.setColor(choice == current
+                    ? (GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#66FFFFFF"))
+                    : (GlassKit.light() ? Color.parseColor("#B3FFFFFF") : Color.parseColor("#33FFFFFF")));
+            chip.setStroke(dp(1), choice == current ? COLOR_ACCENT_ORANGE() : Color.parseColor("#33000000"));
+            pill.setBackground(chip);
+            pill.setClickable(true);
+            pill.setOnClickListener(v -> applyAppearance(picked));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(40), 1f);
+            lp.setMargins(dp(4), 0, dp(4), 0);
+            row.addView(pill, lp);
+        }
+        themeRowView = row;
+        readerColumn.addView(row, 1);
+    }
+
+    /** Saves the chosen appearance and redraws the reader in place, without opening another window. */
+    private void applyAppearance(int choice) {
+        PerazimTheme.saveChoice(getContext(), choice);
+        PerazimTheme.applyPreference(getContext());
+        dismissActionBar();
+        dismissNotesPanel();
+        dismissNoteEditor();
+        themeRowView = null;
+        View rebuilt = buildReaderLayout();
+        setContentView(rebuilt);
+        loadCanonicalBooks();
+        loadChapterVerses(currentBookId, currentChapter);
     }
 
     public void setTargetPassage(@NonNull String bookId, int chapter) {
@@ -303,6 +350,7 @@ public class BibleReaderDialog extends Dialog {
 
         LinearLayout root = new LinearLayout(getContext());
         root.setOrientation(LinearLayout.VERTICAL);
+        readerColumn = root;
 
         root.addView(createHeaderBar());
 
