@@ -46,11 +46,7 @@ jobs:
           emulator-boot-timeout: 1800
           arch: x86_64
           target: google_apis
-          script: >-
-            timeout 300 bash -c 'until adb shell service check package 2>/dev/null | grep -q "package: found"; do sleep 2; done';
-            ./gradlew connectedDebugAndroidTest
-            -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.data.local.DatabaseEncryptionMigrationTest,org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest
-            --stacktrace
+          script: bash server/test/database_suites_ci.sh
       - name: Upload instrumentation reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
