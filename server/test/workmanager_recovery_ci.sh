@@ -9,6 +9,9 @@ echo "packages matching perazim: $(echo "$pm_list" | grep -i perazim | tr '\n' '
 app_pkg=$(echo "$pm_list" | sed 's/^package://' | grep -i perazimchurch | grep -v -i test | head -1 || true)
 app_pkg=${app_pkg:-org.perazimchurch.app}
 echo "installed app package: $app_pkg"
+# No testApplicationId is set in build.gradle, so the instrumentation package is the app package plus .test.
+test_pkg="${app_pkg}.test"
+
 mock_pid=''
 cleanup() {
   if [[ -n "$mock_pid" ]]; then
@@ -22,7 +25,7 @@ node server/test/workmanager_recovery_mock_server.js >/tmp/workmanager-mock.log 
 mock_pid=$!
 mock_ready=false
 for _ in $(seq 1 20); do
-  if curl -fsS http://127.0.0.1:18080/__received >/dev/null; then
+  if curl -fsS http://127.0.0.1:18080/__received >/dev/null 2>&1; then
     mock_ready=true
     break
   fi
@@ -33,12 +36,39 @@ if [[ "$mock_ready" != true ]]; then
   echo 'FAIL: synthetic mock server did not start.' >&2
   exit 1
 fi
+echo 'mock server ready on 127.0.0.1:18080'
+
+# Build and install both APKs ourselves. The Gradle connected task removes the app after its run,
+# which would also delete the queued WorkManager row that the process-death check depends on.
+./gradlew assembleDebug assembleDebugAndroidTest --stacktrace
+app_apk=$(find build/outputs/apk/debug -maxdepth 1 -name '*.apk' | head -1 || true)
+test_apk=$(find build/outputs/apk/androidTest/debug -maxdepth 1 -name '*.apk' | head -1 || true)
+echo "app apk: ${app_apk:-missing}"
+echo "test apk: ${test_apk:-missing}"
+if [[ -z "$app_apk" || -z "$test_apk" ]]; then
+  echo 'FAIL: debug app or test APK was not built.' >&2
+  exit 1
+fi
+adb install -r "$app_apk"
+adb install -r "$test_apk"
 
 adb shell svc wifi disable
 adb shell svc data disable || true  # the emulator image may not expose the phone service
-./gradlew connectedDebugAndroidTest \
-  -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
-  --stacktrace
+
+mkdir -p build/reports/androidTests/connected
+instrument_out=$(adb shell am instrument -w \
+  -e class org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
+  "$test_pkg/androidx.test.runner.AndroidJUnitRunner" 2>&1 | tr -d '\r' || true)
+echo "$instrument_out" | tee build/reports/androidTests/connected/instrumentation-output.txt
+if ! grep -q '^OK (' <<<"$instrument_out"; then
+  echo 'FAIL: sync instrumentation tests did not pass.' >&2
+  exit 1
+fi
+
+if ! adb shell pm path "$app_pkg" 2>/dev/null | tr -d '\r' | grep -q '^package:'; then
+  echo "FAIL: $app_pkg is not installed after the instrumentation run." >&2
+  exit 1
+fi
 
 # Kill the app process, not force-stop it, so JobScheduler may restart persisted work.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
@@ -69,7 +99,7 @@ adb shell svc data enable || true
 
 received=false
 for _ in $(seq 1 60); do
-  if curl -fsS http://127.0.0.1:18080/__received | grep -q 'wm_process_restart_probe'; then
+  if curl -fsS http://127.0.0.1:18080/__received 2>/dev/null | grep -q 'wm_process_restart_probe'; then
     received=true
     break
   fi
@@ -77,7 +107,6 @@ for _ in $(seq 1 60); do
 done
 if [[ "$received" != true ]]; then
   # Keep evidence for the report: app log, JobScheduler and network state, and the mock log.
-  mkdir -p build/reports/androidTests/connected
   {
     echo '== mock server log'; cat /tmp/workmanager-mock.log 2>/dev/null || true
     echo '== jobscheduler (app)'; adb shell dumpsys jobscheduler 2>/dev/null | grep -i -A4 'org.perazimchurch' | head -150 || true
