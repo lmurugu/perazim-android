@@ -414,13 +414,11 @@ public class BibleReaderDialog extends Dialog {
         FrameLayout chapterCard = new FrameLayout(getContext());
         GradientDrawable cardGlass = new GradientDrawable();
         cardGlass.setCornerRadius(dp(28));
-        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#D9241238") : Color.parseColor("#F2200F30"));
-        cardGlass.setStroke(dp(1), GlassKit.light() ? Color.parseColor("#40FFFFFF") : Color.parseColor("#33FFFFFF"));
+        // The card is invisible (no fill, no border) but still holds the verses in place.
+        cardGlass.setColor(Color.TRANSPARENT);
         chapterCard.setBackground(cardGlass);
         chapterCardView = chapterCard;
-        if (GlassKit.light()) {
-            GlassKit.keep(chapterCard);  // light mode: keep the darker frosted card as built
-        }
+        GlassKit.keep(chapterCard);  // stop the automatic glass pass from drawing a card here
         chapterCard.addView(versesScrollView, new FrameLayout.LayoutParams(-1, -1));
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(-1, 0, 1f);
         lpCard.setMargins(dp(16), dp(12), dp(16), dp(12));
@@ -932,7 +930,7 @@ public class BibleReaderDialog extends Dialog {
         int end = sb.length();
         float numberScale = 11f / verseTextSp;
         sb.setSpan(new android.text.style.RelativeSizeSpan(numberScale), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor("#F8A95A")),
+        sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#C06119" : "#F8A95A")),
                 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.setSpan(new android.text.style.TypefaceSpan("sans-serif"), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1018,7 +1016,7 @@ public class BibleReaderDialog extends Dialog {
 
     /** Verse text colour: light ink on the dark frosted chapter card in light mode. */
     private int verseInk() {
-        return GlassKit.light() ? Color.parseColor("#F5EEFF") : GlassKit.text();
+        return GlassKit.text();
     }
 
     private String formatCitation(BibleVerse verse) {
