@@ -1569,7 +1569,7 @@ public class BibleReaderDialog extends Dialog {
                 links.setOrientation(LinearLayout.HORIZONTAL);
                 for (final org.perazimchurch.app.domain.model.VerseLocation loc : note.getLinks()) {
                     TextView chip = GlassKit.text(getContext(), BibleDataSeeder.canonicalBookName(loc.bookNumber)
-                            + " " + loc.chapter + ":" + loc.verse, 12, true, GlassKit.accent());
+                            + " " + loc.chapter + ":" + loc.verse, 12, true, GlassKit.light() ? GlassKit.accent() : Color.parseColor("#B8530F"));
                     chip.setPadding(dp(8), dp(4), dp(8), dp(4));
                     chip.setClickable(true);
                     chip.setOnClickListener(v -> {
