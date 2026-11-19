@@ -83,8 +83,18 @@ public final class GamesHubDialog extends Dialog {
         }
     }
 
+    /**
+     * A plain Dialog uses the framework's light Theme.Dialog, which paints a light window frame
+     * and light default text. Pick a Material theme that matches the app's current mode instead.
+     */
+    private static int windowTheme() {
+        return PerazimTheme.isLight()
+                ? android.R.style.Theme_Material_Light_NoActionBar
+                : android.R.style.Theme_Material_NoActionBar;
+    }
+
     private GamesHubDialog(Activity activity) {
-        super(activity);
+        super(activity, windowTheme());
         this.activity = activity;
         ownerId = SessionManager.getInstance(activity).getActiveUserId();
         scorePrefix = ownerKey(ownerId);
