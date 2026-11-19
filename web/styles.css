@@ -71,5 +71,7 @@ a { color: #FFD2A8; }
 .tab.on { color: var(--text); background: var(--glass); border-radius: 12px; }
 .status { min-height: 1.5em; color: #FFD2A8; font-size: 14px; }
 .panel { margin-top: 8px; }
+.photo { display: block; max-width: 100%; height: auto; border-radius: 12px; margin: 8px 0; }
+audio { width: 100%; margin: 8px 0; }
 @media (min-width: 720px) { .view { padding-top: 20px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
