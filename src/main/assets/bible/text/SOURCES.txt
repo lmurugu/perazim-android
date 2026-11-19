@@ -1,0 +1,13 @@
+Bundled Bible texts (public domain)
+
+KJV.tsv.gz  King James Version (1611/1769). Source: eBible.org English KJV USFM release.
+            Public domain.
+WEB.tsv.gz  World English Bible. Source: eBible.org USFM release. Public domain (eBible.org
+            copyright statement: "The World English Bible is in the Public Domain").
+ASV.tsv.gz  American Standard Version (1901). Source: eBible.org USFM release. Public domain.
+BSB.tsv.gz  Berean Standard Bible. Source: eBible.org "engbsb" USFM release (BSB Publishing).
+            Public domain: dedicated to the public domain on 30 April 2023 by Berean Bible.
+            The USFM release carries Berean study notes and headings; only verse text is kept.
+
+Format: bookNumber<TAB>chapter<TAB>verse<TAB>text, gzip compressed.
+Built with scripts/bible/build_bible_text.py.

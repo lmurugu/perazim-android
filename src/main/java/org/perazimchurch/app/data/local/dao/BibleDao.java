@@ -11,6 +11,7 @@ import org.perazimchurch.app.data.local.entity.BibleBookEntity;
 import org.perazimchurch.app.data.local.entity.BibleChapterEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
+import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
 
 import java.util.List;
 
@@ -87,7 +88,7 @@ public interface BibleDao {
     @Query("SELECT * FROM bible_verses WHERE (translationId = 'KJV' OR translationId IS NULL) AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
     BibleVerseEntity getVerse(int bookNumber, int chapterNumber, int verseNumber);
 
-    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 200")
     List<BibleVerseEntity> searchVerses(String translationId, String query);
 
     @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :firstTerm || '%' AND text LIKE '%' || :secondTerm || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
@@ -119,4 +120,27 @@ public interface BibleDao {
 
     @Query("DELETE FROM bible_translations")
     void deleteAllTranslations();
+
+    // --- Bulk text import (bundled public-domain translations) ---
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertVersesIgnoringExisting(List<BibleVerseEntity> verses);
+
+    @Query("SELECT COUNT(*) FROM bible_verses WHERE translationId = :translationId")
+    int countVerses(String translationId);
+
+    // --- Highlights (per verse position, shared by every translation) ---
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertHighlight(BibleVerseHighlightEntity highlight);
+
+    @Query("DELETE FROM bible_verse_highlights WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber")
+    void deleteHighlight(int bookNumber, int chapterNumber, int verseNumber);
+
+    @Query("SELECT * FROM bible_verse_highlights WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber")
+    List<BibleVerseHighlightEntity> getHighlightsForChapter(int bookNumber, int chapterNumber);
+
+    @Query("SELECT * FROM bible_verse_highlights ORDER BY updatedMillis DESC")
+    List<BibleVerseHighlightEntity> getAllHighlights();
+
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
+    BibleVerseEntity getVerseInTranslation(String translationId, int bookNumber, int chapterNumber, int verseNumber);
 }

@@ -5,6 +5,7 @@ import org.perazimchurch.app.domain.model.BibleChapter;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Repository interface defining operations for Scripture reading, translations, and verse bookmarks.
@@ -18,4 +19,19 @@ public interface BibleRepository {
     List<BibleVerse> getBookmarkedVerses();
     void bookmarkVerse(String verseId, boolean isFavorite);
     void saveVerseNote(String verseId, String note);
+
+    /** Translations whose text is bundled and readable offline. */
+    List<BibleTranslation> getTranslationsWithText();
+
+    /** Highlight colour names by verse number for one chapter. */
+    Map<Integer, String> getHighlightsForChapter(String bookId, int chapterNumber);
+
+    /** Sets a verse highlight colour, or clears it when {@code colour} is null. */
+    void setHighlight(String bookId, int chapterNumber, int verseNumber, String colour);
+
+    /** Bookmarked verses and highlighted verses together, in reading order, with the default translation text. */
+    List<BibleVerse> getSavedVerses();
+
+    /** The same verse in every translation that has text, in picker order. */
+    List<BibleVerse> getVerseInAllTranslations(String bookId, int chapterNumber, int verseNumber);
 }

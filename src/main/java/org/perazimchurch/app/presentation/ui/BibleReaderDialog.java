@@ -8,6 +8,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -41,6 +42,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.perazimchurch.app.domain.model.BibleTranslation;
+import org.perazimchurch.app.domain.model.ScriptureReference;
+import org.perazimchurch.app.data.mapper.BibleMapper;
+import org.perazimchurch.app.presentation.bible.HighlightColors;
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.presentation.viewmodel.BibleViewModel;
@@ -468,36 +473,49 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void showTranslationSelectorDialog() {
-        final String[] translationIds = {"KJV", "SUV", "NIV", "ESV", "NKJV"};
-        final String[] translationLabels = {
-                "King James Version (KJV)",
-                "Swahili Union Version (SUV)",
-                "New International Version (NIV)",
-                "English Standard Version (ESV)",
-                "New King James Version (NKJV)"
-        };
+        bibleViewModel.loadReadableTranslations(translations -> {
+            if (translations == null || translations.isEmpty()) {
+                Toast.makeText(getContext(), "No translation text is available offline.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            rememberTranslationNames(translations);
+            final List<String> ids = new ArrayList<>();
+            List<String> labels = new ArrayList<>();
+            int selectedIndex = 0;
+            for (BibleTranslation t : translations) {
+                if (t.getId() == null) {
+                    continue;
+                }
+                if (t.getId().equalsIgnoreCase(currentTranslation)) {
+                    selectedIndex = ids.size();
+                }
+                ids.add(t.getId());
+                labels.add(t.getId() + " · " + (t.getName() != null ? t.getName() : t.getId()));
+            }
+            AppDialogs.builder(getContext())
+                    .setTitle("Select Translation / Chagua Tafsiri")
+                    .setSingleChoiceItems(labels.toArray(new String[0]), selectedIndex, (dialog, which) -> {
+                        String chosen = ids.get(which);
+                        dialog.dismiss();
+                        if (!chosen.equalsIgnoreCase(currentTranslation)) {
+                            currentTranslation = chosen;
+                            updateTranslationBadge();
+                            loadChapterVerses(currentBookId, currentChapter);
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+    }
 
-        int selectedIndex = 0;
-        for (int i = 0; i < translationIds.length; i++) {
-            if (translationIds[i].equalsIgnoreCase(currentTranslation)) {
-                selectedIndex = i;
-                break;
+    private final Map<String, String> translationNames = new HashMap<>();
+
+    private void rememberTranslationNames(List<BibleTranslation> translations) {
+        for (BibleTranslation t : translations) {
+            if (t.getId() != null && t.getName() != null) {
+                translationNames.put(t.getId(), t.getName());
             }
         }
-
-        AppDialogs.builder(getContext())
-                .setTitle("Select Translation / Chagua Tafsiri")
-                .setSingleChoiceItems(translationLabels, selectedIndex, (dialog, which) -> {
-                    String chosen = translationIds[which];
-                    dialog.dismiss();
-                    if (!chosen.equalsIgnoreCase(currentTranslation)) {
-                        currentTranslation = chosen;
-                        updateTranslationBadge();
-                        loadChapterVerses(currentBookId, currentChapter);
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
     }
 
     // =========================================================================
@@ -585,6 +603,15 @@ public class BibleReaderDialog extends Dialog {
             return;
         }
 
+        // A typed reference such as "John 3:16" opens the passage directly, offline.
+        ScriptureReference reference = ScriptureReference.parse(query);
+        if (reference != null) {
+            pendingScrollVerse = reference.namesVerse() ? reference.verseStart : 0;
+            loadChapterVerses(BibleMapper.getBookIdFromNumber(reference.bookNumber), reference.chapter);
+            hideKeyboard(etSearchQuery);
+            return;
+        }
+
         loadingProgress.setVisibility(View.VISIBLE);
         tvEmptyState.setVisibility(View.GONE);
         clearVerseViews();
@@ -617,7 +644,11 @@ public class BibleReaderDialog extends Dialog {
     // VERSE LIST RENDERING & TYPOGRAPHY
     // =========================================================================
 
+    private final Map<Integer, View> verseRows = new HashMap<>();
+    private int pendingScrollVerse = 0;
+
     private void clearVerseViews() {
+        verseRows.clear();
         for (int i = versesContainer.getChildCount() - 1; i >= 0; i--) {
             View child = versesContainer.getChildAt(i);
             if (child != loadingProgress && child != tvEmptyState) {
@@ -637,7 +668,13 @@ public class BibleReaderDialog extends Dialog {
         for (final BibleVerse verse : verses) {
             versesContainer.addView(createVerseRow(verse, isSearchResult));
         }
-        versesScrollView.post(() -> versesScrollView.scrollTo(0, 0));
+        final View target = (!isSearchResult && pendingScrollVerse > 0) ? verseRows.get(pendingScrollVerse) : null;
+        pendingScrollVerse = 0;
+        if (target != null) {
+            versesScrollView.post(() -> versesScrollView.scrollTo(0, offsetWithin(target, versesScrollView)));
+        } else {
+            versesScrollView.post(() -> versesScrollView.scrollTo(0, 0));
+        }
     }
 
     private View createVerseRow(final BibleVerse verse, final boolean isSearchResult) {
@@ -645,7 +682,14 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout row = new LinearLayout(getContext());
         row.setOrientation(LinearLayout.VERTICAL);
         boolean isCornerstone = "2SA".equals(verse.getBookId()) && verse.getChapterNumber() == 5 && verse.getVerseNumber() == 20;
-        if (verse.isFavorite()) {
+        HighlightColors.Colour highlight = HighlightColors.byName(verse.getHighlightColor());
+        if (highlight != null) {
+            GradientDrawable mark = new GradientDrawable();
+            mark.setCornerRadius(dp(12));
+            mark.setColor(Color.parseColor(highlight.tint));
+            row.setBackground(mark);
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
+        } else if (verse.isFavorite()) {
             GradientDrawable mark = new GradientDrawable();
             mark.setCornerRadius(dp(12));
             mark.setColor(Color.parseColor("#26E17D2F"));
@@ -691,9 +735,26 @@ public class BibleReaderDialog extends Dialog {
         lpRow.setMargins(0, 0, 0, dp(14));
         row.setLayoutParams(lpRow);
         row.setClickable(true);
-        row.setContentDescription("Verse " + verse.getVerseNumber() + ". Tap to bookmark, add a note or copy.");
+        row.setContentDescription("Verse " + verse.getVerseNumber() + ". Tap to highlight, bookmark, add a note, copy, share or compare.");
+        if (!isSearchResult) {
+            verseRows.put(verse.getVerseNumber(), row);
+        }
         row.setOnClickListener(v -> showVerseOptionsModal(verse));
         return row;
+    }
+
+    /** Vertical position of a view inside an ancestor scroll view. */
+    private static int offsetWithin(View target, ViewGroup ancestor) {
+        int y = 0;
+        View current = target;
+        while (current != null && current.getParent() != null && current.getParent() != ancestor) {
+            y += current.getTop();
+            current = (View) current.getParent();
+        }
+        if (current != null) {
+            y += current.getTop();
+        }
+        return Math.max(0, y - ancestor.getPaddingTop());
     }
 
     private String formatCitation(BibleVerse verse) {
@@ -728,7 +789,7 @@ public class BibleReaderDialog extends Dialog {
 
         // Verse Text Snippet
         TextView tvSnippet = new TextView(getContext());
-        tvSnippet.setText("“" + verse.getText() + "”");
+        tvSnippet.setText("\u201c" + verse.getText() + "\u201d");
         tvSnippet.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvSnippet.setTypeface(Typeface.SERIF, Typeface.ITALIC);
         tvSnippet.setTextColor(COLOR_TEXT_MUTED());
@@ -739,8 +800,38 @@ public class BibleReaderDialog extends Dialog {
         builder.setView(container);
         final AlertDialog dialog = builder.create();
 
-        // Action 1: Bookmark / Highlight Toggle
-        String bookmarkLabel = verse.isFavorite() ? "⭐ Remove Bookmark" : "☆ Bookmark / Highlight";
+        // Highlight colours: tap a swatch to highlight, tap the current colour to clear it.
+        TextView tvHighlightLabel = new TextView(getContext());
+        tvHighlightLabel.setText("HIGHLIGHT");
+        tvHighlightLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tvHighlightLabel.setLetterSpacing(0.12f);
+        tvHighlightLabel.setTextColor(COLOR_TEXT_MUTED());
+        container.addView(tvHighlightLabel);
+
+        LinearLayout swatchRow = new LinearLayout(getContext());
+        swatchRow.setOrientation(LinearLayout.HORIZONTAL);
+        swatchRow.setPadding(0, dp(8), 0, dp(14));
+        for (final HighlightColors.Colour colour : HighlightColors.ALL) {
+            View swatch = new View(getContext());
+            GradientDrawable dot = new GradientDrawable();
+            dot.setShape(GradientDrawable.OVAL);
+            dot.setColor(Color.parseColor(colour.swatch));
+            boolean active = colour.name.equals(verse.getHighlightColor());
+            dot.setStroke(active ? dp(3) : dp(1), active ? COLOR_PURPLE_DARK() : Color.parseColor("#33000000"));
+            swatch.setBackground(dot);
+            swatch.setContentDescription(colour.name + " highlight" + (active ? ", selected" : ""));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(40), dp(40));
+            lp.setMargins(0, 0, dp(12), 0);
+            swatch.setOnClickListener(v -> {
+                dialog.dismiss();
+                applyHighlight(verse, active ? null : colour.name);
+            });
+            swatchRow.addView(swatch, lp);
+        }
+        container.addView(swatchRow);
+
+        // Action 1: Bookmark (saved verse)
+        String bookmarkLabel = verse.isFavorite() ? "⭐ Remove Bookmark" : "☆ Bookmark Verse";
         Button btnBookmark = createOptionButton(bookmarkLabel, COLOR_ACCENT_ORANGE(), COLOR_WHITE());
         btnBookmark.setOnClickListener(v -> {
             boolean nextState = !verse.isFavorite();
@@ -762,11 +853,11 @@ public class BibleReaderDialog extends Dialog {
         });
         container.addView(btnNote);
 
-        // Action 3: Copy to Clipboard
-        Button btnCopy = createOptionButton("📋 Copy to Clipboard", COLOR_PURPLE_DARK(), COLOR_WHITE());
+        // Action 3: Copy with reference and translation
+        Button btnCopy = createOptionButton("📋 Copy Verse", COLOR_PURPLE_DARK(), COLOR_WHITE());
         btnCopy.setOnClickListener(v -> {
             ClipboardManager cm = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Holy Scripture", citation + "\n\"" + verse.getText() + "\" (" + verse.getTranslationId() + ")");
+            ClipData clip = ClipData.newPlainText("Holy Scripture", verseShareText(verse, citation));
             if (cm != null) {
                 cm.setPrimaryClip(clip);
                 Toast.makeText(getContext(), "✓ Copied " + citation + " to clipboard!", Toast.LENGTH_SHORT).show();
@@ -775,7 +866,23 @@ public class BibleReaderDialog extends Dialog {
         });
         container.addView(btnCopy);
 
-        // Action 4: In Search mode, jump to this chapter
+        // Action 4: Share the verse with its reference
+        Button btnShare = createOptionButton("↗ Share Verse", COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
+        btnShare.setOnClickListener(v -> {
+            dialog.dismiss();
+            shareVerse(verse, citation);
+        });
+        container.addView(btnShare);
+
+        // Action 5: Compare the verse across every readable translation
+        Button btnCompare = createOptionButton("⇄ Compare Translations", COLOR_PURPLE_DARK(), COLOR_WHITE());
+        btnCompare.setOnClickListener(v -> {
+            dialog.dismiss();
+            showCompareDialog(verse, citation);
+        });
+        container.addView(btnCompare);
+
+        // Action 6: In Search mode, jump to this chapter
         if (isSearchMode) {
             Button btnGoToChapter = createOptionButton("➔ Open Chapter in Reader", COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
             btnGoToChapter.setOnClickListener(v -> {
@@ -790,6 +897,79 @@ public class BibleReaderDialog extends Dialog {
         container.addView(btnCancel);
 
         dialog.show();
+    }
+
+    /** Sets or clears a verse highlight, updates the loaded verse lists and redraws. */
+    private void applyHighlight(final BibleVerse verse, @Nullable final String colour) {
+        verse.setHighlightColor(colour);
+        for (BibleVerse loaded : currentVerses) {
+            if (loaded.getVerseNumber() == verse.getVerseNumber() && loaded.getChapterNumber() == verse.getChapterNumber()) {
+                loaded.setHighlightColor(colour);
+            }
+        }
+        bibleViewModel.setHighlight(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), colour, () ->
+                Toast.makeText(getContext(), colour == null ? "Highlight removed" : "Highlighted " + colour, Toast.LENGTH_SHORT).show());
+        renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+    }
+
+    /** The text copied or shared for a verse: reference, verse text and translation id. */
+    private String verseShareText(BibleVerse verse, String citation) {
+        return citation + " (" + verse.getTranslationId() + ")\n\u201c" + verse.getText() + "\u201d";
+    }
+
+    private void shareVerse(BibleVerse verse, String citation) {
+        Intent send = new Intent(Intent.ACTION_SEND);
+        send.setType("text/plain");
+        send.putExtra(Intent.EXTRA_SUBJECT, citation);
+        send.putExtra(Intent.EXTRA_TEXT, verseShareText(verse, citation));
+        try {
+            getContext().startActivity(Intent.createChooser(send, "Share verse"));
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "No app available to share this verse.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /** Shows the same verse in every readable translation, one under the other. */
+    private void showCompareDialog(final BibleVerse verse, final String citation) {
+        bibleViewModel.loadReadableTranslations(translations -> {
+            if (translations != null) {
+                rememberTranslationNames(translations);
+            }
+            bibleViewModel.loadVerseInAllTranslations(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), versions -> {
+                if (versions == null || versions.isEmpty()) {
+                    Toast.makeText(getContext(), "No other translations are available for this verse.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                LinearLayout box = new LinearLayout(getContext());
+                box.setOrientation(LinearLayout.VERTICAL);
+                box.setPadding(dp(18), dp(8), dp(18), dp(12));
+                for (BibleVerse version : versions) {
+                    String name = translationNames.get(version.getTranslationId());
+                    TextView head = new TextView(getContext());
+                    head.setText(version.getTranslationId() + (name != null ? " · " + name : ""));
+                    head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                    head.setLetterSpacing(0.08f);
+                    head.setTypeface(Typeface.DEFAULT_BOLD);
+                    head.setTextColor(COLOR_PRIMARY_PURPLE());
+                    head.setPadding(0, dp(12), 0, dp(4));
+                    box.addView(head);
+                    TextView body = new TextView(getContext());
+                    body.setText(version.getText());
+                    body.setTypeface(Typeface.SERIF);
+                    body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                    body.setTextColor(GlassKit.text());
+                    body.setLineSpacing(0f, 1.35f);
+                    box.addView(body);
+                }
+                ScrollView scroll = new ScrollView(getContext());
+                scroll.addView(box);
+                AppDialogs.builder(getContext())
+                        .setTitle(citation + " · Compare")
+                        .setView(scroll)
+                        .setPositiveButton("Close", null)
+                        .show();
+            });
+        });
     }
 
     private void showStudyNoteEditor(final BibleVerse verse) {

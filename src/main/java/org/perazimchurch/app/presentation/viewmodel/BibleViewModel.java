@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import org.perazimchurch.app.domain.model.BibleBook;
+import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.repository.BibleRepository;
 import org.perazimchurch.app.presentation.state.UiState;
@@ -172,6 +173,61 @@ public class BibleViewModel extends ViewModel {
                 if (onDone != null) {
                     postCallback(onDone);
                 }
+            }
+        });
+    }
+
+    /**
+     * Loads the translations whose text is bundled and readable offline.
+     */
+    public void loadReadableTranslations(@Nullable Consumer<List<BibleTranslation>> callback) {
+        executor.execute(() -> {
+            List<BibleTranslation> result;
+            try {
+                result = bibleRepo.getTranslationsWithText();
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading readable translations");
+                result = Collections.emptyList();
+            }
+            if (callback != null) {
+                final List<BibleTranslation> res = result != null ? result : Collections.emptyList();
+                postCallback(() -> callback.accept(res));
+            }
+        });
+    }
+
+    /**
+     * Sets or clears the highlight colour of a verse.
+     */
+    public void setHighlight(@NonNull String bookId, int chapter, int verse, @Nullable String colour, @Nullable Runnable onDone) {
+        executor.execute(() -> {
+            try {
+                bibleRepo.setHighlight(bookId, chapter, verse, colour);
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving Bible highlight");
+            } finally {
+                if (onDone != null) {
+                    postCallback(onDone);
+                }
+            }
+        });
+    }
+
+    /**
+     * Loads the same verse in every readable translation, for side-by-side comparison.
+     */
+    public void loadVerseInAllTranslations(@NonNull String bookId, int chapter, int verse, @Nullable Consumer<List<BibleVerse>> callback) {
+        executor.execute(() -> {
+            List<BibleVerse> result;
+            try {
+                result = bibleRepo.getVerseInAllTranslations(bookId, chapter, verse);
+            } catch (Exception e) {
+                Log.e(TAG, "Error comparing Bible translations");
+                result = Collections.emptyList();
+            }
+            if (callback != null) {
+                final List<BibleVerse> res = result != null ? result : Collections.emptyList();
+                postCallback(() -> callback.accept(res));
             }
         });
     }

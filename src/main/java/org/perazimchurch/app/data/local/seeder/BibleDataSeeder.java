@@ -45,7 +45,7 @@ public final class BibleDataSeeder {
     public static final String SWAHILI_TRANSLATION_ID = "SUV";
 
     // Canonical 66 Books Metadata [ID, Name, Testament, ChapterCount]
-    private static final Object[][] CANONICAL_BOOKS = {
+    static final Object[][] CANONICAL_BOOKS = {
             {"GEN", "Genesis", "OLD", 50},
             {"EXO", "Exodus", "OLD", 40},
             {"LEV", "Leviticus", "OLD", 27},
@@ -143,6 +143,10 @@ public final class BibleDataSeeder {
             Log.w(TAG, "Cannot seed: bibleDao instance is null");
             return;
         }
+
+        // Full public-domain texts are imported on every call that has assets; the import is
+        // idempotent and returns at once when each bundled translation is already complete.
+        BibleTextImporter.importBundledTranslations(context, bibleDao);
 
         // 1. Check if default translation exists
         List<BibleTranslationEntity> existingTranslations = bibleDao.getTranslations();

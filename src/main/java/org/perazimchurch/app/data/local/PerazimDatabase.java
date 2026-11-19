@@ -43,6 +43,7 @@ import org.perazimchurch.app.data.local.entity.BibleBookEntity;
 import org.perazimchurch.app.data.local.entity.BibleChapterEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
+import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
 import org.perazimchurch.app.data.local.entity.CampusEntity;
 import org.perazimchurch.app.data.local.entity.CommentEntity;
 import org.perazimchurch.app.data.local.entity.ConnectionEntity;
@@ -90,6 +91,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         BibleBookEntity.class,
         BibleChapterEntity.class,
         BibleVerseEntity.class,
+        BibleVerseHighlightEntity.class,
         ConversationEntity.class,
         MessageEntity.class,
         ConnectionEntity.class,
@@ -106,7 +108,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         EventRsvpEntity.class,
         DailyChallengeEntity.class
     },
-    version = 7,
+    version = 8,
     exportSchema = true
 )
 @TypeConverters({Converters.class})
@@ -213,6 +215,17 @@ public abstract class PerazimDatabase extends RoomDatabase {
         }
     };
 
+    public static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            // Verse highlights in several colours; existing bookmarks and notes are untouched.
+            db.execSQL("CREATE TABLE IF NOT EXISTS `bible_verse_highlights` (" +
+                    "`bookNumber` INTEGER NOT NULL, `chapterNumber` INTEGER NOT NULL, " +
+                    "`verseNumber` INTEGER NOT NULL, `color` TEXT, `updatedMillis` INTEGER NOT NULL, " +
+                    "PRIMARY KEY(`bookNumber`, `chapterNumber`, `verseNumber`))");
+        }
+    };
+
     public static PerazimDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (PerazimDatabase.class) {
@@ -226,7 +239,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
                             DATABASE_NAME
                     )
                     .openHelperFactory(new SupportOpenHelperFactory(databaseKey))
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                     .build();
                 }
             }
