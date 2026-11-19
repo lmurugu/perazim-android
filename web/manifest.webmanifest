@@ -1,0 +1,16 @@
+{
+  "name": "Perazim Church",
+  "short_name": "Perazim",
+  "description": "Scripture, sermons, prayer and community for Perazim Mission Church, Embu.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "lang": "en",
+  "background_color": "#2A0F33",
+  "theme_color": "#681A7D",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

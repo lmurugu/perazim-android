@@ -1,0 +1,75 @@
+/* Frosted glass on the church's purple and orange. Tokens live on :root. */
+:root {
+  --deep: #2A0F33;
+  --royal: #681A7D;
+  --orange: #E17D2F;
+  --text: #FFFFFF;
+  --muted: rgba(255, 255, 255, 0.72);
+  --glass: rgba(255, 255, 255, 0.12);
+  --glass-edge: rgba(255, 255, 255, 0.22);
+  --radius: 16px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--deep);
+  color: var(--text);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  padding: env(safe-area-inset-top) 0 calc(72px + env(safe-area-inset-bottom));
+}
+.bg {
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(225, 125, 47, 0.45), transparent 42%),
+    radial-gradient(circle at 90% 30%, rgba(104, 26, 125, 0.9), transparent 55%),
+    linear-gradient(160deg, #2A0F33 0%, #4a1758 100%);
+}
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+.top {
+  position: sticky; top: 0; z-index: 2; margin: 12px 12px 0;
+  border-radius: var(--radius); padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top h1 { font-size: 20px; margin: 0; }
+.muted { color: var(--muted); font-size: 14px; }
+.view { padding: 12px 16px 24px; max-width: 640px; margin: 0 auto; }
+.card { border-radius: var(--radius); padding: 14px 16px; margin: 12px 0; }
+.card h2 { font-size: 18px; margin: 4px 0 6px; }
+.card p { margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.meta { color: var(--muted); font-size: 13px; }
+.hero { font-size: 22px; font-weight: 700; margin: 8px 0 4px; }
+button, .btn {
+  font: inherit; color: var(--text); cursor: pointer;
+  background: linear-gradient(135deg, var(--orange), var(--royal));
+  border: 0; border-radius: 12px; padding: 10px 14px; min-height: 44px;
+  margin: 4px 4px 4px 0;
+}
+button.ghost { background: var(--glass); border: 1px solid var(--glass-edge); }
+button:disabled { opacity: 0.5; cursor: default; }
+input, select {
+  width: 100%; font: inherit; color: var(--text);
+  background: rgba(0, 0, 0, 0.25); border: 1px solid var(--glass-edge);
+  border-radius: 12px; padding: 12px; min-height: 44px; margin: 6px 0;
+}
+select option { color: #111; }
+label { display: block; font-size: 14px; color: var(--muted); }
+a { color: #FFD2A8; }
+.tabs {
+  position: fixed; left: 12px; right: 12px; bottom: calc(8px + env(safe-area-inset-bottom)); z-index: 3;
+  border-radius: 20px; display: flex; justify-content: space-around; padding: 6px;
+}
+.tab {
+  background: transparent; border: 0; margin: 0; flex: 1;
+  color: var(--muted); padding: 8px 4px; min-height: 48px; font-size: 13px;
+}
+.tab.on { color: var(--text); background: var(--glass); border-radius: 12px; }
+.status { min-height: 1.5em; color: #FFD2A8; font-size: 14px; }
+.panel { margin-top: 8px; }
+@media (min-width: 720px) { .view { padding-top: 20px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
