@@ -71,8 +71,24 @@ install_apk() {
 install_apk "$app_apk"
 install_apk "$test_apk"
 
-adb shell svc wifi disable
-adb shell svc data disable || true  # the emulator image may not expose the phone service
+# The emulator's system services can also drop a shell call with "Broken pipe" after they answer.
+# Retry the call with a pause and a service wait before each retry, up to five times.
+adb_retry() {
+  local attempt
+  for attempt in 1 2 3 4 5; do
+    if adb shell "$@"; then
+      return 0
+    fi
+    echo "adb shell $* failed (attempt $attempt); waiting 10 seconds before retrying"
+    sleep 10
+    wait_for_system_services
+  done
+  echo "FAIL: adb shell $* failed after five attempts." >&2
+  return 1
+}
+
+adb_retry svc wifi disable
+adb_retry svc data disable || true  # the emulator image may not expose the phone service
 
 mkdir -p build/reports/androidTests/connected
 instrument_out=$(adb shell am instrument -w \
@@ -131,8 +147,8 @@ if [[ "$killed" != true ]]; then
 fi
 echo 'app pid after kill: none'
 
-adb shell svc wifi enable
-adb shell svc data enable || true
+adb_retry svc wifi enable
+adb_retry svc data enable || true
 # The emulator can take minutes to bring up a default network after svc wifi enable, and JobScheduler
 # will not run the CONNECTED job until it has one. Run 44579465224 needed a little over 3 minutes,
 # so poll for up to 10 minutes before the delivery wait starts.
