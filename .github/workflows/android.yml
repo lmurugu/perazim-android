@@ -84,5 +84,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: background-sync-instrumentation-reports
-          path: build/outputs/androidTest-results/connected/**/*.xml
+          path: |
+            build/outputs/androidTest-results/connected/**/*.xml
+            build/reports/androidTests/connected/**
           if-no-files-found: warn

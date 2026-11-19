@@ -50,6 +50,14 @@ for _ in $(seq 1 60); do
   sleep 2
 done
 if [[ "$received" != true ]]; then
+  # Keep evidence for the report: app log, JobScheduler and network state, and the mock log.
+  mkdir -p build/reports/androidTests/connected
+  {
+    echo '== mock server log'; cat /tmp/workmanager-mock.log 2>/dev/null || true
+    echo '== jobscheduler (app)'; adb shell dumpsys jobscheduler 2>/dev/null | grep -i -A4 'org.perazimchurch' | head -150 || true
+    echo '== connectivity'; adb shell dumpsys connectivity 2>/dev/null | grep -i 'active default\|NetworkAgentInfo\|VALIDATED' | head -40 || true
+    echo '== logcat (app and WorkManager)'; adb logcat -d 2>/dev/null | grep -i 'perazim\|WorkManager\|JobScheduler\|JobService\|BackgroundSync' | tail -400 || true
+  } > build/reports/androidTests/connected/workmanager-diagnostics.txt 2>&1
   echo 'FAIL: queued synthetic mutation was not delivered after process death without reopening the app.' >&2
   exit 1
 fi
