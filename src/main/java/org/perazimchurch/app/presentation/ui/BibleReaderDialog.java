@@ -264,7 +264,8 @@ public class BibleReaderDialog extends Dialog {
                 android.graphics.drawable.Drawable monitor = getContext().getDrawable(org.perazimchurch.app.R.drawable.ic_theme_system);
                 if (monitor != null) {
                     monitor.setTint(choice == current ? COLOR_ACCENT_ORANGE() : GlassKit.text());
-                    icon.setCompoundDrawablesWithIntrinsicBounds(monitor, null, null, null);
+                    icon.setCompoundDrawablesWithIntrinsicBounds(null, monitor, null, null);
+                    icon.setPadding(0, dp(12), 0, 0);
                 }
             }
             GradientDrawable circle = new GradientDrawable();
@@ -422,7 +423,7 @@ public class BibleReaderDialog extends Dialog {
         }
         chapterCard.addView(versesScrollView, new FrameLayout.LayoutParams(-1, -1));
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(-1, 0, 1f);
-        lpCard.setMargins(dp(16), 0, dp(16), dp(8));
+        lpCard.setMargins(dp(16), dp(12), dp(16), dp(12));
         root.addView(chapterCard, lpCard);
 
         // Previous / Next sit below the card, so they never cover the verses.
@@ -480,7 +481,7 @@ public class BibleReaderDialog extends Dialog {
         row.addView(tvTranslationBadge, new LinearLayout.LayoutParams(-2, dp(44)));
 
         FrameLayout themeToggle = GlassKit.circleIcon(getContext(),
-                GlassKit.light() ? org.perazimchurch.app.R.drawable.gl_moon : org.perazimchurch.app.R.drawable.gl_sun,
+                GlassKit.light() ? org.perazimchurch.app.R.drawable.gl_sun : org.perazimchurch.app.R.drawable.gl_moon,
                 44, 18, "Light or dark mode");
         themeToggle.setOnClickListener(v -> toggleAppearance());
         row.addView(themeToggle);
