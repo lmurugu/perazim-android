@@ -69,6 +69,8 @@ clean: extra/worship-.png
 clean: extra/worship-Praise.png
 clean: extra/worship-Search-hymns-by-number-or-lyric-keywords.png
 clean: extra/worship-Worship.png
+clean: home-dark-clean.png
+clean: home-light-clean.png
 clean: light-community.png
 clean: light-games.png
 clean: light-sermons.png
