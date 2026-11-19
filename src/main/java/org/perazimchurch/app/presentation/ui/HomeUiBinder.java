@@ -273,7 +273,7 @@ public class HomeUiBinder {
         refreshGreetingNameAsync();
 
         // 2. Header photo, 140dp as in the original build
-        contentContainer.addView(createHeroPhoto(), GlassKit.matchHeight(context, 140, 14));
+        contentContainer.addView(createHeaderBanner(), GlassKit.matchHeight(context, 140, 14));
 
         // 3. Continue today's reading
         contentContainer.addView(createTodayCard(), GlassKit.matchWrap(context, 16));
@@ -289,59 +289,50 @@ public class HomeUiBinder {
         rootScrollView.addView(contentContainer);
     }
 
-    private View createHeroPhoto() {
-        FrameLayout hero = new FrameLayout(context);
+    /** The original header: the dawn-cross photo, the church logo and name along the bottom, 14dp corners. */
+    private View createHeaderBanner() {
+        FrameLayout header = new FrameLayout(context);
         GradientDrawable shape = new GradientDrawable();
-        shape.setCornerRadius(dp(26));
+        shape.setCornerRadius(dp(16));
         shape.setColor(PerazimTheme.COLOR_SURFACE_SOLID);
-        hero.setBackground(shape);
-        hero.setClipToOutline(true);
-        GlassKit.keep(hero);
+        header.setBackground(shape);
+        header.setClipToOutline(true);
 
-        Bitmap photo = loadAssetBitmap("backgrounds/church/community_congregation.jpg", 900);
-        if (photo != null) {
+        Bitmap bg = loadAssetBitmap("backgrounds/bg_home_dawn_cross.png", 720);
+        if (bg != null) {
             ImageView iv = new ImageView(context);
-            iv.setImageBitmap(photo);
+            iv.setImageBitmap(bg);
             iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            hero.addView(iv, new FrameLayout.LayoutParams(
+            header.addView(iv, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            View scrim = new View(context);
+            scrim.setBackground(new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                    new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")}));
+            header.addView(scrim, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
 
-        // Frosted caption: rgba(30,10,40,0.45) over a real blur of the photo, 18dp corners, 0.2 rim
-        FrostPane caption = new FrostPane(context, photo, 0.5f, dp(18),
-                Color.parseColor("#731E0A28"), Color.parseColor("#33FFFFFF"));
-        LinearLayout captionText = new LinearLayout(context);
-        captionText.setOrientation(LinearLayout.VERTICAL);
-        captionText.setPadding(dp(14), dp(10), dp(14), dp(10));
-        captionText.addView(GlassKit.text(context, "PERAZIM MISSION CHURCH", 14, true, Color.WHITE));
-        captionText.addView(GlassKit.text(context, "The Place of Great Breakthrough", 12, false,
-                Color.parseColor("#E6D8EE")), GlassKit.matchWrap(context, 3));
-        caption.addView(GlassKit.keep(captionText));
-        FrameLayout.LayoutParams lpCaption = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        lpCaption.setMargins(dp(10), 0, dp(10), dp(10));
-        hero.addView(caption, lpCaption);
+        LinearLayout banner = new LinearLayout(context);
+        banner.setOrientation(LinearLayout.HORIZONTAL);
+        banner.setGravity(Gravity.CENTER_VERTICAL);
+        banner.setPadding(dp(14), dp(14), dp(14), dp(14));
 
-        // 1dp light rim around the photo
-        View rim = new View(context);
-        GradientDrawable rimBg = new GradientDrawable();
-        rimBg.setCornerRadius(dp(26));
-        rimBg.setStroke(Math.max(1, dp(1)), Color.parseColor("#33FFFFFF"));
-        rim.setBackground(rimBg);
-        hero.addView(GlassKit.keep(rim), new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        hero.setClickable(true);
-        hero.setOnClickListener(v -> { if (listener != null) listener.onNavigateToTab(3); });
-        // The photo clips to its rounded outline, so its shadow (0 12px 30px rgba(0,0,0,0.35)) sits on a holder.
-        FrameLayout holder = new FrameLayout(context);
-        GradientDrawable holderShape = new GradientDrawable();
-        holderShape.setCornerRadius(dp(26));
-        holderShape.setColor(Color.TRANSPARENT);
-        holder.setBackground(holderShape);
-        GlassKit.shadow(holder, Color.parseColor(PerazimTheme.isLight() ? "#403D1749" : "#59000000"), 12, 30);
-        holder.addView(hero, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        return GlassKit.keep(holder);
+        ImageView logo = new ImageView(context);
+        logo.setImageResource(R.drawable.ic_perazim_logo);
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(44), dp(44));
+        lpLogo.setMargins(0, 0, dp(12), 0);
+        banner.addView(logo, lpLogo);
+
+        LinearLayout titleCol = new LinearLayout(context);
+        titleCol.setOrientation(LinearLayout.VERTICAL);
+        titleCol.addView(GlassKit.text(context, "PERAZIM MISSION CHURCH", 17, true, Color.WHITE));
+        titleCol.addView(GlassKit.text(context, "The Place of Great Breakthrough", 12, false,
+                Color.parseColor("#E6D8EE")), GlassKit.matchWrap(context, 2));
+        banner.addView(titleCol);
+
+        header.addView(GlassKit.keep(banner), new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+        return GlassKit.keep(header);
     }
 
     private String buildGreeting() {
