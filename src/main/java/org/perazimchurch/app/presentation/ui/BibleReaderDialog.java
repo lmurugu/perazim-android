@@ -1461,6 +1461,7 @@ public class BibleReaderDialog extends Dialog {
             return;
         }
         dismissNoteEditor();
+        dismissNotesPanel();
         final List<org.perazimchurch.app.domain.model.VerseLocation> links = new ArrayList<>();
         if (existing != null) {
             links.addAll(existing.getLinks());
@@ -1572,7 +1573,7 @@ public class BibleReaderDialog extends Dialog {
             delete.setOnClickListener(v -> bibleViewModel.deleteNote(existing.getId(), () -> {
                 Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
                 dismissNoteEditor();
-                refreshNotesPanel();
+                showNotesDialog();
             }));
             bottom.addView(delete);
         }
@@ -1594,7 +1595,7 @@ public class BibleReaderDialog extends Dialog {
             bibleViewModel.saveNote(existing == null ? 0L : existing.getId(), html, links, topics, id -> {
                 Toast.makeText(getContext(), "Note saved", Toast.LENGTH_SHORT).show();
                 dismissNoteEditor();
-                refreshNotesPanel();
+                showNotesDialog();
             });
         });
 
