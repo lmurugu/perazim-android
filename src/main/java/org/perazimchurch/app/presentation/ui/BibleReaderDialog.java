@@ -228,48 +228,60 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
-    /** The three appearance choices, shown side by side in the header; System is the default. */
-    private View themeRowView;
-    private LinearLayout readerColumn;
+    /** Three appearance icons in a popup under the header button; System is the default. */
+    private View themePopupView;
 
     private void toggleAppearance() {
-        if (themeRowView != null) {
-            if (readerColumn != null) {
-                readerColumn.removeView(themeRowView);
-            }
-            themeRowView = null;
+        if (themePopupView != null) {
+            dismissThemePopup();
             return;
         }
-        if (readerColumn == null) {
+        if (readerFrame == null) {
             return;
         }
         LinearLayout row = new LinearLayout(getContext());
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER);
-        row.setPadding(dp(16), dp(8), dp(16), 0);
+        row.setPadding(dp(8), dp(8), dp(8), dp(8));
+        GradientDrawable panel = new GradientDrawable();
+        panel.setCornerRadius(dp(24));
+        panel.setColor(GlassKit.light() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F2241238"));
+        panel.setStroke(dp(1), Color.parseColor("#33000000"));
+        row.setBackground(panel);
         int current = PerazimTheme.savedChoice(getContext());
-        String[] labels = {"System", "Light", "Dark"};
-        for (int choice = 0; choice < labels.length; choice++) {
+        // System (auto), Light (sun), Dark (moon)
+        String[] glyphs = {"A", "\u2600", "\u263E"};
+        String[] descriptions = {"System", "Light", "Dark"};
+        for (int choice = 0; choice < glyphs.length; choice++) {
             final int picked = choice;
-            TextView pill = GlassKit.text(getContext(), labels[choice], 13, true,
+            TextView icon = GlassKit.text(getContext(), glyphs[choice], 16, true,
                     choice == current ? GlassKit.accent() : GlassKit.text());
-            pill.setGravity(Gravity.CENTER);
-            pill.setPadding(dp(14), dp(8), dp(14), dp(8));
-            GradientDrawable chip = new GradientDrawable();
-            chip.setCornerRadius(dp(18));
-            chip.setColor(choice == current
-                    ? (GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#66FFFFFF"))
+            icon.setGravity(Gravity.CENTER);
+            icon.setContentDescription(descriptions[choice]);
+            GradientDrawable circle = new GradientDrawable();
+            circle.setShape(GradientDrawable.OVAL);
+            circle.setColor(choice == current ? Color.parseColor("#33E17D2F")
                     : (GlassKit.light() ? Color.parseColor("#B3FFFFFF") : Color.parseColor("#33FFFFFF")));
-            chip.setStroke(dp(1), choice == current ? COLOR_ACCENT_ORANGE() : Color.parseColor("#33000000"));
-            pill.setBackground(chip);
-            pill.setClickable(true);
-            pill.setOnClickListener(v -> applyAppearance(picked));
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(40), 1f);
+            circle.setStroke(dp(1), choice == current ? COLOR_ACCENT_ORANGE() : Color.parseColor("#33000000"));
+            icon.setBackground(circle);
+            icon.setClickable(true);
+            icon.setOnClickListener(v -> applyAppearance(picked));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(44), dp(44));
             lp.setMargins(dp(4), 0, dp(4), 0);
-            row.addView(pill, lp);
+            row.addView(icon, lp);
         }
-        themeRowView = row;
-        readerColumn.addView(row, 1);
+        FrameLayout.LayoutParams flp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.END);
+        flp.setMargins(0, dp(70), dp(16), 0);
+        readerFrame.addView(row, flp);
+        themePopupView = row;
+    }
+
+    private void dismissThemePopup() {
+        if (themePopupView != null && readerFrame != null) {
+            readerFrame.removeView(themePopupView);
+        }
+        themePopupView = null;
     }
 
     /** Saves the chosen appearance and redraws the reader in place, without opening another window. */
@@ -279,7 +291,7 @@ public class BibleReaderDialog extends Dialog {
         dismissActionBar();
         dismissNotesPanel();
         dismissNoteEditor();
-        themeRowView = null;
+        dismissThemePopup();
         View rebuilt = buildReaderLayout();
         setContentView(rebuilt);
         loadCanonicalBooks();
@@ -350,7 +362,6 @@ public class BibleReaderDialog extends Dialog {
 
         LinearLayout root = new LinearLayout(getContext());
         root.setOrientation(LinearLayout.VERTICAL);
-        readerColumn = root;
 
         root.addView(createHeaderBar());
 
@@ -1415,7 +1426,7 @@ public class BibleReaderDialog extends Dialog {
         }
         // Dim and blur the verses behind the card so it stands out.
         View scrim = new View(getContext());
-        scrim.setBackgroundColor(Color.parseColor("#8C000000"));
+        scrim.setBackgroundColor(Color.parseColor("#C7000000"));
         scrim.setOnClickListener(v -> dismissNotesPanel());
         readerFrame.addView(scrim, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
@@ -1430,7 +1441,7 @@ public class BibleReaderDialog extends Dialog {
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
         GradientDrawable glass = new GradientDrawable();
         glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F5140B20"));
+        glass.setColor(Color.parseColor("#F6EEFA"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         panel.setBackground(glass);
         // Higher than the verse card, so the verses cannot draw over the Notes card.
@@ -1515,12 +1526,13 @@ public class BibleReaderDialog extends Dialog {
         refreshNotesPanel();
     }
 
+    /** The Notes card is always light (option A), so its text is always dark. */
     private int notesInk() {
-        return GlassKit.light() ? Color.parseColor("#2A0F33") : Color.parseColor("#F5EEFF");
+        return Color.parseColor("#2A0F33");
     }
 
     private int notesMuted() {
-        return GlassKit.light() ? Color.parseColor("#5B4A6E") : Color.parseColor("#D9C9F2");
+        return Color.parseColor("#5B4A6E");
     }
 
     private void dismissNotesPanel() {
