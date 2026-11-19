@@ -44,9 +44,11 @@ Last reviewed: 2026-11-19. Branch: `claude/project-thread-xf5etn`.
 | Safe-area insets for notched iPhones | **DONE** | `env(safe-area-inset-*)` in `web/styles.css`. |
 | Service worker never caches API responses | **DONE** | `web/sw.js`. |
 | Content Security Policy | **DONE** | Set in `web/index.html`. |
-| Capacitor project (`android/`, `ios/`) | **OWNER** | Not generated. Needs Levi's decision on the Android project (Java app versus Capacitor) and a Mac for iOS. |
-| Apple "minimum functionality" (guideline 4.2) | **CODE** | A web app in a wrapper can be rejected. Native value is needed: push notifications, offline storage and photo access. Not built. |
-| iOS privacy manifest (`PrivacyInfo.xcprivacy`) | **OWNER** | Needed once the iOS project exists. |
+| Capacitor iOS project (`ios/`) | **DONE** | Generated on Linux with `cap add ios`. Permissions and background audio are in `Info.plist`. Building and signing it needs a Mac and Xcode (**OWNER**). Android stays the Java app for now. |
+| Apple "minimum functionality" (guideline 4.2) | **DONE** / **VERIFY** | Native features are wired in `web/native.js`: offline storage (Preferences), system photo picker, push registration, and lock-screen controls for sermon audio. Test on a real iPhone before submission. |
+| Push notifications | **OWNER** | Device tokens are registered and removed on sign-out (`/api/community/devices`). Sending needs FCM and APNs credentials, which are not configured. |
+| Bible audio in the app | **OWNER** | The web app has no Bible audio. The Android app plays local files only. The 35 audio files are on Levi's PC and are not publicly hosted. |
+| iOS privacy manifest (`PrivacyInfo.xcprivacy`) | **DONE** | Declares the data types collected, no tracking, and the UserDefaults reason. Registered in the Xcode project. |
 
 ## 4. Owner actions
 
