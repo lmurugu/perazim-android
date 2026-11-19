@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Right after boot the package service can lag behind sys.boot_completed; wait for it.
-timeout 300 bash -c 'until [ -n "$(adb shell pm path android 2>/dev/null)" ]; do sleep 2; done'
+timeout 300 bash -c 'until adb shell service check package 2>/dev/null | grep -q "package: found"; do sleep 2; done'
 
 mock_pid=''
 cleanup() {

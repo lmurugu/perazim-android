@@ -47,7 +47,7 @@ jobs:
           arch: x86_64
           target: google_apis
           script: >-
-            timeout 300 bash -c 'until [ -n "$(adb shell pm path android 2>/dev/null)" ]; do sleep 2; done';
+            timeout 300 bash -c 'until adb shell service check package 2>/dev/null | grep -q "package: found"; do sleep 2; done';
             ./gradlew connectedDebugAndroidTest
             -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.data.local.DatabaseEncryptionMigrationTest,org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest
             --stacktrace
