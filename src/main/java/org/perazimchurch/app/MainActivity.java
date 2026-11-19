@@ -1,5 +1,7 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.Activity;
@@ -1203,7 +1205,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             updateRoutineView();
 
             org.perazimchurch.app.ui.components.FeedbackManager.get(this).milestone(this);
-            new AlertDialog.Builder(this)
+            AppDialogs.builder(this)
                     .setTitle("🎉 3-Minute Breakthrough Complete!")
                     .setMessage("Hallelujah! You completed your daily breakthrough routine!\n\n"
                             + "• Streak Extended: " + streakCount + " Days 🔥\n"
@@ -1313,7 +1315,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void showLegacyFullScriptureDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         ScrollView sv = new ScrollView(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
@@ -1411,7 +1413,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showWhatsAppVerseCardDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -1582,7 +1584,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showGracePointDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -1888,7 +1890,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             prayerTitle.setTypeface(Typeface.DEFAULT_BOLD);
             prayerTitle.setPadding(dp(20), dp(16), dp(20), dp(8));
             prayerTitle.setBackgroundColor(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_BG_DEEP);
-            AlertDialog dialog = new AlertDialog.Builder(this).setCustomTitle(prayerTitle)
+            AlertDialog dialog = AppDialogs.builder(this).setCustomTitle(prayerTitle)
                     .setView(prayer).setNegativeButton("Close", null).create();
             dialog.show();
             if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawable(
@@ -2699,7 +2701,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void showSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         builder.setTitle("⚙️ Preferences & Data Saver");
 
         LinearLayout layout = new LinearLayout(this);
@@ -2851,7 +2853,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showPrayerRequestDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         builder.setTitle("🙏 Submit Prayer Request");
         builder.setMessage("Your petition will be submitted to Bishop Dr. David Mutweri and the Perazim Intercessory Prayer Team.\n\nPastoral Office: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · info@perazimchurch.org");
 
@@ -2892,7 +2894,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             btnMiniPlayPause.setText("⏸");
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -2958,7 +2960,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             GamificationStore.saveSpiritualXp(this, resolveGamificationUserId(), xpCount);
             updateHud();
             Toast.makeText(this, "+10 XP for spending time in prayer!", Toast.LENGTH_SHORT).show();
-            new AlertDialog.Builder(this)
+            AppDialogs.builder(this)
                     .setTitle("Daily Guided Prayer")
                     .setMessage("Heavenly Father, we worship You as the God of the Breakthrough. As waters burst forth, let every mountain before us be swept away. Amen.")
                     .setPositiveButton("Amen", null)
@@ -3012,7 +3014,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void showContactDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         ScrollView sv = new ScrollView(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);

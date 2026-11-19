@@ -1,5 +1,7 @@
 package org.perazimchurch.app.ui.components;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 
@@ -23,7 +25,7 @@ public final class ThemeSwitcher {
                 "Light glass",
                 "Dark purple glass"
         };
-        new AlertDialog.Builder(activity)
+        AppDialogs.builder(activity)
                 .setTitle("Appearance")
                 .setSingleChoiceItems(labels, current, (dialog, which) -> {
                     dialog.dismiss();

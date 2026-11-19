@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.AlertDialog;
@@ -374,7 +376,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         choices.add("Clear this conversation");
         final int selectedUpdateIndex = updateIndex;
         final int selectedRollbackIndex = rollbackIndex;
-        new AlertDialog.Builder(activity).setTitle("Choose your guide")
+        AppDialogs.builder(activity).setTitle("Choose your guide")
                 .setItems(choices.toArray(new String[0]), (dialog, which) -> {
                     if (which == 0) setGuideMode("local");
                     else if (which == 1) showModelDownload();
@@ -394,16 +396,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
         java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
         String sessionToken = SessionManager.getInstance(activity).getAuthToken();
         if (trustedKeys.isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("This build has no trusted knowledge signing key.")
+            AppDialogs.builder(activity).setMessage("This build has no trusted knowledge signing key.")
                     .setPositiveButton("OK", null).show();
             return;
         }
         if (sessionToken == null || sessionToken.trim().isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("Sign in before checking for an authorized knowledge rollback.")
+            AppDialogs.builder(activity).setMessage("Sign in before checking for an authorized knowledge rollback.")
                     .setPositiveButton("OK", null).show();
             return;
         }
-        AlertDialog progress = new AlertDialog.Builder(activity)
+        AlertDialog progress = AppDialogs.builder(activity)
                 .setTitle("Checking authorized rollback")
                 .setMessage("Verifying the signed authorization for the previous package…")
                 .setCancelable(false).create();
@@ -421,7 +423,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
                     @Override public void onError(String message) {
                         progress.dismiss();
-                        if (isShowing()) new AlertDialog.Builder(activity).setMessage(message)
+                        if (isShowing()) AppDialogs.builder(activity).setMessage(message)
                                 .setPositiveButton("OK", null).show();
                     }
                 });
@@ -430,13 +432,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private void showKnowledgeUpdate() {
         java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
         if (trustedKeys.isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("This build has no trusted knowledge signing key.")
+            AppDialogs.builder(activity).setMessage("This build has no trusted knowledge signing key.")
                     .setPositiveButton("OK", null).show();
             return;
         }
         String sessionToken = SessionManager.getInstance(activity).getAuthToken();
         if (sessionToken == null || sessionToken.trim().isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("Sign in before downloading approved offline knowledge.")
+            AppDialogs.builder(activity).setMessage("Sign in before downloading approved offline knowledge.")
                     .setPositiveButton("OK", null).show();
             return;
         }
@@ -446,7 +448,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 : "Last successful sync: "
                 + java.text.DateFormat.getDateTimeInstance().format(new java.util.Date(previous.lastSuccessAt))
                 + " (verified package version " + previous.lastSuccessVersion + ").";
-        AlertDialog progress = new AlertDialog.Builder(activity)
+        AlertDialog progress = AppDialogs.builder(activity)
                 .setTitle("Updating offline knowledge")
                 .setMessage(previousSuccess + "\n\nDownloading and verifying the signed package…")
                 .setCancelable(false).create();
@@ -464,7 +466,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
                     @Override public void onError(String message) {
                         progress.dismiss();
-                        if (isShowing()) new AlertDialog.Builder(activity).setMessage(message)
+                        if (isShowing()) AppDialogs.builder(activity).setMessage(message)
                                 .setPositiveButton("OK", null).show();
                     }
                 });
@@ -472,7 +474,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void showModelDownload() {
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
-            new AlertDialog.Builder(activity)
+            AppDialogs.builder(activity)
                     .setMessage("On-device AI downloads are disabled until an approved knowledge package and trusted signing key are provisioned.")
                     .setPositiveButton("OK", null).show();
             return;
@@ -480,17 +482,17 @@ public class AiBreakthroughGuideDialog extends Dialog {
         String modelMessage = "validation".equals(BuildConfig.BUILD_TYPE)
                 ? "Validation only: verifies or repairs the installed model from the locally staged Qwen artifact and uses a synthetic signed knowledge passage."
                 : "This checks the installed model integrity first. If it is missing or damaged, the verified model is downloaded and installed.";
-        new AlertDialog.Builder(activity).setTitle("Download on-phone AI")
+        AppDialogs.builder(activity).setTitle("Download on-phone AI")
                 .setMessage(modelMessage)
                 .setNegativeButton("Not now", null)
                 .setPositiveButton("Check / download", (dialog, which) -> {
-                    AlertDialog progress = new AlertDialog.Builder(activity).setTitle("Downloading on-phone model")
+                    AlertDialog progress = AppDialogs.builder(activity).setTitle("Downloading on-phone model")
                             .setMessage("Starting…").setCancelable(false).setNegativeButton("Pause", (d,w) -> OnDeviceAi.cancel()).create();
                     progress.show();
                     OnDeviceAi.download(activity, new OnDeviceAi.DownloadCallback() {
                         public void onProgress(int percent) { if (progress.isShowing()) progress.setMessage(percent + "% · The download can be paused and resumed."); }
                         public void onComplete() { progress.dismiss(); setGuideMode("local"); if (isShowing()) displayAiMessage(AiResponse.plainText("The model is ready. You can turn off Wi-Fi and mobile data and ask your question.", null), "On-phone AI ready"); }
-                        public void onError(String error) { progress.dismiss(); if (isShowing()) new AlertDialog.Builder(activity).setMessage(error).setPositiveButton("OK", null).show(); }
+                        public void onError(String error) { progress.dismiss(); if (isShowing()) AppDialogs.builder(activity).setMessage(error).setPositiveButton("OK", null).show(); }
                     });
                 }).show();
     }
@@ -504,7 +506,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     public void showConsentDialog() {
         if (activity == null || activity.isFinishing()) return;
         if (!BuildConfig.ONLINE_AI_ENABLED) {
-            new AlertDialog.Builder(activity)
+            AppDialogs.builder(activity)
                     .setMessage("Online AI is unavailable in this build while the authenticated church service is being verified.")
                     .setPositiveButton("OK", null).show();
             return;

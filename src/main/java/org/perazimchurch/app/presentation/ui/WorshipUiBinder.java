@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -510,7 +512,7 @@ public class WorshipUiBinder {
     public void showHymnDetailSheet(final Hymn hymn) {
         if (hymn == null) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = AppDialogs.builder(activity);
 
         ScrollView dialogScroll = new ScrollView(activity);
         dialogScroll.setFillViewport(true);

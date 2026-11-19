@@ -1,5 +1,7 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.Activity;
@@ -151,7 +153,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         spInfo.addView(spContact);
 
         speakerCard.setOnClickListener(v -> {
-            new android.app.AlertDialog.Builder(this)
+            AppDialogs.builder(this)
                     .setTitle("Bishop Dr. David Mutweri")
                     .setMessage("Presiding Bishop · Perazim Mission Church\n\n"
                             + "• Direct Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + "\n"

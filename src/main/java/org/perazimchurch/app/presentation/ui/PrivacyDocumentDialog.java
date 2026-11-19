@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.text.TextUtils;
@@ -24,7 +26,7 @@ final class PrivacyDocumentDialog {
         text.setTextIsSelectable(true);
         ScrollView scroll = new ScrollView(context);
         scroll.addView(text, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        new AlertDialog.Builder(context).setTitle(title).setView(scroll).setPositiveButton("Close", null).show();
+        AppDialogs.builder(context).setTitle(title).setView(scroll).setPositiveButton("Close", null).show();
     }
 
     @NonNull static String readAsset(@NonNull Context context, @NonNull String path) throws Exception {

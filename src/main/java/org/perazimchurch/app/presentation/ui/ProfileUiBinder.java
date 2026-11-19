@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.Activity;
@@ -297,7 +299,7 @@ public class ProfileUiBinder {
     }
 
     private void showDeleteAccountFirstStep() {
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Delete my account")
                 .setMessage("This will permanently remove your posts, comments, prayer requests, messages, connections, RSVPs and uploaded photos, and it will disable your sign-in.\n\n"
                         + "Some records must be kept for legal reasons: the audit log, your consent and request history, and the decision on any membership claim (without your name or phone number). They are not used for anything else.\n\n"
@@ -310,7 +312,7 @@ public class ProfileUiBinder {
     private void showDeleteAccountTypedConfirmation() {
         EditText input = new EditText(context);
         input.setHint("Type DELETE to confirm");
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Confirm deletion")
                 .setView(input)
                 .setPositiveButton("Delete my account", (dialog, which) -> {
@@ -343,7 +345,7 @@ public class ProfileUiBinder {
     }
 
     private void showLogoutConfirmationDialog() {
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Log Out")
                 .setMessage("Are you sure you want to sign out of your Perazim account? Your offline prayers and readings will remain saved on this device in Guest Mode.")
                 .setPositiveButton("Log Out", (dialog, which) -> {
@@ -445,7 +447,7 @@ public class ProfileUiBinder {
         addOption(account, "Member Account", authSummary, v -> AuthDialog.show(context, user -> refreshProfile()));
         addOption(account, "Church Membership", "Check your status or submit a private request", v -> MembershipDialog.show(context));
         addOption(account, "Change account phone number", "Unavailable · your number and membership link stay unchanged",
-                v -> new AlertDialog.Builder(context)
+                v -> AppDialogs.builder(context)
                         .setTitle("Phone number change unavailable")
                         .setMessage("Phone number changes are currently unavailable. Your current account number and any membership link are unchanged.")
                         .setPositiveButton("Close", null)
@@ -558,7 +560,7 @@ public class ProfileUiBinder {
         swCelebrate.setOnCheckedChangeListener((b, on) -> fm.setCelebrationsEnabled(on));
         box.addView(swCelebrate);
 
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Sound, Haptics & Celebrations")
                 .setView(box)
                 .setPositiveButton("Done", null)
@@ -570,7 +572,7 @@ public class ProfileUiBinder {
             List<SyncQueueEntity> failed = PerazimDatabase.getInstance(context).syncQueueDao().getFailedItems();
             mainHandler.post(() -> {
                 if (failed == null || failed.isEmpty()) {
-                    new AlertDialog.Builder(context).setTitle("Failed offline updates")
+                    AppDialogs.builder(context).setTitle("Failed offline updates")
                             .setMessage("There are no failed offline updates.")
                             .setPositiveButton("Close", null).show();
                     return;
@@ -581,7 +583,7 @@ public class ProfileUiBinder {
                     String detail = item.getLastError() == null ? "Needs attention" : item.getLastError();
                     labels[i] = item.getEntityType() + " · " + item.getEntityId() + "\n" + detail + "\nTap to retry";
                 }
-                new AlertDialog.Builder(context).setTitle("Failed offline updates")
+                AppDialogs.builder(context).setTitle("Failed offline updates")
                         .setItems(labels, (dialog, which) -> {
                             SyncQueueEntity item = failed.get(which);
                             new Thread(() -> {
@@ -652,7 +654,7 @@ public class ProfileUiBinder {
     }
 
     public void showSavedContentDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
 
@@ -709,7 +711,7 @@ public class ProfileUiBinder {
     }
 
     public void showBreakthroughGuideDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
 
@@ -784,7 +786,7 @@ public class ProfileUiBinder {
     }
 
     private void showPastoralCareDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         builder.setTitle("Pastoral Care & Headquarters");
         builder.setMessage("Bishop Dr. David Mutweri & Pastoral Team\n"
                 + "Perazim Mission Church · Embu Headquarters\n\n"
@@ -804,7 +806,7 @@ public class ProfileUiBinder {
     }
 
     public void showAboutDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
 
@@ -882,7 +884,7 @@ public class ProfileUiBinder {
     }
 
     public void showFellowshipExtrasDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         builder.setTitle("Fellowship Extras");
 
         ScrollView sv = new ScrollView(context);
@@ -1744,7 +1746,7 @@ public class ProfileUiBinder {
         ScrollView pickerScroll = new ScrollView(context);
         pickerScroll.setFillViewport(true);
         pickerScroll.addView(panel);
-        AlertDialog dialog = new AlertDialog.Builder(context).setView(pickerScroll).setNegativeButton("Close", null).create();
+        AlertDialog dialog = AppDialogs.builder(context).setView(pickerScroll).setNegativeButton("Close", null).create();
         panel.setTag(dialog);
         dialog.show();
     }

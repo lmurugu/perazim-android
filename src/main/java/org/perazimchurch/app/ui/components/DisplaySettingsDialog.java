@@ -1,5 +1,7 @@
 package org.perazimchurch.app.ui.components;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 
@@ -17,7 +19,7 @@ public final class DisplaySettingsDialog {
     public static void show(Activity activity) {
         final int appBefore = DisplaySettings.appSize(activity);
         final boolean[] changed = {false};
-        new AlertDialog.Builder(activity)
+        AppDialogs.builder(activity)
                 .setTitle("App size")
                 .setSingleChoiceItems(DisplaySettings.APP_LABELS, appBefore, (dialog, which) -> {
                     dialog.dismiss();
@@ -33,7 +35,7 @@ public final class DisplaySettingsDialog {
 
     private static void askText(Activity activity, boolean[] changed) {
         final int textBefore = DisplaySettings.textSize(activity);
-        new AlertDialog.Builder(activity)
+        AppDialogs.builder(activity)
                 .setTitle("Text size")
                 .setSingleChoiceItems(DisplaySettings.TEXT_LABELS, textBefore, (dialog, which) -> {
                     dialog.dismiss();

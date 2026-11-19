@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -326,7 +328,7 @@ public final class CommunityUiBinder {
         body.addView(text(post.optString("title"), 21)); body.addView(text(post.optString("content"), 16));
         if (!post.optString("media_url").isEmpty()) addPhoto(body,post.optString("media_url"));
         if (owner.equals(post.optString("author_id"))) {
-            row(body, button("Edit", () -> editPost(post)), button("Delete", () -> new AlertDialog.Builder(activity)
+            row(body, button("Edit", () -> editPost(post)), button("Delete", () -> AppDialogs.builder(activity)
                     .setTitle("Delete this post?").setMessage("Comments and reactions will also be removed.")
                     .setNegativeButton("Keep", null).setPositiveButton("Delete", (d,w) -> request("DELETE", "api/community/posts/" + encode(post.optString("id")), null,
                             r -> { toast("Post deleted"); refresh(); }, this::showError)).show()));
@@ -424,7 +426,7 @@ public final class CommunityUiBinder {
             TextView memberName=text(m.optString("name")+" · "+m.optString("role"),16);memberHead.addView(memberName,new LinearLayout.LayoutParams(0,-2,1));
             card.addView(memberHead);
             if(!this.owner.equals(m.optString("user_id")))card.addView(button("Message",()->showConversation(m.optString("user_id"),m.optString("name"))));
-            if(isOwner&&!group.optString("created_by").equals(m.optString("user_id")))card.addView(button("Remove from group",()->new AlertDialog.Builder(activity).setTitle("Remove "+m.optString("name")+"?").setNegativeButton("Keep",null).setPositiveButton("Remove",(d,w)->request("DELETE","api/community/groups/"+encode(groupId)+"/members/"+encode(m.optString("user_id")),null,x->toast("Member removed; reopen roster to refresh"),this::showError)).show()));
+            if(isOwner&&!group.optString("created_by").equals(m.optString("user_id")))card.addView(button("Remove from group",()->AppDialogs.builder(activity).setTitle("Remove "+m.optString("name")+"?").setNegativeButton("Keep",null).setPositiveButton("Remove",(d,w)->request("DELETE","api/community/groups/"+encode(groupId)+"/members/"+encode(m.optString("user_id")),null,x->toast("Member removed; reopen roster to refresh"),this::showError)).show()));
         }},this::showError);
     }
     public void showClasses() {
@@ -435,7 +437,7 @@ public final class CommunityUiBinder {
             if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject c=rows.optJSONObject(i);if(c==null)continue;LinearLayout card=card(list);
                 card.addView(text((c.optBoolean("is_cancelled")?"Cancelled · ":"")+c.optString("title"),20));card.addView(text(c.optString("group_name")+" · "+c.optString("teacher_name")+"\n"+date(c.optLong("starts_at"))+" · "+c.optInt("duration_minutes")+" minutes",14));card.addView(text(c.optString("description"),16));
                 if(!c.optBoolean("is_cancelled"))card.addView(button("Join video classroom", () -> org.perazimchurch.app.ClassroomCallActivity.open(activity,c.optString("id"),c.optString("title"))));
-                if(owner.equals(c.optString("created_by"))&&!c.optBoolean("is_cancelled"))card.addView(button("Cancel class",()->new AlertDialog.Builder(activity).setTitle("Cancel this class?").setNegativeButton("Keep",null).setPositiveButton("Cancel class",(d,w)->request("DELETE","api/community/classes/"+encode(c.optString("id")),null,x->toast("Class cancelled; reopen Classes to refresh"),this::showError)).show()));
+                if(owner.equals(c.optString("created_by"))&&!c.optBoolean("is_cancelled"))card.addView(button("Cancel class",()->AppDialogs.builder(activity).setTitle("Cancel this class?").setNegativeButton("Keep",null).setPositiveButton("Cancel class",(d,w)->request("DELETE","api/community/classes/"+encode(c.optString("id")),null,x->toast("Class cancelled; reopen Classes to refresh"),this::showError)).show()));
             }});
     }
     private void scheduleClass(JSONObject group) {
@@ -512,7 +514,7 @@ public final class CommunityUiBinder {
         if(!signedIn())return;LinearLayout body=column();JSONArray drafts=store.drafts();
         if(drafts.length()==0)body.addView(text("No saved drafts. Posts, comments and messages that could not send will be kept here for this account and server.",16));
         for(int i=0;i<drafts.length();i++){JSONObject draft=drafts.optJSONObject(i);if(draft==null)continue;JSONObject value=draft.optJSONObject("body");if(value==null)continue;LinearLayout card=card(body);card.addView(text(draft.optString("label"),17));card.addView(text(value.optString("content"),16));
-            row(card,button("Retry sending",()->saveAndSend(draft.optString("endpoint"),value,draft.optString("label"),r->{toast("Sent successfully");refresh();card.setVisibility(View.GONE);})),button("Delete draft",()->new AlertDialog.Builder(activity).setTitle("Delete saved draft?").setNegativeButton("Keep",null).setPositiveButton("Delete",(d,w)->{store.removeDraft(value.optString("id"));card.setVisibility(View.GONE);}).show()));}
+            row(card,button("Retry sending",()->saveAndSend(draft.optString("endpoint"),value,draft.optString("label"),r->{toast("Sent successfully");refresh();card.setVisibility(View.GONE);})),button("Delete draft",()->AppDialogs.builder(activity).setTitle("Delete saved draft?").setNegativeButton("Keep",null).setPositiveButton("Delete",(d,w)->{store.removeDraft(value.optString("id"));card.setVisibility(View.GONE);}).show()));}
         panel("Saved drafts · this account",body);
     }
     public void showNotifications() {
@@ -542,7 +544,7 @@ public final class CommunityUiBinder {
         body.addView(button("Save server address",()->{
             String value=address.getText().toString().trim();try{java.net.URI uri=new java.net.URI(value);if(!("http".equals(uri.getScheme())||"https".equals(uri.getScheme()))||uri.getHost()==null||uri.getUserInfo()!=null||uri.getQuery()!=null||uri.getFragment()!=null||!(uri.getPath()==null||uri.getPath().isEmpty()||"/".equals(uri.getPath())))throw new IllegalArgumentException();}catch(Exception e){address.setError("Enter a server origin, for example http://192.168.1.10:3000");return;}
             while(value.endsWith("/"))value=value.substring(0,value.length()-1);final String selected=value;if(selected.equals(ApiClient.getBaseUrl(activity))){dialog.dismiss();return;}
-            new AlertDialog.Builder(activity).setTitle("Switch to this server?").setMessage("You will be signed out. Existing local data and drafts are preserved for their original account and server. Sign in again from Profile; accounts belong to each server. Local HTTP is only for your trusted Wi-Fi pilot.").setNegativeButton("Keep current server",null).setPositiveButton("Switch and sign out",(d,w)->{
+            AppDialogs.builder(activity).setTitle("Switch to this server?").setMessage("You will be signed out. Existing local data and drafts are preserved for their original account and server. Sign in again from Profile; accounts belong to each server. Local HTTP is only for your trusted Wi-Fi pilot.").setNegativeButton("Keep current server",null).setPositiveButton("Switch and sign out",(d,w)->{
                 session().logout();ApiClient.setBaseUrl(activity,selected);dialog.dismiss();resetScope();refresh();toast("Server changed. Sign in from Profile.");
             }).show();
         }));
@@ -627,12 +629,12 @@ public final class CommunityUiBinder {
         return message==null||message.trim().isEmpty()?"Request failed ("+code+")":message;
     }
     private void showError(int code,String message){alert("Couldn't complete the request",error(code,message));}
-    private void alert(String title,String message){new AlertDialog.Builder(activity).setTitle(title).setMessage(message).setPositiveButton("OK",null).show();}
+    private void alert(String title,String message){AppDialogs.builder(activity).setTitle(title).setMessage(message).setPositiveButton("OK",null).show();}
     private void toast(String message){Toast.makeText(activity,message,Toast.LENGTH_LONG).show();}
     private void chooseDate(long[] target,Button button){Calendar c=Calendar.getInstance();c.setTimeInMillis(target[0]);new DatePickerDialog(activity,(picker,y,m,d)->{
         c.set(y,m,d);new TimePickerDialog(activity,(time,h,min)->{c.set(Calendar.HOUR_OF_DAY,h);c.set(Calendar.MINUTE,min);c.set(Calendar.SECOND,0);target[0]=c.getTimeInMillis();button.setText("Starts: "+date(target[0]));},c.get(Calendar.HOUR_OF_DAY),c.get(Calendar.MINUTE),true).show();
     },c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH)).show();}
-    private AlertDialog panel(String title,LinearLayout body){body.setPadding(dp(16),dp(12),dp(16),dp(24));AlertDialog d=new AlertDialog.Builder(activity).setTitle(title).setView(scroll(body)).setNegativeButton("Close",null).create();d.show();if(d.getWindow()!=null){d.getWindow().setBackgroundDrawableResource(android.R.color.black);d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,(int)(activity.getResources().getDisplayMetrics().heightPixels*0.90));d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);}return d;}
+    private AlertDialog panel(String title,LinearLayout body){body.setPadding(dp(16),dp(12),dp(16),dp(24));AlertDialog d=AppDialogs.builder(activity).setTitle(title).setView(scroll(body)).setNegativeButton("Close",null).create();d.show();if(d.getWindow()!=null){d.getWindow().setBackgroundDrawableResource(android.R.color.black);d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,(int)(activity.getResources().getDisplayMetrics().heightPixels*0.90));d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);}return d;}
     private LinearLayout column(){LinearLayout l=new LinearLayout(activity);l.setOrientation(LinearLayout.VERTICAL);l.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);return l;}
     private ScrollView scroll(LinearLayout body){ScrollView s=new ScrollView(activity);s.setFillViewport(true);s.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);s.addView(body);return s;}
     private LinearLayout card(LinearLayout parent){LinearLayout c=column();c.setPadding(dp(14),dp(12),dp(14),dp(12));c.setBackground(PerazimTheme.createCardGradient(dp(14),dp(1)));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,dp(8),0,dp(8));parent.addView(c,p);return c;}

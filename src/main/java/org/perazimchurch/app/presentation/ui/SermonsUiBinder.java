@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -961,7 +963,7 @@ public class SermonsUiBinder {
                 }
             }));
         } else if ("DOWNLOADED".equals(currentStatus)) {
-            new AlertDialog.Builder(activity)
+            AppDialogs.builder(activity)
                     .setTitle("Manage Download")
                     .setMessage(sermon.getTitle() + " is saved offline.")
                     .setPositiveButton("Play Offline", (dialog, which) -> {

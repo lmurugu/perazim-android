@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.AlertDialog;
@@ -839,7 +841,7 @@ public class HomeUiBinder {
         card.setClickable(true);
 
         card.setOnClickListener(v -> {
-            new AlertDialog.Builder(context)
+            AppDialogs.builder(context)
                     .setTitle(ann.getTitle())
                     .setMessage((ann.getBody() != null ? ann.getBody() : "") + "\n\n— Perazim Mission Church")
                     .setPositiveButton("Close", null)
@@ -1055,7 +1057,7 @@ public class HomeUiBinder {
     }
 
     public void showPrayerRequestModal() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         builder.setTitle("🙏 Submit Prayer Request");
         builder.setMessage("Your petition will be submitted to Bishop Dr. David Mutweri and the Perazim Intercessory Prayer Team.\n\nPastoral Care: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · info@perazimchurch.org");
 
@@ -1081,7 +1083,7 @@ public class HomeUiBinder {
     }
 
     private void showSermonPlayerModal(@NonNull Sermon sermon) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         LinearLayout box = new LinearLayout(context);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -1127,7 +1129,7 @@ public class HomeUiBinder {
     }
 
     private void showSermonDetailsModal(@NonNull Sermon sermon) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         builder.setTitle("🎙️ Sermon Details");
 
         StringBuilder sb = new StringBuilder();

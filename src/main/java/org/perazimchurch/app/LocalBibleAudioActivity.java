@@ -1,5 +1,7 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.Manifest;
@@ -164,7 +166,7 @@ public class LocalBibleAudioActivity extends Activity {
     }
 
     private void chooseBook() {
-        new AlertDialog.Builder(this)
+        AppDialogs.builder(this)
                 .setTitle("Which book is this audio for?")
                 .setItems(BOOKS, (dialog, which) -> openAudioPicker(BOOKS[which]))
                 .setNegativeButton("Cancel", null)
@@ -256,7 +258,7 @@ public class LocalBibleAudioActivity extends Activity {
             showMediaAudioPicker();
         } else {
             String book = pendingBook == null ? "selected Bible book" : pendingBook;
-            new AlertDialog.Builder(this).setTitle("Find " + book + " audio")
+            AppDialogs.builder(this).setTitle("Find " + book + " audio")
                     .setMessage("To list matching recordings already on this phone, Perazim needs audio access. It will show matching file names and sizes so you can choose one to play.")
                     .setPositiveButton("Continue", (dialog, which) -> requestPermissions(new String[]{permission}, REQUEST_AUDIO_PERMISSION))
                     .setNegativeButton("Cancel", (dialog, which) -> pendingBook = null).show();
@@ -304,14 +306,14 @@ public class LocalBibleAudioActivity extends Activity {
         if (matches.isEmpty()) {
             String book = pendingBook == null ? "this book" : pendingBook;
             pendingBook = null;
-            new AlertDialog.Builder(this).setTitle("No matching audio found")
+            AppDialogs.builder(this).setTitle("No matching audio found")
                     .setMessage("No audio for " + book + " under 25 MB was found on this phone.")
                     .setPositiveButton("OK", null).show();
             return;
         }
         String[] labels = new String[matches.size()];
         for (int i = 0; i < matches.size(); i++) labels[i] = matches.get(i).name;
-        new AlertDialog.Builder(this).setTitle("Choose " + pendingBook + " audio")
+        AppDialogs.builder(this).setTitle("Choose " + pendingBook + " audio")
                 .setItems(labels, (dialog, which) -> {
                     AudioItem selected = matches.get(which);
                     saveSelectedAudio(selected.book, Uri.parse(selected.uri), selected.name);

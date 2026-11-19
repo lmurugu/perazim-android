@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -340,7 +342,7 @@ public class ChatDialog extends Dialog {
     }
 
     private void showOptionsMenu() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
         builder.setTitle(peerName);
 
         String[] options = new String[]{"🚫 Block Member", "📋 Copy Member Name"};
@@ -356,7 +358,7 @@ public class ChatDialog extends Dialog {
     }
 
     private void confirmBlockMember() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
         builder.setTitle("Block Member");
         builder.setMessage("Are you sure you want to block " + peerName + "? You will no longer receive fellowship messages from them.");
         builder.setPositiveButton("Block", (dialog, which) -> {

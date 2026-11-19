@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
@@ -465,7 +467,7 @@ public class BibleReaderDialog extends Dialog {
             }
         }
 
-        new AlertDialog.Builder(getContext())
+        AppDialogs.builder(getContext())
                 .setTitle("Select Translation / Chagua Tafsiri")
                 .setSingleChoiceItems(translationLabels, selectedIndex, (dialog, which) -> {
                     String chosen = translationIds[which];
@@ -691,7 +693,7 @@ public class BibleReaderDialog extends Dialog {
 
     private void showVerseOptionsModal(final BibleVerse verse) {
         final String citation = formatCitation(verse);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
 
         LinearLayout container = new LinearLayout(getContext());
         container.setOrientation(LinearLayout.VERTICAL);
@@ -774,7 +776,7 @@ public class BibleReaderDialog extends Dialog {
 
     private void showStudyNoteEditor(final BibleVerse verse) {
         final String citation = formatCitation(verse);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
         builder.setTitle("📝 Personal Study Note · " + citation);
 
         final EditText etNote = new EditText(getContext());
@@ -821,7 +823,7 @@ public class BibleReaderDialog extends Dialog {
     // =========================================================================
 
     private void showBookSelectorDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
 
         LinearLayout container = new LinearLayout(getContext());
         container.setOrientation(LinearLayout.VERTICAL);
@@ -971,7 +973,7 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void showChapterSelectorGrid(final BibleBook book) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
 
         LinearLayout container = new LinearLayout(getContext());
         container.setOrientation(LinearLayout.VERTICAL);

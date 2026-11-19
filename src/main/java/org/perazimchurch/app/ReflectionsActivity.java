@@ -1,5 +1,7 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 import android.app.AlertDialog;
@@ -195,7 +197,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
             finish();
         } else if (v == btnMeditate) {
             Toast.makeText(this, "⭐ +10 XP earned! Covenant reflection recorded.", Toast.LENGTH_SHORT).show();
-            new AlertDialog.Builder(this)
+            AppDialogs.builder(this)
                     .setTitle("Covenant Reflection")
                     .setMessage("Take 2 quiet minutes to meditate on God's breakout power in your finances, family, and health.")
                     .setPositiveButton("Amen", null)
