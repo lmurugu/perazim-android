@@ -145,6 +145,23 @@ async function run() {
     const sendAgain = await request('POST', '/api/community/messages', b.token, { receiverId: a.id, content: 'Back again' });
     assert.strictEqual(sendAgain.status, 201);
     console.log('PASS: unblocking restores content and messaging');
+
+    // Push devices: registered per member, taken over on re-registration, removed on sign-out
+    const badPlatform = await request('POST', '/api/community/devices', b.token, { token: 'tok_abc', platform: 'windows' });
+    assert.strictEqual(badPlatform.status, 400);
+    const device = await request('POST', '/api/community/devices', b.token, { token: 'tok_safety_device_1', platform: 'ios' });
+    assert.strictEqual(device.status, 201);
+    const takeover = await request('POST', '/api/community/devices', a.token, { token: 'tok_safety_device_1', platform: 'ios' });
+    assert.strictEqual(takeover.status, 201, 'a shared device token moves to the member who signed in on it');
+    const owner = await query("SELECT user_id FROM push_devices WHERE token = 'tok_safety_device_1'");
+    assert.strictEqual(owner.rows[0].user_id, a.id);
+    const otherRemove = await request('DELETE', '/api/community/devices/tok_safety_device_1', b.token);
+    assert.strictEqual(otherRemove.status, 200);
+    const stillThere = await query("SELECT 1 FROM push_devices WHERE token = 'tok_safety_device_1'");
+    assert.strictEqual(stillThere.rows.length, 1, 'a member cannot remove another member\'s device');
+    const ownRemove = await request('DELETE', '/api/community/devices/tok_safety_device_1', a.token);
+    assert.strictEqual(ownRemove.status, 200);
+    console.log('PASS: push device registration, takeover and removal');
     console.log('ALL CONTENT SAFETY TESTS PASSED');
   } finally {
     if (server) await new Promise(resolve => server.close(resolve));

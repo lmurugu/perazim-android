@@ -1455,5 +1455,40 @@ router.post('/reports/:id/decision', requireAuth, async (req, res) => {
   }
 });
 
+// ============================================================================
+// 10. PUSH DEVICES (native apps). Sending needs FCM and APNs credentials, which are not configured yet.
+// ============================================================================
+
+// POST /api/community/devices  { token, platform }
+router.post('/devices', requireAuth, async (req, res) => {
+  try {
+    const token = typeof req.body?.token === 'string' ? req.body.token.trim() : '';
+    const platform = String(req.body?.platform || '').toLowerCase();
+    if (!token || token.length > 512) return res.status(400).json({ error: 'A valid device token is required' });
+    if (!['ios', 'android', 'web'].includes(platform)) return res.status(400).json({ error: 'platform must be ios, android or web' });
+    const now = Date.now();
+    await query(
+      `INSERT INTO push_devices (token, user_id, platform, created_at, updated_at) VALUES ($1, $2, $3, $4, $4)
+       ON CONFLICT (token) DO UPDATE SET user_id = EXCLUDED.user_id, platform = EXCLUDED.platform, updated_at = EXCLUDED.updated_at`,
+      [token, req.user.id, platform, now]
+    );
+    res.status(201).json({ success: true });
+  } catch (err) {
+    console.error('Error registering device');
+    res.status(500).json({ error: 'Failed to register device' });
+  }
+});
+
+// DELETE /api/community/devices/:token  (called on sign-out)
+router.delete('/devices/:token', requireAuth, async (req, res) => {
+  try {
+    await query('DELETE FROM push_devices WHERE token = $1 AND user_id = $2', [req.params.token, req.user.id]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error removing device');
+    res.status(500).json({ error: 'Failed to remove device' });
+  }
+});
+
 module.exports = router;
 module.exports.serveMedia = serveMedia;

@@ -52,6 +52,7 @@ const ERASURE_POLICY = {
   'user_blocks.blocker_id': 'delete',
   'user_blocks.blocked_id': 'delete',
   'content_reports.reporter_id': 'delete',
+  'push_devices.user_id': 'delete',
   // Anonymised: the record stays, the identifying fields are replaced.
   'membership_claims.user_id': 'anonymise',
   // Kept with a reason (append-only history, security, or another person's record).
@@ -125,6 +126,7 @@ async function eraseMemberData(client, userId, now = Date.now()) {
   await client.query('DELETE FROM connections WHERE requester_id = $1 OR recipient_id = $1', [userId]);
   await client.query('DELETE FROM user_blocks WHERE blocker_id = $1 OR blocked_id = $1', [userId]);
   await client.query('DELETE FROM content_reports WHERE reporter_id = $1', [userId]);
+  await client.query('DELETE FROM push_devices WHERE user_id = $1', [userId]);
   await client.query('DELETE FROM in_app_notifications WHERE user_id = $1 OR actor_id = $1', [userId]);
 
   // Progress and uploads.

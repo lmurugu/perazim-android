@@ -24,3 +24,14 @@ CREATE TABLE IF NOT EXISTS content_reports (
     reviewed_by VARCHAR(64) REFERENCES users(id)
 );
 CREATE INDEX IF NOT EXISTS idx_content_reports_status ON content_reports(status, created_at);
+
+-- Push notification devices for the native apps. A device token is personal data:
+-- it is removed on sign-out and erased with the member's account.
+CREATE TABLE IF NOT EXISTS push_devices (
+    token VARCHAR(512) PRIMARY KEY,
+    user_id VARCHAR(64) NOT NULL REFERENCES users(id),
+    platform VARCHAR(16) NOT NULL CHECK (platform IN ('ios', 'android', 'web')),
+    created_at BIGINT NOT NULL,
+    updated_at BIGINT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_push_devices_user ON push_devices(user_id);
