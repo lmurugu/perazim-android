@@ -2,7 +2,10 @@
 set -euo pipefail
 
 # Right after boot the package service can lag behind sys.boot_completed; wait for it.
-timeout 300 bash -c 'until adb shell service check package 2>/dev/null | grep -q "package: found"; do sleep 2; done'
+wait_for_package_service() {
+  timeout 300 bash -c 'until adb shell service check package 2>/dev/null | grep -q "package: found"; do sleep 2; done'
+}
+wait_for_package_service
 
 pm_list=$(adb shell pm list packages 2>/dev/null | tr -d '\r' || true)
 echo "packages matching perazim: $(echo "$pm_list" | grep -i perazim | tr '\n' ' ')"
@@ -49,8 +52,24 @@ if [[ -z "$app_apk" || -z "$test_apk" ]]; then
   echo 'FAIL: debug app or test APK was not built.' >&2
   exit 1
 fi
-adb install -r "$app_apk"
-adb install -r "$test_apk"
+
+# The package service can drop again after a long Gradle build, so wait for it before each install
+# and retry a failed install up to three times.
+install_apk() {
+  local apk=$1
+  for attempt in 1 2 3; do
+    wait_for_package_service
+    if adb install -r "$apk"; then
+      return 0
+    fi
+    echo "install attempt $attempt failed for $apk; retrying after the package service is back"
+    sleep 5
+  done
+  echo "FAIL: could not install $apk after three attempts." >&2
+  return 1
+}
+install_apk "$app_apk"
+install_apk "$test_apk"
 
 adb shell svc wifi disable
 adb shell svc data disable || true  # the emulator image may not expose the phone service
