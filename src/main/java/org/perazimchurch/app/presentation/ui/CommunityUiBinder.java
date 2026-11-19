@@ -86,6 +86,7 @@ public final class CommunityUiBinder {
         row(content, button("My profile", this::editProfile), button("PC connection", this::showConnection));
         row(content, button("+ Share a post", () -> composePost(null, null)), button("Saved drafts", this::showDrafts));
         row(content, button("Daily challenge", this::showChallenge), button("Refresh", this::refresh));
+        content.addView(button("Blocked members", this::showBlocked));
         Spinner filters = spinner(new String[]{"All discussions", "General", "Prayer", "Praise", "Events"});
         filters.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             public void onItemSelected(android.widget.AdapterView<?> p, View v, int n, long id) {
@@ -99,10 +100,11 @@ public final class CommunityUiBinder {
     public void refresh() {
         if (!sameScope()) { resetScope(); feed.removeAllViews(); }
         String key = "feed_" + filter;
-        renderPosts(feed, store.cached(key).optJSONArray("posts"), null);
+        renderPosts(feed, visible(store.cached(key).optJSONArray("posts")), null);
         status.setText("Refreshing… Saved drafts remain on this phone until sent.");
+        syncBlocks(null);
         get("api/community/posts?limit=30&type=" + filter, response -> {
-            store.cache(key, response); renderPosts(feed, response.optJSONArray("posts"), null);
+            store.cache(key, response); renderPosts(feed, visible(response.optJSONArray("posts")), null);
             status.setText(session().isGuest() ? "Public discussions · Sign in from Profile to join in" : "Connected · " + store.drafts().length() + " saved drafts");
         }, (code, message) -> status.setText(error(code, message) + "\nShowing saved discussions. Tap Refresh to reconnect."));
     }
@@ -125,6 +127,7 @@ public final class CommunityUiBinder {
                     renderPosts(target, posts, groupId);
                 }, this::showError);
             }), button("Comments · " + post.optInt("comment_count"), () -> showPost(post, groupId)));
+            if (!owner.equals(post.optString("author_id"))) card.addView(button("Report or block", () -> moreMenu("POST", post.optString("id"), post.optString("author_id"), post.optString("author_name"), this::refresh)));
         }
     }
     private void showPost(JSONObject post, String groupId) {
@@ -159,10 +162,11 @@ public final class CommunityUiBinder {
     private void loadComments(LinearLayout target, String postId) {
         target.removeAllViews(); target.addView(text("Loading comments…", 14));
         get("api/community/posts/" + encode(postId) + "/comments", r -> {
-            target.removeAllViews(); JSONArray rows = r.optJSONArray("comments");
+            target.removeAllViews(); JSONArray rows = visible(r.optJSONArray("comments"));
             if (rows == null || rows.length() == 0) target.addView(text("Start the conversation.", 14));
             if (rows != null) for (int i=0;i<rows.length();i++) { JSONObject c=rows.optJSONObject(i); if(c!=null) {
                 LinearLayout card=card(target);card.addView(text(c.optString("author_name") + " · " + date(c.optLong("created_at")),12));card.addView(text(c.optString("content"),16));
+                if (!owner.equals(c.optString("author_id"))) card.addView(button("Report or block", () -> moreMenu("COMMENT", c.optString("id"), c.optString("author_id"), c.optString("author_name"), () -> loadComments(target, postId))));
             }}
         }, (c,m)->{target.removeAllViews();target.addView(text(error(c,m),14));});
     }
@@ -308,6 +312,7 @@ public final class CommunityUiBinder {
             if(photo[0].isEmpty()&&!required(input))return;JSONObject value=new JSONObject();postSafe(value,"id",id("msg"));postSafe(value,"receiverId",partnerId);postSafe(value,"content",input.getText().toString().trim());postSafe(value,"mediaUrl",photo[0]);
             saveAndSend("api/community/messages",value,"Message to "+name,r->{input.setText("");photo[0]="";photoState.setText("");load.run();});
         }),button("Refresh",()->{load.run();acknowledgeConversation(partnerId);}));
+        body.addView(button("Report or block this member", () -> moreMenu("MEMBER", partnerId, partnerId, name, () -> load.run())));
         panel(name,body);load.run();acknowledgeConversation(partnerId);
     }
     private void acknowledgeConversation(String partnerId) {
@@ -352,6 +357,91 @@ public final class CommunityUiBinder {
                 session().logout();ApiClient.setBaseUrl(activity,selected);dialog.dismiss();resetScope();refresh();toast("Server changed. Sign in from Profile.");
             }).show();
         }));
+    }
+    // Safety: members can report content or block a member. Blocks hide content on this phone at once,
+    // and the server enforces them for everything it returns.
+    private JSONArray visible(JSONArray rows) {
+        JSONArray out = new JSONArray();
+        if (rows == null) return out;
+        java.util.Set<String> hidden = blockedIds();
+        for (int i = 0; i < rows.length(); i++) {
+            JSONObject row = rows.optJSONObject(i);
+            if (row != null && !hidden.contains(row.optString("author_id"))) out.put(row);
+        }
+        return out;
+    }
+    private java.util.Set<String> blockedIds() {
+        java.util.Set<String> ids = new java.util.HashSet<>();
+        JSONArray blocks = store.cached("blocks").optJSONArray("blocks");
+        if (blocks != null) for (int i = 0; i < blocks.length(); i++) {
+            JSONObject b = blocks.optJSONObject(i);
+            if (b != null) ids.add(b.optString("user_id"));
+        }
+        return ids;
+    }
+    private void syncBlocks(Runnable done) {
+        get("api/community/blocks", r -> { store.cache("blocks", r); if (done != null) done.run(); }, (code, msg) -> { if (done != null) done.run(); });
+    }
+    private void moreMenu(String targetType, String targetId, String authorId, String authorName, Runnable after) {
+        if (!signedIn()) return;
+        String name = authorName == null || authorName.isEmpty() ? "this member" : authorName;
+        new AlertDialog.Builder(activity).setTitle("Report or block")
+                .setItems(new String[]{"Report", "Block " + name}, (d, which) -> {
+                    if (which == 0) chooseReason(targetType, targetId, after);
+                    else confirmBlock(authorId, name, after);
+                })
+                .setNegativeButton("Cancel", null).show();
+    }
+    private void chooseReason(String targetType, String targetId, Runnable after) {
+        String[] labels = {"Spam or scam", "Harassment or bullying", "Hate or contempt", "Sexual content", "Violence or threats", "False teaching", "Shares someone's personal information", "Something else"};
+        String[] codes = {"SPAM", "HARASSMENT", "HATE", "SEXUAL", "VIOLENCE", "FALSE_TEACHING", "PRIVACY", "OTHER"};
+        new AlertDialog.Builder(activity).setTitle("Why are you reporting this?")
+                .setItems(labels, (d, which) -> {
+                    JSONObject value = new JSONObject();
+                    postSafe(value, "targetType", targetType);
+                    postSafe(value, "targetId", targetId);
+                    postSafe(value, "reason", codes[which]);
+                    post("api/community/reports", value, r -> {
+                        toast("Thank you. The church team will review this report.");
+                        if (after != null) after.run();
+                    }, this::showError);
+                })
+                .setNegativeButton("Cancel", null).show();
+    }
+    private void confirmBlock(String userId, String name, Runnable after) {
+        new AlertDialog.Builder(activity).setTitle("Block " + name + "?")
+                .setMessage("You will no longer see their posts or comments, and neither of you can send messages. You can unblock them under Blocked members.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Block", (d, w) -> {
+                    JSONObject value = new JSONObject();
+                    postSafe(value, "userId", userId);
+                    post("api/community/blocks", value, r -> {
+                        toast(name + " is blocked");
+                        syncBlocks(() -> { refresh(); if (after != null) after.run(); });
+                    }, this::showError);
+                }).show();
+    }
+    private void showBlocked() {
+        if (!signedIn()) return;
+        LinearLayout body = column();
+        TextView state = text("Loading…", 14); body.addView(state);
+        LinearLayout list = column(); body.addView(list);
+        panel("Blocked members", body);
+        get("api/community/blocks", r -> {
+            store.cache("blocks", r); state.setText("");
+            JSONArray rows = r.optJSONArray("blocks");
+            if (rows == null || rows.length() == 0) { list.addView(text("You have not blocked anyone.", 15)); return; }
+            for (int i = 0; i < rows.length(); i++) {
+                JSONObject b = rows.optJSONObject(i); if (b == null) continue;
+                String blockedId = b.optString("user_id"); String blockedName = b.optString("name", "Member");
+                LinearLayout card = card(list); card.addView(text(blockedName, 16));
+                card.addView(button("Unblock", () -> request("DELETE", "api/community/blocks/" + encode(blockedId), null, x -> {
+                    toast(blockedName + " is unblocked");
+                    card.setVisibility(View.GONE);
+                    syncBlocks(() -> refresh());
+                }, this::showError)));
+            }
+        }, (code, msg) -> state.setText(error(code, msg)));
     }
     private void pickPhoto(PhotoChoice choice) {
         if(!signedIn())return;
