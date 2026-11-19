@@ -28,13 +28,13 @@ fi
 
 adb shell svc wifi disable
 adb shell svc data disable || true  # the emulator image may not expose the phone service
-./gradlew connectedValidationAndroidTest \
+./gradlew connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
   --stacktrace
 
 # Kill the app process, not force-stop it, so JobScheduler may restart persisted work.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
-adb shell am kill org.perazimchurch.app.validation
+adb shell am kill org.perazimchurch.app
 adb shell svc wifi enable
 adb shell svc data enable || true
 
