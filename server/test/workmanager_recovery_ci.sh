@@ -37,7 +37,11 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
 
 # Kill the app process, not force-stop it, so JobScheduler may restart persisted work.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
+# Record the process id around the kill so the job log shows whether the process really died.
+echo "app pid before kill: $(adb shell pidof org.perazimchurch 2>/dev/null || echo none)"
 adb shell am kill org.perazimchurch.app
+sleep 3
+echo "app pid after kill: $(adb shell pidof org.perazimchurch 2>/dev/null || echo none)"
 adb shell svc wifi enable
 adb shell svc data enable || true
 
@@ -58,6 +62,8 @@ if [[ "$received" != true ]]; then
     echo '== connectivity'; adb shell dumpsys connectivity 2>/dev/null | grep -i 'active default\|NetworkAgentInfo\|VALIDATED' | head -40 || true
     echo '== logcat (app and WorkManager)'; adb logcat -d 2>/dev/null | grep -i 'perazim\|WorkManager\|JobScheduler\|JobService\|BackgroundSync' | tail -400 || true
   } > build/reports/androidTests/connected/workmanager-diagnostics.txt 2>&1
+  echo '== mock server log (job log copy)'; cat /tmp/workmanager-mock.log 2>/dev/null || true
+  echo '== pending jobs for the app (job log copy)'; adb shell dumpsys jobscheduler 2>/dev/null | grep -i -A4 'org.perazimchurch' | head -60 || true
   echo 'FAIL: queued synthetic mutation was not delivered after process death without reopening the app.' >&2
   exit 1
 fi
