@@ -72,9 +72,10 @@ public final class GlassKit {
                     new int[]{Color.parseColor("#C7FFFFFF"), Color.parseColor("#B3FFFFFF")});
             d.setStroke(px(c, 1), Color.parseColor("#F2FFFFFF"));
         } else {
-            d = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                    new int[]{Color.parseColor("#24FFFFFF"), Color.parseColor("#14FFFFFF"), Color.parseColor("#12FFFFFF")});
-            d.setStroke(px(c, 1), Color.parseColor("#2EFFFFFF"));
+            // Dark mode uses the original solid purple card (#3D1749 with a #4A3554 rim), as in the original build.
+            d = new GradientDrawable();
+            d.setColor(Color.parseColor("#3D1749"));
+            d.setStroke(px(c, 1), Color.parseColor("#4A3554"));
         }
         d.setCornerRadius(px(c, radiusDp));
         if (light()) {
