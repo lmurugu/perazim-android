@@ -1432,6 +1432,7 @@ public class BibleReaderDialog extends Dialog {
         glass.setColor(GlassKit.light() ? Color.parseColor("#F5140B20") : Color.parseColor("#FFFFFF"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         panel.setBackground(glass);
+        panel.setAlpha(1f);
         // Higher than the verse card, so the verses cannot draw over the Notes card.
         panel.setElevation(dp(48));
         panel.setTranslationZ(dp(48));
