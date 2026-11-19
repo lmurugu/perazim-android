@@ -304,6 +304,7 @@ public class BibleReaderDialog extends Dialog {
         dismissThemePopup();
         View rebuilt = buildReaderLayout();
         setContentView(rebuilt);
+        applyWindowChrome();
         loadCanonicalBooks();
         loadChapterVerses(currentBookId, currentChapter);
     }
@@ -330,12 +331,8 @@ public class BibleReaderDialog extends Dialog {
 
         if (getWindow() != null) {
             getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            getWindow().setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().setStatusBarColor(PerazimTheme.COLOR_BG_DEEP);
-                getWindow().setNavigationBarColor(PerazimTheme.COLOR_BG_DEEP);
-            }
         }
+        applyWindowChrome();
 
         loadCanonicalBooks();
         loadChapterVerses(currentBookId, currentChapter);
@@ -345,6 +342,25 @@ public class BibleReaderDialog extends Dialog {
     private View actionBarView;
     private BibleVerse actionVerse;
     private int focusedVerseNumber = 0;
+
+    /** One background gradient behind everything; status and navigation bars are transparent so it flows top to bottom. */
+    private void applyWindowChrome() {
+        android.view.Window window = getWindow();
+        if (window == null) {
+            return;
+        }
+        window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (android.os.Build.VERSION.SDK_INT >= 30) {
+            android.view.WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                controller.setSystemBarsAppearance(GlassKit.light() ? mask : 0, mask);
+            }
+        }
+    }
 
     private void initFallbackBooks() {
         booksList.clear();
@@ -367,7 +383,7 @@ public class BibleReaderDialog extends Dialog {
     private View buildReaderLayout() {
         // Mockup board "Bible reader": glass header pills, one glass card of serif verses, Previous / Next.
         FrameLayout frame = new FrameLayout(getContext());
-        frame.setBackground(PerazimTheme.createBackgroundGradient());
+        frame.setBackground(null);
         readerFrame = frame;
 
         LinearLayout root = new LinearLayout(getContext());
@@ -442,10 +458,8 @@ public class BibleReaderDialog extends Dialog {
 
         // App logo: goes to the home page.
         FrameLayout back = new FrameLayout(getContext());
-        GradientDrawable logoCircle = new GradientDrawable();
-        logoCircle.setShape(GradientDrawable.OVAL);
-        logoCircle.setColor(GlassKit.light() ? Color.parseColor("#E6FFFFFF") : Color.parseColor("#33FFFFFF"));
-        back.setBackground(logoCircle);
+        GlassKit.keep(back);
+        back.setBackground(null);
         ImageView logo = new ImageView(getContext());
         logo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
         logo.setScaleType(ImageView.ScaleType.CENTER_CROP);
