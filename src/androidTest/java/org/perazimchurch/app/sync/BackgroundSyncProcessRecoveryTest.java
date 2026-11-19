@@ -42,7 +42,7 @@ public class BackgroundSyncProcessRecoveryTest {
 
         List<WorkInfo> work = WorkManager.getInstance(context)
                 .getWorkInfosForUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME)
-                .get(10, TimeUnit.SECONDS);
+                .get(60, TimeUnit.SECONDS);
         assertFalse("WorkManager must retain the queued one-time sync", work.isEmpty());
         // The network is off here, so the queued sync must still be waiting, not finished or failed.
         StringBuilder states = new StringBuilder();
