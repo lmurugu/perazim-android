@@ -3,6 +3,7 @@ package org.perazimchurch.app.domain.repository;
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleChapter;
 import org.perazimchurch.app.domain.model.BibleTranslation;
+import org.perazimchurch.app.domain.model.BibleNote;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.InterlinearWord;
 import org.perazimchurch.app.domain.model.StrongsEntry;
@@ -58,4 +59,13 @@ public interface BibleRepository {
 
     /** Every verse saved under a topic, in reading order, with default-translation text. */
     List<BibleVerse> getTopicVerses(String topic);
+
+    /** All study notes with their linked verses, most recently changed first. */
+    List<BibleNote> getNotes();
+
+    /** Saves a note (id 0 creates one) and replaces its verse links. Returns the note id. */
+    long saveNote(long id, String body, List<VerseLocation> links);
+
+    /** Deletes a note and its links. */
+    void deleteNote(long id);
 }

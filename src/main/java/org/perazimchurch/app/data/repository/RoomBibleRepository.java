@@ -7,6 +7,10 @@ import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
 import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
+import org.perazimchurch.app.data.local.dao.BibleNoteDao;
+import org.perazimchurch.app.data.local.entity.BibleNoteEntity;
+import org.perazimchurch.app.data.local.entity.BibleNoteLinkEntity;
+import org.perazimchurch.app.domain.model.BibleNote;
 import org.perazimchurch.app.data.local.seeder.BibleDataSeeder;
 import org.perazimchurch.app.data.mapper.BibleMapper;
 import org.perazimchurch.app.domain.model.BibleBook;
@@ -34,6 +38,7 @@ import java.util.Map;
 public class RoomBibleRepository implements BibleRepository {
 
     private final BibleDao bibleDao;
+    private BibleNoteDao noteDao;
 
     public RoomBibleRepository(BibleDao bibleDao) {
         this.bibleDao = bibleDao;
@@ -59,6 +64,7 @@ public class RoomBibleRepository implements BibleRepository {
 
     public RoomBibleRepository(android.content.Context context, PerazimDatabase database) {
         this.bibleDao = database != null ? database.bibleDao() : null;
+        this.noteDao = database != null ? database.bibleNoteDao() : null;
         this.assetContext = context != null ? context.getApplicationContext() : null;
     }
 
@@ -427,6 +433,65 @@ public class RoomBibleRepository implements BibleRepository {
             }
         }
         return verses;
+    }
+
+    @Override
+    public List<BibleNote> getNotes() {
+        List<BibleNote> notes = new ArrayList<>();
+        if (noteDao == null) {
+            return notes;
+        }
+        Map<Long, List<VerseLocation>> linksByNote = new HashMap<>();
+        for (BibleNoteLinkEntity link : noteDao.getAllLinks()) {
+            List<VerseLocation> list = linksByNote.get(link.getNoteId());
+            if (list == null) {
+                list = new ArrayList<>();
+                linksByNote.put(link.getNoteId(), list);
+            }
+            list.add(new VerseLocation(link.getBookNumber(), link.getChapterNumber(), link.getVerseNumber()));
+        }
+        for (BibleNoteEntity note : noteDao.getAllNotes()) {
+            List<VerseLocation> links = linksByNote.get(note.getId());
+            if (links == null) {
+                links = new ArrayList<>();
+            }
+            Collections.sort(links);
+            notes.add(new BibleNote(note.getId(), note.getBody(), note.getUpdatedMillis(), links));
+        }
+        return notes;
+    }
+
+    @Override
+    public long saveNote(long id, String body, List<VerseLocation> links) {
+        if (noteDao == null) {
+            return 0L;
+        }
+        String text = body == null ? "" : body;
+        long now = System.currentTimeMillis();
+        long noteId = id;
+        if (id == 0L) {
+            noteId = noteDao.insertNote(new BibleNoteEntity(0L, text, now));
+        } else {
+            noteDao.updateNote(id, text, now);
+        }
+        noteDao.deleteLinks(noteId);
+        List<BibleNoteLinkEntity> rows = new ArrayList<>();
+        for (VerseLocation loc : links) {
+            rows.add(new BibleNoteLinkEntity(noteId, loc.bookNumber, loc.chapter, loc.verse));
+        }
+        if (!rows.isEmpty()) {
+            noteDao.insertLinks(rows);
+        }
+        return noteId;
+    }
+
+    @Override
+    public void deleteNote(long id) {
+        if (noteDao == null || id == 0L) {
+            return;
+        }
+        noteDao.deleteLinks(id);
+        noteDao.deleteNote(id);
     }
 
     private Map<Integer, String> highlightsFor(int bookNumber, int chapterNumber) {

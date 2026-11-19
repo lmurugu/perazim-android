@@ -400,6 +400,12 @@ public class BibleReaderDialog extends Dialog {
         lpGo.leftMargin = dp(6);
         layout.addView(go, lpGo);
 
+        TextView notesButton = GlassKit.text(getContext(), "Notes", 12, true, GlassKit.accent());
+        notesButton.setPadding(dp(10), dp(8), dp(10), dp(8));
+        notesButton.setClickable(true);
+        notesButton.setOnClickListener(v -> showNotesDialog());
+        layout.addView(notesButton);
+
         TextView topics = GlassKit.text(getContext(), "Topics", 12, true, GlassKit.accent());
         topics.setPadding(dp(10), dp(8), dp(10), dp(8));
         topics.setClickable(true);
@@ -1193,6 +1199,112 @@ public class BibleReaderDialog extends Dialog {
                     .setPositiveButton("Close", null)
                     .show();
         });
+    }
+
+    /** Study notes: list, open to edit, and tap a linked verse to jump to it. */
+    private void showNotesDialog() {
+        bibleViewModel.loadNotes(notes -> {
+            LinearLayout box = new LinearLayout(getContext());
+            box.setOrientation(LinearLayout.VERTICAL);
+            box.setPadding(dp(18), dp(8), dp(18), dp(12));
+            TextView newNote = GlassKit.orangeButton(getContext(), "New note", 12);
+            newNote.setOnClickListener(v -> showNoteEditor(null));
+            LinearLayout.LayoutParams nlp = new LinearLayout.LayoutParams(-2, dp(36));
+            nlp.setMargins(0, 0, 0, dp(12));
+            box.addView(newNote, nlp);
+            if (notes.isEmpty()) {
+                TextView empty = GlassKit.text(getContext(), "No notes yet. Write a note and link the verses it talks about.", 13, false, COLOR_TEXT_MUTED());
+                box.addView(empty);
+            }
+            for (final org.perazimchurch.app.domain.model.BibleNote note : notes) {
+                TextView body = GlassKit.text(getContext(), note.getBody().length() > 140
+                        ? note.getBody().substring(0, 140) + "..." : note.getBody(), 14, false, GlassKit.text());
+                body.setOnClickListener(v -> showNoteEditor(note));
+                body.setPadding(0, dp(10), 0, dp(4));
+                box.addView(body);
+                LinearLayout links = new LinearLayout(getContext());
+                links.setOrientation(LinearLayout.HORIZONTAL);
+                for (final org.perazimchurch.app.domain.model.VerseLocation loc : note.getLinks()) {
+                    TextView chip = GlassKit.text(getContext(), BibleDataSeeder.canonicalBookName(loc.bookNumber)
+                            + " " + loc.chapter + ":" + loc.verse, 12, true, GlassKit.accent());
+                    chip.setPadding(dp(8), dp(4), dp(8), dp(4));
+                    chip.setClickable(true);
+                    chip.setOnClickListener(v -> jumpToVerse(loc));
+                    links.addView(chip);
+                }
+                box.addView(links);
+            }
+            ScrollView scroll = new ScrollView(getContext());
+            scroll.addView(box);
+            AppDialogs.builder(getContext())
+                    .setTitle("Notes")
+                    .setView(scroll)
+                    .setNegativeButton("Close", null)
+                    .show();
+        });
+    }
+
+    /** Opens a verse from a note link: loads its chapter and scrolls to the verse. */
+    private void jumpToVerse(org.perazimchurch.app.domain.model.VerseLocation loc) {
+        pendingScrollVerse = loc.verse;
+        loadChapterVerses(BibleMapper.getBookIdFromNumber(loc.bookNumber), loc.chapter);
+    }
+
+    /** Editor for one note: text, linked verses (added by reference, e.g. "John 3:16") and save or delete. */
+    private void showNoteEditor(@Nullable final org.perazimchurch.app.domain.model.BibleNote existing) {
+        final List<org.perazimchurch.app.domain.model.VerseLocation> links = new ArrayList<>();
+        if (existing != null) {
+            links.addAll(existing.getLinks());
+        }
+        LinearLayout box = new LinearLayout(getContext());
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(18), dp(8), dp(18), dp(8));
+        final EditText body = new EditText(getContext());
+        body.setHint("Write your note");
+        body.setMinLines(4);
+        body.setGravity(Gravity.TOP);
+        if (existing != null) {
+            body.setText(existing.getBody());
+        }
+        box.addView(body);
+        final LinearLayout linkBox = new LinearLayout(getContext());
+        linkBox.setOrientation(LinearLayout.VERTICAL);
+        box.addView(linkBox);
+        final Runnable[] redraw = new Runnable[1];
+        redraw[0] = () -> {
+            linkBox.removeAllViews();
+            for (final org.perazimchurch.app.domain.model.VerseLocation loc : links) {
+                TextView row = GlassKit.text(getContext(), "Linked: " + BibleDataSeeder.canonicalBookName(loc.bookNumber)
+                        + " " + loc.chapter + ":" + loc.verse + "   (tap to remove)", 12, false, GlassKit.accent());
+                row.setPadding(0, dp(4), 0, dp(4));
+                row.setOnClickListener(v -> {
+                    links.remove(loc);
+                    redraw[0].run();
+                });
+                linkBox.addView(row);
+            }
+        };
+        redraw[0].run();
+        final EditText reference = new EditText(getContext());
+        reference.setHint("Link a verse, e.g. John 3:16");
+        reference.setSingleLine(true);
+        box.addView(reference);
+        AppDialogs.builder(getContext())
+                .setTitle(existing == null ? "New note" : "Edit note")
+                .setView(box)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String ref = reference.getText().toString().trim();
+                    ScriptureReference parsed = ScriptureReference.parse(ref);
+                    if (!ref.isEmpty() && parsed != null && parsed.namesVerse()) {
+                        links.add(new org.perazimchurch.app.domain.model.VerseLocation(parsed.bookNumber, parsed.chapter, parsed.verseStart));
+                    }
+                    bibleViewModel.saveNote(existing == null ? 0L : existing.getId(), body.getText().toString(), links,
+                            id -> Toast.makeText(getContext(), "Note saved", Toast.LENGTH_SHORT).show());
+                })
+                .setNeutralButton(existing == null ? null : "Delete", existing == null ? null : (dialog, which) ->
+                        bibleViewModel.deleteNote(existing.getId(), () -> Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show()))
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     /** Lists topics; choosing one shows its saved verses in the search list. */

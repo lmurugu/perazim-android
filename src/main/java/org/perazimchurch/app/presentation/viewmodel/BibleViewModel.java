@@ -12,7 +12,9 @@ import androidx.lifecycle.ViewModel;
 
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleTranslation;
+import org.perazimchurch.app.domain.model.BibleNote;
 import org.perazimchurch.app.domain.model.BibleVerse;
+import org.perazimchurch.app.domain.model.VerseLocation;
 import org.perazimchurch.app.domain.model.InterlinearWord;
 import org.perazimchurch.app.domain.model.StrongsEntry;
 import org.perazimchurch.app.domain.model.VerseLocation;
@@ -343,6 +345,54 @@ public class BibleViewModel extends ViewModel {
             if (callback != null) {
                 final List<BibleVerse> res = verses != null ? verses : Collections.emptyList();
                 postCallback(() -> callback.accept(res));
+            }
+        });
+    }
+
+    /** Loads all study notes. */
+    public void loadNotes(@Nullable Consumer<List<BibleNote>> callback) {
+        executor.execute(() -> {
+            List<BibleNote> notes;
+            try {
+                notes = bibleRepo.getNotes();
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading notes");
+                notes = Collections.emptyList();
+            }
+            if (callback != null) {
+                final List<BibleNote> res = notes != null ? notes : Collections.emptyList();
+                postCallback(() -> callback.accept(res));
+            }
+        });
+    }
+
+    /** Saves a note with its verse links, then calls back with the note id. */
+    public void saveNote(long id, @NonNull String body, @NonNull List<VerseLocation> links, @Nullable Consumer<Long> callback) {
+        executor.execute(() -> {
+            long saved = 0L;
+            try {
+                saved = bibleRepo.saveNote(id, body, links);
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving note");
+            }
+            final long result = saved;
+            if (callback != null) {
+                postCallback(() -> callback.accept(result));
+            }
+        });
+    }
+
+    /** Deletes a note, then calls back. */
+    public void deleteNote(long id, @Nullable Runnable onDone) {
+        executor.execute(() -> {
+            try {
+                bibleRepo.deleteNote(id);
+            } catch (Exception e) {
+                Log.e(TAG, "Error deleting note");
+            } finally {
+                if (onDone != null) {
+                    postCallback(onDone);
+                }
             }
         });
     }

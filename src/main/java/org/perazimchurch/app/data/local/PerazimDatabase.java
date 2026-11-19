@@ -45,6 +45,9 @@ import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
 import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
+import org.perazimchurch.app.data.local.entity.BibleNoteEntity;
+import org.perazimchurch.app.data.local.entity.BibleNoteLinkEntity;
+import org.perazimchurch.app.data.local.dao.BibleNoteDao;
 import org.perazimchurch.app.data.local.entity.CampusEntity;
 import org.perazimchurch.app.data.local.entity.CommentEntity;
 import org.perazimchurch.app.data.local.entity.ConnectionEntity;
@@ -94,6 +97,8 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         BibleVerseEntity.class,
         BibleVerseHighlightEntity.class,
         BibleTopicVerseEntity.class,
+        BibleNoteEntity.class,
+        BibleNoteLinkEntity.class,
         ConversationEntity.class,
         MessageEntity.class,
         ConnectionEntity.class,
@@ -110,7 +115,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         EventRsvpEntity.class,
         DailyChallengeEntity.class
     },
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 @TypeConverters({Converters.class})
@@ -126,6 +131,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
     public abstract RiddleDao riddleDao();
     public abstract JokeDao jokeDao();
     public abstract BibleDao bibleDao();
+    public abstract BibleNoteDao bibleNoteDao();
     public abstract EventDao eventDao();
     public abstract AnnouncementDao announcementDao();
     public abstract PrayerDao prayerDao();
@@ -239,6 +245,18 @@ public abstract class PerazimDatabase extends RoomDatabase {
         }
     };
 
+    public static final Migration MIGRATION_9_10 = new Migration(9, 10) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            // Study notes that link to several verses; existing data is untouched.
+            db.execSQL("CREATE TABLE IF NOT EXISTS `bible_notes` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `body` TEXT, `updatedMillis` INTEGER NOT NULL)");
+            db.execSQL("CREATE TABLE IF NOT EXISTS `bible_note_links` (" +
+                    "`noteId` INTEGER NOT NULL, `bookNumber` INTEGER NOT NULL, `chapterNumber` INTEGER NOT NULL, " +
+                    "`verseNumber` INTEGER NOT NULL, PRIMARY KEY(`noteId`, `bookNumber`, `chapterNumber`, `verseNumber`))");
+        }
+    };
+
     public static PerazimDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (PerazimDatabase.class) {
@@ -252,7 +270,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
                             DATABASE_NAME
                     )
                     .openHelperFactory(new SupportOpenHelperFactory(databaseKey))
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                     .build();
                 }
             }
