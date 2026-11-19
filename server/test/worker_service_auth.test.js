@@ -7,7 +7,9 @@ const crypto = require('node:crypto');
 const jwt = require('jsonwebtoken');
 
 const sourcePath = require('node:path').resolve(__dirname, '../../relay/worker.js');
-const source = fs.readFileSync(sourcePath, 'utf8').replace('export default {', 'module.exports.default = {');
+const source = fs.readFileSync(sourcePath, 'utf8')
+  .replace('export default {', 'module.exports.default = {')
+  .replace(/^export class (\w+)/gm, 'class $1') + '\nmodule.exports.QuotaCounter = QuotaCounter;\n';
 const moduleObject = { exports: {} };
 let upstreamCalls = 0;
 let upstreamBody = null;
@@ -65,8 +67,8 @@ async function run() {
   assert.equal(await status(noKv), 503, 'quota dependency absence fails closed before Gemini');
   assert.equal(upstreamCalls, 0);
 
-  const kv = { async get() { return null; }, async put() {} };
-  const response = await worker.fetch(request(token, { question: 'What is a psalm?', requestId: jwt.decode(token).jti }), { ...envBase, PERAZIM_KV: kv });
+  const quotaOk = { idFromName: name => name, get: () => ({ fetch: async () => new Response(JSON.stringify({ allowed: true }), { status: 200, headers: { "Content-Type": "application/json" } }) }) };
+  const response = await worker.fetch(request(token, { question: 'What is a psalm?', requestId: jwt.decode(token).jti }), { ...envBase, QUOTA_COUNTER: quotaOk });
   assert.equal(await status(response), 200);
   const result = await response.json();
   assert.equal(result.answer, 'Synthetic grounded answer');

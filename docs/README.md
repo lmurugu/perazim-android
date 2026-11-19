@@ -19,7 +19,7 @@ Start here. Each link goes to the current document for that topic.
 - [Data inventory](security/data-inventory.md)
 - [Third-party inventory](security/third-parties.md)
 - [Data protection work](data-protection/)
-- [Public privacy notice draft](../server/privacy-notice-v0.2.md)
+- Public privacy notice: retired draft v0.2 (kept for the acknowledgement contract test). Current draft v1.0 lives in the owner's legal drafts folder, outside this repository.
 
 ## Operations
 - [Disaster recovery and hybrid deploy notes](disaster-recovery-and-hybrid-deploy/00_START_HERE.md)

@@ -436,7 +436,6 @@ public final class CommunityUiBinder {
             if(rows==null||rows.length()==0)list.addView(text("No classes scheduled yet.",16));
             if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject c=rows.optJSONObject(i);if(c==null)continue;LinearLayout card=card(list);
                 card.addView(text((c.optBoolean("is_cancelled")?"Cancelled · ":"")+c.optString("title"),20));card.addView(text(c.optString("group_name")+" · "+c.optString("teacher_name")+"\n"+date(c.optLong("starts_at"))+" · "+c.optInt("duration_minutes")+" minutes",14));card.addView(text(c.optString("description"),16));
-                if(!c.optBoolean("is_cancelled"))card.addView(button("Join video classroom", () -> org.perazimchurch.app.ClassroomCallActivity.open(activity,c.optString("id"),c.optString("title"))));
                 if(owner.equals(c.optString("created_by"))&&!c.optBoolean("is_cancelled"))card.addView(button("Cancel class",()->AppDialogs.builder(activity).setTitle("Cancel this class?").setNegativeButton("Keep",null).setPositiveButton("Cancel class",(d,w)->request("DELETE","api/community/classes/"+encode(c.optString("id")),null,x->toast("Class cancelled; reopen Classes to refresh"),this::showError)).show()));
             }});
     }
