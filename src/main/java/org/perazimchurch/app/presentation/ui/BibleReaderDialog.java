@@ -380,6 +380,14 @@ public class BibleReaderDialog extends Dialog {
         etSearchQuery.setSingleLine(true);
         etSearchQuery.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         etSearchQuery.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        etSearchQuery.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == android.view.KeyEvent.KEYCODE_ENTER && event.getAction() == android.view.KeyEvent.ACTION_UP) {
+                performSearch(etSearchQuery.getText().toString().trim());
+                hideKeyboard(etSearchQuery);
+                return true;
+            }
+            return false;
+        });
         etSearchQuery.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 performSearch(etSearchQuery.getText().toString().trim());
@@ -571,6 +579,8 @@ public class BibleReaderDialog extends Dialog {
     }
 
     public void loadChapterVerses(@NonNull String bookId, int chapter) {
+        dismissActionBar();
+        freshRender = true;
         this.currentBookId = bookId;
         this.currentChapter = chapter;
         BibleBook b = bookMap.get(bookId);
@@ -609,6 +619,7 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void toggleSearchMode() {
+        dismissActionBar();
         isSearchMode = !isSearchMode;
         if (isSearchMode) {
             searchBarLayout.setVisibility(View.VISIBLE);
@@ -630,6 +641,7 @@ public class BibleReaderDialog extends Dialog {
 
     private void performSearch(String query) {
         lastQuery = query;
+        freshRender = true;
         if (TextUtils.isEmpty(query)) {
             Toast.makeText(getContext(), "Please enter a keyword to search", Toast.LENGTH_SHORT).show();
             return;
@@ -714,7 +726,13 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
+    /** True when the next render shows new content (chapter, search or topic), not an in-place update. */
+    private boolean freshRender = false;
+
     private void renderVerseList(@NonNull List<BibleVerse> verses, boolean isSearchResult) {
+        boolean fresh = freshRender;
+        freshRender = false;
+        final int keepScrollY = versesScrollView != null ? versesScrollView.getScrollY() : 0;
         clearVerseViews();
         if (isSearchResult) {
             TextView searchSummary = GlassKit.text(getContext(), "Found " + verses.size() + " verses", 11, true, GlassKit.accent());
@@ -733,6 +751,11 @@ public class BibleReaderDialog extends Dialog {
         for (final BibleVerse verse : verses) {
             versesContainer.addView(createVerseRow(verse, isSearchResult));
         }
+        if (!fresh) {
+            // In-place update (highlight, bookmark, focus): keep the reader where it was, no animation.
+            versesScrollView.post(() -> versesScrollView.scrollTo(0, keepScrollY));
+            return;
+        }
         for (int i = 0; i < versesContainer.getChildCount(); i++) {
             View child = versesContainer.getChildAt(i);
             if (child == loadingProgress || child == tvEmptyState) {
@@ -744,11 +767,13 @@ public class BibleReaderDialog extends Dialog {
         final View target = (!isSearchResult && pendingScrollVerse > 0) ? verseRows.get(pendingScrollVerse) : null;
         pendingScrollVerse = 0;
         if (target != null) {
-            versesScrollView.post(() -> versesScrollView.scrollTo(0, offsetWithin(target, versesScrollView)));
+            // Wait for layout so the verse's position is known before scrolling to it.
+            versesScrollView.postDelayed(() -> versesScrollView.scrollTo(0, offsetWithin(target, versesScrollView)), 120);
         } else {
             versesScrollView.post(() -> versesScrollView.scrollTo(0, 0));
         }
     }
+
 
     private View createVerseRow(final BibleVerse verse, final boolean isSearchResult) {
         // Serif verse, line height 1.7, with the verse number as a small bold orange label (mockup)
@@ -882,6 +907,7 @@ public class BibleReaderDialog extends Dialog {
             mutedRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
                     v -> applyHighlight(verse, colour.name)));
         }
+        mutedRow.addView(barIcon("\u2715", "Remove highlight", v -> applyHighlight(verse, null)));
         palette.addView(majorRow);
         palette.addView(mutedRow);
         palette.addView(spectrumView(verse));
@@ -928,7 +954,7 @@ public class BibleReaderDialog extends Dialog {
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        lp.setMargins(dp(12), 0, dp(12), dp(16));
+        lp.setMargins(dp(12), 0, dp(12), dp(84));
         readerFrame.addView(bar, lp);
         actionBarView = bar;
     }
@@ -1074,7 +1100,9 @@ public class BibleReaderDialog extends Dialog {
 
     /** Sets or clears a verse highlight, updates the loaded verse lists and redraws. */
     private void applyHighlight(final BibleVerse verse, @Nullable final String colour) {
+        final String previous = verse.getHighlightColor();
         verse.setHighlightColor(colour);
+        showUndoPill(verse, previous, colour);
         if (actionVerse != null) {
             dismissActionBar();
         }
@@ -1087,6 +1115,42 @@ public class BibleReaderDialog extends Dialog {
                 Toast.makeText(getContext(), colour == null ? "Highlight removed" : "Highlighted " + colour, Toast.LENGTH_SHORT).show());
         renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
     }
+
+    /** Brief "Undo" pill above the controls; restores the verse's previous highlight. */
+    private void showUndoPill(final BibleVerse verse, @Nullable final String previous, @Nullable final String applied) {
+        if (readerFrame == null || java.util.Objects.equals(previous, applied)) {
+            return;
+        }
+        if (undoPillView != null) {
+            readerFrame.removeView(undoPillView);
+        }
+        TextView pill = GlassKit.text(getContext(), "Undo highlight", 12, true, GlassKit.text());
+        pill.setGravity(Gravity.CENTER);
+        pill.setPadding(dp(16), dp(8), dp(16), dp(8));
+        GradientDrawable glass = new GradientDrawable();
+        glass.setCornerRadius(dp(20));
+        glass.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#E6221431"));
+        glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
+        pill.setBackground(glass);
+        pill.setOnClickListener(v -> {
+            readerFrame.removeView(pill);
+            undoPillView = null;
+            applyHighlight(verse, previous);
+        });
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+        lp.setMargins(0, 0, 0, dp(140));
+        readerFrame.addView(pill, lp);
+        undoPillView = pill;
+        pill.postDelayed(() -> {
+            if (undoPillView == pill) {
+                readerFrame.removeView(pill);
+                undoPillView = null;
+            }
+        }, 5000);
+    }
+
+    private View undoPillView;
 
     /** The text copied or shared for a verse: reference, verse text and translation id. */
     private String verseShareText(BibleVerse verse, String citation) {
@@ -1323,6 +1387,7 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void showTopicVerses(final String topic) {
+        freshRender = true;
         bibleViewModel.loadTopicVerses(topic, verses -> {
             searchResults.clear();
             searchResults.addAll(verses);
