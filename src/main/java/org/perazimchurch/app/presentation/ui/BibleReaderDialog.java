@@ -400,6 +400,12 @@ public class BibleReaderDialog extends Dialog {
         lpGo.leftMargin = dp(6);
         layout.addView(go, lpGo);
 
+        TextView topics = GlassKit.text(getContext(), "Topics", 12, true, GlassKit.accent());
+        topics.setPadding(dp(10), dp(8), dp(10), dp(8));
+        topics.setClickable(true);
+        topics.setOnClickListener(v -> showTopicsDialog());
+        layout.addView(topics);
+
         TextView clear = GlassKit.text(getContext(), "Close", 12, true, GlassKit.muted());
         clear.setPadding(dp(10), dp(8), dp(10), dp(8));
         clear.setClickable(true);
@@ -614,7 +620,10 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
+    private String lastQuery = "";
+
     private void performSearch(String query) {
+        lastQuery = query;
         if (TextUtils.isEmpty(query)) {
             Toast.makeText(getContext(), "Please enter a keyword to search", Toast.LENGTH_SHORT).show();
             return;
@@ -706,6 +715,14 @@ public class BibleReaderDialog extends Dialog {
             searchSummary.setLetterSpacing(0.06f);
             searchSummary.setPadding(0, 0, 0, dp(12));
             versesContainer.addView(searchSummary);
+        }
+        if (isSearchResult && !verses.isEmpty()) {
+            TextView saveAll = GlassKit.orangeButton(getContext(), "Save all to a topic", 12);
+            saveAll.setPadding(dp(14), 0, dp(14), 0);
+            saveAll.setOnClickListener(v -> showSaveAllToTopic(new ArrayList<>(verses)));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, dp(36));
+            lp.setMargins(0, 0, 0, dp(12));
+            versesContainer.addView(saveAll, lp);
         }
         for (final BibleVerse verse : verses) {
             versesContainer.addView(createVerseRow(verse, isSearchResult));
@@ -886,6 +903,13 @@ public class BibleReaderDialog extends Dialog {
         secondary.addView(barIcon("\u21c4", "Compare", v -> showCompareDialog(verse, citation)));
         if (newTestament) {
             secondary.addView(barIcon("\u0391\u03b2", "Interlinear", v -> showInterlinearDialog(verse, citation)));
+        }
+        secondary.addView(barIcon("#", "Topic", v -> showTopicPicker(verse)));
+        if (isSearchMode) {
+            secondary.addView(barIcon("\u27a4", "Open chapter", v -> {
+                dismissActionBar();
+                loadChapterVerses(verse.getBookId(), verse.getChapterNumber());
+            }));
         }
         secondary.addView(barIcon("\u2715", "Close", v -> dismissActionBar()));
         bar.addView(secondary);
@@ -1169,6 +1193,116 @@ public class BibleReaderDialog extends Dialog {
                     .setPositiveButton("Close", null)
                     .show();
         });
+    }
+
+    /** Lists topics; choosing one shows its saved verses in the search list. */
+    private void showTopicsDialog() {
+        bibleViewModel.loadTopics(topics -> {
+            if (topics == null || topics.isEmpty()) {
+                Toast.makeText(getContext(), "No topics yet. Save verses to a topic from a verse or from search results.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            AppDialogs.builder(getContext())
+                    .setTitle("Topics")
+                    .setItems(topics.toArray(new String[0]), (dialog, which) -> showTopicVerses(topics.get(which)))
+                    .setNegativeButton("Close", null)
+                    .show();
+        });
+    }
+
+    private void showTopicVerses(final String topic) {
+        bibleViewModel.loadTopicVerses(topic, verses -> {
+            searchResults.clear();
+            searchResults.addAll(verses);
+            isSearchMode = true;
+            if (searchBarLayout != null) {
+                searchBarLayout.setVisibility(View.VISIBLE);
+            }
+            if (chapterNavBar != null) {
+                chapterNavBar.setVisibility(View.GONE);
+            }
+            if (etSearchQuery != null) {
+                etSearchQuery.setText(topic);
+            }
+            renderVerseList(searchResults, true);
+            if (verses.isEmpty()) {
+                Toast.makeText(getContext(), "No verses saved under " + topic + " yet.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /** Checkbox list of topics for one verse, plus a box for a new topic. */
+    private void showTopicPicker(final BibleVerse verse) {
+        final String citation = formatCitation(verse);
+        bibleViewModel.loadTopics(allTopics -> bibleViewModel.loadTopicsForVerse(verse.getBookId(),
+                verse.getChapterNumber(), verse.getVerseNumber(), memberOf -> {
+                    final List<String> existing = new ArrayList<>(allTopics);
+                    final List<String> originallyIn = new ArrayList<>(memberOf);
+                    final List<android.widget.CheckBox> boxes = new ArrayList<>();
+                    LinearLayout box = new LinearLayout(getContext());
+                    box.setOrientation(LinearLayout.VERTICAL);
+                    box.setPadding(dp(18), dp(8), dp(18), dp(8));
+                    for (String topic : existing) {
+                        android.widget.CheckBox cb = new android.widget.CheckBox(getContext());
+                        cb.setText(topic);
+                        cb.setTextColor(GlassKit.text());
+                        cb.setChecked(originallyIn.contains(topic));
+                        cb.setTag(topic);
+                        boxes.add(cb);
+                        box.addView(cb);
+                    }
+                    final EditText newTopic = new EditText(getContext());
+                    newTopic.setHint("New topic, for example healing");
+                    newTopic.setSingleLine(true);
+                    box.addView(newTopic);
+                    ScrollView scroll = new ScrollView(getContext());
+                    scroll.addView(box);
+                    AppDialogs.builder(getContext())
+                            .setTitle("Topics for " + citation)
+                            .setView(scroll)
+                            .setPositiveButton("Save", (dialog, which) -> {
+                                for (android.widget.CheckBox cb : boxes) {
+                                    String topic = (String) cb.getTag();
+                                    boolean nowIn = cb.isChecked();
+                                    if (nowIn != originallyIn.contains(topic)) {
+                                        bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
+                                                verse.getVerseNumber(), topic, nowIn, null);
+                                    }
+                                }
+                                String name = newTopic.getText().toString().trim();
+                                if (!name.isEmpty()) {
+                                    bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
+                                            verse.getVerseNumber(), name, true, () ->
+                                                    Toast.makeText(getContext(), "Saved under " + name, Toast.LENGTH_SHORT).show());
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }));
+    }
+
+    /** Saves every verse of the current search results under one topic label. */
+    private void showSaveAllToTopic(final List<BibleVerse> verses) {
+        final EditText name = new EditText(getContext());
+        name.setSingleLine(true);
+        name.setText(lastQuery);
+        name.setHint("Topic name, for example healing");
+        AppDialogs.builder(getContext())
+                .setTitle("Save " + verses.size() + " verses to a topic")
+                .setView(name)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    final String topic = name.getText().toString().trim();
+                    if (topic.isEmpty()) {
+                        return;
+                    }
+                    for (BibleVerse verse : verses) {
+                        bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
+                                verse.getVerseNumber(), topic, true, null);
+                    }
+                    Toast.makeText(getContext(), "Saved " + verses.size() + " verses under " + topic, Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     /** Shows the same verse in every readable translation, one under the other. */
