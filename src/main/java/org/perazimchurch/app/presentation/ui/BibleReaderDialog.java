@@ -345,9 +345,10 @@ public class BibleReaderDialog extends Dialog {
         FrameLayout chapterCard = new FrameLayout(getContext());
         GradientDrawable cardGlass = new GradientDrawable();
         cardGlass.setCornerRadius(dp(28));
-        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#F2200F30"));
-        cardGlass.setStroke(dp(1), Color.parseColor("#33FFFFFF"));
+        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F2200F30"));
+        cardGlass.setStroke(dp(1), GlassKit.light() ? Color.parseColor("#55401060") : Color.parseColor("#33FFFFFF"));
         chapterCard.setBackground(cardGlass);
+        chapterCardView = chapterCard;
         chapterCard.addView(versesScrollView, new FrameLayout.LayoutParams(-1, -1));
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(-1, 0, 1f);
         lpCard.setMargins(dp(16), 0, dp(16), dp(8));
@@ -1352,6 +1353,8 @@ public class BibleReaderDialog extends Dialog {
 
     /** Frosted floating Notes card; drag the handle to resize it so the verses stay visible. */
     private View notesPanelView;
+    private View notesScrimView;
+    private View chapterCardView;
     private LinearLayout notesPanelList;
 
     private void showNotesDialog() {
@@ -1362,12 +1365,24 @@ public class BibleReaderDialog extends Dialog {
         if (readerFrame == null) {
             return;
         }
+        // Dim and blur the verses behind the card so it stands out.
+        View scrim = new View(getContext());
+        scrim.setBackgroundColor(Color.parseColor("#8C000000"));
+        scrim.setOnClickListener(v -> dismissNotesPanel());
+        readerFrame.addView(scrim, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        notesScrimView = scrim;
+        if (chapterCardView != null && android.os.Build.VERSION.SDK_INT >= 31) {
+            chapterCardView.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(
+                    24f, 24f, android.graphics.Shader.TileMode.CLAMP));
+        }
+
         final LinearLayout panel = new LinearLayout(getContext());
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
         GradientDrawable glass = new GradientDrawable();
         glass.setCornerRadius(dp(24));
-        glass.setColor(Color.parseColor("#F0241238"));
+        glass.setColor(GlassKit.light() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F5140B20"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         panel.setBackground(glass);
         // Higher than the verse card, so the verses cannot draw over the Notes card.
@@ -1453,6 +1468,13 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void dismissNotesPanel() {
+        if (notesScrimView != null && readerFrame != null) {
+            readerFrame.removeView(notesScrimView);
+        }
+        notesScrimView = null;
+        if (chapterCardView != null && android.os.Build.VERSION.SDK_INT >= 31) {
+            chapterCardView.setRenderEffect(null);
+        }
         if (notesPanelView != null && readerFrame != null) {
             readerFrame.removeView(notesPanelView);
         }
@@ -1522,11 +1544,11 @@ public class BibleReaderDialog extends Dialog {
         }
         final LinearLayout editor = new LinearLayout(getContext());
         editor.setOrientation(LinearLayout.VERTICAL);
-        editor.setPadding(dp(16), dp(16), dp(16), dp(12));
         editor.setBackground(PerazimTheme.createBackgroundGradient());
         editor.setClickable(true);
+        editor.setPadding(dp(16), dp(12), dp(16), dp(8));
 
-        // Top bar: close, title, save
+        // Top bar: back, title, save
         LinearLayout top = new LinearLayout(getContext());
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
@@ -1534,37 +1556,105 @@ public class BibleReaderDialog extends Dialog {
         close.setPadding(dp(8), dp(8), dp(8), dp(8));
         close.setOnClickListener(v -> dismissNoteEditor());
         top.addView(close);
-        TextView title = GlassKit.text(getContext(), existing == null ? "New note" : "Edit note", 16, true, GlassKit.text());
-        top.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
+        top.addView(GlassKit.text(getContext(), "Note", 15, true, GlassKit.text()), new LinearLayout.LayoutParams(0, -2, 1f));
         TextView save = GlassKit.orangeButton(getContext(), "Save", 12);
         save.setPadding(dp(16), 0, dp(16), 0);
         top.addView(save, new LinearLayout.LayoutParams(-2, dp(34)));
         editor.addView(top);
 
-        // Formatting toolbar (scrolls sideways so every control stays reachable)
-        android.widget.HorizontalScrollView barScroll = new android.widget.HorizontalScrollView(getContext());
-        LinearLayout toolbar = new LinearLayout(getContext());
-        toolbar.setOrientation(LinearLayout.HORIZONTAL);
-        toolbar.setGravity(Gravity.CENTER_VERTICAL);
-        barScroll.addView(toolbar);
-        editor.addView(barScroll, GlassKit.matchWrap(getContext(), 8));
+        // Scrolling content: topic (H1), body, linked verses, verse reference
+        ScrollView content = new ScrollView(getContext());
+        LinearLayout column = new LinearLayout(getContext());
+        column.setOrientation(LinearLayout.VERTICAL);
+        content.addView(column);
+        editor.addView(content, new LinearLayout.LayoutParams(-1, 0, 1f));
 
+        // Topic is the H1 heading at the very top of the note
+        final EditText topicField = new EditText(getContext());
+        topicField.setHint("Topic");
+        topicField.setSingleLine(true);
+        topicField.setBackground(null);
+        topicField.setTypeface(Typeface.DEFAULT_BOLD);
+        topicField.setTextSize(TypedValue.COMPLEX_UNIT_SP, 26);
+        topicField.setTextColor(GlassKit.text());
+        topicField.setHintTextColor(GlassKit.muted());
+        if (existing != null && !existing.getTopics().isEmpty()) {
+            topicField.setText(existing.getTopics().get(0));
+        }
+        column.addView(topicField, GlassKit.matchWrap(getContext(), 8));
+
+        // Body: first line can be the H2 subtopic; the description hint is overwritten by typing
         final EditText body = new EditText(getContext());
         body.setGravity(Gravity.TOP | Gravity.START);
-        body.setMinLines(8);
+        body.setMinLines(6);
         body.setTypeface(Typeface.SERIF);
         body.setTextColor(GlassKit.text());
-        body.setHint("Write your note. Use the toolbar to format it.");
+        body.setHint("Subtopic, then your notes. Use the toolbar to format.");
+        body.setHintTextColor(GlassKit.muted());
         body.setBackground(null);
         if (existing != null && existing.getBody() != null) {
             body.setText(android.text.Html.fromHtml(existing.getBody(), android.text.Html.FROM_HTML_MODE_COMPACT));
         }
-        LinearLayout.LayoutParams bodyLp = new LinearLayout.LayoutParams(-1, 0, 1f);
-        editor.addView(body, bodyLp);
+        column.addView(body, GlassKit.matchWrap(getContext(), 8));
 
-        // Toolbar buttons
+        // Linked verses below the body
+        final LinearLayout linkBox = new LinearLayout(getContext());
+        linkBox.setOrientation(LinearLayout.VERTICAL);
+        linkBox.setPadding(0, dp(12), 0, dp(12));
+        column.addView(linkBox);
+        final Runnable[] redraw = new Runnable[1];
+        redraw[0] = () -> {
+            linkBox.removeAllViews();
+            for (final org.perazimchurch.app.domain.model.VerseLocation loc : links) {
+                TextView row = GlassKit.text(getContext(), BibleDataSeeder.canonicalBookName(loc.bookNumber)
+                        + " " + loc.chapter + ":" + loc.verse + "  ·  tap to remove", 13, false, GlassKit.accent());
+                row.setPadding(0, dp(6), 0, dp(6));
+                row.setOnClickListener(v -> {
+                    links.remove(loc);
+                    redraw[0].run();
+                });
+                linkBox.addView(row);
+            }
+        };
+        redraw[0].run();
+        final EditText reference = new EditText(getContext());
+        reference.setHint("Link a verse, e.g. John 3:16");
+        reference.setSingleLine(true);
+        reference.setBackground(null);
+        reference.setTextColor(GlassKit.text());
+        reference.setHintTextColor(GlassKit.muted());
+        column.addView(reference, GlassKit.matchWrap(getContext(), 8));
+
+        if (existing != null) {
+            TextView delete = GlassKit.text(getContext(), "Delete note", 12, true, COLOR_ACCENT_ORANGE());
+            delete.setPadding(dp(8), dp(12), dp(8), dp(8));
+            delete.setOnClickListener(v -> bibleViewModel.deleteNote(existing.getId(), () -> {
+                Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
+                dismissNoteEditor();
+                showNotesDialog();
+            }));
+            column.addView(delete);
+        }
+
+        // Formatting toolbar: docked above the keyboard while typing, or opened from the menu button.
+        final LinearLayout dock = new LinearLayout(getContext());
+        dock.setOrientation(LinearLayout.VERTICAL);
+        final HorizontalScrollView toolbarScroll = new HorizontalScrollView(getContext());
+        final LinearLayout toolbar = new LinearLayout(getContext());
+        toolbar.setOrientation(LinearLayout.HORIZONTAL);
+        toolbar.setGravity(Gravity.CENTER_VERTICAL);
+        toolbarScroll.addView(toolbar);
+        toolbarScroll.setVisibility(View.GONE);
+        dock.addView(toolbarScroll, GlassKit.matchWrap(getContext(), 6));
+        TextView menu = GlassKit.text(getContext(), "☰  Format", 13, true, GlassKit.accent());
+        menu.setGravity(Gravity.CENTER);
+        menu.setPadding(dp(14), dp(8), dp(14), dp(8));
+        menu.setContentDescription("Show formatting tools");
+        dock.addView(menu, new LinearLayout.LayoutParams(-2, -2));
+        editor.addView(dock);
+
         toolbar.addView(toolButton("B", () -> applyFormat(body, new android.text.style.StyleSpan(Typeface.BOLD)), true));
-        toolbar.addView(toolButton("I", () -> applyFormat(body, new android.text.style.StyleSpan(Typeface.ITALIC)), true));
+        toolbar.addView(toolButton("I", () -> applyFormat(body, new android.text.style.StyleSpan(Typeface.ITALIC)), false));
         toolbar.addView(toolButton("U", () -> applyFormat(body, new android.text.style.UnderlineSpan()), false));
         toolbar.addView(toolButton("S", () -> applyFormat(body, new android.text.style.StrikethroughSpan()), false));
         toolbar.addView(toolButton("H1", () -> applyHeading(body, 2.0f), true));
@@ -1579,59 +1669,26 @@ public class BibleReaderDialog extends Dialog {
             applyFormat(body, new android.text.style.TypefaceSpan(fonts[fontIndex[0]]));
         }, false));
         for (final HighlightColors.Colour colour : HighlightColors.ALL) {
-            View swatch = swatchView(colour.swatch, false, v -> applyFormat(body,
-                    new android.text.style.BackgroundColorSpan(Color.parseColor(colour.tint))));
-            toolbar.addView(swatch);
+            toolbar.addView(swatchView(colour.swatch, false, v -> applyFormat(body,
+                    new android.text.style.BackgroundColorSpan(Color.parseColor(colour.tint)))));
         }
         toolbar.addView(toolButton("✕", () -> clearFormat(body), false));
 
-        // Linked verses
-        final LinearLayout linkBox = new LinearLayout(getContext());
-        linkBox.setOrientation(LinearLayout.VERTICAL);
-        editor.addView(linkBox);
-        final Runnable[] redraw = new Runnable[1];
-        redraw[0] = () -> {
-            linkBox.removeAllViews();
-            for (final org.perazimchurch.app.domain.model.VerseLocation loc : links) {
-                TextView row = GlassKit.text(getContext(), "Linked: " + BibleDataSeeder.canonicalBookName(loc.bookNumber)
-                        + " " + loc.chapter + ":" + loc.verse + "   (tap to remove)", 12, false, GlassKit.accent());
-                row.setPadding(0, dp(4), 0, dp(4));
-                row.setOnClickListener(v -> {
-                    links.remove(loc);
-                    redraw[0].run();
-                });
-                linkBox.addView(row);
+        menu.setOnClickListener(v -> toolbarScroll.setVisibility(
+                toolbarScroll.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE));
+        // Show the tools above the keyboard when it opens, and tuck them into the menu when it closes.
+        final boolean[] keyboardUp = {false};
+        editor.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            android.graphics.Rect visible = new android.graphics.Rect();
+            editor.getWindowVisibleDisplayFrame(visible);
+            int hidden = editor.getRootView().getHeight() - visible.bottom;
+            boolean up = hidden > dp(120);
+            if (up != keyboardUp[0]) {
+                keyboardUp[0] = up;
+                toolbarScroll.setVisibility(up ? View.VISIBLE : View.GONE);
+                menu.setVisibility(up ? View.GONE : View.VISIBLE);
             }
-        };
-        redraw[0].run();
-        final EditText reference = new EditText(getContext());
-        reference.setHint("Link a verse, e.g. John 3:16");
-        reference.setSingleLine(true);
-        editor.addView(reference);
-
-        // Topics linked to the note
-        final EditText topicsField = new EditText(getContext());
-        topicsField.setHint("Topics, comma separated, e.g. healing, grace");
-        topicsField.setSingleLine(true);
-        if (existing != null && !existing.getTopics().isEmpty()) {
-            topicsField.setText(android.text.TextUtils.join(", ", existing.getTopics()));
-        }
-        editor.addView(topicsField);
-
-        LinearLayout bottom = new LinearLayout(getContext());
-        bottom.setOrientation(LinearLayout.HORIZONTAL);
-        bottom.setGravity(Gravity.CENTER_VERTICAL);
-        if (existing != null) {
-            TextView delete = GlassKit.text(getContext(), "Delete note", 12, true, COLOR_ACCENT_ORANGE());
-            delete.setPadding(dp(8), dp(8), dp(8), dp(8));
-            delete.setOnClickListener(v -> bibleViewModel.deleteNote(existing.getId(), () -> {
-                Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
-                dismissNoteEditor();
-                showNotesDialog();
-            }));
-            bottom.addView(delete);
-        }
-        editor.addView(bottom);
+        });
 
         save.setOnClickListener(v -> {
             String ref = reference.getText().toString().trim();
@@ -1640,10 +1697,8 @@ public class BibleReaderDialog extends Dialog {
                 links.add(new org.perazimchurch.app.domain.model.VerseLocation(parsed.bookNumber, parsed.chapter, parsed.verseStart));
             }
             List<String> topics = new ArrayList<>();
-            for (String name : topicsField.getText().toString().split(",")) {
-                if (!name.trim().isEmpty()) {
-                    topics.add(name.trim());
-                }
+            if (!topicField.getText().toString().trim().isEmpty()) {
+                topics.add(topicField.getText().toString().trim());
             }
             String html = android.text.Html.toHtml(body.getText(), android.text.Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
             bibleViewModel.saveNote(existing == null ? 0L : existing.getId(), html, links, topics, id -> {
