@@ -370,7 +370,8 @@ public class BibleReaderDialog extends Dialog {
             window.setDecorFitsSystemWindows(false);
             if (readerFrame != null) {
                 readerFrame.setOnApplyWindowInsetsListener((v, insets) -> {
-                    android.graphics.Insets bars = insets.getInsets(android.view.WindowInsets.Type.systemBars());
+                    android.graphics.Insets bars = insets.getInsets(
+                            android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
                     v.setPadding(0, bars.top, 0, bars.bottom);
                     return insets;
                 });
