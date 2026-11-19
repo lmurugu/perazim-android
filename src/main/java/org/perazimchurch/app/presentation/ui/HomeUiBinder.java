@@ -260,40 +260,33 @@ public class HomeUiBinder {
 
         contentContainer = new LinearLayout(context);
         contentContainer.setOrientation(LinearLayout.VERTICAL);
-        contentContainer.setPadding(0, dp(8), 0, dp(16));
+        contentContainer.setPadding(dp(16), dp(8), dp(16), dp(24));
 
-        // 1. Greeting (mockup: 24sp bold, then the church line in #CDBBD6)
+        // 1. Greeting, as in the original build: a short line, then the church name under it
         LinearLayout greeting = new LinearLayout(context);
         greeting.setOrientation(LinearLayout.VERTICAL);
-        greeting.setPadding(dp(16), 0, dp(16), 0);
-        tvGreeting = GlassKit.text(context, buildGreeting(), 24, true, GlassKit.text());
+        tvGreeting = GlassKit.text(context, buildGreeting(), 20, true, GlassKit.text());
         greeting.addView(tvGreeting);
-        TextView church = GlassKit.text(context, "Perazim Mission Church · Embu Headquarters", 13, false, GlassKit.muted());
-        greeting.addView(church, GlassKit.matchWrap(context, 4));
+        TextView church = GlassKit.text(context, "Perazim Mission Church · Embu Headquarters", 12, false, GlassKit.muted());
+        greeting.addView(church, GlassKit.matchWrap(context, 2));
         contentContainer.addView(GlassKit.keep(greeting));
         refreshGreetingNameAsync();
 
-        // 2. Hero photo with a frosted caption
-        contentContainer.addView(createHeroPhoto(), sideMargins(GlassKit.matchHeight(context, 150, 18)));
+        // 2. Header photo, 140dp as in the original build
+        contentContainer.addView(createHeroPhoto(), GlassKit.matchHeight(context, 140, 14));
 
         // 3. Continue today's reading
-        contentContainer.addView(createTodayCard(), sideMargins(GlassKit.matchWrap(context, 16)));
+        contentContainer.addView(createTodayCard(), GlassKit.matchWrap(context, 16));
 
-        // 4. Sermons, Events, Community tiles
-        contentContainer.addView(createPhotoTiles(), sideMargins(GlassKit.matchWrap(context, 14)));
+        // 4. Sanctuary doors (2x2) and the Bible games row
+        contentContainer.addView(createDoorsGrid(), GlassKit.matchWrap(context, 16));
 
         // 5. Announcements, below the fold
         announcementsContainer = new LinearLayout(context);
         announcementsContainer.setOrientation(LinearLayout.VERTICAL);
-        contentContainer.addView(announcementsContainer, sideMargins(GlassKit.matchWrap(context, 14)));
+        contentContainer.addView(announcementsContainer, GlassKit.matchWrap(context, 14));
 
         rootScrollView.addView(contentContainer);
-    }
-
-    private LinearLayout.LayoutParams sideMargins(LinearLayout.LayoutParams lp) {
-        lp.leftMargin = dp(12);
-        lp.rightMargin = dp(12);
-        return lp;
     }
 
     private View createHeroPhoto() {
@@ -381,7 +374,7 @@ public class HomeUiBinder {
     }
 
     private View createTodayCard() {
-        LinearLayout card = GlassKit.card(context, 26, 16);
+        LinearLayout card = GlassKit.card(context, 16, 16);
 
         LinearLayout top = new LinearLayout(context);
         top.setOrientation(LinearLayout.HORIZONTAL);
@@ -392,10 +385,10 @@ public class HomeUiBinder {
         top.addView(tvContinueStep);
         card.addView(GlassKit.keep(top));
 
-        tvCornerstoneHeader = GlassKit.text(context, currentCornerstoneRef, 20, true, GlassKit.text());
+        tvCornerstoneHeader = GlassKit.text(context, currentCornerstoneRef, 17, true, GlassKit.text());
         card.addView(tvCornerstoneHeader, GlassKit.matchWrap(context, 8));
 
-        tvCornerstoneBody = GlassKit.text(context, "“" + currentCornerstoneText + "”", 13, false, GlassKit.body());
+        tvCornerstoneBody = GlassKit.text(context, "“" + currentCornerstoneText + "”", 12, false, GlassKit.body());
         tvCornerstoneBody.setLineSpacing(0f, 1.3f);
         tvCornerstoneBody.setMaxLines(4);
         tvCornerstoneBody.setEllipsize(TextUtils.TruncateAt.END);
@@ -415,56 +408,84 @@ public class HomeUiBinder {
     }
 
     /**
-     * Home's lower section: three full-width photo cards that fill the page with imagery instead of
-     * small empty tiles, then the free Bible games card.
+     * Home's lower section, laid out like the original build: a "Sanctuary doors" label, a 2x2 grid of compact
+     * door cards, then a full-width row for the free Bible games.
      */
-    private View createPhotoTiles() {
-        LinearLayout column = new LinearLayout(context);
-        column.setOrientation(LinearLayout.VERTICAL);
-        column.addView(createPhotoCard("Sermons", "Listen to and watch the latest messages",
-                "backgrounds/church/sermons_pastor.jpg",
-                v -> { if (listener != null) listener.onNavigateToTab(1); }), photoParams(0));
-        column.addView(createPhotoCard("Events", "Services, meetings and what is coming up",
-                "backgrounds/church/events_choir.jpg",
-                v -> { if (listener != null) listener.onNavigateToTab(3); }), photoParams(12));
-        column.addView(createPhotoCard("Community", "Fellowship, prayer and church life",
-                "backgrounds/church/community_congregation.jpg",
-                v -> { if (listener != null) listener.onNavigateToTab(3); }), photoParams(12));
-        View gamesTile = createGlassTile("Bible games: free and offline", R.drawable.gl_star, v -> {
+    private View createDoorsGrid() {
+        LinearLayout container = new LinearLayout(context);
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        container.addView(GlassKit.keep(GlassKit.label(context, "SANCTUARY DOORS")), GlassKit.matchWrap(context, 0));
+
+        container.addView(doorRow(
+                createDoorCard(R.drawable.ic_christian_bible, "Bible", "Read scripture",
+                        v -> parseAndOpenScripture(currentCornerstoneRef)),
+                createDoorCard(R.drawable.ic_christian_candle, "Sermons", "Recent messages",
+                        v -> { if (listener != null) listener.onNavigateToTab(1); })),
+                GlassKit.matchWrap(context, 8));
+        container.addView(doorRow(
+                createDoorCard(R.drawable.ic_christian_lyre, "Worship", "Hymns and praise",
+                        v -> { if (listener != null) listener.onNavigateToTab(2); }),
+                createDoorCard(R.drawable.ic_christian_praying_hands, "Prayer", "Share and intercede",
+                        v -> { if (listener != null) listener.onNavigateToTab(3); })),
+                GlassKit.matchWrap(context, 8));
+
+        container.addView(createGamesRow(), GlassKit.matchWrap(context, 8));
+        return container;
+    }
+
+    /** Two equal cards side by side with an 8dp gap. */
+    private LinearLayout doorRow(View left, View right) {
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.addView(left, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        row.addView(new View(context), new LinearLayout.LayoutParams(dp(8), 0));
+        row.addView(right, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        return row;
+    }
+
+    /** One compact door: a 36dp icon square, a 13sp title and an 11sp subtitle on one line. */
+    private View createDoorCard(int iconRes, String title, String subtitle, View.OnClickListener onClick) {
+        LinearLayout card = GlassKit.card(context, 14, 12);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.addView(GlassKit.iconBadge(context, iconRes, GlassKit.iconSquare(context, 10), 36, 18),
+                new LinearLayout.LayoutParams(dp(36), dp(36)));
+
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        textCol.setPadding(dp(10), 0, 0, 0);
+        TextView tvTitle = GlassKit.text(context, title, 13, true, GlassKit.text());
+        textCol.addView(tvTitle);
+        TextView tvSub = GlassKit.text(context, subtitle, 11, false, GlassKit.muted());
+        tvSub.setMaxLines(1);
+        tvSub.setEllipsize(TextUtils.TruncateAt.END);
+        textCol.addView(tvSub);
+        card.addView(textCol, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+        card.setClickable(true);
+        card.setOnClickListener(onClick);
+        return card;
+    }
+
+    /** The free Bible games, as a full-width row under the doors. */
+    private View createGamesRow() {
+        LinearLayout row = GlassKit.card(context, 14, 12);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.addView(GlassKit.iconBadge(context, R.drawable.gl_star, GlassKit.iconSquare(context, 10), 36, 18),
+                new LinearLayout.LayoutParams(dp(36), dp(36)));
+        TextView tv = GlassKit.text(context, "Bible games: free and offline", 13, true, GlassKit.text());
+        LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        lpText.leftMargin = dp(10);
+        row.addView(tv, lpText);
+        row.setClickable(true);
+        row.setOnClickListener(v -> {
             if (context instanceof android.app.Activity) {
                 org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show((android.app.Activity) context);
             }
         });
-        LinearLayout.LayoutParams gamesParams = new LinearLayout.LayoutParams(-1, dp(96));
-        gamesParams.topMargin = dp(12);
-        column.addView(gamesTile, gamesParams);
-        return column;
-    }
-
-    private LinearLayout.LayoutParams photoParams(int topDp) {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(112));
-        lp.topMargin = dp(topDp);
-        return lp;
-    }
-
-    /** A full-width photo card with a frosted caption along the bottom, like the hero above it. */
-    private View createPhotoCard(String title, String subtitle, String photoAsset, View.OnClickListener onClick) {
-        Bitmap photo = loadAssetBitmap(photoAsset, 900);
-        return GlassKit.photoCard(context, photo, title, subtitle, 112, 22, onClick);
-    }
-
-    /** Mockup tile: 110dp glass, 24dp corners, 44dp purple icon square, 12sp label. */
-    private View createGlassTile(String title, int iconRes, View.OnClickListener onClick) {
-        LinearLayout tile = GlassKit.card(context, 24, 0);
-        tile.setGravity(Gravity.CENTER);
-        FrameLayout icon = GlassKit.iconBadge(context, iconRes, GlassKit.iconSquare(context, 14), 44, 22);
-        tile.addView(icon, new LinearLayout.LayoutParams(dp(44), dp(44)));
-        TextView tv = GlassKit.text(context, title, 12, true, GlassKit.text());
-        tv.setGravity(Gravity.CENTER);
-        tile.addView(tv, GlassKit.matchWrap(context, 8));
-        tile.setClickable(true);
-        tile.setOnClickListener(onClick);
-        return tile;
+        return row;
     }
 
     private void toggleOrAdvanceRoutine() {
