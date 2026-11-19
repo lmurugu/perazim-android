@@ -270,23 +270,14 @@ public class BibleReaderDialog extends Dialog {
 
         versesScrollView = new ScrollView(getContext());
         versesScrollView.setFillViewport(true);
-        versesScrollView.setClipToPadding(false);
-        versesScrollView.setPadding(0, 0, 0, dp(96));
-        LinearLayout.LayoutParams lpScroll = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
-        versesScrollView.setLayoutParams(lpScroll);
 
         LinearLayout scrollColumn = new LinearLayout(getContext());
         scrollColumn.setOrientation(LinearLayout.VERTICAL);
         scrollColumn.setPadding(dp(16), dp(14), dp(16), dp(16));
 
         versesContainer = GlassKit.card(getContext(), 28, 0);
-        if (!GlassKit.light()) {
-            GradientDrawable deepPurple = new GradientDrawable();
-            deepPurple.setCornerRadius(dp(28));
-            deepPurple.setColor(Color.parseColor("#22082F"));
-            versesContainer.setBackground(deepPurple);
-        }
+        // The card itself is the fixed frosted panel below; the verses scroll inside it.
+        versesContainer.setBackground(null);
         versesContainer.setPadding(dp(20), dp(22), dp(20), dp(22));
 
         loadingProgress = new ProgressBar(getContext());
@@ -306,14 +297,26 @@ public class BibleReaderDialog extends Dialog {
         versesContainer.addView(tvEmptyState);
 
         scrollColumn.addView(versesContainer, new LinearLayout.LayoutParams(-1, -2));
-        versesScrollView.addView(scrollColumn);
-        root.addView(versesScrollView);
-        frame.addView(root, new FrameLayout.LayoutParams(-1, -1));
+        versesScrollView.addView(scrollColumn, new FrameLayout.LayoutParams(-1, -2));
 
+        // Fixed frosted card: its top and bottom edges never move; only the verses inside scroll.
+        FrameLayout chapterCard = new FrameLayout(getContext());
+        GradientDrawable cardGlass = new GradientDrawable();
+        cardGlass.setCornerRadius(dp(28));
+        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#E6200F30"));
+        cardGlass.setStroke(dp(1), Color.parseColor("#33FFFFFF"));
+        chapterCard.setBackground(cardGlass);
+        chapterCard.addView(versesScrollView, new FrameLayout.LayoutParams(-1, -1));
+        LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(-1, 0, 1f);
+        lpCard.setMargins(dp(16), 0, dp(16), dp(8));
+        root.addView(chapterCard, lpCard);
+
+        // Previous / Next sit below the card, so they never cover the verses.
         chapterNavBar = createChapterNavBar();
-        FrameLayout.LayoutParams lpNav = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM);
+        LinearLayout.LayoutParams lpNav = new LinearLayout.LayoutParams(-1, -2);
         lpNav.setMargins(dp(16), 0, dp(16), dp(24));
-        frame.addView(chapterNavBar, lpNav);
+        root.addView(chapterNavBar, lpNav);
+        frame.addView(root, new FrameLayout.LayoutParams(-1, -1));
         return frame;
     }
 
@@ -809,6 +812,9 @@ public class BibleReaderDialog extends Dialog {
         sb.append(isSearchResult ? "  " : " ");
         int textStart = sb.length();
         sb.append(verse.getText() != null ? verse.getText() : "");
+        if (isSearchResult && !TextUtils.isEmpty(lastQuery)) {
+            highlightSearchTerms(sb, textStart, verse.getText() != null ? verse.getText() : "", lastQuery);
+        }
         if (isCornerstone) {
             sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), textStart, sb.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
@@ -856,6 +862,31 @@ public class BibleReaderDialog extends Dialog {
             y += current.getTop();
         }
         return Math.max(0, y - ancestor.getPaddingTop());
+    }
+
+    /** Colours every occurrence of the searched words (orange, bold) inside a search result verse. */
+    private void highlightSearchTerms(android.text.SpannableStringBuilder sb, int textStart, String text, String query) {
+        String lower = text.toLowerCase(java.util.Locale.US);
+        for (String term : query.trim().split("\\s+")) {
+            if (term.length() < 2) {
+                continue;
+            }
+            String needle = term.toLowerCase(java.util.Locale.US);
+            int from = 0;
+            while (true) {
+                int at = lower.indexOf(needle, from);
+                if (at < 0) {
+                    break;
+                }
+                int start = textStart + at;
+                int end = start + needle.length();
+                sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor("#FF8A2B")),
+                        start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),
+                        start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                from = at + needle.length();
+            }
+        }
     }
 
     private String formatCitation(BibleVerse verse) {
@@ -954,7 +985,7 @@ public class BibleReaderDialog extends Dialog {
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        lp.setMargins(dp(12), 0, dp(12), dp(84));
+        lp.setMargins(dp(12), 0, dp(12), dp(104));
         readerFrame.addView(bar, lp);
         actionBarView = bar;
     }
@@ -1303,6 +1334,25 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout header = new LinearLayout(getContext());
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
+        final float[] floatStart = new float[2];
+        final float[] floatOrigin = new float[2];
+        header.setOnTouchListener((v, ev) -> {
+            switch (ev.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    floatStart[0] = ev.getRawX();
+                    floatStart[1] = ev.getRawY();
+                    floatOrigin[0] = panel.getTranslationX();
+                    floatOrigin[1] = panel.getTranslationY();
+                    return true;
+                case android.view.MotionEvent.ACTION_MOVE:
+                    // Float the card anywhere across the reader while the header is held.
+                    panel.setTranslationX(floatOrigin[0] + ev.getRawX() - floatStart[0]);
+                    panel.setTranslationY(floatOrigin[1] + ev.getRawY() - floatStart[1]);
+                    return true;
+                default:
+                    return true;
+            }
+        });
         TextView title = GlassKit.text(getContext(), "Notes", 16, true, Color.parseColor("#F5EEFF"));
         header.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
         TextView add = GlassKit.orangeButton(getContext(), "New note", 12);
@@ -1342,7 +1392,7 @@ public class BibleReaderDialog extends Dialog {
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(330), Gravity.BOTTOM);
-        lp.setMargins(dp(12), 0, dp(12), dp(84));
+        lp.setMargins(dp(12), 0, dp(12), dp(104));
         readerFrame.addView(panel, lp);
         notesPanelView = panel;
         refreshNotesPanel();
