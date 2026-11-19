@@ -32,7 +32,7 @@ public final class AppDialogs {
     public static AlertDialog.Builder builder(Context context) {
         int theme = PerazimTheme.isLight()
                 ? android.R.style.Theme_Material_Light_Dialog
-                : android.R.style.Theme_Material_Dialog;
+                : org.perazimchurch.app.R.style.PerazimDialogDark;
         return new AlertDialog.Builder(context, theme);
     }
 }

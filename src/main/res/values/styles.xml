@@ -10,4 +10,12 @@
         <item name="android:statusBarColor">#FF1A0A20</item>
         <item name="android:navigationBarColor">#FF1A0A20</item>
     </style>
+    <!-- Alert dialogs in Dark mode: deep purple glass for the body, title bar and footer. -->
+    <style name="PerazimDialogDark" parent="android:Theme.Material.Dialog">
+        <item name="android:colorBackground">#FF2A0F33</item>
+        <item name="android:colorBackgroundFloating">#FF2A0F33</item>
+        <item name="android:textColorPrimary">#FFFFFFFF</item>
+        <item name="android:textColorSecondary">#FFE6D5EE</item>
+        <item name="android:colorAccent">#FFC06BE0</item>
+    </style>
 </resources>
