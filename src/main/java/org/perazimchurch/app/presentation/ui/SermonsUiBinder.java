@@ -170,7 +170,7 @@ public class SermonsUiBinder {
         headerRow.setOrientation(LinearLayout.HORIZONTAL);
         headerRow.setGravity(Gravity.CENTER_VERTICAL);
         headerRow.setPadding(dp(4), 0, 0, dp(14));
-        TextView tvTitle = GlassKit.text(activity, "Sermons", 24, true, GlassKit.text());
+        TextView tvTitle = GlassKit.text(activity, "Sermons", 22, true, GlassKit.text());
         headerRow.addView(tvTitle, new LinearLayout.LayoutParams(0, -2, 1f));
 
         TextView localBibleAudio = GlassKit.glassButton(activity, "Bible audio", 12);
