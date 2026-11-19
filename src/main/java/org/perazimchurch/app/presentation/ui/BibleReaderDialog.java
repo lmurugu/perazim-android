@@ -1265,27 +1265,112 @@ public class BibleReaderDialog extends Dialog {
         });
     }
 
-    /** Study notes: list, open to edit, and tap a linked verse to jump to it. */
+    /** Frosted floating Notes card; drag the handle to resize it so the verses stay visible. */
+    private View notesPanelView;
+    private LinearLayout notesPanelList;
+
     private void showNotesDialog() {
+        if (notesPanelView != null) {
+            dismissNotesPanel();
+            return;
+        }
+        if (readerFrame == null) {
+            return;
+        }
+        final LinearLayout panel = new LinearLayout(getContext());
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setPadding(dp(16), dp(10), dp(16), dp(12));
+        GradientDrawable glass = new GradientDrawable();
+        glass.setCornerRadius(dp(24));
+        glass.setColor(GlassKit.light() ? Color.parseColor("#E6FFFFFF") : Color.parseColor("#D9221431"));
+        glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
+        panel.setBackground(glass);
+        panel.setElevation(dp(12));
+
+        // Drag handle: drag up to enlarge, down to shrink.
+        View handle = new View(getContext());
+        GradientDrawable pill = new GradientDrawable();
+        pill.setCornerRadius(dp(3));
+        pill.setColor(Color.parseColor("#66808080"));
+        handle.setBackground(pill);
+        LinearLayout.LayoutParams hlp = new LinearLayout.LayoutParams(dp(44), dp(5));
+        hlp.gravity = Gravity.CENTER_HORIZONTAL;
+        hlp.setMargins(0, 0, 0, dp(8));
+        panel.addView(handle, hlp);
+
+        LinearLayout header = new LinearLayout(getContext());
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title = GlassKit.text(getContext(), "Notes", 16, true, GlassKit.text());
+        header.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView add = GlassKit.orangeButton(getContext(), "New note", 12);
+        add.setPadding(dp(14), 0, dp(14), 0);
+        add.setOnClickListener(v -> showNoteEditor(null));
+        header.addView(add, new LinearLayout.LayoutParams(-2, dp(34)));
+        TextView close = GlassKit.text(getContext(), "\u2715", 16, true, GlassKit.muted());
+        close.setPadding(dp(12), dp(4), dp(4), dp(4));
+        close.setOnClickListener(v -> dismissNotesPanel());
+        header.addView(close);
+        panel.addView(header);
+
+        notesPanelList = new LinearLayout(getContext());
+        notesPanelList.setOrientation(LinearLayout.VERTICAL);
+        ScrollView scroll = new ScrollView(getContext());
+        scroll.addView(notesPanelList);
+        panel.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1f));
+
+        final int[] startHeight = new int[1];
+        final float[] startY = new float[1];
+        handle.setOnTouchListener((v, ev) -> {
+            FrameLayout.LayoutParams plp = (FrameLayout.LayoutParams) panel.getLayoutParams();
+            switch (ev.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    startHeight[0] = plp.height;
+                    startY[0] = ev.getRawY();
+                    return true;
+                case android.view.MotionEvent.ACTION_MOVE:
+                    int max = (int) (readerFrame.getHeight() * 0.85f);
+                    plp.height = Math.max(dp(120), Math.min(max, startHeight[0] - (int) (ev.getRawY() - startY[0])));
+                    panel.setLayoutParams(plp);
+                    return true;
+                default:
+                    return true;
+            }
+        });
+
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(330), Gravity.BOTTOM);
+        lp.setMargins(dp(12), 0, dp(12), dp(84));
+        readerFrame.addView(panel, lp);
+        notesPanelView = panel;
+        refreshNotesPanel();
+    }
+
+    private void dismissNotesPanel() {
+        if (notesPanelView != null && readerFrame != null) {
+            readerFrame.removeView(notesPanelView);
+        }
+        notesPanelView = null;
+        notesPanelList = null;
+    }
+
+    /** Reloads the notes inside the Notes card. */
+    private void refreshNotesPanel() {
         bibleViewModel.loadNotes(notes -> {
-            LinearLayout box = new LinearLayout(getContext());
-            box.setOrientation(LinearLayout.VERTICAL);
-            box.setPadding(dp(18), dp(8), dp(18), dp(12));
-            TextView newNote = GlassKit.orangeButton(getContext(), "New note", 12);
-            newNote.setOnClickListener(v -> showNoteEditor(null));
-            LinearLayout.LayoutParams nlp = new LinearLayout.LayoutParams(-2, dp(36));
-            nlp.setMargins(0, 0, 0, dp(12));
-            box.addView(newNote, nlp);
+            if (notesPanelList == null) {
+                return;
+            }
+            notesPanelList.removeAllViews();
             if (notes.isEmpty()) {
-                TextView empty = GlassKit.text(getContext(), "No notes yet. Write a note and link the verses it talks about.", 13, false, COLOR_TEXT_MUTED());
-                box.addView(empty);
+                notesPanelList.addView(GlassKit.text(getContext(),
+                        "No notes yet. Write a note and link the verses it talks about.", 13, false, COLOR_TEXT_MUTED()));
             }
             for (final org.perazimchurch.app.domain.model.BibleNote note : notes) {
                 TextView body = GlassKit.text(getContext(), note.getBody().length() > 140
                         ? note.getBody().substring(0, 140) + "..." : note.getBody(), 14, false, GlassKit.text());
                 body.setOnClickListener(v -> showNoteEditor(note));
                 body.setPadding(0, dp(10), 0, dp(4));
-                box.addView(body);
+                notesPanelList.addView(body);
                 LinearLayout links = new LinearLayout(getContext());
                 links.setOrientation(LinearLayout.HORIZONTAL);
                 for (final org.perazimchurch.app.domain.model.VerseLocation loc : note.getLinks()) {
@@ -1293,18 +1378,14 @@ public class BibleReaderDialog extends Dialog {
                             + " " + loc.chapter + ":" + loc.verse, 12, true, GlassKit.accent());
                     chip.setPadding(dp(8), dp(4), dp(8), dp(4));
                     chip.setClickable(true);
-                    chip.setOnClickListener(v -> jumpToVerse(loc));
+                    chip.setOnClickListener(v -> {
+                        dismissNotesPanel();
+                        jumpToVerse(loc);
+                    });
                     links.addView(chip);
                 }
-                box.addView(links);
+                notesPanelList.addView(links);
             }
-            ScrollView scroll = new ScrollView(getContext());
-            scroll.addView(box);
-            AppDialogs.builder(getContext())
-                    .setTitle("Notes")
-                    .setView(scroll)
-                    .setNegativeButton("Close", null)
-                    .show();
         });
     }
 
@@ -1363,10 +1444,16 @@ public class BibleReaderDialog extends Dialog {
                         links.add(new org.perazimchurch.app.domain.model.VerseLocation(parsed.bookNumber, parsed.chapter, parsed.verseStart));
                     }
                     bibleViewModel.saveNote(existing == null ? 0L : existing.getId(), body.getText().toString(), links,
-                            id -> Toast.makeText(getContext(), "Note saved", Toast.LENGTH_SHORT).show());
+                            id -> {
+                                Toast.makeText(getContext(), "Note saved", Toast.LENGTH_SHORT).show();
+                                refreshNotesPanel();
+                            });
                 })
                 .setNeutralButton(existing == null ? null : "Delete", existing == null ? null : (dialog, which) ->
-                        bibleViewModel.deleteNote(existing.getId(), () -> Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show()))
+                        bibleViewModel.deleteNote(existing.getId(), () -> {
+                            Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
+                            refreshNotesPanel();
+                        }))
                 .setNegativeButton("Cancel", null)
                 .show();
     }
