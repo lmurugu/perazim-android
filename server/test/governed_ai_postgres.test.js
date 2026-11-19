@@ -54,6 +54,15 @@ async function run() {
     catch (error) { await client.query('ROLLBACK'); throw error; }
   }
 
+  // Build schema through the official migration runner: copy the named files into a
+  // scratch folder and let migrate() create the ledger and verify checksums.
+  // Migration 0007 is applied to this disposable test database only (owner decision).
+  async function runnerMigrate(filenames) {
+    const dir = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'perazim-governed-'));
+    for (const filename of filenames) fs.copyFileSync(path.join(root, 'migrations', filename), path.join(dir, filename));
+    return require('../src/migrations').migrate(pool, dir);
+  }
+
   async function transact(work) {
     const client = await pool.connect();
     try {
@@ -79,7 +88,7 @@ async function run() {
       // The official runner deliberately rejects any plan containing 0007.
       // Exercise the other real prerequisites in order and document the one
       // skipped guarded migration in the Stage 4 report.
-      for (const filename of files.slice(0, -2)) await apply(client, filename);
+      await runnerMigrate([...files.slice(0, -2), '0007_disable_contact_list_verification.sql'].sort());
       const governedFiles = files.slice(-2);
       await client.query('BEGIN');
       await client.query(fs.readFileSync(path.join(root, 'migrations', governedFiles[0]), 'utf8'));
@@ -88,11 +97,12 @@ async function run() {
       await client.query('ROLLBACK');
       const rolledBack = await client.query("SELECT to_regclass('public.ai_knowledge_sources') AS source_table, to_regclass('public.ai_scripture_verses') AS verse_table");
       assert.deepEqual(rolledBack.rows[0], { source_table: null, verse_table: null });
-      await apply(client, governedFiles[0]);
-      await apply(client, governedFiles[1]);
-      await apply(client, '0015_online_ai_daily_budget.sql');
-      await apply(client, '0016_offline_ai_control_sequence.sql');
-      await apply(client, '0017_ai_offline_rollback_authorizations.sql');
+      // The rollback check above ran on the runner-built prerequisites only. The
+      // governed schema is now applied through the runner as well, so the ledger
+      // is complete before the application's own initDb() runs.
+      await runnerMigrate([...files, '0007_disable_contact_list_verification.sql',
+        '0015_online_ai_daily_budget.sql', '0016_offline_ai_control_sequence.sql',
+        '0017_ai_offline_rollback_authorizations.sql'].sort());
 
       const structure = await client.query(`
         SELECT (SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN

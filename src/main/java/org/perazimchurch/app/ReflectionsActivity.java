@@ -1,6 +1,9 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,15 +31,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ReflectionsActivity extends Activity implements View.OnClickListener {
+    @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(org.perazimchurch.app.ui.theme.UiScale.wrap(newBase));
+    }
+
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = Color.parseColor("#2D0938");
+    public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     public static final int COLOR_PURPLE_DEEPEST = Color.parseColor("#140319");
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
     public static final int COLOR_PURPLE_SOFT = Color.parseColor("#C896D8");
-    public static final int COLOR_PURPLE_BORDER = Color.parseColor("#E7D5EC");
+    public static int COLOR_PURPLE_BORDER() { return PerazimTheme.COLOR_STROKE; }
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = Color.parseColor("#725B78");
+    public static int COLOR_PURPLE_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -45,7 +53,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = Color.parseColor("#FAF7FB");
+    public static int COLOR_CANVAS() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private Button btnBack;
     private Button btnMeditate;
@@ -57,7 +65,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_CANVAS);
+        scrollView.setBackgroundColor(COLOR_CANVAS());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -83,7 +91,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
         title.setText("REFLECTIONS");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
+        title.setTextColor(COLOR_PURPLE_DARK());
         title.setPadding(dp(16), 0, 0, 0);
         navBar.addView(title);
 
@@ -106,7 +114,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
         }
 
         // Covenant Devotional Card
-        LinearLayout card = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout card = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         card.setOrientation(LinearLayout.VERTICAL);
 
         TextView pill = createPillInline("2 SAMUEL 5:20 · BAAL PERAZIM", COLOR_ORANGE_TINT, COLOR_ORANGE);
@@ -116,7 +124,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
         heading.setText("The God of the Overflowing Breakthrough");
         heading.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         heading.setTypeface(Typeface.DEFAULT_BOLD);
-        heading.setTextColor(COLOR_PURPLE_DARK);
+        heading.setTextColor(COLOR_PURPLE_DARK());
         heading.setPadding(0, dp(8), 0, dp(8));
         card.addView(heading);
 
@@ -132,7 +140,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
         TextView body = new TextView(this);
         body.setText("When King David confronted the Philistines in the Valley of Rephaim, he sought counsel from the Lord. God responded with divine assurance: He would break through like a gushing stream. In Hebrew, Baal Perazim signifies the Master of Breakthroughs — God shattering obstacles like a swollen river.\n\nJust as Christ commanded Lazarus to step forth from four days in the tomb, God speaks life into situations deemed impossible. Stand firm in covenant faith today: delayed promises and stubborn barriers are giving way to the surge of the Holy Spirit.");
         body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        body.setTextColor(COLOR_PURPLE_MUTED);
+        body.setTextColor(COLOR_PURPLE_MUTED());
         body.setLineSpacing(dp(3), 1.15f);
         body.setPadding(0, 0, 0, dp(14));
         card.addView(body);
@@ -150,20 +158,20 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
         content.addView(card);
 
         // Prayer Card
-        LinearLayout prayerCard = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout prayerCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         prayerCard.setOrientation(LinearLayout.VERTICAL);
 
         TextView prTitle = new TextView(this);
         prTitle.setText("Breakthrough Prayer");
         prTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         prTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        prTitle.setTextColor(COLOR_PURPLE_DARK);
+        prTitle.setTextColor(COLOR_PURPLE_DARK());
         prayerCard.addView(prTitle);
 
         TextView prBody = new TextView(this);
         prBody.setText("“Heavenly Father, You are the Lord of Baal Perazim. Burst open doors that no man can shut. Break down fear, sickness, and stagnation in my household. In Jesus’ name, Amen.”");
         prBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        prBody.setTextColor(COLOR_PURPLE_MUTED);
+        prBody.setTextColor(COLOR_PURPLE_MUTED());
         prBody.setPadding(0, dp(6), 0, dp(12));
         prayerCard.addView(prBody);
 
@@ -189,7 +197,7 @@ public class ReflectionsActivity extends Activity implements View.OnClickListene
             finish();
         } else if (v == btnMeditate) {
             Toast.makeText(this, "⭐ +10 XP earned! Covenant reflection recorded.", Toast.LENGTH_SHORT).show();
-            new AlertDialog.Builder(this)
+            AppDialogs.builder(this)
                     .setTitle("Covenant Reflection")
                     .setMessage("Take 2 quiet minutes to meditate on God's breakout power in your finances, family, and health.")
                     .setPositiveButton("Amen", null)

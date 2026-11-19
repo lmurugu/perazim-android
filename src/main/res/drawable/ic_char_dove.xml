@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original game character: a dove with an olive leaf (generated). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M10,36 C18,22 36,20 48,28 L58,22 L54,34 C50,46 34,50 22,46 C16,44 12,40 10,36 Z" android:fillColor="#FFFFFF" android:strokeColor="#4A6B8A" android:strokeWidth="2" android:strokeLineJoin="round"/>
+    <path android:pathData="M26,34 C30,26 38,26 42,32" android:strokeColor="#4A6B8A" android:strokeWidth="2" android:strokeLineCap="round"/>
+    <path android:pathData="M30,40 C34,36 40,36 44,38 C40,42 34,42 30,40 Z" android:fillColor="#3E9B52"/>
+    <path android:pathData="M14,30 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z" android:fillColor="#1E2A3A"/>
+</vector>

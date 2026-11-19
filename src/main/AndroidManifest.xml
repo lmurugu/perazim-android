@@ -9,8 +9,8 @@
         android:targetSdkVersion="34" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -47,6 +47,7 @@
     </queries>
 
     <application
+        android:name=".PerazimApplication"
         android:label="Perazim"
         android:icon="@drawable/ic_launcher"
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar"
@@ -68,7 +69,6 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ClassroomCallActivity" android:exported="false" />
 
         <activity
             android:name=".LocalBibleAudioActivity"

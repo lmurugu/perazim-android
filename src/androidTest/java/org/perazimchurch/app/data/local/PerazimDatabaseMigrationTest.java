@@ -160,7 +160,7 @@ public class PerazimDatabaseMigrationTest {
             SupportSQLiteDatabase sourceDb = source.getOpenHelper().getWritableDatabase();
             seedUser(sourceDb);
             seedVerse(sourceDb);
-            seedMessageAndDraft(sourceDb);
+            seedCurrentSchemaMessageAndDraft(sourceDb);
             try (Cursor checkpoint = sourceDb.query("PRAGMA wal_checkpoint(FULL)")) {
                 assertTrue("Checkpoint should return its status row", checkpoint.moveToFirst());
                 assertEquals("Checkpoint should complete without a busy writer", 0,
@@ -245,6 +245,23 @@ public class PerazimDatabaseMigrationTest {
                         + "status, retryCount, lastError) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 new Object[]{FIXTURE_QUEUE_ID, "CREATE", "message", FIXTURE_MESSAGE_ID,
                         "{\"body\":\"synthetic draft\"}", 1700000003L, "pending", 0, ""});
+    }
+
+    /**
+     * Same fixture as seedMessageAndDraft, for a database already at the current schema (v7),
+     * where sync_queue.nextAttemptAt is NOT NULL and must be provided.
+     */
+    private static void seedCurrentSchemaMessageAndDraft(SupportSQLiteDatabase db) {
+        db.execSQL("INSERT INTO messages "
+                        + "(id, conversationId, senderId, senderName, content, sentMillis, "
+                        + "deliveryStatus, syncStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                new Object[]{FIXTURE_MESSAGE_ID, "fixture-conversation", FIXTURE_USER_ID,
+                        "Synthetic Member", "Synthetic message body", 1700000002L, "pending", "pending"});
+        db.execSQL("INSERT INTO sync_queue "
+                        + "(id, operationType, entityType, entityId, payloadJson, timestampMillis, "
+                        + "nextAttemptAt, status, retryCount, lastError) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                new Object[]{FIXTURE_QUEUE_ID, "CREATE", "message", FIXTURE_MESSAGE_ID,
+                        "{\"body\":\"synthetic draft\"}", 1700000003L, 0L, "pending", 0, ""});
     }
 
     private static void assertFixtureRowsPreserved(SupportSQLiteDatabase db,

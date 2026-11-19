@@ -17,7 +17,7 @@ public final class ApiClientTransportTest {
         }
         assertTrue(SecureTransportPolicy.requiresSecureTransport("/api/health", false));
         assertTrue(SecureTransportPolicy.requiresSecureTransport("/api/campuses", false));
-        assertTrue(SecureTransportPolicy.requiresSecureTransport("/api/classroom-calls/sessions", true));
+        assertTrue(SecureTransportPolicy.requiresSecureTransport("/api/community/connections", true));
         assertTrue(SecureTransportPolicy.requiresSecureTransport("/api/community/posts", true));
         assertTrue(SecureTransportPolicy.requiresSecureTransport("/api/community/posts", false));
     }
