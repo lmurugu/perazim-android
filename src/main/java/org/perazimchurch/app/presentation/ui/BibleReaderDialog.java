@@ -119,6 +119,8 @@ public class BibleReaderDialog extends Dialog {
 
     // Active Reader State
     private String currentTranslation = "KJV";
+    private boolean explicitTarget = false;
+    private static final String PREFS_READER = "bible_reader";
     private String currentBookId = "2SA";
     private String currentBookName = "2 Samuel";
     private int currentChapter = 5;
@@ -199,7 +201,46 @@ public class BibleReaderDialog extends Dialog {
         return super.onKeyDown(keyCode, event);
     }
 
+    /** Restores the book, chapter and version the reader was last using. */
+    private void restoreLastPosition() {
+        if (explicitTarget) {
+            return;
+        }
+        try {
+            android.content.SharedPreferences prefs = getContext().getSharedPreferences(PREFS_READER, Context.MODE_PRIVATE);
+            currentBookId = prefs.getString("book", currentBookId);
+            currentChapter = prefs.getInt("chapter", currentChapter);
+            currentTranslation = prefs.getString("translation", currentTranslation);
+        } catch (Exception ignored) {
+            // Preferences unavailable: keep the defaults.
+        }
+    }
+
+    private void saveLastPosition() {
+        try {
+            getContext().getSharedPreferences(PREFS_READER, Context.MODE_PRIVATE).edit()
+                    .putString("book", currentBookId)
+                    .putInt("chapter", currentChapter)
+                    .putString("translation", currentTranslation)
+                    .apply();
+        } catch (Exception ignored) {
+            // Saving is best effort.
+        }
+    }
+
+    /** Opens Appearance (Light, Dark or System), the same choice as on the home page. */
+    private void toggleAppearance() {
+        Context ctx = getContext();
+        while (ctx instanceof android.content.ContextWrapper && !(ctx instanceof android.app.Activity)) {
+            ctx = ((android.content.ContextWrapper) ctx).getBaseContext();
+        }
+        if (ctx instanceof android.app.Activity) {
+            org.perazimchurch.app.ui.components.ThemeSwitcher.choose((android.app.Activity) ctx);
+        }
+    }
+
     public void setTargetPassage(@NonNull String bookId, int chapter) {
+        this.explicitTarget = true;
         this.currentBookId = bookId;
         this.currentChapter = Math.max(1, chapter);
         BibleBook b = bookMap.get(bookId);
@@ -214,6 +255,7 @@ public class BibleReaderDialog extends Dialog {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        restoreLastPosition();
         View rootView = buildReaderLayout();
         setContentView(rootView);
 
@@ -327,10 +369,20 @@ public class BibleReaderDialog extends Dialog {
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(16), dp(16), dp(16), 0);
 
-        FrameLayout back = GlassKit.circleIcon(getContext(), org.perazimchurch.app.R.drawable.gl_back, 44, 20, "Back");
+        // App logo: goes to the home page.
+        FrameLayout back = new FrameLayout(getContext());
+        GradientDrawable logoCircle = new GradientDrawable();
+        logoCircle.setShape(GradientDrawable.OVAL);
+        logoCircle.setColor(GlassKit.light() ? Color.parseColor("#E6FFFFFF") : Color.parseColor("#33FFFFFF"));
+        back.setBackground(logoCircle);
+        ImageView logo = new ImageView(getContext());
+        logo.setImageResource(org.perazimchurch.app.R.drawable.ic_perazim_logo);
+        logo.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        back.addView(logo, new FrameLayout.LayoutParams(dp(44), dp(44)));
+        back.setContentDescription("Home");
         back.setOnClickListener(v -> dismiss());
         btnCloseDialog = back;
-        row.addView(back);
+        row.addView(back, new LinearLayout.LayoutParams(dp(44), dp(44)));
 
         btnBookChapterTitle = GlassKit.text(getContext(), "", 13, true, GlassKit.light() ? Color.parseColor("#2A0F33") : Color.WHITE);
         btnBookChapterTitle.setGravity(Gravity.CENTER);
@@ -354,6 +406,12 @@ public class BibleReaderDialog extends Dialog {
         updateTranslationBadge();
         tvTranslationBadge.setOnClickListener(v -> showTranslationSelectorDialog());
         row.addView(tvTranslationBadge, new LinearLayout.LayoutParams(-2, dp(44)));
+
+        FrameLayout themeToggle = GlassKit.circleIcon(getContext(),
+                GlassKit.light() ? org.perazimchurch.app.R.drawable.gl_moon : org.perazimchurch.app.R.drawable.gl_sun,
+                44, 18, "Light or dark mode");
+        themeToggle.setOnClickListener(v -> toggleAppearance());
+        row.addView(themeToggle);
 
         FrameLayout search = GlassKit.circleIcon(getContext(), org.perazimchurch.app.R.drawable.gl_search, 44, 18, "Search the Bible");
         search.setOnClickListener(v -> toggleSearchMode());
@@ -420,8 +478,6 @@ public class BibleReaderDialog extends Dialog {
         TextView topics = GlassKit.text(getContext(), "Topics", 12, true, GlassKit.accent());
         topics.setPadding(dp(10), dp(8), dp(10), dp(8));
         topics.setClickable(true);
-        topics.setOnClickListener(v -> showTopicsDialog());
-        layout.addView(topics);
 
         TextView clear = GlassKit.text(getContext(), "Close", 12, true, GlassKit.muted());
         clear.setPadding(dp(10), dp(8), dp(10), dp(8));
@@ -493,11 +549,7 @@ public class BibleReaderDialog extends Dialog {
 
     private void updateHeaderTitle() {
         String title = currentBookName + " " + currentChapter;
-        if ("2SA".equals(currentBookId) && currentChapter == 5) {
-            title += " · Baal-perazim ▾";
-        } else {
-            title += " ▾";
-        }
+        title += " ▾";
         if (btnBookChapterTitle != null) {
             btnBookChapterTitle.setText(title);
         }
@@ -507,6 +559,7 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void updateTranslationBadge() {
+        saveLastPosition();
         if (tvTranslationBadge != null) {
             tvTranslationBadge.setText(currentTranslation);
         }
@@ -585,6 +638,7 @@ public class BibleReaderDialog extends Dialog {
         dismissActionBar();
         freshRender = true;
         this.currentBookId = bookId;
+        saveLastPosition();
         this.currentChapter = chapter;
         BibleBook b = bookMap.get(bookId);
         if (b != null) {
@@ -967,7 +1021,7 @@ public class BibleReaderDialog extends Dialog {
         if (newTestament) {
             secondary.addView(barIcon("\u0391\u03b2", "Interlinear", v -> showInterlinearDialog(verse, citation)));
         }
-        secondary.addView(barIcon("#", "Topic", v -> showTopicPicker(verse)));
+        secondary.addView(barIcon("\u2691", "Bookmark label", v -> showTopicPicker(verse)));
         if (isSearchMode) {
             secondary.addView(barIcon("\u27a4", "Open chapter", v -> {
                 dismissActionBar();
