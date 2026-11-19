@@ -173,6 +173,24 @@ public class BibleReaderDialog extends Dialog {
         return dialog;
     }
 
+    /**
+     * Android Back closes the reader. In search mode it first leaves search, as the in-app Back control does, and
+     * hides the keyboard. Without this the key was not handled, and the reader stayed open.
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
+        if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
+            if (isSearchMode) {
+                hideKeyboard(etSearchQuery);
+                toggleSearchMode();
+            } else {
+                dismiss();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     public void setTargetPassage(@NonNull String bookId, int chapter) {
         this.currentBookId = bookId;
         this.currentChapter = Math.max(1, chapter);
