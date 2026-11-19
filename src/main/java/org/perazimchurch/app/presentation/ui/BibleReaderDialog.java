@@ -352,6 +352,11 @@ public class BibleReaderDialog extends Dialog {
         window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.TRANSPARENT);
+        if (android.os.Build.VERSION.SDK_INT >= 29) {
+            // Stop the system painting a contrast scrim over the transparent bars.
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
         if (android.os.Build.VERSION.SDK_INT >= 30) {
             // Draw behind the status and navigation bars, then pad the content so nothing sits under them.
             window.setDecorFitsSystemWindows(false);
