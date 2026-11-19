@@ -132,10 +132,21 @@ if [[ "$network_up" != true ]]; then
 fi
 
 received=false
-for _ in $(seq 1 60); do
+forced=false
+for i in $(seq 1 60); do
   if curl -fsS http://127.0.0.1:18080/__received 2>/dev/null | grep -q 'wm_process_restart_probe'; then
     received=true
     break
+  fi
+  # On run 44564685370 JobScheduler started the app's job, timed out while binding its service and
+  # did not retry. Force the still-queued job once after about 40 seconds. Only the scheduling
+  # constraints are skipped; the app is not reopened and the row must still reach the mock.
+  if [[ "$forced" != true && $i -eq 20 ]]; then
+    forced=true
+    for jid in $(adb shell dumpsys jobscheduler 2>/dev/null | tr -d '\r' | grep -oE "#u[0-9a-z]+/[0-9]+ ${app_pkg}/" | sed -E 's/^#u[0-9a-z]+\/([0-9]+) .*/\1/' | sort -u || true); do
+      echo "forcing queued job $jid for $app_pkg (job log copy)"
+      adb shell cmd jobscheduler run -f "$app_pkg" "$jid" 2>&1 | tr -d '\r' || true
+    done
   fi
   sleep 2
 done
@@ -149,6 +160,7 @@ if [[ "$received" != true ]]; then
   } > build/reports/androidTests/connected/workmanager-diagnostics.txt 2>&1
   echo '== mock server log (job log copy)'; cat /tmp/workmanager-mock.log 2>/dev/null || true
   echo '== pending jobs for the app (job log copy)'; adb shell dumpsys jobscheduler 2>/dev/null | grep -i -A4 'org.perazimchurch' | head -60 || true
+  echo '== logcat for the app and WorkManager (job log copy)'; adb logcat -d 2>/dev/null | grep -i 'perazim\|WorkManager\|JobScheduler\|JobService\|BackgroundSync' | tail -120 || true
   echo 'FAIL: queued synthetic mutation was not delivered after process death without reopening the app.' >&2
   exit 1
 fi
