@@ -85,6 +85,7 @@ public final class GlassPolish {
         try {
             walk(root, hasGlow(root));
             freeShadows(root);
+            fontTree(root);
         } catch (RuntimeException ignored) {
             // Styling must never crash a screen.
         }
@@ -108,6 +109,25 @@ public final class GlassPolish {
             ViewGroup group = (ViewGroup) view;
             for (int i = 0; i < group.getChildCount(); i++) {
                 walk(group.getChildAt(i), glowHere);
+            }
+        }
+    }
+
+    /**
+     * Puts the person's chosen font on every text view, including the ones inside views that are kept as they are.
+     * Runs over the whole tree because the normal pass skips kept views and their children.
+     */
+    private static void fontTree(View view) {
+        if (view.getVisibility() == View.GONE) {
+            return;
+        }
+        if (view instanceof TextView) {
+            AppFonts.apply((TextView) view);
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) view;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                fontTree(group.getChildAt(i));
             }
         }
     }

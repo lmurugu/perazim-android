@@ -46,11 +46,15 @@ public final class UiScale {
         Configuration c = new Configuration();
         boolean changed = false;
 
-        // Text size: 0 means "undefined", which keeps the phone's own text setting.
-        c.fontScale = DisplaySettings.fontScale(DisplaySettings.textSize(app));
-        if (c.fontScale != 0f) {
-            changed = true;
+        // Text size: "Phone setting" follows the phone's own text size, scaled down so the app is not oversized.
+        int textChoice = DisplaySettings.textSize(app);
+        float fontScale = DisplaySettings.fontScale(textChoice);
+        if (textChoice == 0) {
+            float phoneScale = base.getResources().getConfiguration().fontScale;
+            fontScale = (phoneScale > 0f ? phoneScale : 1f) * DisplaySettings.PHONE_TEXT_FACTOR;
         }
+        c.fontScale = fontScale;
+        changed = true;
 
         float shortDp = shortPx / dm.density;
         float xdpi = dm.xdpi;

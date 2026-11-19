@@ -8,8 +8,8 @@ import android.app.AlertDialog;
 import org.perazimchurch.app.ui.theme.DisplaySettings;
 
 /**
- * Lets the person choose the app size, then the text size. The screen is rebuilt in place once they are done,
- * so the change shows straight away and is kept for next time.
+ * Lets the person choose the app size, the text size and the font, in that order. The screen is rebuilt in place
+ * once they are done, so the change shows straight away and is kept for next time.
  */
 public final class DisplaySettingsDialog {
 
@@ -41,6 +41,22 @@ public final class DisplaySettingsDialog {
                     dialog.dismiss();
                     if (which != textBefore) {
                         DisplaySettings.saveTextSize(activity, which);
+                        changed[0] = true;
+                    }
+                    askFont(activity, changed);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private static void askFont(Activity activity, boolean[] changed) {
+        final int fontBefore = DisplaySettings.fontChoice(activity);
+        AppDialogs.builder(activity)
+                .setTitle("Font")
+                .setSingleChoiceItems(DisplaySettings.FONT_LABELS, fontBefore, (dialog, which) -> {
+                    dialog.dismiss();
+                    if (which != fontBefore) {
+                        DisplaySettings.saveFontChoice(activity, which);
                         changed[0] = true;
                     }
                 })
