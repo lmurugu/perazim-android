@@ -399,7 +399,7 @@ public class BibleReaderDialog extends Dialog {
         loadingProgress.setLayoutParams(lpProgress);
         versesContainer.addView(loadingProgress);
 
-        tvEmptyState = GlassKit.text(getContext(), "", 13, true, GlassKit.text());
+        tvEmptyState = GlassKit.text(getContext(), "", 13, true, verseInk());
         tvEmptyState.setGravity(Gravity.CENTER);
         tvEmptyState.setPadding(dp(8), dp(16), dp(8), dp(16));
         tvEmptyState.setLineSpacing(0f, 1.3f);
@@ -413,10 +413,13 @@ public class BibleReaderDialog extends Dialog {
         FrameLayout chapterCard = new FrameLayout(getContext());
         GradientDrawable cardGlass = new GradientDrawable();
         cardGlass.setCornerRadius(dp(28));
-        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F2200F30"));
-        cardGlass.setStroke(dp(1), GlassKit.light() ? Color.parseColor("#55401060") : Color.parseColor("#33FFFFFF"));
+        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#D9241238") : Color.parseColor("#F2200F30"));
+        cardGlass.setStroke(dp(1), GlassKit.light() ? Color.parseColor("#40FFFFFF") : Color.parseColor("#33FFFFFF"));
         chapterCard.setBackground(cardGlass);
         chapterCardView = chapterCard;
+        if (GlassKit.light()) {
+            GlassKit.keep(chapterCard);  // light mode: keep the darker frosted card as built
+        }
         chapterCard.addView(versesScrollView, new FrameLayout.LayoutParams(-1, -1));
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(-1, 0, 1f);
         lpCard.setMargins(dp(16), 0, dp(16), dp(8));
@@ -928,7 +931,7 @@ public class BibleReaderDialog extends Dialog {
         int end = sb.length();
         float numberScale = 11f / verseTextSp;
         sb.setSpan(new android.text.style.RelativeSizeSpan(numberScale), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#C06119" : "#F8A95A")),
+        sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor("#F8A95A")),
                 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.setSpan(new android.text.style.TypefaceSpan("sans-serif"), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -946,7 +949,7 @@ public class BibleReaderDialog extends Dialog {
         tvVerseText.setText(sb);
         tvVerseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, verseTextSp);
         tvVerseText.setTypeface(Typeface.SERIF);
-        tvVerseText.setTextColor(GlassKit.text());
+        tvVerseText.setTextColor(verseInk());
         tvVerseText.setLineSpacing(0f, 1.45f);
         GlassKit.keep(tvVerseText);
         row.addView(tvVerseText);
@@ -1010,6 +1013,11 @@ public class BibleReaderDialog extends Dialog {
                 from = at + needle.length();
             }
         }
+    }
+
+    /** Verse text colour: light ink on the dark frosted chapter card in light mode. */
+    private int verseInk() {
+        return GlassKit.light() ? Color.parseColor("#F5EEFF") : GlassKit.text();
     }
 
     private String formatCitation(BibleVerse verse) {
