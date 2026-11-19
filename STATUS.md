@@ -1,6 +1,10 @@
 # Perazim Mission Church Android App — Feature Status & Honesty Audit
 
-> **Target Version**: `2.2.0` (VersionCode `4`)  
+> **Current build (from build.gradle and PerazimDatabase.java, 2026-11-19)**: versionName `2.2.1`, versionCode `5`, compileSdk and targetSdk `36`, Room database version `7` (migrations 4→5, 5→6 and 6→7; exported schemas 4–7 in `schemas/`).
+>
+> The evidence below was captured on the `2.2.0` pilot (VersionCode `4`, Room v5). Read it as history for that build, not as a description of the current build.
+>
+> **Target Version (audit)**: `2.2.0` (VersionCode `4`)  
 > **Package ID**: `org.perazimchurch.app`  
 > **Target Audience**: 100-Member Pilot (Embu Headquarters & Satellite Campuses)  
 > **Audit Date**: November 3, 2026  

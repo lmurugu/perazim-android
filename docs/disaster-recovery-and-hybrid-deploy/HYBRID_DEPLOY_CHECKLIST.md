@@ -100,7 +100,7 @@ curl --fail --silent http://127.0.0.1:3000/api/health
 
 ### Days 6–7 — offline sync and AI
 
-- [ ] Preserve Room v6 and its migration history; every post-pilot schema change requires a numbered, non-destructive migration (starting v6->v7), exported Room schema, old-version upgrade fixtures, and rollback/compatibility policy. Existing fallbackToDestructiveMigration is a legacy risk, NOT an acceptable way to migrate pilot member data. Preserve queues, Bible, preferences and account records.
+- [ ] Preserve Room v7 and its migration history (4→5, 5→6 and 6→7 are in place); every further schema change requires a numbered, non-destructive migration (starting v7->v8), exported Room schema, old-version upgrade fixtures, and rollback/compatibility policy. Existing fallbackToDestructiveMigration is a legacy risk, NOT an acceptable way to migrate pilot member data. Preserve queues, Bible, preferences and account records.
 - [ ] Audit SyncQueueEntity/SyncQueueDao and server/src/routes/sync.js; record supported mutation types, idempotency, reject reasons, retry caps, timestamps, and authority boundaries.
 - [ ] Add WorkManager for network-constrained background retries only after design approval; WorkManager is best-effort, not an exact real-time schedule. Foreground/manual refresh remains available.
 - [ ] Test repeated mutation IDs, simultaneous client updates, duplicate Amens, server restart, 401/403/429/5xx, network interruption after server commit but before client acknowledgement, and account switching.
