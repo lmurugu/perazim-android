@@ -1282,7 +1282,7 @@ public class BibleReaderDialog extends Dialog {
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
         GradientDrawable glass = new GradientDrawable();
         glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#E6FFFFFF") : Color.parseColor("#D9221431"));
+        glass.setColor(GlassKit.light() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F5201030"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         panel.setBackground(glass);
         panel.setElevation(dp(12));
@@ -1317,7 +1317,7 @@ public class BibleReaderDialog extends Dialog {
         notesPanelList.setOrientation(LinearLayout.VERTICAL);
         ScrollView scroll = new ScrollView(getContext());
         scroll.addView(notesPanelList);
-        panel.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1f));
+        panel.addView(scroll, new LinearLayout.LayoutParams(-1, dp(230)));
 
         final int[] startHeight = new int[1];
         final float[] startY = new float[1];
