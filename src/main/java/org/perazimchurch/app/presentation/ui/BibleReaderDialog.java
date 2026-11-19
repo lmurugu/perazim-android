@@ -148,7 +148,7 @@ public class BibleReaderDialog extends Dialog {
     }
 
     public BibleReaderDialog(@NonNull Context context, @NonNull BibleViewModel bibleViewModel) {
-        super(context, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.fullscreenTheme());
         this.bibleViewModel = bibleViewModel;
         initFallbackBooks();
     }

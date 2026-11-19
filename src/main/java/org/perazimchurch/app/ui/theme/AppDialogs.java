@@ -15,6 +15,20 @@ public final class AppDialogs {
     private AppDialogs() {
     }
 
+    /** Full window dialog theme (no action bar) that follows the app's Light / Dark setting. */
+    public static int windowTheme() {
+        return PerazimTheme.isLight()
+                ? android.R.style.Theme_Material_Light_NoActionBar
+                : android.R.style.Theme_Material_NoActionBar;
+    }
+
+    /** Full-screen dialog theme that follows the app's Light / Dark setting. */
+    public static int fullscreenTheme() {
+        return PerazimTheme.isLight()
+                ? android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
+                : android.R.style.Theme_Material_NoActionBar_Fullscreen;
+    }
+
     public static AlertDialog.Builder builder(Context context) {
         int theme = PerazimTheme.isLight()
                 ? android.R.style.Theme_Material_Light_Dialog

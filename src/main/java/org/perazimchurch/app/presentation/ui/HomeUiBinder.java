@@ -502,7 +502,7 @@ public class HomeUiBinder {
         if (readingDialog != null && readingDialog.isShowing()) {
             return;
         }
-        android.app.Dialog dialog = new android.app.Dialog(context, android.R.style.Theme_Material_NoActionBar) {
+        android.app.Dialog dialog = new android.app.Dialog(context, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme()) {
             @Override
             public void show() {
                 super.show();

@@ -53,7 +53,7 @@ public class OnboardingDialog extends Dialog {
     }
 
     public OnboardingDialog(@NonNull Context context, @Nullable Runnable onGetStartedListener) {
-        super(context);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.onGetStartedListener = onGetStartedListener;
     }
 

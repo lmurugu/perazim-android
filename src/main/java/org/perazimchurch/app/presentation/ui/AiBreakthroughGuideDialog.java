@@ -104,7 +104,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     public AiBreakthroughGuideDialog(@NonNull Activity activity, @NonNull AiActionListener actionListener) {
-        super(activity);
+        super(activity, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.activity = activity;
         this.actionListener = actionListener;
         this.aiEngine = new PerazimAiEngine(activity);
@@ -512,7 +512,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             return;
         }
 
-        final Dialog consentDlg = new Dialog(activity);
+        final Dialog consentDlg = new Dialog(activity, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         consentDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
         consentDlg.setCanceledOnTouchOutside(false);
 

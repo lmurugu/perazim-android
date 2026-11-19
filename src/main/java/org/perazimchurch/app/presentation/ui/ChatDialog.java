@@ -118,7 +118,7 @@ public class ChatDialog extends Dialog {
                       @NonNull String peerId,
                       @NonNull String peerName,
                       @Nullable String peerStatus) {
-        super(context, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.fullscreenTheme());
         this.messageRepository = messageRepository;
         this.connectionRepository = connectionRepository;
         this.syncQueueManager = syncQueueManager;

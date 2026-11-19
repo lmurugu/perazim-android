@@ -80,7 +80,7 @@ public class QrConnectionDialog extends Dialog {
                               @Nullable String userId,
                               @Nullable String userName,
                               @Nullable String campus) {
-        super(context);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.connectionRepository = connectionRepository;
 
         // Resolve user identity
