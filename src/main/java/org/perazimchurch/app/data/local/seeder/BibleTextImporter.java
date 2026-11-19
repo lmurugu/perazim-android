@@ -20,6 +20,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -116,6 +118,9 @@ public final class BibleTextImporter {
     }
 
     private static void importTranslation(Context context, BibleDao dao, Spec spec) throws IOException {
+        if (dao.countVerses(spec.id) > spec.expectedVerses) {
+            reconcileDuplicates(dao, spec.id);
+        }
         if (isComplete(dao, spec)) {
             return;
         }
@@ -166,6 +171,56 @@ public final class BibleTextImporter {
             return null;
         }
         return new FileInputStream(file);
+    }
+
+    /**
+     * Earlier starter rows used a different id scheme, so one verse position can have two rows.
+     * Keep the row with the canonical id, carry over any bookmark or note from the other rows,
+     * and delete the duplicates. Runs only when a translation has more verses than expected.
+     */
+    static void reconcileDuplicates(BibleDao dao, String translationId) {
+        Map<String, List<BibleVerseEntity>> byPosition = new HashMap<>();
+        for (BibleVerseEntity row : dao.getAllVerses(translationId)) {
+            String key = row.getBookNumber() + "." + row.getChapterNumber() + "." + row.getVerseNumber();
+            List<BibleVerseEntity> rows = byPosition.get(key);
+            if (rows == null) {
+                rows = new ArrayList<>(2);
+                byPosition.put(key, rows);
+            }
+            rows.add(row);
+        }
+        for (List<BibleVerseEntity> rows : byPosition.values()) {
+            if (rows.size() < 2) {
+                continue;
+            }
+            BibleVerseEntity keeper = rows.get(0);
+            for (BibleVerseEntity row : rows) {
+                if (row.getId().equals(canonicalId(translationId, row))) {
+                    keeper = row;
+                    break;
+                }
+            }
+            for (BibleVerseEntity row : rows) {
+                if (row == keeper) {
+                    continue;
+                }
+                if (row.isFavorite()) {
+                    keeper.setFavorite(true);
+                }
+                if ((keeper.getNote() == null || keeper.getNote().isEmpty()) && row.getNote() != null) {
+                    keeper.setNote(row.getNote());
+                }
+                dao.deleteVerseById(row.getId());
+            }
+            dao.updateVerse(keeper);
+        }
+        Log.i(TAG, "Reconciled duplicate verse rows for " + translationId);
+    }
+
+    private static String canonicalId(String translationId, BibleVerseEntity row) {
+        String bookId = (String) BibleDataSeeder.CANONICAL_BOOKS[row.getBookNumber() - 1][0];
+        String prefix = "KJV".equals(translationId) ? "" : translationId + ".";
+        return prefix + bookId + "." + row.getChapterNumber() + "." + row.getVerseNumber();
     }
 
     private static void ensureTranslationAndBooks(BibleDao dao, Spec spec) {

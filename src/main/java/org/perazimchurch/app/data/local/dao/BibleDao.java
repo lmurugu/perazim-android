@@ -143,4 +143,7 @@ public interface BibleDao {
 
     @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
     BibleVerseEntity getVerseInTranslation(String translationId, int bookNumber, int chapterNumber, int verseNumber);
+
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId")
+    List<BibleVerseEntity> getAllVerses(String translationId);
 }

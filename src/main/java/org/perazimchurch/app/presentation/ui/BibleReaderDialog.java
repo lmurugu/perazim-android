@@ -281,6 +281,12 @@ public class BibleReaderDialog extends Dialog {
         scrollColumn.setPadding(dp(16), dp(14), dp(16), dp(16));
 
         versesContainer = GlassKit.card(getContext(), 28, 0);
+        if (!GlassKit.light()) {
+            GradientDrawable deepPurple = new GradientDrawable();
+            deepPurple.setCornerRadius(dp(28));
+            deepPurple.setColor(Color.parseColor("#22082F"));
+            versesContainer.setBackground(deepPurple);
+        }
         versesContainer.setPadding(dp(20), dp(22), dp(20), dp(22));
 
         loadingProgress = new ProgressBar(getContext());
@@ -446,8 +452,10 @@ public class BibleReaderDialog extends Dialog {
         middle.addView(sizes);
         nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
-        btnNextChapter = GlassKit.orangeButton(getContext(), "Next", 13);
+        btnNextChapter = GlassKit.glassButton(getContext(), "Next", 13);
         btnNextChapter.setPadding(dp(22), 0, dp(22), 0);
+        attachGlow(btnNextChapter);
+        attachGlow(btnPrevChapter);
         btnNextChapter.setOnClickListener(v -> navigateChapter(1));
         nav.addView(btnNextChapter, new LinearLayout.LayoutParams(-2, dp(48)));
         return nav;
@@ -656,6 +664,31 @@ public class BibleReaderDialog extends Dialog {
     private final Map<Integer, View> verseRows = new HashMap<>();
     private int pendingScrollVerse = 0;
 
+    /** Pressed state: the button glows orange only while it is held down. */
+    private void attachGlow(final TextView button) {
+        final android.graphics.drawable.Drawable rest = button.getBackground();
+        final int restText = button.getCurrentTextColor();
+        button.setOnTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case android.view.MotionEvent.ACTION_DOWN:
+                    GradientDrawable glow = new GradientDrawable();
+                    glow.setCornerRadius(dp(14));
+                    glow.setColor(COLOR_ACCENT_ORANGE());
+                    button.setBackground(glow);
+                    button.setTextColor(COLOR_WHITE());
+                    break;
+                case android.view.MotionEvent.ACTION_UP:
+                case android.view.MotionEvent.ACTION_CANCEL:
+                    button.setBackground(rest);
+                    button.setTextColor(restText);
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        });
+    }
+
     private void clearVerseViews() {
         verseRows.clear();
         for (int i = versesContainer.getChildCount() - 1; i >= 0; i--) {
@@ -676,6 +709,14 @@ public class BibleReaderDialog extends Dialog {
         }
         for (final BibleVerse verse : verses) {
             versesContainer.addView(createVerseRow(verse, isSearchResult));
+        }
+        for (int i = 0; i < versesContainer.getChildCount(); i++) {
+            View child = versesContainer.getChildAt(i);
+            if (child == loadingProgress || child == tvEmptyState) {
+                continue;
+            }
+            child.setTranslationY(-dp(18));
+            child.animate().translationY(0f).setStartDelay(Math.min(i, 14) * 25L).setDuration(320).start();
         }
         final View target = (!isSearchResult && pendingScrollVerse > 0) ? verseRows.get(pendingScrollVerse) : null;
         pendingScrollVerse = 0;
