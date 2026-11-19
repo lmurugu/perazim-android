@@ -620,20 +620,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         bottomNav.setOrientation(LinearLayout.HORIZONTAL);
         bottomNav.setGravity(Gravity.CENTER_VERTICAL);
 
-        // Frosted bar: content scrolling underneath is washed out, as a backdrop blur would.
-        GradientDrawable navBg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                PerazimTheme.isLight()
-                        ? new int[]{Color.parseColor("#FAFFFFFF"), Color.parseColor("#F5FFFFFF")}
-                        : new int[]{Color.parseColor("#FA3A1A45"), Color.parseColor("#FC2A0F33")});
-        navBg.setCornerRadius(dp(32));
-        navBg.setStroke(Math.max(1, dp(1)), Color.parseColor(PerazimTheme.isLight() ? "#F2FFFFFF" : "#2EFFFFFF"));
-        bottomNav.setBackground(navBg);
-        // Mockup: light bar 0 8px 24px rgba(61,23,73,0.15); the dark bar gets a deep shadow to float.
-        if (PerazimTheme.isLight()) {
-            GlassKit.shadow(bottomNav, Color.parseColor("#263D1749"), 8, 24);
-        } else {
-            GlassKit.shadow(bottomNav, Color.parseColor("#59000000"), 10, 30);
-        }
+        // No card behind the tabs: the icons float over the background, as in the mockups.
         GlassKit.keep(bottomNav);
 
         final int[] iconResIds = {
