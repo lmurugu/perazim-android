@@ -265,7 +265,7 @@ public class HomeUiBinder {
         // 1. Greeting (mockup: 24sp bold, then the church line in #CDBBD6)
         LinearLayout greeting = new LinearLayout(context);
         greeting.setOrientation(LinearLayout.VERTICAL);
-        greeting.setPadding(dp(20), 0, dp(20), 0);
+        greeting.setPadding(dp(16), 0, dp(16), 0);
         tvGreeting = GlassKit.text(context, buildGreeting(), 24, true, GlassKit.text());
         greeting.addView(tvGreeting);
         TextView church = GlassKit.text(context, "Perazim Mission Church · Embu Headquarters", 13, false, GlassKit.muted());
@@ -291,8 +291,8 @@ public class HomeUiBinder {
     }
 
     private LinearLayout.LayoutParams sideMargins(LinearLayout.LayoutParams lp) {
-        lp.leftMargin = dp(16);
-        lp.rightMargin = dp(16);
+        lp.leftMargin = dp(12);
+        lp.rightMargin = dp(12);
         return lp;
     }
 

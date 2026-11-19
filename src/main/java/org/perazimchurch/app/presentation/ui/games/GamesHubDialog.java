@@ -173,7 +173,7 @@ public final class GamesHubDialog extends Dialog {
         });
         page = new LinearLayout(activity);
         page.setOrientation(LinearLayout.VERTICAL);
-        page.setPadding(dp(20), dp(16), dp(20), dp(28));
+        page.setPadding(dp(14), dp(16), dp(14), dp(28));
         scroll.addView(page, new ScrollView.LayoutParams(-1, -2));
         setContentView(scroll);
         // Small round glass back button, matching the mockups (not a full-width button).
@@ -298,7 +298,7 @@ public final class GamesHubDialog extends Dialog {
     private void gameCard(Mode selected, String title, String description) {
         LinearLayout card = new LinearLayout(activity);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(16), dp(12), dp(16), dp(16));
+        card.setPadding(dp(14), dp(12), dp(14), dp(14));
         card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
         params.bottomMargin = dp(16);
@@ -340,7 +340,7 @@ public final class GamesHubDialog extends Dialog {
     private void customCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
         LinearLayout card = new LinearLayout(activity);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(16), dp(12), dp(16), dp(16));
+        card.setPadding(dp(14), dp(12), dp(14), dp(14));
         GradientDrawable cardBg = shape(PerazimTheme.COLOR_SURFACE);
         cardBg.setStroke(dp(2), accent);
         card.setBackground(cardBg);
