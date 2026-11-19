@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node test/api.test.js && node test/postgres.test.js && node test/migration_sync_receipts_existing_data.test.js && node test/logging_privacy_scan.test.js && node test/community_api.test.js && node test/prayer_visibility.test.js",
+    "test": "node test/api.test.js && node test/postgres.test.js && node test/migration_sync_receipts_existing_data.test.js && node test/logging_privacy_scan.test.js && node test/community_api.test.js && node test/prayer_visibility.test.js && node test/content_safety.test.js",
     "test:unit": "node test/api.test.js",
     "test:pg": "node test/postgres.test.js",
     "test:prayer-visibility": "node test/prayer_visibility.test.js",
@@ -22,7 +22,8 @@
     "test:online-ai-contract": "node test/online_ai_contract.test.js && node test/worker_service_auth.test.js",
     "test:governed-ai": "node test/offline_knowledge_package.test.js && node test/governed_knowledge.test.js && node test/knowledge_governance.test.js && node test/scripture_corpus.test.js && node test/response_validation.test.js && node test/online_ai_contract.test.js && node test/worker_service_auth.test.js",
     "db:migrate": "node scripts/db-migrate.js",
-    "test:media-feed": "node test/media_feed.test.js"
+    "test:media-feed": "node test/media_feed.test.js",
+    "test:content-safety": "node test/content_safety.test.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#681A7D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Perazim">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; media-src 'self' https:; style-src 'self'; script-src 'self'; connect-src 'self' https: http:; frame-src https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'">
+  <title>Perazim Church</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <header class="top glass">
+    <h1>Perazim</h1>
+    <span id="who" class="muted"></span>
+  </header>
+
+  <main id="view" class="view" aria-live="polite"></main>
+
+  <nav class="tabs glass" aria-label="Main">
+    <button data-tab="home" class="tab on">Home</button>
+    <button data-tab="sermons" class="tab">Sermons</button>
+    <button data-tab="community" class="tab">Community</button>
+    <button data-tab="account" class="tab">Account</button>
+  </nav>
+
+  <script src="config.js"></script>
+  <script src="native.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

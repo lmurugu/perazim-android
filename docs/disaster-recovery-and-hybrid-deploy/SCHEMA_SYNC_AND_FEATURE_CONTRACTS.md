@@ -153,7 +153,7 @@ Before coding, commit an OpenAPI 3.x contract and synthetic JSON fixtures for: a
 
 **No executable migration in this documentation PR.** The future migration must:
 1. Allocate next PostgreSQL numbered migration without changing checksums of 0001–0012.
-2. Allocate a non-destructive Room v6->v7 migration with exported compiler schema and synthetic v4/v5/v6 upgrade coverage; preserve queued operations, Bible, saved preferences and account data. All later post-pilot schema changes require the same tested non-destructive rule; destructive fallback is not an approved migration mechanism.
+2. Room v6->v7 is in place (MIGRATION_6_7, exported schema 7.json). Keep synthetic v4/v5/v6 upgrade coverage for it; preserve queued operations, Bible, saved preferences and account data. All later post-pilot schema changes require the same tested non-destructive rule; destructive fallback is not an approved migration mechanism.
 3. Implement server API and unit/integration/security tests with disposable DB.
 4. Implement Android repository/WorkManager with controlled test APK, then independently implement iOS client.
 5. Verify no old client can forge VERIFIED giving, online AI entitlement, membership, or notification recipients.

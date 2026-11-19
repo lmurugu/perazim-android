@@ -55,7 +55,7 @@ Android (existing Java/Room)             iOS (NOT YET BUILT; separate client)
 
 | Area | Inspected evidence | Classification |
 |---|---|---|
-| Android app | Native Java, package org.perazimchurch.app; minSdk 24, targetSdk 34; Room schema v6 | Exists; do not claim iOS parity |
+| Android app | Native Java, package org.perazimchurch.app; minSdk 24, targetSdk 36; Room database v7 (versionName 2.2.1, versionCode 5) | Exists; do not claim iOS parity |
 | Local sync | sync_queue Room entity and DAO; Express /api/sync endpoint | Exists; cross-feature conflict and recovery gates require new tests |
 | Offline AI | Existing local AI components and specifications; build gates disable Qwen and online AI in inspected build.gradle | Specified/partly implemented, NOT proof of enabled release |
 | Online AI | Express /api/ai/online with verified-member/permission checks; fail-closed gates; Gemini Worker design | Disabled pending review; do not switch to OpenRouter silently |

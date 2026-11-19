@@ -40,6 +40,9 @@ Sensitivity: **P** personal, **S** sensitive (religious belief or health), **C**
 | `NotificationEntity`, `CommentEntity`, `GroupEntity`, `GroupMemberEntity`, `EventRsvpEntity`, `ReflectionEntity`, `DailyChallengeEntity` | Community content and progress | Offline community data | |
 | `SyncQueueEntity` (`sync_queue`) | Payload JSON of pending writes | Offline sync | Deleted when the account is removed from the device |
 | `SyncMetadataEntity`, `AppConfigEntity`, `DownloadedContentEntity` | Operational | Sync and configuration | |
+| Web app storage (`web/app.js`, `web/native.js`): session token and name, push token, cached posts and sermons | Sign-in session and offline copies | Keeps the app usable without a connection | Cleared on sign-out. Native uses Preferences, the browser uses localStorage. |
+| `push_devices` (server) | `token`, `user_id`, `platform`, timestamps | Push notification delivery | Deleted on sign-out from the device, and when the account is erased (`server/src/privacy/erasure.js`) |
+| `user_blocks` and `content_reports` (server) | Block list, report reason and details | Member safety | Blocks and reports by the member are deleted with the account. A report about a member is kept as a safety record. |
 | Bible, hymn, sermon, joke, riddle, verse and event entities | None | Church content | Public content |
 
 Session tokens are stored in the Android Keystore-backed store and excluded from backup (`data_extraction_rules.xml`). Audit finding S-01 in `docs/security/audit-2026-11.md` covers the Room database backup rule.

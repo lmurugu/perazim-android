@@ -93,6 +93,9 @@ async function main() {
     if (server) await new Promise(resolve => server.close(resolve));
     try {
       await query('DELETE FROM prayers WHERE id = ANY($1::text[])', [prayerIds]);
+      // Default groups are seeded with the first ADMIN as creator, which may be this test's admin.
+      // Their member rows cascade; the creator link must go before the admin row.
+      await query('DELETE FROM community_groups WHERE created_by = ANY($1::text[])', [[admin]]);
       await query('DELETE FROM users WHERE id = ANY($1::text[])', [[userA, userB, admin]]);
     } finally {
       await closeDb();
