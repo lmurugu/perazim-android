@@ -134,9 +134,10 @@ echo 'app pid after kill: none'
 adb shell svc wifi enable
 adb shell svc data enable || true
 # The emulator can take minutes to bring up a default network after svc wifi enable, and JobScheduler
-# will not run the CONNECTED job until it has one. Wait for it before the delivery wait starts.
+# will not run the CONNECTED job until it has one. Run 44579465224 needed a little over 3 minutes,
+# so poll for up to 10 minutes before the delivery wait starts.
 network_up=false
-for _ in $(seq 1 90); do
+for _ in $(seq 1 300); do
   if adb shell dumpsys connectivity 2>/dev/null | tr -d '\r' | grep -q 'Active default network: [0-9]'; then
     network_up=true
     break
