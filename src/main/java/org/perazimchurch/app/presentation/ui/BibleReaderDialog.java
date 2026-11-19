@@ -353,6 +353,16 @@ public class BibleReaderDialog extends Dialog {
         window.setStatusBarColor(Color.TRANSPARENT);
         window.setNavigationBarColor(Color.TRANSPARENT);
         if (android.os.Build.VERSION.SDK_INT >= 30) {
+            // Draw behind the status and navigation bars, then pad the content so nothing sits under them.
+            window.setDecorFitsSystemWindows(false);
+            if (readerFrame != null) {
+                readerFrame.setOnApplyWindowInsetsListener((v, insets) -> {
+                    android.graphics.Insets bars = insets.getInsets(android.view.WindowInsets.Type.systemBars());
+                    v.setPadding(0, bars.top, 0, bars.bottom);
+                    return insets;
+                });
+                readerFrame.requestApplyInsets();
+            }
             android.view.WindowInsetsController controller = window.getInsetsController();
             if (controller != null) {
                 int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
