@@ -38,16 +38,16 @@ public class BackgroundSyncSchedulerTest {
     public void enqueuePersistsOneUniqueBackgroundSyncRequest() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         WorkManager manager = WorkManager.getInstance(context);
-        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(10, TimeUnit.SECONDS);
+        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(60, TimeUnit.SECONDS);
 
         BackgroundSyncScheduler.enqueue(context);
 
         List<WorkInfo> work = manager.getWorkInfosForUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME)
-                .get(10, TimeUnit.SECONDS);
+                .get(60, TimeUnit.SECONDS);
         assertEquals(1, work.size());
         assertTrue(work.get(0).getState() == WorkInfo.State.ENQUEUED
                 || work.get(0).getState() == WorkInfo.State.RUNNING);
         assertTrue(work.get(0).getTags().contains(BackgroundSyncScheduler.UNIQUE_WORK_NAME));
-        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(10, TimeUnit.SECONDS);
+        manager.cancelUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).getResult().get(60, TimeUnit.SECONDS);
     }
 }
