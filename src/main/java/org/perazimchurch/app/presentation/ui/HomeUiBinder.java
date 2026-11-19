@@ -449,40 +449,8 @@ public class HomeUiBinder {
 
     /** A full-width photo card with a frosted caption along the bottom, like the hero above it. */
     private View createPhotoCard(String title, String subtitle, String photoAsset, View.OnClickListener onClick) {
-        FrameLayout card = new FrameLayout(context);
-        GradientDrawable shape = new GradientDrawable();
-        shape.setCornerRadius(dp(22));
-        shape.setColor(PerazimTheme.COLOR_SURFACE_SOLID);
-        card.setBackground(shape);
-        card.setClipToOutline(true);
-        GlassKit.keep(card);
-
         Bitmap photo = loadAssetBitmap(photoAsset, 900);
-        if (photo != null) {
-            ImageView iv = new ImageView(context);
-            iv.setImageBitmap(photo);
-            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            card.addView(iv, new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        }
-
-        FrostPane caption = new FrostPane(context, photo, 0.5f, dp(16),
-                Color.parseColor("#731E0A28"), Color.parseColor("#33FFFFFF"));
-        LinearLayout captionText = new LinearLayout(context);
-        captionText.setOrientation(LinearLayout.VERTICAL);
-        captionText.setPadding(dp(14), dp(10), dp(14), dp(10));
-        captionText.addView(GlassKit.text(context, title, 15, true, Color.WHITE));
-        captionText.addView(GlassKit.text(context, subtitle, 12, false, Color.parseColor("#E6D8EE")),
-                GlassKit.matchWrap(context, 2));
-        caption.addView(GlassKit.keep(captionText));
-        FrameLayout.LayoutParams lpCaption = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        lpCaption.setMargins(dp(10), 0, dp(10), dp(10));
-        card.addView(caption, lpCaption);
-
-        card.setClickable(true);
-        card.setOnClickListener(onClick);
-        return card;
+        return GlassKit.photoCard(context, photo, title, subtitle, 112, 22, onClick);
     }
 
     /** Mockup tile: 110dp glass, 24dp corners, 44dp purple icon square, 12sp label. */

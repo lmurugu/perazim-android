@@ -253,6 +253,14 @@ public class SermonsUiBinder {
         cardsContainer.setOrientation(LinearLayout.VERTICAL);
         contentLayout.addView(cardsContainer);
 
+        // Bible audio on this phone, as a full-width photo card so the page is not left half empty
+        Bitmap bibleAudioPhoto = loadAssetBitmap("backgrounds/bg_sermons_lamp.png", 720);
+        LinearLayout.LayoutParams bibleAudioLp = new LinearLayout.LayoutParams(-1, dp(112));
+        bibleAudioLp.topMargin = dp(14);
+        contentLayout.addView(GlassKit.photoCard(activity, bibleAudioPhoto, "Bible audio",
+                "Listen offline to the Bible on this phone", 112, 22,
+                v -> activity.startActivity(new Intent(activity, LocalBibleAudioActivity.class))), bibleAudioLp);
+
         rootScrollView.addView(contentLayout);
 
         // Setup Player Runnable

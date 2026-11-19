@@ -156,6 +156,48 @@ public final class GlassKit {
         return keep(card);
     }
 
+    /**
+     * A full-width photo card with a frosted caption along the bottom: the photo fills the card, and the title and
+     * subtitle sit on a blurred strip. Used to fill space with imagery instead of large type. Pass a null photo for
+     * a plain purple card.
+     */
+    public static FrameLayout photoCard(Context c, android.graphics.Bitmap photo, CharSequence title,
+                                        CharSequence subtitle, float heightDp, float radiusDp,
+                                        View.OnClickListener onClick) {
+        FrameLayout card = new FrameLayout(c);
+        GradientDrawable shape = new GradientDrawable();
+        shape.setCornerRadius(px(c, radiusDp));
+        shape.setColor(PerazimTheme.COLOR_SURFACE_SOLID);
+        card.setBackground(shape);
+        card.setClipToOutline(true);
+        keep(card);
+
+        if (photo != null) {
+            ImageView iv = new ImageView(c);
+            iv.setImageBitmap(photo);
+            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            card.addView(iv, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+
+        FrostPane caption = new FrostPane(c, photo, 0.5f, px(c, radiusDp - 6),
+                Color.parseColor("#731E0A28"), Color.parseColor("#33FFFFFF"));
+        LinearLayout captionText = new LinearLayout(c);
+        captionText.setOrientation(LinearLayout.VERTICAL);
+        captionText.setPadding(px(c, 14), px(c, 10), px(c, 14), px(c, 10));
+        captionText.addView(text(c, title, 15, true, Color.WHITE));
+        captionText.addView(text(c, subtitle, 12, false, Color.parseColor("#E6D8EE")), matchWrap(c, 2));
+        caption.addView(keep(captionText));
+        FrameLayout.LayoutParams lpCaption = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        lpCaption.setMargins(px(c, 10), 0, px(c, 10), px(c, 10));
+        card.addView(caption, lpCaption);
+
+        card.setClickable(true);
+        card.setOnClickListener(onClick);
+        return card;
+    }
+
     /** Full-width orange pill button with the mockup's orange glow. */
     public static TextView orangeButton(Context c, CharSequence s, float textSp) {
         TextView b = text(c, s, textSp, true, Color.WHITE);
