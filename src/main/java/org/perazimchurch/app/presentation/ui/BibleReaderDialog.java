@@ -1424,24 +1424,12 @@ public class BibleReaderDialog extends Dialog {
         if (readerFrame == null) {
             return;
         }
-        // Dim and blur the verses behind the card so it stands out.
-        View scrim = new View(getContext());
-        scrim.setBackgroundColor(Color.parseColor("#C7000000"));
-        scrim.setOnClickListener(v -> dismissNotesPanel());
-        readerFrame.addView(scrim, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        notesScrimView = scrim;
-        if (chapterCardView != null && android.os.Build.VERSION.SDK_INT >= 31) {
-            chapterCardView.setRenderEffect(android.graphics.RenderEffect.createBlurEffect(
-                    24f, 24f, android.graphics.Shader.TileMode.CLAMP));
-        }
-
         final LinearLayout panel = new LinearLayout(getContext());
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
         GradientDrawable glass = new GradientDrawable();
         glass.setCornerRadius(dp(24));
-        glass.setColor(Color.parseColor("#F6EEFA"));
+        glass.setColor(GlassKit.light() ? Color.parseColor("#F5140B20") : Color.parseColor("#FFFFFF"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         panel.setBackground(glass);
         // Higher than the verse card, so the verses cannot draw over the Notes card.
@@ -1526,23 +1514,16 @@ public class BibleReaderDialog extends Dialog {
         refreshNotesPanel();
     }
 
-    /** The Notes card is always light (option A), so its text is always dark. */
+    /** Dark mode: solid white card with dark text (F). Light mode: dark card with light text (G). */
     private int notesInk() {
-        return Color.parseColor("#2A0F33");
+        return GlassKit.light() ? Color.parseColor("#F5EEFF") : Color.parseColor("#2A0F33");
     }
 
     private int notesMuted() {
-        return Color.parseColor("#5B4A6E");
+        return GlassKit.light() ? Color.parseColor("#D9C9F2") : Color.parseColor("#5B4A6E");
     }
 
     private void dismissNotesPanel() {
-        if (notesScrimView != null && readerFrame != null) {
-            readerFrame.removeView(notesScrimView);
-        }
-        notesScrimView = null;
-        if (chapterCardView != null && android.os.Build.VERSION.SDK_INT >= 31) {
-            chapterCardView.setRenderEffect(null);
-        }
         if (notesPanelView != null && readerFrame != null) {
             readerFrame.removeView(notesPanelView);
         }
