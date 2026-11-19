@@ -240,6 +240,7 @@ public class BibleReaderDialog extends Dialog {
             return;
         }
         LinearLayout row = new LinearLayout(getContext());
+        GlassKit.keep(row);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER);
         row.setPadding(dp(8), dp(8), dp(8), dp(8));
@@ -1040,6 +1041,7 @@ public class BibleReaderDialog extends Dialog {
         final boolean newTestament = BibleMapper.resolveBookNumber(verse.getBookId()) >= 40;
 
         final SwipeUpBar bar = new SwipeUpBar(getContext());
+        GlassKit.keep(bar);
         bar.setOrientation(LinearLayout.VERTICAL);
         bar.setGravity(Gravity.CENTER_HORIZONTAL);
 
@@ -1285,6 +1287,7 @@ public class BibleReaderDialog extends Dialog {
         glass.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#E6221431"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         pill.setBackground(glass);
+        GlassKit.keep(pill);
         pill.setOnClickListener(v -> {
             readerFrame.removeView(pill);
             undoPillView = null;
@@ -1433,6 +1436,7 @@ public class BibleReaderDialog extends Dialog {
             return;
         }
         final LinearLayout panel = new LinearLayout(getContext());
+        GlassKit.keep(panel);  // keep the colours as built; the automatic glass pass would wash them out
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
         GradientDrawable glass = new GradientDrawable();
@@ -1604,6 +1608,7 @@ public class BibleReaderDialog extends Dialog {
             links.addAll(existing.getLinks());
         }
         final LinearLayout editor = new LinearLayout(getContext());
+        GlassKit.keep(editor);
         editor.setOrientation(LinearLayout.VERTICAL);
         editor.setBackground(PerazimTheme.createBackgroundGradient());
         editor.setClickable(true);
