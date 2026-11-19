@@ -19,14 +19,14 @@ public final class AppDialogs {
     public static int windowTheme() {
         return PerazimTheme.isLight()
                 ? android.R.style.Theme_Material_Light_NoActionBar
-                : android.R.style.Theme_Material_NoActionBar;
+                : org.perazimchurch.app.R.style.PerazimWindowDark;
     }
 
     /** Full-screen dialog theme that follows the app's Light / Dark setting. */
     public static int fullscreenTheme() {
         return PerazimTheme.isLight()
                 ? android.R.style.Theme_Material_Light_NoActionBar_Fullscreen
-                : android.R.style.Theme_Material_NoActionBar_Fullscreen;
+                : org.perazimchurch.app.R.style.PerazimWindowFullscreenDark;
     }
 
     public static AlertDialog.Builder builder(Context context) {
