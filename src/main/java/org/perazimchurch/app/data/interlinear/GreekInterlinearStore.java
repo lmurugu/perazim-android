@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.domain.model.InterlinearWord;
+import org.perazimchurch.app.domain.model.VerseLocation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,6 +43,29 @@ public final class GreekInterlinearStore {
         }
         List<InterlinearWord> words = verses.get(key(bookNumber, chapter, verse));
         return words != null ? words : Collections.<InterlinearWord>emptyList();
+    }
+
+    /**
+     * Every New Testament verse in the interlinear where a word carries this Strong's number,
+     * in reading order. Used for the offline concordance.
+     */
+    public static synchronized List<VerseLocation> findOccurrences(@Nullable Context context, int strongsNumber) {
+        if (verses == null) {
+            verses = load(context);
+        }
+        List<VerseLocation> found = new ArrayList<>();
+        for (Map.Entry<String, List<InterlinearWord>> entry : verses.entrySet()) {
+            for (InterlinearWord word : entry.getValue()) {
+                if (word.getStrongsNumber() == strongsNumber) {
+                    String[] parts = entry.getKey().split("\\.");
+                    found.add(new VerseLocation(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]),
+                            Integer.parseInt(parts[2])));
+                    break;
+                }
+            }
+        }
+        Collections.sort(found);
+        return found;
     }
 
     static String key(int bookNumber, int chapter, int verse) {

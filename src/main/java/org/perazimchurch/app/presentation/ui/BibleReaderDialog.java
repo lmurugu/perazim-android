@@ -45,6 +45,7 @@ import androidx.annotation.Nullable;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.ScriptureReference;
 import org.perazimchurch.app.data.mapper.BibleMapper;
+import org.perazimchurch.app.data.local.seeder.BibleDataSeeder;
 import org.perazimchurch.app.presentation.bible.HighlightColors;
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleVerse;
@@ -953,6 +954,12 @@ public class BibleReaderDialog extends Dialog {
                 LinearLayout cell = new LinearLayout(getContext());
                 cell.setOrientation(LinearLayout.VERTICAL);
                 cell.setPadding(0, dp(6), 0, dp(6));
+                if (word.getStrongsNumber() > 0) {
+                    final int strongs = word.getStrongsNumber();
+                    cell.setClickable(true);
+                    cell.setContentDescription("Strong's G" + strongs + " for " + word.getOriginal());
+                    cell.setOnClickListener(v -> showStrongsDialog("G" + strongs, strongs));
+                }
                 TextView greek = new TextView(getContext());
                 greek.setText(word.getOriginal());
                 greek.setTypeface(Typeface.SERIF);
@@ -977,6 +984,52 @@ public class BibleReaderDialog extends Dialog {
             scroll.addView(box);
             AppDialogs.builder(getContext())
                     .setTitle(citation + " · Greek Interlinear")
+                    .setView(scroll)
+                    .setPositiveButton("Close", null)
+                    .show();
+        });
+    }
+
+    /** Strong's dictionary entry and the New Testament occurrences of the same number. */
+    private void showStrongsDialog(final String code, final int strongsNumber) {
+        bibleViewModel.loadStrongsDetail(code, strongsNumber, detail -> {
+            LinearLayout box = new LinearLayout(getContext());
+            box.setOrientation(LinearLayout.VERTICAL);
+            box.setPadding(dp(18), dp(8), dp(18), dp(12));
+            TextView def = new TextView(getContext());
+            if (detail.entry != null) {
+                def.setText((detail.entry.getOriginal().isEmpty() ? "" : detail.entry.getOriginal() + "  ")
+                        + detail.entry.getTransliteration() + "\n\n" + detail.entry.getDefinition());
+            } else {
+                def.setText("No dictionary entry for " + code + " in the bundled Strong's dictionary.");
+            }
+            def.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            def.setTextColor(GlassKit.text());
+            def.setLineSpacing(0f, 1.3f);
+            box.addView(def);
+            TextView head = new TextView(getContext());
+            head.setText("NEW TESTAMENT OCCURRENCES (" + detail.occurrences.size() + ")");
+            head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            head.setLetterSpacing(0.08f);
+            head.setTypeface(Typeface.DEFAULT_BOLD);
+            head.setTextColor(COLOR_PRIMARY_PURPLE());
+            head.setPadding(0, dp(16), 0, dp(4));
+            box.addView(head);
+            StringBuilder refs = new StringBuilder();
+            for (org.perazimchurch.app.domain.model.VerseLocation loc : detail.occurrences) {
+                if (refs.length() > 0) refs.append(", ");
+                refs.append(BibleDataSeeder.canonicalBookName(loc.bookNumber)).append(' ').append(loc.chapter).append(':').append(loc.verse);
+            }
+            TextView list = new TextView(getContext());
+            list.setText(refs.length() == 0 ? "None" : refs.toString());
+            list.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            list.setTextColor(COLOR_TEXT_MUTED());
+            list.setLineSpacing(0f, 1.3f);
+            box.addView(list);
+            ScrollView scroll = new ScrollView(getContext());
+            scroll.addView(box);
+            AppDialogs.builder(getContext())
+                    .setTitle("Strong's " + code)
                     .setView(scroll)
                     .setPositiveButton("Close", null)
                     .show();

@@ -14,6 +14,8 @@ import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.InterlinearWord;
+import org.perazimchurch.app.domain.model.StrongsEntry;
+import org.perazimchurch.app.domain.model.VerseLocation;
 import org.perazimchurch.app.domain.repository.BibleRepository;
 import org.perazimchurch.app.presentation.state.UiState;
 
@@ -248,6 +250,35 @@ public class BibleViewModel extends ViewModel {
                 postCallback(() -> callback.accept(res));
             }
         });
+    }
+
+    /** Loads a Strong's entry and its New Testament occurrences for the word tapped in the interlinear. */
+    public void loadStrongsDetail(String code, int strongsNumber, @Nullable Consumer<StrongsDetail> callback) {
+        executor.execute(() -> {
+            StrongsEntry entry = null;
+            List<VerseLocation> occurrences = Collections.emptyList();
+            try {
+                entry = bibleRepo.getStrongsEntry(code);
+                occurrences = bibleRepo.getGreekConcordance(strongsNumber);
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading Strong's detail");
+            }
+            final StrongsDetail detail = new StrongsDetail(entry, occurrences != null ? occurrences : Collections.emptyList());
+            if (callback != null) {
+                postCallback(() -> callback.accept(detail));
+            }
+        });
+    }
+
+    /** A Strong's entry with its occurrences. The entry may be null when the dictionary lacks it. */
+    public static final class StrongsDetail {
+        public final StrongsEntry entry;
+        public final List<VerseLocation> occurrences;
+
+        StrongsDetail(StrongsEntry entry, List<VerseLocation> occurrences) {
+            this.entry = entry;
+            this.occurrences = occurrences;
+        }
     }
 
     private void postCallback(Runnable runnable) {

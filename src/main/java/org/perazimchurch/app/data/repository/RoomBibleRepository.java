@@ -13,6 +13,9 @@ import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.InterlinearWord;
 import org.perazimchurch.app.data.interlinear.GreekInterlinearStore;
+import org.perazimchurch.app.data.interlinear.StrongsStore;
+import org.perazimchurch.app.domain.model.StrongsEntry;
+import org.perazimchurch.app.domain.model.VerseLocation;
 import org.perazimchurch.app.domain.repository.BibleRepository;
 
 import java.util.ArrayList;
@@ -329,6 +332,16 @@ public class RoomBibleRepository implements BibleRepository {
             return Collections.emptyList();
         }
         return GreekInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, verseNumber);
+    }
+
+    @Override
+    public StrongsEntry getStrongsEntry(String code) {
+        return StrongsStore.getEntry(assetContext, code);
+    }
+
+    @Override
+    public List<VerseLocation> getGreekConcordance(int strongsNumber) {
+        return GreekInterlinearStore.findOccurrences(assetContext, strongsNumber);
     }
 
     private Map<Integer, String> highlightsFor(int bookNumber, int chapterNumber) {

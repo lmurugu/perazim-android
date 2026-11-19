@@ -45,6 +45,14 @@ public final class BibleDataSeeder {
     public static final String SWAHILI_TRANSLATION_ID = "SUV";
 
     // Canonical 66 Books Metadata [ID, Name, Testament, ChapterCount]
+    /** Display name of a canonical book (1-66), or an empty string when out of range. */
+    public static String canonicalBookName(int bookNumber) {
+        if (bookNumber < 1 || bookNumber > CANONICAL_BOOKS.length) {
+            return "";
+        }
+        return (String) CANONICAL_BOOKS[bookNumber - 1][1];
+    }
+
     static final Object[][] CANONICAL_BOOKS = {
             {"GEN", "Genesis", "OLD", 50},
             {"EXO", "Exodus", "OLD", 40},

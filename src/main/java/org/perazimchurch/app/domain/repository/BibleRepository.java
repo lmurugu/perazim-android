@@ -5,6 +5,8 @@ import org.perazimchurch.app.domain.model.BibleChapter;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.InterlinearWord;
+import org.perazimchurch.app.domain.model.StrongsEntry;
+import org.perazimchurch.app.domain.model.VerseLocation;
 import java.util.List;
 import java.util.Map;
 
@@ -38,4 +40,10 @@ public interface BibleRepository {
 
     /** Greek interlinear words of a New Testament verse, or an empty list when none is bundled. */
     List<InterlinearWord> getGreekInterlinear(String bookId, int chapterNumber, int verseNumber);
+
+    /** Offline Strong's dictionary entry for a code such as G3056 or H430, or null. */
+    StrongsEntry getStrongsEntry(String code);
+
+    /** New Testament verses where a Greek word carries this Strong's number (offline concordance). */
+    List<VerseLocation> getGreekConcordance(int strongsNumber);
 }
