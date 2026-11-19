@@ -1510,6 +1510,9 @@ public class BibleReaderDialog extends Dialog {
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(330), Gravity.BOTTOM);
         lp.setMargins(dp(12), 0, dp(12), dp(104));
         readerFrame.addView(panel, lp);
+        panel.bringToFront();
+        readerFrame.requestLayout();
+        readerFrame.invalidate();
         notesPanelView = panel;
         refreshNotesPanel();
     }
