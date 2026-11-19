@@ -29,7 +29,6 @@ import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
-import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.nio.charset.StandardCharsets;
@@ -231,27 +230,12 @@ public final class GamesHubDialog extends Dialog {
 
     // ---- Ladder of Faith ----
 
-    /** Maps game events onto the app-wide FeedbackManager, so the user's sound, haptics and celebration switches apply. */
+    /**
+     * Game events hook. No-op on this branch: FeedbackManager lives in PR #23, which is not in this
+     * branch. Wire it here once PR #23 lands so the shared sound, haptics and confetti settings apply.
+     */
     private void announce(List<LadderOfFaith.Event> events) {
-        FeedbackManager feedback = FeedbackManager.get(activity);
-        boolean milestone = events.contains(LadderOfFaith.Event.MILESTONE);
-        for (LadderOfFaith.Event event : events) {
-            switch (event) {
-                case CORRECT:
-                    if (!milestone) feedback.reward(activity);
-                    break;
-                case MILESTONE:
-                    feedback.milestone(activity);
-                    feedback.celebrateIn(getWindow());
-                    break;
-                case WRONG:
-                case LIFELINE_USED:
-                    if (scroll != null) feedback.click(scroll);
-                    break;
-                default:
-                    break;
-            }
-        }
+        // Intentionally empty until FeedbackManager (PR #23) is available on this branch.
     }
 
     private void startLadder() {
