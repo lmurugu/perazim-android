@@ -250,7 +250,7 @@ public class BibleReaderDialog extends Dialog {
         row.setBackground(panel);
         int current = PerazimTheme.savedChoice(getContext());
         // System (auto), Light (sun), Dark (moon)
-        String[] glyphs = {"A", "\u2600", "\u263E"};
+        String[] glyphs = {"", "\u2600", "\u263E"};
         String[] descriptions = {"System", "Light", "Dark"};
         for (int choice = 0; choice < glyphs.length; choice++) {
             final int picked = choice;
@@ -258,6 +258,14 @@ public class BibleReaderDialog extends Dialog {
                     choice == current ? GlassKit.accent() : GlassKit.text());
             icon.setGravity(Gravity.CENTER);
             icon.setContentDescription(descriptions[choice]);
+            if (choice == 0) {
+                // System: a computer (monitor) icon
+                android.graphics.drawable.Drawable monitor = getContext().getDrawable(org.perazimchurch.app.R.drawable.ic_theme_system);
+                if (monitor != null) {
+                    monitor.setTint(choice == current ? COLOR_ACCENT_ORANGE() : GlassKit.text());
+                    icon.setCompoundDrawablesWithIntrinsicBounds(monitor, null, null, null);
+                }
+            }
             GradientDrawable circle = new GradientDrawable();
             circle.setShape(GradientDrawable.OVAL);
             circle.setColor(choice == current ? Color.parseColor("#33E17D2F")
