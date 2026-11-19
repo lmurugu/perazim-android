@@ -1422,13 +1422,13 @@ public class BibleReaderDialog extends Dialog {
                     return true;
             }
         });
-        TextView title = GlassKit.text(getContext(), "Notes", 16, true, Color.parseColor("#F5EEFF"));
+        TextView title = GlassKit.text(getContext(), "Notes", 16, true, notesInk());
         header.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
         TextView add = GlassKit.orangeButton(getContext(), "New note", 12);
         add.setPadding(dp(14), 0, dp(14), 0);
         add.setOnClickListener(v -> showNoteEditor(null));
         header.addView(add, new LinearLayout.LayoutParams(-2, dp(34)));
-        TextView close = GlassKit.text(getContext(), "\u2715", 16, true, Color.parseColor("#D9C9F2"));
+        TextView close = GlassKit.text(getContext(), "\u2715", 16, true, notesMuted());
         close.setPadding(dp(12), dp(4), dp(4), dp(4));
         close.setOnClickListener(v -> dismissNotesPanel());
         header.addView(close);
@@ -1467,6 +1467,14 @@ public class BibleReaderDialog extends Dialog {
         refreshNotesPanel();
     }
 
+    private int notesInk() {
+        return GlassKit.light() ? Color.parseColor("#2A0F33") : Color.parseColor("#F5EEFF");
+    }
+
+    private int notesMuted() {
+        return GlassKit.light() ? Color.parseColor("#5B4A6E") : Color.parseColor("#D9C9F2");
+    }
+
     private void dismissNotesPanel() {
         if (notesScrimView != null && readerFrame != null) {
             readerFrame.removeView(notesScrimView);
@@ -1491,12 +1499,12 @@ public class BibleReaderDialog extends Dialog {
             notesPanelList.removeAllViews();
             if (notes.isEmpty()) {
                 notesPanelList.addView(GlassKit.text(getContext(),
-                        "No notes yet. Write a note and link the verses it talks about.", 13, false, Color.parseColor("#D9C9F2")));
+                        "No notes yet. Write a note and link the verses it talks about.", 13, false, notesMuted()));
             }
             for (final org.perazimchurch.app.domain.model.BibleNote note : notes) {
                 String plain = android.text.Html.fromHtml(note.getBody(), android.text.Html.FROM_HTML_MODE_COMPACT).toString().trim();
                 TextView body = GlassKit.text(getContext(), plain.length() > 140 ? plain.substring(0, 140) + "..." : plain,
-                        14, false, Color.parseColor("#F5EEFF"));
+                        14, false, notesInk());
                 body.setOnClickListener(v -> showNoteEditor(note));
                 body.setPadding(0, dp(10), 0, dp(4));
                 notesPanelList.addView(body);
