@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
+import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
@@ -48,6 +50,7 @@ public final class GamesHubDialog extends Dialog {
     private Round round;
     private Mode mode;
     private VersePuzzle puzzle;
+    private LadderOfFaith ladder;
     private long seed;
 
     public static void show(Activity activity) {
@@ -108,11 +111,81 @@ public final class GamesHubDialog extends Dialog {
     private void hub() {
         if (!activeOwner()) return;
         round = null;
-        screen("Bible Games", "Learn, remember and enjoy. All three games work without internet.", false);
+        screen("Bible Games", "Learn, remember and enjoy. All four games work without internet.", false);
+        statsBar();
         gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
         gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
+        gameCard(Mode.LADDER, "Ladder of Faith", "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.");
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
+    }
+
+    private void statsBar() {
+        LinearLayout bar = new LinearLayout(activity);
+        bar.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams barParams = new LinearLayout.LayoutParams(-1, -2);
+        barParams.bottomMargin = dp(16);
+        page.addView(bar, barParams);
+        int streak = currentStreak();
+        stat(bar, org.perazimchurch.app.R.drawable.ic_game_star, stars() + " stars");
+        stat(bar, org.perazimchurch.app.R.drawable.ic_game_flame, streak + (streak == 1 ? " day" : " days"));
+        stat(bar, org.perazimchurch.app.R.drawable.ic_game_trophy, "Best " + scores.getInt(scorePrefix + Mode.LADDER.name(), 0) + "/" + LadderOfFaith.RUNGS);
+    }
+
+    private void stat(LinearLayout bar, int icon, String label) {
+        LinearLayout pill = new LinearLayout(activity);
+        pill.setOrientation(LinearLayout.HORIZONTAL);
+        pill.setGravity(Gravity.CENTER_VERTICAL);
+        pill.setPadding(dp(8), dp(6), dp(10), dp(6));
+        pill.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        pill.addView(icon(icon, 26), new LinearLayout.LayoutParams(dp(26), dp(26)));
+        TextView text = new TextView(activity);
+        text.setText(label);
+        text.setTextSize(14);
+        text.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        text.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        text.setPadding(dp(6), 0, 0, 0);
+        text.setSingleLine(true);
+        pill.addView(text);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+        params.setMargins(dp(2), 0, dp(2), 0);
+        bar.addView(pill, params);
+    }
+
+    private ImageView icon(int drawable, int sizeDp) {
+        ImageView view = new ImageView(activity);
+        view.setImageResource(drawable);
+        view.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        view.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        return view;
+    }
+
+    private static int iconFor(Mode mode) {
+        switch (mode) {
+            case QUIZ: return org.perazimchurch.app.R.drawable.ic_game_scroll;
+            case WHO_AM_I: return org.perazimchurch.app.R.drawable.ic_game_who;
+            case VERSE_ORDER: return org.perazimchurch.app.R.drawable.ic_game_puzzle;
+            default: return org.perazimchurch.app.R.drawable.ic_game_ladder;
+        }
+    }
+
+    // ---- Stars and daily streak (local to this phone and account) ----
+
+    private int stars() { return scores.getInt(scorePrefix + "stars", 0); }
+    private void addStar() { scores.edit().putInt(scorePrefix + "stars", stars() + 1).apply(); }
+    private static long today() {
+        long now = System.currentTimeMillis();
+        return (now + java.util.TimeZone.getDefault().getOffset(now)) / 86_400_000L;
+    }
+    private int currentStreak() {
+        long last = scores.getLong(scorePrefix + "streakDay", -1);
+        int streak = scores.getInt(scorePrefix + "streak", 0);
+        return last >= today() - 1 ? streak : 0;
+    }
+    private void recordPlay() {
+        long last = scores.getLong(scorePrefix + "streakDay", -1);
+        int next = org.perazimchurch.app.domain.games.GameStreak.next(last, today(), scores.getInt(scorePrefix + "streak", 0));
+        scores.edit().putLong(scorePrefix + "streakDay", today()).putInt(scorePrefix + "streak", next).apply();
     }
 
     private void gameCard(Mode selected, String title, String description) {
@@ -123,10 +196,24 @@ public final class GamesHubDialog extends Dialog {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
         params.bottomMargin = dp(16);
         page.addView(card, params);
-        addText(card, title, 21, true);
+        LinearLayout head = new LinearLayout(activity);
+        head.setOrientation(LinearLayout.HORIZONTAL);
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        head.addView(icon(iconFor(selected), 52), new LinearLayout.LayoutParams(dp(52), dp(52)));
+        TextView titleView = new TextView(activity);
+        titleView.setText(title);
+        titleView.setTextSize(21);
+        titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        titleView.setPadding(dp(12), 0, 0, 0);
+        head.addView(titleView);
+        LinearLayout.LayoutParams headParams = new LinearLayout.LayoutParams(-1, -2);
+        headParams.bottomMargin = dp(8);
+        card.addView(head, headParams);
         addText(card, description, 16, false);
         String key = scorePrefix + selected.name();
-        addText(card, scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/5" : "Your best: not played yet", 14, false);
+        int total = selected == Mode.LADDER ? LadderOfFaith.RUNGS : 5;
+        addText(card, scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/" + total : "Your best: not played yet", 14, false);
         Button start = new Button(activity);
         styleButton(start, "Play " + title, selected == Mode.QUIZ);
         card.addView(start, new LinearLayout.LayoutParams(-1, -2));
@@ -134,9 +221,161 @@ public final class GamesHubDialog extends Dialog {
             if (!activeOwner()) return;
             mode = selected;
             seed = System.nanoTime();
+            recordPlay();
+            if (mode == Mode.LADDER) { startLadder(); return; }
             round = new Round(mode, seed);
             question();
         });
+    }
+
+    // ---- Ladder of Faith ----
+
+    /**
+     * Game events hook. No-op on this branch: FeedbackManager lives in PR #23, which is not in this
+     * branch. Wire it here once PR #23 lands so the shared sound, haptics and confetti settings apply.
+     */
+    private void announce(List<LadderOfFaith.Event> events) {
+        // Intentionally empty until FeedbackManager (PR #23) is available on this branch.
+    }
+
+    private void startLadder() {
+        seed = System.nanoTime();
+        ladder = new LadderOfFaith(seed);
+        showMap();
+    }
+
+    private void showMap() {
+        if (!activeOwner()) return;
+        boolean done = ladder.finished();
+        screen("Ladder of Faith", done ? "Run complete · Score " + ladder.score()
+                : "Rung " + ladder.position() + " of " + LadderOfFaith.RUNGS + " · " + tierName(LadderOfFaith.tierOf(ladder.position())), true);
+        livesRow();
+        LadderMapView map = new LadderMapView(activity);
+        int best = scores.getInt(scorePrefix + Mode.LADDER.name(), 0);
+        map.setProgress(done ? ladder.score() : ladder.position(), best, done);
+        map.setOnClimb(this::ladderQuestion);
+        page.addView(map, new LinearLayout.LayoutParams(-1, -2));
+        if (done) {
+            button("See results", true).setOnClickListener(v -> ladderFinished());
+        } else {
+            button("Climb rung " + ladder.position(), true).setOnClickListener(v -> ladderQuestion());
+            int rung = ladder.position();
+            scroll.post(() -> scroll.scrollTo(0, Math.max(0, (int) (map.getTop() + map.nodeY(rung)) - scroll.getHeight() / 2)));
+        }
+    }
+
+    private void livesRow() {
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setContentDescription(ladder.lives() + " lives left");
+        for (int i = 0; i < LadderOfFaith.LIVES; i++) {
+            ImageView heart = icon(org.perazimchurch.app.R.drawable.ic_game_heart, 28);
+            heart.setAlpha(i < ladder.lives() ? 1f : 0.25f);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(28), dp(28));
+            params.rightMargin = dp(4);
+            row.addView(heart, params);
+        }
+        LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(-1, -2);
+        rowParams.bottomMargin = dp(10);
+        page.addView(row, rowParams);
+    }
+
+    private void ladderQuestion() {
+        if (!activeOwner()) return;
+        if (ladder.finished()) { ladderFinished(); return; }
+        Card card = ladder.current();
+        screen("Ladder of Faith", "Rung " + ladder.position() + " of " + LadderOfFaith.RUNGS + " · " + tierName(LadderOfFaith.tierOf(ladder.position())) + " · Score " + ladder.score() + " · Lives " + ladder.lives(), true);
+        livesRow();
+        text(card.prompt, 23, true);
+        if (ladder.peeked()) text("Verse Peek: " + card.reference, 16, true);
+        Button hint = button("Show a hint", false);
+        TextView hintText = text("", 16, false);
+        hintText.setVisibility(View.GONE);
+        hint.setOnClickListener(v -> { hintText.setText(card.hint); hintText.setVisibility(View.VISIBLE); hint.setEnabled(false); });
+
+        LinearLayout lifelines = new LinearLayout(activity);
+        lifelines.setOrientation(LinearLayout.HORIZONTAL);
+        page.addView(lifelines, new LinearLayout.LayoutParams(-1, -2));
+        Button fifty = new Button(activity);
+        styleButton(fifty, "50/50", false);
+        lifelineIcon(fifty, org.perazimchurch.app.R.drawable.ic_game_fifty);
+        fifty.setEnabled(ladder.fiftyAvailable());
+        fifty.setOnClickListener(v -> { ladder.useFiftyFifty(); announce(ladder.drainEvents()); ladderQuestion(); });
+        Button peek = new Button(activity);
+        styleButton(peek, "Verse Peek", false);
+        lifelineIcon(peek, org.perazimchurch.app.R.drawable.ic_game_eye);
+        peek.setEnabled(ladder.peekAvailable());
+        peek.setOnClickListener(v -> { ladder.usePeek(); announce(ladder.drainEvents()); ladderQuestion(); });
+        Button pass = new Button(activity);
+        styleButton(pass, "Pass", false);
+        lifelineIcon(pass, org.perazimchurch.app.R.drawable.ic_game_skip);
+        pass.setEnabled(ladder.passAvailable());
+        pass.setOnClickListener(v -> { ladder.usePass(); announce(ladder.drainEvents()); ladderQuestion(); });
+        for (Button b : new Button[] { fifty, peek, pass }) {
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+            params.setMargins(dp(2), dp(3), dp(2), dp(3));
+            lifelines.addView(b, params);
+        }
+        gap(8);
+
+        List<String> hidden = ladder.hiddenOptions();
+        List<String> options = new ArrayList<>(card.options);
+        Collections.shuffle(options, new java.util.Random(seed + ladder.position()));
+        for (String option : options) {
+            if (hidden.contains(option)) continue;
+            button(option, false).setOnClickListener(v -> ladderAnswer(option));
+        }
+    }
+
+    private void lifelineIcon(Button button, int drawable) {
+        android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat.getDrawable(activity, drawable);
+        if (d == null) return;
+        d.setBounds(0, 0, dp(30), dp(30));
+        button.setCompoundDrawables(null, d, null, null);
+        button.setCompoundDrawablePadding(dp(2));
+        if (!button.isEnabled()) button.setAlpha(0.45f);
+    }
+
+    private static String tierName(int tier) {
+        return tier == 1 ? "Easy" : tier == 2 ? "Medium" : "Hard";
+    }
+
+    private void ladderAnswer(String value) {
+        if (!activeOwner() || ladder.answered()) return;
+        hideKeyboard();
+        Card card = ladder.current();
+        if (ladder.answer(value)) addStar();
+        List<LadderOfFaith.Event> events = ladder.drainEvents();
+        announce(events);
+        boolean milestone = ladder.milestone();
+        String headline = ladder.correct()
+                ? (milestone ? "Milestone reached!" : "Well done!")
+                : "Let's learn this one";
+        screen(headline, "Score " + ladder.score() + " · Lives " + ladder.lives(), true);
+        text(card.answer, 24, true);
+        text(card.reference, 17, false);
+        text(card.explanation, 18, false);
+        boolean last = ladder.finished();
+        button(last ? "See results" : "Next rung", true).setOnClickListener(v -> {
+            if (last) { showMap(); return; }
+            if (ladder.next()) { if (milestone) showMap(); else ladderQuestion(); }
+        });
+        if (!last) button("View ladder map", false).setOnClickListener(v -> { if (ladder.next()) showMap(); });
+    }
+
+    private void ladderFinished() {
+        if (!activeOwner()) return;
+        String key = scorePrefix + Mode.LADDER.name();
+        int best = Math.max(scores.getInt(key, 0), ladder.score());
+        scores.edit().putInt(key, best).apply();
+        screen("Ladder complete", "Ladder of Faith", true);
+        text(ladder.score() + " / " + LadderOfFaith.RUNGS, 40, true);
+        text(ladder.score() == LadderOfFaith.RUNGS ? "You climbed the whole ladder. Keep putting what you learn into practice." : "Every rung is a chance to learn. Read the references and climb again.", 19, false);
+        text("Your best on this phone: " + best + "/" + LadderOfFaith.RUNGS, 17, false);
+        button("Climb again", true).setOnClickListener(v -> startLadder());
+        button("View ladder map", false).setOnClickListener(v -> showMap());
+        button("Choose another game", false).setOnClickListener(v -> hub());
     }
 
     private String modeTitle() {
@@ -230,6 +469,7 @@ public final class GamesHubDialog extends Dialog {
         hideKeyboard();
         Card card = round.current();
         boolean correct = round.answer(value);
+        if (correct) addStar();
         screen(correct ? "Well done!" : "Let's learn this one", "Score " + round.score() + " · Question " + round.position() + " of " + round.size(), true);
         text(card.answer, 24, true);
         text(card.reference, 17, false);

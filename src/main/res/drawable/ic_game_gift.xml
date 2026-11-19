@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original Perazim game icon (generated). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M13,28 H51 Q54,28 54,31 V55 Q54,58 51,58 H13 Q10,58 10,55 V31 Q10,28 13,28 Z"
+        android:strokeColor="#2E0A55"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#B266FF" android:endColor="#6A1FB0"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M9,20 H55 Q58,20 58,23 V28 Q58,31 55,31 H9 Q6,31 6,28 V23 Q6,20 9,20 Z"
+        android:strokeColor="#2E0A55"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#C88BFF" android:endColor="#7A2BC4"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M28,20 H36 V58 H28 Z"
+        android:strokeColor="#7A4A00"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#FFE88A" android:endColor="#F5A100"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M32,20 C24,6 12,10 18,17 C22,21 28,20 32,20 Z M32,20 C40,6 52,10 46,17 C42,21 36,20 32,20 Z"
+        android:strokeColor="#7A4A00"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#FFE88A" android:endColor="#F5A100"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M10,24 a5,2 0 1,0 10,0 a5,2 0 1,0 -10,0 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.45"/>
+</vector>
