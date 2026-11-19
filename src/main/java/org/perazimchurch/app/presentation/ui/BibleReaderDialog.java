@@ -1441,7 +1441,7 @@ public class BibleReaderDialog extends Dialog {
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
         GradientDrawable glass = new GradientDrawable();
         glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#F5140B20") : Color.parseColor("#FFFFFF"));
+        glass.setColor(GlassKit.light() ? Color.parseColor("#FF140B20") : Color.parseColor("#FFFFFF"));
         glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
         panel.setBackground(glass);
         panel.setAlpha(1f);
