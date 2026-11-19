@@ -160,7 +160,7 @@ public class ProfileUiBinder {
 
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(dp(16), dp(8), dp(16), dp(16));
+        content.setPadding(dp(16), dp(16), dp(16), dp(16));
 
         bind(content);
 
@@ -234,7 +234,7 @@ public class ProfileUiBinder {
         memberInfo.setOrientation(LinearLayout.VERTICAL);
         memberInfo.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
 
-        tvMemberName = GlassKit.text(context, "Perazim Covenant Member", 18, true, GlassKit.text());
+        tvMemberName = GlassKit.text(context, "Perazim Covenant Member", 16, true, GlassKit.text());
         memberInfo.addView(tvMemberName);
         tvMemberEmail = GlassKit.text(context, "member@perazimchurch.org", 12, false, GlassKit.muted());
         memberInfo.addView(tvMemberEmail, GlassKit.matchWrap(context, 2));
