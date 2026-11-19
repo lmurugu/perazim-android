@@ -77,3 +77,6 @@ src/main/assets/bible/local/
 # Licensed texts are never committed; the owner supplies them locally.
 *NASB*
 **/NASB*.tsv.gz
+
+# Heap dumps and profiler output must never be committed.
+*.hprof
