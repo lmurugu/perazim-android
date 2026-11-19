@@ -8,6 +8,8 @@ The **source code** in this repository is licensed under the MIT License (see `L
 |---|---|---|
 | King James Version (KJV) | Public domain; documented in `docs/bible-source.md` §2.1 | None |
 | World English Bible (WEB), American Standard Version (ASV, 1901), Berean Standard Bible (BSB) | Public domain (eBible.org statements; BSB dedicated to the public domain 30 April 2023). Full text bundled in `src/main/assets/bible/text/`, see `SOURCES.txt` there | Owner to confirm with decision D4 |
+| Greek New Testament interlinear (Antoniades 1904/1912 with parsing and Strong's numbers) | Public domain (byztxt/greektext-antoniades README). Asset in `src/main/assets/bible/interlinear/`, see `SOURCES.txt` there | None beyond attribution |
+| New American Standard Bible (NASB) | Copyright The Lockman Foundation. **Not in the repository.** Loaded only from a local file the owner supplies (`Android/data/org.perazimchurch.app/files/bible/NASB.tsv.gz`); ignored by `.gitignore` | Owner licence required before any distribution |
 | Swahili Union Version (SUV, 1952) | Documented as public domain in `docs/bible-source.md` §2.2; the owner has not yet confirmed it with the Bible Society of Kenya | **Pending** owner confirmation (decision D4) |
 | New International Version (NIV) | Copyrighted (Biblica). Bundled in the database | **Pending removal** (decision D4) |
 | English Standard Version (ESV) | Copyrighted (Crossway). Bundled in the database | **Pending removal** (decision D4) |

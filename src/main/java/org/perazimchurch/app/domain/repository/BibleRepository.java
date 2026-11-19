@@ -4,6 +4,7 @@ import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleChapter;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
+import org.perazimchurch.app.domain.model.InterlinearWord;
 import java.util.List;
 import java.util.Map;
 
@@ -34,4 +35,7 @@ public interface BibleRepository {
 
     /** The same verse in every translation that has text, in picker order. */
     List<BibleVerse> getVerseInAllTranslations(String bookId, int chapterNumber, int verseNumber);
+
+    /** Greek interlinear words of a New Testament verse, or an empty list when none is bundled. */
+    List<InterlinearWord> getGreekInterlinear(String bookId, int chapterNumber, int verseNumber);
 }

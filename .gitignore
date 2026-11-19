@@ -73,3 +73,7 @@ server/deploy/backups/
 
 # Real membership data must never be staged or packaged with Android assets.
 member_contacts.csv
+src/main/assets/bible/local/
+# Licensed texts are never committed; the owner supplies them locally.
+*NASB*
+**/NASB*.tsv.gz

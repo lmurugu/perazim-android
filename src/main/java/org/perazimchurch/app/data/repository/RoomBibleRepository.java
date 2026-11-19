@@ -11,6 +11,8 @@ import org.perazimchurch.app.data.mapper.BibleMapper;
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
+import org.perazimchurch.app.domain.model.InterlinearWord;
+import org.perazimchurch.app.data.interlinear.GreekInterlinearStore;
 import org.perazimchurch.app.domain.repository.BibleRepository;
 
 import java.util.ArrayList;
@@ -318,6 +320,15 @@ public class RoomBibleRepository implements BibleRepository {
             }
         }
         return verses;
+    }
+
+    @Override
+    public List<InterlinearWord> getGreekInterlinear(String bookId, int chapterNumber, int verseNumber) {
+        int bookNumber = resolveBookNumber(null, bookId);
+        if (bookNumber < 40) {
+            return Collections.emptyList();
+        }
+        return GreekInterlinearStore.getVerse(assetContext, bookNumber, chapterNumber, verseNumber);
     }
 
     private Map<Integer, String> highlightsFor(int bookNumber, int chapterNumber) {

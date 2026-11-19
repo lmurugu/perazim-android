@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel;
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleVerse;
+import org.perazimchurch.app.domain.model.InterlinearWord;
 import org.perazimchurch.app.domain.repository.BibleRepository;
 import org.perazimchurch.app.presentation.state.UiState;
 
@@ -227,6 +228,23 @@ public class BibleViewModel extends ViewModel {
             }
             if (callback != null) {
                 final List<BibleVerse> res = result != null ? result : Collections.emptyList();
+                postCallback(() -> callback.accept(res));
+            }
+        });
+    }
+
+    /** Loads the Greek interlinear words for a New Testament verse. */
+    public void loadGreekInterlinear(@NonNull String bookId, int chapter, int verse, @Nullable Consumer<List<InterlinearWord>> callback) {
+        executor.execute(() -> {
+            List<InterlinearWord> words;
+            try {
+                words = bibleRepo.getGreekInterlinear(bookId, chapter, verse);
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading interlinear");
+                words = Collections.emptyList();
+            }
+            if (callback != null) {
+                final List<InterlinearWord> res = words != null ? words : Collections.emptyList();
                 postCallback(() -> callback.accept(res));
             }
         });

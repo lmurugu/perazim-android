@@ -12,6 +12,8 @@ import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,16 +45,35 @@ public final class BibleTextImporter {
         public final String description;
         public final String licence;
         public final int expectedVerses;
+        /** True for texts that are never bundled in the app and are read from a local file instead. */
+        public final boolean local;
 
         Spec(String id, String name, String description, String licence, int expectedVerses) {
+            this(id, name, description, licence, expectedVerses, false);
+        }
+
+        Spec(String id, String name, String description, String licence, int expectedVerses, boolean local) {
             this.id = id;
             this.name = name;
             this.language = "en";
             this.description = description;
             this.licence = licence;
             this.expectedVerses = expectedVerses;
+            this.local = local;
         }
     }
+
+    /**
+     * Texts that are not in the repository. The owner copies the file to the app's external
+     * files folder ({@code Android/data/org.perazimchurch.app/files/bible/<ID>.tsv.gz}) and the
+     * importer reads it from there. Used for licensed texts such as the NASB.
+     */
+    public static final List<Spec> LOCAL = Collections.unmodifiableList(java.util.Arrays.asList(
+            new Spec("NASB", "New American Standard Bible",
+                    "New American Standard Bible. Scripture taken from the NEW AMERICAN STANDARD BIBLE, "
+                            + "Copyright \u00a9 1960,1962,1963,1968,1971,1972,1973,1975,1977,1995 by The Lockman Foundation. Used by permission.",
+                    "Licensed: The Lockman Foundation (local copy, not in the repository)", 31102, true)
+    ));
 
     /** Bundled translations, in the order they appear in the reader's version picker. */
     public static final List<Spec> BUNDLED = Collections.unmodifiableList(java.util.Arrays.asList(
@@ -77,7 +98,9 @@ public final class BibleTextImporter {
         if (context == null || dao == null) {
             return;
         }
-        for (Spec spec : BUNDLED) {
+        List<Spec> all = new ArrayList<>(BUNDLED);
+        all.addAll(LOCAL);
+        for (Spec spec : all) {
             try {
                 importTranslation(context, dao, spec);
             } catch (Exception e) {
@@ -96,11 +119,15 @@ public final class BibleTextImporter {
         if (isComplete(dao, spec)) {
             return;
         }
+        InputStream source = openSource(context, spec);
+        if (source == null) {
+            return;
+        }
         ensureTranslationAndBooks(dao, spec);
 
         List<BibleVerseEntity> batch = new ArrayList<>(BATCH_SIZE);
         int imported = 0;
-        try (InputStream raw = context.getAssets().open(ASSET_DIR + spec.id + ".tsv.gz");
+        try (InputStream raw = source;
              BufferedReader reader = new BufferedReader(
                      new InputStreamReader(new GZIPInputStream(raw), StandardCharsets.UTF_8))) {
             String line;
@@ -126,6 +153,20 @@ public final class BibleTextImporter {
             imported += batch.size();
         }
         Log.i(TAG, "Imported " + imported + " verses for " + spec.id + " (stored total " + dao.countVerses(spec.id) + ")");
+    }
+
+    /** Opens the bundled asset, or the owner's local file for local texts. Returns null when absent. */
+    @Nullable
+    private static InputStream openSource(Context context, Spec spec) throws IOException {
+        if (!spec.local) {
+            return context.getAssets().open(ASSET_DIR + spec.id + ".tsv.gz");
+        }
+        File dir = context.getExternalFilesDir("bible");
+        File file = dir == null ? null : new File(dir, spec.id + ".tsv.gz");
+        if (file == null || !file.isFile()) {
+            return null;
+        }
+        return new FileInputStream(file);
     }
 
     private static void ensureTranslationAndBooks(BibleDao dao, Spec spec) {

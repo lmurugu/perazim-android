@@ -882,6 +882,16 @@ public class BibleReaderDialog extends Dialog {
         });
         container.addView(btnCompare);
 
+        // Greek interlinear, for New Testament verses
+        if (verse.getBookId() != null && BibleMapper.resolveBookNumber(verse.getBookId()) >= 40) {
+            Button btnInterlinear = createOptionButton("\u0391\u03b2 Greek Interlinear", COLOR_PURPLE_DARK(), COLOR_WHITE());
+            btnInterlinear.setOnClickListener(v -> {
+                dialog.dismiss();
+                showInterlinearDialog(verse, citation);
+            });
+            container.addView(btnInterlinear);
+        }
+
         // Action 6: In Search mode, jump to this chapter
         if (isSearchMode) {
             Button btnGoToChapter = createOptionButton("➔ Open Chapter in Reader", COLOR_PRIMARY_PURPLE(), COLOR_WHITE());
@@ -927,6 +937,50 @@ public class BibleReaderDialog extends Dialog {
         } catch (Exception e) {
             Toast.makeText(getContext(), "No app available to share this verse.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /** Word-by-word Greek with Strong's numbers and morphology for a New Testament verse. */
+    private void showInterlinearDialog(final BibleVerse verse, final String citation) {
+        bibleViewModel.loadGreekInterlinear(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), words -> {
+            if (words == null || words.isEmpty()) {
+                Toast.makeText(getContext(), "No interlinear is available for this verse.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            LinearLayout box = new LinearLayout(getContext());
+            box.setOrientation(LinearLayout.VERTICAL);
+            box.setPadding(dp(18), dp(8), dp(18), dp(12));
+            for (org.perazimchurch.app.domain.model.InterlinearWord word : words) {
+                LinearLayout cell = new LinearLayout(getContext());
+                cell.setOrientation(LinearLayout.VERTICAL);
+                cell.setPadding(0, dp(6), 0, dp(6));
+                TextView greek = new TextView(getContext());
+                greek.setText(word.getOriginal());
+                greek.setTypeface(Typeface.SERIF);
+                greek.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+                greek.setTextColor(GlassKit.text());
+                cell.addView(greek);
+                TextView meta = new TextView(getContext());
+                String strong = word.getStrongsNumber() > 0 ? "G" + word.getStrongsNumber() : "";
+                meta.setText((strong + (strong.isEmpty() || word.getMorphology().isEmpty() ? "" : " \u00b7 ") + word.getMorphology()).trim());
+                meta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                meta.setTextColor(COLOR_TEXT_MUTED());
+                cell.addView(meta);
+                box.addView(cell);
+            }
+            TextView note = new TextView(getContext());
+            note.setText("Robinson-Pierpont style parsing from the Antoniades 1904/1912 text (public domain). Strong's numbers identify the lemma.");
+            note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            note.setTextColor(COLOR_TEXT_MUTED());
+            note.setPadding(0, dp(10), 0, 0);
+            box.addView(note);
+            ScrollView scroll = new ScrollView(getContext());
+            scroll.addView(box);
+            AppDialogs.builder(getContext())
+                    .setTitle(citation + " · Greek Interlinear")
+                    .setView(scroll)
+                    .setPositiveButton("Close", null)
+                    .show();
+        });
     }
 
     /** Shows the same verse in every readable translation, one under the other. */
