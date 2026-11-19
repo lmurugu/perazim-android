@@ -4,6 +4,11 @@ set -euo pipefail
 # Right after boot the package service can lag behind sys.boot_completed; wait for it.
 timeout 300 bash -c 'until adb shell service check package 2>/dev/null | grep -q "package: found"; do sleep 2; done'
 
+pm_list=$(adb shell pm list packages 2>/dev/null | tr -d '\r' || true)
+echo "packages matching perazim: $(echo "$pm_list" | grep -i perazim | tr '\n' ' ')"
+app_pkg=$(echo "$pm_list" | sed 's/^package://' | grep -i perazimchurch | grep -v -i test | head -1 || true)
+app_pkg=${app_pkg:-org.perazimchurch.app}
+echo "installed app package: $app_pkg"
 mock_pid=''
 cleanup() {
   if [[ -n "$mock_pid" ]]; then
@@ -39,13 +44,13 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
 # Do not open the app again; restore network and wait for the mock API to receive the row.
 # Start the app in the background so a real process exists for the kill. am kill does not
 # touch a process with a visible activity, so send HOME after launch. Network stays off here.
-monkey_out=$(adb shell monkey -p org.perazimchurch.app -c android.intent.category.LAUNCHER 1 2>&1 || true)
+monkey_out=$(adb shell monkey -p "$app_pkg" -c android.intent.category.LAUNCHER 1 2>&1 || true)
 echo "monkey launch output: ${monkey_out:-empty}"
 sleep 5
 adb shell input keyevent KEYCODE_HOME || true
 app_pid=''
 for _ in $(seq 1 15); do
-  app_pid=$(adb shell pidof org.perazimchurch.app 2>/dev/null | tr -d '\r' || true)
+  app_pid=$(adb shell pidof "$app_pkg" 2>/dev/null | tr -d '\r' || true)
   [[ -n "$app_pid" ]] && break
   sleep 2
 done
@@ -56,9 +61,9 @@ if [[ -z "$app_pid" ]]; then
   echo 'FAIL: app process is not running before the kill, so the process-death check proves nothing.' >&2
   exit 1
 fi
-adb shell am kill org.perazimchurch.app
+adb shell am kill "$app_pkg"
 sleep 3
-echo "app pid after kill: $(adb shell pidof org.perazimchurch.app 2>/dev/null | tr -d '\r' || echo none)"
+echo "app pid after kill: $(adb shell pidof "$app_pkg" 2>/dev/null | tr -d '\r' || echo none)"
 adb shell svc wifi enable
 adb shell svc data enable || true
 
