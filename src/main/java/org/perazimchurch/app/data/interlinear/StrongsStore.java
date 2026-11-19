@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import org.perazimchurch.app.data.local.seeder.BibleAssets;
 import org.perazimchurch.app.domain.model.StrongsEntry;
 
 import java.io.BufferedReader;
@@ -43,7 +44,7 @@ public final class StrongsStore {
             return loaded;
         }
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                new GZIPInputStream(context.getAssets().open(ASSET)), StandardCharsets.UTF_8))) {
+                BibleAssets.openText(context, ASSET), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 StrongsEntry entry = parseLine(line);

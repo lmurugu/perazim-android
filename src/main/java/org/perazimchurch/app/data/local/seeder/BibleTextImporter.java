@@ -127,9 +127,8 @@ public final class BibleTextImporter {
 
         List<BibleVerseEntity> batch = new ArrayList<>(BATCH_SIZE);
         int imported = 0;
-        try (InputStream raw = source;
-             BufferedReader reader = new BufferedReader(
-                     new InputStreamReader(new GZIPInputStream(raw), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(source, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 Row row = parseLine(line);
@@ -159,7 +158,7 @@ public final class BibleTextImporter {
     @Nullable
     private static InputStream openSource(Context context, Spec spec) throws IOException {
         if (!spec.local) {
-            return context.getAssets().open(ASSET_DIR + spec.id + ".tsv.gz");
+            return BibleAssets.openText(context, ASSET_DIR + spec.id + ".tsv.gz");
         }
         File dir = context.getExternalFilesDir("bible");
         File file = dir == null ? null : new File(dir, spec.id + ".tsv.gz");
