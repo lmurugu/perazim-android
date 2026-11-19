@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -681,7 +683,7 @@ public class FellowshipUiBinder {
     }
 
     private void promptMarkAnswered(@NonNull Prayer prayer) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(dp(20), dp(18), dp(20), dp(18));
@@ -733,7 +735,7 @@ public class FellowshipUiBinder {
     }
 
     public void showSubmitPrayerDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
 
         LinearLayout layout = new LinearLayout(context);
         layout.setOrientation(LinearLayout.VERTICAL);

@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -28,6 +30,7 @@ import org.json.JSONObject;
 import org.perazimchurch.app.community.CommunityLocalStore;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.data.remote.ApiClient;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 import java.text.DateFormat;
 import java.io.InputStream;
@@ -76,26 +79,142 @@ public final class CommunityUiBinder {
         return true;
     }
     public ScrollView bind() {
-        content.setPadding(dp(16), dp(20), dp(16), dp(32));
-        content.addView(text("Community", 26));
-        content.addView(text("Faith grows when we share life together.", 14));
-        row(content, button("Groups", this::showGroups), button("Classes", this::showClasses));
-        row(content, button("Messages", this::showConversations), button("Notifications", this::showNotifications));
-        row(content, button("Prayer wall", openPrayer), button("Bible games", () ->
-                org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(activity)));
-        row(content, button("My profile", this::editProfile), button("PC connection", this::showConnection));
-        row(content, button("+ Share a post", () -> composePost(null, null)), button("Saved drafts", this::showDrafts));
-        row(content, button("Daily challenge", this::showChallenge), button("Refresh", this::refresh));
-        Spinner filters = spinner(new String[]{"All discussions", "General", "Prayer", "Praise", "Events"});
-        filters.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-            public void onItemSelected(android.widget.AdapterView<?> p, View v, int n, long id) {
-                filter = new String[]{"ALL", "GENERAL", "PRAYER", "PRAISE", "EVENT"}[n]; refresh();
-            }
-            public void onNothingSelected(android.widget.AdapterView<?> parent) { }
-        });
-        content.addView(filters); content.addView(status); content.addView(feed);
-        refresh(); return scroll(content);
+        // Mockup board "Community (light glass)": heading, 2x2 tiles, chips, Recent activity feed.
+        content.setBackground(null);
+        content.setPadding(dp(16), dp(8), dp(16), dp(16));
+        LinearLayout heading = new LinearLayout(activity);
+        heading.setOrientation(LinearLayout.VERTICAL);
+        heading.setPadding(dp(4), 0, dp(4), 0);
+        heading.addView(GlassKit.text(activity, "Community", 26, true, GlassKit.text()));
+        heading.addView(GlassKit.text(activity, "Faith grows when we share life together.", 13, false, GlassKit.muted()),
+                GlassKit.matchWrap(activity, 3));
+        content.addView(GlassKit.keep(heading));
+
+        LinearLayout grid1 = tileRow(
+                tile("Prayer wall", org.perazimchurch.app.R.drawable.gl_prayer, false, openPrayer),
+                tile("Groups", org.perazimchurch.app.R.drawable.gl_people, false, this::showGroups));
+        content.addView(grid1, GlassKit.matchWrap(activity, 18));
+        LinearLayout grid2 = tileRow(
+                tile("Messages", org.perazimchurch.app.R.drawable.gl_chat, false, this::showConversations),
+                tile("Share a post", org.perazimchurch.app.R.drawable.gl_plus, true, () -> composePost(null, null)));
+        content.addView(grid2, GlassKit.matchWrap(activity, 10));
+
+        content.addView(chipRow(new String[]{"Classes", "Notifications", "Bible games", "Daily challenge"},
+                new Runnable[]{this::showClasses, this::showNotifications,
+                        () -> org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(activity), this::showChallenge}),
+                GlassKit.matchWrap(activity, 12));
+        content.addView(chipRow(new String[]{"Saved drafts", "My profile", "PC connection", "Refresh"},
+                new Runnable[]{this::showDrafts, this::editProfile, this::showConnection, this::refresh}),
+                GlassKit.matchWrap(activity, 6));
+
+        TextView recent = GlassKit.text(activity, "Recent activity", 14, true, GlassKit.text());
+        recent.setPadding(dp(4), 0, 0, 0);
+        content.addView(recent, GlassKit.matchWrap(activity, 20));
+
+        // Discussion filters as chips (was a drop-down)
+        final String[] filterLabels = {"All", "General", "Prayer", "Praise", "Events"};
+        final String[] filterKeys = {"ALL", "GENERAL", "PRAYER", "PRAISE", "EVENT"};
+        android.widget.HorizontalScrollView hsv = new android.widget.HorizontalScrollView(activity);
+        hsv.setHorizontalScrollBarEnabled(false);
+        LinearLayout filters = new LinearLayout(activity);
+        filters.setOrientation(LinearLayout.HORIZONTAL);
+        final TextView[] filterChips = new TextView[filterLabels.length];
+        for (int i = 0; i < filterLabels.length; i++) {
+            final int index = i;
+            TextView chip = GlassKit.chip(activity, filterLabels[i], filterKeys[i].equals(filter));
+            chip.setOnClickListener(v -> {
+                filter = filterKeys[index];
+                for (int k = 0; k < filterChips.length; k++) {
+                    boolean on = k == index;
+                    filterChips[k].setBackground(on ? GlassKit.purple(activity, 999) : GlassKit.glass(activity, 999));
+                    filterChips[k].setTextColor(on ? Color.WHITE : GlassKit.text());
+                    filterChips[k].setTypeface(on ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+                }
+                refresh();
+            });
+            filterChips[i] = chip;
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
+            lp.rightMargin = dp(8);
+            filters.addView(chip, lp);
+        }
+        hsv.addView(filters);
+        content.addView(GlassKit.keep(hsv), GlassKit.matchWrap(activity, 10));
+
+        status.setTextColor(GlassKit.muted());
+        status.setTextSize(12);
+        status.setPadding(dp(4), dp(10), dp(4), dp(2));
+        GlassKit.keep(status);
+        content.addView(status);
+        content.addView(feed);
+        refresh();
+        ScrollView sv = scroll(content);
+        sv.setBackground(null);
+        return sv;
     }
+
+    private LinearLayout tileRow(View a, View b) {
+        LinearLayout r = new LinearLayout(activity);
+        r.setOrientation(LinearLayout.HORIZONTAL);
+        r.addView(a, new LinearLayout.LayoutParams(0, dp(84), 1f));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(84), 1f);
+        lp.leftMargin = dp(10);
+        r.addView(b, lp);
+        return GlassKit.keep(r);
+    }
+
+    /** Mockup tile: 84dp, 24dp corners, 32dp icon square top-left, 13sp bold label bottom-left. */
+    private View tile(String label, int icon, boolean orange, Runnable click) {
+        LinearLayout t = new LinearLayout(activity);
+        t.setOrientation(LinearLayout.VERTICAL);
+        t.setPadding(dp(14), dp(14), dp(14), dp(12));
+        if (orange) {
+            android.graphics.drawable.GradientDrawable bg = (android.graphics.drawable.GradientDrawable) GlassKit.orange(activity, 24);
+            bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#99FFFFFF"));
+            t.setBackground(bg);
+            GlassKit.glow(t, GlassKit.ORANGE, 8);
+        } else {
+            t.setBackground(GlassKit.glass(activity, 24));
+        }
+        android.graphics.drawable.GradientDrawable sq;
+        if (orange) {
+            sq = new android.graphics.drawable.GradientDrawable();
+            sq.setColor(Color.parseColor("#40FFFFFF"));
+        } else {
+            sq = new android.graphics.drawable.GradientDrawable(android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                    new int[]{GlassKit.PURPLE_TOP, GlassKit.PURPLE_BOTTOM});
+        }
+        sq.setCornerRadius(dp(10));
+        t.addView(GlassKit.iconBadge(activity, icon, sq, 32, 18), new LinearLayout.LayoutParams(dp(32), dp(32)));
+        View spacer = new View(activity);
+        t.addView(spacer, new LinearLayout.LayoutParams(1, 0, 1f));
+        t.addView(GlassKit.text(activity, label, 13, true, orange ? Color.WHITE : GlassKit.text()));
+        t.setClickable(true);
+        t.setOnClickListener(v -> { if (click != null) click.run(); });
+        return GlassKit.keep(t);
+    }
+
+    /** Small glass chips: 11sp semibold, padding 7/12, as in the mockup. */
+    private View chipRow(String[] labels, Runnable[] actions) {
+        android.widget.HorizontalScrollView hsv = new android.widget.HorizontalScrollView(activity);
+        hsv.setHorizontalScrollBarEnabled(false);
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        for (int i = 0; i < labels.length; i++) {
+            final Runnable action = actions[i];
+            TextView chip = GlassKit.text(activity, labels[i], 11, true,
+                    GlassKit.light() ? Color.parseColor("#3D1749") : GlassKit.text());
+            chip.setPadding(dp(12), dp(7), dp(12), dp(7));
+            chip.setBackground(GlassKit.glassControl(activity, 999));
+            chip.setClickable(true);
+            chip.setOnClickListener(v -> action.run());
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
+            lp.rightMargin = dp(6);
+            row.addView(chip, lp);
+        }
+        hsv.addView(row);
+        return GlassKit.keep(hsv);
+    }
+
     public void refresh() {
         if (!sameScope()) { resetScope(); feed.removeAllViews(); }
         String key = "feed_" + filter;
@@ -108,31 +227,108 @@ public final class CommunityUiBinder {
     }
     private void renderPosts(LinearLayout target, JSONArray posts, String groupId) {
         target.removeAllViews();
-        if (posts == null || posts.length() == 0) { target.addView(text("No discussions here yet. Share a thought, prayer, or praise.", 15)); return; }
+        if (posts == null || posts.length() == 0) {
+            LinearLayout empty = GlassKit.card(activity, 24, 14);
+            empty.addView(GlassKit.text(activity, "No discussions here yet. Share a thought, prayer, or praise.", 13, false, GlassKit.body()));
+            target.addView(empty, GlassKit.matchWrap(activity, 10));
+            return;
+        }
         for (int i = 0; i < posts.length(); i++) {
             JSONObject post = posts.optJSONObject(i); if (post == null) continue;
-            LinearLayout card = card(target);
-            card.addView(text((post.optBoolean("is_pinned") ? "Pinned · " : "") + post.optString("type", "GENERAL") + " · " + post.optString("author_name") + "\n" + date(post.optLong("created_at")), 12));
-            card.addView(text(post.optString("title"), 19));
-            card.addView(text(post.optString("content"), 16));
+            boolean event = "EVENT".equals(post.optString("type"));
+            // Events are the deep purple card; everything else is a glass card (mockup "Recent activity")
+            LinearLayout card = new LinearLayout(activity);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setPadding(dp(14), dp(14), dp(14), dp(14));
+            if (event) {
+                android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable(
+                        android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+                        new int[]{Color.parseColor("#4A1B59"), Color.parseColor("#2F0D39")});
+                bg.setCornerRadius(dp(24));
+                bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#26FFFFFF"));
+                card.setBackground(bg);
+                // Mockup: box-shadow 0 12px 28px rgba(61,23,73,0.3) (deeper on the dark page)
+                GlassKit.shadow(card, Color.parseColor(GlassKit.light() ? "#4D3D1749" : "#4D000000"), 12, 28);
+            } else {
+                card.setBackground(GlassKit.glass(activity, 24));
+            }
+            GlassKit.keep(card);
+            int titleColor = event ? Color.parseColor("#F5F0F7") : GlassKit.text();
+            int bodyColor = event ? Color.parseColor("#E6D8EE") : GlassKit.body();
+            int labelColor = event ? Color.parseColor("#F8C894") : GlassKit.accent();
+
+            String type = post.optString("type", "GENERAL");
+            TextView label = GlassKit.text(activity, ((post.optBoolean("is_pinned") ? "PINNED · " : "") + type + " · "
+                    + date(post.optLong("created_at"))).toUpperCase(java.util.Locale.ROOT), 11, true, labelColor);
+            label.setLetterSpacing(0.06f);
+            card.addView(label);
+            card.addView(GlassKit.text(activity, post.optString("title"), 16, true, titleColor), GlassKit.matchWrap(activity, 4));
+            TextView body = GlassKit.text(activity, post.optString("content"), 12, false, bodyColor);
+            body.setLineSpacing(0f, 1.35f);
+            card.addView(body, GlassKit.matchWrap(activity, 4));
+            String author = post.optString("author_name");
+            if (!author.isEmpty()) {
+                card.addView(GlassKit.text(activity, "— " + author, 11, false, event ? Color.parseColor("#CDBBD6") : GlassKit.muted()),
+                        GlassKit.matchWrap(activity, 4));
+            }
             if (!post.optString("media_url").isEmpty()) addPhoto(card, post.optString("media_url"));
-            if (post.optBoolean("is_answered")) card.addView(text("Prayer answered", 14));
-            if ("EVENT".equals(post.optString("type"))) card.addView(text(date(post.optLong("event_date")) + "\n" + post.optString("event_location"), 14));
-            row(card, button((post.optBoolean("user_has_amened") ? "Amen ✓ " : "Amen ") + post.optInt("amen_count"), () -> {
+            if (post.optBoolean("is_answered")) card.addView(GlassKit.text(activity, "Prayer answered", 12, true, labelColor), GlassKit.matchWrap(activity, 6));
+            if (event) card.addView(GlassKit.text(activity, date(post.optLong("event_date")) + " · " + post.optString("event_location"), 12, false, bodyColor), GlassKit.matchWrap(activity, 6));
+
+            LinearLayout pills = new LinearLayout(activity);
+            pills.setOrientation(LinearLayout.HORIZONTAL);
+            boolean amened = post.optBoolean("user_has_amened");
+            TextView amen = postPill("Amen · " + post.optInt("amen_count"), event, amened);
+            amen.setOnClickListener(v -> {
                 if (!signedIn()) return;
                 post("api/community/posts/" + encode(post.optString("id")) + "/amen", new JSONObject(), r -> {
                     postSafe(post, "amen_count", r.optInt("amenCount")); postSafe(post, "user_has_amened", true);
                     renderPosts(target, posts, groupId);
                 }, this::showError);
-            }), button("Comments · " + post.optInt("comment_count"), () -> showPost(post, groupId)));
+            });
+            pills.addView(amen);
+            TextView comments = postPill("Comments · " + post.optInt("comment_count"), event, false);
+            comments.setOnClickListener(v -> showPost(post, groupId));
+            LinearLayout.LayoutParams lpC = new LinearLayout.LayoutParams(-2, -2);
+            lpC.leftMargin = dp(8);
+            pills.addView(comments, lpC);
+            card.addView(GlassKit.keep(pills), GlassKit.matchWrap(activity, 10));
+
+            card.setClickable(true);
+            card.setOnClickListener(v -> showPost(post, groupId));
+            target.addView(card, GlassKit.matchWrap(activity, 10));
         }
     }
+
+    /** Amen / Comments pills: 12sp bold, padding 9/16. Filled when the member has said Amen. */
+    private TextView postPill(String text, boolean onDark, boolean filled) {
+        boolean light = GlassKit.light() && !onDark;
+        TextView pill = GlassKit.text(activity, text, 12, true,
+                filled ? Color.WHITE : (light ? Color.parseColor("#3D1749") : Color.parseColor("#F5F0F7")));
+        pill.setPadding(dp(16), dp(9), dp(16), dp(9));
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setCornerRadius(dp(999));
+        if (filled) {
+            bg.setColor(light ? Color.parseColor("#3D1749") : GlassKit.PURPLE_TOP);
+            bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#4DFFFFFF"));
+        } else if (light) {
+            bg.setColor(Color.parseColor("#143D1749"));
+            bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#333D1749"));
+        } else {
+            bg.setColor(Color.parseColor("#24FFFFFF"));
+            bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#40FFFFFF"));
+        }
+        pill.setBackground(bg);
+        pill.setClickable(true);
+        return pill;
+    }
+
     private void showPost(JSONObject post, String groupId) {
         LinearLayout body = column();
         body.addView(text(post.optString("title"), 21)); body.addView(text(post.optString("content"), 16));
         if (!post.optString("media_url").isEmpty()) addPhoto(body,post.optString("media_url"));
         if (owner.equals(post.optString("author_id"))) {
-            row(body, button("Edit", () -> editPost(post)), button("Delete", () -> new AlertDialog.Builder(activity)
+            row(body, button("Edit", () -> editPost(post)), button("Delete", () -> AppDialogs.builder(activity)
                     .setTitle("Delete this post?").setMessage("Comments and reactions will also be removed.")
                     .setNegativeButton("Keep", null).setPositiveButton("Delete", (d,w) -> request("DELETE", "api/community/posts/" + encode(post.optString("id")), null,
                             r -> { toast("Post deleted"); refresh(); }, this::showError)).show()));
@@ -230,7 +426,7 @@ public final class CommunityUiBinder {
             TextView memberName=text(m.optString("name")+" · "+m.optString("role"),16);memberHead.addView(memberName,new LinearLayout.LayoutParams(0,-2,1));
             card.addView(memberHead);
             if(!this.owner.equals(m.optString("user_id")))card.addView(button("Message",()->showConversation(m.optString("user_id"),m.optString("name"))));
-            if(isOwner&&!group.optString("created_by").equals(m.optString("user_id")))card.addView(button("Remove from group",()->new AlertDialog.Builder(activity).setTitle("Remove "+m.optString("name")+"?").setNegativeButton("Keep",null).setPositiveButton("Remove",(d,w)->request("DELETE","api/community/groups/"+encode(groupId)+"/members/"+encode(m.optString("user_id")),null,x->toast("Member removed; reopen roster to refresh"),this::showError)).show()));
+            if(isOwner&&!group.optString("created_by").equals(m.optString("user_id")))card.addView(button("Remove from group",()->AppDialogs.builder(activity).setTitle("Remove "+m.optString("name")+"?").setNegativeButton("Keep",null).setPositiveButton("Remove",(d,w)->request("DELETE","api/community/groups/"+encode(groupId)+"/members/"+encode(m.optString("user_id")),null,x->toast("Member removed; reopen roster to refresh"),this::showError)).show()));
         }},this::showError);
     }
     public void showClasses() {
@@ -241,7 +437,7 @@ public final class CommunityUiBinder {
             if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject c=rows.optJSONObject(i);if(c==null)continue;LinearLayout card=card(list);
                 card.addView(text((c.optBoolean("is_cancelled")?"Cancelled · ":"")+c.optString("title"),20));card.addView(text(c.optString("group_name")+" · "+c.optString("teacher_name")+"\n"+date(c.optLong("starts_at"))+" · "+c.optInt("duration_minutes")+" minutes",14));card.addView(text(c.optString("description"),16));
                 if(!c.optBoolean("is_cancelled"))card.addView(button("Join video classroom", () -> org.perazimchurch.app.ClassroomCallActivity.open(activity,c.optString("id"),c.optString("title"))));
-                if(owner.equals(c.optString("created_by"))&&!c.optBoolean("is_cancelled"))card.addView(button("Cancel class",()->new AlertDialog.Builder(activity).setTitle("Cancel this class?").setNegativeButton("Keep",null).setPositiveButton("Cancel class",(d,w)->request("DELETE","api/community/classes/"+encode(c.optString("id")),null,x->toast("Class cancelled; reopen Classes to refresh"),this::showError)).show()));
+                if(owner.equals(c.optString("created_by"))&&!c.optBoolean("is_cancelled"))card.addView(button("Cancel class",()->AppDialogs.builder(activity).setTitle("Cancel this class?").setNegativeButton("Keep",null).setPositiveButton("Cancel class",(d,w)->request("DELETE","api/community/classes/"+encode(c.optString("id")),null,x->toast("Class cancelled; reopen Classes to refresh"),this::showError)).show()));
             }});
     }
     private void scheduleClass(JSONObject group) {
@@ -318,7 +514,7 @@ public final class CommunityUiBinder {
         if(!signedIn())return;LinearLayout body=column();JSONArray drafts=store.drafts();
         if(drafts.length()==0)body.addView(text("No saved drafts. Posts, comments and messages that could not send will be kept here for this account and server.",16));
         for(int i=0;i<drafts.length();i++){JSONObject draft=drafts.optJSONObject(i);if(draft==null)continue;JSONObject value=draft.optJSONObject("body");if(value==null)continue;LinearLayout card=card(body);card.addView(text(draft.optString("label"),17));card.addView(text(value.optString("content"),16));
-            row(card,button("Retry sending",()->saveAndSend(draft.optString("endpoint"),value,draft.optString("label"),r->{toast("Sent successfully");refresh();card.setVisibility(View.GONE);})),button("Delete draft",()->new AlertDialog.Builder(activity).setTitle("Delete saved draft?").setNegativeButton("Keep",null).setPositiveButton("Delete",(d,w)->{store.removeDraft(value.optString("id"));card.setVisibility(View.GONE);}).show()));}
+            row(card,button("Retry sending",()->saveAndSend(draft.optString("endpoint"),value,draft.optString("label"),r->{toast("Sent successfully");refresh();card.setVisibility(View.GONE);})),button("Delete draft",()->AppDialogs.builder(activity).setTitle("Delete saved draft?").setNegativeButton("Keep",null).setPositiveButton("Delete",(d,w)->{store.removeDraft(value.optString("id"));card.setVisibility(View.GONE);}).show()));}
         panel("Saved drafts · this account",body);
     }
     public void showNotifications() {
@@ -348,7 +544,7 @@ public final class CommunityUiBinder {
         body.addView(button("Save server address",()->{
             String value=address.getText().toString().trim();try{java.net.URI uri=new java.net.URI(value);if(!("http".equals(uri.getScheme())||"https".equals(uri.getScheme()))||uri.getHost()==null||uri.getUserInfo()!=null||uri.getQuery()!=null||uri.getFragment()!=null||!(uri.getPath()==null||uri.getPath().isEmpty()||"/".equals(uri.getPath())))throw new IllegalArgumentException();}catch(Exception e){address.setError("Enter a server origin, for example http://192.168.1.10:3000");return;}
             while(value.endsWith("/"))value=value.substring(0,value.length()-1);final String selected=value;if(selected.equals(ApiClient.getBaseUrl(activity))){dialog.dismiss();return;}
-            new AlertDialog.Builder(activity).setTitle("Switch to this server?").setMessage("You will be signed out. Existing local data and drafts are preserved for their original account and server. Sign in again from Profile; accounts belong to each server. Local HTTP is only for your trusted Wi-Fi pilot.").setNegativeButton("Keep current server",null).setPositiveButton("Switch and sign out",(d,w)->{
+            AppDialogs.builder(activity).setTitle("Switch to this server?").setMessage("You will be signed out. Existing local data and drafts are preserved for their original account and server. Sign in again from Profile; accounts belong to each server. Local HTTP is only for your trusted Wi-Fi pilot.").setNegativeButton("Keep current server",null).setPositiveButton("Switch and sign out",(d,w)->{
                 session().logout();ApiClient.setBaseUrl(activity,selected);dialog.dismiss();resetScope();refresh();toast("Server changed. Sign in from Profile.");
             }).show();
         }));
@@ -384,16 +580,18 @@ public final class CommunityUiBinder {
     }
     private void addPhoto(LinearLayout target,String url) {
         if(!url.matches("/uploads/att_[a-zA-Z0-9_.-]+"))return;
-        android.widget.ImageView view=new android.widget.ImageView(activity);view.setAdjustViewBounds(true);view.setMaxHeight(dp(280));view.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);view.setContentDescription("Community photo");target.addView(view,new LinearLayout.LayoutParams(-1,dp(220)));
+        android.widget.ImageView view=new android.widget.ImageView(activity);view.setAdjustViewBounds(true);view.setMaxHeight(dp(280));view.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);view.setContentDescription("Community photo");android.graphics.drawable.GradientDrawable photoShape=new android.graphics.drawable.GradientDrawable();photoShape.setCornerRadius(dp(18));photoShape.setColor(0x14FFFFFF);view.setBackground(photoShape);view.setClipToOutline(true);GlassKit.keep(view);LinearLayout.LayoutParams photoLp=new LinearLayout.LayoutParams(-1,dp(200));photoLp.topMargin=dp(10);target.addView(view,photoLp);
         String expectedOwner=owner,expectedServer=server,token=session().getAuthToken();
-        images.execute(()->{java.net.HttpURLConnection connection=null;try{
+        images.execute(()->{android.graphics.Bitmap[] loaded={null};java.net.HttpURLConnection connection=null;try{
             java.net.URL photoUrl=new java.net.URL(expectedServer+url);if(!ApiClient.allowsProtectedTransport(photoUrl))return;
             connection=(java.net.HttpURLConnection)photoUrl.openConnection();connection.setInstanceFollowRedirects(false);connection.setConnectTimeout(10000);connection.setReadTimeout(10000);
             if(token!=null&&!token.isEmpty())connection.setRequestProperty("Authorization","Bearer "+token);
             if(connection.getResponseCode()!=200)return;
-            android.graphics.Bitmap bitmap;try(java.io.InputStream in=connection.getInputStream()){bitmap=android.graphics.BitmapFactory.decodeStream(in);}
-            activity.runOnUiThread(()->{if(expectedOwner.equals(owner)&&expectedServer.equals(server)&&sameScope()&&!activity.isFinishing())view.setImageBitmap(bitmap);});
-        }catch(Exception ignored){}finally{if(connection!=null)connection.disconnect();}});
+            try(java.io.InputStream in=connection.getInputStream()){loaded[0]=android.graphics.BitmapFactory.decodeStream(in);}
+        }catch(Exception ignored){}finally{if(connection!=null)connection.disconnect();
+            // A photo that could not be loaded leaves no empty box behind.
+            activity.runOnUiThread(()->{if(!expectedOwner.equals(owner)||!expectedServer.equals(server)||!sameScope()||activity.isFinishing())return;
+                if(loaded[0]!=null)view.setImageBitmap(loaded[0]);else if(view.getParent()==target)target.removeView(view);});}});
     }
     private void saveAndSend(String endpoint,JSONObject value,String label,Result after) {
         if(!signedIn()||!sameScope())return;store.saveDraft(endpoint,value,label);
@@ -431,12 +629,12 @@ public final class CommunityUiBinder {
         return message==null||message.trim().isEmpty()?"Request failed ("+code+")":message;
     }
     private void showError(int code,String message){alert("Couldn't complete the request",error(code,message));}
-    private void alert(String title,String message){new AlertDialog.Builder(activity).setTitle(title).setMessage(message).setPositiveButton("OK",null).show();}
+    private void alert(String title,String message){AppDialogs.builder(activity).setTitle(title).setMessage(message).setPositiveButton("OK",null).show();}
     private void toast(String message){Toast.makeText(activity,message,Toast.LENGTH_LONG).show();}
     private void chooseDate(long[] target,Button button){Calendar c=Calendar.getInstance();c.setTimeInMillis(target[0]);new DatePickerDialog(activity,(picker,y,m,d)->{
         c.set(y,m,d);new TimePickerDialog(activity,(time,h,min)->{c.set(Calendar.HOUR_OF_DAY,h);c.set(Calendar.MINUTE,min);c.set(Calendar.SECOND,0);target[0]=c.getTimeInMillis();button.setText("Starts: "+date(target[0]));},c.get(Calendar.HOUR_OF_DAY),c.get(Calendar.MINUTE),true).show();
     },c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH)).show();}
-    private AlertDialog panel(String title,LinearLayout body){body.setPadding(dp(16),dp(12),dp(16),dp(24));AlertDialog d=new AlertDialog.Builder(activity).setTitle(title).setView(scroll(body)).setNegativeButton("Close",null).create();d.show();if(d.getWindow()!=null){d.getWindow().setBackgroundDrawableResource(android.R.color.black);d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,(int)(activity.getResources().getDisplayMetrics().heightPixels*0.90));d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);}return d;}
+    private AlertDialog panel(String title,LinearLayout body){body.setPadding(dp(16),dp(12),dp(16),dp(24));AlertDialog d=AppDialogs.builder(activity).setTitle(title).setView(scroll(body)).setNegativeButton("Close",null).create();d.show();if(d.getWindow()!=null){d.getWindow().setBackgroundDrawableResource(android.R.color.black);d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,(int)(activity.getResources().getDisplayMetrics().heightPixels*0.90));d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);}return d;}
     private LinearLayout column(){LinearLayout l=new LinearLayout(activity);l.setOrientation(LinearLayout.VERTICAL);l.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);return l;}
     private ScrollView scroll(LinearLayout body){ScrollView s=new ScrollView(activity);s.setFillViewport(true);s.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);s.addView(body);return s;}
     private LinearLayout card(LinearLayout parent){LinearLayout c=column();c.setPadding(dp(14),dp(12),dp(14),dp(12));c.setBackground(PerazimTheme.createCardGradient(dp(14),dp(1)));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,dp(8),0,dp(8));parent.addView(c,p);return c;}
@@ -444,7 +642,7 @@ public final class CommunityUiBinder {
     private EditText input(String hint,boolean multiline){EditText e=new EditText(activity);e.setHint(hint);e.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);e.setHintTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);e.setTextSize(16);e.setPadding(dp(10),dp(10),dp(10),dp(10));e.setBackgroundColor(PerazimTheme.COLOR_SURFACE_2);e.setInputType(InputType.TYPE_CLASS_TEXT|(multiline?InputType.TYPE_TEXT_FLAG_MULTI_LINE:InputType.TYPE_TEXT_FLAG_CAP_SENTENCES));if(multiline){e.setMinLines(3);e.setGravity(Gravity.TOP);}LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,dp(6),0,dp(6));e.setLayoutParams(p);return e;}
     private Button button(String title,Runnable click){Button b=new Button(activity);b.setText(title);b.setAllCaps(false);b.setTextSize(14);b.setMinHeight(dp(44));b.setMinimumWidth(0);b.setTextColor(Color.WHITE);b.setBackground(PerazimTheme.createActivePillGradient(dp(10)));b.setPadding(dp(10),dp(8),dp(10),dp(8));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(dp(2),dp(5),dp(2),dp(5));b.setLayoutParams(p);b.setOnClickListener(v->click.run());return b;}
     private void row(LinearLayout parent,Button a,Button b){LinearLayout r=new LinearLayout(activity);r.setOrientation(LinearLayout.HORIZONTAL);for(Button v:new Button[]{a,b}){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,-2,1);p.setMargins(dp(2),dp(4),dp(2),dp(4));r.addView(v,p);}parent.addView(r);}
-    private Spinner spinner(String[] values){Spinner s=new Spinner(activity);ArrayAdapter<String> adapter=new ArrayAdapter<>(activity,android.R.layout.simple_spinner_item,values);adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);s.setAdapter(adapter);s.setBackgroundTintList(android.content.res.ColorStateList.valueOf(PerazimTheme.COLOR_PURPLE_SOFT));s.setPopupBackgroundDrawable(new android.graphics.drawable.ColorDrawable(PerazimTheme.COLOR_SURFACE_2));return s;}
+    private Spinner spinner(String[] values){Spinner s=new Spinner(activity);ArrayAdapter<String> adapter=new ArrayAdapter<>(activity,android.R.layout.simple_spinner_item,values);adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);s.setAdapter(adapter);s.setBackgroundTintList(android.content.res.ColorStateList.valueOf(PerazimTheme.COLOR_PURPLE_SOFT));s.setPopupBackgroundDrawable(new android.graphics.drawable.ColorDrawable(PerazimTheme.COLOR_SURFACE_2_SOLID));return s;}
     private boolean required(EditText field){if(field.getText().toString().trim().isEmpty()){field.setError("Please enter some text");return false;}return true;}
     private int dp(int value){return (int)(value*activity.getResources().getDisplayMetrics().density+0.5f);}
     private static String encode(String value){return Uri.encode(value);}

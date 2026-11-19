@@ -47,6 +47,16 @@ android {
     buildFeatures {
         buildConfig true
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            all {
+                // UI screenshot tests only render when asked: ./gradlew testDebugUnitTest -Dperazim.screenshots=true
+                systemProperty 'perazim.screenshots', System.getProperty('perazim.screenshots', 'false')
+                maxHeapSize = '2g'
+            }
+        }
+    }
     defaultConfig {
         applicationId "org.perazimchurch.app"
         minSdk 24
@@ -163,6 +173,9 @@ dependencies {
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.zxing:core:3.5.3'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'androidx.work:work-testing:2.9.1'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.room:room-testing:2.6.1'

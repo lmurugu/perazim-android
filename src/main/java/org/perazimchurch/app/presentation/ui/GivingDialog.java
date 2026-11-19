@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.AlertDialog;
@@ -64,7 +66,7 @@ public final class GivingDialog {
      * @return The displayed AlertDialog instance
      */
     public static AlertDialog show(@NonNull final Context context) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
         sv.setBackground(PerazimTheme.createDialogGradient(dp(context, 18), dp(context, 1)));

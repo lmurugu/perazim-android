@@ -5,9 +5,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +29,11 @@ import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
+import org.perazimchurch.app.domain.games.MemoryMatch;
+import org.perazimchurch.app.domain.games.MiniCrossword;
+import org.perazimchurch.app.domain.games.RoadToJerusalem;
+import org.perazimchurch.app.domain.games.TimelineSort;
+import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
@@ -36,11 +44,19 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /** Three complete offline Bible games; best scores are local and account-scoped. */
 public final class GamesHubDialog extends Dialog {
+
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
     private final Activity activity;
     private final String ownerId;
     private final SharedPreferences scores;
@@ -52,17 +68,32 @@ public final class GamesHubDialog extends Dialog {
     private VersePuzzle puzzle;
     private LadderOfFaith ladder;
     private long seed;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     public static void show(Activity activity) {
         if (activity.isFinishing() || activity.isDestroyed()) return;
         GamesHubDialog dialog = new GamesHubDialog(activity);
         dialog.show();
         Window window = dialog.getWindow();
-        if (window != null) window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            // The Dialog's default theme draws its own (light) window frame; paint the decor in the app's current mode too.
+            window.getDecorView().setBackground(PerazimTheme.createBackgroundGradient());
+        }
+    }
+
+    /**
+     * A plain Dialog uses the framework's light Theme.Dialog, which paints a light window frame
+     * and light default text. Pick a Material theme that matches the app's current mode instead.
+     */
+    private static int windowTheme() {
+        return PerazimTheme.isLight()
+                ? android.R.style.Theme_Material_Light_NoActionBar
+                : android.R.style.Theme_Material_NoActionBar;
     }
 
     private GamesHubDialog(Activity activity) {
-        super(activity);
+        super(activity, windowTheme());
         this.activity = activity;
         ownerId = SessionManager.getInstance(activity).getActiveUserId();
         scorePrefix = ownerKey(ownerId);
@@ -72,12 +103,33 @@ public final class GamesHubDialog extends Dialog {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        builtLight = PerazimTheme.isLight();
+        applyWindow();
         Window window = getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_DEEP));
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        }
+        if (window != null) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         hub();
+    }
+
+    private boolean builtLight;
+
+    private void applyWindow() {
+        Window window = getWindow();
+        if (window == null) return;
+        window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+        drawBehindSystemBars(window);
+    }
+
+    /**
+     * The phone's light or dark setting can flip while the hub is open (System appearance).
+     * When the window regains focus, rebuild in the new colours. A game in progress restarts its screen.
+     */
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && PerazimTheme.isLight() != builtLight) {
+            builtLight = PerazimTheme.isLight();
+            applyWindow();
+            hub();
+        }
     }
 
     private boolean activeOwner() {
@@ -89,20 +141,59 @@ public final class GamesHubDialog extends Dialog {
         return same;
     }
 
+    /** Transparent status and navigation bars with the glow behind them, like MainActivity. */
+    @SuppressWarnings("deprecation")
+    private void drawBehindSystemBars(Window window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        if (PerazimTheme.isLight()) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
+        window.getDecorView().setSystemUiVisibility(flags);
+    }
+
     private void screen(String title, String subtitle, boolean playing) {
+        handler.removeCallbacksAndMessages(null);
         scroll = new ScrollView(activity);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        scroll.setBackground(PerazimTheme.createBackgroundGradient());
+        // Edge to edge like the rest of the app: content is padded below the status bar and above the nav bar.
+        scroll.setClipToPadding(false);
+        scroll.setOnApplyWindowInsetsListener((v, insets) -> {
+            scroll.setPadding(0, insets.getSystemWindowInsetTop(), 0, insets.getSystemWindowInsetBottom());
+            return insets;
+        });
         page = new LinearLayout(activity);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setPadding(dp(20), dp(16), dp(20), dp(28));
         scroll.addView(page, new ScrollView.LayoutParams(-1, -2));
         setContentView(scroll);
-        Button back = button(playing ? "← Games" : "Close games", false);
+        // Small round glass back button, matching the mockups (not a full-width button).
+        ImageView back = new ImageView(activity);
+        back.setImageResource(org.perazimchurch.app.R.drawable.ic_back_round);
+        back.setPadding(dp(10), dp(10), dp(10), dp(10));
+        back.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        back.setClickable(true);
+        back.setContentDescription(playing ? "Back to games" : "Close games");
+        GradientDrawable glass = new GradientDrawable();
+        glass.setShape(GradientDrawable.OVAL);
+        glass.setColor(PerazimTheme.COLOR_SURFACE_2);
+        glass.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
+        back.setBackground(glass);
         back.setOnClickListener(v -> {
             hideKeyboard();
             if (playing) hub(); else dismiss();
         });
+        LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(44), dp(44));
+        backParams.bottomMargin = dp(12);
+        page.addView(back, backParams);
         text(title, 28, true);
         text(subtitle, 15, false);
         gap(16);
@@ -111,12 +202,27 @@ public final class GamesHubDialog extends Dialog {
     private void hub() {
         if (!activeOwner()) return;
         round = null;
-        screen("Bible Games", "Learn, remember and enjoy. All four games work without internet.", false);
+        screen("Bible Games", "Learn, remember and enjoy. All nine games work without internet.", false);
         statsBar();
         gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
         gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
         gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
         gameCard(Mode.LADDER, "Ladder of Faith", "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.");
+        customCard(org.perazimchurch.app.R.drawable.ic_game_grid, org.perazimchurch.app.R.drawable.ic_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Word Search",
+                "Find Bible names hidden in the letters. Tap a start letter, then the end letter of the word.",
+                solvedLine("WORD_SEARCH"), this::wordSearch);
+        customCard(org.perazimchurch.app.R.drawable.ic_game_cards, org.perazimchurch.app.R.drawable.ic_char_dove, PerazimTheme.COLOR_PURPLE_SOFT, "Memory Match",
+                "Flip two tiles at a time and match the Bible symbols. Each match shows its verse.",
+                solvedLine("MEMORY_MATCH"), this::memoryMatch);
+        customCard(org.perazimchurch.app.R.drawable.ic_game_timeline, org.perazimchurch.app.R.drawable.ic_char_explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
+                "Tap the Bible events in the order they happen in the story.",
+                solvedLine("TIMELINE"), this::timeline);
+        customCard(org.perazimchurch.app.R.drawable.ic_game_crossword, org.perazimchurch.app.R.drawable.ic_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Mini Crossword",
+                "A five-by-five Bible crossword. Four clues cross: Moses, Abel, manna and Saul.",
+                solvedLine("CROSSWORD"), this::miniCrossword);
+        customCard(org.perazimchurch.app.R.drawable.ic_game_road, org.perazimchurch.app.R.drawable.ic_char_explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
+                "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
+                solvedLine("ROAD"), this::roadToJerusalem);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
     }
 
@@ -226,6 +332,364 @@ public final class GamesHubDialog extends Dialog {
             round = new Round(mode, seed);
             question();
         });
+    }
+
+    // ---- Word Search, Memory Match and Story Timeline ----
+
+    private void customCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(16), dp(12), dp(16), dp(16));
+        GradientDrawable cardBg = shape(PerazimTheme.COLOR_SURFACE);
+        cardBg.setStroke(dp(2), accent);
+        card.setBackground(cardBg);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(16);
+        page.addView(card, params);
+        LinearLayout head = new LinearLayout(activity);
+        head.setOrientation(LinearLayout.HORIZONTAL);
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        head.addView(icon(iconRes, 52), new LinearLayout.LayoutParams(dp(52), dp(52)));
+        TextView titleView = new TextView(activity);
+        titleView.setText(title);
+        titleView.setTextSize(21);
+        titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        titleView.setPadding(dp(12), 0, 0, 0);
+        head.addView(titleView, new LinearLayout.LayoutParams(0, -2, 1f));
+        head.addView(icon(characterRes, 44), new LinearLayout.LayoutParams(dp(44), dp(44)));
+        LinearLayout.LayoutParams headParams = new LinearLayout.LayoutParams(-1, -2);
+        headParams.bottomMargin = dp(8);
+        card.addView(head, headParams);
+        addText(card, description, 16, false);
+        addText(card, bestLine, 14, false);
+        Button play = new Button(activity);
+        styleButton(play, "Play " + title, false);
+        card.addView(play, new LinearLayout.LayoutParams(-1, -2));
+        play.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            seed = System.nanoTime();
+            start.run();
+        });
+    }
+
+    private String solvedLine(String key) {
+        int n = scores.getInt(scorePrefix + key, 0);
+        return n == 0 ? "Solved: not yet" : "Solved: " + n + (n == 1 ? " time" : " times");
+    }
+
+    private void solvedOnce(String key) {
+        scores.edit().putInt(scorePrefix + key, scores.getInt(scorePrefix + key, 0) + 1).apply();
+    }
+
+    private FeedbackManager feedback() { return FeedbackManager.get(activity); }
+
+    private void wordSearch() {
+        WordSearch game = new WordSearch(seed);
+        screen("Word Search", "Tap a start letter, then the end letter of a word. Words run in any direction.", true);
+        TextView status = text("Found 0 of " + game.words().size(), 16, true);
+        TextView[][] cells = new TextView[WordSearch.SIZE][WordSearch.SIZE];
+        Set<Integer> foundCells = new HashSet<>();
+        int[] start = {-1, -1};
+        LinearLayout grid = new LinearLayout(activity);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        grid.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        grid.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int r = 0; r < WordSearch.SIZE; r++) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (int c = 0; c < WordSearch.SIZE; c++) {
+                final int rr = r, cc = c;
+                TextView cell = new TextView(activity);
+                cell.setText(String.valueOf(game.letter(r, c)));
+                cell.setGravity(Gravity.CENTER);
+                cell.setTextSize(16);
+                cell.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                cell.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                cells[r][c] = cell;
+                row.addView(cell, new LinearLayout.LayoutParams(0, dp(36), 1f));
+                cell.setOnClickListener(v -> {
+                    if (start[0] < 0) {
+                        start[0] = rr; start[1] = cc;
+                        cell.setBackgroundColor(PerazimTheme.COLOR_PURPLE_SOFT);
+                        feedback().gameCue(FeedbackManager.GameCue.PICK);
+                        return;
+                    }
+                    int[][] hit = game.select(start[0], start[1], rr, cc);
+                    start[0] = -1; start[1] = -1;
+                    if (hit != null) {
+                        for (int[] p : hit) foundCells.add(p[0] * WordSearch.SIZE + p[1]);
+                        addStar();
+                        feedback().gameCue(FeedbackManager.GameCue.MATCH);
+                        status.setText("Found " + game.found().size() + " of " + game.words().size());
+                        if (game.complete()) {
+                            solvedOnce("WORD_SEARCH");
+                            feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                            feedback().celebrateIn(getWindow());
+                            status.setText("All words found. Well done.");
+                        }
+                    } else {
+                        feedback().gameCue(FeedbackManager.GameCue.MISS);
+                        Toast.makeText(activity, "Not a word in that line. Try again.", Toast.LENGTH_SHORT).show();
+                    }
+                    for (int r2 = 0; r2 < cells.length; r2++) {
+                        for (int c2 = 0; c2 < cells[r2].length; c2++) {
+                            boolean found = foundCells.contains(r2 * WordSearch.SIZE + c2);
+                            cells[r2][c2].setBackgroundColor(found ? PerazimTheme.COLOR_ORANGE_GHOST : 0x00000000);
+                        }
+                    }
+                });
+            }
+            grid.addView(row);
+        }
+        page.addView(grid, wrapParams(12));
+        StringBuilder list = new StringBuilder("Find: ");
+        for (String w : game.words()) list.append(w).append("   ");
+        text(list.toString().trim(), 16, false);
+        button("New puzzle", false).setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); wordSearch(); });
+    }
+
+    private void memoryMatch() {
+        MemoryMatch game = new MemoryMatch(seed, 6);
+        screen("Memory Match", "Flip two tiles. Match the pairs in as few moves as you can.", true);
+        TextView status = text("Moves: 0", 16, true);
+        TextView reveal = text("", 15, false);
+        int cols = 3;
+        TextView[] tileViews = new TextView[game.tiles().size()];
+        LinearLayout grid = new LinearLayout(activity);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        for (int i = 0; i < tileViews.length; i += cols) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (int j = i; j < i + cols && j < tileViews.length; j++) {
+                final int index = j;
+                TextView tile = new TextView(activity);
+                tile.setGravity(Gravity.CENTER);
+                tile.setTextSize(14);
+                tile.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                tileViews[j] = tile;
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(78), 1f);
+                lp.setMargins(dp(4), dp(4), dp(4), dp(4));
+                row.addView(tile, lp);
+                tile.setOnClickListener(v -> {
+                    if (game.mismatchShowing() || !game.flip(index)) return;
+                    if (game.mismatchShowing()) feedback().gameCue(FeedbackManager.GameCue.MISS);
+                    else if (game.tiles().get(index).matched) feedback().gameCue(FeedbackManager.GameCue.MATCH);
+                    else feedback().gameCue(FeedbackManager.GameCue.PICK);
+                    refreshTiles(game, tileViews);
+                    status.setText("Moves: " + game.moves());
+                    MemoryMatch.Tile t = game.tiles().get(index);
+                    reveal.setText(t.faceUp || t.matched ? t.symbol.reference : "");
+                    if (game.complete()) {
+                        addStar();
+                        solvedOnce("MEMORY_MATCH");
+                        feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                        feedback().celebrateIn(getWindow());
+                        status.setText("Complete in " + game.moves() + " moves.");
+                        reveal.setText("Every pair found.");
+                    } else if (game.mismatchShowing()) {
+                        handler.postDelayed(() -> {
+                            game.hideMismatch();
+                            refreshTiles(game, tileViews);
+                        }, 800);
+                    }
+                });
+            }
+            grid.addView(row);
+        }
+        refreshTiles(game, tileViews);
+        page.addView(grid, wrapParams(12));
+        button("New deck", false).setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); memoryMatch(); });
+    }
+
+    private void refreshTiles(MemoryMatch game, TextView[] views) {
+        List<MemoryMatch.Tile> tiles = game.tiles();
+        for (int i = 0; i < views.length; i++) {
+            MemoryMatch.Tile t = tiles.get(i);
+            boolean shown = t.faceUp || t.matched;
+            views[i].setText(shown ? t.symbol.label : "?");
+            views[i].setTextColor(shown ? PerazimTheme.COLOR_TEXT_DARK : PerazimTheme.COLOR_TEXT_PRIMARY);
+            views[i].setBackground(shape(t.matched ? PerazimTheme.COLOR_ORANGE_SOFT
+                    : shown ? PerazimTheme.COLOR_WARM_CREAM : PerazimTheme.COLOR_PURPLE_MUTED));
+        }
+    }
+
+    private void timeline() {
+        TimelineSort game = new TimelineSort(seed, 6);
+        screen("Story Timeline", "Tap the events in the order they happen in the Bible story.", true);
+        TextView status = text("Placed 0 of " + game.ordered().size(), 16, true);
+        List<TimelineSort.Event> events = game.shuffled();
+        for (int i = 0; i < events.size(); i++) {
+            final int index = i;
+            Button b = button(events.get(i).title, false);
+            b.setOnClickListener(v -> {
+                if (game.isPlaced(index)) return;
+                if (game.tap(index)) {
+                    addStar();
+                    feedback().gameCue(FeedbackManager.GameCue.MATCH);
+                    b.setText(game.placed() + ". " + events.get(index).title + " (" + events.get(index).reference + ")");
+                    b.setAlpha(0.7f);
+                    status.setText("Placed " + game.placed() + " of " + game.ordered().size());
+                    if (game.complete()) {
+                        solvedOnce("TIMELINE");
+                        feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                        feedback().celebrateIn(getWindow());
+                        status.setText("Story in order. Mistakes: " + game.mistakes());
+                    }
+                } else {
+                    feedback().gameCue(FeedbackManager.GameCue.MISS);
+                    Toast.makeText(activity, "Not yet. Think about what comes first in the story.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        button("New timeline", false).setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); timeline(); });
+    }
+
+    private void miniCrossword() {
+        MiniCrossword cw = new MiniCrossword();
+        screen("Mini Crossword", "Fill in the grid from the clues below. Tap Check to see which letters are right.", true);
+        EditText[][] cells = new EditText[MiniCrossword.SIZE][MiniCrossword.SIZE];
+        LinearLayout grid = new LinearLayout(activity);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        grid.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        grid.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int r = 0; r < MiniCrossword.SIZE; r++) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (int c = 0; c < MiniCrossword.SIZE; c++) {
+                if (!cw.isLetter(r, c)) {
+                    View black = new View(activity);
+                    black.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+                    row.addView(black, new LinearLayout.LayoutParams(0, dp(52), 1f));
+                    continue;
+                }
+                EditText cell = new EditText(activity);
+                cell.setGravity(Gravity.CENTER);
+                cell.setSingleLine(true);
+                cell.setTextSize(20);
+                cell.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                cell.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                cell.setPadding(0, 0, 0, 0);
+                cell.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                cell.setFilters(new android.text.InputFilter[]{
+                        new android.text.InputFilter.AllCaps(), new android.text.InputFilter.LengthFilter(1)});
+                cell.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+                cells[r][c] = cell;
+                row.addView(cell, new LinearLayout.LayoutParams(0, dp(52), 1f));
+            }
+            grid.addView(row);
+        }
+        page.addView(grid, wrapParams(12));
+        for (MiniCrossword.Clue clue : cw.clues()) {
+            text(clue.number + " " + clue.direction + ": " + clue.text, 15, false);
+        }
+        TextView status = text("", 16, true);
+        button("Check my answers", true).setOnClickListener(v -> {
+            feedback().click(v);
+            String[][] typed = new String[MiniCrossword.SIZE][MiniCrossword.SIZE];
+            int right = 0, total = 0;
+            for (int r = 0; r < MiniCrossword.SIZE; r++) {
+                for (int c = 0; c < MiniCrossword.SIZE; c++) {
+                    if (cells[r][c] == null) { typed[r][c] = ""; continue; }
+                    typed[r][c] = cells[r][c].getText().toString();
+                    total++;
+                    boolean ok = cw.matches(r, c, typed[r][c]);
+                    if (ok) right++;
+                    cells[r][c].setBackgroundColor(typed[r][c].isEmpty() ? PerazimTheme.COLOR_SURFACE
+                            : ok ? 0x6610B981 : 0x66EF4444);
+                }
+            }
+            if (cw.solved(typed)) {
+                addStar();
+                solvedOnce("CROSSWORD");
+                feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                feedback().celebrateIn(getWindow());
+                status.setText("Solved. Every answer is right.");
+            } else {
+                feedback().gameCue(FeedbackManager.GameCue.MISS);
+                status.setText(right + " of " + total + " letters are right so far.");
+            }
+        });
+    }
+
+    private void roadToJerusalem() {
+        RoadToJerusalem game = new RoadToJerusalem(seed);
+        screen("Road to Jerusalem", "Roll the die to move. The phone travels too. First to square 20 wins.", true);
+        TextView status = text("Roll to begin your journey.", 16, true);
+        TextView[] squares = new TextView[RoadToJerusalem.FINISH + 1];
+        LinearLayout board = new LinearLayout(activity);
+        board.setOrientation(LinearLayout.VERTICAL);
+        board.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        board.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int first = 0; first <= RoadToJerusalem.FINISH; first += 5) {
+            LinearLayout line = new LinearLayout(activity);
+            line.setOrientation(LinearLayout.HORIZONTAL);
+            for (int sq = first; sq < first + 5 && sq <= RoadToJerusalem.FINISH; sq++) {
+                TextView t = new TextView(activity);
+                t.setGravity(Gravity.CENTER);
+                t.setTextSize(12);
+                t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                t.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                squares[sq] = t;
+                line.addView(t, new LinearLayout.LayoutParams(0, dp(58), 1f));
+            }
+            board.addView(line);
+        }
+        page.addView(board, wrapParams(12));
+        refreshRoad(game, squares);
+        Button roll = button("Roll the die", true);
+        Button again = button("New road", false);
+        again.setVisibility(View.GONE);
+        roll.setOnClickListener(v -> {
+            if (game.finished()) return;
+            feedback().gameCue(FeedbackManager.GameCue.PICK);
+            roll.setEnabled(false);
+            RoadToJerusalem.Move mine = game.turn(true);
+            String line = "You rolled " + mine.roll + "." + (mine.note == null ? "" : " " + mine.note);
+            status.setText(line);
+            refreshRoad(game, squares);
+            if (game.finished()) { finishRoad(game, status, roll, again); return; }
+            handler.postDelayed(() -> {
+                RoadToJerusalem.Move theirs = game.turn(false);
+                status.setText(line + "\nThe phone rolled " + theirs.roll + "." + (theirs.note == null ? "" : " " + theirs.note));
+                refreshRoad(game, squares);
+                if (game.finished()) finishRoad(game, status, roll, again);
+                else roll.setEnabled(true);
+            }, 900);
+        });
+        again.setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); roadToJerusalem(); });
+    }
+
+    private void finishRoad(RoadToJerusalem game, TextView status, Button roll, Button again) {
+        roll.setEnabled(false);
+        again.setVisibility(View.VISIBLE);
+        if ("You".equals(game.winner())) {
+            addStar();
+            solvedOnce("ROAD");
+            feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+            feedback().celebrateIn(getWindow());
+            status.setText(status.getText() + "\nYou reached Jerusalem first.");
+        } else {
+            status.setText(status.getText() + "\nThe phone reached Jerusalem first. Try a new road.");
+        }
+    }
+
+    private void refreshRoad(RoadToJerusalem game, TextView[] squares) {
+        for (int i = 0; i < squares.length; i++) {
+            StringBuilder label = new StringBuilder();
+            label.append(i == 0 ? "Start" : i == RoadToJerusalem.FINISH ? "Jerusalem" : String.valueOf(i));
+            if (game.playerAt() == i) label.append("\nYou");
+            if (game.computerAt() == i) label.append("\nPhone");
+            squares[i].setText(label.toString());
+            squares[i].setBackground(shape(game.hasNote(i) ? PerazimTheme.COLOR_ORANGE_GHOST : PerazimTheme.COLOR_SURFACE));
+        }
+    }
+
+    private LinearLayout.LayoutParams wrapParams(int bottomDp) {
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+        lp.bottomMargin = dp(bottomDp);
+        return lp;
     }
 
     // ---- Ladder of Faith ----

@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
@@ -41,6 +43,7 @@ import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.domain.model.Hymn;
 import org.perazimchurch.app.presentation.viewmodel.WorshipViewModel;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -120,34 +123,19 @@ public class WorshipUiBinder {
 
         contentLayout = new LinearLayout(activity);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
-        contentLayout.setPadding(dp(16), dp(16), dp(16), dp(36));
+        contentLayout.setPadding(dp(16), dp(8), dp(16), dp(16));
 
-        // 1. Title Header
+        // 1. Heading (mockup: "Worship" 26sp, subtitle in #CDBBD6)
         LinearLayout headerRow = new LinearLayout(activity);
         headerRow.setOrientation(LinearLayout.VERTICAL);
-        headerRow.setPadding(0, dp(4), 0, dp(12));
+        headerRow.setPadding(dp(4), 0, dp(4), dp(18));
+        headerRow.addView(GlassKit.text(activity, "Worship", 26, true, GlassKit.text()));
+        headerRow.addView(GlassKit.text(activity, "Expanded Hymnal and Chord Browser", 13, false, GlassKit.muted()),
+                GlassKit.matchWrap(activity, 3));
+        contentLayout.addView(GlassKit.keep(headerRow));
 
-        TextView tvTitle = new TextView(activity);
-        tvTitle.setText("Worship");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        headerRow.addView(tvTitle);
-
-        TextView tvSubtitle = new TextView(activity);
-        tvSubtitle.setText("Expanded Hymnal & Chord Browser");
-        tvSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvSubtitle.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvSubtitle.setPadding(0, dp(2), 0, 0);
-        headerRow.addView(tvSubtitle);
-
-        contentLayout.addView(headerRow);
-
-        // 2. Classical Art Banner Row (Quiet)
-        View artBanner = buildArtBanner();
-        if (artBanner != null) {
-            contentLayout.addView(artBanner);
-        }
+        // 2. Purple-to-orange glass banner
+        contentLayout.addView(buildArtBanner());
 
         // 3. Search Bar on #4F1E5C
         View searchBar = buildSearchBar();
@@ -158,13 +146,8 @@ public class WorshipUiBinder {
         contentLayout.addView(chipsRow);
 
         // 5. Section Header
-        TextView tvHeader = new TextView(activity);
-        tvHeader.setText("HYMNS & SPIRITUAL SONGS");
-        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvHeader.setPadding(0, dp(10), 0, dp(8));
-        contentLayout.addView(tvHeader);
+        View tvHeader = new View(activity); // the mockup goes straight from chips to the list
+        contentLayout.addView(tvHeader, new LinearLayout.LayoutParams(1, dp(6)));
 
         // 6. Loading Indicator
         loadingBar = new ProgressBar(activity);
@@ -190,6 +173,12 @@ public class WorshipUiBinder {
             ivEmpty.setImageBitmap(emptyDoveBmp);
             ivEmpty.setScaleType(ImageView.ScaleType.FIT_CENTER);
             ivEmpty.setAlpha(0.85f);
+            // Rounded tile so the illustration's dark square sits softly on the glow.
+            android.graphics.drawable.GradientDrawable emptyShape = new android.graphics.drawable.GradientDrawable();
+            emptyShape.setCornerRadius(dp(24));
+            emptyShape.setColor(android.graphics.Color.TRANSPARENT);
+            ivEmpty.setBackground(emptyShape);
+            ivEmpty.setClipToOutline(true);
             LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(dp(100), dp(100));
             lpImg.setMargins(0, 0, 0, dp(12));
             ivEmpty.setLayoutParams(lpImg);
@@ -218,58 +207,39 @@ public class WorshipUiBinder {
     // 1. CLASSICAL ART BANNER ROW (16:9 HERO WITH CONTEMPLATIVE SCRIM)
     // =========================================================================
 
-    @Nullable
     private View buildArtBanner() {
-        Bitmap duskBmp = loadAssetBitmap("backgrounds/bg_worship_dusk.png", 720);
-        if (duskBmp == null) return null;
+        FrameLayout banner = new FrameLayout(activity);
+        GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor("#8C8B32AA"), Color.parseColor("#4DE17D2F")});
+        bg.setCornerRadius(dp(28));
+        bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#38FFFFFF"));
+        banner.setBackground(bg);
+        GlassKit.keep(banner);
 
-        FrameLayout heroFrame = new FrameLayout(activity);
-        LinearLayout.LayoutParams lpFrame = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(150));
-        lpFrame.setMargins(0, 0, 0, dp(14));
-        heroFrame.setLayoutParams(lpFrame);
-        heroFrame.setBackground(PerazimTheme.createCardGradient(dp(14), dp(1)));
-        heroFrame.setClipToOutline(true);
+        LinearLayout text = new LinearLayout(activity);
+        text.setOrientation(LinearLayout.VERTICAL);
+        TextView title = GlassKit.text(activity, "SACRED HYMNS AND CHORAL WORSHIP", 14, true, Color.WHITE);
+        title.setLetterSpacing(0.04f);
+        text.addView(title);
+        text.addView(GlassKit.text(activity, "Perazim Mission Church · Songs of Contemplation", 12, false,
+                Color.parseColor("#E6D8EE")), GlassKit.matchWrap(activity, 3));
+        FrameLayout.LayoutParams lpText = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM | Gravity.START);
+        lpText.setMargins(dp(18), 0, dp(18), dp(16));
+        banner.addView(GlassKit.keep(text), lpText);
 
-        ImageView ivHero = new ImageView(activity);
-        ivHero.setImageBitmap(duskBmp);
-        ivHero.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        heroFrame.addView(ivHero, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        GradientDrawable sq = new GradientDrawable();
+        sq.setColor(Color.parseColor("#24FFFFFF"));
+        sq.setStroke(Math.max(1, dp(1)), Color.parseColor("#4DFFFFFF"));
+        sq.setCornerRadius(dp(14));
+        FrameLayout icon = GlassKit.iconBadge(activity, org.perazimchurch.app.R.drawable.gl_music, sq, 40, 20);
+        FrameLayout.LayoutParams lpIcon = new FrameLayout.LayoutParams(dp(40), dp(40), Gravity.TOP | Gravity.END);
+        lpIcon.setMargins(0, dp(18), dp(18), 0);
+        banner.addView(icon, lpIcon);
 
-        View bottomScrim = new View(activity);
-        GradientDrawable scrimGrad = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
-        bottomScrim.setBackground(scrimGrad);
-        heroFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-        LinearLayout textOverlay = new LinearLayout(activity);
-        textOverlay.setOrientation(LinearLayout.VERTICAL);
-        textOverlay.setGravity(Gravity.BOTTOM);
-        textOverlay.setPadding(dp(16), dp(16), dp(16), dp(14));
-        FrameLayout.LayoutParams lpText = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        textOverlay.setLayoutParams(lpText);
-
-        TextView tvTitle = new TextView(activity);
-        tvTitle.setText("SACRED HYMNS & CHORAL WORSHIP");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tvTitle.setLetterSpacing(0.04f);
-        textOverlay.addView(tvTitle);
-
-        TextView tvSubtitle = new TextView(activity);
-        tvSubtitle.setText("Perazim Mission Church · Songs of Contemplation");
-        tvSubtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSubtitle.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvSubtitle.setPadding(0, dp(2), 0, 0);
-        textOverlay.addView(tvSubtitle);
-
-        heroFrame.addView(textOverlay);
-        return heroFrame;
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(110));
+        lp.bottomMargin = dp(14);
+        banner.setLayoutParams(lp);
+        return banner;
     }
 
     // =========================================================================
@@ -280,24 +250,26 @@ public class WorshipUiBinder {
         LinearLayout searchLayout = new LinearLayout(activity);
         searchLayout.setOrientation(LinearLayout.HORIZONTAL);
         searchLayout.setGravity(Gravity.CENTER_VERTICAL);
-        searchLayout.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 12, PerazimTheme.COLOR_STROKE, 1));
-        searchLayout.setPadding(dp(12), dp(4), dp(12), dp(4));
+        searchLayout.setBackground(GlassKit.glass(activity, 24));
+        searchLayout.setPadding(dp(16), 0, dp(8), 0);
+        GlassKit.keep(searchLayout);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(48));
         lp.setMargins(0, 0, 0, dp(12));
         searchLayout.setLayoutParams(lp);
 
         ImageView ivSearch = new ImageView(activity);
-        ivSearch.setImageResource(org.perazimchurch.app.R.drawable.ic_search);
+        ivSearch.setImageResource(org.perazimchurch.app.R.drawable.gl_search);
+        ivSearch.setImageTintList(android.content.res.ColorStateList.valueOf(GlassKit.muted()));
         LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(18), dp(18));
-        lpIcon.setMargins(0, 0, dp(8), 0);
+        lpIcon.setMargins(0, 0, dp(10), 0);
         ivSearch.setLayoutParams(lpIcon);
         searchLayout.addView(ivSearch);
 
         etSearch = new EditText(activity);
-        etSearch.setHint("Search hymns by number or lyric keywords…");
-        etSearch.setHintTextColor(PerazimTheme.COLOR_TEXT_DISABLED);
-        etSearch.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        etSearch.setHint("Search hymns by number or lyric keywords");
+        etSearch.setHintTextColor(GlassKit.muted());
+        etSearch.setTextColor(GlassKit.text());
         etSearch.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         etSearch.setBackground(null);
         etSearch.setSingleLine(true);
@@ -326,7 +298,7 @@ public class WorshipUiBinder {
         Button btnClear = new Button(activity);
         btnClear.setText("✕");
         btnClear.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnClear.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        btnClear.setTextColor(GlassKit.muted());
         btnClear.setBackground(null);
         btnClear.setPadding(dp(4), dp(4), dp(4), dp(4));
         btnClear.setOnClickListener(v -> etSearch.setText(""));
@@ -344,7 +316,7 @@ public class WorshipUiBinder {
         hsv.setHorizontalScrollBarEnabled(false);
         LinearLayout.LayoutParams lpHsv = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpHsv.setMargins(0, 0, 0, dp(8));
+        lpHsv.setMargins(0, 0, 0, dp(12));
         hsv.setLayoutParams(lpHsv);
 
         chipsContainer = new LinearLayout(activity);
@@ -356,8 +328,14 @@ public class WorshipUiBinder {
             Button btn = new Button(activity);
             btn.setText(cat);
             btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            btn.setTypeface(Typeface.DEFAULT_BOLD);
-            btn.setPadding(dp(14), dp(4), dp(14), dp(4));
+            btn.setAllCaps(false);
+            btn.setMinWidth(0);
+            btn.setMinimumWidth(0);
+            btn.setMinHeight(0);
+            btn.setMinimumHeight(0);
+            btn.setStateListAnimator(null);
+            btn.setPadding(dp(16), 0, dp(16), 0);
+            GlassKit.keep(btn);
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, dp(34));
@@ -387,13 +365,9 @@ public class WorshipUiBinder {
     private void updateChipStyles() {
         for (Button btn : chipButtons) {
             boolean isSelected = btn.getText().toString().equalsIgnoreCase(selectedCategory);
-            if (isSelected) {
-                btn.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-                btn.setBackground(PerazimTheme.createActivePillGradient(dp(14)));
-            } else {
-                btn.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-                btn.setBackground(PerazimTheme.createMutedPillGradient(dp(14), PerazimTheme.COLOR_STROKE, dp(1)));
-            }
+            btn.setTextColor(isSelected ? Color.WHITE : GlassKit.text());
+            btn.setTypeface(isSelected ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+            btn.setBackground(isSelected ? GlassKit.purple(activity, 999) : GlassKit.glass(activity, 999));
         }
     }
 
@@ -430,66 +404,47 @@ public class WorshipUiBinder {
     }
 
     private View createHymnRowCard(final Hymn hymn) {
-        final LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, 14, PerazimTheme.COLOR_STROKE, 1);
+        // Mockup row: 62dp glass, 22dp corners, #n badge, title + "Category · Key", heart circle
+        final LinearLayout card = GlassKit.card(activity, 22, 0);
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
-        card.setPadding(dp(16), dp(12), dp(14), dp(12));
+        card.setPadding(dp(14), dp(10), dp(14), dp(10));
+        card.setMinimumHeight(dp(62));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(10));
+        lp.setMargins(0, 0, 0, dp(8));
         card.setLayoutParams(lp);
 
-        // 1. Number Badge in #A67BB3
-        TextView tvNumber = new TextView(activity);
-        tvNumber.setText("#" + hymn.getNumber());
-        tvNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvNumber.setTypeface(Typeface.DEFAULT_BOLD);
-        tvNumber.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvNumber.setBackground(createCardBackground(PerazimTheme.COLOR_SURFACE_2, 6, PerazimTheme.COLOR_STROKE, 1));
-        tvNumber.setPadding(dp(8), dp(4), dp(8), dp(4));
-        LinearLayout.LayoutParams lpNum = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        TextView tvNumber = GlassKit.text(activity, "#" + hymn.getNumber(), 11, true, GlassKit.text());
+        tvNumber.setGravity(Gravity.CENTER);
+        tvNumber.setBackground(GlassKit.glassControl(activity, 12));
+        LinearLayout.LayoutParams lpNum = new LinearLayout.LayoutParams(dp(34), dp(34));
         lpNum.setMargins(0, 0, dp(12), 0);
-        tvNumber.setLayoutParams(lpNum);
-        card.addView(tvNumber);
+        card.addView(tvNumber, lpNum);
 
-        // 2. Title & Key Column
         LinearLayout textCol = new LinearLayout(activity);
         textCol.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        textCol.setLayoutParams(lpText);
-
-        TextView tvTitle = new TextView(activity);
-        tvTitle.setText(hymn.getTitle());
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        TextView tvTitle = GlassKit.text(activity, hymn.getTitle(), 14, true, GlassKit.text());
+        tvTitle.setMaxLines(1);
+        tvTitle.setEllipsize(android.text.TextUtils.TruncateAt.END);
         textCol.addView(tvTitle);
-
         String category = hymn.getCategory() != null ? hymn.getCategory() : "Hymn";
         String rawKey = hymn.getKeySignature() != null && !hymn.getKeySignature().isEmpty()
                 ? hymn.getKeySignature() : (hymn.getKey() != null ? hymn.getKey() : "G");
-        TextView tvCategoryKey = new TextView(activity);
-        tvCategoryKey.setText(category + " · Key of " + rawKey.replace("Major", "").trim());
-        tvCategoryKey.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvCategoryKey.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        tvCategoryKey.setPadding(0, dp(2), 0, 0);
-        textCol.addView(tvCategoryKey);
+        textCol.addView(GlassKit.text(activity, category + " · Key of " + rawKey.replace("Major", "").trim(), 12, false,
+                GlassKit.muted()), GlassKit.matchWrap(activity, 3));
+        card.addView(GlassKit.keep(textCol), new LinearLayout.LayoutParams(0, -2, 1f));
 
-        card.addView(textCol);
-
-        // 3. Quiet Outline Heart Button
         final Button btnHeart = new Button(activity);
+        GlassKit.keep(btnHeart);
         updateHeartButtonState(btnHeart, hymn.isFavorite());
-        LinearLayout.LayoutParams lpHeart = new LinearLayout.LayoutParams(dp(34), dp(34));
-        lpHeart.setMargins(dp(6), 0, dp(6), 0);
+        LinearLayout.LayoutParams lpHeart = new LinearLayout.LayoutParams(dp(36), dp(36));
+        lpHeart.setMargins(dp(10), 0, 0, 0);
         btnHeart.setLayoutParams(lpHeart);
-
         btnHeart.setOnClickListener(v -> {
             boolean nextFav = !hymn.isFavorite();
             hymn.setFavorite(nextFav);
             updateHeartButtonState(btnHeart, nextFav);
-
             viewModel.toggleFavorite(hymn.getId(), nextFav, () -> activity.runOnUiThread(() -> {
                 String msg = nextFav ? "Added to Favorites" : "Removed from Favorites";
                 Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show();
@@ -500,30 +455,42 @@ public class WorshipUiBinder {
         });
         card.addView(btnHeart);
 
-        // 4. Clean Vector Chevron Right
-        ImageView ivChevron = new ImageView(activity);
-        ivChevron.setImageResource(org.perazimchurch.app.R.drawable.ic_chevron_right);
-        LinearLayout.LayoutParams lpChev = new LinearLayout.LayoutParams(dp(18), dp(18));
-        ivChevron.setLayoutParams(lpChev);
-        card.addView(ivChevron);
-
+        card.setClickable(true);
         card.setOnClickListener(v -> showHymnDetailSheet(hymn));
-
         return card;
     }
 
     private void updateHeartButtonState(Button btnHeart, boolean isFav) {
+        // Vector heart (the old ♥ character could render as a broken glyph)
+        btnHeart.setText("");
+        btnHeart.setStateListAnimator(null);
+        btnHeart.setMinWidth(0);
+        btnHeart.setMinimumWidth(0);
+        btnHeart.setMinHeight(0);
+        btnHeart.setMinimumHeight(0);
+        GradientDrawable ring = new GradientDrawable();
+        ring.setShape(GradientDrawable.OVAL);
+        android.graphics.drawable.Drawable heart = activity.getDrawable(
+                isFav ? org.perazimchurch.app.R.drawable.gl_heart_fill : org.perazimchurch.app.R.drawable.gl_heart);
         if (isFav) {
-            btnHeart.setText("♥");
-            btnHeart.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            btnHeart.setTextColor(PerazimTheme.COLOR_ORANGE_BRAND);
-            btnHeart.setBackground(createCardBackground(PerazimTheme.COLOR_ORANGE_GHOST, 17, PerazimTheme.COLOR_ORANGE_SOFT, 1));
+            ring.setColor(Color.parseColor("#33E17D2F"));
+            ring.setStroke(Math.max(1, dp(1)), GlassKit.ORANGE);
         } else {
-            btnHeart.setText("♡");
-            btnHeart.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            btnHeart.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-            btnHeart.setBackground(createCardBackground(Color.TRANSPARENT, 17, PerazimTheme.COLOR_STROKE, 1));
+            ring.setColor(Color.TRANSPARENT);
+            ring.setStroke(Math.max(1, dp(1)), GlassKit.light() ? Color.parseColor("#403D1749") : Color.parseColor("#40FFFFFF"));
         }
+        if (heart != null) {
+            heart = heart.mutate();
+            heart.setTint(isFav ? Color.parseColor("#F8A95A") : GlassKit.muted());
+            android.graphics.drawable.LayerDrawable layered = new android.graphics.drawable.LayerDrawable(
+                    new android.graphics.drawable.Drawable[]{ring, heart});
+            int inset = dp(9);
+            layered.setLayerInset(1, inset, inset, inset, inset);
+            btnHeart.setBackground(layered);
+        } else {
+            btnHeart.setBackground(ring);
+        }
+        btnHeart.setContentDescription(isFav ? "Favorite" : "Add to favorites");
         btnHeart.setPadding(0, 0, 0, 0);
     }
 
@@ -545,7 +512,7 @@ public class WorshipUiBinder {
     public void showHymnDetailSheet(final Hymn hymn) {
         if (hymn == null) return;
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = AppDialogs.builder(activity);
 
         ScrollView dialogScroll = new ScrollView(activity);
         dialogScroll.setFillViewport(true);
