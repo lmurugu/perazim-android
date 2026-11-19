@@ -303,7 +303,7 @@ public class BibleReaderDialog extends Dialog {
         FrameLayout chapterCard = new FrameLayout(getContext());
         GradientDrawable cardGlass = new GradientDrawable();
         cardGlass.setCornerRadius(dp(28));
-        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#E6200F30"));
+        cardGlass.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#F2200F30"));
         cardGlass.setStroke(dp(1), Color.parseColor("#33FFFFFF"));
         chapterCard.setBackground(cardGlass);
         chapterCard.addView(versesScrollView, new FrameLayout.LayoutParams(-1, -1));
@@ -1418,8 +1418,9 @@ public class BibleReaderDialog extends Dialog {
                         "No notes yet. Write a note and link the verses it talks about.", 13, false, Color.parseColor("#D9C9F2")));
             }
             for (final org.perazimchurch.app.domain.model.BibleNote note : notes) {
-                TextView body = GlassKit.text(getContext(), note.getBody().length() > 140
-                        ? note.getBody().substring(0, 140) + "..." : note.getBody(), 14, false, Color.parseColor("#F5EEFF"));
+                String plain = android.text.Html.fromHtml(note.getBody(), android.text.Html.FROM_HTML_MODE_COMPACT).toString().trim();
+                TextView body = GlassKit.text(getContext(), plain.length() > 140 ? plain.substring(0, 140) + "..." : plain,
+                        14, false, Color.parseColor("#F5EEFF"));
                 body.setOnClickListener(v -> showNoteEditor(note));
                 body.setPadding(0, dp(10), 0, dp(4));
                 notesPanelList.addView(body);
@@ -1437,6 +1438,11 @@ public class BibleReaderDialog extends Dialog {
                     links.addView(chip);
                 }
                 notesPanelList.addView(links);
+                if (!note.getTopics().isEmpty()) {
+                    TextView tags = GlassKit.text(getContext(), "#" + android.text.TextUtils.join("  #", note.getTopics()),
+                            11, true, COLOR_ACCENT_ORANGE());
+                    notesPanelList.addView(tags);
+                }
             }
         });
     }
@@ -1447,26 +1453,87 @@ public class BibleReaderDialog extends Dialog {
         loadChapterVerses(BibleMapper.getBookIdFromNumber(loc.bookNumber), loc.chapter);
     }
 
-    /** Editor for one note: text, linked verses (added by reference, e.g. "John 3:16") and save or delete. */
+    /** Full-screen note editor on the gradient background: rich text, linked verses and topics. */
+    private View noteEditorView;
+
     private void showNoteEditor(@Nullable final org.perazimchurch.app.domain.model.BibleNote existing) {
+        if (readerFrame == null) {
+            return;
+        }
+        dismissNoteEditor();
         final List<org.perazimchurch.app.domain.model.VerseLocation> links = new ArrayList<>();
         if (existing != null) {
             links.addAll(existing.getLinks());
         }
-        LinearLayout box = new LinearLayout(getContext());
-        box.setOrientation(LinearLayout.VERTICAL);
-        box.setPadding(dp(18), dp(8), dp(18), dp(8));
+        final LinearLayout editor = new LinearLayout(getContext());
+        editor.setOrientation(LinearLayout.VERTICAL);
+        editor.setPadding(dp(16), dp(16), dp(16), dp(12));
+        editor.setBackground(PerazimTheme.createBackgroundGradient());
+        editor.setClickable(true);
+
+        // Top bar: close, title, save
+        LinearLayout top = new LinearLayout(getContext());
+        top.setOrientation(LinearLayout.HORIZONTAL);
+        top.setGravity(Gravity.CENTER_VERTICAL);
+        TextView close = GlassKit.text(getContext(), "Back", 13, true, GlassKit.accent());
+        close.setPadding(dp(8), dp(8), dp(8), dp(8));
+        close.setOnClickListener(v -> dismissNoteEditor());
+        top.addView(close);
+        TextView title = GlassKit.text(getContext(), existing == null ? "New note" : "Edit note", 16, true, GlassKit.text());
+        top.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView save = GlassKit.orangeButton(getContext(), "Save", 12);
+        save.setPadding(dp(16), 0, dp(16), 0);
+        top.addView(save, new LinearLayout.LayoutParams(-2, dp(34)));
+        editor.addView(top);
+
+        // Formatting toolbar (scrolls sideways so every control stays reachable)
+        android.widget.HorizontalScrollView barScroll = new android.widget.HorizontalScrollView(getContext());
+        LinearLayout toolbar = new LinearLayout(getContext());
+        toolbar.setOrientation(LinearLayout.HORIZONTAL);
+        toolbar.setGravity(Gravity.CENTER_VERTICAL);
+        barScroll.addView(toolbar);
+        editor.addView(barScroll, GlassKit.matchWrap(getContext(), 8));
+
         final EditText body = new EditText(getContext());
-        body.setHint("Write your note");
-        body.setMinLines(4);
-        body.setGravity(Gravity.TOP);
-        if (existing != null) {
-            body.setText(existing.getBody());
+        body.setGravity(Gravity.TOP | Gravity.START);
+        body.setMinLines(8);
+        body.setTypeface(Typeface.SERIF);
+        body.setTextColor(GlassKit.text());
+        body.setHint("Write your note. Use the toolbar to format it.");
+        body.setBackground(null);
+        if (existing != null && existing.getBody() != null) {
+            body.setText(android.text.Html.fromHtml(existing.getBody(), android.text.Html.FROM_HTML_MODE_COMPACT));
         }
-        box.addView(body);
+        LinearLayout.LayoutParams bodyLp = new LinearLayout.LayoutParams(-1, 0, 1f);
+        editor.addView(body, bodyLp);
+
+        // Toolbar buttons
+        toolbar.addView(toolButton("B", () -> applyFormat(body, new android.text.style.StyleSpan(Typeface.BOLD)), true));
+        toolbar.addView(toolButton("I", () -> applyFormat(body, new android.text.style.StyleSpan(Typeface.ITALIC)), true));
+        toolbar.addView(toolButton("U", () -> applyFormat(body, new android.text.style.UnderlineSpan()), false));
+        toolbar.addView(toolButton("S", () -> applyFormat(body, new android.text.style.StrikethroughSpan()), false));
+        toolbar.addView(toolButton("H1", () -> applyHeading(body, 2.0f), true));
+        toolbar.addView(toolButton("H2", () -> applyHeading(body, 1.6f), true));
+        toolbar.addView(toolButton("H3", () -> applyHeading(body, 1.3f), true));
+        toolbar.addView(toolButton("H4", () -> applyHeading(body, 1.1f), true));
+        toolbar.addView(toolButton("☐", () -> toggleCheckbox(body), false));
+        final String[] fonts = {"serif", "sans-serif", "monospace"};
+        final int[] fontIndex = {0};
+        toolbar.addView(toolButton("Aa", () -> {
+            fontIndex[0] = (fontIndex[0] + 1) % fonts.length;
+            applyFormat(body, new android.text.style.TypefaceSpan(fonts[fontIndex[0]]));
+        }, false));
+        for (final HighlightColors.Colour colour : HighlightColors.ALL) {
+            View swatch = swatchView(colour.swatch, false, v -> applyFormat(body,
+                    new android.text.style.BackgroundColorSpan(Color.parseColor(colour.tint))));
+            toolbar.addView(swatch);
+        }
+        toolbar.addView(toolButton("✕", () -> clearFormat(body), false));
+
+        // Linked verses
         final LinearLayout linkBox = new LinearLayout(getContext());
         linkBox.setOrientation(LinearLayout.VERTICAL);
-        box.addView(linkBox);
+        editor.addView(linkBox);
         final Runnable[] redraw = new Runnable[1];
         redraw[0] = () -> {
             linkBox.removeAllViews();
@@ -1485,29 +1552,144 @@ public class BibleReaderDialog extends Dialog {
         final EditText reference = new EditText(getContext());
         reference.setHint("Link a verse, e.g. John 3:16");
         reference.setSingleLine(true);
-        box.addView(reference);
-        AppDialogs.builder(getContext())
-                .setTitle(existing == null ? "New note" : "Edit note")
-                .setView(box)
-                .setPositiveButton("Save", (dialog, which) -> {
-                    String ref = reference.getText().toString().trim();
-                    ScriptureReference parsed = ScriptureReference.parse(ref);
-                    if (!ref.isEmpty() && parsed != null && parsed.namesVerse()) {
-                        links.add(new org.perazimchurch.app.domain.model.VerseLocation(parsed.bookNumber, parsed.chapter, parsed.verseStart));
-                    }
-                    bibleViewModel.saveNote(existing == null ? 0L : existing.getId(), body.getText().toString(), links,
-                            id -> {
-                                Toast.makeText(getContext(), "Note saved", Toast.LENGTH_SHORT).show();
-                                refreshNotesPanel();
-                            });
-                })
-                .setNeutralButton(existing == null ? null : "Delete", existing == null ? null : (dialog, which) ->
-                        bibleViewModel.deleteNote(existing.getId(), () -> {
-                            Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
-                            refreshNotesPanel();
-                        }))
-                .setNegativeButton("Cancel", null)
-                .show();
+        editor.addView(reference);
+
+        // Topics linked to the note
+        final EditText topicsField = new EditText(getContext());
+        topicsField.setHint("Topics, comma separated, e.g. healing, grace");
+        topicsField.setSingleLine(true);
+        if (existing != null && !existing.getTopics().isEmpty()) {
+            topicsField.setText(android.text.TextUtils.join(", ", existing.getTopics()));
+        }
+        editor.addView(topicsField);
+
+        LinearLayout bottom = new LinearLayout(getContext());
+        bottom.setOrientation(LinearLayout.HORIZONTAL);
+        bottom.setGravity(Gravity.CENTER_VERTICAL);
+        if (existing != null) {
+            TextView delete = GlassKit.text(getContext(), "Delete note", 12, true, COLOR_ACCENT_ORANGE());
+            delete.setPadding(dp(8), dp(8), dp(8), dp(8));
+            delete.setOnClickListener(v -> bibleViewModel.deleteNote(existing.getId(), () -> {
+                Toast.makeText(getContext(), "Note deleted", Toast.LENGTH_SHORT).show();
+                dismissNoteEditor();
+                refreshNotesPanel();
+            }));
+            bottom.addView(delete);
+        }
+        editor.addView(bottom);
+
+        save.setOnClickListener(v -> {
+            String ref = reference.getText().toString().trim();
+            ScriptureReference parsed = ScriptureReference.parse(ref);
+            if (!ref.isEmpty() && parsed != null && parsed.namesVerse()) {
+                links.add(new org.perazimchurch.app.domain.model.VerseLocation(parsed.bookNumber, parsed.chapter, parsed.verseStart));
+            }
+            List<String> topics = new ArrayList<>();
+            for (String name : topicsField.getText().toString().split(",")) {
+                if (!name.trim().isEmpty()) {
+                    topics.add(name.trim());
+                }
+            }
+            String html = android.text.Html.toHtml(body.getText(), android.text.Html.TO_HTML_PARAGRAPH_LINES_CONSECUTIVE);
+            bibleViewModel.saveNote(existing == null ? 0L : existing.getId(), html, links, topics, id -> {
+                Toast.makeText(getContext(), "Note saved", Toast.LENGTH_SHORT).show();
+                dismissNoteEditor();
+                refreshNotesPanel();
+            });
+        });
+
+        readerFrame.addView(editor, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        noteEditorView = editor;
+    }
+
+    private void dismissNoteEditor() {
+        if (noteEditorView != null && readerFrame != null) {
+            readerFrame.removeView(noteEditorView);
+        }
+        noteEditorView = null;
+    }
+
+    private TextView toolButton(String label, Runnable action, boolean bold) {
+        TextView button = GlassKit.text(getContext(), label, 13, bold, GlassKit.text());
+        button.setGravity(Gravity.CENTER);
+        button.setMinWidth(dp(40));
+        button.setPadding(dp(10), dp(8), dp(10), dp(8));
+        GradientDrawable chip = new GradientDrawable();
+        chip.setCornerRadius(dp(12));
+        chip.setColor(GlassKit.light() ? Color.parseColor("#E6FFFFFF") : Color.parseColor("#CC2E1B4A"));
+        button.setBackground(chip);
+        button.setClickable(true);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
+        lp.setMargins(0, 0, dp(6), 0);
+        button.setLayoutParams(lp);
+        button.setOnClickListener(v -> action.run());
+        return button;
+    }
+
+    /** Character range of the selection, or the line the cursor is on when nothing is selected. */
+    private int[] formatRange(EditText body) {
+        android.text.Editable text = body.getText();
+        int start = body.getSelectionStart();
+        int end = body.getSelectionEnd();
+        if (start < 0 || end < 0) {
+            start = end = text.length();
+        }
+        if (start == end) {
+            int ls = start;
+            while (ls > 0 && text.charAt(ls - 1) != '\n') {
+                ls--;
+            }
+            int le = end;
+            while (le < text.length() && text.charAt(le) != '\n') {
+                le++;
+            }
+            return new int[]{ls, le};
+        }
+        return new int[]{Math.min(start, end), Math.max(start, end)};
+    }
+
+    private void applyFormat(EditText body, Object span) {
+        int[] range = formatRange(body);
+        if (range[0] < range[1]) {
+            body.getText().setSpan(span, range[0], range[1], android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+    }
+
+    private void applyHeading(EditText body, float scale) {
+        int[] range = formatRange(body);
+        android.text.Editable text = body.getText();
+        for (Object old : text.getSpans(range[0], range[1], android.text.style.RelativeSizeSpan.class)) {
+            text.removeSpan(old);
+        }
+        if (range[0] < range[1]) {
+            text.setSpan(new android.text.style.RelativeSizeSpan(scale), range[0], range[1], android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            text.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), range[0], range[1], android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+    }
+
+    /** Puts an empty box at the start of the line, or ticks/unticks an existing one. */
+    private void toggleCheckbox(EditText body) {
+        android.text.Editable text = body.getText();
+        int[] range = formatRange(body);
+        int lineStart = range[0];
+        if (lineStart < text.length() && (text.charAt(lineStart) == '☐' || text.charAt(lineStart) == '☑')) {
+            text.replace(lineStart, lineStart + 1, text.charAt(lineStart) == '☐' ? "☑" : "☐");
+        } else {
+            text.insert(lineStart, "☐ ");
+        }
+    }
+
+    private void clearFormat(EditText body) {
+        int[] range = formatRange(body);
+        android.text.Editable text = body.getText();
+        for (Object span : text.getSpans(range[0], range[1], Object.class)) {
+            if (span instanceof android.text.style.StyleSpan || span instanceof android.text.style.UnderlineSpan
+                    || span instanceof android.text.style.StrikethroughSpan || span instanceof android.text.style.RelativeSizeSpan
+                    || span instanceof android.text.style.BackgroundColorSpan || span instanceof android.text.style.TypefaceSpan) {
+                text.removeSpan(span);
+            }
+        }
     }
 
     /** Lists topics; choosing one shows its saved verses in the search list. */

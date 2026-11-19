@@ -367,11 +367,11 @@ public class BibleViewModel extends ViewModel {
     }
 
     /** Saves a note with its verse links, then calls back with the note id. */
-    public void saveNote(long id, @NonNull String body, @NonNull List<VerseLocation> links, @Nullable Consumer<Long> callback) {
+    public void saveNote(long id, @NonNull String body, @NonNull List<VerseLocation> links, @NonNull List<String> topics, @Nullable Consumer<Long> callback) {
         executor.execute(() -> {
             long saved = 0L;
             try {
-                saved = bibleRepo.saveNote(id, body, links);
+                saved = bibleRepo.saveNote(id, body, links, topics);
             } catch (Exception e) {
                 Log.e(TAG, "Error saving note");
             }

@@ -115,7 +115,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         EventRsvpEntity.class,
         DailyChallengeEntity.class
     },
-    version = 10,
+    version = 11,
     exportSchema = true
 )
 @TypeConverters({Converters.class})
@@ -257,6 +257,14 @@ public abstract class PerazimDatabase extends RoomDatabase {
         }
     };
 
+    public static final Migration MIGRATION_10_11 = new Migration(10, 11) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            // Topic labels on notes; existing notes are untouched.
+            db.execSQL("ALTER TABLE `bible_notes` ADD COLUMN `topics` TEXT");
+        }
+    };
+
     public static PerazimDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (PerazimDatabase.class) {
@@ -270,7 +278,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
                             DATABASE_NAME
                     )
                     .openHelperFactory(new SupportOpenHelperFactory(databaseKey))
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                     .build();
                 }
             }

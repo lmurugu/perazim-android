@@ -17,8 +17,8 @@ public interface BibleNoteDao {
     @Insert
     long insertNote(BibleNoteEntity note);
 
-    @Query("UPDATE bible_notes SET body = :body, updatedMillis = :updatedMillis WHERE id = :id")
-    void updateNote(long id, String body, long updatedMillis);
+    @Query("UPDATE bible_notes SET body = :body, updatedMillis = :updatedMillis, topics = :topics WHERE id = :id")
+    void updateNote(long id, String body, long updatedMillis, String topics);
 
     @Query("DELETE FROM bible_notes WHERE id = :id")
     void deleteNote(long id);

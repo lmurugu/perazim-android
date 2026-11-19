@@ -11,12 +11,18 @@ public class BibleNoteEntity {
     private long id;
     private String body;
     private long updatedMillis;
+    /** Comma-separated topic labels linked to this note, for example "healing,grace". */
+    private String topics;
 
-    public BibleNoteEntity(long id, String body, long updatedMillis) {
+    public BibleNoteEntity(long id, String body, long updatedMillis, String topics) {
         this.id = id;
         this.body = body;
         this.updatedMillis = updatedMillis;
+        this.topics = topics;
     }
+
+    public String getTopics() { return topics; }
+    public void setTopics(String topics) { this.topics = topics; }
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }

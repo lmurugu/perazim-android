@@ -456,23 +456,32 @@ public class RoomBibleRepository implements BibleRepository {
                 links = new ArrayList<>();
             }
             Collections.sort(links);
-            notes.add(new BibleNote(note.getId(), note.getBody(), note.getUpdatedMillis(), links));
+            List<String> topicNames = new ArrayList<>();
+            if (note.getTopics() != null) {
+                for (String name : note.getTopics().split(",")) {
+                    if (!name.trim().isEmpty()) {
+                        topicNames.add(name.trim());
+                    }
+                }
+            }
+            notes.add(new BibleNote(note.getId(), note.getBody(), note.getUpdatedMillis(), links, topicNames));
         }
         return notes;
     }
 
     @Override
-    public long saveNote(long id, String body, List<VerseLocation> links) {
+    public long saveNote(long id, String body, List<VerseLocation> links, List<String> topics) {
         if (noteDao == null) {
             return 0L;
         }
         String text = body == null ? "" : body;
         long now = System.currentTimeMillis();
+        String topicText = joinTopics(topics);
         long noteId = id;
         if (id == 0L) {
-            noteId = noteDao.insertNote(new BibleNoteEntity(0L, text, now));
+            noteId = noteDao.insertNote(new BibleNoteEntity(0L, text, now, topicText));
         } else {
-            noteDao.updateNote(id, text, now);
+            noteDao.updateNote(id, text, now, topicText);
         }
         noteDao.deleteLinks(noteId);
         List<BibleNoteLinkEntity> rows = new ArrayList<>();
@@ -483,6 +492,23 @@ public class RoomBibleRepository implements BibleRepository {
             noteDao.insertLinks(rows);
         }
         return noteId;
+    }
+
+    private static String joinTopics(List<String> topics) {
+        if (topics == null || topics.isEmpty()) {
+            return "";
+        }
+        StringBuilder out = new StringBuilder();
+        for (String topic : topics) {
+            String clean = topic.trim().replace(",", " ");
+            if (!clean.isEmpty()) {
+                if (out.length() > 0) {
+                    out.append(',');
+                }
+                out.append(clean);
+            }
+        }
+        return out.toString();
     }
 
     @Override
