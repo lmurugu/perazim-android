@@ -39,7 +39,8 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
 # Do not open the app again; restore network and wait for the mock API to receive the row.
 # Start the app in the background so a real process exists for the kill. am kill does not
 # touch a process with a visible activity, so send HOME after launch. Network stays off here.
-adb shell monkey -p org.perazimchurch.app -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1 || true
+monkey_out=$(adb shell monkey -p org.perazimchurch.app -c android.intent.category.LAUNCHER 1 2>&1 || true)
+echo "monkey launch output: ${monkey_out:-empty}"
 sleep 5
 adb shell input keyevent KEYCODE_HOME || true
 app_pid=''
@@ -50,6 +51,8 @@ for _ in $(seq 1 15); do
 done
 echo "app pid before kill: ${app_pid:-none}"
 if [[ -z "$app_pid" ]]; then
+  echo '== processes matching perazim (job log copy)'; adb shell ps -A 2>/dev/null | grep -i perazim || echo 'no perazim processes'
+  echo '== fatal or crash lines (job log copy)'; adb logcat -d 2>/dev/null | grep -i -E 'FATAL|AndroidRuntime|Process .*(died|killed)' | tail -40 || true
   echo 'FAIL: app process is not running before the kill, so the process-death check proves nothing.' >&2
   exit 1
 fi
