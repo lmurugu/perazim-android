@@ -1,8 +1,12 @@
 plugins { id 'com.android.application' version '8.9.1' }
 
+// Release checks (for example scripts/inspect_release_apk.py) can run on the
+// throwaway Android debug keystore instead: pass -PthrowawayReleaseCheck=true.
+// In that mode keystore.properties is neither read nor used.
+def throwawayReleaseCheck = providers.gradleProperty('throwawayReleaseCheck').orElse('false').get() == 'true'
 def keystorePropertiesFile = file("keystore.properties")
 def keystoreProperties = new Properties()
-if (keystorePropertiesFile.exists()) {
+if (!throwawayReleaseCheck && keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
@@ -78,7 +82,7 @@ android {
     }
     signingConfigs {
         release {
-            if (keystorePropertiesFile.exists()) {
+            if (keystorePropertiesFile.exists() && !throwawayReleaseCheck) {
                 storeFile file(keystoreProperties['storeFile'])
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
@@ -96,7 +100,9 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(pilotApiBaseUrl)
-            if (keystorePropertiesFile.exists()) {
+            if (throwawayReleaseCheck) {
+                signingConfig signingConfigs.debug
+            } else if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
         }
