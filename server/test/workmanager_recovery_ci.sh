@@ -72,12 +72,13 @@ fi
 
 # Kill the app process, not force-stop it, so JobScheduler may restart persisted work.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
-# Start the app in the background so a real process exists for the kill. am kill does not
-# touch a process with a visible activity, so send HOME after launch. Network stays off here.
+# Start the app in the background so a real process exists for the kill. am kill only reaches
+# background processes, so send HOME after launch and wait before killing. Network stays off here.
 monkey_out=$(adb shell monkey -p "$app_pkg" -c android.intent.category.LAUNCHER 1 2>&1 || true)
 echo "monkey launch output: ${monkey_out:-empty}"
 sleep 5
 adb shell input keyevent KEYCODE_HOME || true
+sleep 10
 app_pid=''
 for _ in $(seq 1 15); do
   app_pid=$(adb shell pidof "$app_pkg" 2>/dev/null | tr -d '\r' || true)
@@ -91,11 +92,29 @@ if [[ -z "$app_pid" ]]; then
   echo 'FAIL: app process is not running before the kill, so the process-death check proves nothing.' >&2
   exit 1
 fi
-adb shell am kill "$app_pkg"
-sleep 3
-echo "app pid after kill: $(adb shell pidof "$app_pkg" 2>/dev/null | tr -d '\r' || echo none)"
+
+# Retry the kill until the process is really gone. A single am kill can be ignored while the app
+# is still settling into the background, and the old check then tested nothing.
+killed=false
+for _ in $(seq 1 10); do
+  adb shell am kill "$app_pkg" >/dev/null 2>&1 || true
+  sleep 2
+  if [[ -z "$(adb shell pidof "$app_pkg" 2>/dev/null | tr -d '\r' || true)" ]]; then
+    killed=true
+    break
+  fi
+done
+echo "app process killed: $killed"
+if [[ "$killed" != true ]]; then
+  echo '== process state (job log copy)'; adb shell dumpsys activity processes 2>/dev/null | grep -i -A3 perazim | head -40 || true
+  echo 'FAIL: am kill did not stop the app process, so the process-death check proves nothing.' >&2
+  exit 1
+fi
+echo 'app pid after kill: none'
 adb shell svc wifi enable
 adb shell svc data enable || true
+echo '== connectivity after enabling network (job log copy)'
+adb shell dumpsys connectivity 2>/dev/null | grep -i 'active default\|VALIDATED' | head -10 || true
 
 received=false
 for _ in $(seq 1 60); do
