@@ -46,4 +46,16 @@ public interface BibleRepository {
 
     /** New Testament verses where a Greek word carries this Strong's number (offline concordance). */
     List<VerseLocation> getGreekConcordance(int strongsNumber);
+
+    /** Topic labels that have at least one saved verse, alphabetical. */
+    List<String> getTopics();
+
+    /** Topic labels attached to one verse. */
+    List<String> getTopicsForVerse(String bookId, int chapterNumber, int verseNumber);
+
+    /** Adds or removes a verse from a topic. */
+    void setVerseTopic(String bookId, int chapterNumber, int verseNumber, String topic, boolean member);
+
+    /** Every verse saved under a topic, in reading order, with default-translation text. */
+    List<BibleVerse> getTopicVerses(String topic);
 }

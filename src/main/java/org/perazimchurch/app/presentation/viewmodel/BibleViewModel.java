@@ -281,6 +281,72 @@ public class BibleViewModel extends ViewModel {
         }
     }
 
+    /** Loads topic labels, alphabetical. */
+    public void loadTopics(@Nullable Consumer<List<String>> callback) {
+        executor.execute(() -> {
+            List<String> topics;
+            try {
+                topics = bibleRepo.getTopics();
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading topics");
+                topics = Collections.emptyList();
+            }
+            if (callback != null) {
+                final List<String> res = topics != null ? topics : Collections.emptyList();
+                postCallback(() -> callback.accept(res));
+            }
+        });
+    }
+
+    /** Loads the topic labels attached to one verse. */
+    public void loadTopicsForVerse(@NonNull String bookId, int chapter, int verse, @Nullable Consumer<List<String>> callback) {
+        executor.execute(() -> {
+            List<String> topics;
+            try {
+                topics = bibleRepo.getTopicsForVerse(bookId, chapter, verse);
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading verse topics");
+                topics = Collections.emptyList();
+            }
+            if (callback != null) {
+                final List<String> res = topics != null ? topics : Collections.emptyList();
+                postCallback(() -> callback.accept(res));
+            }
+        });
+    }
+
+    /** Adds or removes a verse from a topic, then calls back. */
+    public void setVerseTopic(@NonNull String bookId, int chapter, int verse, @NonNull String topic, boolean member, @Nullable Runnable onDone) {
+        executor.execute(() -> {
+            try {
+                bibleRepo.setVerseTopic(bookId, chapter, verse, topic, member);
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving verse topic");
+            } finally {
+                if (onDone != null) {
+                    postCallback(onDone);
+                }
+            }
+        });
+    }
+
+    /** Loads every verse saved under a topic. */
+    public void loadTopicVerses(@NonNull String topic, @Nullable Consumer<List<BibleVerse>> callback) {
+        executor.execute(() -> {
+            List<BibleVerse> verses;
+            try {
+                verses = bibleRepo.getTopicVerses(topic);
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading topic verses");
+                verses = Collections.emptyList();
+            }
+            if (callback != null) {
+                final List<BibleVerse> res = verses != null ? verses : Collections.emptyList();
+                postCallback(() -> callback.accept(res));
+            }
+        });
+    }
+
     private void postCallback(Runnable runnable) {
         if (runnable == null) return;
         try {

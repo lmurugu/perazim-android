@@ -12,6 +12,7 @@ import org.perazimchurch.app.data.local.entity.BibleChapterEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
+import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
 
 import java.util.List;
 
@@ -146,4 +147,23 @@ public interface BibleDao {
 
     @Query("SELECT * FROM bible_verses WHERE translationId = :translationId")
     List<BibleVerseEntity> getAllVerses(String translationId);
+
+    // --- Topics (labels on saved verses) ---
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertTopicVerse(BibleTopicVerseEntity link);
+
+    @Query("DELETE FROM bible_topic_verses WHERE topic = :topic AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber")
+    void deleteTopicVerse(String topic, int bookNumber, int chapterNumber, int verseNumber);
+
+    @Query("SELECT topic FROM bible_topic_verses GROUP BY topic ORDER BY topic COLLATE NOCASE")
+    List<String> getTopicNames();
+
+    @Query("SELECT COUNT(*) FROM bible_topic_verses WHERE topic = :topic")
+    int countTopicVerses(String topic);
+
+    @Query("SELECT * FROM bible_topic_verses WHERE topic = :topic ORDER BY bookNumber, chapterNumber, verseNumber")
+    List<BibleTopicVerseEntity> getTopicVerses(String topic);
+
+    @Query("SELECT * FROM bible_topic_verses WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber")
+    List<BibleTopicVerseEntity> getTopicsForVerse(int bookNumber, int chapterNumber, int verseNumber);
 }

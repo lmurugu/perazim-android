@@ -6,6 +6,7 @@ import org.perazimchurch.app.data.local.entity.BibleBookEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
+import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
 import org.perazimchurch.app.data.local.seeder.BibleDataSeeder;
 import org.perazimchurch.app.data.mapper.BibleMapper;
 import org.perazimchurch.app.domain.model.BibleBook;
@@ -382,6 +383,50 @@ public class RoomBibleRepository implements BibleRepository {
     @Override
     public List<VerseLocation> getGreekConcordance(int strongsNumber) {
         return GreekInterlinearStore.findOccurrences(assetContext, strongsNumber);
+    }
+
+    @Override
+    public List<String> getTopics() {
+        return bibleDao.getTopicNames();
+    }
+
+    @Override
+    public List<String> getTopicsForVerse(String bookId, int chapterNumber, int verseNumber) {
+        List<String> names = new ArrayList<>();
+        for (BibleTopicVerseEntity link : bibleDao.getTopicsForVerse(resolveBookNumber(null, bookId), chapterNumber, verseNumber)) {
+            names.add(link.getTopic());
+        }
+        return names;
+    }
+
+    @Override
+    public void setVerseTopic(String bookId, int chapterNumber, int verseNumber, String topic, boolean member) {
+        if (bookId == null || topic == null || topic.trim().isEmpty()) {
+            return;
+        }
+        int bookNumber = resolveBookNumber(null, bookId);
+        String label = topic.trim();
+        if (member) {
+            bibleDao.upsertTopicVerse(new BibleTopicVerseEntity(label, bookNumber, chapterNumber, verseNumber));
+        } else {
+            bibleDao.deleteTopicVerse(label, bookNumber, chapterNumber, verseNumber);
+        }
+    }
+
+    @Override
+    public List<BibleVerse> getTopicVerses(String topic) {
+        ensureAssetsReady();
+        String translationId = resolveDefaultTranslationId();
+        List<BibleVerse> verses = new ArrayList<>();
+        for (BibleTopicVerseEntity link : bibleDao.getTopicVerses(topic)) {
+            BibleVerseEntity entity = bibleDao.getVerseInTranslation(translationId, link.getBookNumber(),
+                    link.getChapterNumber(), link.getVerseNumber());
+            if (entity != null) {
+                String bookId = BibleDataSeeder.canonicalBookId(link.getBookNumber());
+                verses.add(BibleMapper.toDomain(entity, translationId, bookId));
+            }
+        }
+        return verses;
     }
 
     private Map<Integer, String> highlightsFor(int bookNumber, int chapterNumber) {
