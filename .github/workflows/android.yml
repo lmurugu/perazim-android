@@ -46,6 +46,8 @@ jobs:
           emulator-boot-timeout: 1800
           arch: x86_64
           target: google_apis
+          cores: 4
+          ram-size: 4096M
           script: bash server/test/database_suites_ci.sh
       - name: Upload instrumentation reports
         if: always()
@@ -74,6 +76,8 @@ jobs:
           emulator-boot-timeout: 1800
           arch: x86_64
           target: google_apis
+          cores: 4
+          ram-size: 4096M
           script: bash server/test/workmanager_recovery_ci.sh
       - name: Upload instrumentation reports
         if: always()
