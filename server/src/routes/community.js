@@ -34,6 +34,20 @@ async function canAccessPost(user, postId) {
   return !result.rows[0].group_id || await canAccessGroup(user, result.rows[0].group_id);
 }
 
+// A block works in both directions: neither member sees the other's content or can message them.
+async function blockedEitherWay(userA, userB) {
+  if (!userA || !userB) return false;
+  const result = await query(
+    `SELECT 1 FROM user_blocks WHERE (blocker_id = $1 AND blocked_id = $2) OR (blocker_id = $2 AND blocked_id = $1) LIMIT 1`,
+    [userA, userB]
+  );
+  return result.rows.length > 0;
+}
+// SQL fragment hiding rows whose author (column `authorColumn`) is blocked either way from the viewer.
+function notBlockedFragment(param, authorColumn) {
+  return `NOT EXISTS (SELECT 1 FROM user_blocks b WHERE (b.blocker_id = ${param} AND b.blocked_id = ${authorColumn}) OR (b.blocked_id = ${param} AND b.blocker_id = ${authorColumn}))`;
+}
+
 // Only local, validated uploads owned by this member can be attached.
 async function ownsMedia(userId, mediaUrl) {
   if (!mediaUrl) return true;
@@ -339,6 +353,9 @@ router.get('/posts', optionalAuth, async (req, res) => {
       params.push(currentUserId);
       userParamIndices.push(paramIndex++);
       params.push(currentUserId);
+      const blockParam = paramIndex++;
+      params.push(currentUserId);
+      conditions.push(notBlockedFragment(`$${blockParam}`, 'p.author_id'));
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -555,14 +572,20 @@ router.get('/posts/:id/comments', optionalAuth, async (req, res) => {
   try {
     const { id } = req.params;
     if (!await canAccessPost(req.user, id)) return res.status(404).json({ error: 'Post unavailable' });
+    const commentParams = [id];
+    let blockFilter = '';
+    if (req.user) {
+      commentParams.push(req.user.id);
+      blockFilter = `AND ${notBlockedFragment('$2', 'c.author_id')}`;
+    }
     const result = await query(
       `SELECT c.id, c.post_id, c.author_id, c.author_name, c.content, c.created_at,
               u.avatar_url AS author_avatar
        FROM post_comments c
        LEFT JOIN users u ON c.author_id = u.id
-       WHERE c.post_id = $1
+       WHERE c.post_id = $1 ${blockFilter}
        ORDER BY c.created_at ASC`,
-      [id]
+      commentParams
     );
 
     res.json({ comments: result.rows });
@@ -589,6 +612,7 @@ router.post('/posts/:id/comments', requireAuth, async (req, res) => {
     }
 
     const post = postCheck.rows[0];
+    if (await blockedEitherWay(req.user.id, post.author_id)) return res.status(403).json({ error: 'You cannot comment on this post' });
     const commentId = suppliedId || `comm_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
     const previous = await query('SELECT * FROM post_comments WHERE id = $1', [commentId]);
     if (previous.rows.length) {
@@ -786,7 +810,9 @@ router.get('/conversations', requireAuth, async (req, res) => {
       [userId]
     );
 
-    res.json({ conversations: result.rows });
+    const blocked = await query('SELECT blocker_id, blocked_id FROM user_blocks WHERE blocker_id = $1 OR blocked_id = $1', [userId]);
+    const hidden = new Set(blocked.rows.map(row => (row.blocker_id === userId ? row.blocked_id : row.blocker_id)));
+    res.json({ conversations: result.rows.filter(row => !hidden.has(row.partner_id)) });
   } catch (err) {
     console.error('Error fetching conversations');
     res.status(500).json({ error: 'Failed to fetch conversations' });
@@ -798,6 +824,7 @@ router.get('/messages/:partnerId', requireAuth, async (req, res) => {
   try {
     const { partnerId } = req.params;
     const userId = req.user.id;
+    if (await blockedEitherWay(userId, partnerId)) return res.json({ messages: [] });
 
     const result = await query(
       `SELECT m.id, m.conversation_id, m.sender_id, m.receiver_id, m.content,
@@ -838,6 +865,7 @@ router.post('/messages', requireAuth, async (req, res) => {
     }
 
     if (receiverId === req.user.id) return res.status(400).json({ error: 'Choose another member' });
+    if (await blockedEitherWay(req.user.id, receiverId)) return res.status(403).json({ error: 'You cannot message this member' });
     const convId = getConversationId(req.user.id, receiverId);
     const msgId = id || `msg_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
     const previous = await query('SELECT * FROM messages WHERE id = $1', [msgId]);
@@ -1289,6 +1317,142 @@ router.delete('/classes/:id', requireAuth, async (req, res) => {
     if (!result.rows.length) return res.status(403).json({ error: 'Only the teacher can cancel this class' });
     res.json({ success: true });
   } catch (error) { res.status(500).json({ error: 'Could not cancel class' }); }
+});
+
+// ============================================================================
+// 9. SAFETY: BLOCKS AND REPORTS (store policy for user-generated content)
+// ============================================================================
+
+const REPORT_REASONS = ['SPAM', 'HARASSMENT', 'HATE', 'SEXUAL', 'VIOLENCE', 'FALSE_TEACHING', 'PRIVACY', 'OTHER'];
+const REPORT_TARGET_TYPES = ['POST', 'COMMENT', 'MESSAGE', 'MEMBER'];
+
+// GET /api/community/blocks
+router.get('/blocks', requireAuth, async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT b.blocked_id AS user_id, u.name, u.avatar_url, b.created_at
+       FROM user_blocks b LEFT JOIN users u ON u.id = b.blocked_id
+       WHERE b.blocker_id = $1 ORDER BY b.created_at DESC`,
+      [req.user.id]
+    );
+    res.json({ blocks: result.rows });
+  } catch (err) {
+    console.error('Error fetching blocks');
+    res.status(500).json({ error: 'Failed to fetch blocked members' });
+  }
+});
+
+// POST /api/community/blocks  { userId }
+router.post('/blocks', requireAuth, async (req, res) => {
+  try {
+    const userId = typeof req.body?.userId === 'string' ? req.body.userId.trim() : '';
+    if (!userId) return res.status(400).json({ error: 'userId is required' });
+    if (userId === req.user.id) return res.status(400).json({ error: 'You cannot block yourself' });
+    const target = await query('SELECT id FROM users WHERE id = $1 AND is_active = TRUE', [userId]);
+    if (target.rows.length === 0) return res.status(404).json({ error: 'Member not found' });
+    await query(
+      `INSERT INTO user_blocks (blocker_id, blocked_id, created_at) VALUES ($1, $2, $3)
+       ON CONFLICT (blocker_id, blocked_id) DO NOTHING`,
+      [req.user.id, userId, Date.now()]
+    );
+    res.status(201).json({ success: true, userId });
+  } catch (err) {
+    console.error('Error blocking member');
+    res.status(500).json({ error: 'Failed to block member' });
+  }
+});
+
+// DELETE /api/community/blocks/:userId
+router.delete('/blocks/:userId', requireAuth, async (req, res) => {
+  try {
+    await query('DELETE FROM user_blocks WHERE blocker_id = $1 AND blocked_id = $2', [req.user.id, req.params.userId]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error unblocking member');
+    res.status(500).json({ error: 'Failed to unblock member' });
+  }
+});
+
+// POST /api/community/reports  { targetType, targetId, reason, details }
+router.post('/reports', requireAuth, async (req, res) => {
+  try {
+    const targetType = String(req.body?.targetType || '').toUpperCase();
+    const targetId = typeof req.body?.targetId === 'string' ? req.body.targetId.trim() : '';
+    const reason = String(req.body?.reason || '').toUpperCase();
+    const details = typeof req.body?.details === 'string' ? req.body.details.trim().slice(0, 500) : '';
+    if (!REPORT_TARGET_TYPES.includes(targetType)) return res.status(400).json({ error: 'Choose what you are reporting' });
+    if (!targetId || targetId.length > 128) return res.status(400).json({ error: 'targetId is required' });
+    if (!REPORT_REASONS.includes(reason)) return res.status(400).json({ error: 'Choose a reason for the report' });
+
+    // Only content the reporter can already see may be reported.
+    let reportedUserId = null;
+    if (targetType === 'POST') {
+      const post = await query('SELECT author_id FROM community_posts WHERE id = $1', [targetId]);
+      if (!post.rows.length || !await canAccessPost(req.user, targetId)) return res.status(404).json({ error: 'Content not found' });
+      reportedUserId = post.rows[0].author_id;
+    } else if (targetType === 'COMMENT') {
+      const comment = await query('SELECT author_id, post_id FROM post_comments WHERE id = $1', [targetId]);
+      if (!comment.rows.length || !await canAccessPost(req.user, comment.rows[0].post_id)) return res.status(404).json({ error: 'Content not found' });
+      reportedUserId = comment.rows[0].author_id;
+    } else if (targetType === 'MESSAGE') {
+      const message = await query('SELECT sender_id, receiver_id FROM messages WHERE id = $1', [targetId]);
+      const row = message.rows[0];
+      if (!row || (row.sender_id !== req.user.id && row.receiver_id !== req.user.id)) return res.status(404).json({ error: 'Content not found' });
+      reportedUserId = row.sender_id === req.user.id ? row.receiver_id : row.sender_id;
+    } else {
+      const member = await query('SELECT id FROM users WHERE id = $1 AND is_active = TRUE', [targetId]);
+      if (!member.rows.length) return res.status(404).json({ error: 'Member not found' });
+      reportedUserId = targetId;
+    }
+    if (reportedUserId === req.user.id) return res.status(400).json({ error: 'You cannot report your own content' });
+
+    const id = `rep_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
+    await query(
+      `INSERT INTO content_reports (id, reporter_id, target_type, target_id, reported_user_id, reason, details, status, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'OPEN', $8)`,
+      [id, req.user.id, targetType, targetId, reportedUserId, reason, details, Date.now()]
+    );
+    res.status(201).json({ success: true, id, status: 'OPEN' });
+  } catch (err) {
+    console.error('Error submitting report');
+    res.status(500).json({ error: 'Failed to send report' });
+  }
+});
+
+// GET /api/community/reports  (administrators: open reports for church review)
+router.get('/reports', requireAuth, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only administrators can review reports' });
+    const status = String(req.query.status || 'OPEN').toUpperCase();
+    if (!['OPEN', 'ACTIONED', 'DISMISSED'].includes(status)) return res.status(400).json({ error: 'Invalid status' });
+    const result = await query(
+      `SELECT id, reporter_id, target_type, target_id, reported_user_id, reason, details, status, created_at, reviewed_at
+       FROM content_reports WHERE status = $1 ORDER BY created_at ASC LIMIT 100`,
+      [status]
+    );
+    res.json({ reports: result.rows });
+  } catch (err) {
+    console.error('Error fetching reports');
+    res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+});
+
+// POST /api/community/reports/:id/decision  { status: 'ACTIONED' | 'DISMISSED' }
+router.post('/reports/:id/decision', requireAuth, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') return res.status(403).json({ error: 'Only administrators can review reports' });
+    const status = String(req.body?.status || '').toUpperCase();
+    if (!['ACTIONED', 'DISMISSED'].includes(status)) return res.status(400).json({ error: 'status must be ACTIONED or DISMISSED' });
+    const result = await query(
+      `UPDATE content_reports SET status = $2, reviewed_at = $3, reviewed_by = $4 WHERE id = $1 RETURNING id, status`,
+      [req.params.id, status, Date.now(), req.user.id]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Report not found' });
+    res.json({ success: true, report: result.rows[0] });
+  } catch (err) {
+    console.error('Error recording report decision');
+    res.status(500).json({ error: 'Failed to record decision' });
+  }
 });
 
 module.exports = router;

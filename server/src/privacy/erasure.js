@@ -49,6 +49,9 @@ const ERASURE_POLICY = {
   'user_permissions.user_id': 'delete',
   'pilot_bootstrap.user_id': 'delete',
   'refresh_tokens.user_id': 'delete',
+  'user_blocks.blocker_id': 'delete',
+  'user_blocks.blocked_id': 'delete',
+  'content_reports.reporter_id': 'delete',
   // Anonymised: the record stays, the identifying fields are replaced.
   'membership_claims.user_id': 'anonymise',
   // Kept with a reason (append-only history, security, or another person's record).
@@ -73,6 +76,8 @@ const ERASURE_POLICY = {
   'disposal_events.authorized_by': 'keep: append-only disposal record',
   'disposal_events.confirmed_by': 'keep: append-only disposal record',
   'retention_reviews.reviewed_by': 'keep: append-only retention record',
+  'content_reports.reported_user_id': 'keep: church safety review record about another member\'s content',
+  'content_reports.reviewed_by': 'keep: governance record of a safety review',
   'community_groups.created_by': 'keep: creator link to the anonymised account',
   'community_classes.created_by': 'keep: creator link to the anonymised account',
   'user_permissions.granted_by': 'keep: records who granted another permission',
@@ -118,6 +123,8 @@ async function eraseMemberData(client, userId, now = Date.now()) {
   // Messages, connections and notifications the member sent, received or triggered.
   await client.query('DELETE FROM messages WHERE sender_id = $1 OR receiver_id = $1', [userId]);
   await client.query('DELETE FROM connections WHERE requester_id = $1 OR recipient_id = $1', [userId]);
+  await client.query('DELETE FROM user_blocks WHERE blocker_id = $1 OR blocked_id = $1', [userId]);
+  await client.query('DELETE FROM content_reports WHERE reporter_id = $1', [userId]);
   await client.query('DELETE FROM in_app_notifications WHERE user_id = $1 OR actor_id = $1', [userId]);
 
   // Progress and uploads.
