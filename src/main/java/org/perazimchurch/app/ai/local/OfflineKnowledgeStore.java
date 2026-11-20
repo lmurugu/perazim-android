@@ -1016,32 +1016,86 @@ public final class OfflineKnowledgeStore {
                 && new File(context.getFilesDir(), PREVIOUS_PACKAGE_FILE).isFile();
     }
 
+    /**
+     * Returns the evidence that may be shown to the model. Authority comes only from the governance manifest, never
+     * from fields inside the package document. Documents without a governed, hash-matching, non-withdrawn entry are
+     * dropped; nothing here fails open.
+     */
     @NonNull
     public static JSONArray retrieve(Context context, Map<String, String> trustedKeys,
                                      String appVersion, long nowMillis, String question) throws Exception {
         VerifiedPackage installed = read(context, trustedKeys, appVersion, nowMillis);
         if (question == null || question.trim().isEmpty()) return new JSONArray();
         if (isUnderspecifiedReferenceQuestion(question)) return new JSONArray();
-        java.util.List<JSONObject> candidates = new java.util.ArrayList<>();
-        VerifiedControl control = null;
+        JSONArray selected = new JSONArray();
         if (installed != null && installed.documents.length() > 0) {
+            VerifiedControl control = null;
             try { control = readWithdrawalControl(context, trustedKeys, nowMillis); }
             catch (Exception ignored) { control = null; }
-        }
-        if (installed != null && (installed.documents.length() == 0 || control != null)) {
-            String[] terms = question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+");
-            for (int i = 0; i < installed.documents.length(); i++) {
-                JSONObject document = installed.documents.getJSONObject(i);
-                if (control != null && control.withdrawnSources.contains(sourceKey(
-                        document.optString("sourceId"), document.optString("version")))) continue;
-                String text = document.getString("text");
-                String normalized = text.toLowerCase(java.util.Locale.ROOT);
-                int score = 0;
-                for (String term : terms) {
-                    if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
-                }
-                if (score > 0) candidates.add(document);
+            // Fail closed: without a current withdrawal manifest no package document is offered as evidence.
+            // No signed approval manifest is defined yet, so the governance list is empty and nothing is authorised.
+            if (control != null) {
+                selected = selectGoverned(installed.documents, control.withdrawnSources,
+                        SourceGovernance.parse(null), question);
             }
+        }
+        boolean scriptureQuestion = LocalScriptureRetriever.isScriptureRelated(question);
+        if (scriptureQuestion && selected.length() < 3) {
+            int chars = 0;
+            for (int i = 0; i < selected.length(); i++) chars += Math.min(1200, selected.getJSONObject(i).optString("text").length());
+            JSONArray scripture = LocalScriptureRetriever.retrieve(context, question);
+            for (int i = 0; i < scripture.length() && selected.length() < 3; i++) {
+                JSONObject passage = scripture.getJSONObject(i);
+                selected.put(passage);
+                chars += passage.optString("text").length();
+                if (chars >= 3600) break;
+            }
+        }
+        return selected;
+    }
+
+    /** Pure selection step, host-testable. Builds fresh evidence objects; no authority field is copied from the document. */
+    static JSONArray selectGoverned(JSONArray documents, java.util.Set<String> withdrawnKeys,
+                                    java.util.List<SourceGovernance.Source> governance, String question) throws Exception {
+        java.util.Map<String, SourceGovernance.Source> bySource = new java.util.HashMap<>();
+        java.util.Set<String> ambiguous = new java.util.HashSet<>();
+        for (SourceGovernance.Source source : governance) {
+            String key = sourceKey(source.id, source.version);
+            if (bySource.put(key, source) != null) ambiguous.add(key);
+        }
+        String[] terms = question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+");
+        java.util.List<JSONObject> candidates = new java.util.ArrayList<>();
+        for (int i = 0; i < documents.length(); i++) {
+            JSONObject document = documents.getJSONObject(i);
+            String sourceId = document.optString("sourceId");
+            String version = document.optString("version");
+            String key = sourceKey(sourceId, version);
+            if (withdrawnKeys != null && withdrawnKeys.contains(key)) continue;
+            String text = document.getString("text");
+            String normalized = text.toLowerCase(java.util.Locale.ROOT);
+            int score = 0;
+            for (String term : terms) {
+                if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
+            }
+            if (score == 0) continue;
+            SourceGovernance.Source entry = ambiguous.contains(key) ? null : bySource.get(key);
+            String actualHash = sha256(text.getBytes(StandardCharsets.UTF_8));
+            String authority = SourceGovernance.authorityClassFor(entry, actualHash);
+            if ("UNAPPROVED".equals(authority) || !SourceGovernance.mayRetrieveForContext(entry)) continue;
+            boolean official = SourceGovernance.OFFICIAL_AUTHORITY.equals(authority);
+            JSONObject evidence = new JSONObject()
+                    .put("sourceId", sourceId)
+                    .put("version", version)
+                    .put("location", document.optString("location"))
+                    .put("title", document.optString("title"))
+                    .put("text", text)
+                    .put("contentHash", actualHash)
+                    .put("authorityClass", authority)
+                    .put("citationEligible", official);
+            if (official) {
+                evidence.put("approvedBy", entry.approvedBy).put("approvedAt", entry.approvedAt);
+            }
+            candidates.add(evidence);
         }
         candidates.sort((left, right) -> {
             try {
@@ -1056,15 +1110,6 @@ public final class OfflineKnowledgeStore {
             if (selected.length() >= documentLimit || chars >= 3600) break;
             selected.put(document);
             chars += Math.min(1200, document.optString("text").length());
-        }
-        if (scriptureQuestion && selected.length() < 3) {
-            JSONArray scripture = LocalScriptureRetriever.retrieve(context, question);
-            for (int i = 0; i < scripture.length() && selected.length() < 3; i++) {
-                JSONObject passage = scripture.getJSONObject(i);
-                selected.put(passage);
-                chars += passage.optString("text").length();
-                if (chars >= 3600) break;
-            }
         }
         return selected;
     }
