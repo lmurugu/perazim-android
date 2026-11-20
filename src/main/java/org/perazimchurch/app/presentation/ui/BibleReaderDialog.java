@@ -2015,9 +2015,9 @@ public class BibleReaderDialog extends Dialog {
             card.setPadding(dp(12), dp(4), dp(12), dp(4));
             GradientDrawable frost = new GradientDrawable();
             frost.setCornerRadius(dp(12));
-            // Light package on a dark phone, dark package on a light phone.
-            frost.setColor(phoneIsDark() ? 0x80FFFFFF : 0xCC2D0938);
-            frost.setStroke(dp(1), phoneIsDark() ? 0xD9FFFFFF : 0x33FFFFFF);
+            // Always the light frosted card, so the strips and circles stay legible over verse text.
+            frost.setColor(0xE6FFFFFF);
+            frost.setStroke(dp(1), 0xD9FFFFFF);
             card.setBackground(frost);
         }
 
