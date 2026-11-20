@@ -63,7 +63,34 @@ GREEK_OVERRIDES = {1722: "in", 4314: "with", 1064: "womb"}  # en, pros (πρὸ�
 NO_ARTICLE_BEFORE = {2316, 2424}  # theos (God), Iēsous (Jesus)
 PRONOUN_1 = {"G": "our", "D": "us", "A": "us", "N": "we"}
 PRONOUN_2 = {"G": "your", "D": "you", "A": "you", "N": "you"}
-HEBREW_OVERRIDES = {7462: ("", "shepherd")}  # ro'eh (רֹעֶה), shepherd/tend
+HEBREW_OVERRIDES = {7462: ("", "shepherd"), 776: ("", "earth")}  # ro'eh (shepherd/tend); 'erets (earth, not country)
+POSSESSIVE = {"1cs": "my", "1cp": "our", "2ms": "your", "2fs": "your", "2mp": "your", "2fp": "your",
+              "3ms": "his", "3fs": "her", "3mp": "their", "3fp": "their"}
+OBJECT_PRONOUN = {"1cs": "me", "1cp": "us", "2ms": "you", "2fs": "you", "2mp": "you", "2fp": "you",
+                  "3ms": "him", "3fs": "her", "3mp": "them", "3fp": "them"}
+
+
+def with_suffix(gloss, morph):
+    """Add the pronoun suffix to a Hebrew gloss: "my shepherd" for a noun, "keep_him" for a verb or preposition."""
+    segments = [x.lstrip("H") for x in morph.split("/")]
+    suffix = next((x for x in segments if x.startswith("S") and len(x) >= 5), None)
+    base = [x for x in segments if not x.startswith("S")]
+    if not suffix or not base or gloss in ("", "-"):
+        return gloss
+    key = suffix[2:5]
+    # A participle with a suffix is a noun with a possessive ("my shepherd"); a finite verb or a preposition takes
+    # the suffix as its object ("keep him", "upon him").
+    participle = base[-1][:1] == "V" and len(base[-1]) > 2 and base[-1][2] in "rs"
+    object_form = base[-1][:1] in ("V", "R") and not participle
+    if object_form:
+        pronoun = OBJECT_PRONOUN.get(key)
+        if not pronoun or gloss.endswith("_" + pronoun):
+            return gloss
+        return gloss + "_" + pronoun
+    pronoun = POSSESSIVE.get(key)
+    if not pronoun or gloss.startswith(pronoun + "_"):
+        return gloss
+    return pronoun + "_" + gloss
 
 
 def sanitize_cell(cell):
@@ -230,6 +257,8 @@ def apply(path, step_rows, books, hebrew):
                         f[4] = PRONOUN_2.get(f[2][3], "")
                     elif hebrew and number in HEBREW_OVERRIDES and f[2].startswith(HEBREW_OVERRIDES[number][0]):
                         f[4] = HEBREW_OVERRIDES[number][1]
+                    if hebrew:
+                        f[4] = with_suffix(f[4], f[2])
                     cell_list[i] = "|".join(f)
             cell_list = [sanitize_cell(c) for c in cell_list]
             out_lines.append("%s\t%s\t%s\t%s\n" % (book, chapter, verse, " ".join(cell_list)))
