@@ -312,7 +312,7 @@ public class RoomBibleRepository implements BibleRepository {
     }
 
     /**
-     * Verse list for an interlinear version. The verse text lists each word with its gloss in brackets;
+     * Verse list for an interlinear version. The verse text lists each word as {original} then its gloss;
      * the full word-by-word view (transliteration, gloss, Strong's number, parsing) opens from the verse.
      */
     private List<BibleVerse> interlinearChapter(int bookNumber, int chapterNumber, String bookId, boolean greek) {
@@ -326,15 +326,15 @@ public class RoomBibleRepository implements BibleRepository {
             if (words.isEmpty()) {
                 continue;
             }
+            // Each word is written as {original} followed by its English gloss. The reader shows the English
+            // in bold and the original inside the braces, so the English is what the eye lands on first.
             StringBuilder text = new StringBuilder();
             for (InterlinearWord word : words) {
                 if (text.length() > 0) {
                     text.append(' ');
                 }
-                text.append(word.getOriginal());
-                if (!word.getGloss().isEmpty()) {
-                    text.append(" (").append(word.getGloss()).append(')');
-                }
+                text.append('{').append(word.getOriginal()).append("} ");
+                text.append(word.getGloss().isEmpty() ? "\u2014" : word.getGloss());
             }
             BibleVerse verse = BibleMapper.toDomain(entity, translationId, bookId);
             verse.setText(text.toString());

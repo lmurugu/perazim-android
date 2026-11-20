@@ -977,7 +977,13 @@ public class BibleReaderDialog extends Dialog {
         sb.setSpan(new android.text.style.TypefaceSpan("sans-serif"), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.append(isSearchResult ? "  " : " ");
         int textStart = sb.length();
-        sb.append(verse.getText() != null ? verse.getText() : "");
+        boolean interlinearVersion = org.perazimchurch.app.data.repository.RoomBibleRepository.GREEK_INTERLINEAR.equals(verse.getTranslationId())
+                || org.perazimchurch.app.data.repository.RoomBibleRepository.HEBREW_INTERLINEAR.equals(verse.getTranslationId());
+        if (interlinearVersion && !isSearchResult) {
+            appendInterlinearVerse(sb, verse.getText() != null ? verse.getText() : "");
+        } else {
+            sb.append(verse.getText() != null ? verse.getText() : "");
+        }
         if (isSearchResult && !TextUtils.isEmpty(lastQuery)) {
             highlightSearchTerms(sb, textStart, verse.getText() != null ? verse.getText() : "", lastQuery);
         }
@@ -1057,6 +1063,33 @@ public class BibleReaderDialog extends Dialog {
                         start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 from = at + needle.length();
             }
+        }
+    }
+
+    /**
+     * Interlinear version text: "{original} gloss" pairs. The English gloss is bold; the original sits inside
+     * the braces in regular weight, so the reader sees the English first.
+     */
+    private void appendInterlinearVerse(android.text.SpannableStringBuilder sb, String text) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\{([^}]*)\\}\\s*([^{]*)").matcher(text);
+        int last = 0;
+        while (m.find()) {
+            if (m.start() > last) {
+                sb.append(text.substring(last, m.start()));
+            }
+            sb.append('{').append(m.group(1)).append('}');
+            int braceEnd = sb.length();
+            sb.append(' ');
+            int glossStart = sb.length();
+            sb.append(m.group(2).trim());
+            int glossEnd = sb.length();
+            sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), glossStart, glossEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.append(' ');
+            last = m.end();
+        }
+        if (last < text.length()) {
+            sb.append(text.substring(last));
         }
     }
 
