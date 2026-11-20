@@ -189,7 +189,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
-            // Cold start: show the black logo screen first, then build the app behind it.
+            // Cold start: show the black logo screen first, then build the app behind it. While the words fade in,
+            // open the database on another thread, so the app build that follows finds it ready and is shorter.
+            final android.content.Context appContext = getApplicationContext();
+            Thread warm = new Thread(() -> {
+                try {
+                    SessionManager.getInstance(appContext);
+                } catch (Throwable ignored) {
+                    // Opening it again on the main thread will report any real problem.
+                }
+            }, "startup-warm-up");
+            warm.start();
             org.perazimchurch.app.ui.components.StartupSplash.begin(this, () -> initApp(null));
         } else {
             initApp(savedInstanceState);
