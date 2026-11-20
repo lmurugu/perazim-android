@@ -195,8 +195,8 @@ public final class GamesHubDialog extends Dialog {
         LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(44), dp(44));
         backParams.bottomMargin = dp(12);
         page.addView(back, backParams);
-        text(title, 28, true);
-        text(subtitle, 15, false);
+        text(title, 24, true);
+        text(subtitle, 13, false);
         gap(16);
     }
 
@@ -205,26 +205,37 @@ public final class GamesHubDialog extends Dialog {
         round = null;
         screen("Bible Games", "Learn, remember and enjoy. All nine games work without internet.", false);
         statsBar();
-        gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
-        gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
-        gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
-        gameCard(Mode.LADDER, "Ladder of Faith", "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.");
-        customCard(org.perazimchurch.app.R.drawable.ic_game_grid, org.perazimchurch.app.R.drawable.ic_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Word Search",
+        int shepherd = org.perazimchurch.app.R.drawable.ic_char_shepherd;
+        int dove = org.perazimchurch.app.R.drawable.ic_char_dove;
+        int explorer = org.perazimchurch.app.R.drawable.ic_char_explorer;
+        gameCard(iconFor(Mode.QUIZ), shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Bible Quiz",
+                "Five questions, four choices each. Discover the story behind every answer.",
+                modeBestLine(Mode.QUIZ, 5), () -> startMode(Mode.QUIZ));
+        gameCard(iconFor(Mode.WHO_AM_I), explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Who am I?",
+                "Read a Bible character's clues, ask for a hint, then type your answer.",
+                modeBestLine(Mode.WHO_AM_I, 5), () -> startMode(Mode.WHO_AM_I));
+        gameCard(iconFor(Mode.VERSE_ORDER), dove, PerazimTheme.COLOR_ORANGE_SOFT, "Verse Builder",
+                "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.",
+                modeBestLine(Mode.VERSE_ORDER, 5), () -> startMode(Mode.VERSE_ORDER));
+        gameCard(iconFor(Mode.LADDER), shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Ladder of Faith",
+                "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.",
+                modeBestLine(Mode.LADDER, LadderOfFaith.RUNGS), () -> startMode(Mode.LADDER));
+        gameCard(org.perazimchurch.app.R.drawable.ic_game_grid, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Word Search",
                 "Find Bible names hidden in the letters. Tap a start letter, then the end letter of the word.",
                 solvedLine("WORD_SEARCH"), this::wordSearch);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_cards, org.perazimchurch.app.R.drawable.ic_char_dove, PerazimTheme.COLOR_PURPLE_SOFT, "Memory Match",
+        gameCard(org.perazimchurch.app.R.drawable.ic_game_cards, dove, PerazimTheme.COLOR_PURPLE_SOFT, "Memory Match",
                 "Flip two tiles at a time and match the Bible symbols. Each match shows its verse.",
                 solvedLine("MEMORY_MATCH"), this::memoryMatch);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_timeline, org.perazimchurch.app.R.drawable.ic_char_explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
+        gameCard(org.perazimchurch.app.R.drawable.ic_game_timeline, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
                 "Tap the Bible events in the order they happen in the story.",
                 solvedLine("TIMELINE"), this::timeline);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_crossword, org.perazimchurch.app.R.drawable.ic_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Mini Crossword",
+        gameCard(org.perazimchurch.app.R.drawable.ic_game_crossword, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Mini Crossword",
                 "A five-by-five Bible crossword. Four clues cross: Moses, Abel, manna and Saul.",
                 solvedLine("CROSSWORD"), this::miniCrossword);
-        customCard(org.perazimchurch.app.R.drawable.ic_game_road, org.perazimchurch.app.R.drawable.ic_char_explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
+        gameCard(org.perazimchurch.app.R.drawable.ic_game_road, explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
                 "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
                 solvedLine("ROAD"), this::roadToJerusalem);
-        text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
+        text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
     }
 
     private void statsBar() {
@@ -248,7 +259,7 @@ public final class GamesHubDialog extends Dialog {
         pill.addView(icon(icon, 26), new LinearLayout.LayoutParams(dp(26), dp(26)));
         TextView text = new TextView(activity);
         text.setText(label);
-        text.setTextSize(14);
+        text.setTextSize(12);
         text.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         text.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         text.setPadding(dp(6), 0, 0, 0);
@@ -295,77 +306,38 @@ public final class GamesHubDialog extends Dialog {
         scores.edit().putLong(scorePrefix + "streakDay", today()).putInt(scorePrefix + "streak", next).apply();
     }
 
-    private void gameCard(Mode selected, String title, String description) {
+    /** One card layout for every game on the hub: icon, character, title, one line, best score, play. */
+    private void gameCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
         LinearLayout card = new LinearLayout(activity);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(14), dp(12), dp(14), dp(14));
-        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
-        params.bottomMargin = dp(16);
-        page.addView(card, params);
-        LinearLayout head = new LinearLayout(activity);
-        head.setOrientation(LinearLayout.HORIZONTAL);
-        head.setGravity(Gravity.CENTER_VERTICAL);
-        head.addView(icon(iconFor(selected), 52), new LinearLayout.LayoutParams(dp(52), dp(52)));
-        TextView titleView = new TextView(activity);
-        titleView.setText(title);
-        titleView.setTextSize(21);
-        titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        titleView.setPadding(dp(12), 0, 0, 0);
-        head.addView(titleView);
-        LinearLayout.LayoutParams headParams = new LinearLayout.LayoutParams(-1, -2);
-        headParams.bottomMargin = dp(8);
-        card.addView(head, headParams);
-        addText(card, description, 16, false);
-        String key = scorePrefix + selected.name();
-        int total = selected == Mode.LADDER ? LadderOfFaith.RUNGS : 5;
-        addText(card, scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/" + total : "Your best: not played yet", 14, false);
-        Button start = new Button(activity);
-        styleButton(start, "Play " + title, selected == Mode.QUIZ);
-        card.addView(start, new LinearLayout.LayoutParams(-1, -2));
-        start.setOnClickListener(v -> {
-            if (!activeOwner()) return;
-            mode = selected;
-            seed = System.nanoTime();
-            recordPlay();
-            if (mode == Mode.LADDER) { startLadder(); return; }
-            round = new Round(mode, seed);
-            question();
-        });
-    }
-
-    // ---- Word Search, Memory Match and Story Timeline ----
-
-    private void customCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
-        LinearLayout card = new LinearLayout(activity);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(14), dp(12), dp(14), dp(14));
+        card.setPadding(dp(12), dp(10), dp(12), dp(12));
         GradientDrawable cardBg = shape(PerazimTheme.COLOR_SURFACE);
-        cardBg.setStroke(dp(2), accent);
+        cardBg.setStroke(dp(1), accent);
         card.setBackground(cardBg);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
-        params.bottomMargin = dp(16);
+        params.bottomMargin = dp(12);
         page.addView(card, params);
         LinearLayout head = new LinearLayout(activity);
         head.setOrientation(LinearLayout.HORIZONTAL);
         head.setGravity(Gravity.CENTER_VERTICAL);
-        head.addView(icon(iconRes, 52), new LinearLayout.LayoutParams(dp(52), dp(52)));
+        head.addView(icon(iconRes, 40), new LinearLayout.LayoutParams(dp(40), dp(40)));
         TextView titleView = new TextView(activity);
         titleView.setText(title);
-        titleView.setTextSize(21);
+        titleView.setTextSize(16);
         titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        titleView.setPadding(dp(12), 0, 0, 0);
+        titleView.setPadding(dp(10), 0, 0, 0);
         head.addView(titleView, new LinearLayout.LayoutParams(0, -2, 1f));
-        head.addView(icon(characterRes, 44), new LinearLayout.LayoutParams(dp(44), dp(44)));
+        head.addView(icon(characterRes, 36), new LinearLayout.LayoutParams(dp(36), dp(36)));
         LinearLayout.LayoutParams headParams = new LinearLayout.LayoutParams(-1, -2);
-        headParams.bottomMargin = dp(8);
+        headParams.bottomMargin = dp(6);
         card.addView(head, headParams);
-        addText(card, description, 16, false);
-        addText(card, bestLine, 14, false);
+        addText(card, description, 13, false);
+        addText(card, bestLine, 12, false);
         Button play = new Button(activity);
         styleButton(play, "Play " + title, false);
+        play.setTextSize(14);
+        play.setMinHeight(dp(44));
         card.addView(play, new LinearLayout.LayoutParams(-1, -2));
         play.setOnClickListener(v -> {
             if (!activeOwner()) return;
@@ -374,6 +346,21 @@ public final class GamesHubDialog extends Dialog {
             start.run();
         });
     }
+
+    private String modeBestLine(Mode selected, int total) {
+        String key = scorePrefix + selected.name();
+        return scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/" + total : "Your best: not played yet";
+    }
+
+    private void startMode(Mode selected) {
+        mode = selected;
+        recordPlay();
+        if (mode == Mode.LADDER) { startLadder(); return; }
+        round = new Round(mode, seed);
+        question();
+    }
+
+    // ---- Custom games: Word Search, Memory Match, Story Timeline, Mini Crossword, Road to Jerusalem ----
 
     private String solvedLine(String key) {
         int n = scores.getInt(scorePrefix + key, 0);
