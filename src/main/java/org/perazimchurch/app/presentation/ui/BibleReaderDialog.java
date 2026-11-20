@@ -643,6 +643,9 @@ public class BibleReaderDialog extends Dialog {
         sizes.addView(larger);
         sizes.addView(lighter);
         sizes.addView(bolder);
+        TextView swipe = sizeButton("Swipe", "Swipe across words to colour them purple", false);
+        swipe.setOnClickListener(v -> toggleSwipeColour(swipe));
+        sizes.addView(swipe);
         middle.addView(sizes);
         nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
@@ -887,7 +890,7 @@ public class BibleReaderDialog extends Dialog {
                 } else {
                     selectedVerses.remove(hit);
                 }
-                renderVerseList(currentVerses, false);
+                restyleVerseRows();
             }
             if (versesScrollView != null) {
                 versesScrollView.requestDisallowInterceptTouchEvent(true);
@@ -919,11 +922,7 @@ public class BibleReaderDialog extends Dialog {
                 12, false, notesMuted());
         hint.setPadding(0, dp(4), 0, dp(6));
         list.addView(hint);
-        addSwatchRow(list, HighlightColors.BOLD);
-        addSwatchRow(list, HighlightColors.ALL);
-        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
-            addSwatchRow(list, shadeRow);
-        }
+        list.addView(buildColourPicker(name -> applyHighlightToSelected(name), null, false, null));
         TextView done = GlassKit.orangeButton(getContext(), "Done", 14);
         done.setPadding(dp(28), 0, dp(28), 0);
         done.setOnClickListener(v -> dismissNotesPanel());
@@ -934,17 +933,9 @@ public class BibleReaderDialog extends Dialog {
         list.addView(doneRow, rowLp);
     }
 
-    private void addSwatchRow(LinearLayout list, List<HighlightColors.Colour> colours) {
-        LinearLayout row = new LinearLayout(getContext());
-        row.setGravity(Gravity.CENTER);
-        for (final HighlightColors.Colour colour : colours) {
-            row.addView(swatchView(colour.swatch, false, v -> applyHighlightToSelected(colour.name)));
-        }
-        list.addView(row);
-    }
-
     /** Colours every chosen verse, then clears the choice so the next portion can be selected. */
     private void applyHighlightToSelected(final String colour) {
+        recordColourUse(colour);
         if (selectedVerses.isEmpty()) {
             Toast.makeText(getContext(), "Drag across or tap the verses first", Toast.LENGTH_SHORT).show();
             return;
@@ -1200,29 +1191,7 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout row = new LinearLayout(getContext());
         row.setOrientation(LinearLayout.VERTICAL);
         boolean isCornerstone = "2SA".equals(verse.getBookId()) && verse.getChapterNumber() == 5 && verse.getVerseNumber() == 20;
-        HighlightColors.Colour highlight = HighlightColors.byName(verse.getHighlightColor());
-        if (highlight != null) {
-            GradientDrawable mark = new GradientDrawable();
-            mark.setCornerRadius(dp(12));
-            mark.setColor(Color.parseColor(highlight.tint));
-            row.setBackground(mark);
-            row.setPadding(dp(8), dp(6), dp(8), dp(6));
-        } else if (verse.isFavorite()) {
-            GradientDrawable mark = new GradientDrawable();
-            mark.setCornerRadius(dp(12));
-            mark.setColor(Color.parseColor("#26E17D2F"));
-            row.setBackground(mark);
-            row.setPadding(dp(8), dp(6), dp(8), dp(6));
-        }
-        if (selectMode && !isSearchResult && selectedVerses.contains(verse.getVerseNumber())) {
-            // Chosen for colouring: a bordered panel in the highlight tint (or orange if not yet coloured).
-            GradientDrawable chosen = new GradientDrawable();
-            chosen.setCornerRadius(dp(12));
-            chosen.setColor(highlight != null ? Color.parseColor(highlight.tint) : Color.parseColor("#33E17D2F"));
-            chosen.setStroke(dp(2), Color.parseColor("#E17D2F"));
-            row.setBackground(chosen);
-            row.setPadding(dp(8), dp(6), dp(8), dp(6));
-        }
+        styleVerseRow(row, verse, isSearchResult);
         GlassKit.keep(row);
 
         String label = isSearchResult ? formatCitation(verse) : String.valueOf(verse.getVerseNumber());
@@ -1293,6 +1262,9 @@ public class BibleReaderDialog extends Dialog {
                 if (selectTouch(ev)) {
                     return true;
                 }
+                if (swipeColourOn && !interlinearVersion) {
+                    return swipeColourTouch(tvVerseText, verse, textStart, ev);
+                }
                 swipe.onTouchEvent(ev);
                 return false;
             });
@@ -1329,6 +1301,49 @@ public class BibleReaderDialog extends Dialog {
         }
         row.setOnClickListener(v -> showVerseActionBar(verse));
         return row;
+    }
+
+    /** Background and padding of a verse row: whole-verse highlight, favourite, or chosen in select mode. */
+    private void styleVerseRow(LinearLayout row, BibleVerse verse, boolean isSearchResult) {
+        row.setBackground(null);
+        row.setPadding(0, 0, 0, 0);
+        if (selectMode && !isSearchResult) {
+            // Constant padding in select mode, so rows do not move while the finger drags across them.
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
+        }
+        HighlightColors.Colour highlight = HighlightColors.byName(verse.getHighlightColor());
+        if (highlight != null) {
+            GradientDrawable mark = new GradientDrawable();
+            mark.setCornerRadius(dp(12));
+            mark.setColor(Color.parseColor(highlight.tint));
+            row.setBackground(mark);
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
+        } else if (verse.isFavorite()) {
+            GradientDrawable mark = new GradientDrawable();
+            mark.setCornerRadius(dp(12));
+            mark.setColor(Color.parseColor("#26E17D2F"));
+            row.setBackground(mark);
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
+        }
+        if (selectMode && !isSearchResult && selectedVerses.contains(verse.getVerseNumber())) {
+            // Chosen for colouring: a bordered panel in the highlight tint (or orange if not yet coloured).
+            GradientDrawable chosen = new GradientDrawable();
+            chosen.setCornerRadius(dp(12));
+            chosen.setColor(highlight != null ? Color.parseColor(highlight.tint) : Color.parseColor("#33E17D2F"));
+            chosen.setStroke(dp(2), Color.parseColor("#E17D2F"));
+            row.setBackground(chosen);
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
+        }
+    }
+
+    /** Restyles the chosen verse rows in place; rebuilding them mid-drag would end the touch. */
+    private void restyleVerseRows() {
+        for (BibleVerse v : currentVerses) {
+            View r = verseRows.get(v.getVerseNumber());
+            if (r instanceof LinearLayout) {
+                styleVerseRow((LinearLayout) r, v, false);
+            }
+        }
     }
 
     /** Vertical position of a view inside an ancestor scroll view. */
@@ -1486,6 +1501,72 @@ public class BibleReaderDialog extends Dialog {
         };
     }
 
+    /** Swipe-to-colour mode: when on, dragging across a plain-text verse colours the words in bold purple. */
+    private boolean swipeColourOn;
+    /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
+    private int swipeAnchor = -1;
+
+    private void toggleSwipeColour(TextView button) {
+        swipeColourOn = !swipeColourOn;
+        swipeAnchor = -1;
+        button.setText(swipeColourOn ? "Swipe on" : "Swipe");
+        button.setAlpha(swipeColourOn ? 1f : 0.75f);
+        Toast.makeText(getContext(), swipeColourOn ? "Swipe to colour words purple" : "Swipe colouring off",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Handles a touch while swipe colouring is on. A drag from the first word to the last colours
+     * everything between them in purple; a tap without a drag opens the verse menu as before.
+     */
+    private boolean swipeColourTouch(final TextView tv, final BibleVerse verse, final int textStart,
+                                     android.view.MotionEvent ev) {
+        int action = ev.getActionMasked();
+        if (action == android.view.MotionEvent.ACTION_DOWN) {
+            if (tv.getLayout() == null) {
+                return false;
+            }
+            tv.getParent().requestDisallowInterceptTouchEvent(true);
+            swipeAnchor = tv.getOffsetForPosition(ev.getX(), ev.getY());
+            return true;
+        }
+        if (action == android.view.MotionEvent.ACTION_MOVE) {
+            return swipeAnchor >= 0;
+        }
+        if (action == android.view.MotionEvent.ACTION_UP || action == android.view.MotionEvent.ACTION_CANCEL) {
+            if (swipeAnchor < 0) {
+                return true;
+            }
+            int last = tv.getOffsetForPosition(ev.getX(), ev.getY());
+            int from = Math.min(swipeAnchor, last) - textStart;
+            int to = Math.max(swipeAnchor, last) - textStart;
+            swipeAnchor = -1;
+            int[] range = trimmedBodyRange(verse, from, to);
+            if (action == android.view.MotionEvent.ACTION_UP && range != null) {
+                applyWordHighlight(verse, range[0], range[1], "bold-purple");
+            } else if (action == android.view.MotionEvent.ACTION_UP) {
+                showVerseActionBar(verse);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /** Clamps [from, to) to the verse body and trims spaces at both ends; null when nothing is left. */
+    @Nullable
+    private static int[] trimmedBodyRange(BibleVerse verse, int from, int to) {
+        String body = verse.getText() != null ? verse.getText() : "";
+        int start = Math.max(0, from);
+        int end = Math.min(body.length(), to);
+        while (start < end && Character.isWhitespace(body.charAt(start))) {
+            start++;
+        }
+        while (end > start && Character.isWhitespace(body.charAt(end - 1))) {
+            end--;
+        }
+        return end > start ? new int[]{start, end} : null;
+    }
+
     /** Action menu for a selected word or range in a plain-text verse. */
     private android.view.ActionMode.Callback wordSelectionCallback(final TextView tv, final BibleVerse verse, final int textStart) {
         return new android.view.ActionMode.Callback() {
@@ -1585,28 +1666,13 @@ public class BibleReaderDialog extends Dialog {
 
     /** Colour card for a chosen word or range. */
     private void pickWordColour(final BibleVerse verse, final int start, final int end) {
-        LinearLayout list = new LinearLayout(getContext());
-        list.setOrientation(LinearLayout.VERTICAL);
-        addWordSwatchRow(list, verse, start, end, HighlightColors.BOLD);
-        addWordSwatchRow(list, verse, start, end, HighlightColors.ALL);
-        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
-            addWordSwatchRow(list, verse, start, end, shadeRow);
-        }
-        wordColourDialog = openCardDialog("Highlight words", "Only the words you chose are coloured", list, null, null);
-    }
-
-    private void addWordSwatchRow(LinearLayout list, final BibleVerse verse, final int start, final int end,
-                                  List<HighlightColors.Colour> colours) {
-        LinearLayout row = new LinearLayout(getContext());
-        row.setGravity(Gravity.CENTER);
-        for (final HighlightColors.Colour colour : colours) {
-            row.addView(swatchView(colour.swatch, false, v -> applyWordHighlight(verse, start, end, colour.name)));
-        }
-        list.addView(row);
+        wordColourDialog = openCardDialog("Highlight words", "Only the words you chose are coloured",
+                buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, false, null), null, null);
     }
 
     /** Adds a word range to the verse, updates the loaded verse lists and redraws. */
     private void applyWordHighlight(final BibleVerse verse, final int start, final int end, final String colour) {
+        recordColourUse(colour);
         if (wordColourDialog != null) {
             wordColourDialog.dismiss();
             wordColourDialog = null;
@@ -1801,45 +1867,110 @@ public class BibleReaderDialog extends Dialog {
         actionBarView = bar;
     }
 
-    /** Colours, muted colours, spectrum and remove, as one block. */
-    private View buildPalette(final BibleVerse verse) {
-        LinearLayout palette = new LinearLayout(getContext());
-        palette.setOrientation(LinearLayout.VERTICAL);
-        palette.setGravity(Gravity.CENTER_HORIZONTAL);
-        LinearLayout majorRow = new LinearLayout(getContext());
-        majorRow.setGravity(Gravity.CENTER);
-        for (final HighlightColors.Colour colour : HighlightColors.ALL) {
-            majorRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
-                    v -> applyHighlight(verse, colour.name)));
+    /** Colours used most often, so the shared picker shows them first. */
+    private static final String[] DEFAULT_COLOURS = {"bold-purple", "bold-yellow", "bold-green", "bold-blue", "bold-orange", "red"};
+    private static final String HIGHLIGHT_PREFS = "highlight_colour_use";
+
+    private void recordColourUse(@Nullable String colour) {
+        if (colour == null || getContext() == null) {
+            return;
         }
-        LinearLayout mutedRow = new LinearLayout(getContext());
-        mutedRow.setGravity(Gravity.CENTER);
-        for (final HighlightColors.Colour colour : HighlightColors.MUTED) {
-            mutedRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
-                    v -> applyHighlight(verse, colour.name)));
+        try {
+            android.content.SharedPreferences prefs = getContext().getSharedPreferences(HIGHLIGHT_PREFS, Context.MODE_PRIVATE);
+            prefs.edit().putInt(colour, prefs.getInt(colour, 0) + 1).apply();
+        } catch (RuntimeException ignored) {
+            // Usage counts are a convenience; a failed write must not stop the highlight.
         }
-        mutedRow.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> applyHighlight(verse, null)));
-        LinearLayout boldRow = new LinearLayout(getContext());
-        boldRow.setGravity(Gravity.CENTER);
-        for (final HighlightColors.Colour colour : HighlightColors.BOLD) {
-            boldRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
-                    v -> applyHighlight(verse, colour.name)));
-        }
-        palette.addView(majorRow);
-        palette.addView(mutedRow);
-        palette.addView(boldRow);
-        // Washed out to darker, one row per shade, so the same hue can be chosen light or deep.
-        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
-            LinearLayout gradRow = new LinearLayout(getContext());
-            gradRow.setGravity(Gravity.CENTER);
-            for (final HighlightColors.Colour colour : shadeRow) {
-                gradRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
-                        v -> applyHighlight(verse, colour.name)));
+    }
+
+    /** Up to six colours, most used first, then the defaults to fill the row. */
+    private List<String> frequentColours() {
+        List<String> names = new ArrayList<>();
+        try {
+            android.content.SharedPreferences prefs = getContext().getSharedPreferences(HIGHLIGHT_PREFS, Context.MODE_PRIVATE);
+            Map<String, ?> all = prefs.getAll();
+            List<Map.Entry<String, ?>> entries = new ArrayList<>(all.entrySet());
+            java.util.Collections.sort(entries, (a, b) -> Integer.compare(
+                    ((Number) b.getValue()).intValue(), ((Number) a.getValue()).intValue()));
+            for (Map.Entry<String, ?> e : entries) {
+                if (names.size() < 6 && e.getValue() instanceof Number && HighlightColors.byName(e.getKey()) != null) {
+                    names.add(e.getKey());
+                }
             }
-            palette.addView(gradRow);
+        } catch (RuntimeException ignored) {
+            // Fall through to the defaults.
         }
-        palette.addView(spectrumView(verse));
-        return palette;
+        for (String fallback : DEFAULT_COLOURS) {
+            if (names.size() >= 6) {
+                break;
+            }
+            if (!names.contains(fallback)) {
+                names.add(fallback);
+            }
+        }
+        return names;
+    }
+
+    /**
+     * The one colour picker used everywhere: the most used colours in a row, then a spectrum
+     * to pick any other colour. Calls onPick with the chosen colour name or "#RRGGBB".
+     */
+    private View buildColourPicker(final java.util.function.Consumer<String> onPick, @Nullable final String current,
+                                   boolean allowRemove, @Nullable final Runnable onRemove) {
+        LinearLayout picker = new LinearLayout(getContext());
+        picker.setOrientation(LinearLayout.VERTICAL);
+        picker.setGravity(Gravity.CENTER_HORIZONTAL);
+        LinearLayout row = new LinearLayout(getContext());
+        row.setGravity(Gravity.CENTER);
+        for (final String name : frequentColours()) {
+            HighlightColors.Colour colour = HighlightColors.byName(name);
+            if (colour != null) {
+                row.addView(swatchView(colour.swatch, name.equals(current), v -> {
+                    recordColourUse(name);
+                    onPick.accept(name);
+                }));
+            }
+        }
+        if (allowRemove && onRemove != null) {
+            row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
+        }
+        picker.addView(row);
+        picker.addView(spectrumBar(onPick));
+        return picker;
+    }
+
+    /** One hue spectrum: tap or drag across it, and the colour under the finger is chosen on release. */
+    private View spectrumBar(final java.util.function.Consumer<String> onPick) {
+        final View spectrum = new View(getContext());
+        GradientDrawable hues = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
+                0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000});
+        hues.setCornerRadius(dp(10));
+        spectrum.setBackground(hues);
+        spectrum.setContentDescription("Pick any colour from the spectrum");
+        spectrum.setOnTouchListener((v, event) -> {
+            int action = event.getActionMasked();
+            if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
+                    || action == android.view.MotionEvent.ACTION_UP) {
+                float frac = Math.max(0f, Math.min(1f, event.getX() / Math.max(1, v.getWidth())));
+                int rgb = Color.HSVToColor(new float[]{frac * 359f, 0.55f, 0.98f});
+                String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
+                if (action == android.view.MotionEvent.ACTION_UP) {
+                    recordColourUse(hex);
+                    onPick.accept(hex);
+                }
+            }
+            return true;
+        });
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(260), dp(20));
+        lp.setMargins(0, dp(8), 0, dp(4));
+        spectrum.setLayoutParams(lp);
+        return spectrum;
+    }
+
+    /** Colours for the verse action bar: the shared picker, with remove. */
+    private View buildPalette(final BibleVerse verse) {
+        return buildColourPicker(name -> applyHighlight(verse, name), verse.getHighlightColor(),
+                true, () -> applyHighlight(verse, null));
     }
 
     /** Active group icons turn orange; the rest use the normal ink. */
@@ -1923,32 +2054,6 @@ public class BibleReaderDialog extends Dialog {
     }
 
     /** RGB spectrum: drag or tap across the hue bar to pick any colour. */
-    private View spectrumView(final BibleVerse verse) {
-        final View spectrum = new View(getContext());
-        GradientDrawable hues = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
-                0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000});
-        hues.setCornerRadius(dp(10));
-        spectrum.setBackground(hues);
-        spectrum.setContentDescription("Pick any colour from the spectrum");
-        spectrum.setOnTouchListener((v, event) -> {
-            int action = event.getActionMasked();
-            if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
-                    || action == android.view.MotionEvent.ACTION_UP) {
-                float frac = Math.max(0f, Math.min(1f, event.getX() / Math.max(1, v.getWidth())));
-                int rgb = Color.HSVToColor(new float[]{frac * 359f, 0.55f, 0.98f});
-                String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
-                if (action == android.view.MotionEvent.ACTION_UP) {
-                    applyHighlight(verse, hex);
-                }
-            }
-            return true;
-        });
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(260), dp(20));
-        lp.setMargins(0, dp(8), 0, dp(4));
-        spectrum.setLayoutParams(lp);
-        return spectrum;
-    }
-
     /** Stays in front of the verses; swipe up reveals more actions, swipe down hides them. */
     private static final class SwipeUpBar extends LinearLayout {
         private float downY;
