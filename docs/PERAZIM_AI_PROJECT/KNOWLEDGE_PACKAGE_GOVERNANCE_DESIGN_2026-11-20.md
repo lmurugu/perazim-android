@@ -1,6 +1,6 @@
 # Knowledge-package governance design (2026-11-20)
 
-**Status:** the decision logic (`SourceGovernance.java`) is connected to offline retrieval through `GovernedEvidence.java`, called from `OfflineKnowledgeStore.retrieve`. It is host-tested with synthetic data only. **No signed approval manifest exists yet**, so retrieval currently offers no package document as evidence (fail closed). No source is approved.
+**Status:** the decision logic (`SourceGovernance.java`) is connected to offline retrieval through `GovernedEvidence.java`, called from `OfflineKnowledgeStore.retrieve`. It is host-tested with synthetic data only. Approval status now travels in a `governance` array inside the signed package payload (commit 172161c). The packages published so far carry no approved sources, so retrieval offers no package document as evidence (fail closed). No source is approved.
 
 ## 1. Categories
 | Category | Meaning | May establish official policy? | May be offered as context? |
@@ -38,7 +38,9 @@ Only then does the authority class become `APPROVED_OFFICIAL`. The output valida
 5. Scripture passages from `LocalScriptureRetriever` are appended as before. They come from app-bundled Bible text, not from the knowledge package, so they are outside this manifest.
 
 ## 4. Trust boundary
-- Approval fields come only from the **manifest**. The manifest must pass the signed-package verification (Ed25519, `Ed25519Verifier`) before it is used. No such manifest format is defined yet; its contract is pending review with the signed-package security thread.
+- Approval fields come only from the signed payload's `governance` array, read after Ed25519 verification (`Ed25519Verifier`). The array is covered by `contentDigest`. `SourceGovernance.fromVerifiedPayload` parses it strictly: `approvedAt` must be an integer epoch-millisecond value no later than `publishedAt`, and any malformed entry rejects the whole package.
+- Rollback: `GovernedEvidence.assertRollbackAllowed` refuses a target with a revoked or superseded source, a withdrawn sourceId+version, or unreadable withdrawal status when it has documents. It runs before any slot is written.
+- Approver purpose binding (Session 2 item 3) is not yet implemented; it depends on the S2-06 key-map work.
 - Fields inside a document (`authorityClass`, `citationEligible`, `category`, `approvedBy`, `approvedAt`, `scope`, `approvalReference`) are never copied into evidence. Tests: `GovernedSelectionTest.documentSelfDeclaredApprovalIsIgnoredWithoutGovernanceEntry` and `selfDeclaredApprovalCannotOverrideGovernedUnapprovedCategory`.
 - Malformed manifest entries are dropped, so they cannot become sources.
 
@@ -51,7 +53,8 @@ Only then does the authority class become `APPROVED_OFFICIAL`. The output valida
 Until a signed approval manifest is provided, `retrieve` returns no package evidence. The on-device answer path therefore reports that no verified approved source supports the question. This affects the validation build's bundled synthetic package. It is intentional: no source has been approved.
 
 ## 7. Not yet implemented
-- The signed approval-manifest format, its verification and its provisioning (contract to be agreed with the signed-package security review before any change to the signature or manifest contract).
+- Approver allowlist with purpose binding (S2-06).
+- Monotonic clock floor (S2-07), checkpoint migration (S2-05), key purposes (S2-06), duplicate-key JSON parsing (S2-10): Session 2 proposals, not yet implemented here.
 - Auditing of approval records (who approved, when, on what evidence) beyond the manifest fields.
 - Governance of bundled scripture passages (not part of the package).
 - Device or emulator verification of the retrieval change. Host tests cover the selection step only; `OfflineKnowledgeStore.retrieve` itself is Android-dependent and has not been compiled or run in this session.
