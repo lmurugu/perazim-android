@@ -123,8 +123,12 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(PerazimAiEngine.sensitivePastoralResponse().getMessageText()));
             return;
         }
+        if (PerazimAiEngine.isHumanDecisionQuery(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.humanDecisionResponse().getMessageText()));
+            return;
+        }
         if (PerazimAiEngine.isOutOfScopeForModel(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.outOfScopeResponse().getMessageText()));
+            MAIN.post(() -> callback.onError(PerazimAiEngine.boundaryResponseFor(question).getMessageText()));
             return;
         }
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
@@ -195,6 +199,9 @@ public final class OnDeviceAi {
                 if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
                 String result = answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim();
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
+                if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)) {
+                    throw new IOException("The local model made a claim the app cannot verify. Ask again or contact the church office.");
+                }
                 if (!hasVerifiedCitations(result, evidence)) {
                     throw new IOException("The local model did not return a verified source citation.");
                 }

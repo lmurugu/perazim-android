@@ -95,7 +95,7 @@ public class PerazimAiEngine {
         }
 
         if (isClearlyOutOfScopeQuery(rawQuery)) {
-            return outOfScopeResponse();
+            return boundaryResponseFor(rawQuery);
         }
 
         // 1. BIBLE RIDDLES & TRIVIA
@@ -201,6 +201,60 @@ public class PerazimAiEngine {
                 Arrays.asList("🙏 Open pastoral contacts", "🙏 Open prayer support"));
     }
 
+    /** Medical, legal and financial matters: these get the professional-referral boundary, not the church referral. */
+    private static final Pattern PROFESSIONAL_MATTER = Pattern.compile(
+            "\\b(?:medic\\w*|dose|dosage|diagnos\\w*|symptoms?|fever|chest pain|pills?|antibiotics?|malaria|paracetamol|ibuprofen|" +
+            "legal|lawsuit|lawyer|sue|court|contract|agreement|invest\\w*|stocks?|shares|bitcoin|crypto\\w*|forex|bonds?|" +
+            "portfolio|loans?|tax|financial|bank|money)\\b", Pattern.CASE_INSENSITIVE);
+    /** Questions that ask the assistant to make a leadership decision about a person or membership. */
+    private static final Pattern HUMAN_DECISION = Pattern.compile(
+            "\\b(?:am i saved|is (?:he|she|they|my \\w+) saved|am i going to heaven|is (?:he|she|they) condemned|" +
+            "(?:remove|expel|discipline|restore|reinstate|excommunicate)\\b.{0,40}\\b(?:member|membership|church)|" +
+            "(?:accept|reject|approve|deny|revoke)\\b.{0,40}\\bmembership|" +
+            "(?:should|can|may|will) (?:i|he|she) (?:be )?(?:ordained|appointed|a pastor|a deacon|an elder)|" +
+            "(?:is|am) (?:i|he|she) (?:an? )?(?:accepted |official )?member)\\b", Pattern.CASE_INSENSITIVE);
+    /** Replies that claim an app action happened. Only the app itself can confirm an action. */
+    private static final Pattern CLAIMED_APP_ACTION = Pattern.compile(
+            "\\b(?:i (?:have )?(?:submitted|sent|registered|updated|contacted|changed|forwarded|notified|recorded)|" +
+            "(?:has|have) been (?:submitted|sent|registered|updated|contacted|changed|forwarded|notified|recorded)|" +
+            "submitted successfully|i (?:have )?(?:informed|alerted) (?:the )?(?:bishop|pastor|leader))\\b", Pattern.CASE_INSENSITIVE);
+    /** Replies that claim to be a human church authority. */
+    private static final Pattern CLAIMED_HUMAN_AUTHORITY = Pattern.compile(
+            "\\bi (?:am|'m) (?:your |the |a |an )?(?:pastor|bishop|priest|elder|deacon|counsellor|counselor|church leader)\\b|" +
+            "\\bi (?:now )?(?:declare|pronounce|forgive) you\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isProfessionalMatterQuery(@Nullable String query) {
+        return query != null && PROFESSIONAL_MATTER.matcher(query).find();
+    }
+
+    public static boolean isHumanDecisionQuery(@Nullable String query) {
+        return query != null && HUMAN_DECISION.matcher(query.replace('’', '\'')).find();
+    }
+
+    public static boolean claimsAppActionOrHumanAuthority(@Nullable String answer) {
+        return answer != null && (CLAIMED_APP_ACTION.matcher(answer).find() || CLAIMED_HUMAN_AUTHORITY.matcher(answer).find());
+    }
+
+    @NonNull
+    public static AiResponse professionalBoundaryResponse() {
+        return AiResponse.plainText(
+                "I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
+                Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
+    }
+
+    @NonNull
+    public static AiResponse humanDecisionResponse() {
+        return AiResponse.plainText(
+                "This decision belongs to church leadership, and I cannot make it. Please speak with the Bishop or an authorised leader.",
+                Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
+    }
+
+    /** Chooses the boundary wording: professional referral for medical, legal and financial matters, church referral otherwise. */
+    @NonNull
+    public static AiResponse boundaryResponseFor(@Nullable String query) {
+        return isProfessionalMatterQuery(query) ? professionalBoundaryResponse() : outOfScopeResponse();
+    }
+
     /** Church, Bible, faith and app topics the on-phone model may answer. English, Swahili and Sheng. */
     private static final Pattern MODEL_IN_SCOPE_TOPIC = Pattern.compile(
             "\\b(?:bible|biblia|scripture|scriptures|verse|verses|aya|chapter|book of|gospel|injili|psalm|psalms|zaburi|proverbs|" +
@@ -217,7 +271,7 @@ public class PerazimAiEngine {
             "\\b(?:ignore|forget|disregard|bypass)\\s+(?:all\\s+|the\\s+|your\\s+|previous\\s+|church\\s+|these\\s+)*(?:rules|instructions|guidelines|restrictions|prompt)\\b|" +
             "\\bpretend\\s+(?:you\\s+are|to\\s+be|that)\\b|\\broleplay\\b|\\brole-play\\b|\\byou\\s+are\\s+now\\b|\\bfrom\\s+now\\s+on\\s+you\\b|" +
             "\\bspeak\\s+as\\b|\\bact\\s+as\\s+(?:my|an?)\\s+(?!christian|church|pastor|believer|leader)|\\bsong\\s+lyrics\\b|" +
-            "\\banswer\\s+any\\s+question\\b|\\b(?:riddles?|trivia|jokes?|poems?|poetry)\\b", Pattern.CASE_INSENSITIVE);
+            "\\banswer\\s+any\\s+question\\b|\\bdeclare\\b.{0,40}\\b(?:doctrine|official|policy|position)\\b|\\byou\\s+are\\s+the\\s+(?:bishop|pastor|leader)\\b|\\bignore\\b.{0,30}\\b(?:previous|prior|above)\\s+instructions\\b|\\b(?:riddles?|trivia|jokes?|poems?|poetry)\\b", Pattern.CASE_INSENSITIVE);
 
     /**
      * Stricter gate for the on-phone model: refuses anything outside church, Bible, faith and app topics,
@@ -244,7 +298,7 @@ public class PerazimAiEngine {
     @NonNull
     public static AiResponse outOfScopeResponse() {
         return AiResponse.plainText(
-                "I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with the Bishop or an appropriate person. For medical, legal or financial matters, please consult a qualified professional.",
+                "I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with the Bishop or an appropriate person.",
                 Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 

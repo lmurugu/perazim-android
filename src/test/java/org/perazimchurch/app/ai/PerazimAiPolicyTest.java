@@ -51,7 +51,8 @@ public class PerazimAiPolicyTest {
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("What does Scripture teach about stewardship?"));
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("How can I support someone who is grieving?"));
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("Explain John 3:16"));
-        assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("qualified professional"));
+        assertTrue(PerazimAiEngine.boundaryResponseFor("Which medication should I take?").getMessageText().contains("qualified professional"));
+        assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("Please speak with the Bishop"));
     }
 
     @Test public void crisisResponseDoesNotInventAContactOrPromiseAvailability() {
