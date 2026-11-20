@@ -56,6 +56,17 @@ public class VerifiedPayloadAndRollbackTest {
         assertTrue(SourceGovernance.fromVerifiedPayload(null, PUBLISHED).isEmpty());
     }
 
+    @Test public void presentButNonArrayGovernanceRejectsThePackage() throws Exception {
+        for (Object value : new Object[] {"not-an-array", new JSONObject().put("id", "x"), 7, JSONObject.NULL}) {
+            try {
+                SourceGovernance.fromVerifiedPayload(value, PUBLISHED);
+                fail("expected rejection for " + value);
+            } catch (SecurityException expected) {
+                // fail closed
+            }
+        }
+    }
+
     @Test public void validEntryParsesWithApprovalTimeAsEpochMillis() throws Exception {
         List<SourceGovernance.Source> out = SourceGovernance.fromVerifiedPayload(arr(validEntry()), PUBLISHED);
         assertEquals(1, out.size());

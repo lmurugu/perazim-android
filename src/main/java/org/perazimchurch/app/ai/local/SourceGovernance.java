@@ -72,9 +72,14 @@ public final class SourceGovernance {
      * malformed entry rejects the whole package, and approval time must be an integer epoch-millisecond value no
      * later than publication. An absent array means no source is authorised.
      */
-    public static List<Source> fromVerifiedPayload(JSONArray governance, long publishedAt) {
+    public static List<Source> fromVerifiedPayload(Object governanceValue, long publishedAt) {
         List<Source> out = new ArrayList<>();
-        if (governance == null) return out;
+        // Only an absent key (null here) means no governance. Any present non-array value, including JSON null, rejects.
+        if (governanceValue == null) return out;
+        if (!(governanceValue instanceof JSONArray)) {
+            throw new SecurityException("Package governance must be an array when present.");
+        }
+        JSONArray governance = (JSONArray) governanceValue;
         for (int i = 0; i < governance.length(); i++) {
             JSONObject o = governance.optJSONObject(i);
             if (o == null) throw new SecurityException("Package governance entry is malformed.");

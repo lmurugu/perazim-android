@@ -275,7 +275,7 @@ public final class OfflineKnowledgeStore {
         }
         long publishedAtValue = payload.getLong("publishedAt");
         java.util.List<SourceGovernance.Source> governance =
-                SourceGovernance.fromVerifiedPayload(payload.optJSONArray("governance"), publishedAtValue);
+                SourceGovernance.fromVerifiedPayload(payload.opt("governance"), publishedAtValue);
         return new VerifiedPackage(payload.getString("version"), contentDigest, documents, publishedAtValue, governance);
     }
 
