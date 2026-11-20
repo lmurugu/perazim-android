@@ -19,6 +19,20 @@ import java.util.List;
 public final class BibleVerseReader {
 
     private static final String PREFS = "bible_text_db";
+    /** Bumped when the bundled text files are rebuilt, so installed copies are replaced. */
+    public static final int BUNDLED_TEXT_REVISION = 2;
+    private static final java.util.Set<String> BUNDLED_IDS =
+            new java.util.HashSet<>(java.util.Arrays.asList("KJV", "WEB", "ASV", "BSB"));
+
+    public static boolean isBundledId(String translationId) {
+        return BUNDLED_IDS.contains(translationId);
+    }
+
+    private static String readyKey(String translationId) {
+        return BUNDLED_IDS.contains(translationId)
+                ? "ready_" + translationId + "_r" + BUNDLED_TEXT_REVISION
+                : "ready_" + translationId;
+    }
 
     private final BibleDao mainDao;
     @Nullable
@@ -46,17 +60,32 @@ public final class BibleVerseReader {
         return new BibleVerseReader(mainDao, null, null);
     }
 
+    /**
+     * True when the text database can serve this translation: its current copy is ready, or an earlier copy of
+     * a bundled text is, which keeps reading working while the newer copy is imported.
+     */
     public static boolean isReady(@Nullable Context context, String translationId) {
         if (context == null) {
             return false;
         }
+        android.content.SharedPreferences prefs = context.getApplicationContext()
+                .getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        return prefs.getBoolean(readyKey(translationId), false)
+                || (BUNDLED_IDS.contains(translationId) && prefs.getBoolean("ready_" + translationId, false));
+    }
+
+    /** True only when this translation's current copy is complete in the text database. */
+    public static boolean isCurrent(@Nullable Context context, String translationId) {
+        if (context == null) {
+            return false;
+        }
         return context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .getBoolean("ready_" + translationId, false);
+                .getBoolean(readyKey(translationId), false);
     }
 
     public static void markReady(Context context, String translationId) {
         context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                .edit().putBoolean("ready_" + translationId, true).apply();
+                .edit().putBoolean(readyKey(translationId), true).apply();
     }
 
     private boolean useText(String translationId) {

@@ -60,7 +60,7 @@ public final class BibleTextMigration {
 
         // 2. Anything else that only exists in the private database.
         for (String id : dao.getVerseTranslationIds()) {
-            if (id == null || BibleVerseReader.isReady(app, id)) {
+            if (id == null || BibleVerseReader.isReady(app, id) || BibleVerseReader.isBundledId(id)) {
                 continue;
             }
             if (copyFromPrivate(dao, textDao, id)) {

@@ -123,12 +123,7 @@ public final class BibleTextImporter {
     }
 
     private static void importTranslation(Context context, BibleDao dao, BibleTextDao textDao, Spec spec) throws IOException {
-        if (BibleVerseReader.isReady(context, spec.id) && isComplete(textDao, spec)) {
-            return;
-        }
-        if (isComplete(textDao, spec)) {
-            ensureTranslationAndBooks(dao, spec);
-            BibleVerseReader.markReady(context, spec.id);
+        if (BibleVerseReader.isCurrent(context, spec.id) && isComplete(textDao, spec)) {
             return;
         }
         InputStream source = openSource(context, spec);
@@ -136,7 +131,6 @@ public final class BibleTextImporter {
             return;
         }
         ensureTranslationAndBooks(dao, spec);
-        textDao.deleteTranslation(spec.id);
 
         List<BibleTextVerseEntity> batch = new ArrayList<>(BATCH_SIZE);
         int imported = 0;
