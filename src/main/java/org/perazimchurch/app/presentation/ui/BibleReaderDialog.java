@@ -919,15 +919,38 @@ public class BibleReaderDialog extends Dialog {
     /** The colour panel for select mode: stays open so one colour can be chosen, then another portion selected. */
     private void openSelectCard() {
         LinearLayout list = openFloatingCard("select", "Select verses", null, null);
-        list.addView(buildColourPicker(name -> applyHighlightToSelected(name), null, false, null));
-        TextView done = GlassKit.orangeButton(getContext(), "Done", 14);
-        done.setPadding(dp(28), 0, dp(28), 0);
+        // No backdrop card: strip the panel to its content, so only the picker and the Done icon show.
+        if (notesPanelView instanceof LinearLayout) {
+            LinearLayout panel = (LinearLayout) notesPanelView;
+            panel.setBackground(null);
+            panel.setPadding(0, 0, 0, 0);
+            View content = list;
+            while (content.getParent() instanceof View && content.getParent() != panel) {
+                content = (View) content.getParent();
+            }
+            for (int i = panel.getChildCount() - 1; i >= 0; i--) {
+                if (panel.getChildAt(i) != content) {
+                    panel.removeViewAt(i);
+                }
+            }
+        }
+        list.addView(buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, false));
+        ImageView done = new ImageView(getContext());
+        done.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_check);
+        done.setContentDescription("Done");
+        done.setPadding(dp(8), dp(8), dp(8), dp(8));
+        GradientDrawable doneBg = new GradientDrawable();
+        doneBg.setShape(GradientDrawable.OVAL);
+        doneBg.setColor(COLOR_ACCENT_ORANGE());
+        done.setBackground(doneBg);
+        LinearLayout.LayoutParams doneLp = new LinearLayout.LayoutParams(dp(36), dp(36));
+        doneLp.setMargins(0, dp(8), 0, 0);
+        done.setLayoutParams(doneLp);
         done.setOnClickListener(v -> dismissNotesPanel());
         LinearLayout doneRow = new LinearLayout(getContext());
         doneRow.setGravity(Gravity.CENTER);
-        doneRow.addView(done, new LinearLayout.LayoutParams(-2, dp(40)));
-        LinearLayout.LayoutParams rowLp = GlassKit.matchWrap(getContext(), 10);
-        list.addView(doneRow, rowLp);
+        doneRow.addView(done);
+        list.addView(doneRow);
     }
 
     /** Colours every chosen verse, then clears the choice so the next portion can be selected. */
@@ -1714,7 +1737,7 @@ public class BibleReaderDialog extends Dialog {
     /** Colour card for a chosen word or range. */
     private void pickWordColour(final BibleVerse verse, final int start, final int end) {
         wordColourDialog = openCardDialog("Highlight", null,
-                buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, false, null), null, null);
+                buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, false, null, false), null, null);
     }
 
     /** Adds a word range to the verse, updates the loaded verse lists and redraws. */
@@ -1964,7 +1987,7 @@ public class BibleReaderDialog extends Dialog {
      * Presets apply straight away; the tracks preview until the check is pressed.
      */
     private View buildColourPicker(final java.util.function.Consumer<String> onPick, @Nullable final String current,
-                                   boolean allowRemove, @Nullable final Runnable onRemove) {
+                                   boolean allowRemove, @Nullable final Runnable onRemove, boolean framed) {
         final String seed = current != null && HighlightColors.byName(current) != null ? current : frequentColours().get(0);
         HighlightColors.Colour seedColour = HighlightColors.byName(seed);
         int seedRgb = seedColour != null ? Color.parseColor(seedColour.swatch) : 0xFF8E24AA;
@@ -1977,13 +2000,15 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout card = new LinearLayout(getContext());
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
-        card.setPadding(dp(12), dp(4), dp(12), dp(4));
-        GradientDrawable frost = new GradientDrawable();
-        frost.setCornerRadius(dp(12));
-        // Light package on a dark phone, dark package on a light phone.
-        frost.setColor(phoneIsDark() ? 0x80FFFFFF : 0xCC2D0938);
-        frost.setStroke(dp(1), phoneIsDark() ? 0xD9FFFFFF : 0x33FFFFFF);
-        card.setBackground(frost);
+        if (framed) {
+            card.setPadding(dp(12), dp(4), dp(12), dp(4));
+            GradientDrawable frost = new GradientDrawable();
+            frost.setCornerRadius(dp(12));
+            // Light package on a dark phone, dark package on a light phone.
+            frost.setColor(phoneIsDark() ? 0x80FFFFFF : 0xCC2D0938);
+            frost.setStroke(dp(1), phoneIsDark() ? 0xD9FFFFFF : 0x33FFFFFF);
+            card.setBackground(frost);
+        }
 
         final TrackSlider[] bars = new TrackSlider[2];
         final Runnable[] refresh = new Runnable[1];
@@ -2166,7 +2191,7 @@ public class BibleReaderDialog extends Dialog {
     /** Colours for the verse action bar: the shared picker, with remove. */
     private View buildPalette(final BibleVerse verse) {
         return buildColourPicker(name -> applyHighlight(verse, name), verse.getHighlightColor(),
-                true, () -> applyHighlight(verse, null));
+                true, () -> applyHighlight(verse, null), true);
     }
 
     /** Active group icons turn orange; the rest use the normal ink. */
