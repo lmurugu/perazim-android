@@ -1557,7 +1557,7 @@ public class BibleReaderDialog extends Dialog {
         circle.setColor(on ? 0x33E17D2F : 0x00000000);
         icon.setBackground(circle);
         // Dark ink on the light theme, bright ink on the dark theme; the on state stays orange.
-        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : (GlassKit.light() ? 0xFF2A1B3D : 0xFFF1EAFB));
+        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : (phoneIsDark() ? 0xFFF1EAFB : 0xFF2A1B3D));
     }
 
     /**
@@ -1978,8 +1978,9 @@ public class BibleReaderDialog extends Dialog {
         card.setPadding(dp(12), dp(4), dp(12), dp(4));
         GradientDrawable frost = new GradientDrawable();
         frost.setCornerRadius(dp(12));
-        frost.setColor(GlassKit.light() ? 0x80FFFFFF : 0x663A1F55);
-        frost.setStroke(dp(1), GlassKit.light() ? 0xD9FFFFFF : 0x33FFFFFF);
+        // Light package on a dark phone, dark package on a light phone.
+        frost.setColor(phoneIsDark() ? 0x80FFFFFF : 0xCC2D0938);
+        frost.setStroke(dp(1), phoneIsDark() ? 0xD9FFFFFF : 0x33FFFFFF);
         card.setBackground(frost);
 
         final TrackSlider[] bars = new TrackSlider[2];
@@ -2054,9 +2055,16 @@ public class BibleReaderDialog extends Dialog {
         return card;
     }
 
-    /** Slider thumbs: dark purple on the light card, bright orange on the dark card. */
+    /** True when the phone itself is in dark mode. The picker contrasts with this, not with the app's theme. */
+    private boolean phoneIsDark() {
+        android.content.res.Configuration config = getContext().getResources().getConfiguration();
+        return (config.uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    /** Slider thumbs contrast with the phone: purple on a light phone, orange on a dark phone. */
     private int pickerThumbColour() {
-        return GlassKit.light() ? 0xFF4A1D6E : 0xFFE17D2F;
+        return phoneIsDark() ? 0xFFE17D2F : 0xFF4A1D6E;
     }
 
     /** A thin strip with a round thumb. The gradient is the strip; the thumb is dark purple with a glow. */
