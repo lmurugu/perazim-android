@@ -58,7 +58,9 @@ def contextual_gloss(text):
 # Reading fixes where the translators' context gloss is wrong for a very common word. Keyed by Strong's
 # number; applied to every occurrence. Checked against standard English readings of Gen 1:1, John 1:1 and
 # Psalm 23:1; the ESV and NASB text itself is not bundled.
-GREEK_OVERRIDES = {1722: "in", 4314: "with"}  # en (ἐν), pros (πρὸς)
+GREEK_OVERRIDES = {1722: "in", 4314: "with", 1064: "in_womb"}  # en, pros (πρὸς), gastrí (γαστρί)
+PRONOUN_1 = {"G": "our", "D": "us", "A": "us", "N": "we"}
+PRONOUN_2 = {"G": "your", "D": "you", "A": "you", "N": "you"}
 HEBREW_OVERRIDES = {7462: ("", "shepherd")}  # ro'eh (רֹעֶה), shepherd/tend
 
 
@@ -116,7 +118,7 @@ def apply(path, step_rows, books, hebrew):
                         fields = cell_list[i].split("|")
                         if not gloss or len(fields) != 5:
                             continue
-                        fields[4] = gloss
+                        fields[4] = gloss.replace(" ", "_")
                         cell_list[i] = "|".join(fields)
                         changed += 1
                 for i, c in enumerate(cell_list):
@@ -124,8 +126,15 @@ def apply(path, step_rows, books, hebrew):
                     if len(f) != 5:
                         continue
                     number = int(f[1] or 0)
+                    empty = f[4] in ("", "-")
                     if not hebrew and number in GREEK_OVERRIDES:
                         f[4] = GREEK_OVERRIDES[number]
+                    elif not hebrew and empty and f[2].startswith("T-"):
+                        f[4] = "the"
+                    elif not hebrew and empty and f[2].startswith("P-1") and len(f[2]) >= 4:
+                        f[4] = PRONOUN_1.get(f[2][3], "")
+                    elif not hebrew and empty and f[2].startswith("P-2") and len(f[2]) >= 4:
+                        f[4] = PRONOUN_2.get(f[2][3], "")
                     elif hebrew and number in HEBREW_OVERRIDES and f[2].startswith(HEBREW_OVERRIDES[number][0]):
                         f[4] = HEBREW_OVERRIDES[number][1]
                     cell_list[i] = "|".join(f)
