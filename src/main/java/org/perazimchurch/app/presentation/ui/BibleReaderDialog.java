@@ -2056,11 +2056,12 @@ public class BibleReaderDialog extends Dialog {
         return card;
     }
 
-    /** True when the phone itself is in dark mode. The picker contrasts with this, not with the app's theme. */
+    /**
+     * True when the reader is drawn dark. The reader's background follows the app's theme (GlassKit), and the
+     * verse action bar contrasts with that, so the picker and tool icons do the same.
+     */
     private boolean phoneIsDark() {
-        android.content.res.Configuration config = getContext().getResources().getConfiguration();
-        return (config.uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
-                == android.content.res.Configuration.UI_MODE_NIGHT_YES;
+        return !GlassKit.light();
     }
 
     /** Slider thumbs contrast with the phone: purple on a light phone, orange on a dark phone. */
