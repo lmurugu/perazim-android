@@ -1045,7 +1045,8 @@ public class BibleReaderDialog extends Dialog {
                 }
                 int start = textStart + at;
                 int end = start + needle.length();
-                sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor("#FF8A2B")),
+                // Light mode: a bold, readable purple. Dark mode: orange.
+                sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#6A2DA8" : "#FF8A2B")),
                         start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),
                         start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1092,82 +1093,121 @@ public class BibleReaderDialog extends Dialog {
         bar.setOrientation(LinearLayout.VERTICAL);
         bar.setGravity(Gravity.CENTER_HORIZONTAL);
 
-        // Colour palette: major colours, muted versions, spectrum and clear.
-        final LinearLayout palette = new LinearLayout(getContext());
-        palette.setOrientation(LinearLayout.VERTICAL);
-        palette.setGravity(Gravity.CENTER_HORIZONTAL);
-        palette.setVisibility(View.GONE);
-        LinearLayout majorRow = new LinearLayout(getContext());
-        majorRow.setGravity(Gravity.CENTER);
-        for (HighlightColors.Colour colour : HighlightColors.ALL) {
-            majorRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
-                    v -> applyHighlight(verse, colour.name)));
-        }
-        LinearLayout mutedRow = new LinearLayout(getContext());
-        mutedRow.setGravity(Gravity.CENTER);
-        for (HighlightColors.Colour colour : HighlightColors.MUTED) {
-            mutedRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
-                    v -> applyHighlight(verse, colour.name)));
-        }
-        mutedRow.addView(barIcon("\u2715", "Remove highlight", v -> applyHighlight(verse, null)));
-        palette.addView(majorRow);
-        palette.addView(mutedRow);
-        palette.addView(spectrumView(verse));
-        bar.addView(palette, GlassKit.matchWrap(getContext(), 6));
+        // The area above the main row shows whichever group is open: colours, save tools or study tools.
+        final LinearLayout expand = new LinearLayout(getContext());
+        expand.setOrientation(LinearLayout.VERTICAL);
+        expand.setGravity(Gravity.CENTER_HORIZONTAL);
+        bar.addView(expand, GlassKit.matchWrap(getContext(), 4));
+
+        final ImageView highlightBtn = barIconRes(org.perazimchurch.app.R.drawable.ic_bar_highlight, "Highlight colours", null);
+        final ImageView saveBtn = barIconRes(org.perazimchurch.app.R.drawable.ic_bar_saveplus, "Save and notes", null);
+        final ImageView studyBtn = barIconRes(org.perazimchurch.app.R.drawable.ic_bar_study, "Study tools", null);
+        final String[] openGroup = {""};
+        final Runnable[] refreshGroup = new Runnable[1];
+        final java.util.function.Consumer<String> toggleGroup = kind -> {
+            openGroup[0] = kind.equals(openGroup[0]) ? "" : kind;
+            expand.removeAllViews();
+            tintBarIcon(highlightBtn, "highlight".equals(openGroup[0]));
+            tintBarIcon(saveBtn, "save".equals(openGroup[0]));
+            tintBarIcon(studyBtn, "study".equals(openGroup[0]));
+            if ("highlight".equals(openGroup[0])) {
+                expand.addView(buildPalette(verse));
+            } else if ("save".equals(openGroup[0])) {
+                LinearLayout row = barRow();
+                final ImageView star = barIconRes(verse.isFavorite()
+                        ? org.perazimchurch.app.R.drawable.ic_bar_star_filled : org.perazimchurch.app.R.drawable.ic_bar_star, "Bookmark", null);
+                tintBarIcon(star, verse.isFavorite());
+                star.setOnClickListener(v -> {
+                    boolean nextState = !verse.isFavorite();
+                    verse.setFavorite(nextState);
+                    bibleViewModel.toggleBookmark(verse.getId(), nextState, () ->
+                            Toast.makeText(getContext(), nextState ? "Bookmarked" : "Bookmark removed", Toast.LENGTH_SHORT).show());
+                    star.setImageResource(nextState ? org.perazimchurch.app.R.drawable.ic_bar_star_filled : org.perazimchurch.app.R.drawable.ic_bar_star);
+                    tintBarIcon(star, nextState);
+                    renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+                });
+                row.addView(star);
+                row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_topic, "Topics", v -> {
+                    dismissActionBar();
+                    showTopicsCard(verse);
+                }));
+                row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_edit, "Note on this verse", v -> {
+                    dismissActionBar();
+                    showStudyNoteEditor(verse);
+                }));
+                row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_notes, "All notes", v -> {
+                    dismissActionBar();
+                    showNotesDialog();
+                }));
+                expand.addView(row);
+            } else if ("study".equals(openGroup[0])) {
+                LinearLayout row = barRow();
+                row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_compare, "Compare translations", v -> showCompareDialog(verse, citation)));
+                if (newTestament) {
+                    row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_interlinear, "Interlinear", v -> showInterlinearDialog(verse, citation)));
+                }
+                row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_search, "Search the Bible", v -> {
+                    dismissActionBar();
+                    if (!isSearchMode) {
+                        toggleSearchMode();
+                    }
+                }));
+                if (isSearchMode) {
+                    row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_study, "Open chapter", v -> {
+                        dismissActionBar();
+                        loadChapterVerses(verse.getBookId(), verse.getChapterNumber());
+                    }));
+                }
+                expand.addView(row);
+            }
+        };
+        highlightBtn.setOnClickListener(v -> toggleGroup.accept("highlight"));
+        saveBtn.setOnClickListener(v -> toggleGroup.accept("save"));
+        studyBtn.setOnClickListener(v -> toggleGroup.accept("study"));
 
         LinearLayout primary = barRow();
-        primary.addView(barIcon("\u25cf", "Highlight", v -> palette.setVisibility(palette.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE)));
-        primary.addView(barIcon(verse.isFavorite() ? "\u2605" : "\u2606", "Bookmark", v -> {
-            boolean nextState = !verse.isFavorite();
-            verse.setFavorite(nextState);
-            bibleViewModel.toggleBookmark(verse.getId(), nextState, () ->
-                    Toast.makeText(getContext(), nextState ? "Bookmarked" : "Bookmark removed", Toast.LENGTH_SHORT).show());
-            renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
-        }));
-        // Topics: the bookmark-ribbon icon opens the Topics card for this verse (save it to a topic, or browse topics).
-        primary.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_topic, "Topics", v -> {
-            dismissActionBar();
-            showTopicsCard(verse);
-        }));
-        primary.addView(barIcon("\u270e", "Note on this verse", v -> {
-            dismissActionBar();
-            showStudyNoteEditor(verse);
-        }));
-        primary.addView(barIcon("\u2398", "Copy", v -> copyVerse(verse, citation)));
+        primary.addView(highlightBtn);
+        primary.addView(saveBtn);
+        primary.addView(studyBtn);
+        primary.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_copy, "Copy", v -> copyVerse(verse, citation)));
+        primary.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_share, "Share", v -> shareVerse(verse, citation)));
+        primary.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Close", v -> dismissActionBar()));
         bar.addView(primary);
-
-        // Second row is always visible: share, compare, interlinear, all notes, search, close.
-        final LinearLayout secondary = barRow();
-        secondary.addView(barIcon("\u2197", "Share", v -> shareVerse(verse, citation)));
-        secondary.addView(barIcon("\u21c4", "Compare", v -> showCompareDialog(verse, citation)));
-        if (newTestament) {
-            secondary.addView(barIcon("\u0391\u03b2", "Interlinear", v -> showInterlinearDialog(verse, citation)));
-        }
-        secondary.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_notes, "Notes", v -> {
-            dismissActionBar();
-            showNotesDialog();
-        }));
-        secondary.addView(barIconRes(org.perazimchurch.app.R.drawable.gl_search, "Search the Bible", v -> {
-            dismissActionBar();
-            if (!isSearchMode) {
-                toggleSearchMode();
-            }
-        }));
-        if (isSearchMode) {
-            secondary.addView(barIcon("\u27a4", "Open chapter", v -> {
-                dismissActionBar();
-                loadChapterVerses(verse.getBookId(), verse.getChapterNumber());
-            }));
-        }
-        secondary.addView(barIcon("\u2715", "Close", v -> dismissActionBar()));
-        bar.addView(secondary);
-
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
         lp.setMargins(dp(12), 0, dp(12), dp(104));
         readerFrame.addView(bar, lp);
         actionBarView = bar;
+    }
+
+    /** Colours, muted colours, spectrum and remove, as one block. */
+    private View buildPalette(final BibleVerse verse) {
+        LinearLayout palette = new LinearLayout(getContext());
+        palette.setOrientation(LinearLayout.VERTICAL);
+        palette.setGravity(Gravity.CENTER_HORIZONTAL);
+        LinearLayout majorRow = new LinearLayout(getContext());
+        majorRow.setGravity(Gravity.CENTER);
+        for (final HighlightColors.Colour colour : HighlightColors.ALL) {
+            majorRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                    v -> applyHighlight(verse, colour.name)));
+        }
+        LinearLayout mutedRow = new LinearLayout(getContext());
+        mutedRow.setGravity(Gravity.CENTER);
+        for (final HighlightColors.Colour colour : HighlightColors.MUTED) {
+            mutedRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                    v -> applyHighlight(verse, colour.name)));
+        }
+        mutedRow.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> applyHighlight(verse, null)));
+        palette.addView(majorRow);
+        palette.addView(mutedRow);
+        palette.addView(spectrumView(verse));
+        return palette;
+    }
+
+    /** Active group icons turn orange; the rest use the normal ink. */
+    private void tintBarIcon(ImageView icon, boolean active) {
+        icon.setColorFilter(active ? COLOR_ACCENT_ORANGE() : GlassKit.text());
     }
 
     private void dismissActionBar() {
@@ -1203,7 +1243,9 @@ public class BibleReaderDialog extends Dialog {
         circle.setStroke(dp(1), Color.parseColor("#33000000"));
         icon.setBackground(circle);
         icon.setContentDescription(label);
-        icon.setOnClickListener(onClick);
+        if (onClick != null) {
+            icon.setOnClickListener(onClick);
+        }
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(44), dp(44));
         lp.setMargins(dp(3), dp(4), dp(3), dp(4));
         icon.setLayoutParams(lp);
