@@ -1535,8 +1535,8 @@ public class BibleReaderDialog extends Dialog {
         icon.setImageResource(drawable);
         icon.setContentDescription(description);
         icon.setPadding(dp(16), dp(16), dp(16), dp(16));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(60), dp(60));
-        lp.setMargins(dp(8), dp(4), dp(8), dp(4));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(46), dp(46));
+        lp.setMargins(dp(10), dp(4), dp(10), dp(4));
         icon.setLayoutParams(lp);
         styleHighlightIcon(icon, on);
         return icon;
@@ -1545,9 +1545,9 @@ public class BibleReaderDialog extends Dialog {
     private void styleHighlightIcon(ImageView icon, boolean on) {
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(on ? COLOR_ACCENT_ORANGE() : (GlassKit.light() ? 0x1A000000 : 0x33FFFFFF));
+        circle.setColor(on ? 0x33E17D2F : 0x00000000);
         icon.setBackground(circle);
-        icon.setColorFilter(on ? 0xFFFFFFFF : notesMuted());
+        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : notesMuted());
     }
 
     /**
@@ -1947,63 +1947,189 @@ public class BibleReaderDialog extends Dialog {
     }
 
     /**
-     * The one colour picker used everywhere: the most used colours in a row, then a spectrum
-     * to pick any other colour. Calls onPick with the chosen colour name or "#RRGGBB".
+     * The one colour picker used everywhere, as a compact panel: a hue track, a saturation track and an
+     * intensity track (washed out to dark), a row of frequently used colours, and a check to apply the mix.
+     * Presets apply straight away; the tracks preview until the check is pressed.
      */
     private View buildColourPicker(final java.util.function.Consumer<String> onPick, @Nullable final String current,
                                    boolean allowRemove, @Nullable final Runnable onRemove) {
-        LinearLayout picker = new LinearLayout(getContext());
-        picker.setOrientation(LinearLayout.VERTICAL);
-        picker.setGravity(Gravity.CENTER_HORIZONTAL);
-        LinearLayout row = new LinearLayout(getContext());
-        row.setGravity(Gravity.CENTER);
+        final String seed = current != null && HighlightColors.byName(current) != null ? current : frequentColours().get(0);
+        HighlightColors.Colour seedColour = HighlightColors.byName(seed);
+        int seedRgb = seedColour != null ? Color.parseColor(seedColour.swatch) : 0xFF8E24AA;
+        final float[] hsv = new float[3];
+        Color.colorToHSV(seedRgb, hsv);
+        // State: hue in degrees, saturation 0..1, intensity position 0 (dark) .. 1 (washed out).
+        final float[] st = {hsv[0], hsv[1], Math.max(0f, Math.min(1f, 0.5f * (hsv[2] - 0.35f) / 0.65f))};
+
+        LinearLayout panel = new LinearLayout(getContext());
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setGravity(Gravity.CENTER_HORIZONTAL);
+        panel.setPadding(dp(8), dp(4), dp(8), dp(4));
+
+        final TrackSlider[] bars = new TrackSlider[3];
+        final Runnable[] refresh = new Runnable[1];
+        refresh[0] = () -> {
+            int colour = intensityColour(st[0], st[1], st[2]);
+            bars[0].update(st[0] / 360f, hueStops(), hsvInt(st[0], 1f, 1f));
+            bars[1].update(st[1], new int[]{hsvInt(st[0], 0f, 0.92f), hsvInt(st[0], 1f, 1f)}, colour);
+            bars[2].update(st[2], intensityStops(st[0], st[1]), colour);
+        };
+        bars[0] = new TrackSlider(getContext(), st[0] / 360f, (f, done) -> {
+            st[0] = f * 360f;
+            refresh[0].run();
+        });
+        bars[1] = new TrackSlider(getContext(), st[1], (f, done) -> {
+            st[1] = f;
+            refresh[0].run();
+        });
+        bars[2] = new TrackSlider(getContext(), st[2], (f, done) -> {
+            st[2] = f;
+            refresh[0].run();
+        });
+        for (TrackSlider bar : bars) {
+            panel.addView(bar, GlassKit.matchWrap(getContext(), 0));
+        }
+        refresh[0].run();
+
+        LinearLayout presets = new LinearLayout(getContext());
+        presets.setOrientation(LinearLayout.HORIZONTAL);
+        presets.setGravity(Gravity.CENTER);
         for (final String name : frequentColours()) {
             HighlightColors.Colour colour = HighlightColors.byName(name);
-            if (colour != null) {
-                View dot = swatchView(colour.swatch, name.equals(current), v -> {
-                    recordColourUse(name);
-                    onPick.accept(name);
-                });
-                LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(36), dp(36));
-                dotLp.setMargins(dp(6), dp(4), dp(6), dp(4));
-                dot.setLayoutParams(dotLp);
-                row.addView(dot);
+            if (colour == null) {
+                continue;
             }
+            View dot = swatchView(colour.swatch, name.equals(current), v -> {
+                recordColourUse(name);
+                onPick.accept(name);
+            });
+            LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(30), dp(30));
+            dotLp.setMargins(dp(5), dp(4), dp(5), dp(4));
+            dot.setLayoutParams(dotLp);
+            presets.addView(dot);
         }
         if (allowRemove && onRemove != null) {
-            row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
+            presets.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
         }
-        picker.addView(row);
-        picker.addView(spectrumBar(onPick));
-        return picker;
+        ImageView apply = new ImageView(getContext());
+        apply.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_check);
+        apply.setContentDescription("Apply this colour");
+        apply.setPadding(dp(6), dp(6), dp(6), dp(6));
+        GradientDrawable applyBg = new GradientDrawable();
+        applyBg.setShape(GradientDrawable.OVAL);
+        applyBg.setColor(COLOR_ACCENT_ORANGE());
+        apply.setBackground(applyBg);
+        LinearLayout.LayoutParams applyLp = new LinearLayout.LayoutParams(dp(34), dp(34));
+        applyLp.setMargins(dp(8), dp(4), dp(2), dp(4));
+        apply.setLayoutParams(applyLp);
+        apply.setOnClickListener(v -> {
+            int rgb = intensityColour(st[0], st[1], st[2]);
+            String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
+            recordColourUse(hex);
+            onPick.accept(hex);
+        });
+        presets.addView(apply);
+        LinearLayout.LayoutParams presetsLp = GlassKit.matchWrap(getContext(), 8);
+        panel.addView(presets, presetsLp);
+        return panel;
     }
 
-    /** One hue spectrum: tap or drag across it, and the colour under the finger is chosen on release. */
-    private View spectrumBar(final java.util.function.Consumer<String> onPick) {
-        final View spectrum = new View(getContext());
-        GradientDrawable hues = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
-                0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000});
-        hues.setCornerRadius(dp(7));
-        spectrum.setBackground(hues);
-        spectrum.setContentDescription("Pick any colour from the spectrum");
-        spectrum.setOnTouchListener((v, event) -> {
-            int action = event.getActionMasked();
-            if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
-                    || action == android.view.MotionEvent.ACTION_UP) {
-                float frac = Math.max(0f, Math.min(1f, event.getX() / Math.max(1, v.getWidth())));
-                int rgb = Color.HSVToColor(new float[]{frac * 359f, 0.55f, 0.98f});
-                String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
-                if (action == android.view.MotionEvent.ACTION_UP) {
-                    recordColourUse(hex);
-                    onPick.accept(hex);
-                }
+    /** A slim track with a round thumb. The gradient is the track; the thumb shows the current colour. */
+    private static final class TrackSlider extends View {
+        interface Listener {
+            void onMove(float value, boolean done);
+        }
+
+        private float value;
+        private int[] stops = {0xFF000000, 0xFFFFFFFF};
+        private int thumbFill = 0xFFFFFFFF;
+        private final Listener listener;
+        private final float density;
+        private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        TrackSlider(android.content.Context context, float initial, Listener listener) {
+            super(context);
+            this.value = initial;
+            this.listener = listener;
+            this.density = context.getResources().getDisplayMetrics().density;
+        }
+
+        void update(float newValue, int[] newStops, int fill) {
+            value = Math.max(0f, Math.min(1f, newValue));
+            stops = newStops;
+            thumbFill = fill;
+            invalidate();
+        }
+
+        @Override
+        protected void onMeasure(int widthSpec, int heightSpec) {
+            setMeasuredDimension(android.view.View.MeasureSpec.getSize(widthSpec), (int) (30 * density));
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float inset = 11 * density;
+            float trackH = 9 * density;
+            float cy = getHeight() / 2f;
+            android.graphics.RectF track = new android.graphics.RectF(inset, cy - trackH / 2, getWidth() - inset, cy + trackH / 2);
+            paint.setShader(new android.graphics.LinearGradient(track.left, 0, track.right, 0, stops, null,
+                    android.graphics.Shader.TileMode.CLAMP));
+            canvas.drawRoundRect(track, trackH / 2, trackH / 2, paint);
+            paint.setShader(null);
+            float x = track.left + value * track.width();
+            paint.setColor(0xFFFFFFFF);
+            canvas.drawCircle(x, cy, 11 * density, paint);
+            paint.setColor(thumbFill);
+            canvas.drawCircle(x, cy, 8 * density, paint);
+        }
+
+        @Override
+        public boolean onTouchEvent(android.view.MotionEvent ev) {
+            int action = ev.getActionMasked();
+            if (action == android.view.MotionEvent.ACTION_DOWN) {
+                getParent().requestDisallowInterceptTouchEvent(true);
             }
-            return true;
-        });
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(240), dp(14));
-        lp.setMargins(0, dp(10), 0, dp(6));
-        spectrum.setLayoutParams(lp);
-        return spectrum;
+            if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
+                    || action == android.view.MotionEvent.ACTION_UP || action == android.view.MotionEvent.ACTION_CANCEL) {
+                float inset = 11 * density;
+                float span = Math.max(1f, getWidth() - 2 * inset);
+                value = Math.max(0f, Math.min(1f, (ev.getX() - inset) / span));
+                invalidate();
+                listener.onMove(value, action == android.view.MotionEvent.ACTION_UP
+                        || action == android.view.MotionEvent.ACTION_CANCEL);
+                return true;
+            }
+            return super.onTouchEvent(ev);
+        }
+    }
+
+    private static int hsvInt(float hue, float sat, float val) {
+        return Color.HSVToColor(new float[]{hue, sat, val});
+    }
+
+    private static int[] hueStops() {
+        return new int[]{hsvInt(0, 1, 1), hsvInt(60, 1, 1), hsvInt(120, 1, 1), hsvInt(180, 1, 1),
+                hsvInt(240, 1, 1), hsvInt(300, 1, 1), hsvInt(360, 1, 1)};
+    }
+
+    /** Dark, the colour itself, then washed out. */
+    private static int[] intensityStops(float hue, float sat) {
+        return new int[]{hsvInt(hue, sat, 0.35f), hsvInt(hue, sat, 1f), hsvInt(hue, sat * 0.25f, 1f)};
+    }
+
+    private static int intensityColour(float hue, float sat, float position) {
+        return lerpStops(intensityStops(hue, sat), position);
+    }
+
+    private static int lerpStops(int[] stops, float position) {
+        float pos = Math.max(0f, Math.min(1f, position)) * (stops.length - 1);
+        int i = Math.min(stops.length - 2, (int) pos);
+        float f = pos - i;
+        int a = stops[i];
+        int b = stops[i + 1];
+        return Color.rgb(Math.round(Color.red(a) + (Color.red(b) - Color.red(a)) * f),
+                Math.round(Color.green(a) + (Color.green(b) - Color.green(a)) * f),
+                Math.round(Color.blue(a) + (Color.blue(b) - Color.blue(a)) * f));
     }
 
     /** Colours for the verse action bar: the shared picker, with remove. */
