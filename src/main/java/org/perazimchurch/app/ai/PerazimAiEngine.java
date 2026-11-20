@@ -221,7 +221,7 @@ public class PerazimAiEngine {
     /** Replies that present a statement as officially approved or official Perazim position. */
     private static final Pattern CLAIMED_OFFICIAL_STATUS = Pattern.compile(
             "\\b(?:officially approved|approved by the bishop|is the official (?:position|doctrine|policy|teaching) of|" +
-            "official church (?:position|policy) is)\\b", Pattern.CASE_INSENSITIVE);
+            "official church (?:position|policy) is(?! not))\\b", Pattern.CASE_INSENSITIVE);
     /** Replies that claim to be a human church authority. */
     private static final Pattern CLAIMED_HUMAN_AUTHORITY = Pattern.compile(
             "\\bi (?:am|'m) (?:your |the |a |an )?(?:church )?(?:pastor|bishop|priest|elder|deacon|counsellor|counselor|leader)\\b|" +
@@ -237,8 +237,40 @@ public class PerazimAiEngine {
 
     public static boolean claimsAppActionOrHumanAuthority(@Nullable String answer) {
         return answer != null && (CLAIMED_APP_ACTION.matcher(answer).find()
-                || CLAIMED_HUMAN_AUTHORITY.matcher(answer).find()
-                || CLAIMED_OFFICIAL_STATUS.matcher(answer).find());
+                || CLAIMED_HUMAN_AUTHORITY.matcher(answer).find());
+    }
+
+    /** True when the reply presents something as official Perazim position, policy or approval. */
+    public static boolean claimsOfficialStatus(@Nullable String answer) {
+        return answer != null && CLAIMED_OFFICIAL_STATUS.matcher(answer).find();
+    }
+
+    /** Authority class that only an owner-approved knowledge package may carry. */
+    public static final String APPROVED_OFFICIAL_CLASS = "APPROVED_OFFICIAL";
+    private static final Pattern CITATION = Pattern.compile("\\[([^@\\]]+)@([^:]+): ([^\\]]+)\\]");
+
+    /**
+     * Provenance check: an official-status claim is allowed only when the reply cites an evidence item that is
+     * citation-eligible and marked {@link #APPROVED_OFFICIAL_CLASS} in trusted package metadata. Wording alone never counts.
+     */
+    public static boolean officialClaimHasApprovedProvenance(@Nullable String answer, @Nullable org.json.JSONArray evidence) {
+        if (answer == null || evidence == null) return false;
+        java.util.regex.Matcher m = CITATION.matcher(answer);
+        while (m.find()) {
+            String sourceId = m.group(1).trim();
+            String version = m.group(2).trim();
+            for (int i = 0; i < evidence.length(); i++) {
+                org.json.JSONObject item = evidence.optJSONObject(i);
+                if (item == null) continue;
+                if (sourceId.equals(item.optString("sourceId"))
+                        && version.equals(item.optString("version"))
+                        && APPROVED_OFFICIAL_CLASS.equals(item.optString("authorityClass"))
+                        && item.optBoolean("citationEligible", false)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @NonNull

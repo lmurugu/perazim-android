@@ -199,7 +199,9 @@ public final class OnDeviceAi {
                 if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
                 String result = answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim();
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
-                if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)) {
+                if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
+                        || (PerazimAiEngine.claimsOfficialStatus(result)
+                        && !PerazimAiEngine.officialClaimHasApprovedProvenance(result, evidence))) {
                     throw new IOException("The local model made a claim the app cannot verify. Ask again or contact the church office.");
                 }
                 if (!hasVerifiedCitations(result, evidence)) {

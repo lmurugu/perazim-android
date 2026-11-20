@@ -36,17 +36,40 @@ public class AuthorityCoverageTest {
     }
 
     /** Cases 7, 8: prohibited replies that present false policy or approval, which must be rejected. */
-    @Test public void prohibitedFalseApprovalAndPolicyAreRejected() {
+    @Test public void prohibitedFalseApprovalAndPolicyAreFlaggedWithoutProvenance() {
         String[] prohibited = {
-                "This policy is officially approved and binding for all members.",
-                "This was approved by the Bishop, so it is church policy.",
-                "This is the official position of Perazim on this matter.",
-                "The official church policy is that visitors must register first."
+                "This policy is officially approved and binding for all members. [syn-1@1: p1]",
+                "This was approved by the Bishop, so it is church policy. [syn-1@1: p1]",
+                "This is the official position of Perazim on this matter. [syn-1@1: p1]",
+                "The official church policy is that visitors must register first. [syn-1@1: p1]"
         };
         for (String reply : prohibited) {
-            assertTrue("prohibited reply not rejected: " + reply,
-                    PerazimAiEngine.claimsAppActionOrHumanAuthority(reply));
+            assertTrue("official claim not flagged: " + reply, PerazimAiEngine.claimsOfficialStatus(reply));
         }
+    }
+
+    @Test public void officialClaimNeedsApprovedProvenanceFromTrustedMetadata() throws Exception {
+        org.json.JSONObject ref = new org.json.JSONObject().put("sourceId", "syn-1").put("version", "1")
+                .put("location", "p1").put("authorityClass", "REFERENCE").put("citationEligible", true);
+        org.json.JSONObject approved = new org.json.JSONObject().put("sourceId", "syn-2").put("version", "3")
+                .put("location", "s4").put("authorityClass", "APPROVED_OFFICIAL").put("citationEligible", true);
+        org.json.JSONObject notCitable = new org.json.JSONObject().put("sourceId", "syn-3").put("version", "1")
+                .put("location", "p2").put("authorityClass", "APPROVED_OFFICIAL").put("citationEligible", false);
+        String claim = "This is the official position of Perazim on this matter.";
+        org.json.JSONArray unapproved = new org.json.JSONArray().put(ref);
+        org.json.JSONArray good = new org.json.JSONArray().put(ref).put(approved);
+        org.json.JSONArray context = new org.json.JSONArray().put(notCitable);
+        assertFalse(PerazimAiEngine.officialClaimHasApprovedProvenance(claim + " [syn-1@1: p1]", unapproved));
+        assertTrue(PerazimAiEngine.officialClaimHasApprovedProvenance(claim + " [syn-2@3: s4]", good));
+        assertFalse("context-only item must not establish approval",
+                PerazimAiEngine.officialClaimHasApprovedProvenance(claim + " [syn-3@1: p2]", context));
+        assertFalse("claim citing nothing has no provenance",
+                PerazimAiEngine.officialClaimHasApprovedProvenance(claim, good));
+    }
+
+    @Test public void notEstablishedStatementsAreNotOfficialClaims() {
+        assertFalse(PerazimAiEngine.claimsOfficialStatus("The official church policy is not established in the approved sources."));
+        assertFalse(PerazimAiEngine.claimsOfficialStatus("This is not the official position of Perazim."));
     }
 
     /** Case 10 (partial): an injection-like user question is refused before generation. */
