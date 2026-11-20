@@ -611,6 +611,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         if (Build.VERSION.SDK_INT >= 30) {
             // Same flow as the Bible tab: the glow runs from the very top to the very bottom edge,
             // behind the camera cutout, the status bar and the navigation bar.
+            window.getDecorView();  // make sure the decor view exists before using the insets controller
             window.setDecorFitsSystemWindows(false);
             window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
             if (Build.VERSION.SDK_INT >= 28) {
