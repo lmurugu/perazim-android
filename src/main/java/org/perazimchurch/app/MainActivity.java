@@ -606,6 +606,29 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                     insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
             return insets.consumeSystemWindowInsets();
         });
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Same flow as the Bible tab: the glow runs from the very top to the very bottom edge,
+            // behind the camera cutout, the status bar and the navigation bar.
+            window.setDecorFitsSystemWindows(false);
+            window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+            if (Build.VERSION.SDK_INT >= 28) {
+                android.view.WindowManager.LayoutParams attrs = window.getAttributes();
+                attrs.layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+                window.setAttributes(attrs);
+            }
+            root.setOnApplyWindowInsetsListener((v, insets) -> {
+                android.graphics.Insets bars = insets.getInsets(
+                        android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                return android.view.WindowInsets.CONSUMED;
+            });
+            android.view.WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+            }
+        }
         root.requestApplyInsets();
     }
 
