@@ -74,31 +74,22 @@ public final class StartupSplash {
         name.setAlpha(0f);
         tagline.setAlpha(0f);
 
-        // One timeline from the moment the app process started: the name and slogan fade in from 1 s to 2 s,
-        // stay until 7 s, fade out by 8 s, and then the black screen lifts. If the app finished loading late,
-        // the timeline simply continues from where it already is.
+        // One timeline from the moment the app process started: the name and slogan fade in from 1 s to 2 s
+        // and stay. The whole screen (black, logo, name and slogan) then fades away together from 7 s to 8 s.
         final long total = 8000;
         long sinceStart = android.os.SystemClock.elapsedRealtime() - android.os.Process.getStartElapsedRealtime();
         final long startAt = Math.max(0, Math.min(sinceStart, total));
-        ValueAnimator clock = ValueAnimator.ofInt(0, (int) (total + FADE_OUT_MS));
-        clock.setDuration(total + FADE_OUT_MS);
+        ValueAnimator clock = ValueAnimator.ofInt(0, (int) total);
+        clock.setDuration(total);
         clock.setInterpolator(new android.view.animation.LinearInterpolator());
         clock.addUpdateListener(a -> {
             int t = (Integer) a.getAnimatedValue();
-            float textAlpha;
-            if (t < 1000) textAlpha = 0f;
-            else if (t < 2000) textAlpha = (t - 1000) / 1000f;
-            else if (t < 7000) textAlpha = 1f;
-            else if (t < 8000) textAlpha = 1f - (t - 7000) / 1000f;
-            else textAlpha = 0f;
+            float textAlpha = t < 1000 ? 0f : (t < 2000 ? (t - 1000) / 1000f : 1f);
             name.setAlpha(textAlpha);
             tagline.setAlpha(textAlpha);
-            float lift = Math.min(1f, textAlpha);
-            name.setTranslationY((1f - lift) * GlassKit.px(activity, 10));
-            tagline.setTranslationY((1f - lift) * GlassKit.px(activity, 10));
-            if (t > 8000) {
-                overlay.setAlpha(1f - (t - 8000) / (float) FADE_OUT_MS);
-            }
+            name.setTranslationY((1f - textAlpha) * GlassKit.px(activity, 10));
+            tagline.setTranslationY((1f - textAlpha) * GlassKit.px(activity, 10));
+            overlay.setAlpha(t < 7000 ? 1f : 1f - (t - 7000) / 1000f);
         });
         clock.addListener(new AnimatorListenerAdapter() {
             @Override
