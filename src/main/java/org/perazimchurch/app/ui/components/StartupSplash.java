@@ -2,15 +2,13 @@ package org.perazimchurch.app.ui.components;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -74,42 +72,41 @@ public final class StartupSplash {
         overlay.setElevation(GlassKit.px(activity, 100));
 
         name.setAlpha(0f);
-        name.setTranslationY(GlassKit.px(activity, 14));
         tagline.setAlpha(0f);
-        tagline.setTranslationY(GlassKit.px(activity, 14));
 
-        DecelerateInterpolator ease = new DecelerateInterpolator(1.6f);
-        AnimatorSet logoIn = new AnimatorSet();
-        logoIn.playTogether(
-                ObjectAnimator.ofFloat(logo, View.SCALE_X, 1f, 1.06f, 1f),
-                ObjectAnimator.ofFloat(logo, View.SCALE_Y, 1f, 1.06f, 1f));
-        logoIn.setDuration(LOGO_IN_MS);
-        logoIn.setInterpolator(ease);
-
-        AnimatorSet nameIn = new AnimatorSet();
-        nameIn.playTogether(
-                ObjectAnimator.ofFloat(name, View.ALPHA, 0f, 1f),
-                ObjectAnimator.ofFloat(name, View.TRANSLATION_Y, GlassKit.px(activity, 14), 0f),
-                ObjectAnimator.ofFloat(tagline, View.ALPHA, 0f, 1f),
-                ObjectAnimator.ofFloat(tagline, View.TRANSLATION_Y, GlassKit.px(activity, 14), 0f));
-        nameIn.setDuration(NAME_IN_MS);
-        nameIn.setInterpolator(ease);
-        nameIn.setStartDelay(150);
-
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(overlay, View.ALPHA, 1f, 0f);
-        fadeOut.setDuration(FADE_OUT_MS);
-        fadeOut.setStartDelay(HOLD_MS);
-
-        AnimatorSet all = new AnimatorSet();
-        all.play(logoIn);
-        all.play(nameIn).after(0);
-        all.play(fadeOut).after(logoIn);
-        all.addListener(new AnimatorListenerAdapter() {
+        // One timeline from the moment the app process started: the name and slogan fade in from 1 s to 2 s,
+        // stay until 7 s, fade out by 8 s, and then the black screen lifts. If the app finished loading late,
+        // the timeline simply continues from where it already is.
+        final long total = 8000;
+        long sinceStart = android.os.SystemClock.elapsedRealtime() - android.os.Process.getStartElapsedRealtime();
+        final long startAt = Math.max(0, Math.min(sinceStart, total));
+        ValueAnimator clock = ValueAnimator.ofInt(0, (int) (total + FADE_OUT_MS));
+        clock.setDuration(total + FADE_OUT_MS);
+        clock.setInterpolator(new android.view.animation.LinearInterpolator());
+        clock.addUpdateListener(a -> {
+            int t = (Integer) a.getAnimatedValue();
+            float textAlpha;
+            if (t < 1000) textAlpha = 0f;
+            else if (t < 2000) textAlpha = (t - 1000) / 1000f;
+            else if (t < 7000) textAlpha = 1f;
+            else if (t < 8000) textAlpha = 1f - (t - 7000) / 1000f;
+            else textAlpha = 0f;
+            name.setAlpha(textAlpha);
+            tagline.setAlpha(textAlpha);
+            float lift = Math.min(1f, textAlpha);
+            name.setTranslationY((1f - lift) * GlassKit.px(activity, 10));
+            tagline.setTranslationY((1f - lift) * GlassKit.px(activity, 10));
+            if (t > 8000) {
+                overlay.setAlpha(1f - (t - 8000) / (float) FADE_OUT_MS);
+            }
+        });
+        clock.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 decor.removeView(overlay);
             }
         });
-        all.start();
+        clock.start();
+        clock.setCurrentPlayTime(startAt);
     }
 }
