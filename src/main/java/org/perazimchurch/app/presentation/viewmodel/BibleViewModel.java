@@ -201,6 +201,38 @@ public class BibleViewModel extends ViewModel {
         });
     }
 
+    /** Adds a word or character-range highlight inside a verse body. Runs off the main thread. */
+    public void addWordHighlight(@NonNull String translationId, @NonNull String bookId, int chapter, int verse,
+                                 int start, int end, @NonNull String colour, @Nullable Runnable onDone) {
+        executor.execute(() -> {
+            try {
+                bibleRepo.addWordHighlight(translationId, bookId, chapter, verse, start, end, colour);
+            } catch (Exception e) {
+                Log.e(TAG, "Error saving Bible word highlight");
+            } finally {
+                if (onDone != null) {
+                    postCallback(onDone);
+                }
+            }
+        });
+    }
+
+    /** Clears the word ranges in a verse that overlap [start, end). Other ranges are kept. */
+    public void clearWordHighlights(@NonNull String translationId, @NonNull String bookId, int chapter, int verse,
+                                    int start, int end, @Nullable Runnable onDone) {
+        executor.execute(() -> {
+            try {
+                bibleRepo.clearWordHighlights(translationId, bookId, chapter, verse, start, end);
+            } catch (Exception e) {
+                Log.e(TAG, "Error clearing Bible word highlights");
+            } finally {
+                if (onDone != null) {
+                    postCallback(onDone);
+                }
+            }
+        });
+    }
+
     /**
      * Sets or clears the highlight colour of a verse.
      */

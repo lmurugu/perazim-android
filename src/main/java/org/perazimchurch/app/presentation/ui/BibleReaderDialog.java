@@ -49,6 +49,7 @@ import org.perazimchurch.app.data.local.seeder.BibleDataSeeder;
 import org.perazimchurch.app.presentation.bible.HighlightColors;
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleVerse;
+import org.perazimchurch.app.domain.model.WordHighlight;
 import org.perazimchurch.app.presentation.viewmodel.BibleViewModel;
 import org.perazimchurch.app.presentation.viewmodel.ViewModelFactory;
 import org.perazimchurch.app.ui.theme.GlassKit;
@@ -1247,6 +1248,9 @@ public class BibleReaderDialog extends Dialog {
         if (isSearchResult && !TextUtils.isEmpty(lastQuery)) {
             highlightSearchTerms(sb, textStart, verse.getText() != null ? verse.getText() : "", lastQuery);
         }
+        if (!isSearchResult && !interlinearVersion) {
+            applyWordHighlightSpans(sb, textStart, verse);
+        }
         if (isCornerstone) {
             sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), textStart, sb.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
@@ -1260,6 +1264,12 @@ public class BibleReaderDialog extends Dialog {
             tvVerseText.setTextIsSelectable(true);
             tvVerseText.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
             tvVerseText.setCustomSelectionActionModeCallback(interlinearSelectionCallback(tvVerseText, verse));
+        }
+        if (!isSearchResult && !interlinearVersion) {
+            // Drag across words to select a range: Highlight, Clear highlight or Select verses from the menu.
+            tvVerseText.setTextIsSelectable(true);
+            tvVerseText.setCustomSelectionActionModeCallback(wordSelectionCallback(tvVerseText, verse, textStart));
+            tvVerseText.setOnClickListener(v -> showVerseActionBar(verse));
         }
         if (!isSearchResult) {
             // A quick sideways swipe across the verse selects the whole verse and opens the verse menu.
@@ -1474,6 +1484,155 @@ public class BibleReaderDialog extends Dialog {
             public void onDestroyActionMode(android.view.ActionMode mode) {
             }
         };
+    }
+
+    /** Action menu for a selected word or range in a plain-text verse. */
+    private android.view.ActionMode.Callback wordSelectionCallback(final TextView tv, final BibleVerse verse, final int textStart) {
+        return new android.view.ActionMode.Callback() {
+            private int[] range;
+
+            @Override
+            public boolean onCreateActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                range = bodyRangeOfSelection(tv, verse, textStart);
+                if (range == null) {
+                    return false;
+                }
+                menu.add(0, 1, 0, "Highlight");
+                if (overlapsWordHighlight(verse, range[0], range[1])) {
+                    menu.add(0, 2, 1, "Clear highlight");
+                }
+                menu.add(0, 3, 2, "Select verses");
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(android.view.ActionMode mode, android.view.MenuItem item) {
+                if (range == null) {
+                    mode.finish();
+                    return true;
+                }
+                final int start = range[0];
+                final int end = range[1];
+                mode.finish();
+                if (item.getItemId() == 1) {
+                    pickWordColour(verse, start, end);
+                } else if (item.getItemId() == 2) {
+                    clearWordHighlight(verse, start, end);
+                } else if (item.getItemId() == 3) {
+                    enterSelectMode(verse);
+                }
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(android.view.ActionMode mode) {
+            }
+        };
+    }
+
+    /** The selected text as [start, end) offsets into the verse body, trimmed of spaces; null when nothing is selected. */
+    @Nullable
+    private static int[] bodyRangeOfSelection(TextView tv, BibleVerse verse, int textStart) {
+        int selStart = tv.getSelectionStart();
+        int selEnd = tv.getSelectionEnd();
+        if (selStart < 0 || selEnd <= selStart) {
+            return null;
+        }
+        String body = verse.getText() != null ? verse.getText() : "";
+        int start = Math.max(0, selStart - textStart);
+        int end = Math.min(body.length(), selEnd - textStart);
+        while (start < end && Character.isWhitespace(body.charAt(start))) {
+            start++;
+        }
+        while (end > start && Character.isWhitespace(body.charAt(end - 1))) {
+            end--;
+        }
+        return end > start ? new int[]{start, end} : null;
+    }
+
+    private static boolean overlapsWordHighlight(BibleVerse verse, int start, int end) {
+        for (WordHighlight highlight : verse.getWordHighlights()) {
+            if (highlight.overlaps(start, end)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Paints each word or character range of the verse in its colour; only the covered characters change. */
+    private static void applyWordHighlightSpans(android.text.SpannableStringBuilder sb, int textStart, BibleVerse verse) {
+        int bodyLength = sb.length() - textStart;
+        for (WordHighlight highlight : verse.getWordHighlights()) {
+            HighlightColors.Colour colour = HighlightColors.byName(highlight.getColour());
+            int start = Math.max(0, Math.min(highlight.getStart(), bodyLength));
+            int end = Math.max(0, Math.min(highlight.getEnd(), bodyLength));
+            if (colour == null || end <= start) {
+                continue;
+            }
+            int fill = (Color.parseColor(colour.swatch) & 0x00FFFFFF) | 0x73000000;
+            sb.setSpan(new android.text.style.BackgroundColorSpan(fill), textStart + start, textStart + end,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+    }
+
+    /** Colour card for a chosen word or range. */
+    private void pickWordColour(final BibleVerse verse, final int start, final int end) {
+        LinearLayout list = new LinearLayout(getContext());
+        list.setOrientation(LinearLayout.VERTICAL);
+        addWordSwatchRow(list, verse, start, end, HighlightColors.BOLD);
+        addWordSwatchRow(list, verse, start, end, HighlightColors.ALL);
+        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
+            addWordSwatchRow(list, verse, start, end, shadeRow);
+        }
+        openCardDialog("Highlight words", "Only the words you chose are coloured", list, null, null);
+    }
+
+    private void addWordSwatchRow(LinearLayout list, final BibleVerse verse, final int start, final int end,
+                                  List<HighlightColors.Colour> colours) {
+        LinearLayout row = new LinearLayout(getContext());
+        row.setGravity(Gravity.CENTER);
+        for (final HighlightColors.Colour colour : colours) {
+            row.addView(swatchView(colour.swatch, false, v -> applyWordHighlight(verse, start, end, colour.name)));
+        }
+        list.addView(row);
+    }
+
+    /** Adds a word range to the verse, updates the loaded verse lists and redraws. */
+    private void applyWordHighlight(final BibleVerse verse, final int start, final int end, final String colour) {
+        List<WordHighlight> ranges = new ArrayList<>(verse.getWordHighlights());
+        ranges.add(new WordHighlight(start, end, colour));
+        setWordHighlights(verse, ranges);
+        bibleViewModel.addWordHighlight(verse.getTranslationId(), verse.getBookId(), verse.getChapterNumber(),
+                verse.getVerseNumber(), start, end, colour, null);
+        renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+    }
+
+    /** Removes the word ranges that overlap the selection; other ranges in the verse stay. */
+    private void clearWordHighlight(final BibleVerse verse, final int start, final int end) {
+        List<WordHighlight> kept = new ArrayList<>();
+        for (WordHighlight highlight : verse.getWordHighlights()) {
+            if (!highlight.overlaps(start, end)) {
+                kept.add(highlight);
+            }
+        }
+        setWordHighlights(verse, kept);
+        bibleViewModel.clearWordHighlights(verse.getTranslationId(), verse.getBookId(), verse.getChapterNumber(),
+                verse.getVerseNumber(), start, end, null);
+        renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+    }
+
+    private void setWordHighlights(final BibleVerse verse, final List<WordHighlight> ranges) {
+        verse.setWordHighlights(new ArrayList<>(ranges));
+        for (BibleVerse loaded : currentVerses) {
+            if (loaded.getVerseNumber() == verse.getVerseNumber() && loaded.getChapterNumber() == verse.getChapterNumber()) {
+                loaded.setWordHighlights(new ArrayList<>(ranges));
+            }
+        }
     }
 
     /** Size scale for the word cards: follows the verse A- / A+ setting (18 is the default). */

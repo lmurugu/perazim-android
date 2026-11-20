@@ -6,6 +6,8 @@ import org.perazimchurch.app.data.local.entity.BibleBookEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
+import org.perazimchurch.app.data.local.entity.BibleWordHighlightEntity;
+import org.perazimchurch.app.domain.model.WordHighlight;
 import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
 import org.perazimchurch.app.data.local.dao.BibleNoteDao;
 import org.perazimchurch.app.data.local.entity.BibleNoteEntity;
@@ -133,8 +135,11 @@ public class RoomBibleRepository implements BibleRepository {
             verses = BibleMapper.toDomainVerseList(entities, resolvedTranslation, bookId);
         }
         Map<Integer, String> highlights = highlightsFor(bookNumber, chapterNumber);
+        Map<Integer, List<WordHighlight>> wordRanges = wordHighlightsFor(resolvedTranslation, bookNumber, chapterNumber);
         for (BibleVerse verse : verses) {
             verse.setHighlightColor(highlights.get(verse.getVerseNumber()));
+            List<WordHighlight> ranges = wordRanges.get(verse.getVerseNumber());
+            verse.setWordHighlights(ranges == null ? new ArrayList<>() : ranges);
         }
         return verses;
     }
@@ -381,6 +386,38 @@ public class RoomBibleRepository implements BibleRepository {
     }
 
     @Override
+    public void addWordHighlight(String translationId, String bookId, int chapterNumber, int verseNumber,
+                                 int start, int end, String colour) {
+        if (translationId == null || translationId.isEmpty() || bookId == null || bookId.trim().isEmpty()
+                || chapterNumber < 1 || verseNumber < 1 || colour == null || colour.trim().isEmpty()
+                || start < 0 || end <= start) {
+            return;
+        }
+        int bookNumber = resolveBookNumber(null, bookId);
+        bibleDao.insertWordHighlight(new BibleWordHighlightEntity(translationId, bookNumber, chapterNumber,
+                verseNumber, start, end, colour.trim(), System.currentTimeMillis()));
+    }
+
+    @Override
+    public void clearWordHighlights(String translationId, String bookId, int chapterNumber, int verseNumber,
+                                    int start, int end) {
+        if (translationId == null || translationId.isEmpty() || bookId == null || bookId.trim().isEmpty()
+                || chapterNumber < 1 || verseNumber < 1 || end <= start) {
+            return;
+        }
+        int bookNumber = resolveBookNumber(null, bookId);
+        List<BibleWordHighlightEntity> rows = bibleDao.getWordHighlightsForChapter(translationId, bookNumber, chapterNumber);
+        if (rows == null) {
+            return;
+        }
+        for (BibleWordHighlightEntity row : rows) {
+            if (row.getVerseNumber() == verseNumber && row.getStartOffset() < end && start < row.getEndOffset()) {
+                bibleDao.deleteWordHighlight(row.getId());
+            }
+        }
+    }
+
+    @Override
     public void setHighlight(String bookId, int chapterNumber, int verseNumber, String colour) {
         if (bookId == null || bookId.trim().isEmpty() || chapterNumber < 1 || verseNumber < 1) {
             return;
@@ -604,6 +641,26 @@ public class RoomBibleRepository implements BibleRepository {
             }
         }
         return colours;
+    }
+
+    /** Word and character-range highlights for one chapter of one translation, grouped by verse number. */
+    private Map<Integer, List<WordHighlight>> wordHighlightsFor(String translationId, int bookNumber, int chapterNumber) {
+        Map<Integer, List<WordHighlight>> ranges = new HashMap<>();
+        if (bibleDao == null || translationId == null) {
+            return ranges;
+        }
+        List<BibleWordHighlightEntity> rows = bibleDao.getWordHighlightsForChapter(translationId, bookNumber, chapterNumber);
+        if (rows != null) {
+            for (BibleWordHighlightEntity row : rows) {
+                List<WordHighlight> list = ranges.get(row.getVerseNumber());
+                if (list == null) {
+                    list = new ArrayList<>();
+                    ranges.put(row.getVerseNumber(), list);
+                }
+                list.add(new WordHighlight(row.getStartOffset(), row.getEndOffset(), row.getColor()));
+            }
+        }
+        return ranges;
     }
 
     private static String referenceKey(int bookNumber, int chapterNumber, int verseNumber) {

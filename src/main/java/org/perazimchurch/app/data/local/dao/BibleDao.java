@@ -12,6 +12,7 @@ import org.perazimchurch.app.data.local.entity.BibleChapterEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
+import org.perazimchurch.app.data.local.entity.BibleWordHighlightEntity;
 import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
 
 import java.util.List;
@@ -138,6 +139,16 @@ public interface BibleDao {
 
     @Query("SELECT * FROM bible_verse_highlights WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber")
     List<BibleVerseHighlightEntity> getHighlightsForChapter(int bookNumber, int chapterNumber);
+
+    // --- Word and character-range highlights (per translation and verse body) ---
+    @Insert
+    void insertWordHighlight(BibleWordHighlightEntity highlight);
+
+    @Query("SELECT * FROM bible_word_highlights WHERE translationId = :translationId AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber")
+    List<BibleWordHighlightEntity> getWordHighlightsForChapter(String translationId, int bookNumber, int chapterNumber);
+
+    @Query("DELETE FROM bible_word_highlights WHERE id = :id")
+    void deleteWordHighlight(long id);
 
     @Query("SELECT * FROM bible_verse_highlights ORDER BY updatedMillis DESC")
     List<BibleVerseHighlightEntity> getAllHighlights();

@@ -44,6 +44,7 @@ import org.perazimchurch.app.data.local.entity.BibleChapterEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
+import org.perazimchurch.app.data.local.entity.BibleWordHighlightEntity;
 import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
 import org.perazimchurch.app.data.local.entity.BibleNoteEntity;
 import org.perazimchurch.app.data.local.entity.BibleNoteLinkEntity;
@@ -96,6 +97,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         BibleChapterEntity.class,
         BibleVerseEntity.class,
         BibleVerseHighlightEntity.class,
+        BibleWordHighlightEntity.class,
         BibleTopicVerseEntity.class,
         BibleNoteEntity.class,
         BibleNoteLinkEntity.class,
@@ -115,7 +117,7 @@ import org.perazimchurch.app.data.local.entity.UserEntity;
         EventRsvpEntity.class,
         DailyChallengeEntity.class
     },
-    version = 11,
+    version = 12,
     exportSchema = true
 )
 @TypeConverters({Converters.class})
@@ -265,6 +267,20 @@ public abstract class PerazimDatabase extends RoomDatabase {
         }
     };
 
+    public static final Migration MIGRATION_11_12 = new Migration(11, 12) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase db) {
+            // Word and character-range highlights, kept apart from whole-verse highlights; existing data is untouched.
+            db.execSQL("CREATE TABLE IF NOT EXISTS `bible_word_highlights` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `translationId` TEXT, " +
+                    "`bookNumber` INTEGER NOT NULL, `chapterNumber` INTEGER NOT NULL, `verseNumber` INTEGER NOT NULL, " +
+                    "`startOffset` INTEGER NOT NULL, `endOffset` INTEGER NOT NULL, `color` TEXT, " +
+                    "`updatedMillis` INTEGER NOT NULL)");
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_bible_word_highlights_translationId_bookNumber_chapterNumber` " +
+                    "ON `bible_word_highlights` (`translationId`, `bookNumber`, `chapterNumber`)");
+        }
+    };
+
     public static PerazimDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (PerazimDatabase.class) {
@@ -278,7 +294,7 @@ public abstract class PerazimDatabase extends RoomDatabase {
                             DATABASE_NAME
                     )
                     .openHelperFactory(new SupportOpenHelperFactory(databaseKey))
-                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                    .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                     .build();
                 }
             }

@@ -30,6 +30,14 @@ public interface BibleRepository {
     /** Highlight colour names by verse number for one chapter. */
     Map<Integer, String> getHighlightsForChapter(String bookId, int chapterNumber);
 
+    /** Adds a word or character-range highlight to a verse body; offsets are [start, end). */
+    void addWordHighlight(String translationId, String bookId, int chapterNumber, int verseNumber,
+                          int start, int end, String colour);
+
+    /** Removes every word range in the verse that shares a character with [start, end). Other ranges stay. */
+    void clearWordHighlights(String translationId, String bookId, int chapterNumber, int verseNumber,
+                             int start, int end);
+
     /** Sets a verse highlight colour, or clears it when {@code colour} is null. */
     void setHighlight(String bookId, int chapterNumber, int verseNumber, String colour);
 

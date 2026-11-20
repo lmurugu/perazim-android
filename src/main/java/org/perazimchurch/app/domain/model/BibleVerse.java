@@ -18,6 +18,7 @@ public class BibleVerse implements Serializable {
     private String note;
     /** Highlight colour name (for example "yellow"), or null when the verse is not highlighted. */
     private String highlightColor;
+    private java.util.List<WordHighlight> wordHighlights = new java.util.ArrayList<>();
 
     public BibleVerse() {
     }
@@ -61,4 +62,10 @@ public class BibleVerse implements Serializable {
 
     public String getHighlightColor() { return highlightColor; }
     public void setHighlightColor(String highlightColor) { this.highlightColor = highlightColor; }
+
+    /** Word and character-range highlights in this verse body; may overlap the verse highlight. */
+    public java.util.List<WordHighlight> getWordHighlights() { return wordHighlights; }
+    public void setWordHighlights(java.util.List<WordHighlight> wordHighlights) {
+        this.wordHighlights = wordHighlights == null ? new java.util.ArrayList<>() : wordHighlights;
+    }
 }
