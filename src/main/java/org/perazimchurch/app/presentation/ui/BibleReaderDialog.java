@@ -587,6 +587,8 @@ public class BibleReaderDialog extends Dialog {
         TextView topics = GlassKit.text(getContext(), "Topics", 12, true, GlassKit.accent());
         topics.setPadding(dp(10), dp(8), dp(10), dp(8));
         topics.setClickable(true);
+        topics.setOnClickListener(v -> showTopicsCard(null));
+        layout.addView(topics);
 
         TextView clear = GlassKit.text(getContext(), "Close", 12, true, GlassKit.muted());
         clear.setPadding(dp(10), dp(8), dp(10), dp(8));
@@ -1122,21 +1124,35 @@ public class BibleReaderDialog extends Dialog {
                     Toast.makeText(getContext(), nextState ? "Bookmarked" : "Bookmark removed", Toast.LENGTH_SHORT).show());
             renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
         }));
-        primary.addView(barIcon("\u270e", "Note", v -> {
+        // Topics: the bookmark-ribbon icon opens the Topics card for this verse (save it to a topic, or browse topics).
+        primary.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_topic, "Topics", v -> {
+            dismissActionBar();
+            showTopicsCard(verse);
+        }));
+        primary.addView(barIcon("\u270e", "Note on this verse", v -> {
             dismissActionBar();
             showStudyNoteEditor(verse);
         }));
         primary.addView(barIcon("\u2398", "Copy", v -> copyVerse(verse, citation)));
-        primary.addView(barIcon("\u2197", "Share", v -> shareVerse(verse, citation)));
         bar.addView(primary);
 
+        // Second row is always visible: share, compare, interlinear, all notes, search, close.
         final LinearLayout secondary = barRow();
-        secondary.setVisibility(View.GONE);
+        secondary.addView(barIcon("\u2197", "Share", v -> shareVerse(verse, citation)));
         secondary.addView(barIcon("\u21c4", "Compare", v -> showCompareDialog(verse, citation)));
         if (newTestament) {
             secondary.addView(barIcon("\u0391\u03b2", "Interlinear", v -> showInterlinearDialog(verse, citation)));
         }
-        secondary.addView(barIcon("\u2691", "Bookmark label", v -> showTopicPicker(verse)));
+        secondary.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_notes, "Notes", v -> {
+            dismissActionBar();
+            showNotesDialog();
+        }));
+        secondary.addView(barIconRes(org.perazimchurch.app.R.drawable.gl_search, "Search the Bible", v -> {
+            dismissActionBar();
+            if (!isSearchMode) {
+                toggleSearchMode();
+            }
+        }));
         if (isSearchMode) {
             secondary.addView(barIcon("\u27a4", "Open chapter", v -> {
                 dismissActionBar();
@@ -1146,11 +1162,6 @@ public class BibleReaderDialog extends Dialog {
         secondary.addView(barIcon("\u2715", "Close", v -> dismissActionBar()));
         bar.addView(secondary);
 
-        bar.setOnSwipeUp(() -> secondary.setVisibility(View.VISIBLE));
-        bar.setOnSwipeDown(() -> secondary.setVisibility(View.GONE));
-        TextView hint = GlassKit.text(getContext(), "swipe up for more", 10, false, COLOR_TEXT_MUTED());
-        hint.setGravity(Gravity.CENTER);
-        bar.addView(hint);
 
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
@@ -1178,6 +1189,27 @@ public class BibleReaderDialog extends Dialog {
     }
 
     /** Circular floating icon with a label for screen readers. */
+    /** Circular floating icon drawn from a vector, for the Notes, Topics and Search buttons. */
+    private ImageView barIconRes(int drawableRes, String label, View.OnClickListener onClick) {
+        ImageView icon = new ImageView(getContext());
+        icon.setImageResource(drawableRes);
+        icon.setColorFilter(GlassKit.text());
+        icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        int pad = dp(11);
+        icon.setPadding(pad, pad, pad, pad);
+        GradientDrawable circle = new GradientDrawable();
+        circle.setShape(GradientDrawable.OVAL);
+        circle.setColor(GlassKit.light() ? Color.parseColor("#F2FFFFFF") : Color.parseColor("#D9201830"));
+        circle.setStroke(dp(1), Color.parseColor("#33000000"));
+        icon.setBackground(circle);
+        icon.setContentDescription(label);
+        icon.setOnClickListener(onClick);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(44), dp(44));
+        lp.setMargins(dp(3), dp(4), dp(3), dp(4));
+        icon.setLayoutParams(lp);
+        return icon;
+    }
+
     private TextView barIcon(String glyph, String label, View.OnClickListener onClick) {
         TextView icon = new TextView(getContext());
         icon.setText(glyph);
@@ -1472,14 +1504,29 @@ public class BibleReaderDialog extends Dialog {
     private View chapterCardView;
     private LinearLayout notesPanelList;
 
+    /** Which card is open: "notes", "topics" or "topic-save"; empty when none. */
+    private String cardKind = "";
+
+    /** Notes icon: opens the Notes card, or closes it if it is already open. */
     private void showNotesDialog() {
-        if (notesPanelView != null) {
+        if (notesPanelView != null && "notes".equals(cardKind)) {
             dismissNotesPanel();
             return;
         }
         if (readerFrame == null) {
             return;
         }
+        openFloatingCard("notes", "Notes", "New note", () -> showNoteEditor(null));
+        refreshNotesPanel();
+    }
+
+    /**
+     * Builds the frosted floating card used for Notes and Topics: drag the header to float it, drag the handle to
+     * resize it. Returns the list that the caller fills.
+     */
+    private LinearLayout openFloatingCard(String kind, String titleText, @Nullable String actionLabel, @Nullable Runnable action) {
+        dismissNotesPanel();
+        cardKind = kind;
         final LinearLayout panel = new LinearLayout(getContext());
         GlassKit.keep(panel);  // keep the colours as built; the automatic glass pass would wash them out
         panel.setOrientation(LinearLayout.VERTICAL);
@@ -1527,12 +1574,14 @@ public class BibleReaderDialog extends Dialog {
                     return true;
             }
         });
-        TextView title = GlassKit.text(getContext(), "Notes", 16, true, notesInk());
+        TextView title = GlassKit.text(getContext(), titleText, 16, true, notesInk());
         header.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
-        TextView add = GlassKit.orangeButton(getContext(), "New note", 12);
-        add.setPadding(dp(14), 0, dp(14), 0);
-        add.setOnClickListener(v -> showNoteEditor(null));
-        header.addView(add, new LinearLayout.LayoutParams(-2, dp(34)));
+        if (actionLabel != null && action != null) {
+            TextView add = GlassKit.orangeButton(getContext(), actionLabel, 12);
+            add.setPadding(dp(14), 0, dp(14), 0);
+            add.setOnClickListener(v -> action.run());
+            header.addView(add, new LinearLayout.LayoutParams(-2, dp(34)));
+        }
         TextView close = GlassKit.text(getContext(), "\u2715", 16, true, notesMuted());
         close.setPadding(dp(12), dp(4), dp(4), dp(4));
         close.setOnClickListener(v -> dismissNotesPanel());
@@ -1572,7 +1621,7 @@ public class BibleReaderDialog extends Dialog {
         readerFrame.requestLayout();
         readerFrame.invalidate();
         notesPanelView = panel;
-        refreshNotesPanel();
+        return notesPanelList;
     }
 
     /** Dark mode: solid white card with dark text (F). Light mode: dark card with light text (G). */
@@ -1590,6 +1639,7 @@ public class BibleReaderDialog extends Dialog {
         }
         notesPanelView = null;
         notesPanelList = null;
+        cardKind = "";
     }
 
     /** Reloads the notes inside the Notes card. */
@@ -1913,115 +1963,192 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
-    /** Lists topics; choosing one shows its saved verses in the search list. */
-    private void showTopicsDialog() {
+    // =========================================================================
+    // TOPICS (bookmark labels): the same frosted card as Notes
+    // =========================================================================
+
+    /**
+     * Topics card. With a verse it also shows whether that verse is saved under each topic and lets the person
+     * tick it; without a verse it just lists the topics.
+     */
+    private void showTopicsCard(@Nullable final BibleVerse verse) {
+        if (notesPanelView != null && "topics".equals(cardKind) && verse == null) {
+            dismissNotesPanel();
+            return;
+        }
+        if (readerFrame == null) {
+            return;
+        }
+        openFloatingCard("topics", verse == null ? "Topics" : "Topics for " + formatCitation(verse), null, null);
+        refreshTopicsCard(verse, null);
+    }
+
+    private TextView cardText(String text, float sp, boolean bold, boolean muted) {
+        return GlassKit.text(getContext(), text, sp, bold, muted ? notesMuted() : notesInk());
+    }
+
+    private void refreshTopicsCard(@Nullable final BibleVerse verse, @Nullable final String openTopic) {
+        if (notesPanelList == null) {
+            return;
+        }
+        if (openTopic != null) {
+            showTopicDetail(verse, openTopic);
+            return;
+        }
         bibleViewModel.loadTopics(topics -> {
-            if (topics == null || topics.isEmpty()) {
-                Toast.makeText(getContext(), "No topics yet. Save verses to a topic from a verse or from search results.", Toast.LENGTH_LONG).show();
+            if (notesPanelList == null || !"topics".equals(cardKind)) {
                 return;
             }
-            AppDialogs.builder(getContext())
-                    .setTitle("Topics")
-                    .setItems(topics.toArray(new String[0]), (dialog, which) -> showTopicVerses(topics.get(which)))
-                    .setNegativeButton("Close", null)
-                    .show();
+            final Runnable[] reload = new Runnable[1];
+            reload[0] = () -> refreshTopicsCard(verse, null);
+            if (verse == null) {
+                bibleViewModel.loadTopicsForVerse("", 0, 0, none -> fillTopics(topics, new ArrayList<>(), null));
+            } else {
+                bibleViewModel.loadTopicsForVerse(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(),
+                        memberOf -> fillTopics(topics, memberOf, verse));
+            }
         });
     }
 
-    private void showTopicVerses(final String topic) {
-        freshRender = true;
+    private void fillTopics(List<String> topics, final List<String> memberOf, @Nullable final BibleVerse verse) {
+        if (notesPanelList == null) {
+            return;
+        }
+        notesPanelList.removeAllViews();
+        if (topics.isEmpty()) {
+            notesPanelList.addView(cardText("No topics yet. Name one below, or save search results to a topic.", 13, false, true));
+        }
+        for (final String topic : topics) {
+            LinearLayout row = new LinearLayout(getContext());
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(0, dp(8), 0, dp(8));
+            if (verse != null) {
+                final boolean in = memberOf.contains(topic);
+                TextView box = cardText(in ? "☑" : "☐", 20, true, false);
+                box.setPadding(0, 0, dp(10), 0);
+                box.setContentDescription((in ? "Remove from " : "Save to ") + topic);
+                box.setOnClickListener(v -> bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
+                        verse.getVerseNumber(), topic, !in, () -> refreshTopicsCard(verse, null)));
+                row.addView(box);
+            }
+            TextView name = cardText(topic, 15, true, false);
+            name.setOnClickListener(v -> refreshTopicsCard(verse, topic));
+            row.addView(name, new LinearLayout.LayoutParams(0, -2, 1f));
+            TextView open = GlassKit.text(getContext(), "View ›", 12, true, COLOR_ACCENT_ORANGE());
+            open.setPadding(dp(10), dp(4), 0, dp(4));
+            open.setOnClickListener(v -> refreshTopicsCard(verse, topic));
+            row.addView(open);
+            notesPanelList.addView(row);
+        }
+        // New topic: type a name and add; with a verse selected the verse is saved under it straight away.
+        LinearLayout add = new LinearLayout(getContext());
+        add.setOrientation(LinearLayout.HORIZONTAL);
+        add.setGravity(Gravity.CENTER_VERTICAL);
+        add.setPadding(0, dp(12), 0, 0);
+        final EditText field = new EditText(getContext());
+        field.setHint(verse == null ? "New topic, e.g. healing" : "Save this verse under a new topic");
+        field.setSingleLine(true);
+        field.setTextColor(notesInk());
+        field.setHintTextColor(notesMuted());
+        add.addView(field, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView go = GlassKit.orangeButton(getContext(), verse == null ? "Add" : "Save", 12);
+        go.setPadding(dp(14), 0, dp(14), 0);
+        go.setOnClickListener(v -> {
+            String name = field.getText().toString().trim();
+            if (name.isEmpty()) {
+                return;
+            }
+            if (verse == null) {
+                Toast.makeText(getContext(), "Topic “" + name + "” is created when you save a verse to it.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), name, true,
+                    () -> refreshTopicsCard(verse, null));
+        });
+        add.addView(go, new LinearLayout.LayoutParams(-2, dp(36)));
+        notesPanelList.addView(add);
+    }
+
+    /** One topic's saved verses inside the card. Tap a verse to jump straight to its place in the Bible. */
+    private void showTopicDetail(@Nullable final BibleVerse verse, final String topic) {
+        notesPanelList.removeAllViews();
+        TextView back = GlassKit.text(getContext(), "‹ Topics   ·   " + topic, 14, true, COLOR_ACCENT_ORANGE());
+        back.setPadding(0, dp(4), 0, dp(10));
+        back.setOnClickListener(v -> refreshTopicsCard(verse, null));
+        notesPanelList.addView(back);
         bibleViewModel.loadTopicVerses(topic, verses -> {
-            searchResults.clear();
-            searchResults.addAll(verses);
-            isSearchMode = true;
-            if (searchBarLayout != null) {
-                searchBarLayout.setVisibility(View.VISIBLE);
+            if (notesPanelList == null || !"topics".equals(cardKind)) {
+                return;
             }
-            if (chapterNavBar != null) {
-                chapterNavBar.setVisibility(View.GONE);
-            }
-            if (etSearchQuery != null) {
-                etSearchQuery.setText(topic);
-            }
-            renderVerseList(searchResults, true);
             if (verses.isEmpty()) {
-                Toast.makeText(getContext(), "No verses saved under " + topic + " yet.", Toast.LENGTH_SHORT).show();
+                notesPanelList.addView(cardText("No verses saved under this topic yet.", 13, false, true));
+            }
+            for (final BibleVerse saved : verses) {
+                TextView ref = cardText(formatCitation(saved), 13, true, false);
+                ref.setTextColor(COLOR_ACCENT_ORANGE());
+                ref.setPadding(0, dp(10), 0, dp(2));
+                notesPanelList.addView(ref);
+                String text = saved.getText() == null ? "" : saved.getText();
+                TextView body = cardText(text.length() > 160 ? text.substring(0, 160) + "..." : text, 14, false, false);
+                View.OnClickListener jump = v -> {
+                    dismissNotesPanel();
+                    pendingScrollVerse = saved.getVerseNumber();
+                    loadChapterVerses(saved.getBookId(), saved.getChapterNumber());
+                };
+                ref.setOnClickListener(jump);
+                body.setOnClickListener(jump);
+                notesPanelList.addView(body);
             }
         });
     }
 
-    /** Checkbox list of topics for one verse, plus a box for a new topic. */
-    private void showTopicPicker(final BibleVerse verse) {
-        final String citation = formatCitation(verse);
-        bibleViewModel.loadTopics(allTopics -> bibleViewModel.loadTopicsForVerse(verse.getBookId(),
-                verse.getChapterNumber(), verse.getVerseNumber(), memberOf -> {
-                    final List<String> existing = new ArrayList<>(allTopics);
-                    final List<String> originallyIn = new ArrayList<>(memberOf);
-                    final List<android.widget.CheckBox> boxes = new ArrayList<>();
-                    LinearLayout box = new LinearLayout(getContext());
-                    box.setOrientation(LinearLayout.VERTICAL);
-                    box.setPadding(dp(18), dp(8), dp(18), dp(8));
-                    for (String topic : existing) {
-                        android.widget.CheckBox cb = new android.widget.CheckBox(getContext());
-                        cb.setText(topic);
-                        cb.setTextColor(GlassKit.text());
-                        cb.setChecked(originallyIn.contains(topic));
-                        cb.setTag(topic);
-                        boxes.add(cb);
-                        box.addView(cb);
-                    }
-                    final EditText newTopic = new EditText(getContext());
-                    newTopic.setHint("New topic, for example healing");
-                    newTopic.setSingleLine(true);
-                    box.addView(newTopic);
-                    ScrollView scroll = new ScrollView(getContext());
-                    scroll.addView(box);
-                    AppDialogs.builder(getContext())
-                            .setTitle("Topics for " + citation)
-                            .setView(scroll)
-                            .setPositiveButton("Save", (dialog, which) -> {
-                                for (android.widget.CheckBox cb : boxes) {
-                                    String topic = (String) cb.getTag();
-                                    boolean nowIn = cb.isChecked();
-                                    if (nowIn != originallyIn.contains(topic)) {
-                                        bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
-                                                verse.getVerseNumber(), topic, nowIn, null);
-                                    }
-                                }
-                                String name = newTopic.getText().toString().trim();
-                                if (!name.isEmpty()) {
-                                    bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
-                                            verse.getVerseNumber(), name, true, () ->
-                                                    Toast.makeText(getContext(), "Saved under " + name, Toast.LENGTH_SHORT).show());
-                                }
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .show();
-                }));
-    }
-
-    /** Saves every verse of the current search results under one topic label. */
+    /** Saves every verse of the current search results under one topic: same card, with the topics as quick picks. */
     private void showSaveAllToTopic(final List<BibleVerse> verses) {
+        if (readerFrame == null) {
+            return;
+        }
+        LinearLayout list = openFloatingCard("topic-save", "Save " + verses.size() + " verses to a topic", null, null);
         final EditText name = new EditText(getContext());
         name.setSingleLine(true);
         name.setText(lastQuery);
+        name.setTextColor(notesInk());
+        name.setHintTextColor(notesMuted());
         name.setHint("Topic name, for example healing");
-        AppDialogs.builder(getContext())
-                .setTitle("Save " + verses.size() + " verses to a topic")
-                .setView(name)
-                .setPositiveButton("Save", (dialog, which) -> {
-                    final String topic = name.getText().toString().trim();
-                    if (topic.isEmpty()) {
-                        return;
-                    }
-                    for (BibleVerse verse : verses) {
-                        bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
-                                verse.getVerseNumber(), topic, true, null);
-                    }
-                    Toast.makeText(getContext(), "Saved " + verses.size() + " verses under " + topic, Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        list.addView(name);
+        final LinearLayout chips = new LinearLayout(getContext());
+        chips.setOrientation(LinearLayout.VERTICAL);
+        list.addView(chips);
+        bibleViewModel.loadTopics(topics -> {
+            if (!"topic-save".equals(cardKind) || topics.isEmpty()) {
+                return;
+            }
+            chips.addView(cardText("Or pick one you already have", 12, false, true));
+            for (final String topic : topics) {
+                TextView chip = GlassKit.text(getContext(), topic, 14, true, COLOR_ACCENT_ORANGE());
+                chip.setPadding(0, dp(8), 0, dp(8));
+                chip.setOnClickListener(v -> name.setText(topic));
+                chips.addView(chip);
+            }
+        });
+        TextView save = GlassKit.orangeButton(getContext(), "Save " + verses.size() + " verses", 13);
+        save.setPadding(dp(18), 0, dp(18), 0);
+        save.setOnClickListener(v -> {
+            final String topic = name.getText().toString().trim();
+            if (topic.isEmpty()) {
+                return;
+            }
+            for (BibleVerse verse : verses) {
+                bibleViewModel.setVerseTopic(verse.getBookId(), verse.getChapterNumber(),
+                        verse.getVerseNumber(), topic, true, null);
+            }
+            Toast.makeText(getContext(), "Saved " + verses.size() + " verses under " + topic, Toast.LENGTH_SHORT).show();
+            showTopicsCard(null);
+            refreshTopicsCard(null, topic);
+        });
+        LinearLayout.LayoutParams lpSave = new LinearLayout.LayoutParams(-2, dp(40));
+        lpSave.topMargin = dp(12);
+        list.addView(save, lpSave);
     }
 
     /** Shows the same verse in every readable translation, one under the other. */
