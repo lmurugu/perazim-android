@@ -1527,7 +1527,16 @@ public class BibleReaderDialog extends Dialog {
         });
         row.addView(select);
 
-        holder[0] = openCardDialog("Highlight", null, row, null, null);
+        // Icons only: no card, no title and no words.
+        final android.app.Dialog dialog = new android.app.Dialog(getContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setContentView(row);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setDimAmount(0f);
+        }
+        holder[0] = dialog;
+        dialog.show();
     }
 
     private ImageView highlightIcon(int drawable, boolean on, String description) {
