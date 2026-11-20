@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.domain.model.SpiritualLevel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,6 +127,11 @@ public class PerazimAiEngine {
             return handleBibleQuery(q);
         }
 
+        // 6a. Fellowship items that contain worship words: praise reports and direct chat
+        if (containsAny(q, "praise report", "praise reports", "direct chat")) {
+            return handleFellowshipQuery();
+        }
+
         // 6. WORSHIP & HYMNAL: Songs, Praise, Hymns, Nyimbo
         if (containsAny(q, "hymn", "hymnal", "worship", "song", "sing", "praise", "nyimbo", "chords")) {
             return handleWorshipQuery();
@@ -213,20 +219,10 @@ public class PerazimAiEngine {
             "(?:accept|reject|approve|deny|revoke)\\b.{0,40}\\bmembership|" +
             "(?:should|can|may|will) (?:i|he|she) (?:be )?(?:ordained|appointed|a pastor|a deacon|an elder)|" +
             "(?:is|am) (?:i|he|she) (?:an? )?(?:accepted |official )?member)\\b", Pattern.CASE_INSENSITIVE);
-    /** Replies that claim an app action happened. Only the app itself can confirm an action. */
-    private static final Pattern CLAIMED_APP_ACTION = Pattern.compile(
-            "\\b(?:i (?:have )?(?:submitted|sent|registered|updated|contacted|changed|forwarded|notified|recorded)|" +
-            "(?:has|have) been (?:submitted|sent|registered|updated|contacted|changed|forwarded|notified|recorded)|" +
-            "submitted successfully|i (?:have )?(?:informed|alerted) (?:the )?(?:bishop|pastor|leader))\\b", Pattern.CASE_INSENSITIVE);
     /** Replies that present a statement as officially approved or official Perazim position. */
     private static final Pattern CLAIMED_OFFICIAL_STATUS = Pattern.compile(
             "\\b(?:officially approved|approved by the bishop|is the official (?:position|doctrine|policy|teaching) of|" +
             "official church (?:position|policy) is(?! not))\\b", Pattern.CASE_INSENSITIVE);
-    /** Replies that claim to be a human church authority. */
-    private static final Pattern CLAIMED_HUMAN_AUTHORITY = Pattern.compile(
-            "\\bi (?:am|'m) (?:your |the |a |an )?(?:church )?(?:pastor|bishop|priest|elder|deacon|counsellor|counselor|leader)\\b|" +
-            "\\bi (?:now )?(?:declare|pronounce|forgive) you\\b", Pattern.CASE_INSENSITIVE);
-
     public static boolean isProfessionalMatterQuery(@Nullable String query) {
         return query != null && PROFESSIONAL_MATTER.matcher(query).find();
     }
@@ -235,9 +231,9 @@ public class PerazimAiEngine {
         return query != null && HUMAN_DECISION.matcher(query.replace('’', '\'')).find();
     }
 
+    /** Delegates to {@link AppActionClaims}: completed or promised app actions and human-authority claims. */
     public static boolean claimsAppActionOrHumanAuthority(@Nullable String answer) {
-        return answer != null && (CLAIMED_APP_ACTION.matcher(answer).find()
-                || CLAIMED_HUMAN_AUTHORITY.matcher(answer).find());
+        return AppActionClaims.claimsAppActionOrHumanAuthority(answer);
     }
 
     /** True when the reply presents something as official Perazim position, policy or approval. */
@@ -384,25 +380,14 @@ public class PerazimAiEngine {
     private AiResponse handleXpQuery(String q) {
         String userId = getEffectiveUserId();
         int xp = GamificationStore.getSpiritualXp(context, userId, 0);
-        int level = calculateLevel(xp);
-        String levelName = getLevelTitle(level);
-        int nextLevelXp = level * 250;
-        int remaining = Math.max(0, nextLevelXp - xp);
+        int level = SpiritualLevel.levelFor(xp);
+        int remaining = SpiritualLevel.xpToNextLevel(xp);
 
-        String msg;
-        if (xp > 0) {
-            msg = "⭐ **Spiritual XP Telemetry:**\n\n"
-                    + "• **Current XP:** " + xp + " XP\n"
-                    + "• **Rank:** Level " + level + " (" + levelName + ")\n"
-                    + "• **Progress to Level " + (level + 1) + ":** " + remaining + " XP needed.\n\n"
-                    + "💡 *Open the app's activities to review current progress rules. This guide only reads your displayed XP; it does not award points.*";
-        } else {
-            msg = "⭐ **Spiritual XP Telemetry:**\n\n"
-                    + "• **Current XP:** 0 XP\n"
-                    + "• **Rank:** Level 1 (" + levelName + ")\n"
-                    + "• **Progress to Level 2:** 250 XP needed.\n\n"
-                    + "💡 *Open the app's activities to review current progress rules. This guide only reads your displayed XP; it does not award points.*";
-        }
+        String msg = "⭐ **Spiritual XP:**\n\n"
+                + "• **Current XP:** " + xp + " XP\n"
+                + "• **Level:** " + level + " Disciple\n"
+                + "• **Progress to Level " + (level + 1) + ":** " + remaining + " XP needed.\n\n"
+                + "💡 *XP is earned through app activities. This guide only reads your displayed XP; it does not award points.*";
 
         List<String> chips = Arrays.asList("⚡ Open Reflection", "🧩 Open Riddles", "🔥 Check Streak");
         return AiResponse.withAction(msg, AiResponse.INTENT_REFLECTIONS, "⚡ Open Reflection", null, chips);
@@ -414,24 +399,24 @@ public class PerazimAiEngine {
         boolean isFrozen = GamificationStore.isStreakFrozen(context, userId, false);
         int grace = GamificationStore.getGracePoints(context, userId, 0);
 
-        String status = isFrozen ? "❄️ FROZEN / SHIELDED" : (streak > 0 ? "🔥 ACTIVE ALTAIRE" : "⚪ NOT STARTED");
+        String status = isFrozen ? "❄️ FROZEN / SHIELDED" : (streak > 0 ? "🔥 ACTIVE" : "⚪ NOT STARTED");
 
         String msg;
         if (streak > 0) {
             msg = "🔥 **Devotional Streak Status:**\n\n"
                     + "• **Current Streak:** " + streak + " Days (" + status + ")\n"
-                    + "• **Grace Tokens:** " + grace + " 💜 available\n\n"
+                    + "• **Grace Points:** " + grace + " 💜 available\n\n"
                     + (isFrozen
-                    ? "Your streak is currently protected by Grace Freeze! Complete today's devotion to unfreeze and keep the flame burning."
+                    ? "Your streak is protected by a Streak Freeze, which is activated in the app with Grace Points. Complete today's devotion to keep the flame burning."
                     : "Your streak is active! Make sure to read today's scripture and pray before midnight to keep your fire burning.");
         } else {
             msg = "🔥 **Devotional Streak Status:**\n\n"
                     + "• **Current Streak:** 0 Days (" + status + ")\n"
-                    + "• **Grace Tokens:** " + grace + " 💜 available\n\n"
+                    + "• **Grace Points:** " + grace + " 💜 available\n\n"
                     + "Your devotional journey begins today! Complete today's 3-minute prayer reflection to ignite Day 1 of your streak fire.";
         }
 
-        List<String> chips = Arrays.asList("💜 What are Grace Tokens?", "⚡ Complete Today's Devotion", "⭐ Check XP");
+        List<String> chips = Arrays.asList("💜 What are Grace Points?", "⚡ Complete Today's Devotion", "⭐ Check XP");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "👤 View Streak in Profile", null, chips);
     }
 
@@ -440,8 +425,8 @@ public class PerazimAiEngine {
         int grace = GamificationStore.getGracePoints(context, userId, 0);
 
         String msg = "💜 **Grace Points in the app:**\n\n"
-                + "You currently have **" + grace + " Grace Tokens**.\n\n"
-                + "These are an app progress feature and are not a measure of God's grace. Check the current Profile screen for how your streak is handled.";
+                + "You currently have **" + grace + " Grace Points**.\n\n"
+                + "These are an app progress feature and are not a measure of God's grace. In the app, Grace Points can activate a 48-hour Streak Freeze (2 Grace Points) or restore a missed day (3 Grace Points).";
 
         List<String> chips = Arrays.asList("🔥 Check Streak Status", "⭐ Earn More XP", "👤 Go to Profile");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_PROFILE, "❄️ Manage Streak Protection", null, chips);
@@ -482,7 +467,7 @@ public class PerazimAiEngine {
         String msg = "🎵 **Perazim Hymnal & Praise Browser:**\n\n"
                 + "Explore classic hymns and worship choruses with key signatures, time signatures, and stanzas.\n"
                 + "• Categories: *Worship, Faith, Grace, Praise, Favorites*\n"
-                + "• Hymns available: *Holy Holy Holy*, *Great Is Thy Faithfulness*, *Amazing Grace*, and more.";
+                + "• Hymns available: *Holy, Holy, Holy!*, *Great Is Thy Faithfulness*, *Amazing Grace*, and more.";
 
         List<String> chips = Arrays.asList("🎵 Browse Hymns", "🎥 Watch Live Worship", "🙏 Prayer Wall");
         return AiResponse.withAction(msg, AiResponse.INTENT_NAVIGATE_WORSHIP, "🎵 Open Worship Hymnal", null, chips);
@@ -514,7 +499,7 @@ public class PerazimAiEngine {
 
     private AiResponse handleReflectionsQuery() {
         String msg = "⚡ **Daily reflection:**\n\n"
-                + "Open the Reflections section to read today's material and its Scripture reference. The guide does not create a devotional, state an official interpretation, or award points.";
+                + "Open Home to start today's 3-minute reflection routine. The guide does not create a devotional, state an official interpretation, or award points.";
 
         List<String> chips = Arrays.asList("⚡ Start a Reflection", "🔥 Check Streak", "📖 Open Bible");
         return AiResponse.withAction(msg, AiResponse.INTENT_REFLECTIONS, "⚡ Open Reflections", null, chips);
@@ -536,7 +521,7 @@ public class PerazimAiEngine {
         String msg = "👤 **Member Profile & Offline Manager:**\n\n"
                 + "Manage your spiritual credentials and offline storage.\n"
                 + "• View downloaded sermon audios and hymnals.\n"
-                + "• Toggle Grace streak freeze protection.\n"
+                + "• Use Grace Points to activate a 48-hour Streak Freeze.\n"
                 + "• Use only contact routes currently displayed in the app and verify them before sharing sensitive information.";
 
         List<String> chips = Arrays.asList("📦 Manage Offline Audio", "🔥 Check Streak", "⭐ View XP");
@@ -571,22 +556,6 @@ public class PerazimAiEngine {
             return "For broader questions, you can switch to on-phone Qwen. It requires the local model and verified supporting knowledge, and it has no live internet access.";
         }
         return "Generative AI is not enabled in this build. You can still open the Bible for local Scripture lookup or use the built-in app guide.";
-    }
-
-    private int calculateLevel(int xp) {
-        if (xp < 250) return 1;
-        if (xp < 500) return 2;
-        if (xp < 1000) return 3;
-        return 4;
-    }
-
-    private String getLevelTitle(int level) {
-        switch (level) {
-            case 1: return "Disciple of the Breach";
-            case 2: return "Covenant Seeker";
-            case 3: return "Watchman on the Walls";
-            default: return "Baal-Perazim Conqueror";
-        }
     }
 
     private boolean containsAny(String text, String... words) {

@@ -2548,7 +2548,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         hudRow.setGravity(Gravity.CENTER_VERTICAL);
 
         LinearLayout streakCard = createMetricCard("🔥 " + streakCount + " Days", "Streak", streakFrozen ? "❄️ Frozen" : "Active", COLOR_ORANGE_TINT, COLOR_ACCENT_ORANGE);
-        LinearLayout xpCard = createMetricCard("⭐ " + xpCount + " XP", "Spiritual XP", "Level 3 Disciple", COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE);
+        LinearLayout xpCard = createMetricCard("⭐ " + xpCount + " XP", "Spiritual XP", "Level " + org.perazimchurch.app.domain.model.SpiritualLevel.levelFor(xpCount) + " Disciple", COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE);
         LinearLayout graceCard = createMetricCard("💜 " + graceCount + " Pts", "Grace Points", "Tokens Available", COLOR_ORANGE_TINT, COLOR_ORANGE_DARK);
 
         hudRow.addView(streakCard);
