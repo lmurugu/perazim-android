@@ -754,6 +754,8 @@ public class BibleReaderDialog extends Dialog {
                         holder[0].dismiss();
                     }
                     if (!chosen.equalsIgnoreCase(currentTranslation)) {
+                        // Stay on the verse the reader is on, rather than jumping back to verse 1.
+                        pendingScrollVerse = topVisibleVerse();
                         currentTranslation = chosen;
                         updateTranslationBadge();
                         loadChapterVerses(currentBookId, currentChapter);
@@ -829,6 +831,10 @@ public class BibleReaderDialog extends Dialog {
                 currentVerses.clear();
                 currentVerses.addAll(verses);
                 renderVerseList(currentVerses, false);
+                if (pendingVersePicker) {
+                    pendingVersePicker = false;
+                    showVersePicker();
+                }
             } else {
                 currentVerses.clear();
                 tvEmptyState.setText("No " + currentTranslation + " text is downloaded for "
@@ -837,6 +843,74 @@ public class BibleReaderDialog extends Dialog {
                 tvEmptyState.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    /** Set when a chapter is chosen in the picker: the verse card opens once the chapter is on screen. */
+    private boolean pendingVersePicker = false;
+
+    /** One card with every verse number of the chapter, so a verse can be reached without scrolling. */
+    private void showVersePicker() {
+        int count = 0;
+        for (BibleVerse v : currentVerses) {
+            count = Math.max(count, v.getVerseNumber());
+        }
+        if (count <= 0) {
+            return;
+        }
+        final LinearLayout grid = new LinearLayout(getContext());
+        grid.setOrientation(LinearLayout.VERTICAL);
+        final android.app.Dialog[] holder = new android.app.Dialog[1];
+        final int columns = 6;
+        LinearLayout row = null;
+        for (int n = 1; n <= count; n++) {
+            if ((n - 1) % columns == 0) {
+                row = new LinearLayout(getContext());
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                grid.addView(row, GlassKit.matchWrap(getContext(), 0));
+            }
+            final int verseNumber = n;
+            TextView cell = GlassKit.text(getContext(), String.valueOf(n), 14, true, notesInk());
+            cell.setGravity(Gravity.CENTER);
+            cell.setBackground(cardTile(false));
+            cell.setClickable(true);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(42), 1f);
+            lp.setMargins(dp(3), dp(3), dp(3), dp(3));
+            cell.setOnClickListener(v -> {
+                if (holder[0] != null) {
+                    holder[0].dismiss();
+                }
+                scrollToVerse(verseNumber);
+            });
+            row.addView(cell, lp);
+        }
+        holder[0] = openCardDialog(currentBookName + " " + currentChapter, "Choose a verse", grid,
+                "\u2039 Start of chapter", () -> scrollToVerse(1));
+    }
+
+    /** Scrolls the chapter so the verse is at the top. */
+    private void scrollToVerse(int verseNumber) {
+        View row = verseRows.get(verseNumber);
+        if (row != null && versesScrollView != null) {
+            versesScrollView.post(() -> versesScrollView.smoothScrollTo(0, offsetWithin(row, versesScrollView)));
+        }
+    }
+
+    /** The verse nearest the top of the screen: kept when the translation changes. */
+    private int topVisibleVerse() {
+        if (versesScrollView == null || verseRows.isEmpty()) {
+            return 0;
+        }
+        int scrollY = versesScrollView.getScrollY();
+        int best = 0;
+        int bestY = Integer.MIN_VALUE;
+        for (Map.Entry<Integer, View> e : verseRows.entrySet()) {
+            int y = offsetWithin(e.getValue(), versesScrollView);
+            if (y <= scrollY + dp(24) && y > bestY) {
+                bestY = y;
+                best = e.getKey();
+            }
+        }
+        return best;
     }
 
     private void toggleSearchMode() {
@@ -1436,8 +1510,25 @@ public class BibleReaderDialog extends Dialog {
                     v -> applyHighlight(verse, colour.name)));
         }
         mutedRow.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> applyHighlight(verse, null)));
+        LinearLayout boldRow = new LinearLayout(getContext());
+        boldRow.setGravity(Gravity.CENTER);
+        for (final HighlightColors.Colour colour : HighlightColors.BOLD) {
+            boldRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                    v -> applyHighlight(verse, colour.name)));
+        }
         palette.addView(majorRow);
         palette.addView(mutedRow);
+        palette.addView(boldRow);
+        // Washed out to darker, one row per shade, so the same hue can be chosen light or deep.
+        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
+            LinearLayout gradRow = new LinearLayout(getContext());
+            gradRow.setGravity(Gravity.CENTER);
+            for (final HighlightColors.Colour colour : shadeRow) {
+                gradRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                        v -> applyHighlight(verse, colour.name)));
+            }
+            palette.addView(gradRow);
+        }
         palette.addView(spectrumView(verse));
         return palette;
     }
@@ -2724,6 +2815,7 @@ public class BibleReaderDialog extends Dialog {
                 if (holder[0] != null) {
                     holder[0].dismiss();
                 }
+                pendingVersePicker = true;
                 loadChapterVerses(book.getId(), chNum);
             });
             currentRow.addView(cell, lpCell);

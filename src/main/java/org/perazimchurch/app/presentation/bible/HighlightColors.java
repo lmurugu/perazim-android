@@ -47,6 +47,56 @@ public final class HighlightColors {
             new Colour("muted-purple", "#A89BC4", "#30A89BC4")
     ));
 
+    /** Bold, saturated colours: a strong red, orange, yellow and so on, for highlights that must stand out. */
+    public static final List<Colour> BOLD = Collections.unmodifiableList(Arrays.asList(
+            new Colour("red", "#E53935", "#66E53935"),
+            new Colour("bold-orange", "#FB8C00", "#66FB8C00"),
+            new Colour("bold-yellow", "#FDD835", "#66FDD835"),
+            new Colour("bold-green", "#43A047", "#6643A047"),
+            new Colour("teal", "#00897B", "#6600897B"),
+            new Colour("bold-blue", "#1E88E5", "#661E88E5"),
+            new Colour("indigo", "#3949AB", "#663949AB"),
+            new Colour("bold-purple", "#8E24AA", "#668E24AA"),
+            new Colour("magenta", "#D81B60", "#66D81B60")
+    ));
+
+    private static final String[] HUE_BASE = {"#E53935", "#FB8C00", "#FDD835", "#43A047", "#00897B",
+            "#1E88E5", "#3949AB", "#8E24AA", "#D81B60"};
+    private static final String[] HUE_NAME = {"red", "orange", "yellow", "green", "teal", "blue", "indigo", "purple", "pink"};
+
+    /**
+     * Three shades per hue, from washed out (light) to darker (dark): rows are light, mid and dark,
+     * each row has the nine hues in the same order as HUE_NAME.
+     */
+    public static final List<List<Colour>> GRADIENT_ROWS = buildGradient();
+
+    private static List<List<Colour>> buildGradient() {
+        String[] shade = {"light", "mid", "dark"};
+        List<List<Colour>> rows = new java.util.ArrayList<>();
+        for (int k = 0; k < shade.length; k++) {
+            List<Colour> row = new java.util.ArrayList<>();
+            for (int h = 0; h < HUE_BASE.length; h++) {
+                String hex = k == 0 ? mix(HUE_BASE[h], 0xFF, 0.55f)
+                        : k == 1 ? HUE_BASE[h]
+                        : mix(HUE_BASE[h], 0x00, 0.35f);
+                row.add(new Colour(HUE_NAME[h] + "-" + shade[k], hex, "#66" + hex.substring(1)));
+            }
+            rows.add(Collections.unmodifiableList(row));
+        }
+        return Collections.unmodifiableList(rows);
+    }
+
+    /** Moves a colour toward white (channel 0xFF) or black (0x00) by the given fraction. */
+    private static String mix(String hex, int target, float amount) {
+        int r = Integer.parseInt(hex.substring(1, 3), 16);
+        int g = Integer.parseInt(hex.substring(3, 5), 16);
+        int b = Integer.parseInt(hex.substring(5, 7), 16);
+        r = Math.round(r + (target - r) * amount);
+        g = Math.round(g + (target - g) * amount);
+        b = Math.round(b + (target - b) * amount);
+        return String.format(Locale.US, "#%02X%02X%02X", r, g, b);
+    }
+
     /**
      * Builds a colour from a "#RRGGBB" value chosen on the spectrum. Returns null when the text
      * is not a six-digit hex colour.
@@ -74,6 +124,18 @@ public final class HighlightColors {
         for (Colour colour : MUTED) {
             if (colour.name.equals(clean)) {
                 return colour;
+            }
+        }
+        for (Colour colour : BOLD) {
+            if (colour.name.equals(clean)) {
+                return colour;
+            }
+        }
+        for (List<Colour> row : GRADIENT_ROWS) {
+            for (Colour colour : row) {
+                if (colour.name.equals(clean)) {
+                    return colour;
+                }
             }
         }
         for (Colour colour : ALL) {
