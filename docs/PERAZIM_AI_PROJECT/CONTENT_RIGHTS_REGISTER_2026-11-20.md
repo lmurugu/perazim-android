@@ -51,3 +51,94 @@ Also excluded: audio and video links in the seed file. Reproduction, transcripti
 3. Decide D4 (NIV, NKJV, Swahili Union Version).
 4. Decide, for each hymn, whether to clear it, exclude it or obtain permission.
 5. Decide whether sermon material may be used, and provide written permission if so.
+
+---
+
+## 6. Research addendum (Session 4, 2026-11-20)
+
+**Status: research record only. No rights are approved by this addendum. Nothing here is legal advice. Access dates are 2026-11-20.**
+
+Classification key: **Verified** = read in the publisher's or rights holder's own text. **Apparent** = indicated by a secondary or partial source. **Uncertain** = not yet established. **Permission required** = the source's terms say written permission is needed for the use in question.
+
+### 6.1 ESV (Crossway)
+
+| Point | Finding | Class | Source (accessed 2026-11-20) |
+|---|---|---|---|
+| Quotation without written permission | Up to and including 500 verses (print, digital, audio). Not more than one-half of any one book; not 25% or more of the total text of the new work | Verified | https://www.crossway.org/rights-and-permissions/esv/ (same text at /support/esv-bible-permissions/) |
+| Copyright notice | Required. Begins "Scripture quotations are from the ESV® Bible" and includes "ESV Text Edition: 2025" and "Used by permission. All rights reserved." | Verified | same |
+| Audio and sermons | Quotes must be verbatim and credited "ESV". Sermons are listed among audio uses | Verified | same |
+| Translation | Not permitted "in whole or in part into any other language" | Verified | same |
+| AI | The text "may not be used, accessed, or processed by any artificial intelligence (AI) system." Covers training, fine-tuning, interpretation and AI-generated responses based on the text | Verified | same |
+| Church, bulletins, classes | Bulletins and class use listed; no full notice needed in non-saleable media but "(ESV)" must follow the quotation | Verified | same |
+| App or website use | ESV API free for websites and apps for non-commercial use; commercial app use and AI use fall outside the standard guidelines | Verified | same; API at https://api.esv.org/ |
+| Storage in the app package | Not addressed directly for offline bundled text. Treated as **Permission required** | Uncertain | — |
+| Trademark | "ESV" and "English Standard Version" are registered trademarks of Crossway | Verified | same |
+
+**Consequence for the register:** the ESV's 500-verse allowance is the most restrictive limit found so far for a bundled offline app. Quoting in the offline AI answers, translation, and any AI processing each appear to need written permission. Keep ESV excluded from the package.
+
+### 6.2 NASB (The Lockman Foundation)
+
+| Point | Finding | Class | Source |
+|---|---|---|---|
+| Quotation without written permission | Up to 1,000 verses in any form (written, visual, electronic, audio). Not a complete book; not more than 50% of the work; not stored in an electronic retrieval system beyond 1,000 verses | Verified | https://www.lockman.org/permission-to-quote-copyright-trademark-information/ (page modified 2026-10-29) |
+| Notice | Required. Full notice with © line and Lockman.org link. Web pages and apps must use the full notice with a clickable link | Verified | same |
+| Electronic and app use | Site content for personal, noncommercial use. Redistribution needs written consent, except an insubstantial portion shared occasionally with attribution | Verified | same |
+| AI | AI systems may quote up to 1,000 verses in a single response, scope limited to dynamic user queries (RAG and search). Training, fine-tuning, evaluating or developing AI models is **not** permitted without prior written permission. Each quote names the translation | Verified | same ("AI Usage & Attribution") |
+| Translation | Page does not address translation. Trademarks need permission | Verified (silence) | same |
+| Edition | Notice year rule: use only the last year of the edition quoted (for example, not 2020 for NASB 1995) | Verified | same |
+| Contact | The Lockman Foundation, PO Box 2279, La Habra, CA 90632-2279, (714) 879-3055; request form at lockman.org. No fee stated | Verified | same |
+
+**Consequence:** the app's existing rule (NASB only from a user-supplied file, kept out of git) remains correct. Local storage of a user's own file is a separate question. AI training on NASB text is not permitted without written permission. Use in offline answers would need to fit the RAG-limited, 1,000-verse rule and attribution.
+
+### 6.3 KJV (Crown / Cambridge University Press)
+
+| Point | Finding | Class | Source |
+|---|---|---|---|
+| Rights holder | "Rights in the Authorized (King James) Version of the Bible are vested in the Crown." Administered in the UK by the Crown's patentee, Cambridge University Press | Verified | https://assets.cambridge.org/97805211/63347/copyright/9780521163347_copyright_info.pdf and .../97805212/28626/copyright/9780521228626_copyright_info.pdf (both CUP copyright sheets, 2011 copyright year) |
+| Liturgical or non-commercial educational use | Up to 500 verses (or less than a full book) needs no permission, per these two CUP sheets | Verified for these two editions | same |
+| Other uses | Written permission from the Permissions Manager, Cambridge University Press | Verified | same |
+| Edition in the repo | `kjv_manifest.json` does not record the source edition; the seed text is not matched to a CUP edition | Uncertain | repo |
+| Public domain status | The text is often treated as public domain, but the CUP sheets describe Crown rights in the UK. Status outside the UK and US, and for a specific digital edition, is not established | Uncertain | — |
+| Notice in the Reference System | Adapted reference notes carry "Copyright Zondervan. Used by permission." This covers the reference system, not the KJV text | Verified | same (2011 sheet) |
+
+**Consequence:** Keep the KJV entry as "Verify edition source and licence" (already in section 1). Any app text should follow the CUP 500-verse rule only where its edition's sheet confirms it. Do not treat the KJV as cleared for the package.
+
+### 6.4 Hymns and worship material
+
+| Item | Finding | Class |
+|---|---|---|
+| Public domain classification by title | The search results so far (hymnary.org index pages) show many editions and arrangements but no rights statement for any seed title. Authorship dates and first-publication dates are not yet verified for each hymn | Uncertain |
+| Great Is Thy Faithfulness, How Great Thou Art, Grace Greater Than Our Sin | Listed as "possibly protected" in section 2. Rights and publisher not confirmed in this pass | Permission required until verified |
+| Lyrics and chord charts | Chord arrangements and modern arrangements are separately protected. Planning Center's copyright page (US-focused) states that sharing "audio, charts, or lyrics you do not have licenses for is illegal, even if you don't allow downloading" and names CCLI Church Copyright, Streaming and SongSelect licences as the routes | Verified for the US licence scheme; Kenya position not established |
+| Church licensing in Kenya | Not established. The CCLI page at ccli.com blocked automated retrieval (robots.txt). Whether CCLI or another scheme covers Embu, Kenya is **Uncertain** | Uncertain |
+
+Source for the licence summary: https://help.planningcenter.com/en/copyright-concerns.html (accessed 2026-11-20).
+
+**Consequence:** keep all 12 hymns excluded from the package, including lyrics and chords, until each has a rights check (author death dates, publisher, arrangement) and any needed licence.
+
+### 6.5 Sermons, teaching recordings and transcripts
+
+| Point | Finding | Class | Source |
+|---|---|---|---|
+| Are sermons protected works? | Berne Convention Article 2bis(2) lets member states allow reproduction of lectures, addresses and similar works delivered in public, for informatory purposes, and reserves the author's right to make a collection (Art. 2bis(3)). The word "sermons" does not appear in Art. 2bis. Protection of spoken sermons is therefore a matter of national law | Verified (treaty text) | https://law.cornell.edu/treaties/berne/2bis.html (accessed 2026-11-20) |
+| Kenya | The Copyright Act (Cap. 130, 2022 consolidation) is the current text. Its protected-works list, term and exceptions were **not read** in this pass. The WIPO Lex PDF link (ke045en_1.pdf) failed to fetch (URL too long for the proxy) | Uncertain | https://www.wipo.int/wipolex/en/legislation/details/23267 (page read) |
+| Recordings and video | Reproduction, transcription and AI ingestion each need permission, per section 3 | Permission required | section 3 |
+| Streaming licences | US-focused guidance says streamed services need a streaming licence for any music used | Verified for US; Kenya not established | Planning Center page, above |
+
+**Consequence:** keep all sermons, audio, video and transcripts excluded. Ask the owner for written permission from each preacher, and check the Kenya Act text before any reliance on an exception.
+
+### 6.6 Sources not yet checked
+
+- Kenya Copyright Act (2022 consolidation) full text, sections on works, term, exceptions and collective management. Recheck at WIPO Lex or the Kenya Gazette.
+- Copyright (Collective Management) Regulations, 2020 (Legal Notice 178 of 2020): https://www.wipo.int/wipolex/en/legislation/details/23416
+- Copyright Regulations, 2020 (Legal Notice 177 of 2020): https://www.wipo.int/wipolex/en/legislation/details/23415
+- CCLI coverage for Kenya or Africa: https://www.ccli.com/ (not retrieved)
+- Authorship and death dates for each hymn, and the publisher of each arrangement.
+
+### 6.7 Decisions for the owner (new)
+
+1. Confirm whether the app needs ESV text at all. Its 500-verse limit and AI prohibition conflict with offline AI answers.
+2. Decide whether to pursue Crossway's written permission, or to use another translation for AI answers.
+3. Confirm whether NASB should be used in AI answers, given that AI training is not permitted and RAG use needs the attribution format.
+4. Provide the KJV edition used in `kjv_manifest.json` so it can be matched to its publisher sheet.
+5. Obtain the Kenya Copyright Act text from the Kenya Gazette or legal counsel so the sermon and hymn analysis can rely on Kenyan law.
