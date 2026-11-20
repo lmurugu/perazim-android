@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public final class ScriptureReference {
 
     private static final Pattern REFERENCE = Pattern.compile(
-            "^((?:[1-3]\\s*)?[A-Za-z][A-Za-z .]*?)\\s+(\\d{1,3})(?:\\s*:\\s*(\\d{1,3})(?:\\s*[-–]\\s*(\\d{1,3}))?)?$");
+            "^((?:[1-3] *)?[A-Za-z][A-Za-z.]*(?: [A-Za-z][A-Za-z.]*)*)\\s+(\\d{1,3})(?:\\s*:\\s*(\\d{1,3})(?:\\s*[-–]\\s*(\\d{1,3}))?)?$");
 
     public final int bookNumber;
     public final int chapter;
