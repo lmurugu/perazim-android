@@ -940,7 +940,9 @@ public class BibleReaderDialog extends Dialog {
             notesPanelView.setLayoutParams(plp);
         }
         View picker = buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, true);
-        picker.setLayoutParams(new LinearLayout.LayoutParams(dp(300), dp(40)));
+        LinearLayout.LayoutParams pickerLp = new LinearLayout.LayoutParams(dp(340), dp(46));
+        pickerLp.gravity = Gravity.CENTER_HORIZONTAL;
+        picker.setLayoutParams(pickerLp);
         list.addView(picker);
         ImageView done = new ImageView(getContext());
         done.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_check);
@@ -2033,35 +2035,51 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout strips = new LinearLayout(getContext());
         strips.setOrientation(LinearLayout.VERTICAL);
         strips.setGravity(Gravity.CENTER_VERTICAL);
+        // Releasing a thumb applies the colour, the same as tapping a circle.
+        final Runnable applyMix = () -> {
+            int rgb = intensityColour(st[0], st[1], st[2]);
+            String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
+            recordColourUse(hex);
+            onPick.accept(hex);
+        };
         bars[0] = new TrackSlider(getContext(), st[0] / 360f, (f, done) -> {
             st[0] = f * 360f;
             refresh[0].run();
+            if (done) {
+                applyMix.run();
+            }
         });
         bars[1] = new TrackSlider(getContext(), st[2], (f, done) -> {
             st[2] = f;
             refresh[0].run();
+            if (done) {
+                applyMix.run();
+            }
         });
         for (TrackSlider bar : bars) {
-            strips.addView(bar, new LinearLayout.LayoutParams(-1, dp(14)));
+            strips.addView(bar, new LinearLayout.LayoutParams(-1, dp(16)));
         }
-        card.addView(strips, new LinearLayout.LayoutParams(0, -2, 1f));
+        // The strips take 70% of the picker, the circles 30%.
+        card.addView(strips, new LinearLayout.LayoutParams(0, -2, 7f));
         refresh[0].run();
 
         LinearLayout dots = new LinearLayout(getContext());
         dots.setOrientation(LinearLayout.HORIZONTAL);
         dots.setGravity(Gravity.CENTER_VERTICAL);
+        int shown = 0;
         for (final String name : frequentColours()) {
             HighlightColors.Colour colour = HighlightColors.byName(name);
-            if (colour == null) {
+            if (colour == null || shown >= 4) {
                 continue;
             }
+            shown++;
             final boolean chosen = name.equals(current);
             View dot = swatchView(colour.swatch, false, v -> {
                 recordColourUse(name);
                 onPick.accept(name);
             });
-            LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(14), dp(14));
-            dotLp.setMargins(dp(4), 0, dp(4), 0);
+            LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(16), dp(16));
+            dotLp.setMargins(dp(3), 0, dp(3), 0);
             dot.setLayoutParams(dotLp);
             // The chosen circle grows to 1.5 times its size instead of showing a ring.
             dot.setScaleX(chosen ? 1.5f : 1f);
@@ -2079,17 +2097,12 @@ public class BibleReaderDialog extends Dialog {
         applyBg.setShape(GradientDrawable.OVAL);
         applyBg.setColor(COLOR_ACCENT_ORANGE());
         apply.setBackground(applyBg);
-        LinearLayout.LayoutParams applyLp = new LinearLayout.LayoutParams(dp(14), dp(14));
-        applyLp.setMargins(dp(4), 0, 0, 0);
+        LinearLayout.LayoutParams applyLp = new LinearLayout.LayoutParams(dp(16), dp(16));
+        applyLp.setMargins(dp(3), 0, 0, 0);
         apply.setLayoutParams(applyLp);
-        apply.setOnClickListener(v -> {
-            int rgb = intensityColour(st[0], st[1], st[2]);
-            String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
-            recordColourUse(hex);
-            onPick.accept(hex);
-        });
+        apply.setOnClickListener(v -> applyMix.run());
         dots.addView(apply);
-        card.addView(dots, new LinearLayout.LayoutParams(-2, -2));
+        card.addView(dots, new LinearLayout.LayoutParams(0, -2, 3f));
         return card;
     }
 
@@ -2138,7 +2151,7 @@ public class BibleReaderDialog extends Dialog {
         @Override
         protected void onDraw(android.graphics.Canvas canvas) {
             float inset = 4 * density;
-            float trackH = 3 * density;
+            float trackH = 3.5f * density;
             float cy = getHeight() / 2f;
             android.graphics.RectF track = new android.graphics.RectF(inset, cy - trackH / 2, getWidth() - inset, cy + trackH / 2);
             paint.setShader(new android.graphics.LinearGradient(track.left, 0, track.right, 0, stops, null,
@@ -2148,7 +2161,7 @@ public class BibleReaderDialog extends Dialog {
             float x = track.left + value * track.width();
             paint.setShadowLayer(4 * density, 0, 0, (thumbFill & 0x00FFFFFF) | 0xCC000000);
             paint.setColor(thumbFill);
-            canvas.drawCircle(x, cy, 3.5f * density, paint);
+            canvas.drawCircle(x, cy, 4f * density, paint);
             paint.clearShadowLayer();
         }
 
