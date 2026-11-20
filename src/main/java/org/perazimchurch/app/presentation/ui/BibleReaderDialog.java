@@ -211,6 +211,8 @@ public class BibleReaderDialog extends Dialog {
             currentBookId = prefs.getString("book", currentBookId);
             currentChapter = prefs.getInt("chapter", currentChapter);
             currentTranslation = prefs.getString("translation", currentTranslation);
+            verseTextSp = prefs.getFloat("verse_sp", verseTextSp);
+            verseWeight = prefs.getInt("verse_weight", verseWeight);
         } catch (Exception ignored) {
             // Preferences unavailable: keep the defaults.
         }
@@ -632,6 +634,16 @@ public class BibleReaderDialog extends Dialog {
         smaller.setContentDescription("Smaller text");
         smaller.setClickable(true);
         smaller.setOnClickListener(v -> changeVerseSize(-2f));
+        TextView lighter = GlassKit.text(getContext(), "B\u2212", 12, false, GlassKit.muted());
+        lighter.setPadding(dp(8), dp(4), dp(8), dp(4));
+        lighter.setContentDescription("Less bold text");
+        lighter.setClickable(true);
+        lighter.setOnClickListener(v -> changeVerseWeight(-100));
+        TextView bolder = GlassKit.text(getContext(), "B+", 12, true, GlassKit.muted());
+        bolder.setPadding(dp(8), dp(4), dp(8), dp(4));
+        bolder.setContentDescription("Bolder text");
+        bolder.setClickable(true);
+        bolder.setOnClickListener(v -> changeVerseWeight(100));
         TextView larger = GlassKit.text(getContext(), "A+", 12, true, GlassKit.muted());
         larger.setPadding(dp(8), dp(4), dp(8), dp(4));
         larger.setContentDescription("Larger text");
@@ -639,6 +651,8 @@ public class BibleReaderDialog extends Dialog {
         larger.setOnClickListener(v -> changeVerseSize(2f));
         sizes.addView(smaller);
         sizes.addView(larger);
+        sizes.addView(lighter);
+        sizes.addView(bolder);
         middle.addView(sizes);
         nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
@@ -652,10 +666,38 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private float verseTextSp = 18f;
+    /** Stroke weight of the verse text: 300 is light, 400 is the normal default, 700 is bold, 800 is heavy. */
+    private int verseWeight = 400;
 
     private void changeVerseSize(float delta) {
         verseTextSp = Math.max(14f, Math.min(28f, verseTextSp + delta));
+        saveVerseStyle();
         renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+    }
+
+    /** B- removes weight (lighter text), B+ adds weight (bolder text). Size and weight are independent. */
+    private void changeVerseWeight(int delta) {
+        verseWeight = Math.max(300, Math.min(800, verseWeight + delta));
+        saveVerseStyle();
+        renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+    }
+
+    private android.graphics.Typeface verseTypeface() {
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            return Typeface.create(Typeface.SERIF, verseWeight, false);
+        }
+        return verseWeight >= 600 ? Typeface.create(Typeface.SERIF, Typeface.BOLD) : Typeface.create(Typeface.SERIF, Typeface.NORMAL);
+    }
+
+    private void saveVerseStyle() {
+        try {
+            getContext().getSharedPreferences(PREFS_READER, Context.MODE_PRIVATE).edit()
+                    .putFloat("verse_sp", verseTextSp)
+                    .putInt("verse_weight", verseWeight)
+                    .apply();
+        } catch (Exception ignored) {
+            // Preferences unavailable: the size and weight still apply for this session.
+        }
     }
 
     private void updateHeaderTitle() {
@@ -994,7 +1036,7 @@ public class BibleReaderDialog extends Dialog {
         TextView tvVerseText = new TextView(getContext());
         tvVerseText.setText(sb);
         tvVerseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, verseTextSp);
-        tvVerseText.setTypeface(Typeface.SERIF);
+        tvVerseText.setTypeface(verseTypeface());
         if (interlinearVersion && !isSearchResult) {
             tvVerseText.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
         }
@@ -1708,17 +1750,49 @@ public class BibleReaderDialog extends Dialog {
         dismissNotesPanel();
         cardKind = kind;
         final android.view.ScaleGestureDetector[] pinch = new android.view.ScaleGestureDetector[1];
+        final boolean[] twoFingerActive = new boolean[1];
+        final float[] twoFingerLast = new float[2];
         final LinearLayout panel = new LinearLayout(getContext()) {
             @Override
             public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
-                // The card owns every touch that lands on it, so nothing reaches the verses behind it,
-                // and two fingers on it resize the card.
+                // The card owns every touch that lands on it, so nothing reaches the verses behind it.
+                // Two fingers on the card drag it (the middle of the two fingers follows the card),
+                // and spreading or pinching them resizes it. One finger still scrolls the list inside.
                 if (pinch[0] != null) {
                     pinch[0].onTouchEvent(ev);
-                    if (pinch[0].isInProgress()) {
-                        getParent().requestDisallowInterceptTouchEvent(true);
-                        return true;
+                }
+                int action = ev.getActionMasked();
+                if (ev.getPointerCount() >= 2) {
+                    float cx = 0f;
+                    float cy = 0f;
+                    for (int i = 0; i < ev.getPointerCount(); i++) {
+                        cx += ev.getRawX(i);
+                        cy += ev.getRawY(i);
                     }
+                    cx /= ev.getPointerCount();
+                    cy /= ev.getPointerCount();
+                    if (!twoFingerActive[0]) {
+                        // Stop the list from scrolling with the first finger before the second one lands.
+                        android.view.MotionEvent cancel = android.view.MotionEvent.obtain(ev);
+                        cancel.setAction(android.view.MotionEvent.ACTION_CANCEL);
+                        super.dispatchTouchEvent(cancel);
+                        cancel.recycle();
+                        twoFingerActive[0] = true;
+                        twoFingerLast[0] = cx;
+                        twoFingerLast[1] = cy;
+                    } else if (action == android.view.MotionEvent.ACTION_MOVE
+                            && (pinch[0] == null || !pinch[0].isInProgress())) {
+                        setTranslationX(getTranslationX() + cx - twoFingerLast[0]);
+                        setTranslationY(getTranslationY() + cy - twoFingerLast[1]);
+                    }
+                    twoFingerLast[0] = cx;
+                    twoFingerLast[1] = cy;
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    return true;
+                }
+                twoFingerActive[0] = false;
+                if (pinch[0] != null && pinch[0].isInProgress()) {
+                    return true;
                 }
                 super.dispatchTouchEvent(ev);
                 return true;
