@@ -1960,10 +1960,14 @@ public class BibleReaderDialog extends Dialog {
         for (final String name : frequentColours()) {
             HighlightColors.Colour colour = HighlightColors.byName(name);
             if (colour != null) {
-                row.addView(swatchView(colour.swatch, name.equals(current), v -> {
+                View dot = swatchView(colour.swatch, name.equals(current), v -> {
                     recordColourUse(name);
                     onPick.accept(name);
-                }));
+                });
+                LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(36), dp(36));
+                dotLp.setMargins(dp(6), dp(4), dp(6), dp(4));
+                dot.setLayoutParams(dotLp);
+                row.addView(dot);
             }
         }
         if (allowRemove && onRemove != null) {
@@ -1979,7 +1983,7 @@ public class BibleReaderDialog extends Dialog {
         final View spectrum = new View(getContext());
         GradientDrawable hues = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
                 0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000});
-        hues.setCornerRadius(dp(10));
+        hues.setCornerRadius(dp(7));
         spectrum.setBackground(hues);
         spectrum.setContentDescription("Pick any colour from the spectrum");
         spectrum.setOnTouchListener((v, event) -> {
@@ -1996,8 +2000,8 @@ public class BibleReaderDialog extends Dialog {
             }
             return true;
         });
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(260), dp(20));
-        lp.setMargins(0, dp(8), 0, dp(4));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(240), dp(14));
+        lp.setMargins(0, dp(10), 0, dp(6));
         spectrum.setLayoutParams(lp);
         return spectrum;
     }
