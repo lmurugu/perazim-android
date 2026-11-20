@@ -58,7 +58,9 @@ def contextual_gloss(text):
 # Reading fixes where the translators' context gloss is wrong for a very common word. Keyed by Strong's
 # number; applied to every occurrence. Checked against standard English readings of Gen 1:1, John 1:1 and
 # Psalm 23:1; the ESV and NASB text itself is not bundled.
-GREEK_OVERRIDES = {1722: "in", 4314: "with", 1064: "in_womb"}  # en, pros (πρὸς), gastrí (γαστρί)
+GREEK_OVERRIDES = {1722: "in", 4314: "with", 1064: "womb"}  # en, pros (πρὸς), gastrí (γαστρί)
+# English does not put "the" before these names, so the article before them gets no gloss.
+NO_ARTICLE_BEFORE = {2316, 2424}  # theos (God), Iēsous (Jesus)
 PRONOUN_1 = {"G": "our", "D": "us", "A": "us", "N": "we"}
 PRONOUN_2 = {"G": "your", "D": "you", "A": "you", "N": "you"}
 HEBREW_OVERRIDES = {7462: ("", "shepherd")}  # ro'eh (רֹעֶה), shepherd/tend
@@ -129,8 +131,9 @@ def apply(path, step_rows, books, hebrew):
                     empty = f[4] in ("", "-")
                     if not hebrew and number in GREEK_OVERRIDES:
                         f[4] = GREEK_OVERRIDES[number]
-                    elif not hebrew and empty and f[2].startswith("T-"):
-                        f[4] = "the"
+                    elif not hebrew and f[2].startswith("T-") and f[4] in ("", "-", "the"):
+                        nxt = cell_list[i + 1].split("|") if i + 1 < len(cell_list) else ["", "0"]
+                        f[4] = "-" if int(nxt[1] or 0) in NO_ARTICLE_BEFORE else "the"
                     elif not hebrew and empty and f[2].startswith("P-1") and len(f[2]) >= 4:
                         f[4] = PRONOUN_1.get(f[2][3], "")
                     elif not hebrew and empty and f[2].startswith("P-2") and len(f[2]) >= 4:
