@@ -1038,7 +1038,10 @@ public class BibleReaderDialog extends Dialog {
         tvVerseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, verseTextSp);
         tvVerseText.setTypeface(verseTypeface());
         if (interlinearVersion && !isSearchResult) {
+            // Selecting words opens their dictionary entry; selecting a range or the whole verse opens the verse menu.
+            tvVerseText.setTextIsSelectable(true);
             tvVerseText.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+            tvVerseText.setCustomSelectionActionModeCallback(interlinearSelectionCallback(tvVerseText, verse));
         }
         tvVerseText.setTextColor(verseInk());
         tvVerseText.setLineSpacing(0f, 1.45f);
@@ -1134,8 +1137,6 @@ public class BibleReaderDialog extends Dialog {
             if (m.start() > last) {
                 sb.append(text.substring(last, m.start()));
             }
-            // The original word is smaller, regular weight and muted, so it reads as a marker beside the English.
-            // The Hebrew or Greek is isolated (FSI...PDI) so the right-to-left script cannot pull the braces out of place.
             String token = m.group(1);
             String code = "";
             int bar = token.indexOf('|');
@@ -1143,60 +1144,119 @@ public class BibleReaderDialog extends Dialog {
                 code = token.substring(bar + 1);
                 token = token.substring(0, bar);
             }
+            int wordStart = sb.length();
+            // The original word: smaller, regular weight, muted and underlined. Isolated (FSI...PDI) for right-to-left text.
             int braceStart = sb.length();
             sb.append('{').append('\u2068').append(token).append('\u2069').append('}');
             int braceEnd = sb.length();
-            final int strongsNumber = parseStrongsNumber(code);
-            if (strongsNumber > 0) {
-                // Tap the original word, or its English gloss, to open the Strong's dictionary entry.
-                final String strongsCode = code;
-                sb.setSpan(new android.text.style.ClickableSpan() {
-                    @Override
-                    public void onClick(android.view.View widget) {
-                        showStrongsDialog(strongsCode, strongsNumber);
-                    }
-
-                    @Override
-                    public void updateDrawState(android.text.TextPaint ds) {
-                        ds.setUnderlineText(true);
-                        ds.setColor(cardAccent());
-                    }
-                }, braceStart, braceEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
             sb.setSpan(new android.text.style.StyleSpan(Typeface.NORMAL), braceStart, braceEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new android.text.style.RelativeSizeSpan(0.8f), braceStart, braceEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new android.text.style.ForegroundColorSpan(GlassKit.muted()), braceStart, braceEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.UnderlineSpan(), braceStart, braceEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append(' ');
-            // The English gloss is bold and a little larger, so it is the first thing the eye reads.
+            // The English gloss: bold and a little larger, so it is the first thing the eye reads.
             int glossStart = sb.length();
             sb.append(m.group(2).trim());
             int glossEnd = sb.length();
-            if (strongsNumber > 0 && glossEnd > glossStart) {
-                final String glossCode = code;
-                sb.setSpan(new android.text.style.ClickableSpan() {
-                    @Override
-                    public void onClick(android.view.View widget) {
-                        showStrongsDialog(glossCode, strongsNumber);
-                    }
-
-                    @Override
-                    public void updateDrawState(android.text.TextPaint ds) {
-                        ds.setUnderlineText(false);
-                    }
-                }, glossStart, glossEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
             sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), glossStart, glossEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new android.text.style.RelativeSizeSpan(1.15f), glossStart, glossEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // One span covers the whole word, so a tap on either part opens its dictionary entry.
+            int number = parseStrongsNumber(code);
+            if (number > 0 && glossEnd > wordStart) {
+                sb.setSpan(new InterlinearWordSpan(code, number), wordStart, glossEnd,
+                        android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
             sb.append(' ');
             last = m.end();
         }
         if (last < text.length()) {
             sb.append(text.substring(last));
+        }
+    }
+
+    /** Chooses the action from the selection: one word opens its dictionary entry, anything wider opens the verse menu. */
+    private android.view.ActionMode.Callback interlinearSelectionCallback(final TextView tv, final BibleVerse verse) {
+        return new android.view.ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                int start = tv.getSelectionStart();
+                int end = tv.getSelectionEnd();
+                if (start < 0 || end <= start || !(tv.getText() instanceof android.text.Spannable)) {
+                    return false;
+                }
+                final android.text.Spannable text = (android.text.Spannable) tv.getText();
+                InterlinearWordSpan[] words = text.getSpans(start, end, InterlinearWordSpan.class);
+                InterlinearWordSpan only = null;
+                if (words.length == 1 && start >= text.getSpanStart(words[0]) && end <= text.getSpanEnd(words[0])) {
+                    only = words[0];
+                }
+                final InterlinearWordSpan single = only;
+                // Clear the selection first, so the card opens on a clean verse.
+                tv.post(() -> {
+                    android.text.Selection.removeSelection(text);
+                    if (single != null) {
+                        showStrongsDialog(single.code, single.number);
+                    } else {
+                        showVerseActionBar(verse);
+                    }
+                });
+                return false;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(android.view.ActionMode mode, android.view.MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(android.view.ActionMode mode) {
+            }
+        };
+    }
+
+    /** Size scale for the word cards: follows the verse A- / A+ setting (18 is the default). */
+    private float cardScale() {
+        return verseTextSp / 18f;
+    }
+
+    /** Typeface for the word cards: follows the verse B- / B+ setting. */
+    private android.graphics.Typeface cardTypeface(String family, int weight) {
+        int w = Math.max(300, Math.min(900, weight));
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            return Typeface.create(Typeface.create(family, Typeface.NORMAL), w, false);
+        }
+        return w >= 600 ? Typeface.create(family, Typeface.BOLD) : Typeface.create(family, Typeface.NORMAL);
+    }
+
+    /** A tappable interlinear word: opens its Strong's entry when it is tapped or selected on its own. */
+    private final class InterlinearWordSpan extends android.text.style.ClickableSpan {
+        final String code;
+        final int number;
+
+        InterlinearWordSpan(String code, int number) {
+            this.code = code;
+            this.number = number;
+        }
+
+        @Override
+        public void onClick(android.view.View widget) {
+            showStrongsDialog(code, number);
+        }
+
+        @Override
+        public void updateDrawState(android.text.TextPaint ds) {
+            ds.setUnderlineText(false);
         }
     }
 
@@ -1630,8 +1690,8 @@ public class BibleReaderDialog extends Dialog {
 
         TextView original = new TextView(getContext());
         original.setText("{" + word.getOriginal() + "}");
-        original.setTypeface(Typeface.SERIF, Typeface.NORMAL);
-        original.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        original.setTypeface(cardTypeface("serif", verseWeight));
+        original.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16 * cardScale());
         original.setTextColor(notesInk());
         original.setGravity(Gravity.CENTER);
         original.setTextDirection(hebrew ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
@@ -1640,15 +1700,16 @@ public class BibleReaderDialog extends Dialog {
         TextView translit = new TextView(getContext());
         translit.setText(word.getTransliteration());
         translit.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-        translit.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        translit.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12 * cardScale());
         translit.setTextColor(notesMuted());
         translit.setGravity(Gravity.CENTER);
         column.addView(translit);
 
         TextView gloss = new TextView(getContext());
         gloss.setText(word.getGloss().isEmpty() ? "\u2014" : word.getGloss());
-        gloss.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
-        gloss.setTypeface(Typeface.DEFAULT_BOLD);
+        gloss.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19 * cardScale());
+        // The English is bold by default; the B- / B+ setting moves it lighter or heavier.
+        gloss.setTypeface(cardTypeface("sans-serif", verseWeight + 300));
         gloss.setTextColor(notesInk());
         gloss.setGravity(Gravity.CENTER);
         gloss.setPadding(0, dp(4), 0, dp(4));
@@ -1659,7 +1720,7 @@ public class BibleReaderDialog extends Dialog {
             final int number = word.getStrongsNumber();
             TextView strongs = new TextView(getContext());
             strongs.setText("{" + code + "}");
-            strongs.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            strongs.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12 * cardScale());
             strongs.setTextColor(cardAccent());
             strongs.setPaintFlags(strongs.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
             strongs.setGravity(Gravity.CENTER);
@@ -1672,7 +1733,7 @@ public class BibleReaderDialog extends Dialog {
 
         TextView parsing = new TextView(getContext());
         parsing.setText(word.getParsing().isEmpty() ? word.getMorphology() : word.getParsing());
-        parsing.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        parsing.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11 * cardScale());
         parsing.setTextColor(notesMuted());
         parsing.setGravity(Gravity.CENTER);
         parsing.setPadding(0, dp(4), 0, 0);
@@ -1693,7 +1754,8 @@ public class BibleReaderDialog extends Dialog {
             } else {
                 def.setText("No dictionary entry for " + code + " in the bundled Strong's dictionary.");
             }
-            def.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            def.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14 * cardScale());
+            def.setTypeface(cardTypeface("sans-serif", verseWeight));
             def.setTextColor(notesInk());
             def.setLineSpacing(0f, 1.3f);
             box.addView(def);
@@ -1712,7 +1774,8 @@ public class BibleReaderDialog extends Dialog {
             }
             TextView list = new TextView(getContext());
             list.setText(refs.length() == 0 ? "None" : refs.toString());
-            list.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            list.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13 * cardScale());
+            list.setTypeface(cardTypeface("sans-serif", verseWeight));
             list.setTextColor(notesMuted());
             list.setLineSpacing(0f, 1.3f);
             box.addView(list);
