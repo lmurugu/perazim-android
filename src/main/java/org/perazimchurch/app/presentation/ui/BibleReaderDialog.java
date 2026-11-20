@@ -1554,7 +1554,8 @@ public class BibleReaderDialog extends Dialog {
     private void styleHighlightIcon(ImageView icon, boolean on) {
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(on ? 0x33E17D2F : 0x00000000);
+        // Translucent circle behind each tool, as on the verse action bar: dark on a dark phone, light on a light one.
+        circle.setColor(on ? 0x33E17D2F : (phoneIsDark() ? 0x59000000 : 0x59FFFFFF));
         icon.setBackground(circle);
         // Dark ink on the light theme, bright ink on the dark theme; the on state stays orange.
         icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : (phoneIsDark() ? 0xFFF1EAFB : 0xFF2A1B3D));
