@@ -334,13 +334,33 @@ public class RoomBibleRepository implements BibleRepository {
                     text.append(' ');
                 }
                 text.append('{').append(word.getOriginal()).append("} ");
-                text.append(word.getGloss().isEmpty() ? "\u2014" : word.getGloss());
+                text.append(englishGloss(word));
             }
             BibleVerse verse = BibleMapper.toDomain(entity, translationId, bookId);
             verse.setText(text.toString());
             verses.add(verse);
         }
         return verses;
+    }
+
+    /** The English shown in bold: the gloss if it is English, else the transliteration, else a dash. */
+    private static String englishGloss(InterlinearWord word) {
+        String gloss = word.getGloss() == null ? "" : word.getGloss().trim();
+        if (containsLatin(gloss)) {
+            return gloss;
+        }
+        String translit = word.getTransliteration() == null ? "" : word.getTransliteration().trim();
+        return containsLatin(translit) ? translit : "\u2014";
+    }
+
+    private static boolean containsLatin(String value) {
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<InterlinearWord> interlinearWords(boolean greek, int bookNumber, int chapterNumber, int verseNumber) {
