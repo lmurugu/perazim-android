@@ -923,11 +923,14 @@ public class BibleReaderDialog extends Dialog {
         for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
             addSwatchRow(list, shadeRow);
         }
-        TextView done = GlassKit.orangeButton(getContext(), "Done", 13);
+        TextView done = GlassKit.orangeButton(getContext(), "Done", 14);
+        done.setPadding(dp(28), 0, dp(28), 0);
         done.setOnClickListener(v -> dismissNotesPanel());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, dp(38));
-        lp.topMargin = dp(10);
-        list.addView(done, lp);
+        LinearLayout doneRow = new LinearLayout(getContext());
+        doneRow.setGravity(Gravity.CENTER);
+        doneRow.addView(done, new LinearLayout.LayoutParams(-2, dp(40)));
+        LinearLayout.LayoutParams rowLp = GlassKit.matchWrap(getContext(), 10);
+        list.addView(doneRow, rowLp);
     }
 
     private void addSwatchRow(LinearLayout list, List<HighlightColors.Colour> colours) {
