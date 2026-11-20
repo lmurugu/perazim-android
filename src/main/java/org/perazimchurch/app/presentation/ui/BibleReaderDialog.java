@@ -1077,8 +1077,11 @@ public class BibleReaderDialog extends Dialog {
             if (m.start() > last) {
                 sb.append(text.substring(last, m.start()));
             }
+            int braceStart = sb.length();
             sb.append('{').append(m.group(1)).append('}');
-            int braceEnd = sb.length();
+            // Keep the original in regular weight even when the reader has chosen bolder verse text.
+            sb.setSpan(new android.text.style.StyleSpan(Typeface.NORMAL), braceStart, sb.length(),
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append(' ');
             int glossStart = sb.length();
             sb.append(m.group(2).trim());
