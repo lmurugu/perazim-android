@@ -1961,66 +1961,76 @@ public class BibleReaderDialog extends Dialog {
         // State: hue in degrees, saturation 0..1, intensity position 0 (dark) .. 1 (washed out).
         final float[] st = {hsv[0], hsv[1], Math.max(0f, Math.min(1f, 0.5f * (hsv[2] - 0.35f) / 0.65f))};
 
-        LinearLayout panel = new LinearLayout(getContext());
-        panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setGravity(Gravity.CENTER_HORIZONTAL);
-        panel.setPadding(dp(8), dp(4), dp(8), dp(4));
+        // Frosted, slightly curved card with a single row: two strips on the left, colour circles on the right.
+        LinearLayout card = new LinearLayout(getContext());
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setPadding(dp(12), dp(4), dp(12), dp(4));
+        GradientDrawable frost = new GradientDrawable();
+        frost.setCornerRadius(dp(12));
+        frost.setColor(0x80FFFFFF);
+        frost.setStroke(dp(1), 0xD9FFFFFF);
+        card.setBackground(frost);
 
-        final TrackSlider[] bars = new TrackSlider[3];
+        final TrackSlider[] bars = new TrackSlider[2];
         final Runnable[] refresh = new Runnable[1];
         refresh[0] = () -> {
             int colour = intensityColour(st[0], st[1], st[2]);
-            bars[0].update(st[0] / 360f, hueStops(), hsvInt(st[0], 1f, 1f));
-            bars[1].update(st[1], new int[]{hsvInt(st[0], 0f, 0.92f), hsvInt(st[0], 1f, 1f)}, colour);
-            bars[2].update(st[2], intensityStops(st[0], st[1]), colour);
+            bars[0].update(st[0] / 360f, hueStops(), COLOR_PICKER_THUMB);
+            bars[1].update(st[2], intensityStops(st[0], st[1]), COLOR_PICKER_THUMB);
+            bars[1].setTag(colour);
         };
+        LinearLayout strips = new LinearLayout(getContext());
+        strips.setOrientation(LinearLayout.VERTICAL);
+        strips.setGravity(Gravity.CENTER_VERTICAL);
         bars[0] = new TrackSlider(getContext(), st[0] / 360f, (f, done) -> {
             st[0] = f * 360f;
             refresh[0].run();
         });
-        bars[1] = new TrackSlider(getContext(), st[1], (f, done) -> {
-            st[1] = f;
-            refresh[0].run();
-        });
-        bars[2] = new TrackSlider(getContext(), st[2], (f, done) -> {
+        bars[1] = new TrackSlider(getContext(), st[2], (f, done) -> {
             st[2] = f;
             refresh[0].run();
         });
         for (TrackSlider bar : bars) {
-            panel.addView(bar, GlassKit.matchWrap(getContext(), 0));
+            strips.addView(bar, new LinearLayout.LayoutParams(0, dp(14), 1f));
         }
+        card.addView(strips, new LinearLayout.LayoutParams(0, -2, 1f));
         refresh[0].run();
 
-        LinearLayout presets = new LinearLayout(getContext());
-        presets.setOrientation(LinearLayout.HORIZONTAL);
-        presets.setGravity(Gravity.CENTER);
+        LinearLayout dots = new LinearLayout(getContext());
+        dots.setOrientation(LinearLayout.HORIZONTAL);
+        dots.setGravity(Gravity.CENTER_VERTICAL);
         for (final String name : frequentColours()) {
             HighlightColors.Colour colour = HighlightColors.byName(name);
             if (colour == null) {
                 continue;
             }
-            View dot = swatchView(colour.swatch, name.equals(current), v -> {
+            final boolean chosen = name.equals(current);
+            View dot = swatchView(colour.swatch, false, v -> {
                 recordColourUse(name);
                 onPick.accept(name);
             });
-            LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(30), dp(30));
-            dotLp.setMargins(dp(5), dp(4), dp(5), dp(4));
+            LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(14), dp(14));
+            dotLp.setMargins(dp(4), 0, dp(4), 0);
             dot.setLayoutParams(dotLp);
-            presets.addView(dot);
+            // The chosen circle grows to 1.5 times its size instead of showing a ring.
+            dot.setScaleX(chosen ? 1.5f : 1f);
+            dot.setScaleY(chosen ? 1.5f : 1f);
+            dots.addView(dot);
         }
         if (allowRemove && onRemove != null) {
-            presets.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
+            dots.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
         }
         ImageView apply = new ImageView(getContext());
         apply.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_check);
         apply.setContentDescription("Apply this colour");
-        apply.setPadding(dp(6), dp(6), dp(6), dp(6));
+        apply.setPadding(dp(3), dp(3), dp(3), dp(3));
         GradientDrawable applyBg = new GradientDrawable();
         applyBg.setShape(GradientDrawable.OVAL);
         applyBg.setColor(COLOR_ACCENT_ORANGE());
         apply.setBackground(applyBg);
-        LinearLayout.LayoutParams applyLp = new LinearLayout.LayoutParams(dp(34), dp(34));
-        applyLp.setMargins(dp(8), dp(4), dp(2), dp(4));
+        LinearLayout.LayoutParams applyLp = new LinearLayout.LayoutParams(dp(14), dp(14));
+        applyLp.setMargins(dp(4), 0, 0, 0);
         apply.setLayoutParams(applyLp);
         apply.setOnClickListener(v -> {
             int rgb = intensityColour(st[0], st[1], st[2]);
@@ -2028,13 +2038,16 @@ public class BibleReaderDialog extends Dialog {
             recordColourUse(hex);
             onPick.accept(hex);
         });
-        presets.addView(apply);
-        LinearLayout.LayoutParams presetsLp = GlassKit.matchWrap(getContext(), 8);
-        panel.addView(presets, presetsLp);
-        return panel;
+        dots.addView(apply);
+        card.addView(dots, new LinearLayout.LayoutParams(-2, -2));
+        return card;
     }
 
-    /** A slim track with a round thumb. The gradient is the track; the thumb shows the current colour. */
+    /** Dark purple slider thumbs with a soft glow, as in the chosen picker design. */
+    private static final int COLOR_PICKER_THUMB = 0xFF4A1D6E;
+    private static final int COLOR_PICKER_GLOW = 0xCC9C4DFF;
+
+    /** A thin strip with a round thumb. The gradient is the strip; the thumb is dark purple with a glow. */
     private static final class TrackSlider extends View {
         interface Listener {
             void onMove(float value, boolean done);
@@ -2042,7 +2055,7 @@ public class BibleReaderDialog extends Dialog {
 
         private float value;
         private int[] stops = {0xFF000000, 0xFFFFFFFF};
-        private int thumbFill = 0xFFFFFFFF;
+        private int thumbFill = COLOR_PICKER_THUMB;
         private final Listener listener;
         private final float density;
         private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
@@ -2062,14 +2075,9 @@ public class BibleReaderDialog extends Dialog {
         }
 
         @Override
-        protected void onMeasure(int widthSpec, int heightSpec) {
-            setMeasuredDimension(android.view.View.MeasureSpec.getSize(widthSpec), (int) (30 * density));
-        }
-
-        @Override
         protected void onDraw(android.graphics.Canvas canvas) {
-            float inset = 11 * density;
-            float trackH = 9 * density;
+            float inset = 4 * density;
+            float trackH = 3 * density;
             float cy = getHeight() / 2f;
             android.graphics.RectF track = new android.graphics.RectF(inset, cy - trackH / 2, getWidth() - inset, cy + trackH / 2);
             paint.setShader(new android.graphics.LinearGradient(track.left, 0, track.right, 0, stops, null,
@@ -2077,10 +2085,10 @@ public class BibleReaderDialog extends Dialog {
             canvas.drawRoundRect(track, trackH / 2, trackH / 2, paint);
             paint.setShader(null);
             float x = track.left + value * track.width();
-            paint.setColor(0xFFFFFFFF);
-            canvas.drawCircle(x, cy, 11 * density, paint);
+            paint.setShadowLayer(4 * density, 0, 0, COLOR_PICKER_GLOW);
             paint.setColor(thumbFill);
-            canvas.drawCircle(x, cy, 8 * density, paint);
+            canvas.drawCircle(x, cy, 3.5f * density, paint);
+            paint.clearShadowLayer();
         }
 
         @Override
@@ -2091,7 +2099,7 @@ public class BibleReaderDialog extends Dialog {
             }
             if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
                     || action == android.view.MotionEvent.ACTION_UP || action == android.view.MotionEvent.ACTION_CANCEL) {
-                float inset = 11 * density;
+                float inset = 4 * density;
                 float span = Math.max(1f, getWidth() - 2 * inset);
                 value = Math.max(0f, Math.min(1f, (ev.getX() - inset) / span));
                 invalidate();
