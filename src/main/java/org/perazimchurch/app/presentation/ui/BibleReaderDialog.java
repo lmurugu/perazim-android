@@ -1992,7 +1992,7 @@ public class BibleReaderDialog extends Dialog {
             refresh[0].run();
         });
         for (TrackSlider bar : bars) {
-            strips.addView(bar, new LinearLayout.LayoutParams(0, dp(14), 1f));
+            strips.addView(bar, new LinearLayout.LayoutParams(-1, dp(14)));
         }
         card.addView(strips, new LinearLayout.LayoutParams(0, -2, 1f));
         refresh[0].run();
