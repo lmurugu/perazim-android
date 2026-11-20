@@ -150,8 +150,10 @@ public class OfflineAssistantQaTest {
     }
 
     /**
-     * Confirmed gap. An evidence item that marks itself APPROVED_OFFICIAL and citable, yet is superseded,
-     * still satisfies the official-claim provenance check, because the check trusts the item's own metadata.
+     * Engine-level gap (defence in depth). officialClaimHasApprovedProvenance trusts the authorityClass field on
+     * each evidence item. On ai/s1-governance and later, retrieval sets authorityClass from the manifest, so the
+     * item reaching this check is governed. This test still fails because the check does not look at supersession
+     * itself. Remove @Ignore only after the check also rejects superseded or revoked items.
      */
     @Ignore("KNOWN GAP: provenance check trusts self-declared authorityClass on superseded items")
     @Test
