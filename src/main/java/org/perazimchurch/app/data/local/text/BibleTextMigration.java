@@ -86,7 +86,15 @@ public final class BibleTextMigration {
             db.getOpenHelper().getWritableDatabase().execSQL("VACUUM");
             // In write-ahead mode the rewritten file only shrinks once the log is merged back and truncated.
             android.database.Cursor checkpoint = db.getOpenHelper().getWritableDatabase().query("PRAGMA wal_checkpoint(TRUNCATE)");
+            if (checkpoint.moveToFirst()) {
+                Log.i(TAG, "wal_checkpoint busy=" + checkpoint.getInt(0) + " log=" + checkpoint.getInt(1) + " checkpointed=" + checkpoint.getInt(2));
+            }
             checkpoint.close();
+            android.database.Cursor pages = db.getOpenHelper().getWritableDatabase().query("PRAGMA page_count");
+            if (pages.moveToFirst()) {
+                Log.i(TAG, "page_count after vacuum=" + pages.getInt(0));
+            }
+            pages.close();
             Log.i(TAG, "Private database compacted from " + before + " to " + file.length() + " bytes");
         }
     }
