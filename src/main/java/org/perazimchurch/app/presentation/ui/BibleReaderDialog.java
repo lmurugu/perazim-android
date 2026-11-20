@@ -2232,6 +2232,207 @@ public class BibleReaderDialog extends Dialog {
     }
 
     /** Shows the same verse in every readable translation, one under the other. */
+    /**
+     * The frosted card used by the book picker, the chapter picker and Compare. It matches the Notes card:
+     * the same glass, the same fonts and the same colours in light and dark mode.
+     */
+    private android.app.Dialog openCardDialog(String titleText, @Nullable String sub, View content,
+                                              @Nullable String backLabel, @Nullable Runnable onBack) {
+        final android.app.Dialog dialog = new android.app.Dialog(getContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        LinearLayout card = new LinearLayout(getContext());
+        GlassKit.keep(card);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(18), dp(14), dp(18), dp(14));
+        GradientDrawable glass = new GradientDrawable();
+        glass.setCornerRadius(dp(24));
+        glass.setColor(GlassKit.light() ? Color.parseColor("#FF140B20") : Color.parseColor("#FFFFFF"));
+        glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
+        card.setBackground(glass);
+
+        LinearLayout header = new LinearLayout(getContext());
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.addView(GlassKit.text(getContext(), titleText, 16, true, notesInk()), new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView close = GlassKit.text(getContext(), "✕", 16, true, notesMuted());
+        close.setPadding(dp(12), dp(4), dp(4), dp(4));
+        close.setOnClickListener(v -> dialog.dismiss());
+        header.addView(close);
+        card.addView(header);
+        if (sub != null) {
+            TextView subtitle = GlassKit.text(getContext(), sub, 12, false, notesMuted());
+            subtitle.setPadding(0, dp(2), 0, dp(10));
+            card.addView(subtitle);
+        } else {
+            card.addView(new View(getContext()), new LinearLayout.LayoutParams(-1, dp(8)));
+        }
+        // The list scrolls inside the card, and the card never grows taller than about two thirds of the screen.
+        ScrollView scroll = new ScrollView(getContext()) {
+            @Override
+            protected void onMeasure(int widthSpec, int heightSpec) {
+                int cap = (int) (getResources().getDisplayMetrics().heightPixels * 0.62f);
+                super.onMeasure(widthSpec, View.MeasureSpec.makeMeasureSpec(cap, View.MeasureSpec.AT_MOST));
+            }
+        };
+        scroll.setVerticalScrollBarEnabled(false);
+        scroll.addView(content);
+        card.addView(scroll, new LinearLayout.LayoutParams(-1, -2));
+        if (backLabel != null && onBack != null) {
+            TextView back = GlassKit.text(getContext(), backLabel, 13, true, cardAccent());
+            back.setPadding(0, dp(12), 0, dp(2));
+            back.setOnClickListener(v -> {
+                dialog.dismiss();
+                onBack.run();
+            });
+            card.addView(back);
+        }
+        dialog.setContentView(card);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setDimAmount(0.5f);
+            dialog.getWindow().setLayout((int) (getContext().getResources().getDisplayMetrics().widthPixels * 0.92f),
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        dialog.show();
+        return dialog;
+    }
+
+    /** Accent for text on the Notes-style card: bright orange on the dark card, deep orange on the white card. */
+    private int cardAccent() {
+        return GlassKit.light() ? Color.parseColor("#FF8A2B") : Color.parseColor("#B8530F");
+    }
+
+    private GradientDrawable cardTile(boolean selected) {
+        GradientDrawable d = new GradientDrawable();
+        d.setCornerRadius(dp(14));
+        if (selected) {
+            d.setColor(Color.parseColor("#FF8A2B"));
+        } else {
+            d.setColor(GlassKit.light() ? Color.parseColor("#26FFFFFF") : Color.parseColor("#14000000"));
+        }
+        return d;
+    }
+
+    private void showBookSelectorDialog() {
+        final LinearLayout body = new LinearLayout(getContext());
+        body.setOrientation(LinearLayout.VERTICAL);
+
+        final LinearLayout tabs = new LinearLayout(getContext());
+        tabs.setOrientation(LinearLayout.HORIZONTAL);
+        final TextView tabOt = GlassKit.text(getContext(), "Old Testament", 13, true, notesInk());
+        final TextView tabNt = GlassKit.text(getContext(), "New Testament", 13, true, notesInk());
+        for (TextView t : new TextView[]{tabOt, tabNt}) {
+            t.setGravity(Gravity.CENTER);
+            t.setClickable(true);
+        }
+        LinearLayout.LayoutParams lpOt = new LinearLayout.LayoutParams(0, dp(38), 1f);
+        lpOt.setMargins(0, 0, dp(4), 0);
+        LinearLayout.LayoutParams lpNt = new LinearLayout.LayoutParams(0, dp(38), 1f);
+        lpNt.setMargins(dp(4), 0, 0, 0);
+        tabs.addView(tabOt, lpOt);
+        tabs.addView(tabNt, lpNt);
+        body.addView(tabs, GlassKit.matchWrap(getContext(), 0));
+
+        final LinearLayout list = new LinearLayout(getContext());
+        list.setOrientation(LinearLayout.VERTICAL);
+        body.addView(list, GlassKit.matchWrap(getContext(), 10));
+
+        final android.app.Dialog dialog = openCardDialog("Choose a book", "66 books, all available offline", body, null, null);
+        final Runnable showOt = () -> {
+            tabOt.setBackground(cardTile(true));
+            tabOt.setTextColor(Color.WHITE);
+            tabNt.setBackground(cardTile(false));
+            tabNt.setTextColor(notesInk());
+            populateBooksInContainer(list, "OLD", dialog);
+        };
+        final Runnable showNt = () -> {
+            tabNt.setBackground(cardTile(true));
+            tabNt.setTextColor(Color.WHITE);
+            tabOt.setBackground(cardTile(false));
+            tabOt.setTextColor(notesInk());
+            populateBooksInContainer(list, "NEW", dialog);
+        };
+        tabOt.setOnClickListener(v -> showOt.run());
+        tabNt.setOnClickListener(v -> showNt.run());
+        BibleBook current = bookMap.get(currentBookId);
+        if (current != null && "NEW".equalsIgnoreCase(current.getTestament())) {
+            showNt.run();
+        } else {
+            showOt.run();
+        }
+    }
+
+    private void populateBooksInContainer(LinearLayout container, String testament, final android.app.Dialog parentDialog) {
+        container.removeAllViews();
+        for (final BibleBook book : booksList) {
+            if (!testament.equalsIgnoreCase(book.getTestament())) {
+                continue;
+            }
+            boolean isCurrent = book.getId().equals(currentBookId);
+            LinearLayout itemRow = new LinearLayout(getContext());
+            itemRow.setOrientation(LinearLayout.HORIZONTAL);
+            itemRow.setGravity(Gravity.CENTER_VERTICAL);
+            itemRow.setPadding(dp(14), dp(11), dp(14), dp(11));
+            itemRow.setBackground(cardTile(false));
+            itemRow.setClickable(true);
+            LinearLayout.LayoutParams lp = GlassKit.matchWrap(getContext(), 0);
+            lp.bottomMargin = dp(6);
+            itemRow.setLayoutParams(lp);
+
+            TextView name = GlassKit.text(getContext(), book.getName(), 14, true, isCurrent ? cardAccent() : notesInk());
+            itemRow.addView(name, new LinearLayout.LayoutParams(0, -2, 1f));
+            itemRow.addView(GlassKit.text(getContext(), book.getChapterCount() + " ch", 12, false, notesMuted()));
+            itemRow.setOnClickListener(v -> {
+                parentDialog.dismiss();
+                showChapterSelectorGrid(book);
+            });
+            container.addView(itemRow);
+        }
+    }
+
+    private void showChapterSelectorGrid(final BibleBook book) {
+        final LinearLayout grid = new LinearLayout(getContext());
+        grid.setOrientation(LinearLayout.VERTICAL);
+        final android.app.Dialog[] holder = new android.app.Dialog[1];
+        int columns = 5;
+        int total = book.getChapterCount();
+        LinearLayout currentRow = null;
+        for (int ch = 1; ch <= total; ch++) {
+            if ((ch - 1) % columns == 0) {
+                currentRow = new LinearLayout(getContext());
+                currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams lpRow = GlassKit.matchWrap(getContext(), 0);
+                lpRow.bottomMargin = dp(8);
+                grid.addView(currentRow, lpRow);
+            }
+            final int chNum = ch;
+            boolean isCurrent = book.getId().equals(currentBookId) && chNum == currentChapter;
+            TextView cell = GlassKit.text(getContext(), String.valueOf(chNum), 14, true, isCurrent ? Color.WHITE : notesInk());
+            cell.setGravity(Gravity.CENTER);
+            cell.setBackground(cardTile(isCurrent));
+            cell.setClickable(true);
+            LinearLayout.LayoutParams lpCell = new LinearLayout.LayoutParams(0, dp(46), 1f);
+            lpCell.setMargins(dp(3), 0, dp(3), 0);
+            cell.setOnClickListener(v -> {
+                if (holder[0] != null) {
+                    holder[0].dismiss();
+                }
+                loadChapterVerses(book.getId(), chNum);
+            });
+            currentRow.addView(cell, lpCell);
+        }
+        if (currentRow != null) {
+            for (int i = currentRow.getChildCount(); i < columns; i++) {
+                View filler = new View(getContext());
+                LinearLayout.LayoutParams lpHolder = new LinearLayout.LayoutParams(0, dp(46), 1f);
+                lpHolder.setMargins(dp(3), 0, dp(3), 0);
+                currentRow.addView(filler, lpHolder);
+            }
+        }
+        holder[0] = openCardDialog(book.getName(), "Choose a chapter, 1 to " + total, grid,
+                "‹ Back to books", this::showBookSelectorDialog);
+    }
+
     private void showCompareDialog(final BibleVerse verse, final String citation) {
         bibleViewModel.loadReadableTranslations(translations -> {
             if (translations != null) {
@@ -2244,32 +2445,19 @@ public class BibleReaderDialog extends Dialog {
                 }
                 LinearLayout box = new LinearLayout(getContext());
                 box.setOrientation(LinearLayout.VERTICAL);
-                box.setPadding(dp(18), dp(8), dp(18), dp(12));
                 for (BibleVerse version : versions) {
                     String name = translationNames.get(version.getTranslationId());
-                    TextView head = new TextView(getContext());
-                    head.setText(version.getTranslationId() + (name != null ? " · " + name : ""));
-                    head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-                    head.setLetterSpacing(0.08f);
-                    head.setTypeface(Typeface.DEFAULT_BOLD);
-                    head.setTextColor(COLOR_PRIMARY_PURPLE());
+                    TextView head = GlassKit.text(getContext(),
+                            version.getTranslationId() + (name != null ? " · " + name : ""), 12, true, cardAccent());
+                    head.setLetterSpacing(0.06f);
                     head.setPadding(0, dp(12), 0, dp(4));
                     box.addView(head);
-                    TextView body = new TextView(getContext());
-                    body.setText(version.getText());
+                    TextView body = GlassKit.text(getContext(), version.getText(), 15, false, notesInk());
                     body.setTypeface(Typeface.SERIF);
-                    body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                    body.setTextColor(GlassKit.text());
                     body.setLineSpacing(0f, 1.35f);
                     box.addView(body);
                 }
-                ScrollView scroll = new ScrollView(getContext());
-                scroll.addView(box);
-                AppDialogs.builder(getContext())
-                        .setTitle(citation + " · Compare")
-                        .setView(scroll)
-                        .setPositiveButton("Close", null)
-                        .show();
+                openCardDialog(citation, "Compare translations", box, null, null);
             });
         });
     }
@@ -2321,253 +2509,6 @@ public class BibleReaderDialog extends Dialog {
     // =========================================================================
     // BOOK & CHAPTER SELECTOR DIALOGS
     // =========================================================================
-
-    private void showBookSelectorDialog() {
-        AlertDialog.Builder builder = AppDialogs.builder(getContext());
-
-        LinearLayout container = new LinearLayout(getContext());
-        container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(dp(16), dp(16), dp(16), dp(16));
-        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
-
-        // Header Title
-        TextView tvTitle = new TextView(getContext());
-        tvTitle.setText("📖 Select Book of the Bible");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        container.addView(tvTitle);
-
-        TextView tvSub = new TextView(getContext());
-        tvSub.setText("66-book catalog · KJV starter passages available offline");
-        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        tvSub.setPadding(0, dp(2), 0, dp(12));
-        container.addView(tvSub);
-
-        // Testament Tabs (Old Testament 39 · New Testament 27)
-        final LinearLayout tabsRow = new LinearLayout(getContext());
-        tabsRow.setOrientation(LinearLayout.HORIZONTAL);
-        tabsRow.setPadding(0, 0, 0, dp(10));
-
-        final Button btnTabOt = new Button(getContext());
-        btnTabOt.setText("Old Testament (39)");
-        btnTabOt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnTabOt.setTypeface(Typeface.DEFAULT_BOLD);
-        btnTabOt.setTextColor(COLOR_WHITE());
-        btnTabOt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE(), COLOR_PRIMARY_PURPLE()));
-        LinearLayout.LayoutParams lpOt = new LinearLayout.LayoutParams(0, dp(36), 1.0f);
-        lpOt.setMargins(0, 0, dp(4), 0);
-        btnTabOt.setLayoutParams(lpOt);
-        tabsRow.addView(btnTabOt);
-
-        final Button btnTabNt = new Button(getContext());
-        btnTabNt.setText("New Testament (27)");
-        btnTabNt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        btnTabNt.setTypeface(Typeface.DEFAULT_BOLD);
-        btnTabNt.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        btnTabNt.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-        LinearLayout.LayoutParams lpNt = new LinearLayout.LayoutParams(0, dp(36), 1.0f);
-        lpNt.setMargins(dp(4), 0, 0, 0);
-        btnTabNt.setLayoutParams(lpNt);
-        tabsRow.addView(btnTabNt);
-
-        container.addView(tabsRow);
-
-        // Books List ScrollView
-        ScrollView svBooks = new ScrollView(getContext());
-        LinearLayout.LayoutParams lpSv = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(380));
-        svBooks.setLayoutParams(lpSv);
-
-        final LinearLayout booksContainer = new LinearLayout(getContext());
-        booksContainer.setOrientation(LinearLayout.VERTICAL);
-        svBooks.addView(booksContainer);
-        container.addView(svBooks);
-
-        builder.setView(container);
-        builder.setNegativeButton("Cancel", null);
-        final AlertDialog bookDialog = builder.create();
-
-        // Render Books for Selected Testament
-        final Runnable renderBooksOt = () -> populateBooksInContainer(booksContainer, "OLD", bookDialog);
-        final Runnable renderBooksNt = () -> populateBooksInContainer(booksContainer, "NEW", bookDialog);
-
-        btnTabOt.setOnClickListener(v -> {
-            btnTabOt.setTextColor(COLOR_WHITE());
-            btnTabOt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE(), COLOR_PRIMARY_PURPLE()));
-            btnTabNt.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-            btnTabNt.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-            renderBooksOt.run();
-        });
-
-        btnTabNt.setOnClickListener(v -> {
-            btnTabNt.setTextColor(COLOR_WHITE());
-            btnTabNt.setBackground(createPillBg(COLOR_PRIMARY_PURPLE(), COLOR_PRIMARY_PURPLE()));
-            btnTabOt.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-            btnTabOt.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-            renderBooksNt.run();
-        });
-
-        // Default open to current book's testament
-        BibleBook current = bookMap.get(currentBookId);
-        boolean isCurrentNt = current != null && "NEW".equalsIgnoreCase(current.getTestament());
-        if (isCurrentNt) {
-            btnTabNt.performClick();
-        } else {
-            renderBooksOt.run();
-        }
-
-        bookDialog.show();
-    }
-
-    private void populateBooksInContainer(LinearLayout container, String testament, final AlertDialog parentDialog) {
-        container.removeAllViews();
-        List<BibleBook> filtered = new ArrayList<>();
-        for (BibleBook b : booksList) {
-            if (testament.equalsIgnoreCase(b.getTestament())) {
-                filtered.add(b);
-            }
-        }
-
-        for (final BibleBook book : filtered) {
-            LinearLayout itemRow = new LinearLayout(getContext());
-            itemRow.setOrientation(LinearLayout.HORIZONTAL);
-            itemRow.setGravity(Gravity.CENTER_VERTICAL);
-            itemRow.setPadding(dp(12), dp(10), dp(12), dp(10));
-
-            boolean isCurrent = book.getId().equals(currentBookId);
-            GradientDrawable bg = new GradientDrawable();
-            bg.setColor(isCurrent ? PerazimTheme.COLOR_SURFACE_2 : PerazimTheme.COLOR_SURFACE);
-            bg.setStroke(dp(1), isCurrent ? COLOR_PRIMARY_PURPLE() : PerazimTheme.COLOR_STROKE);
-            bg.setCornerRadius(dp(8));
-            itemRow.setBackground(bg);
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(0, 0, 0, dp(6));
-            itemRow.setLayoutParams(lp);
-
-            TextView tvBookName = new TextView(getContext());
-            tvBookName.setText(book.getName());
-            tvBookName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            tvBookName.setTypeface(Typeface.DEFAULT_BOLD);
-            tvBookName.setTextColor(isCurrent ? COLOR_ACCENT_ORANGE() : PerazimTheme.COLOR_TEXT_PRIMARY);
-            LinearLayout.LayoutParams lpName = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-            tvBookName.setLayoutParams(lpName);
-            itemRow.addView(tvBookName);
-
-            TextView tvChapters = new TextView(getContext());
-            tvChapters.setText(book.getChapterCount() + " ch");
-            tvChapters.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            tvChapters.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-            itemRow.addView(tvChapters);
-
-            itemRow.setOnClickListener(v -> {
-                parentDialog.dismiss();
-                showChapterSelectorGrid(book);
-            });
-
-            container.addView(itemRow);
-        }
-    }
-
-    private void showChapterSelectorGrid(final BibleBook book) {
-        AlertDialog.Builder builder = AppDialogs.builder(getContext());
-
-        LinearLayout container = new LinearLayout(getContext());
-        container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(dp(16), dp(16), dp(16), dp(16));
-        container.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
-
-        // Header Title
-        TextView tvTitle = new TextView(getContext());
-        tvTitle.setText("📖 " + book.getName() + " · Select Chapter");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        container.addView(tvTitle);
-
-        TextView tvSub = new TextView(getContext());
-        tvSub.setText("Select from 1 to " + book.getChapterCount() + " chapters");
-        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        tvSub.setPadding(0, dp(2), 0, dp(12));
-        container.addView(tvSub);
-
-        // Grid of Chapters inside ScrollView
-        ScrollView sv = new ScrollView(getContext());
-        LinearLayout.LayoutParams lpSv = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(350));
-        sv.setLayoutParams(lpSv);
-
-        LinearLayout gridContainer = new LinearLayout(getContext());
-        gridContainer.setOrientation(LinearLayout.VERTICAL);
-
-        builder.setView(container);
-        builder.setNegativeButton("Back to Books", (d, w) -> showBookSelectorDialog());
-        final AlertDialog chDialog = builder.create();
-
-        int columns = 5;
-        int total = book.getChapterCount();
-        LinearLayout currentRow = null;
-
-        for (int ch = 1; ch <= total; ch++) {
-            if ((ch - 1) % columns == 0) {
-                currentRow = new LinearLayout(getContext());
-                currentRow.setOrientation(LinearLayout.HORIZONTAL);
-                LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                lpRow.setMargins(0, 0, 0, dp(8));
-                currentRow.setLayoutParams(lpRow);
-                gridContainer.addView(currentRow);
-            }
-
-            final int chNum = ch;
-            boolean isCurrent = book.getId().equals(currentBookId) && chNum == currentChapter;
-
-            Button btnCh = new Button(getContext());
-            btnCh.setText(String.valueOf(chNum));
-            btnCh.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            btnCh.setTypeface(Typeface.DEFAULT_BOLD);
-            btnCh.setTextColor(COLOR_WHITE());
-
-            GradientDrawable btnBg = new GradientDrawable();
-            btnBg.setColor(isCurrent ? COLOR_PRIMARY_PURPLE() : PerazimTheme.COLOR_SURFACE_2);
-            btnBg.setStroke(dp(1), isCurrent ? COLOR_PRIMARY_PURPLE() : PerazimTheme.COLOR_STROKE);
-            btnBg.setCornerRadius(dp(8));
-            btnCh.setBackground(btnBg);
-
-            LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(0, dp(44), 1.0f);
-            lpBtn.setMargins(dp(3), 0, dp(3), 0);
-            btnCh.setLayoutParams(lpBtn);
-
-            btnCh.setOnClickListener(v -> {
-                chDialog.dismiss();
-                loadChapterVerses(book.getId(), chNum);
-            });
-            if (currentRow != null) {
-                currentRow.addView(btnCh);
-            }
-        }
-
-        // Fill remaining empty cells in last row for alignment
-        if (currentRow != null && currentRow.getChildCount() < columns) {
-            int remaining = columns - currentRow.getChildCount();
-            for (int i = 0; i < remaining; i++) {
-                View placeholder = new View(getContext());
-                LinearLayout.LayoutParams lpHolder = new LinearLayout.LayoutParams(0, dp(44), 1.0f);
-                lpHolder.setMargins(dp(3), 0, dp(3), 0);
-                placeholder.setLayoutParams(lpHolder);
-                currentRow.addView(placeholder);
-            }
-        }
-
-        sv.addView(gridContainer);
-        container.addView(sv);
-
-        chDialog.show();
-    }
 
     // =========================================================================
     // UI GRAPHICS & DRAWABLE HELPERS
