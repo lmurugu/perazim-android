@@ -56,5 +56,10 @@ background. Keep each prompt to the subject and the style above.
 ## Status
 
 - Briefs written: yes (this file).
-- Assets generated: not yet. Generation spends the account's credits, so these
-  will run after the briefs are reviewed.
+- Assets generated: yes. Each card uses a 256 px square PNG in
+  `src/main/res/drawable-nodpi/` (`game_art_*` and `game_char_*`).
+- Generator returned 16:9 frames. Images were centred-cropped to square where
+  the subject fit. Word search was regenerated at 1:1. Timeline does not fit a
+  centred square, so it is padded to square on its own lavender background.
+- Road to Jerusalem keeps its vector icon (`ic_game_road.xml`). Its generated
+  art was not produced, so no new asset exists for it.
