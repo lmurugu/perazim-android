@@ -995,6 +995,9 @@ public class BibleReaderDialog extends Dialog {
         tvVerseText.setText(sb);
         tvVerseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, verseTextSp);
         tvVerseText.setTypeface(Typeface.SERIF);
+        if (interlinearVersion && !isSearchResult) {
+            tvVerseText.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+        }
         tvVerseText.setTextColor(verseInk());
         tvVerseText.setLineSpacing(0f, 1.45f);
         GlassKit.keep(tvVerseText);
@@ -1066,6 +1069,18 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
+    /** Parses the number from a code such as H7626 or G3588. Returns 0 when there is no code. */
+    private static int parseStrongsNumber(String code) {
+        if (code == null || code.length() < 2) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(code.substring(1));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     /**
      * Interlinear version text: "{original} gloss" pairs. The English gloss is bold; the original sits inside
      * the braces in regular weight, so the reader sees the English first.
@@ -1079,9 +1094,33 @@ public class BibleReaderDialog extends Dialog {
             }
             // The original word is smaller, regular weight and muted, so it reads as a marker beside the English.
             // The Hebrew or Greek is isolated (FSI...PDI) so the right-to-left script cannot pull the braces out of place.
+            String token = m.group(1);
+            String code = "";
+            int bar = token.indexOf('|');
+            if (bar >= 0) {
+                code = token.substring(bar + 1);
+                token = token.substring(0, bar);
+            }
             int braceStart = sb.length();
-            sb.append('{').append('\u2068').append(m.group(1)).append('\u2069').append('}');
+            sb.append('{').append('\u2068').append(token).append('\u2069').append('}');
             int braceEnd = sb.length();
+            final int strongsNumber = parseStrongsNumber(code);
+            if (strongsNumber > 0) {
+                // Tap the original word, or its English gloss, to open the Strong's dictionary entry.
+                final String strongsCode = code;
+                sb.setSpan(new android.text.style.ClickableSpan() {
+                    @Override
+                    public void onClick(android.view.View widget) {
+                        showStrongsDialog(strongsCode, strongsNumber);
+                    }
+
+                    @Override
+                    public void updateDrawState(android.text.TextPaint ds) {
+                        ds.setUnderlineText(true);
+                        ds.setColor(cardAccent());
+                    }
+                }, braceStart, braceEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
             sb.setSpan(new android.text.style.StyleSpan(Typeface.NORMAL), braceStart, braceEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new android.text.style.RelativeSizeSpan(0.8f), braceStart, braceEnd,
@@ -1093,6 +1132,20 @@ public class BibleReaderDialog extends Dialog {
             int glossStart = sb.length();
             sb.append(m.group(2).trim());
             int glossEnd = sb.length();
+            if (strongsNumber > 0 && glossEnd > glossStart) {
+                final String glossCode = code;
+                sb.setSpan(new android.text.style.ClickableSpan() {
+                    @Override
+                    public void onClick(android.view.View widget) {
+                        showStrongsDialog(glossCode, strongsNumber);
+                    }
+
+                    @Override
+                    public void updateDrawState(android.text.TextPaint ds) {
+                        ds.setUnderlineText(false);
+                    }
+                }, glossStart, glossEnd, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
             sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), glossStart, glossEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.setSpan(new android.text.style.RelativeSizeSpan(1.15f), glossStart, glossEnd,
