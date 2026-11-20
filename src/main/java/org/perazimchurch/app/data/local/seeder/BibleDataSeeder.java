@@ -160,10 +160,6 @@ public final class BibleDataSeeder {
             return;
         }
 
-        // Full public-domain texts are imported on every call that has assets; the import is
-        // idempotent and returns at once when each bundled translation is already complete.
-        BibleTextImporter.importBundledTranslations(context, bibleDao);
-
         // 1. Check if default translation exists
         List<BibleTranslationEntity> existingTranslations = bibleDao.getTranslations();
         boolean hasDefault = false;
@@ -180,8 +176,12 @@ public final class BibleDataSeeder {
             // Check if 66 books and key breakthrough verse exist
             List<BibleBookEntity> existingBooks = bibleDao.getBooksByTranslation(DEFAULT_TRANSLATION_ID);
             BibleVerseEntity sampleVerse = bibleDao.getVerse(10, 5, 20); // 2 Samuel 5:20
-            if (existingBooks != null && existingBooks.size() >= 66 && sampleVerse != null
-                    && (context == null || bibleDao.getVerse("KJV", 66, 21, 27) != null)) {
+            // Once the KJV text lives in the separate text database, the starter rows are no longer needed here.
+            boolean kjvInTextDb = context != null
+                    && org.perazimchurch.app.data.local.text.BibleVerseReader.isReady(context, DEFAULT_TRANSLATION_ID);
+            if (existingBooks != null && existingBooks.size() >= 66
+                    && (kjvInTextDb || (sampleVerse != null
+                    && (context == null || bibleDao.getVerse("KJV", 66, 21, 27) != null)))) {
                 Log.d(TAG, "Bible already fully seeded with KJV default, 66 canonical books, and verses.");
                 return;
             }

@@ -66,6 +66,9 @@ public class RoomBibleRepository implements BibleRepository {
         this.bibleDao = database != null ? database.bibleDao() : null;
         this.noteDao = database != null ? database.bibleNoteDao() : null;
         this.assetContext = context != null ? context.getApplicationContext() : null;
+        if (this.assetContext != null && this.bibleDao != null) {
+            org.perazimchurch.app.data.local.text.BibleTextMigration.startInBackground(this.assetContext);
+        }
     }
 
     // Run on the ViewModel executor before the first read, avoiding a race with seeding.

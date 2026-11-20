@@ -166,4 +166,18 @@ public interface BibleDao {
 
     @Query("SELECT * FROM bible_topic_verses WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber")
     List<BibleTopicVerseEntity> getTopicsForVerse(int bookNumber, int chapterNumber, int verseNumber);
+
+    // --- Moving verse text to the separate text database ---
+    @Query("SELECT DISTINCT translationId FROM bible_verses")
+    List<String> getVerseTranslationIds();
+
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND bookNumber = :bookNumber")
+    List<BibleVerseEntity> getVersesForBook(String translationId, int bookNumber);
+
+    /** Removes verse rows of one translation that hold no bookmark and no note. */
+    @Query("DELETE FROM bible_verses WHERE translationId = :translationId AND isFavorite = 0 AND (note IS NULL OR note = '')")
+    void deleteVersesWithoutUserData(String translationId);
+
+    @Query("SELECT COUNT(*) FROM bible_verses")
+    int countAllVerseRows();
 }
