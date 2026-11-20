@@ -47,3 +47,9 @@ Dependencies are listed in `build.gradle` and `server/package.json`. Their licen
 | Glosses for Hebrew words | Strong's Hebrew entries, from openscriptures HebrewStrong.xml, **CC BY 4.0** | Same source as the Strong's dictionary above |
 | Transliterations | Computed by `scripts/bible/enrich_interlinear.py` from a fixed letter table written for this project | No outside data |
 | Plain-English parsing | Written for this project (`GrammarDescriber`) from the Robinson and OSHB code schemes | No outside data |
+
+## English glosses (STEPBible Translators Amalgamated data)
+
+| Item | Source and licence | Notes |
+|---|---|---|
+| English contextual glosses for every word of the Hebrew OT and Greek NT interlinears | STEPBible.org, Translators Amalgamated OT (TAHOT) and NT (TAGNT), based on work at Tyndale House, Cambridge. **CC BY 4.0**. Attribute Tyndale House and STEPBible.org, and link https://github.com/STEPBible/STEPBible-Data | Only the gloss and Strong's number are bundled, not the data files. Applied by `scripts/bible/apply_stepbible_glosses.py` |

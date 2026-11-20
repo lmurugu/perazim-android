@@ -1513,8 +1513,8 @@ public class BibleReaderDialog extends Dialog {
             box.setOrientation(LinearLayout.VERTICAL);
             box.addView(flow);
             TextView note = GlassKit.text(getContext(), hebrew
-                    ? "Hebrew text and morphology: Open Scriptures Hebrew Bible (CC BY 4.0). Glosses and Strong's entries: Strong's dictionary. Tap a Strong's number for its entry."
-                    : "Greek text and parsing: Antoniades 1904/1912 (public domain). Glosses and Strong's entries: Strong's dictionary (public domain). Tap a Strong's number for its entry and occurrences.",
+                    ? "Hebrew text and morphology: Open Scriptures Hebrew Bible (CC BY 4.0). English glosses: STEPBible.org Translators Amalgamated OT, Tyndale House Cambridge (CC BY 4.0). Strong's entries: Strong's dictionary. Tap a Strong's number for its entry."
+                    : "Greek text and parsing: Antoniades 1904/1912 (public domain). English glosses: STEPBible.org Translators Amalgamated NT, Tyndale House Cambridge (CC BY 4.0). Strong's entries: Strong's dictionary (public domain). Tap a Strong's number for its entry and occurrences.",
                     11, false, notesMuted());
             note.setPadding(0, dp(12), 0, 0);
             box.addView(note);
