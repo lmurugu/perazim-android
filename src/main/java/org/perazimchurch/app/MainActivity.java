@@ -600,7 +600,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
             }
         }
-        window.getDecorView().setSystemUiVisibility(flags);
+        if (Build.VERSION.SDK_INT < 30) {
+            window.getDecorView().setSystemUiVisibility(flags);
+        }
         root.setOnApplyWindowInsetsListener((v, insets) -> {
             v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
                     insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
