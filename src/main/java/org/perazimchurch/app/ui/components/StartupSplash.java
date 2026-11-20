@@ -27,8 +27,8 @@ import org.perazimchurch.app.ui.theme.GlassKit;
  */
 public final class StartupSplash {
 
-    private static final long WORDS_DELAY_MS = 300;
-    private static final long WORDS_IN_MS = 700;
+    private static final long WORDS_DELAY_MS = 0;
+    private static final long WORDS_IN_MS = 500;
     /** The words stay up at least this long, so a fast start still lets them be read. */
     private static final long MIN_SHOWN_MS = 1800;
     private static final long WORDS_OUT_MS = 200;
@@ -92,7 +92,7 @@ public final class StartupSplash {
         title.setAlpha(0f);
         slogan.setAlpha(0f);
         title.animate().alpha(1f).setStartDelay(WORDS_DELAY_MS).setDuration(WORDS_IN_MS).start();
-        slogan.animate().alpha(1f).setStartDelay(WORDS_DELAY_MS + 150).setDuration(WORDS_IN_MS).start();
+        slogan.animate().alpha(1f).setStartDelay(WORDS_DELAY_MS + 100).setDuration(WORDS_IN_MS).start();
 
         overlay = root;
         name = title;
@@ -106,7 +106,7 @@ public final class StartupSplash {
             public boolean onPreDraw() {
                 root.getViewTreeObserver().removeOnPreDrawListener(this);
                 // Give the words time to fade in while the main thread is still free; building the app blocks it.
-                root.postDelayed(buildApp, WORDS_DELAY_MS + WORDS_IN_MS + 150);
+                root.postDelayed(buildApp, WORDS_DELAY_MS + WORDS_IN_MS + 250);
                 return true;
             }
         });
