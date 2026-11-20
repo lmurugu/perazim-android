@@ -57,7 +57,15 @@ public class PerazimAiEngine {
             Pattern.compile("\\b(?:should i|recommend|help me choose|help me pick)\\b.{0,70}\\b(?:investment portfolio|retirement portfolio|personal budget|payday loan|mortgage|credit card|tax return|insurance policy)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:what|which|recommend|prescribe)\\b.{0,50}\\b(?:medicine|medication|drug|dosage|dose|treatment)\\b|\\b(?:diagnose me|diagnose my|medical advice|prescribe medication)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:give me legal advice|should i sue|how (?:do|can) i sue|file (?:a )?lawsuit|draft (?:a )?(?:legal )?contract|represent me in court)\\b", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("\\b(?:who won|latest score|current score|score of)\\b.{0,60}\\b(?:football|match|game|election|sports?)\\b|\\b(?:write|draft) (?:me )?a campaign speech\\b", Pattern.CASE_INSENSITIVE)
+            Pattern.compile("\\b(?:who won|latest score|current score|score of)\\b.{0,60}\\b(?:football|match|game|election|sports?)\\b|\\b(?:write|draft) (?:me )?a campaign speech\\b", Pattern.CASE_INSENSITIVE),
+            // General-purpose tasks the app does not offer: code, arithmetic, recipes, weather, travel, entertainment.
+            Pattern.compile("\\b(?:write|debug|fix|explain|generate)\\b.{0,40}\\b(?:python|javascript|typescript|sql|html|css|c\\+\\+|java code|code snippet|source code|regex)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:solve|calculate|compute|integrate|differentiate)\\b.{0,40}\\b(?:equation|integral|derivative|algebra|calculus|percentage|square root)\\b|\\bwhat is \\d+\\s*(?:[-+*/x×÷]|times|plus|minus|divided by)\\s*\\d+", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:recipe|how (?:do|to|can) i (?:cook|bake)|ingredients for)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:dose|dosage|ibuprofen|paracetamol|acetaminophen|antibiotics?|aspirin)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:weather (?:today|tomorrow|forecast|this week)|forecast for (?:today|tomorrow|this week))\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:book|find|cheap)\\b.{0,30}\\b(?:flights?|hotels?|airbnb|train tickets?)\\b|\\bvisa application\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:movie|movies|netflix|tv show|celebrity|box office)\\b", Pattern.CASE_INSENSITIVE)
     };
 
     private final Context context;
