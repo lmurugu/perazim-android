@@ -940,7 +940,7 @@ public class BibleReaderDialog extends Dialog {
             notesPanelView.setLayoutParams(plp);
         }
         View picker = buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, true);
-        LinearLayout.LayoutParams pickerLp = new LinearLayout.LayoutParams(dp(340), dp(46));
+        LinearLayout.LayoutParams pickerLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46));
         pickerLp.gravity = Gravity.CENTER_HORIZONTAL;
         picker.setLayoutParams(pickerLp);
         list.addView(picker);
@@ -2065,7 +2065,7 @@ public class BibleReaderDialog extends Dialog {
 
         LinearLayout dots = new LinearLayout(getContext());
         dots.setOrientation(LinearLayout.HORIZONTAL);
-        dots.setGravity(Gravity.CENTER_VERTICAL);
+        dots.setGravity(Gravity.CENTER);
         int shown = 0;
         for (final String name : frequentColours()) {
             HighlightColors.Colour colour = HighlightColors.byName(name);
@@ -2089,19 +2089,6 @@ public class BibleReaderDialog extends Dialog {
         if (allowRemove && onRemove != null) {
             dots.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
         }
-        ImageView apply = new ImageView(getContext());
-        apply.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_check);
-        apply.setContentDescription("Apply this colour");
-        apply.setPadding(dp(3), dp(3), dp(3), dp(3));
-        GradientDrawable applyBg = new GradientDrawable();
-        applyBg.setShape(GradientDrawable.OVAL);
-        applyBg.setColor(COLOR_ACCENT_ORANGE());
-        apply.setBackground(applyBg);
-        LinearLayout.LayoutParams applyLp = new LinearLayout.LayoutParams(dp(16), dp(16));
-        applyLp.setMargins(dp(3), 0, 0, 0);
-        apply.setLayoutParams(applyLp);
-        apply.setOnClickListener(v -> applyMix.run());
-        dots.addView(apply);
         card.addView(dots, new LinearLayout.LayoutParams(0, -2, 3f));
         return card;
     }
