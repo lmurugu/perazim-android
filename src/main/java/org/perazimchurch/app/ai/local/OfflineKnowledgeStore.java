@@ -46,15 +46,7 @@ public final class OfflineKnowledgeStore {
     private static final String CONTROL_STATE_PREFS = "perazim_ai_package_control_state_v1";
     private static final String INSTALL_STATE_KEY_ALIAS = "org.perazimchurch.app.ai.package-state.v1";
     private static final String UPDATE_STATUS_PREFS = "perazim_ai_package_update_status_v1";
-    private static final java.util.Set<String> QUERY_STOP_WORDS = new java.util.HashSet<>(java.util.Arrays.asList(
-            "about", "after", "also", "and", "are", "because", "been", "before", "being", "but",
-            "can", "could", "did", "does", "doing", "down", "for", "from", "had", "has", "have",
-            "bible", "chapter", "how", "into", "just", "kjv", "like", "not", "of", "off", "on", "once", "only", "or", "our",
-            "out", "over", "own", "please", "read", "show", "same", "should", "so", "some", "such",
-            "scripture", "passage", "mean", "means", "meaning", "explain", "interpret", "interpreting", "say",
-            "tell", "than", "that", "the", "their", "them", "there", "these", "they", "this", "those",
-            "through", "too", "under", "until", "very", "what", "when", "where", "which", "while",
-            "verse", "verses", "who", "with", "would", "you", "your"));
+    private static final java.util.Set<String> QUERY_STOP_WORDS = GovernedEvidence.STOP_WORDS;
     private OfflineKnowledgeStore() {}
 
     public static final class VerifiedPackage {
@@ -1035,8 +1027,9 @@ public final class OfflineKnowledgeStore {
             // Fail closed: without a current withdrawal manifest no package document is offered as evidence.
             // No signed approval manifest is defined yet, so the governance list is empty and nothing is authorised.
             if (control != null) {
-                selected = selectGoverned(installed.documents, control.withdrawnSources,
-                        SourceGovernance.parse(null), question);
+                int documentLimit = LocalScriptureRetriever.isScriptureRelated(question) ? 2 : 3;
+                selected = GovernedEvidence.select(installed.documents, control.withdrawnSources,
+                        SourceGovernance.parse(null), question, documentLimit);
             }
         }
         boolean scriptureQuestion = LocalScriptureRetriever.isScriptureRelated(question);
@@ -1052,75 +1045,6 @@ public final class OfflineKnowledgeStore {
             }
         }
         return selected;
-    }
-
-    /** Pure selection step, host-testable. Builds fresh evidence objects; no authority field is copied from the document. */
-    static JSONArray selectGoverned(JSONArray documents, java.util.Set<String> withdrawnKeys,
-                                    java.util.List<SourceGovernance.Source> governance, String question) throws Exception {
-        java.util.Map<String, SourceGovernance.Source> bySource = new java.util.HashMap<>();
-        java.util.Set<String> ambiguous = new java.util.HashSet<>();
-        for (SourceGovernance.Source source : governance) {
-            String key = sourceKey(source.id, source.version);
-            if (bySource.put(key, source) != null) ambiguous.add(key);
-        }
-        String[] terms = question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+");
-        java.util.List<JSONObject> candidates = new java.util.ArrayList<>();
-        for (int i = 0; i < documents.length(); i++) {
-            JSONObject document = documents.getJSONObject(i);
-            String sourceId = document.optString("sourceId");
-            String version = document.optString("version");
-            String key = sourceKey(sourceId, version);
-            if (withdrawnKeys != null && withdrawnKeys.contains(key)) continue;
-            String text = document.getString("text");
-            String normalized = text.toLowerCase(java.util.Locale.ROOT);
-            int score = 0;
-            for (String term : terms) {
-                if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
-            }
-            if (score == 0) continue;
-            SourceGovernance.Source entry = ambiguous.contains(key) ? null : bySource.get(key);
-            String actualHash = sha256(text.getBytes(StandardCharsets.UTF_8));
-            String authority = SourceGovernance.authorityClassFor(entry, actualHash);
-            if ("UNAPPROVED".equals(authority) || !SourceGovernance.mayRetrieveForContext(entry)) continue;
-            boolean official = SourceGovernance.OFFICIAL_AUTHORITY.equals(authority);
-            JSONObject evidence = new JSONObject()
-                    .put("sourceId", sourceId)
-                    .put("version", version)
-                    .put("location", document.optString("location"))
-                    .put("title", document.optString("title"))
-                    .put("text", text)
-                    .put("contentHash", actualHash)
-                    .put("authorityClass", authority)
-                    .put("citationEligible", official);
-            if (official) {
-                evidence.put("approvedBy", entry.approvedBy).put("approvedAt", entry.approvedAt);
-            }
-            candidates.add(evidence);
-        }
-        candidates.sort((left, right) -> {
-            try {
-                return Integer.compare(overlap(right.getString("text"), question), overlap(left.getString("text"), question));
-            } catch (JSONException error) { return 0; }
-        });
-        JSONArray selected = new JSONArray();
-        int chars = 0;
-        boolean scriptureQuestion = LocalScriptureRetriever.isScriptureRelated(question);
-        int documentLimit = scriptureQuestion ? 2 : 3;
-        for (JSONObject document : candidates) {
-            if (selected.length() >= documentLimit || chars >= 3600) break;
-            selected.put(document);
-            chars += Math.min(1200, document.optString("text").length());
-        }
-        return selected;
-    }
-
-    private static int overlap(String text, String question) {
-        int score = 0;
-        String normalized = text.toLowerCase(java.util.Locale.ROOT);
-        for (String term : question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+")) {
-            if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
-        }
-        return score;
     }
 
     static boolean isUnderspecifiedReferenceQuestion(String question) {

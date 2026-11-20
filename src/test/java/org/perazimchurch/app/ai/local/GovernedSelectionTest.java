@@ -60,8 +60,8 @@ public class GovernedSelectionTest {
 
     private static JSONArray select(JSONArray documents, List<SourceGovernance.Source> governance,
                                     String... withdrawn) throws Exception {
-        return OfflineKnowledgeStore.selectGoverned(documents, new HashSet<>(java.util.Arrays.asList(withdrawn)),
-                governance, QUESTION);
+        return GovernedEvidence.select(documents, new HashSet<>(java.util.Arrays.asList(withdrawn)),
+                governance, QUESTION, 3);
     }
 
     @Test public void approvedSourceIsOfferedAsOfficialAndCitable() throws Exception {
@@ -159,10 +159,10 @@ public class GovernedSelectionTest {
     }
 
     @Test public void unrelatedQuestionReturnsNothing() throws Exception {
-        JSONArray out = OfflineKnowledgeStore.selectGoverned(
+        JSONArray out = GovernedEvidence.select(
                 docs(document("syn-ok", TEXT)), new HashSet<String>(),
                 manifest(governance("syn-ok", SourceGovernance.CATEGORY_CHURCH_APPROVED, TEXT)),
-                "zebra quantum");
+                "zebra quantum", 3);
         assertEquals(0, out.length());
     }
 }
