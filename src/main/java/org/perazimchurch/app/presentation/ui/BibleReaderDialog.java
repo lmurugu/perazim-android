@@ -1590,7 +1590,7 @@ public class BibleReaderDialog extends Dialog {
         circle.setShape(GradientDrawable.OVAL);
         // Translucent circle behind each tool, as on the verse action bar: dark on a dark phone, light on a light one.
         // Solid enough to read, like the verse action bar: deep purple behind light icons on dark, near-white behind dark icons on light.
-        circle.setColor(on ? 0x33E17D2F : (phoneIsDark() ? 0x99301848 : 0xE6FFFFFF));
+        circle.setColor(on ? 0x33E17D2F : (phoneIsDark() ? 0xF2301848 : 0xF2FFFFFF));
         icon.setBackground(circle);
         // Dark ink on the light theme, bright ink on the dark theme; the on state stays orange.
         icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : (phoneIsDark() ? 0xFFF1EAFB : 0xFF2A1B3D));
@@ -2015,9 +2015,9 @@ public class BibleReaderDialog extends Dialog {
             card.setPadding(dp(12), dp(4), dp(12), dp(4));
             GradientDrawable frost = new GradientDrawable();
             frost.setCornerRadius(dp(12));
-            // Always the light frosted card, so the strips and circles stay legible over verse text.
-            frost.setColor(0xF7FFFFFF);
-            frost.setStroke(dp(1), 0xD9FFFFFF);
+            // Dark card on a light page, light card on a dark page, nearly opaque so verse text does not show through.
+            frost.setColor(phoneIsDark() ? 0xF22D0938 : 0xF7FFFFFF);
+            frost.setStroke(dp(1), phoneIsDark() ? 0x33FFFFFF : 0xD9FFFFFF);
             card.setBackground(frost);
         }
 
@@ -2098,9 +2098,9 @@ public class BibleReaderDialog extends Dialog {
      * verse action bar contrasts with that, so the picker and tool icons do the same.
      */
     private boolean phoneIsDark() {
-        // The floating tools always use the light style (near-white circles, dark icons, purple thumbs),
-        // because they sit over verse text and must stay legible in both themes.
-        return false;
+        // Despite the name: true means the tools use the DARK style (deep purple card and circles, light
+        // icons, orange thumbs). That is when the page is light, so the tools always contrast with the page.
+        return GlassKit.light();
     }
 
     /** Slider thumbs contrast with the phone: purple on a light phone, orange on a dark phone. */
