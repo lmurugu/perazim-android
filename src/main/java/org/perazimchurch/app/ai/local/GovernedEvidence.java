@@ -100,6 +100,32 @@ final class GovernedEvidence {
         return evidence;
     }
 
+    /**
+     * Refuses a rollback target that carries a revoked or superseded governance entry, or any document whose
+     * sourceId+version is withdrawn. A null withdrawn set means the withdrawal status could not be read, so a target
+     * with documents is refused (fail closed).
+     */
+    static void assertRollbackAllowed(List<SourceGovernance.Source> governance, JSONArray documents,
+                                      Set<String> withdrawnKeys) {
+        for (SourceGovernance.Source source : governance) {
+            if (source.revoked || source.supersededBy != null) {
+                throw new SecurityException("Rollback target contains a revoked or superseded source.");
+            }
+        }
+        int count = documents == null ? 0 : documents.length();
+        if (count == 0) return;
+        if (withdrawnKeys == null) {
+            throw new SecurityException("Rollback refused: withdrawal status cannot be established.");
+        }
+        for (int i = 0; i < count; i++) {
+            JSONObject document = documents.optJSONObject(i);
+            if (document == null) throw new SecurityException("Rollback target contains a malformed document.");
+            if (withdrawnKeys.contains(key(document.optString("sourceId"), document.optString("version")))) {
+                throw new SecurityException("Rollback target contains a withdrawn source.");
+            }
+        }
+    }
+
     static int overlap(String text, String question) {
         int score = 0;
         String normalized = text.toLowerCase(Locale.ROOT);

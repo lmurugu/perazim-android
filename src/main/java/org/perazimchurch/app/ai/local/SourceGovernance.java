@@ -68,6 +68,59 @@ public final class SourceGovernance {
     }
 
     /**
+     * Parses the governance array of a package whose signature has already been verified. Types are strict: any
+     * malformed entry rejects the whole package, and approval time must be an integer epoch-millisecond value no
+     * later than publication. An absent array means no source is authorised.
+     */
+    public static List<Source> fromVerifiedPayload(JSONArray governance, long publishedAt) {
+        List<Source> out = new ArrayList<>();
+        if (governance == null) return out;
+        for (int i = 0; i < governance.length(); i++) {
+            JSONObject o = governance.optJSONObject(i);
+            if (o == null) throw new SecurityException("Package governance entry is malformed.");
+            String id = requiredString(o, "id");
+            String version = requiredString(o, "version");
+            String category = requiredString(o, "category");
+            Object approvedAtValue = o.opt("approvedAt");
+            String approvedAt = null;
+            if (approvedAtValue != null && approvedAtValue != JSONObject.NULL) {
+                if (!(approvedAtValue instanceof Long) && !(approvedAtValue instanceof Integer)) {
+                    throw new SecurityException("Package governance approval time must be an integer.");
+                }
+                long millis = ((Number) approvedAtValue).longValue();
+                if (millis <= 0 || millis > publishedAt) {
+                    throw new SecurityException("Package governance approval time is outside the publication window.");
+                }
+                approvedAt = Long.toString(millis);
+            }
+            Object revokedValue = o.opt("revoked");
+            if (revokedValue != null && revokedValue != JSONObject.NULL && !(revokedValue instanceof Boolean)) {
+                throw new SecurityException("Package governance revoked flag must be boolean.");
+            }
+            out.add(new Source(id, version, category,
+                    optionalString(o, "approvedBy"), approvedAt, optionalString(o, "scope"),
+                    optionalString(o, "sha256"), optionalString(o, "supersededBy"),
+                    Boolean.TRUE.equals(revokedValue)));
+        }
+        return out;
+    }
+
+    private static String requiredString(JSONObject o, String key) {
+        Object value = o.opt(key);
+        if (!(value instanceof String) || ((String) value).trim().isEmpty()) {
+            throw new SecurityException("Package governance entry is missing " + key + ".");
+        }
+        return ((String) value).trim();
+    }
+
+    private static String optionalString(JSONObject o, String key) {
+        Object value = o.opt(key);
+        if (value == null || value == JSONObject.NULL) return null;
+        if (!(value instanceof String)) throw new SecurityException("Package governance field " + key + " must be a string.");
+        return blankToNull((String) value);
+    }
+
+    /**
      * Official authority requires all of: category CHURCH_APPROVED, a named approver, an approval date, a scope,
      * not revoked, not superseded, and a content hash that matches the installed content.
      */

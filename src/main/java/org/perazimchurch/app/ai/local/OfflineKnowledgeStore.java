@@ -54,8 +54,12 @@ public final class OfflineKnowledgeStore {
         public final String digest;
         public final JSONArray documents;
         public final long publishedAt;
+        /** Governance parsed from the signed payload only. Empty means no source is authorised. */
+        public final java.util.List<SourceGovernance.Source> governance;
 
-        private VerifiedPackage(String version, String digest, JSONArray documents, long publishedAt) {
+        private VerifiedPackage(String version, String digest, JSONArray documents, long publishedAt,
+                                java.util.List<SourceGovernance.Source> governance) {
+            this.governance = java.util.Collections.unmodifiableList(new java.util.ArrayList<>(governance));
             this.version = version;
             this.digest = digest;
             this.documents = documents;
@@ -269,7 +273,10 @@ public final class OfflineKnowledgeStore {
                 throw new SecurityException("A package source is missing provenance.");
             }
         }
-        return new VerifiedPackage(payload.getString("version"), contentDigest, documents, payload.getLong("publishedAt"));
+        long publishedAtValue = payload.getLong("publishedAt");
+        java.util.List<SourceGovernance.Source> governance =
+                SourceGovernance.fromVerifiedPayload(payload.optJSONArray("governance"), publishedAtValue);
+        return new VerifiedPackage(payload.getString("version"), contentDigest, documents, publishedAtValue, governance);
     }
 
     public static synchronized VerifiedPackage install(Context context, String envelope,
@@ -334,6 +341,12 @@ public final class OfflineKnowledgeStore {
                         controlCheckpoint == null ? 0L : controlCheckpoint.sequence)) {
             throw new SecurityException("Rollback authorization does not match the exact installed target or is stale.");
         }
+
+        VerifiedControl withdrawal = null;
+        try { withdrawal = readWithdrawalControl(context, trustedKeys, nowMillis); }
+        catch (Exception ignored) { withdrawal = null; }
+        GovernedEvidence.assertRollbackAllowed(target.governance, target.documents,
+                withdrawal == null ? null : withdrawal.withdrawnSources);
 
         writeEnvelope(context, PREVIOUS_PACKAGE_FILE, currentEnvelope);
         writeEnvelope(context, PACKAGE_FILE, targetEnvelope);
@@ -1025,11 +1038,11 @@ public final class OfflineKnowledgeStore {
             try { control = readWithdrawalControl(context, trustedKeys, nowMillis); }
             catch (Exception ignored) { control = null; }
             // Fail closed: without a current withdrawal manifest no package document is offered as evidence.
-            // No signed approval manifest is defined yet, so the governance list is empty and nothing is authorised.
+            // Governance comes only from the signed payload; an absent array means nothing is authorised.
             if (control != null) {
                 int documentLimit = LocalScriptureRetriever.isScriptureRelated(question) ? 2 : 3;
                 selected = GovernedEvidence.select(installed.documents, control.withdrawnSources,
-                        SourceGovernance.parse(null), question, documentLimit);
+                        installed.governance, question, documentLimit);
             }
         }
         boolean scriptureQuestion = LocalScriptureRetriever.isScriptureRelated(question);
@@ -1065,30 +1078,6 @@ public final class OfflineKnowledgeStore {
         return sourceId + "\u0000" + version;
     }
 
-    /**
-     * Quotes a string exactly as the Node signer's JSON.stringify does (S2-01). org.json also escapes "</" and
-     * U+0080-U+009F and U+2000-U+20FF, which makes canonical bytes differ from the signer's for ordinary text.
-     */
-    static String jsonString(String s) {
-        StringBuilder b = new StringBuilder(s.length() + 2).append('"');
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"': b.append("\\\""); break;
-                case '\\': b.append("\\\\"); break;
-                case '\b': b.append("\\b"); break;
-                case '\f': b.append("\\f"); break;
-                case '\n': b.append("\\n"); break;
-                case '\r': b.append("\\r"); break;
-                case '\t': b.append("\\t"); break;
-                default:
-                    if (c < 0x20) b.append(String.format(java.util.Locale.ROOT, "\\u%04x", (int) c));
-                    else b.append(c);
-            }
-        }
-        return b.append('"').toString();
-    }
-
     private static String canonical(Object value) throws JSONException {
         if (value == JSONObject.NULL || value == null) return "null";
         if (value instanceof JSONObject) {
@@ -1103,7 +1092,7 @@ public final class OfflineKnowledgeStore {
             for (Map.Entry<String, Object> entry : sorted.entrySet()) {
                 if (!first) result.append(',');
                 first = false;
-                result.append(jsonString(entry.getKey())).append(':').append(canonical(entry.getValue()));
+                result.append(CanonicalJson.jsonString(entry.getKey())).append(':').append(canonical(entry.getValue()));
             }
             return result.append('}').toString();
         }
@@ -1116,7 +1105,7 @@ public final class OfflineKnowledgeStore {
             }
             return result.append(']').toString();
         }
-        if (value instanceof String) return jsonString((String) value);
+        if (value instanceof String) return CanonicalJson.jsonString((String) value);
         if (value instanceof Number || value instanceof Boolean) return value.toString();
         throw new JSONException("Unsupported package JSON value.");
     }
