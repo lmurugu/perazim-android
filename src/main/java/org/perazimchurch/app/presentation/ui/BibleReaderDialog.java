@@ -1580,6 +1580,9 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
+    /** The open colour card for a word or range, closed once a colour is applied. */
+    private android.app.Dialog wordColourDialog;
+
     /** Colour card for a chosen word or range. */
     private void pickWordColour(final BibleVerse verse, final int start, final int end) {
         LinearLayout list = new LinearLayout(getContext());
@@ -1589,7 +1592,7 @@ public class BibleReaderDialog extends Dialog {
         for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
             addWordSwatchRow(list, verse, start, end, shadeRow);
         }
-        openCardDialog("Highlight words", "Only the words you chose are coloured", list, null, null);
+        wordColourDialog = openCardDialog("Highlight words", "Only the words you chose are coloured", list, null, null);
     }
 
     private void addWordSwatchRow(LinearLayout list, final BibleVerse verse, final int start, final int end,
@@ -1604,6 +1607,10 @@ public class BibleReaderDialog extends Dialog {
 
     /** Adds a word range to the verse, updates the loaded verse lists and redraws. */
     private void applyWordHighlight(final BibleVerse verse, final int start, final int end, final String colour) {
+        if (wordColourDialog != null) {
+            wordColourDialog.dismiss();
+            wordColourDialog = null;
+        }
         List<WordHighlight> ranges = new ArrayList<>(verse.getWordHighlights());
         ranges.add(new WordHighlight(start, end, colour));
         setWordHighlights(verse, ranges);
