@@ -395,6 +395,8 @@ public class HomeUiBinder {
 
         syncRoutineStateWithGamificationStore();
         updateBeginRoutineButtonText();
+        card.setBackground(photoBackground("backgrounds/bg_reader_scroll.png", 16));
+        recolorForPhoto(card);
         return card;
     }
 
@@ -402,6 +404,60 @@ public class HomeUiBinder {
      * Home's lower section, laid out like the original build: a "Sanctuary doors" label, a 2x2 grid of compact
      * door cards, then a full-width row for the free Bible games.
      */
+    /** A card photo: the image rounded to the card corners, with a purple wash on the left where the words sit. */
+    private Drawable photoBackground(String assetPath, int cornerDp) {
+        Bitmap src = loadAssetBitmap(assetPath, 720);
+        if (src == null) {
+            return PerazimTheme.createCardGradient(dp(cornerDp), dp(1));
+        }
+        Bitmap bmp = popped(src);
+        androidx.core.graphics.drawable.RoundedBitmapDrawable photo =
+                androidx.core.graphics.drawable.RoundedBitmapDrawableFactory.create(context.getResources(), bmp);
+        photo.setCornerRadius(dp(cornerDp));
+        GradientDrawable wash = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{0x8C2A0F33, 0x332A0F33, 0x002A0F33});
+        wash.setCornerRadius(dp(cornerDp));
+        GradientDrawable rim = new GradientDrawable();
+        rim.setCornerRadius(dp(cornerDp));
+        rim.setColor(Color.TRANSPARENT);
+        rim.setStroke(dp(1), 0x40FFFFFF);
+        return new LayerDrawable(new Drawable[]{photo, wash, rim});
+    }
+
+    /** Boosts contrast and saturation so the card photos read clearly. */
+    private Bitmap popped(Bitmap src) {
+        Bitmap out = Bitmap.createBitmap(src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
+        android.graphics.ColorMatrix cm = new android.graphics.ColorMatrix();
+        cm.setSaturation(1.3f);
+        float c = 1.2f;
+        float t = (-0.5f * c + 0.5f) * 255f;
+        cm.postConcat(new android.graphics.ColorMatrix(new float[]{
+                c, 0, 0, 0, t,
+                0, c, 0, 0, t,
+                0, 0, c, 0, t,
+                0, 0, 0, 1, 0}));
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColorFilter(new android.graphics.ColorMatrixColorFilter(cm));
+        new Canvas(out).drawBitmap(src, 0, 0, paint);
+        return out;
+    }
+
+    /** Makes the text on a photo card white, with a soft shadow so it reads over the image. */
+    private void recolorForPhoto(View v) {
+        if (v instanceof android.widget.Button) {
+            return;
+        }
+        if (v instanceof TextView) {
+            ((TextView) v).setTextColor(Color.WHITE);
+            ((TextView) v).setShadowLayer(dp(4), 0, dp(1), 0xCC000000);
+        } else if (v instanceof ViewGroup) {
+            ViewGroup g = (ViewGroup) v;
+            for (int i = 0; i < g.getChildCount(); i++) {
+                recolorForPhoto(g.getChildAt(i));
+            }
+        }
+    }
+
     private View createDoorsGrid() {
         LinearLayout container = new LinearLayout(context);
         container.setOrientation(LinearLayout.VERTICAL);
@@ -409,15 +465,15 @@ public class HomeUiBinder {
         container.addView(GlassKit.keep(GlassKit.label(context, "SANCTUARY DOORS")), GlassKit.matchWrap(context, 0));
 
         container.addView(doorRow(
-                createDoorCard(R.drawable.ic_christian_bible, "Bible", "Read scripture",
+                createDoorCard(R.drawable.ic_christian_bible, "Bible", "Read scripture", "backgrounds/bg_reader_scroll.png",
                         v -> parseAndOpenScripture(currentCornerstoneRef)),
-                createDoorCard(R.drawable.ic_christian_candle, "Sermons", "Recent messages",
+                createDoorCard(R.drawable.ic_christian_candle, "Sermons", "Recent messages", "backgrounds/bg_sermons_lamp.png",
                         v -> { if (listener != null) listener.onNavigateToTab(1); })),
                 GlassKit.matchWrap(context, 8));
         container.addView(doorRow(
-                createDoorCard(R.drawable.ic_christian_lyre, "Worship", "Hymns and praise",
+                createDoorCard(R.drawable.ic_christian_lyre, "Worship", "Hymns and praise", "backgrounds/bg_worship_dusk.png",
                         v -> { if (listener != null) listener.onNavigateToTab(2); }),
-                createDoorCard(R.drawable.ic_christian_praying_hands, "Prayer", "Share and intercede",
+                createDoorCard(R.drawable.ic_christian_praying_hands, "Prayer", "Share and intercede", "backgrounds/bg_prayer_moon.png",
                         v -> { if (listener != null) listener.onNavigateToTab(3); })),
                 GlassKit.matchWrap(context, 8));
 
@@ -436,24 +492,27 @@ public class HomeUiBinder {
     }
 
     /** One compact door: a 36dp icon square, a 13sp title and an 11sp subtitle on one line. */
-    private View createDoorCard(int iconRes, String title, String subtitle, View.OnClickListener onClick) {
+    private View createDoorCard(int iconRes, String title, String subtitle, String photo, View.OnClickListener onClick) {
         LinearLayout card = GlassKit.card(context, 14, 12);
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
-        card.addView(GlassKit.iconBadge(context, iconRes, GlassKit.iconSquare(context, 10), 36, 18),
-                new LinearLayout.LayoutParams(dp(36), dp(36)));
+        card.setMinimumHeight(dp(104));
+        card.setBackground(photoBackground(photo, 14));
+        card.addView(GlassKit.iconBadge(context, iconRes, GlassKit.iconSquare(context, 10), 40, 20),
+                new LinearLayout.LayoutParams(dp(40), dp(40)));
 
         LinearLayout textCol = new LinearLayout(context);
         textCol.setOrientation(LinearLayout.VERTICAL);
         textCol.setPadding(dp(10), 0, 0, 0);
-        TextView tvTitle = GlassKit.text(context, title, 13, true, GlassKit.text());
+        TextView tvTitle = GlassKit.text(context, title, 15, true, GlassKit.text());
         textCol.addView(tvTitle);
-        TextView tvSub = GlassKit.text(context, subtitle, 11, false, GlassKit.muted());
+        TextView tvSub = GlassKit.text(context, subtitle, 12, false, GlassKit.muted());
         tvSub.setMaxLines(1);
         tvSub.setEllipsize(TextUtils.TruncateAt.END);
         textCol.addView(tvSub);
         card.addView(textCol, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
+        recolorForPhoto(card);
         card.setClickable(true);
         card.setOnClickListener(onClick);
         return card;
@@ -464,12 +523,15 @@ public class HomeUiBinder {
         LinearLayout row = GlassKit.card(context, 14, 12);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.addView(GlassKit.iconBadge(context, R.drawable.gl_star, GlassKit.iconSquare(context, 10), 36, 18),
-                new LinearLayout.LayoutParams(dp(36), dp(36)));
-        TextView tv = GlassKit.text(context, "Bible games: free and offline", 13, true, GlassKit.text());
+        row.setMinimumHeight(dp(104));
+        row.setBackground(photoBackground("backgrounds/bg_riddles_lantern.png", 14));
+        row.addView(GlassKit.iconBadge(context, R.drawable.gl_star, GlassKit.iconSquare(context, 10), 40, 20),
+                new LinearLayout.LayoutParams(dp(40), dp(40)));
+        TextView tv = GlassKit.text(context, "Bible games: free and offline", 15, true, GlassKit.text());
         LinearLayout.LayoutParams lpText = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
         lpText.leftMargin = dp(10);
         row.addView(tv, lpText);
+        recolorForPhoto(row);
         row.setClickable(true);
         row.setOnClickListener(v -> {
             if (context instanceof android.app.Activity) {
