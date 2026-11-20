@@ -80,12 +80,60 @@ LEXICAL_PRONOUNS = {"he", "she", "it", "self", "i", "we", "you"}
 
 
 def greek_gloss(row):
-    """Lexical gloss, except that a lexical pronoun (he/it/self) takes the contextual form (him, his, ...)."""
+    """Literal lexical gloss; a lexical pronoun (he/it/self) takes the contextual form (him, his, ...).
+    Participles (V-P... codes) take the -ing form."""
     lexical = lexical_gloss(row[4]) if len(row) > 4 else ""
     contextual = contextual_gloss(row[2])
     if lexical and lexical.lower() in LEXICAL_PRONOUNS and contextual:
         return contextual
-    return lexical or contextual
+    gloss = lexical or contextual
+    morph = row[3].split("=", 1)[1] if len(row) > 3 and "=" in row[3] else ""
+    if gloss and lexical and morph.startswith("V-P") and gloss.lower() not in LEXICAL_PRONOUNS:
+        return ing_form(gloss)
+    return gloss
+
+
+def ing_form(word):
+    """Present participle of a verb gloss: "have" -> "having", "give" -> "giving", "be" -> "being"."""
+    if word == "be":
+        return "being"
+    if word.endswith("ie"):
+        return word[:-2] + "ying"
+    if word.endswith("e") and not word.endswith("ee"):
+        return word[:-1] + "ing"
+    return word + "ing"
+
+
+def is_participle(morph):
+    """Greek V-P... codes, and Hebrew OSHB verb codes whose conjugation letter is r (active participle)."""
+    if morph.startswith("V-P"):
+        return True
+    last = morph.split("/")[-1]
+    return len(last) > 2 and last[0] == "V" and last[2] == "r"
+
+
+def hebrew_lemma_gloss(text):
+    """Main lemma meaning from the STEPBible lexical column, for example "{H1254A=בָּרָא=to create}" -> "create"."""
+    groups = re.findall(r"\{H\d+[A-Z]?=[^=}]*=([^}]*)\}", text or "")
+    if not groups:
+        return ""
+    meaning = groups[-1].lstrip(": ")
+    first = re.split(r"[»/,;:]", meaning)[0].strip().rstrip(".!?")
+    first = re.sub(r"^to\s+", "", first, flags=re.IGNORECASE)
+    if not first or " " in first or not PLAIN.match(first.lower()):
+        return ""
+    return first
+
+
+def hebrew_gloss(row):
+    """Literal lexical gloss; the contextual gloss is the fallback. Active participles take the -ing form."""
+    lexical = hebrew_lemma_gloss(row[11]) if len(row) > 11 else ""
+    contextual = contextual_gloss(row[3])
+    gloss = lexical or contextual
+    morph = row[5] if len(row) > 5 else ""
+    if gloss and is_participle(morph) and lexical:
+        return ing_form(gloss)
+    return gloss
 
 
 def lexical_gloss(text):
@@ -133,7 +181,7 @@ def apply(path, step_rows, books, hebrew):
                 ours = [int(c.split("|")[1] or 0) for c in cell_list]
                 if hebrew:
                     theirs = [strongs_of(r[4]) for r in rows]
-                    glosses = [contextual_gloss(r[3]) for r in rows]
+                    glosses = [hebrew_gloss(r) for r in rows]
                 else:
                     theirs = [strongs_of(r[3]) for r in rows]
                     # The lexical column is closer to word for word; the contextual gloss is the fallback.
@@ -155,6 +203,11 @@ def apply(path, step_rows, books, hebrew):
                         continue
                     number = int(f[1] or 0)
                     empty = f[4] in ("", "-")
+                    if hebrew and number == 1961:
+                        # hayah, "to be": a perfect or sequential-perfect third-person form reads "was".
+                        last = f[2].split("/")[-1].lstrip("H")
+                        if len(last) > 3 and last[0] == "V" and last[1] == "q" and last[2] in "pw" and last[3] == "3":
+                            f[4] = "was"
                     if not hebrew and number == 1510:
                         # eimi, "to be", takes the tense shown by its grammar code.
                         morph = f[2]
