@@ -466,7 +466,7 @@ public class ProfileUiBinder {
                         + " · " + (PerazimTheme.isLight() ? "light glass" : "dark purple glass") + " · tap to change",
                 v -> {
                     if (context instanceof Activity) {
-                        org.perazimchurch.app.ui.components.ThemeSwitcher.choose((Activity) context);
+                        org.perazimchurch.app.ui.components.ThemeSwitcher.choose((Activity) context, v);
                     }
                 });
         addOption(settings, "Display",

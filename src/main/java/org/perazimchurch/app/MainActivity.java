@@ -280,6 +280,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         }
 
         setContentView(rootWindow);
+        if (savedInstanceState == null) {
+            // Cold start only: a black start-up screen with the logo, not a theme switch rebuild.
+            org.perazimchurch.app.ui.components.StartupSplash.show(this);
+        }
         handleIntent(getIntent());
     }
 
@@ -439,7 +443,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private View createTopAppBar() {
         // Mockup header: logo and "Perazim", then the light/dark switch and the glass profile button.
         return GlassKit.header(this,
-                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.choose(this),
+                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.choose(this, v),
                 v -> switchTab(NavigationContract.TAB_ID_PROFILE));
     }
 

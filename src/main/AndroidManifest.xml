@@ -61,6 +61,7 @@
         <activity
             android:name=".MainActivity"
             android:label="Perazim"
+            android:theme="@style/PerazimLaunch"
             android:exported="true"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|keyboardHidden">
