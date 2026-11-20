@@ -220,7 +220,7 @@ public class PerazimAiEngine {
             "submitted successfully|i (?:have )?(?:informed|alerted) (?:the )?(?:bishop|pastor|leader))\\b", Pattern.CASE_INSENSITIVE);
     /** Replies that claim to be a human church authority. */
     private static final Pattern CLAIMED_HUMAN_AUTHORITY = Pattern.compile(
-            "\\bi (?:am|'m) (?:your |the |a |an )?(?:pastor|bishop|priest|elder|deacon|counsellor|counselor|church leader)\\b|" +
+            "\\bi (?:am|'m) (?:your |the |a |an )?(?:church )?(?:pastor|bishop|priest|elder|deacon|counsellor|counselor|leader)\\b|" +
             "\\bi (?:now )?(?:declare|pronounce|forgive) you\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isProfessionalMatterQuery(@Nullable String query) {

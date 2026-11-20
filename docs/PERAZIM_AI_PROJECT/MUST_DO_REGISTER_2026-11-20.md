@@ -25,3 +25,20 @@ Reconciled against: the owner's 2026-11-20 instruction, `docs/internal/remediati
 | G1 | Remediation plan items (Phases 0–6, Security, Compliance) | Per plan | `docs/internal/remediation-plan.md` (updated 2026-11-18) | Not part of this offline-AI thread | Owner | Owner decisions D1–D4, church name, legal |
 | G2 | Launch gates L4, L7, L8 (offline/online AI and data gates) | None ticked | Plan status table | Owner-level gates | Owner | Yes |
 | G3 | Minimum age 18+ | Decided and implemented | Owner decision 2026-11-18 | None | None | No |
+
+## Update 2026-11-20 (evening; owner direction of 19:29)
+
+| ID | Update | Status now | Evidence | Remaining |
+|---|---|---|---|---|
+| B1 | Source approval matrix and missing-documents register | Written | `KNOWLEDGE_SOURCE_APPROVAL_MATRIX_2026-11-20.md`, `MISSING_DOCUMENTS_REGISTER_2026-11-20.md` | Owner decisions per row |
+| B2 | Identity comparison: name, motto, slogan, vision, mission (2 versions), values | Written; conflicts open | `CHURCH_IDENTITY_COMPARISON_2026-11-20.md` | Leadership decision. Owner has confirmed the AI-facing name only |
+| B4 | Content-rights register (Bible, hymns, sermons) | Written; nothing cleared | `CONTENT_RIGHTS_REGISTER_2026-11-20.md` | Owner permissions |
+| A3 | Synthetic retrieved-document injection tests | Automated (host) | `SyntheticInjectionAndValidatorTest.injectedRetrievedTextStaysInsideUntrustedBlock` | Real-model run (F) |
+| D3 | Output validator: prohibited and legitimate fixtures both tested | Automated (host); legitimate replies pass, prohibited replies rejected | `SyntheticInjectionAndValidatorTest` | Real-model replies |
+| A4 | Output validation false rejection | Partly tested (fixture set of 10 legitimate replies) | same | Real-model replies |
+| C1–C6 | Offline verification | Still not demonstrated on a device | See verification report | Phone runtime (owner authorisation) |
+| F1 | Runtime plan | Written, not executed | `RUNTIME_TEST_PLAN_2026-11-20.md` | Owner authorisation |
+
+Dependency added: `testImplementation 'org.json:json:20240303'` (host tests only, `build.gradle`).
+
+Completion states used: Implemented, Automatically tested, Manually verified, Runtime verified, Formally approved, Blocked, Awaiting owner decision. No item is marked Runtime verified or Formally approved except Document 02 as instructions.
