@@ -68,6 +68,7 @@ public final class BibleTextMigration {
             }
         }
 
+        Log.i(TAG, "Private verse rows before trim: " + dao.countAllVerseRows());
         // 3. Remove the moved rows from the private database (never a bookmarked or noted verse).
         boolean trimmed = false;
         for (String id : dao.getVerseTranslationIds()) {
@@ -77,6 +78,7 @@ public final class BibleTextMigration {
             }
         }
 
+        Log.i(TAG, "Private verse rows after trim: " + dao.countAllVerseRows());
         // 4. Compact the private database so its file, and the start-up check on it, become small.
         File file = app.getDatabasePath("perazim_database.db");
         if (trimmed && file.length() > COMPACT_ABOVE_BYTES) {
