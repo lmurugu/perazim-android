@@ -1474,9 +1474,8 @@ public class BibleReaderDialog extends Dialog {
             note.setPadding(0, dp(12), 0, 0);
             box.addView(note);
             ScrollView scroll = new ScrollView(getContext());
-            scroll.addView(box);
             openCardDialog(citation + (hebrew ? " \u00b7 Hebrew Interlinear" : " \u00b7 Greek Interlinear"),
-                    "Word by word", scroll, null, null);
+                    "Word by word", box, null, null);
         });
     }
 
@@ -1490,9 +1489,9 @@ public class BibleReaderDialog extends Dialog {
         // No tile behind each word: the words sit directly on the one card, so there is no card inside a card.
 
         TextView original = new TextView(getContext());
-        original.setText(word.getOriginal());
-        original.setTypeface(Typeface.SERIF);
-        original.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        original.setText("{" + word.getOriginal() + "}");
+        original.setTypeface(Typeface.SERIF, Typeface.NORMAL);
+        original.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         original.setTextColor(notesInk());
         original.setGravity(Gravity.CENTER);
         original.setTextDirection(hebrew ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
@@ -1508,7 +1507,8 @@ public class BibleReaderDialog extends Dialog {
 
         TextView gloss = new TextView(getContext());
         gloss.setText(word.getGloss().isEmpty() ? "\u2014" : word.getGloss());
-        gloss.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        gloss.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
+        gloss.setTypeface(Typeface.DEFAULT_BOLD);
         gloss.setTextColor(notesInk());
         gloss.setGravity(Gravity.CENTER);
         gloss.setPadding(0, dp(4), 0, dp(4));
@@ -1518,7 +1518,7 @@ public class BibleReaderDialog extends Dialog {
             final String code = (hebrew ? "H" : "G") + word.getStrongsNumber();
             final int number = word.getStrongsNumber();
             TextView strongs = new TextView(getContext());
-            strongs.setText(code);
+            strongs.setText("{" + code + "}");
             strongs.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
             strongs.setTextColor(cardAccent());
             strongs.setPaintFlags(strongs.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
@@ -1554,7 +1554,7 @@ public class BibleReaderDialog extends Dialog {
                 def.setText("No dictionary entry for " + code + " in the bundled Strong's dictionary.");
             }
             def.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            def.setTextColor(GlassKit.text());
+            def.setTextColor(notesInk());
             def.setLineSpacing(0f, 1.3f);
             box.addView(def);
             TextView head = new TextView(getContext());
@@ -1562,7 +1562,7 @@ public class BibleReaderDialog extends Dialog {
             head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             head.setLetterSpacing(0.08f);
             head.setTypeface(Typeface.DEFAULT_BOLD);
-            head.setTextColor(COLOR_PRIMARY_PURPLE());
+            head.setTextColor(cardAccent());
             head.setPadding(0, dp(16), 0, dp(4));
             box.addView(head);
             StringBuilder refs = new StringBuilder();
@@ -1573,16 +1573,10 @@ public class BibleReaderDialog extends Dialog {
             TextView list = new TextView(getContext());
             list.setText(refs.length() == 0 ? "None" : refs.toString());
             list.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            list.setTextColor(COLOR_TEXT_MUTED());
+            list.setTextColor(notesMuted());
             list.setLineSpacing(0f, 1.3f);
             box.addView(list);
-            ScrollView scroll = new ScrollView(getContext());
-            scroll.addView(box);
-            AppDialogs.builder(getContext())
-                    .setTitle("Strong's " + code)
-                    .setView(scroll)
-                    .setPositiveButton("Close", null)
-                    .show();
+            openCardDialog("Strong's " + code, "Dictionary entry and concordance", box, null, null);
         });
     }
 
