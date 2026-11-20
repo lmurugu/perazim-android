@@ -1077,16 +1077,25 @@ public class BibleReaderDialog extends Dialog {
             if (m.start() > last) {
                 sb.append(text.substring(last, m.start()));
             }
+            // The original word is smaller, regular weight and muted, so it reads as a marker beside the English.
+            // The Hebrew or Greek is isolated (FSI...PDI) so the right-to-left script cannot pull the braces out of place.
             int braceStart = sb.length();
-            sb.append('{').append(m.group(1)).append('}');
-            // Keep the original in regular weight even when the reader has chosen bolder verse text.
-            sb.setSpan(new android.text.style.StyleSpan(Typeface.NORMAL), braceStart, sb.length(),
+            sb.append('{').append('\u2068').append(m.group(1)).append('\u2069').append('}');
+            int braceEnd = sb.length();
+            sb.setSpan(new android.text.style.StyleSpan(Typeface.NORMAL), braceStart, braceEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.RelativeSizeSpan(0.8f), braceStart, braceEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.ForegroundColorSpan(GlassKit.muted()), braceStart, braceEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append(' ');
+            // The English gloss is bold and a little larger, so it is the first thing the eye reads.
             int glossStart = sb.length();
             sb.append(m.group(2).trim());
             int glossEnd = sb.length();
             sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), glossStart, glossEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.RelativeSizeSpan(1.15f), glossStart, glossEnd,
                     android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             sb.append(' ');
             last = m.end();
