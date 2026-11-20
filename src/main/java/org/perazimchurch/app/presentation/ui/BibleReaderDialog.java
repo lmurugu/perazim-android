@@ -643,6 +643,9 @@ public class BibleReaderDialog extends Dialog {
         sizes.addView(larger);
         sizes.addView(lighter);
         sizes.addView(bolder);
+        TextView swipe = sizeButton("Swipe", "Swipe across words to colour them purple", false);
+        swipe.setOnClickListener(v -> toggleSwipeColour(swipe));
+        sizes.addView(swipe);
         middle.addView(sizes);
         nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
@@ -1293,6 +1296,9 @@ public class BibleReaderDialog extends Dialog {
                 if (selectTouch(ev)) {
                     return true;
                 }
+                if (swipeColourOn && !interlinearVersion) {
+                    return swipeColourTouch(tvVerseText, verse, textStart, ev);
+                }
                 swipe.onTouchEvent(ev);
                 return false;
             });
@@ -1484,6 +1490,72 @@ public class BibleReaderDialog extends Dialog {
             public void onDestroyActionMode(android.view.ActionMode mode) {
             }
         };
+    }
+
+    /** Swipe-to-colour mode: when on, dragging across a plain-text verse colours the words in bold purple. */
+    private boolean swipeColourOn;
+    /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
+    private int swipeAnchor = -1;
+
+    private void toggleSwipeColour(TextView button) {
+        swipeColourOn = !swipeColourOn;
+        swipeAnchor = -1;
+        button.setText(swipeColourOn ? "Swipe on" : "Swipe");
+        button.setAlpha(swipeColourOn ? 1f : 0.75f);
+        Toast.makeText(getContext(), swipeColourOn ? "Swipe to colour words purple" : "Swipe colouring off",
+                Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Handles a touch while swipe colouring is on. A drag from the first word to the last colours
+     * everything between them in purple; a tap without a drag opens the verse menu as before.
+     */
+    private boolean swipeColourTouch(final TextView tv, final BibleVerse verse, final int textStart,
+                                     android.view.MotionEvent ev) {
+        int action = ev.getActionMasked();
+        if (action == android.view.MotionEvent.ACTION_DOWN) {
+            if (tv.getLayout() == null) {
+                return false;
+            }
+            tv.getParent().requestDisallowInterceptTouchEvent(true);
+            swipeAnchor = tv.getOffsetForPosition(ev.getX(), ev.getY());
+            return true;
+        }
+        if (action == android.view.MotionEvent.ACTION_MOVE) {
+            return swipeAnchor >= 0;
+        }
+        if (action == android.view.MotionEvent.ACTION_UP || action == android.view.MotionEvent.ACTION_CANCEL) {
+            if (swipeAnchor < 0) {
+                return true;
+            }
+            int last = tv.getOffsetForPosition(ev.getX(), ev.getY());
+            int from = Math.min(swipeAnchor, last) - textStart;
+            int to = Math.max(swipeAnchor, last) - textStart;
+            swipeAnchor = -1;
+            int[] range = trimmedBodyRange(verse, from, to);
+            if (action == android.view.MotionEvent.ACTION_UP && range != null) {
+                applyWordHighlight(verse, range[0], range[1], "bold-purple");
+            } else if (action == android.view.MotionEvent.ACTION_UP) {
+                showVerseActionBar(verse);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /** Clamps [from, to) to the verse body and trims spaces at both ends; null when nothing is left. */
+    @Nullable
+    private static int[] trimmedBodyRange(BibleVerse verse, int from, int to) {
+        String body = verse.getText() != null ? verse.getText() : "";
+        int start = Math.max(0, from);
+        int end = Math.min(body.length(), to);
+        while (start < end && Character.isWhitespace(body.charAt(start))) {
+            start++;
+        }
+        while (end > start && Character.isWhitespace(body.charAt(end - 1))) {
+            end--;
+        }
+        return end > start ? new int[]{start, end} : null;
     }
 
     /** Action menu for a selected word or range in a plain-text verse. */
