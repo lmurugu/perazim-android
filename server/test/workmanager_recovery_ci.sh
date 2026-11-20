@@ -28,13 +28,13 @@ fi
 
 adb shell svc wifi disable
 adb shell svc data disable || true  # the emulator image may not expose the phone service
-./gradlew connectedValidationAndroidTest \
+./gradlew connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
   --stacktrace
 
 # Kill the app process, not force-stop it, so JobScheduler may restart persisted work.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
-adb shell am kill org.perazimchurch.app.validation
+adb shell am kill org.perazimchurch.app
 adb shell svc wifi enable
 adb shell svc data enable || true
 
@@ -47,6 +47,13 @@ for _ in $(seq 1 60); do
   sleep 2
 done
 if [[ "$received" != true ]]; then
+  echo 'Diagnostics: connectivity and job state after the app process was killed.' >&2
+  adb shell dumpsys connectivity | grep -iE 'NetworkAgentInfo|CONNECTED|VALIDATED' | head -n 20 >&2 || true
+  adb shell dumpsys jobscheduler | grep -i 'org.perazimchurch' | head -n 40 >&2 || true
+  adb logcat -d -s WorkManager:* BackgroundSync:* ApiClient:* JobScheduler:* 2>/dev/null | tail -n 200 >&2 || true
+  echo 'Mock server received:' >&2
+  curl -fsS http://127.0.0.1:18080/__received >&2 || true
+  echo >&2
   echo 'FAIL: queued synthetic mutation was not delivered after process death without reopening the app.' >&2
   exit 1
 fi

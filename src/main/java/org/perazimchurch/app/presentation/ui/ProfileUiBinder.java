@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.Activity;
@@ -62,6 +64,7 @@ import org.perazimchurch.app.presentation.viewmodel.SavedContentData;
 import org.perazimchurch.app.sync.SheetSyncManager;
 import org.perazimchurch.app.sync.SyncDispatcher;
 import org.perazimchurch.app.sync.SyncQueueManager;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -157,7 +160,7 @@ public class ProfileUiBinder {
 
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(dp(16), dp(16), dp(16), dp(32));
+        content.setPadding(dp(16), dp(16), dp(16), dp(16));
 
         bind(content);
 
@@ -203,103 +206,79 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createProfileHeaderCard() {
-        FrameLayout rootFrame = new FrameLayout(context);
-        LinearLayout.LayoutParams lpRoot = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(140));
-        lpRoot.setMargins(0, 0, 0, dp(12));
-        rootFrame.setLayoutParams(lpRoot);
-        rootFrame.setBackground(PerazimTheme.createHeroGradient(dp(PerazimTheme.RADIUS_LG), dp(1)));
-        rootFrame.setClipToOutline(true);
-
-        Bitmap coverBmp = loadAssetBitmap("backgrounds/bg_me_path.png", 720);
-        if (coverBmp != null) {
-            ImageView ivCover = new ImageView(context);
-            ivCover.setImageBitmap(coverBmp);
-            ivCover.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            rootFrame.addView(ivCover, new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-
-            View bottomScrim = new View(context);
-            GradientDrawable scrimGrad = new GradientDrawable(
-                    GradientDrawable.Orientation.TOP_BOTTOM,
-                    new int[]{Color.TRANSPARENT, Color.parseColor("#2A0F33")});
-            bottomScrim.setBackground(scrimGrad);
-            rootFrame.addView(bottomScrim, new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        }
-
-        LinearLayout card = new LinearLayout(context);
+        // Mockup: glass card, 64dp glass avatar circle, name 18sp, line in #CDBBD6, purple pill button
+        LinearLayout card = GlassKit.card(context, 28, 16);
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
-        card.setLayoutParams(new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        LinearLayout.LayoutParams lpRoot = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpRoot.setMargins(0, 0, 0, dp(12));
+        card.setLayoutParams(lpRoot);
 
-        // Member Avatar with Church Logo
         ivAvatar = new ImageView(context);
         ivAvatar.setScaleType(ImageView.ScaleType.CENTER_CROP);
         GradientDrawable avatarBackground = new GradientDrawable();
         avatarBackground.setShape(GradientDrawable.OVAL);
-        avatarBackground.setColor(Color.WHITE);
+        avatarBackground.setColor(GlassKit.light() ? Color.WHITE : Color.parseColor("#1FFFFFFF"));
+        avatarBackground.setStroke(Math.max(1, dp(1)), Color.parseColor("#4DFFFFFF"));
         ivAvatar.setBackground(avatarBackground);
         ivAvatar.setClipToOutline(true);
         ivAvatar.setOnClickListener(v -> showAvatarPicker());
         ivAvatar.setContentDescription("Profile picture. Tap to change.");
-        LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(54), dp(54));
+        LinearLayout.LayoutParams lpAv = new LinearLayout.LayoutParams(dp(64), dp(64));
         lpAv.setMargins(0, 0, dp(14), 0);
         ivAvatar.setLayoutParams(lpAv);
         card.addView(ivAvatar);
 
-        // Member Text Info
         LinearLayout memberInfo = new LinearLayout(context);
         memberInfo.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lpInfo = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        memberInfo.setLayoutParams(lpInfo);
+        memberInfo.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
 
-        tvMemberName = new TextView(context);
-        tvMemberName.setText("Perazim Covenant Member");
-        tvMemberName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        tvMemberName.setTypeface(Typeface.DEFAULT_BOLD);
-        tvMemberName.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        tvMemberName = GlassKit.text(context, "Perazim Covenant Member", 16, true, GlassKit.text());
         memberInfo.addView(tvMemberName);
+        tvMemberEmail = GlassKit.text(context, "member@perazimchurch.org", 12, false, GlassKit.muted());
+        memberInfo.addView(tvMemberEmail, GlassKit.matchWrap(context, 2));
 
-        tvMemberEmail = new TextView(context);
-        tvMemberEmail.setText("member@perazimchurch.org");
-        tvMemberEmail.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvMemberEmail.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        tvMemberEmail.setPadding(0, dp(2), 0, dp(4));
-        memberInfo.addView(tvMemberEmail);
-
-
-        // Auth Action Button (Sign In / Register or Log Out)
         btnAuthAction = new Button(context);
+        GlassKit.keep(btnAuthAction);
         btnAuthAction.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnAuthAction.setTypeface(Typeface.DEFAULT_BOLD);
-        btnAuthAction.setPadding(dp(10), dp(2), dp(10), dp(2));
+        btnAuthAction.setLetterSpacing(0.04f);
+        btnAuthAction.setStateListAnimator(null);
+        btnAuthAction.setMinWidth(0);
+        btnAuthAction.setMinimumWidth(0);
+        btnAuthAction.setMinHeight(0);
+        btnAuthAction.setMinimumHeight(0);
+        btnAuthAction.setPadding(dp(14), 0, dp(14), 0);
         LinearLayout.LayoutParams lpAuth = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(32));
-        lpAuth.topMargin = dp(6);
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(30));
+        lpAuth.topMargin = dp(8);
         btnAuthAction.setLayoutParams(lpAuth);
         updateAuthButtonState();
         memberInfo.addView(btnAuthAction);
 
         btnDeleteAccount = new Button(context);
+        GlassKit.keep(btnDeleteAccount);
         btnDeleteAccount.setText("Delete my account");
+        btnDeleteAccount.setAllCaps(false);
         btnDeleteAccount.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         btnDeleteAccount.setTypeface(Typeface.DEFAULT_BOLD);
-        btnDeleteAccount.setTextColor(0xFFB00020);
+        btnDeleteAccount.setTextColor(GlassKit.light() ? 0xFFB00020 : 0xFFFF8A80);
         btnDeleteAccount.setBackgroundColor(Color.TRANSPARENT);
-        btnDeleteAccount.setPadding(dp(10), dp(2), dp(10), dp(2));
+        btnDeleteAccount.setStateListAnimator(null);
+        btnDeleteAccount.setMinHeight(0);
+        btnDeleteAccount.setMinimumHeight(0);
+        btnDeleteAccount.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        btnDeleteAccount.setPadding(0, 0, dp(10), 0);
         LinearLayout.LayoutParams lpDelete = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(32));
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(28));
         lpDelete.topMargin = dp(2);
         btnDeleteAccount.setLayoutParams(lpDelete);
         btnDeleteAccount.setOnClickListener(v -> showDeleteAccountFirstStep());
         memberInfo.addView(btnDeleteAccount);
 
-        card.addView(memberInfo);
-        rootFrame.addView(card);
-        return rootFrame;
+        card.addView(GlassKit.keep(memberInfo));
+        return card;
     }
 
     private void updateAuthButtonState() {
@@ -307,20 +286,20 @@ public class ProfileUiBinder {
         boolean isGuest = SessionManager.getInstance(context).isGuest();
         if (btnDeleteAccount != null) btnDeleteAccount.setVisibility(isGuest ? View.GONE : View.VISIBLE);
         if (isGuest) {
-            btnAuthAction.setText("🔑 Sign In / Register");
-            btnAuthAction.setTextColor(PerazimTheme.COLOR_ORANGE_SOFT);
-            btnAuthAction.setBackground(PerazimTheme.createCardGradient(dp(8), dp(1)));
+            btnAuthAction.setText("SIGN IN / REGISTER");
+            btnAuthAction.setTextColor(Color.WHITE);
+            btnAuthAction.setBackground(GlassKit.purple(context, 15));
             btnAuthAction.setOnClickListener(v -> AuthDialog.show(context, user -> refreshProfile()));
         } else {
-            btnAuthAction.setText("Log Out");
-            btnAuthAction.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-            btnAuthAction.setBackgroundColor(Color.TRANSPARENT);
+            btnAuthAction.setText("LOG OUT");
+            btnAuthAction.setTextColor(GlassKit.text());
+            btnAuthAction.setBackground(GlassKit.glassControl(context, 15));
             btnAuthAction.setOnClickListener(v -> showLogoutConfirmationDialog());
         }
     }
 
     private void showDeleteAccountFirstStep() {
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Delete my account")
                 .setMessage("This will permanently remove your posts, comments, prayer requests, messages, connections, RSVPs and uploaded photos, and it will disable your sign-in.\n\n"
                         + "Some records must be kept for legal reasons: the audit log, your consent and request history, and the decision on any membership claim (without your name or phone number). They are not used for anything else.\n\n"
@@ -333,7 +312,7 @@ public class ProfileUiBinder {
     private void showDeleteAccountTypedConfirmation() {
         EditText input = new EditText(context);
         input.setHint("Type DELETE to confirm");
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Confirm deletion")
                 .setView(input)
                 .setPositiveButton("Delete my account", (dialog, which) -> {
@@ -366,7 +345,7 @@ public class ProfileUiBinder {
     }
 
     private void showLogoutConfirmationDialog() {
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Log Out")
                 .setMessage("Are you sure you want to sign out of your Perazim account? Your offline prayers and readings will remain saved on this device in Guest Mode.")
                 .setPositiveButton("Log Out", (dialog, which) -> {
@@ -383,19 +362,16 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createStatsRowCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
-        card.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpCard.setMargins(0, 0, 0, dp(12));
-        card.setLayoutParams(lpCard);
-        card.setPadding(dp(12), dp(12), dp(12), dp(12));
-
+        // Mockup: one 64dp glass strip, four columns, value 16sp bold over a 10sp label
         LinearLayout row = new LinearLayout(context);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        row.setBackground(GlassKit.glass(context, 24));
+        LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(64));
+        lpCard.setMargins(0, 0, 0, dp(14));
+        row.setLayoutParams(lpCard);
+        GlassKit.keep(row);
 
         String uid = resolveGamificationUserId();
         int currentStreak = GamificationStore.getStreak(context, uid, 0);
@@ -403,30 +379,19 @@ public class ProfileUiBinder {
         int currentGrace = GamificationStore.getGracePoints(context, uid, 0);
         int lifetimeDays = GamificationStore.getLifetimeRoutineDays(context, uid, 0);
 
-        LinearLayout c1 = createStatColumn(currentStreak + "d", "Streak");
+        LinearLayout c1 = createStatColumn(currentStreak + " Days", "Streak");
         tvStreakValue = (TextView) c1.getChildAt(0);
         row.addView(c1);
-
-        row.addView(createVerticalDivider());
-
-        LinearLayout c2 = createStatColumn(String.valueOf(currentXp), "Spiritual XP");
+        LinearLayout c2 = createStatColumn(currentXp + " XP", "Spiritual XP");
         tvXpValue = (TextView) c2.getChildAt(0);
         row.addView(c2);
-
-        row.addView(createVerticalDivider());
-
-        LinearLayout c3 = createStatColumn(String.valueOf(currentGrace), "Grace");
+        LinearLayout c3 = createStatColumn(currentGrace + " Pts", "Grace");
         tvGraceValue = (TextView) c3.getChildAt(0);
         row.addView(c3);
-
-        row.addView(createVerticalDivider());
-
-        LinearLayout c4 = createStatColumn(lifetimeDays + "d", "Lifetime");
+        LinearLayout c4 = createStatColumn(lifetimeDays + " Days", "Lifetime");
         tvLifetimeDaysValue = (TextView) c4.getChildAt(0);
         row.addView(c4);
-
-        card.addView(row);
-        return card;
+        return row;
     }
 
     private View createVerticalDivider() {
@@ -441,24 +406,14 @@ public class ProfileUiBinder {
         LinearLayout col = new LinearLayout(context);
         col.setOrientation(LinearLayout.VERTICAL);
         col.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        col.setLayoutParams(lp);
-
-        TextView tvVal = new TextView(context);
-        tvVal.setText(value);
-        tvVal.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
-        tvVal.setTypeface(Typeface.DEFAULT_BOLD);
-        tvVal.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        col.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        TextView tvVal = GlassKit.text(context, value, 16, true, GlassKit.text());
+        tvVal.setGravity(Gravity.CENTER);
         col.addView(tvVal);
-
-        TextView tvLbl = new TextView(context);
-        tvLbl.setText(label);
-        tvLbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        tvLbl.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvLbl.setPadding(0, dp(2), 0, 0);
-        col.addView(tvLbl);
-
-        return col;
+        TextView tvLbl = GlassKit.text(context, label, 10, false, GlassKit.muted());
+        tvLbl.setGravity(Gravity.CENTER);
+        col.addView(tvLbl, GlassKit.matchWrap(context, 3));
+        return GlassKit.keep(col);
     }
 
     // =========================================================================
@@ -466,16 +421,10 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createGiveButtonCard() {
-        Button btnGive = new Button(context);
-        btnGive.setText("Give with M-Pesa");
-        btnGive.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        btnGive.setTypeface(Typeface.DEFAULT_BOLD);
-        btnGive.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(12)));
-        btnGive.setPadding(dp(14), dp(12), dp(14), dp(12));
+        TextView btnGive = GlassKit.orangeButton(context, "GIVE WITH M-PESA", 13);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(14));
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(50));
+        lp.setMargins(0, 0, 0, dp(16));
         btnGive.setLayoutParams(lp);
         btnGive.setOnClickListener(v -> GivingDialog.show(context));
         return btnGive;
@@ -486,123 +435,136 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createOptionsListCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_SURFACE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
-        card.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(14));
-        card.setLayoutParams(lp);
-        card.setPadding(dp(4), dp(8), dp(4), dp(8));
+        // Mockup: grouped glass lists under ACCOUNT, CONTENT and CHURCH labels
+        LinearLayout groups = new LinearLayout(context);
+        groups.setOrientation(LinearLayout.VERTICAL);
+        GlassKit.keep(groups);
 
-        TextView tvHeader = new TextView(context);
-        tvHeader.setText("CHURCH & RESOURCES");
-        tvHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvHeader.setTypeface(Typeface.DEFAULT_BOLD);
-        tvHeader.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        tvHeader.setLetterSpacing(0.04f);
-        tvHeader.setPadding(dp(12), dp(4), 0, dp(8));
-        // Row 0: Member Account Authentication
         String authSummary = SessionManager.getInstance(context).isGuest()
-                ? "Offline Guest Mode · Tap to Sign In or Register"
+                ? "Offline Guest Mode"
                 : "Signed in · Tap to manage account";
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_christian_church,
-                "Member Account",
-                authSummary,
-                v -> AuthDialog.show(context, user -> refreshProfile())
-        ));
-        card.addView(createHorizontalDivider());
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_phone,
-                "Change account phone number",
-                "Unavailable · your current number and membership link stay unchanged",
-                v -> new AlertDialog.Builder(context)
+        LinearLayout account = optionGroup(groups, "ACCOUNT");
+        addOption(account, "Member Account", authSummary, v -> AuthDialog.show(context, user -> refreshProfile()));
+        addOption(account, "Church Membership", "Check your status or submit a private request", v -> MembershipDialog.show(context));
+        addOption(account, "Change account phone number", "Unavailable · your number and membership link stay unchanged",
+                v -> AppDialogs.builder(context)
                         .setTitle("Phone number change unavailable")
                         .setMessage("Phone number changes are currently unavailable. Your current account number and any membership link are unchanged.")
                         .setPositiveButton("Close", null)
-                        .show()
-        ));
-        card.addView(createHorizontalDivider());
+                        .show());
 
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_christian_church,
-                "Church Membership",
-                "Check your status or submit a private request",
-                v -> MembershipDialog.show(context)
-        ));
-        card.addView(createHorizontalDivider());
+        LinearLayout content = optionGroup(groups, "CONTENT");
+        addOption(content, "Saved and Offline Content", "Sermons, hymns, bookmarked verses", v -> showSavedContentDialog());
+        addOption(content, "Breakthrough Guide", "Contemplative spiritual companion", v -> showBreakthroughGuideDialog());
+        addOption(content, "Fellowship Extras", "Riddles and Christian joy and humor", v -> showFellowshipExtrasDialog());
+        addOption(content, "Refresh Content", SheetSyncManager.getLastSyncStatusText(context), v -> triggerContentSync());
+        addOption(content, "Failed offline updates", "Review saved updates and tap one to retry", v -> showFailedSyncItems());
 
-        // Row 1: Refresh Content
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_refresh,
-                "Refresh Content",
-                SheetSyncManager.getLastSyncStatusText(context),
-                v -> triggerContentSync()
-        ));
-        card.addView(createHorizontalDivider());
+        LinearLayout settings = optionGroup(groups, "SETTINGS");
+        addOption(settings, "Appearance",
+                PerazimTheme.choiceName(PerazimTheme.savedChoice(context))
+                        + " · " + (PerazimTheme.isLight() ? "light glass" : "dark purple glass") + " · tap to change",
+                v -> {
+                    if (context instanceof Activity) {
+                        org.perazimchurch.app.ui.components.ThemeSwitcher.choose((Activity) context);
+                    }
+                });
+        addOption(settings, "Display",
+                "App size " + org.perazimchurch.app.ui.theme.DisplaySettings.APP_LABELS[org.perazimchurch.app.ui.theme.DisplaySettings.appSize(context)]
+                        + " · Text " + org.perazimchurch.app.ui.theme.DisplaySettings.TEXT_LABELS[org.perazimchurch.app.ui.theme.DisplaySettings.textSize(context)],
+                v -> {
+                    if (context instanceof Activity) {
+                        org.perazimchurch.app.ui.components.DisplaySettingsDialog.show((Activity) context);
+                    }
+                });
+        addOption(settings, "Sound, Haptics and Celebrations", "Button sounds, vibration and confetti",
+                v -> showFeedbackSettingsDialog());
 
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_refresh,
-                "Failed offline updates",
-                "Review saved updates and tap one to retry",
-                v -> showFailedSyncItems()
-        ));
-        card.addView(createHorizontalDivider());
+        LinearLayout church = optionGroup(groups, "CHURCH");
+        addOption(church, "Tithe and Stewardship", "Support ministry, worship and missions via M-Pesa", v -> GivingDialog.show(context));
+        addOption(church, "Pastoral Care and Office", "Call, WhatsApp, SMS or directions", v -> showPastoralCareDialog());
+        addOption(church, "About Perazim Mission Church",
+                "Vision, leadership and version " + org.perazimchurch.app.BuildConfig.VERSION_NAME,
+                v -> showAboutDialog());
+        return groups;
+    }
 
-        // Row 2: Saved / Offline Content
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_christian_bible,
-                "Saved & Offline Content",
-                "Downloaded sermons, favorite hymns, bookmarked verses",
-                v -> showSavedContentDialog()
-        ));
-        card.addView(createHorizontalDivider());
-
-        // Row 3: Tithes & Stewardship
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_christian_wheat,
-                "Tithe & Stewardship",
-                "Support ministry, worship, and missions via M-Pesa",
-                v -> GivingDialog.show(context)
-        ));
-        card.addView(createHorizontalDivider());
-
-        // Row 4: Breakthrough Guide
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_christian_candle,
-                "Breakthrough Guide",
-                "Contemplative spiritual companion & scriptures",
-                v -> showBreakthroughGuideDialog()
-        ));
-        card.addView(createHorizontalDivider());
-
-        // Row 5: Fellowship Extras (Riddles & Jokes)
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_christian_praying_hands,
-                "Fellowship Extras",
-                "Devotional riddles and Christian joy & humor",
-                v -> showFellowshipExtrasDialog()
-        ));
-        card.addView(createHorizontalDivider());
-
-        // Row 6: Pastoral Care
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_phone,
-                "Pastoral Care & Office",
-                "Call, WhatsApp, SMS, or directions to the church",
-                v -> showPastoralCareDialog()
-        ));
-        card.addView(createHorizontalDivider());
-
-        // Row 7: About Perazim
-        card.addView(createOptionRow(
-                org.perazimchurch.app.R.drawable.ic_christian_church,
-                "About Perazim Mission Church",
-                "Vision, leadership & version " + org.perazimchurch.app.BuildConfig.VERSION_NAME + " (Build " + org.perazimchurch.app.BuildConfig.VERSION_CODE + ")",
-                v -> showAboutDialog()
-        ));
-
+    private LinearLayout optionGroup(LinearLayout parent, String label) {
+        TextView tv = GlassKit.text(context, label, 10, true, GlassKit.muted());
+        tv.setLetterSpacing(0.1f);
+        tv.setPadding(dp(4), 0, 0, dp(6));
+        parent.addView(tv, GlassKit.matchWrap(context, parent.getChildCount() == 0 ? 0 : 14));
+        LinearLayout card = new LinearLayout(context);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setBackground(GlassKit.glass(context, 22));
+        card.setClipToOutline(true);
+        parent.addView(GlassKit.keep(card), GlassKit.matchWrap(context, 0));
         return card;
+    }
+
+    private void addOption(LinearLayout card, String title, String subtitle, View.OnClickListener click) {
+        if (card.getChildCount() > 0) {
+            View divider = new View(context);
+            divider.setBackgroundColor(GlassKit.light() ? Color.parseColor("#1F3D1749") : Color.parseColor("#1FFFFFFF"));
+            card.addView(divider, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Math.max(1, dp(1))));
+        }
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(11), dp(16), dp(11));
+        LinearLayout textCol = new LinearLayout(context);
+        textCol.setOrientation(LinearLayout.VERTICAL);
+        textCol.addView(GlassKit.text(context, title, 13, true, GlassKit.text()));
+        TextView sub = GlassKit.text(context, subtitle, 11, false, GlassKit.muted());
+        sub.setMaxLines(1);
+        sub.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        textCol.addView(sub, GlassKit.matchWrap(context, 2));
+        row.addView(textCol, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        ImageView chevron = new ImageView(context);
+        chevron.setImageResource(org.perazimchurch.app.R.drawable.ic_chevron_right);
+        chevron.setColorFilter(GlassKit.muted(), PorterDuff.Mode.SRC_IN);
+        row.addView(chevron, new LinearLayout.LayoutParams(dp(14), dp(14)));
+        row.setClickable(true);
+        row.setOnClickListener(click);
+        card.addView(GlassKit.keep(row));
+    }
+
+    private void showFeedbackSettingsDialog() {
+        final org.perazimchurch.app.ui.components.FeedbackManager fm =
+                org.perazimchurch.app.ui.components.FeedbackManager.get(context);
+        LinearLayout box = new LinearLayout(context);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setPadding(dp(20), dp(12), dp(20), dp(4));
+
+        android.widget.Switch swSound = new android.widget.Switch(context);
+        swSound.setText("Sounds (buttons, rewards, milestones)");
+        swSound.setChecked(fm.isSoundEnabled());
+        swSound.setPadding(0, dp(10), 0, dp(10));
+        swSound.setOnCheckedChangeListener((b, on) -> {
+            fm.setSoundEnabled(on);
+            if (on) fm.reward(null);
+        });
+        box.addView(swSound);
+
+        android.widget.Switch swHaptics = new android.widget.Switch(context);
+        swHaptics.setText("Haptic feedback (vibration)");
+        swHaptics.setChecked(fm.isHapticsEnabled());
+        swHaptics.setPadding(0, dp(10), 0, dp(10));
+        swHaptics.setOnCheckedChangeListener((b, on) -> fm.setHapticsEnabled(on));
+        box.addView(swHaptics);
+
+        android.widget.Switch swCelebrate = new android.widget.Switch(context);
+        swCelebrate.setText("Celebrations (confetti)");
+        swCelebrate.setChecked(fm.isCelebrationsEnabled());
+        swCelebrate.setPadding(0, dp(10), 0, dp(10));
+        swCelebrate.setOnCheckedChangeListener((b, on) -> fm.setCelebrationsEnabled(on));
+        box.addView(swCelebrate);
+
+        AppDialogs.builder(context)
+                .setTitle("Sound, Haptics & Celebrations")
+                .setView(box)
+                .setPositiveButton("Done", null)
+                .show();
     }
 
     private void showFailedSyncItems() {
@@ -610,7 +572,7 @@ public class ProfileUiBinder {
             List<SyncQueueEntity> failed = PerazimDatabase.getInstance(context).syncQueueDao().getFailedItems();
             mainHandler.post(() -> {
                 if (failed == null || failed.isEmpty()) {
-                    new AlertDialog.Builder(context).setTitle("Failed offline updates")
+                    AppDialogs.builder(context).setTitle("Failed offline updates")
                             .setMessage("There are no failed offline updates.")
                             .setPositiveButton("Close", null).show();
                     return;
@@ -621,7 +583,7 @@ public class ProfileUiBinder {
                     String detail = item.getLastError() == null ? "Needs attention" : item.getLastError();
                     labels[i] = item.getEntityType() + " · " + item.getEntityId() + "\n" + detail + "\nTap to retry";
                 }
-                new AlertDialog.Builder(context).setTitle("Failed offline updates")
+                AppDialogs.builder(context).setTitle("Failed offline updates")
                         .setItems(labels, (dialog, which) -> {
                             SyncQueueEntity item = failed.get(which);
                             new Thread(() -> {
@@ -692,7 +654,7 @@ public class ProfileUiBinder {
     }
 
     public void showSavedContentDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
 
@@ -749,7 +711,7 @@ public class ProfileUiBinder {
     }
 
     public void showBreakthroughGuideDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
 
@@ -824,7 +786,7 @@ public class ProfileUiBinder {
     }
 
     private void showPastoralCareDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         builder.setTitle("Pastoral Care & Headquarters");
         builder.setMessage("Bishop Dr. David Mutweri & Pastoral Team\n"
                 + "Perazim Mission Church · Embu Headquarters\n\n"
@@ -844,7 +806,7 @@ public class ProfileUiBinder {
     }
 
     public void showAboutDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         ScrollView sv = new ScrollView(context);
         sv.setFillViewport(true);
 
@@ -922,7 +884,7 @@ public class ProfileUiBinder {
     }
 
     public void showFellowshipExtrasDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = AppDialogs.builder(context);
         builder.setTitle("Fellowship Extras");
 
         ScrollView sv = new ScrollView(context);
@@ -930,7 +892,7 @@ public class ProfileUiBinder {
         LinearLayout content = new LinearLayout(context);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(16));
-        content.setBackgroundColor(PerazimTheme.COLOR_SURFACE);
+        content.setBackgroundColor(PerazimTheme.COLOR_SURFACE_SOLID);
 
         // Tab Row: Riddles | Jokes
         LinearLayout tabRow = new LinearLayout(context);
@@ -1598,15 +1560,15 @@ public class ProfileUiBinder {
                 int liveGrace = GamificationStore.getGracePoints(context, uid, user != null ? user.getGracePoints() : 0);
 
                 if (tvStreakValue != null) {
-                    tvStreakValue.setText("🔥 " + liveStreak + " Days");
+                    tvStreakValue.setText(liveStreak + " Days");
                 }
                 isStreakFrozen = user != null && user.isStreakFrozen();
 
                     if (tvXpValue != null) {
-                        tvXpValue.setText("⭐ " + liveXp + " XP");
+                        tvXpValue.setText(liveXp + " XP");
                     }
                     if (tvGraceValue != null) {
-                        tvGraceValue.setText("💜 " + liveGrace + " Pts");
+                        tvGraceValue.setText(liveGrace + " Pts");
                     }
 
                     int liveLifetime = GamificationStore.getLifetimeRoutineDays(context, uid, 0);
@@ -1615,7 +1577,7 @@ public class ProfileUiBinder {
                     int badgeCount = (hasFirst ? 1 : 0) + (hasStreak7 ? 1 : 0);
 
                     if (tvLifetimeDaysValue != null) {
-                        tvLifetimeDaysValue.setText("📅 " + liveLifetime + " Days");
+                        tvLifetimeDaysValue.setText(liveLifetime + " Days");
                     }
                     if (tvBadgesCountValue != null) {
                         tvBadgesCountValue.setText("🏆 " + badgeCount + " / 2");
@@ -1784,7 +1746,7 @@ public class ProfileUiBinder {
         ScrollView pickerScroll = new ScrollView(context);
         pickerScroll.setFillViewport(true);
         pickerScroll.addView(panel);
-        AlertDialog dialog = new AlertDialog.Builder(context).setView(pickerScroll).setNegativeButton("Close", null).create();
+        AlertDialog dialog = AppDialogs.builder(context).setView(pickerScroll).setNegativeButton("Close", null).create();
         panel.setTag(dialog);
         dialog.show();
     }

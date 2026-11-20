@@ -10,7 +10,7 @@ import java.util.Random;
 
 /** Offline learning games. Scores belong to these games, never member rewards. */
 public final class BibleGames {
-    public enum Mode { QUIZ, WHO_AM_I, VERSE_ORDER }
+    public enum Mode { QUIZ, WHO_AM_I, VERSE_ORDER, LADDER }
 
     public static final class Card {
         public final String prompt;
@@ -130,6 +130,7 @@ public final class BibleGames {
             case QUIZ: return QUIZ;
             case WHO_AM_I: return PEOPLE;
             case VERSE_ORDER: return VERSES;
+            case LADDER: return LadderBank.all();
             default: throw new IllegalArgumentException("Unknown game");
         }
     }
@@ -163,6 +164,11 @@ public final class BibleGames {
         c("I heard God calling my name as a child in the sanctuary. Who am I?", "Samuel", "1 Samuel 3", "With Eli's help, Samuel learned to recognise and answer God's call.", "My mother was Hannah.", "", "Samweli"),
         c("I met Jesus at a well and told my town about him. Who am I?", "The Samaritan woman", "John 4:4–30", "John does not give her name; her testimony led others to meet Jesus.", "The conversation happened in Samaria.", "", "Samaritan woman|Woman at the well|The woman at the well|Samaritan")
     ));
+
+    /** Builds a bank question; the correct answer must be one of the pipe-separated options. */
+    static Card ladderCard(String q, String a, String ref, String explanation, String hint, String options) {
+        return new Card(q, a, ref, explanation, hint, options, "");
+    }
 
     // Short public-domain KJV passages; these games do not require downloaded translations.
     private static final List<Card> VERSES = Collections.unmodifiableList(Arrays.asList(

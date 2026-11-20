@@ -51,6 +51,12 @@ import java.util.concurrent.Executors;
  */
 public class NotificationDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     private final NotificationRepository notificationRepo;
     private final String userId;
     private final Runnable onDismissCallback;
@@ -93,7 +99,7 @@ public class NotificationDialog extends Dialog {
                               @NonNull NotificationRepository notificationRepo,
                               @NonNull String userId,
                               @Nullable Runnable onDismissCallback) {
-        super(context);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.notificationRepo = notificationRepo;
         this.userId = userId != null && !userId.trim().isEmpty() ? userId.trim() : "user_active";
         this.onDismissCallback = onDismissCallback;
