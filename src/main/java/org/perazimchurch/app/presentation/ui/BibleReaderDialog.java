@@ -345,6 +345,8 @@ public class BibleReaderDialog extends Dialog {
     private View actionBarView;
     private BibleVerse actionVerse;
     private int focusedVerseNumber = 0;
+    /** Further verses tapped while the verse bar is open; the bar's highlight applies to these as well. */
+    private final java.util.TreeSet<Integer> extraActionVerses = new java.util.TreeSet<>();
 
     /** One background gradient behind everything; status and navigation bars are transparent so it flows top to bottom. */
     private void applyWindowChrome() {
@@ -917,8 +919,19 @@ public class BibleReaderDialog extends Dialog {
     }
 
     /** The colour panel for select mode: stays open so one colour can be chosen, then another portion selected. */
+    /** The picker for swipe colouring: choose the colour here, then drag across words to paint them. */
+    private void openSwipeColourPanel() {
+        swipeColourOn = true;
+        swipeAnchor = -1;
+        openSelectCard(true);
+    }
+
     private void openSelectCard() {
-        LinearLayout list = openFloatingCard("select", "Select verses", null, null);
+        openSelectCard(false);
+    }
+
+    private void openSelectCard(final boolean forSwipe) {
+        LinearLayout list = openFloatingCard(forSwipe ? "swipecolour" : "select", "Colour", null, null);
         // No backdrop card: strip the panel to its content, so only the picker and the Done icon show.
         if (notesPanelView instanceof LinearLayout) {
             LinearLayout panel = (LinearLayout) notesPanelView;
@@ -939,7 +952,13 @@ public class BibleReaderDialog extends Dialog {
             plp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             notesPanelView.setLayoutParams(plp);
         }
-        View picker = buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, true);
+        View picker = buildColourPicker(name -> {
+            if (forSwipe) {
+                swipeColourName = name;
+            } else {
+                applyHighlightToSelected(name);
+            }
+        }, forSwipe ? swipeColourName : null, false, null, true);
         LinearLayout.LayoutParams pickerLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46));
         pickerLp.gravity = Gravity.CENTER_HORIZONTAL;
         picker.setLayoutParams(pickerLp);
@@ -1267,7 +1286,7 @@ public class BibleReaderDialog extends Dialog {
             // Drag across words to select a range: Highlight, Clear highlight or Select verses from the menu.
             tvVerseText.setTextIsSelectable(true);
             tvVerseText.setCustomSelectionActionModeCallback(wordSelectionCallback(tvVerseText, verse, textStart));
-            tvVerseText.setOnClickListener(v -> showVerseActionBar(verse));
+            tvVerseText.setOnClickListener(v -> onVerseTapped(verse));
         }
         if (!isSearchResult) {
             // A quick sideways swipe across the verse selects the whole verse and opens the verse menu.
@@ -1324,11 +1343,12 @@ public class BibleReaderDialog extends Dialog {
         row.setContentDescription("Verse " + verse.getVerseNumber() + ". Tap to highlight, bookmark, add a note, copy, share or compare.");
         if (!isSearchResult) {
             verseRows.put(verse.getVerseNumber(), row);
-            if (focusedVerseNumber > 0 && verse.getVerseNumber() != focusedVerseNumber) {
+            if (focusedVerseNumber > 0 && verse.getVerseNumber() != focusedVerseNumber
+                    && !extraActionVerses.contains(verse.getVerseNumber())) {
                 row.setAlpha(0.35f);
             }
         }
-        row.setOnClickListener(v -> showVerseActionBar(verse));
+        row.setOnClickListener(v -> onVerseTapped(verse));
         return row;
     }
 
@@ -1532,6 +1552,8 @@ public class BibleReaderDialog extends Dialog {
 
     /** Swipe-to-colour mode: when on, dragging across a plain-text verse colours the words in bold purple. */
     private boolean swipeColourOn;
+    /** The colour swipe colouring paints with; the hamburger picker sets it. */
+    private String swipeColourName = "bold-purple";
     /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
     private int swipeAnchor = -1;
 
@@ -1555,7 +1577,7 @@ public class BibleReaderDialog extends Dialog {
             if (holder[0] != null) {
                 holder[0].dismiss();
             }
-            enterSelectMode(null);
+            openSwipeColourPanel();
         });
         row.addView(select);
 
@@ -1626,9 +1648,9 @@ public class BibleReaderDialog extends Dialog {
             swipeAnchor = -1;
             int[] range = trimmedBodyRange(verse, from, to);
             if (action == android.view.MotionEvent.ACTION_UP && range != null) {
-                applyWordHighlight(verse, range[0], range[1], "bold-purple");
+                applyWordHighlight(verse, range[0], range[1], swipeColourName);
             } else if (action == android.view.MotionEvent.ACTION_UP) {
-                showVerseActionBar(verse);
+                onVerseTapped(verse);
             }
             return true;
         }
@@ -2217,10 +2239,28 @@ public class BibleReaderDialog extends Dialog {
             readerFrame.removeView(actionBarView);
         }
         actionBarView = null;
+        extraActionVerses.clear();
         if (focusedVerseNumber != 0) {
             focusedVerseNumber = 0;
             renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
         }
+    }
+
+    /**
+     * A tap on a verse. With the verse bar closed it opens the bar for that verse. With the bar open, a tap on
+     * another verse adds it to (or removes it from) the group the bar acts on, so many verses can be chosen one by one.
+     */
+    private void onVerseTapped(BibleVerse verse) {
+        if (actionBarView != null && !isSearchMode && actionVerse != null
+                && verse.getVerseNumber() != actionVerse.getVerseNumber()) {
+            if (!extraActionVerses.remove(verse.getVerseNumber())) {
+                extraActionVerses.add(verse.getVerseNumber());
+            }
+            renderVerseList(currentVerses, false);
+            return;
+        }
+        extraActionVerses.clear();
+        showVerseActionBar(verse);
     }
 
     private LinearLayout barRow() {
@@ -2352,6 +2392,15 @@ public class BibleReaderDialog extends Dialog {
     private void applyHighlight(final BibleVerse verse, @Nullable final String colour) {
         final String previous = verse.getHighlightColor();
         verse.setHighlightColor(colour);
+        recordColourUse(colour);
+        // The same colour goes on every other verse chosen with the bar.
+        final java.util.TreeSet<Integer> group = new java.util.TreeSet<>(extraActionVerses);
+        for (BibleVerse other : currentVerses) {
+            if (group.contains(other.getVerseNumber())) {
+                other.setHighlightColor(colour);
+                bibleViewModel.setHighlight(other.getBookId(), other.getChapterNumber(), other.getVerseNumber(), colour, () -> { });
+            }
+        }
         showUndoPill(verse, previous, colour);
         if (actionVerse != null) {
             dismissActionBar();
