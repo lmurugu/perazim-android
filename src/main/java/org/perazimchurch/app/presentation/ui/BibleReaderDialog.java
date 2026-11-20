@@ -1508,31 +1508,78 @@ public class BibleReaderDialog extends Dialog {
     /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
     private int swipeAnchor = -1;
 
-    /** One card for every highlight tool: swipe colouring and select verses. */
+    /** One card for every highlight tool. Each tool is a tile with a title, a line of help and a state chip. */
     private void showHighlightTools() {
         LinearLayout list = new LinearLayout(getContext());
         list.setOrientation(LinearLayout.VERTICAL);
         final android.app.Dialog[] holder = new android.app.Dialog[1];
-        TextView swipeRow = GlassKit.glassButton(getContext(), swipeLabel(), 14);
-        swipeRow.setOnClickListener(v -> {
-            swipeColourOn = !swipeColourOn;
-            swipeAnchor = -1;
-            swipeRow.setText(swipeLabel());
-        });
-        list.addView(swipeRow, GlassKit.matchWrap(getContext(), 8));
-        TextView selectRow = GlassKit.glassButton(getContext(), "Select verses", 14);
-        selectRow.setOnClickListener(v -> {
-            if (holder[0] != null) {
-                holder[0].dismiss();
-            }
-            enterSelectMode(null);
-        });
-        list.addView(selectRow, GlassKit.matchWrap(getContext(), 8));
-        holder[0] = openCardDialog("Highlight", "Colour words, sentences or whole verses", list, null, null);
+
+        final TextView swipeChip = highlightChip(swipeColourOn);
+        View swipeTile = highlightTile("Swipe to colour",
+                "Drag across words in a verse to colour them purple", swipeChip, () -> {
+                    swipeColourOn = !swipeColourOn;
+                    swipeAnchor = -1;
+                    swipeChip.setText(swipeColourOn ? "On" : "Off");
+                    styleHighlightChip(swipeChip, swipeColourOn);
+                });
+        list.addView(swipeTile, GlassKit.matchWrap(getContext(), 0));
+
+        View selectTile = highlightTile("Select verses",
+                "Choose several verses, then pick one colour for all", null, () -> {
+                    if (holder[0] != null) {
+                        holder[0].dismiss();
+                    }
+                    enterSelectMode(null);
+                });
+        list.addView(selectTile, GlassKit.matchWrap(getContext(), 10));
+
+        TextView tip = GlassKit.text(getContext(),
+                "Tip: long-press a word to colour a phrase or a whole sentence.", 12, false, GlassKit.muted());
+        tip.setPadding(dp(4), dp(12), dp(4), 0);
+        list.addView(tip);
+
+        holder[0] = openCardDialog("Highlight", "Words, sentences or whole verses", list, null, null);
     }
 
-    private String swipeLabel() {
-        return swipeColourOn ? "Swipe colouring: on" : "Swipe colouring: off";
+    /** A rounded, tappable tile for one highlight tool. */
+    private View highlightTile(String title, String help, @Nullable View chip, Runnable onTap) {
+        LinearLayout tile = new LinearLayout(getContext());
+        tile.setOrientation(LinearLayout.HORIZONTAL);
+        tile.setGravity(Gravity.CENTER_VERTICAL);
+        tile.setPadding(dp(16), dp(14), dp(16), dp(14));
+        GradientDrawable panel = new GradientDrawable();
+        panel.setCornerRadius(dp(16));
+        panel.setColor(GlassKit.light() ? 0x33FFFFFF : 0x26FFFFFF);
+        panel.setStroke(dp(1), 0x33FFFFFF);
+        tile.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(0x33E17D2F), panel, null));
+        LinearLayout text = new LinearLayout(getContext());
+        text.setOrientation(LinearLayout.VERTICAL);
+        text.addView(GlassKit.text(getContext(), title, 15, true, notesInk()));
+        text.addView(GlassKit.text(getContext(), help, 12, false, notesMuted()));
+        tile.addView(text, new LinearLayout.LayoutParams(0, -2, 1f));
+        if (chip != null) {
+            tile.addView(chip);
+        }
+        tile.setOnClickListener(v -> onTap.run());
+        tile.setMinimumHeight(dp(64));
+        return tile;
+    }
+
+    private TextView highlightChip(boolean on) {
+        TextView chip = GlassKit.text(getContext(), on ? "On" : "Off", 12, true, notesInk());
+        chip.setGravity(Gravity.CENTER);
+        chip.setPadding(dp(14), dp(6), dp(14), dp(6));
+        styleHighlightChip(chip, on);
+        return chip;
+    }
+
+    private void styleHighlightChip(TextView chip, boolean on) {
+        GradientDrawable pill = new GradientDrawable();
+        pill.setCornerRadius(dp(20));
+        pill.setColor(on ? COLOR_ACCENT_ORANGE() : 0x1A000000);
+        chip.setBackground(pill);
+        chip.setTextColor(on ? 0xFFFFFFFF : notesMuted());
     }
 
     /**
