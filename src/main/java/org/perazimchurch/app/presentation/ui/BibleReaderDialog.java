@@ -802,6 +802,7 @@ public class BibleReaderDialog extends Dialog {
 
     public void loadChapterVerses(@NonNull String bookId, int chapter) {
         dismissActionBar();
+        exitSelectMode();
         freshRender = true;
         this.currentBookId = bookId;
         saveLastPosition();
@@ -845,6 +846,118 @@ public class BibleReaderDialog extends Dialog {
         });
     }
 
+    /** Select mode: drag a finger across verses (or tap them) to choose several, then pick a colour for all of them. */
+    private boolean selectMode = false;
+    private final java.util.TreeSet<Integer> selectedVerses = new java.util.TreeSet<>();
+    private int dragVerse = -1;
+    private boolean dragAdds = true;
+
+    private void enterSelectMode(BibleVerse verse) {
+        dismissActionBar();
+        openSelectCard();
+        selectMode = true;
+        selectedVerses.clear();
+        selectedVerses.add(verse.getVerseNumber());
+        renderVerseList(currentVerses, false);
+    }
+
+    private void exitSelectMode() {
+        selectMode = false;
+        selectedVerses.clear();
+        dragVerse = -1;
+    }
+
+    /** Touch handling while selecting: the verse under the finger is added, or removed if the drag began on a chosen verse. */
+    private boolean selectTouch(android.view.MotionEvent ev) {
+        if (!selectMode) {
+            return false;
+        }
+        int action = ev.getActionMasked();
+        if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE) {
+            int hit = verseAtRawY(ev.getRawY());
+            if (action == android.view.MotionEvent.ACTION_DOWN) {
+                dragAdds = hit <= 0 || !selectedVerses.contains(hit);
+                dragVerse = -1;
+            }
+            if (hit > 0 && hit != dragVerse) {
+                dragVerse = hit;
+                if (dragAdds) {
+                    selectedVerses.add(hit);
+                } else {
+                    selectedVerses.remove(hit);
+                }
+                renderVerseList(currentVerses, false);
+            }
+            if (versesScrollView != null) {
+                versesScrollView.requestDisallowInterceptTouchEvent(true);
+            }
+        } else if (action == android.view.MotionEvent.ACTION_UP || action == android.view.MotionEvent.ACTION_CANCEL) {
+            dragVerse = -1;
+        }
+        return true;
+    }
+
+    /** The verse whose row is under a screen Y position, or 0. */
+    private int verseAtRawY(float rawY) {
+        int[] loc = new int[2];
+        for (Map.Entry<Integer, View> e : verseRows.entrySet()) {
+            View row = e.getValue();
+            row.getLocationOnScreen(loc);
+            if (rawY >= loc[1] && rawY < loc[1] + row.getHeight()) {
+                return e.getKey();
+            }
+        }
+        return 0;
+    }
+
+    /** The colour panel for select mode: stays open so one colour can be chosen, then another portion selected. */
+    private void openSelectCard() {
+        LinearLayout list = openFloatingCard("select", "Select verses", null, null);
+        TextView hint = GlassKit.text(getContext(),
+                "Drag across the verses, or tap them. Then pick a colour for everything chosen. Choose a new portion and colour again.",
+                12, false, notesMuted());
+        hint.setPadding(0, dp(4), 0, dp(6));
+        list.addView(hint);
+        addSwatchRow(list, HighlightColors.BOLD);
+        addSwatchRow(list, HighlightColors.ALL);
+        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
+            addSwatchRow(list, shadeRow);
+        }
+        TextView done = GlassKit.orangeButton(getContext(), "Done", 13);
+        done.setOnClickListener(v -> dismissNotesPanel());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, dp(38));
+        lp.topMargin = dp(10);
+        list.addView(done, lp);
+    }
+
+    private void addSwatchRow(LinearLayout list, List<HighlightColors.Colour> colours) {
+        LinearLayout row = new LinearLayout(getContext());
+        row.setGravity(Gravity.CENTER);
+        for (final HighlightColors.Colour colour : colours) {
+            row.addView(swatchView(colour.swatch, false, v -> applyHighlightToSelected(colour.name)));
+        }
+        list.addView(row);
+    }
+
+    /** Colours every chosen verse, then clears the choice so the next portion can be selected. */
+    private void applyHighlightToSelected(final String colour) {
+        if (selectedVerses.isEmpty()) {
+            Toast.makeText(getContext(), "Drag across or tap the verses first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int count = 0;
+        for (BibleVerse v : currentVerses) {
+            if (selectedVerses.contains(v.getVerseNumber())) {
+                v.setHighlightColor(colour);
+                bibleViewModel.setHighlight(v.getBookId(), v.getChapterNumber(), v.getVerseNumber(), colour, () -> { });
+                count++;
+            }
+        }
+        selectedVerses.clear();
+        renderVerseList(currentVerses, false);
+        Toast.makeText(getContext(), "Highlighted " + count + (count == 1 ? " verse" : " verses"), Toast.LENGTH_SHORT).show();
+    }
+
     /** Set when a chapter is chosen in the picker: the verse card opens once the chapter is on screen. */
     private boolean pendingVersePicker = false;
 
@@ -882,6 +995,14 @@ public class BibleReaderDialog extends Dialog {
                 scrollToVerse(verseNumber);
             });
             row.addView(cell, lp);
+        }
+        if (row != null) {
+            for (int i = row.getChildCount(); i < columns; i++) {
+                View filler = new View(getContext());
+                LinearLayout.LayoutParams fp = new LinearLayout.LayoutParams(0, dp(42), 1f);
+                fp.setMargins(dp(3), dp(3), dp(3), dp(3));
+                row.addView(filler, fp);
+            }
         }
         holder[0] = openCardDialog(currentBookName + " " + currentChapter, "Choose a verse", grid,
                 "\u2039 Start of chapter", () -> scrollToVerse(1));
@@ -1089,6 +1210,15 @@ public class BibleReaderDialog extends Dialog {
             row.setBackground(mark);
             row.setPadding(dp(8), dp(6), dp(8), dp(6));
         }
+        if (selectMode && !isSearchResult && selectedVerses.contains(verse.getVerseNumber())) {
+            // Chosen for colouring: a bordered panel in the highlight tint (or orange if not yet coloured).
+            GradientDrawable chosen = new GradientDrawable();
+            chosen.setCornerRadius(dp(12));
+            chosen.setColor(highlight != null ? Color.parseColor(highlight.tint) : Color.parseColor("#33E17D2F"));
+            chosen.setStroke(dp(2), Color.parseColor("#E17D2F"));
+            row.setBackground(chosen);
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
+        }
         GlassKit.keep(row);
 
         String label = isSearchResult ? formatCitation(verse) : String.valueOf(verse.getVerseNumber());
@@ -1147,8 +1277,18 @@ public class BibleReaderDialog extends Dialog {
                         }
                     });
             tvVerseText.setOnTouchListener((v, ev) -> {
+                if (selectTouch(ev)) {
+                    return true;
+                }
                 swipe.onTouchEvent(ev);
                 return false;
+            });
+        }
+        if (!isSearchResult) {
+            row.setOnTouchListener((v, ev) -> selectTouch(ev));
+            row.setOnLongClickListener(v -> {
+                enterSelectMode(verse);
+                return true;
             });
         }
         tvVerseText.setTextColor(verseInk());
@@ -2105,6 +2245,10 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void dismissNotesPanel() {
+        if ("select".equals(cardKind)) {
+            exitSelectMode();
+            renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+        }
         if (notesPanelView != null && readerFrame != null) {
             readerFrame.removeView(notesPanelView);
         }
