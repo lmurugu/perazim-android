@@ -82,6 +82,9 @@ public final class BibleTextMigration {
         if (trimmed && file.length() > COMPACT_ABOVE_BYTES) {
             long before = file.length();
             db.getOpenHelper().getWritableDatabase().execSQL("VACUUM");
+            // In write-ahead mode the rewritten file only shrinks once the log is merged back and truncated.
+            android.database.Cursor checkpoint = db.getOpenHelper().getWritableDatabase().query("PRAGMA wal_checkpoint(TRUNCATE)");
+            checkpoint.close();
             Log.i(TAG, "Private database compacted from " + before + " to " + file.length() + " bytes");
         }
     }
