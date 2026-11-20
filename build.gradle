@@ -156,7 +156,7 @@ tasks.configureEach { task ->
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.room:room-runtime:2.6.1'
+    implementation 'androidx.room:room-runtime:2.8.5'
     implementation 'net.zetetic:sqlcipher-android:4.16.0@aar'
     implementation 'androidx.sqlite:sqlite:2.6.2'
     implementation 'androidx.work:work-runtime:2.9.1'
