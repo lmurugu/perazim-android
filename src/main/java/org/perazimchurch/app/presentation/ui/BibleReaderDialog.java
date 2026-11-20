@@ -1487,8 +1487,7 @@ public class BibleReaderDialog extends Dialog {
         column.setGravity(Gravity.CENTER_HORIZONTAL);
         column.setPadding(dp(8), dp(8), dp(8), dp(8));
         column.setLayoutParams(new ViewGroup.LayoutParams(dp(132), ViewGroup.LayoutParams.WRAP_CONTENT));
-        // A flat tile inside the card, not a second frosted card: it only separates one word from the next.
-        column.setBackground(cardTile(false));
+        // No tile behind each word: the words sit directly on the one card, so there is no card inside a card.
 
         TextView original = new TextView(getContext());
         original.setText(word.getOriginal());
