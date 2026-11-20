@@ -218,6 +218,10 @@ public class PerazimAiEngine {
             "\\b(?:i (?:have )?(?:submitted|sent|registered|updated|contacted|changed|forwarded|notified|recorded)|" +
             "(?:has|have) been (?:submitted|sent|registered|updated|contacted|changed|forwarded|notified|recorded)|" +
             "submitted successfully|i (?:have )?(?:informed|alerted) (?:the )?(?:bishop|pastor|leader))\\b", Pattern.CASE_INSENSITIVE);
+    /** Replies that present a statement as officially approved or official Perazim position. */
+    private static final Pattern CLAIMED_OFFICIAL_STATUS = Pattern.compile(
+            "\\b(?:officially approved|approved by the bishop|is the official (?:position|doctrine|policy|teaching) of|" +
+            "official church (?:position|policy) is)\\b", Pattern.CASE_INSENSITIVE);
     /** Replies that claim to be a human church authority. */
     private static final Pattern CLAIMED_HUMAN_AUTHORITY = Pattern.compile(
             "\\bi (?:am|'m) (?:your |the |a |an )?(?:church )?(?:pastor|bishop|priest|elder|deacon|counsellor|counselor|leader)\\b|" +
@@ -232,7 +236,9 @@ public class PerazimAiEngine {
     }
 
     public static boolean claimsAppActionOrHumanAuthority(@Nullable String answer) {
-        return answer != null && (CLAIMED_APP_ACTION.matcher(answer).find() || CLAIMED_HUMAN_AUTHORITY.matcher(answer).find());
+        return answer != null && (CLAIMED_APP_ACTION.matcher(answer).find()
+                || CLAIMED_HUMAN_AUTHORITY.matcher(answer).find()
+                || CLAIMED_OFFICIAL_STATUS.matcher(answer).find());
     }
 
     @NonNull
