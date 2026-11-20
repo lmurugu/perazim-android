@@ -244,7 +244,7 @@ public class PerazimAiEngine {
     @NonNull
     public static AiResponse outOfScopeResponse() {
         return AiResponse.plainText(
-                "I can help with Christian faith, approved Perazim information, and using this app. I cannot provide investment, medical, or legal advice, or answer unrelated general-interest questions. Please consult a qualified professional for those matters; for a spiritual or church concern, speak with an authorised human leader.",
+                "I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with the Bishop or an appropriate person. For medical, legal or financial matters, please consult a qualified professional.",
                 Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
