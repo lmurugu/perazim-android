@@ -30,7 +30,9 @@ public final class StartupSplash {
     private static final long WORDS_DELAY_MS = 0;
     private static final long WORDS_IN_MS = 500;
     /** The words stay up at least this long, so a fast start still lets them be read. */
-    private static final long MIN_SHOWN_MS = 1800;
+    private static final long MIN_SHOWN_MS = 3500;
+    /** After the app is ready, the words stay up this much longer before fading. */
+    private static final long HOLD_AFTER_READY_MS = 1000;
     private static final long WORDS_OUT_MS = 200;
     private static final long BLACK_OUT_MS = 350;
 
@@ -134,7 +136,7 @@ public final class StartupSplash {
         stack.addView(splash, new FrameLayout.LayoutParams(-1, -1));
         activity.setContentView(stack);
 
-        long wait = Math.max(0, MIN_SHOWN_MS - (SystemClock.elapsedRealtime() - beganAt));
+        long wait = Math.max(HOLD_AFTER_READY_MS, MIN_SHOWN_MS - (SystemClock.elapsedRealtime() - beganAt));
         final View words1 = name;
         final View words2 = tagline;
         overlay = null;
