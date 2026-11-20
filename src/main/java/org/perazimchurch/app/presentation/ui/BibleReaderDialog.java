@@ -1556,7 +1556,7 @@ public class BibleReaderDialog extends Dialog {
         circle.setShape(GradientDrawable.OVAL);
         circle.setColor(on ? 0x33E17D2F : 0x00000000);
         icon.setBackground(circle);
-        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : notesMuted());
+        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : GlassKit.text());
     }
 
     /**
