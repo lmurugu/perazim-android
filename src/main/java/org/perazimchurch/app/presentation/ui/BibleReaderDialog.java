@@ -919,11 +919,6 @@ public class BibleReaderDialog extends Dialog {
     /** The colour panel for select mode: stays open so one colour can be chosen, then another portion selected. */
     private void openSelectCard() {
         LinearLayout list = openFloatingCard("select", "Select verses", null, null);
-        TextView hint = GlassKit.text(getContext(),
-                "Drag across the verses, or tap them. Then pick a colour for everything chosen. Choose a new portion and colour again.",
-                12, false, notesMuted());
-        hint.setPadding(0, dp(4), 0, dp(6));
-        list.addView(hint);
         list.addView(buildColourPicker(name -> applyHighlightToSelected(name), null, false, null));
         TextView done = GlassKit.orangeButton(getContext(), "Done", 14);
         done.setPadding(dp(28), 0, dp(28), 0);
@@ -1508,78 +1503,51 @@ public class BibleReaderDialog extends Dialog {
     /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
     private int swipeAnchor = -1;
 
-    /** One card for every highlight tool. Each tool is a tile with a title, a line of help and a state chip. */
+    /** One small card of icon toggles for the highlight tools. On is orange, off is muted. */
     private void showHighlightTools() {
-        LinearLayout list = new LinearLayout(getContext());
-        list.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout row = new LinearLayout(getContext());
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
         final android.app.Dialog[] holder = new android.app.Dialog[1];
 
-        final TextView swipeChip = highlightChip(swipeColourOn);
-        View swipeTile = highlightTile("Swipe to colour",
-                "Drag across words in a verse to colour them purple", swipeChip, () -> {
-                    swipeColourOn = !swipeColourOn;
-                    swipeAnchor = -1;
-                    swipeChip.setText(swipeColourOn ? "On" : "Off");
-                    styleHighlightChip(swipeChip, swipeColourOn);
-                });
-        list.addView(swipeTile, GlassKit.matchWrap(getContext(), 0));
+        final ImageView swipe = highlightIcon(org.perazimchurch.app.R.drawable.ic_hl_swipe, swipeColourOn, "Swipe to colour words");
+        swipe.setOnClickListener(v -> {
+            swipeColourOn = !swipeColourOn;
+            swipeAnchor = -1;
+            styleHighlightIcon(swipe, swipeColourOn);
+        });
+        row.addView(swipe);
 
-        View selectTile = highlightTile("Select verses",
-                "Choose several verses, then pick one colour for all", null, () -> {
-                    if (holder[0] != null) {
-                        holder[0].dismiss();
-                    }
-                    enterSelectMode(null);
-                });
-        list.addView(selectTile, GlassKit.matchWrap(getContext(), 10));
+        ImageView select = highlightIcon(org.perazimchurch.app.R.drawable.ic_hl_select, false, "Select verses");
+        select.setOnClickListener(v -> {
+            if (holder[0] != null) {
+                holder[0].dismiss();
+            }
+            enterSelectMode(null);
+        });
+        row.addView(select);
 
-        TextView tip = GlassKit.text(getContext(),
-                "Tip: long-press a word to colour a phrase or a whole sentence.", 12, false, GlassKit.muted());
-        tip.setPadding(dp(4), dp(12), dp(4), 0);
-        list.addView(tip);
-
-        holder[0] = openCardDialog("Highlight", "Words, sentences or whole verses", list, null, null);
+        holder[0] = openCardDialog("Highlight", null, row, null, null);
     }
 
-    /** A rounded, tappable tile for one highlight tool. */
-    private View highlightTile(String title, String help, @Nullable View chip, Runnable onTap) {
-        LinearLayout tile = new LinearLayout(getContext());
-        tile.setOrientation(LinearLayout.HORIZONTAL);
-        tile.setGravity(Gravity.CENTER_VERTICAL);
-        tile.setPadding(dp(16), dp(14), dp(16), dp(14));
-        GradientDrawable panel = new GradientDrawable();
-        panel.setCornerRadius(dp(16));
-        panel.setColor(GlassKit.light() ? 0x33FFFFFF : 0x26FFFFFF);
-        panel.setStroke(dp(1), 0x33FFFFFF);
-        tile.setBackground(new android.graphics.drawable.RippleDrawable(
-                android.content.res.ColorStateList.valueOf(0x33E17D2F), panel, null));
-        LinearLayout text = new LinearLayout(getContext());
-        text.setOrientation(LinearLayout.VERTICAL);
-        text.addView(GlassKit.text(getContext(), title, 15, true, notesInk()));
-        text.addView(GlassKit.text(getContext(), help, 12, false, notesMuted()));
-        tile.addView(text, new LinearLayout.LayoutParams(0, -2, 1f));
-        if (chip != null) {
-            tile.addView(chip);
-        }
-        tile.setOnClickListener(v -> onTap.run());
-        tile.setMinimumHeight(dp(64));
-        return tile;
+    private ImageView highlightIcon(int drawable, boolean on, String description) {
+        ImageView icon = new ImageView(getContext());
+        icon.setImageResource(drawable);
+        icon.setContentDescription(description);
+        icon.setPadding(dp(16), dp(16), dp(16), dp(16));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(60), dp(60));
+        lp.setMargins(dp(8), dp(4), dp(8), dp(4));
+        icon.setLayoutParams(lp);
+        styleHighlightIcon(icon, on);
+        return icon;
     }
 
-    private TextView highlightChip(boolean on) {
-        TextView chip = GlassKit.text(getContext(), on ? "On" : "Off", 12, true, notesInk());
-        chip.setGravity(Gravity.CENTER);
-        chip.setPadding(dp(14), dp(6), dp(14), dp(6));
-        styleHighlightChip(chip, on);
-        return chip;
-    }
-
-    private void styleHighlightChip(TextView chip, boolean on) {
-        GradientDrawable pill = new GradientDrawable();
-        pill.setCornerRadius(dp(20));
-        pill.setColor(on ? COLOR_ACCENT_ORANGE() : 0x1A000000);
-        chip.setBackground(pill);
-        chip.setTextColor(on ? 0xFFFFFFFF : notesMuted());
+    private void styleHighlightIcon(ImageView icon, boolean on) {
+        GradientDrawable circle = new GradientDrawable();
+        circle.setShape(GradientDrawable.OVAL);
+        circle.setColor(on ? COLOR_ACCENT_ORANGE() : 0x1A000000);
+        icon.setBackground(circle);
+        icon.setColorFilter(on ? 0xFFFFFFFF : notesMuted());
     }
 
     /**
@@ -1733,7 +1701,7 @@ public class BibleReaderDialog extends Dialog {
 
     /** Colour card for a chosen word or range. */
     private void pickWordColour(final BibleVerse verse, final int start, final int end) {
-        wordColourDialog = openCardDialog("Highlight words", "Only the words you chose are coloured",
+        wordColourDialog = openCardDialog("Highlight", null,
                 buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, false, null), null, null);
     }
 
