@@ -1545,7 +1545,7 @@ public class BibleReaderDialog extends Dialog {
     private void styleHighlightIcon(ImageView icon, boolean on) {
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(on ? COLOR_ACCENT_ORANGE() : 0x1A000000);
+        circle.setColor(on ? COLOR_ACCENT_ORANGE() : (GlassKit.light() ? 0x1A000000 : 0x33FFFFFF));
         icon.setBackground(circle);
         icon.setColorFilter(on ? 0xFFFFFFFF : notesMuted());
     }
