@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Press and selection colour: frosted dark purple in light mode, frosted white in dark mode.
+         Applied at runtime by MainActivity, so it follows the in-app Light / Dark choice. -->
+    <style name="PerazimPressLight">
+        <item name="colorControlHighlight">#4D3D1749</item>
+        <item name="android:colorControlHighlight">#4D3D1749</item>
+        <item name="android:textColorHighlight">#4D3D1749</item>
+    </style>
+    <style name="PerazimPressDark">
+        <item name="colorControlHighlight">#40FFFFFF</item>
+        <item name="android:colorControlHighlight">#40FFFFFF</item>
+        <item name="android:textColorHighlight">#40FFFFFF</item>
+    </style>
     <style name="UiCard">
         <item name="android:padding">16dp</item>
     </style>
