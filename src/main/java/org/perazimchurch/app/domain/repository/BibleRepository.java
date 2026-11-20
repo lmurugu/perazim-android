@@ -64,7 +64,7 @@ public interface BibleRepository {
     List<BibleNote> getNotes();
 
     /** Saves a note (id 0 creates one) and replaces its verse links. Returns the note id. */
-    long saveNote(long id, String body, List<VerseLocation> links);
+    long saveNote(long id, String body, List<VerseLocation> links, List<String> topics);
 
     /** Deletes a note and its links. */
     void deleteNote(long id);

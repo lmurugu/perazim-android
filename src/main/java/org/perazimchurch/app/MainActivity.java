@@ -186,8 +186,27 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            // Cold start: show the black logo screen first, then build the app behind it. While the words fade in,
+            // open the database on another thread, so the app build that follows finds it ready and is shorter.
+            final android.content.Context appContext = getApplicationContext();
+            Thread warm = new Thread(() -> {
+                try {
+                    SessionManager.getInstance(appContext);
+                } catch (Throwable ignored) {
+                    // Opening it again on the main thread will report any real problem.
+                }
+            }, "startup-warm-up");
+            warm.start();
+            org.perazimchurch.app.ui.components.StartupSplash.begin(this, () -> initApp(null));
+        } else {
+            initApp(savedInstanceState);
+        }
+    }
+
+    private void initApp(Bundle savedInstanceState) {
         org.perazimchurch.app.ui.theme.Glass.useDensity(getResources().getDisplayMetrics().density);
 
         // Initialize gamification persistence
@@ -262,7 +281,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 
         // 5. Illustrated Quiet-Dark Splash Overlay
-        splashContainer = createSplashScreen();
+        splashContainer = getIntent() != null && getIntent().getBooleanExtra("show_splash", false)
+                ? createSplashScreen() : null;
         if (splashContainer != null) {
             rootWindow.addView(splashContainer);
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
@@ -279,7 +299,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             }, 1200);
         }
 
-        setContentView(rootWindow);
+        // On a cold start the app goes under the black logo screen, which then fades away.
+        org.perazimchurch.app.ui.components.StartupSplash.showApp(this, rootWindow);
         handleIntent(getIntent());
     }
 
@@ -439,7 +460,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private View createTopAppBar() {
         // Mockup header: logo and "Perazim", then the light/dark switch and the glass profile button.
         return GlassKit.header(this,
-                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.choose(this),
+                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.choose(this, v),
                 v -> switchTab(NavigationContract.TAB_ID_PROFILE));
     }
 
@@ -600,13 +621,69 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
             }
         }
-        window.getDecorView().setSystemUiVisibility(flags);
+        if (Build.VERSION.SDK_INT < 30) {
+            window.getDecorView().setSystemUiVisibility(flags);
+        }
         root.setOnApplyWindowInsetsListener((v, insets) -> {
             v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
                     insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
             return insets.consumeSystemWindowInsets();
         });
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Same flow as the Bible tab: the glow runs from the very top to the very bottom edge,
+            // behind the camera cutout, the status bar and the navigation bar.
+            window.getDecorView();  // make sure the decor view exists before using the insets controller
+            window.setDecorFitsSystemWindows(false);
+            window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+            if (Build.VERSION.SDK_INT >= 28) {
+                android.view.WindowManager.LayoutParams attrs = window.getAttributes();
+                attrs.layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+                window.setAttributes(attrs);
+            }
+            root.setOnApplyWindowInsetsListener((v, insets) -> {
+                android.graphics.Insets bars = insets.getInsets(
+                        android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                return android.view.WindowInsets.CONSUMED;
+            });
+            android.view.WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+            }
+        }
         root.requestApplyInsets();
+        if (Build.VERSION.SDK_INT >= 30) {
+            // The system resets bar appearance while the window attaches, so apply it again afterwards.
+            root.post(() -> applySystemBarLook(window));
+            root.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    v.post(() -> applySystemBarLook(window));
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                }
+            });
+        }
+    }
+
+    /** Transparent bars with dark icons in light mode and light icons in dark mode, no contrast scrim. */
+    private void applySystemBarLook(android.view.Window window) {
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        android.view.WindowInsetsController controller = window.getInsetsController();
+        if (controller != null) {
+            int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                    | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+            controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+        }
     }
 
     private View createBottomTabBar() {

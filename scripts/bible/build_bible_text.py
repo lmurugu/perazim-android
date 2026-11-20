@@ -54,6 +54,10 @@ def clean_verse_text(raw):
     # Paragraph marks (KJV pilcrows) are layout, not scripture text.
     text = text.replace("\u00b6", " ")
     text = re.sub(r"\s+", " ", text).strip()
+    # Some sources put a space before punctuation (for example "LORD ." or "art ,"): remove it,
+    # and remove the space some sources leave after an opening bracket or quote.
+    text = re.sub(r"\s+([,.;:!?)\]\u201d\u2019])", r"\1", text)
+    text = re.sub(r"([(\[\u201c\u2018])\s+", r"\1", text)
     return text
 
 

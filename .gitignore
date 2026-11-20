@@ -80,3 +80,6 @@ src/main/assets/bible/local/
 
 # Heap dumps and profiler output must never be committed.
 *.hprof
+
+# Brand logos are tracked so they stay available.
+!docs/brand/*.png

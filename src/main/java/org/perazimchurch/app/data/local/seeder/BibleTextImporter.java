@@ -10,6 +10,10 @@ import org.perazimchurch.app.data.local.dao.BibleDao;
 import org.perazimchurch.app.data.local.entity.BibleBookEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
+import org.perazimchurch.app.data.local.text.BibleTextDao;
+import org.perazimchurch.app.data.local.text.BibleTextDatabase;
+import org.perazimchurch.app.data.local.text.BibleTextVerseEntity;
+import org.perazimchurch.app.data.local.text.BibleVerseReader;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -91,20 +95,21 @@ public final class BibleTextImporter {
     }
 
     /**
-     * Imports every bundled translation that is not yet complete. Safe to call repeatedly.
+     * Imports every bundled translation that is not yet in the separate text database. Safe to call repeatedly.
      *
      * @param context Application context used to open assets; no-op when null
-     * @param dao     Bible DAO of the open database
+     * @param dao     Bible DAO of the private database (translation and book names only)
      */
     public static synchronized void importBundledTranslations(@Nullable Context context, @Nullable BibleDao dao) {
         if (context == null || dao == null) {
             return;
         }
+        BibleTextDao textDao = BibleTextDatabase.get(context).textDao();
         List<Spec> all = new ArrayList<>(BUNDLED);
         all.addAll(LOCAL);
         for (Spec spec : all) {
             try {
-                importTranslation(context, dao, spec);
+                importTranslation(context, dao, textDao, spec);
             } catch (Exception e) {
                 // A broken or missing asset must not stop the reader from opening.
                 Log.w(TAG, "Could not import bundled translation " + spec.id, e);
@@ -112,16 +117,13 @@ public final class BibleTextImporter {
         }
     }
 
-    /** Returns true when the translation already has all verses its source publishes. */
-    public static boolean isComplete(@NonNull BibleDao dao, @NonNull Spec spec) {
-        return dao.countVerses(spec.id) >= spec.expectedVerses;
+    /** Returns true when the translation already has all verses its source publishes in the text database. */
+    public static boolean isComplete(@NonNull BibleTextDao textDao, @NonNull Spec spec) {
+        return textDao.count(spec.id) >= spec.expectedVerses;
     }
 
-    private static void importTranslation(Context context, BibleDao dao, Spec spec) throws IOException {
-        if (dao.countVerses(spec.id) > spec.expectedVerses) {
-            reconcileDuplicates(dao, spec.id);
-        }
-        if (isComplete(dao, spec)) {
+    private static void importTranslation(Context context, BibleDao dao, BibleTextDao textDao, Spec spec) throws IOException {
+        if (BibleVerseReader.isCurrent(context, spec.id) && isComplete(textDao, spec)) {
             return;
         }
         InputStream source = openSource(context, spec);
@@ -130,33 +132,33 @@ public final class BibleTextImporter {
         }
         ensureTranslationAndBooks(dao, spec);
 
-        List<BibleVerseEntity> batch = new ArrayList<>(BATCH_SIZE);
+        List<BibleTextVerseEntity> batch = new ArrayList<>(BATCH_SIZE);
         int imported = 0;
         try (BufferedReader reader = new BufferedReader(
                      new InputStreamReader(source, StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 Row row = parseLine(line);
-                if (row == null) {
+                if (row == null || row.bookNumber < 1 || row.bookNumber > BibleDataSeeder.CANONICAL_BOOKS.length) {
                     continue;
                 }
-                BibleVerseEntity entity = toEntity(spec, row);
-                if (entity == null) {
-                    continue;
-                }
-                batch.add(entity);
+                batch.add(new BibleTextVerseEntity(spec.id, row.bookNumber, row.chapter, row.verse, row.text));
                 if (batch.size() >= BATCH_SIZE) {
-                    dao.insertVersesIgnoringExisting(batch);
+                    textDao.insertAll(batch);
                     imported += batch.size();
                     batch.clear();
                 }
             }
         }
         if (!batch.isEmpty()) {
-            dao.insertVersesIgnoringExisting(batch);
+            textDao.insertAll(batch);
             imported += batch.size();
         }
-        Log.i(TAG, "Imported " + imported + " verses for " + spec.id + " (stored total " + dao.countVerses(spec.id) + ")");
+        // Only trust the text database for this translation once every verse is in.
+        if (isComplete(textDao, spec)) {
+            BibleVerseReader.markReady(context, spec.id);
+        }
+        Log.i(TAG, "Imported " + imported + " verses for " + spec.id + " into the text database");
     }
 
     /** Opens the bundled asset, or the owner's local file for local texts. Returns null when absent. */
@@ -171,56 +173,6 @@ public final class BibleTextImporter {
             return null;
         }
         return new FileInputStream(file);
-    }
-
-    /**
-     * Earlier starter rows used a different id scheme, so one verse position can have two rows.
-     * Keep the row with the canonical id, carry over any bookmark or note from the other rows,
-     * and delete the duplicates. Runs only when a translation has more verses than expected.
-     */
-    static void reconcileDuplicates(BibleDao dao, String translationId) {
-        Map<String, List<BibleVerseEntity>> byPosition = new HashMap<>();
-        for (BibleVerseEntity row : dao.getAllVerses(translationId)) {
-            String key = row.getBookNumber() + "." + row.getChapterNumber() + "." + row.getVerseNumber();
-            List<BibleVerseEntity> rows = byPosition.get(key);
-            if (rows == null) {
-                rows = new ArrayList<>(2);
-                byPosition.put(key, rows);
-            }
-            rows.add(row);
-        }
-        for (List<BibleVerseEntity> rows : byPosition.values()) {
-            if (rows.size() < 2) {
-                continue;
-            }
-            BibleVerseEntity keeper = rows.get(0);
-            for (BibleVerseEntity row : rows) {
-                if (row.getId().equals(canonicalId(translationId, row))) {
-                    keeper = row;
-                    break;
-                }
-            }
-            for (BibleVerseEntity row : rows) {
-                if (row == keeper) {
-                    continue;
-                }
-                if (row.isFavorite()) {
-                    keeper.setFavorite(true);
-                }
-                if ((keeper.getNote() == null || keeper.getNote().isEmpty()) && row.getNote() != null) {
-                    keeper.setNote(row.getNote());
-                }
-                dao.deleteVerseById(row.getId());
-            }
-            dao.updateVerse(keeper);
-        }
-        Log.i(TAG, "Reconciled duplicate verse rows for " + translationId);
-    }
-
-    private static String canonicalId(String translationId, BibleVerseEntity row) {
-        String bookId = (String) BibleDataSeeder.CANONICAL_BOOKS[row.getBookNumber() - 1][0];
-        String prefix = "KJV".equals(translationId) ? "" : translationId + ".";
-        return prefix + bookId + "." + row.getChapterNumber() + "." + row.getVerseNumber();
     }
 
     private static void ensureTranslationAndBooks(BibleDao dao, Spec spec) {

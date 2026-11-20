@@ -40,9 +40,12 @@ public class RoomBibleRepository implements BibleRepository {
 
     private final BibleDao bibleDao;
     private BibleNoteDao noteDao;
+    /** Verse text: the separate text database once a translation has moved there, the private one before. */
+    private org.perazimchurch.app.data.local.text.BibleVerseReader reader;
 
     public RoomBibleRepository(BibleDao bibleDao) {
         this.bibleDao = bibleDao;
+        this.reader = bibleDao != null ? org.perazimchurch.app.data.local.text.BibleVerseReader.mainOnly(bibleDao) : null;
         if (bibleDao != null) {
             if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
                 java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
@@ -67,6 +70,12 @@ public class RoomBibleRepository implements BibleRepository {
         this.bibleDao = database != null ? database.bibleDao() : null;
         this.noteDao = database != null ? database.bibleNoteDao() : null;
         this.assetContext = context != null ? context.getApplicationContext() : null;
+        if (this.bibleDao != null) {
+            this.reader = org.perazimchurch.app.data.local.text.BibleVerseReader.create(this.assetContext, this.bibleDao);
+        }
+        if (this.assetContext != null && this.bibleDao != null) {
+            org.perazimchurch.app.data.local.text.BibleTextMigration.startInBackground(this.assetContext);
+        }
     }
 
     // Run on the ViewModel executor before the first read, avoiding a race with seeding.
@@ -120,7 +129,7 @@ public class RoomBibleRepository implements BibleRepository {
         } else if (HEBREW_INTERLINEAR.equals(resolvedTranslation)) {
             verses = interlinearChapter(bookNumber, chapterNumber, bookId, false);
         } else {
-            List<BibleVerseEntity> entities = bibleDao.getVerses(resolvedTranslation, bookNumber, chapterNumber);
+            List<BibleVerseEntity> entities = withUserData(reader.getVerses(resolvedTranslation, bookNumber, chapterNumber), resolvedTranslation, bookNumber, chapterNumber);
             verses = BibleMapper.toDomainVerseList(entities, resolvedTranslation, bookId);
         }
         Map<Integer, String> highlights = highlightsFor(bookNumber, chapterNumber);
@@ -137,7 +146,8 @@ public class RoomBibleRepository implements BibleRepository {
                 ? translationId
                 : resolveDefaultTranslationId();
         int bookNumber = resolveBookNumber(resolvedTranslation, bookId);
-        BibleVerseEntity entity = bibleDao.getVerse(resolvedTranslation, bookNumber, chapterNumber, verseNumber);
+        BibleVerseEntity entity = reader.getVerse(resolvedTranslation, bookNumber, chapterNumber, verseNumber);
+        entity = withUserData(entity, resolvedTranslation);
 
         if (entity == null) {
             return null;
@@ -155,13 +165,18 @@ public class RoomBibleRepository implements BibleRepository {
                 ? translationId
                 : resolveDefaultTranslationId();
         String cleanQuery = query.trim();
-        List<BibleVerseEntity> entities = bibleDao.searchVerses(resolvedTranslation, cleanQuery);
+        List<BibleVerseEntity> entities = reader.search(resolvedTranslation, cleanQuery);
         if ((entities == null || entities.isEmpty()) && cleanQuery.contains("-")) {
-            entities = bibleDao.searchVerses(resolvedTranslation, cleanQuery.replace("-", " ").trim());
+            entities = reader.search(resolvedTranslation, cleanQuery.replace("-", " ").trim());
         } else if ((entities == null || entities.isEmpty()) && cleanQuery.contains(" ")) {
-            entities = bibleDao.searchVerses(resolvedTranslation, cleanQuery.replace(" ", "-").trim());
+            entities = reader.search(resolvedTranslation, cleanQuery.replace(" ", "-").trim());
         }
 
+        if (entities != null) {
+            for (BibleVerseEntity found : entities) {
+                withUserData(found, resolvedTranslation);
+            }
+        }
         return BibleMapper.toDomainVerseList(entities, resolvedTranslation);
     }
 
@@ -179,39 +194,10 @@ public class RoomBibleRepository implements BibleRepository {
         if (verseId == null || verseId.trim().isEmpty()) {
             return;
         }
-        bibleDao.updateBookmark(verseId, isFavorite);
-        BibleVerseEntity entity = bibleDao.getVerseById(verseId);
-        if (entity != null) {
-            entity.setFavorite(isFavorite);
-            bibleDao.updateVerse(entity);
-        } else {
-            // Fallback resolution for identifiers like "book.chapter.verse" or "2SA.5.20" or "KJV.2SA.5.20"
-            String[] parts = verseId.split("\\.");
-            if (parts.length == 3) {
-                try {
-                    int bNum = resolveBookNumber(null, parts[0]);
-                    int cNum = Integer.parseInt(parts[1]);
-                    int vNum = Integer.parseInt(parts[2]);
-                    BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
-                    if (verseEntity != null) {
-                        verseEntity.setFavorite(isFavorite);
-                        bibleDao.updateVerse(verseEntity);
-                    }
-                } catch (Exception ignored) {
-                }
-            } else if (parts.length == 4) {
-                try {
-                    int bNum = resolveBookNumber(parts[0], parts[1]);
-                    int cNum = Integer.parseInt(parts[2]);
-                    int vNum = Integer.parseInt(parts[3]);
-                    BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
-                    if (verseEntity != null) {
-                        verseEntity.setFavorite(isFavorite);
-                        bibleDao.updateVerse(verseEntity);
-                    }
-                } catch (Exception ignored) {
-                }
-            }
+        BibleVerseEntity row = userRowFor(verseId.trim());
+        if (row != null) {
+            row.setFavorite(isFavorite);
+            bibleDao.updateVerse(row);
         }
     }
 
@@ -220,40 +206,86 @@ public class RoomBibleRepository implements BibleRepository {
         if (verseId == null || verseId.trim().isEmpty()) {
             return;
         }
-        bibleDao.updateVerseNote(verseId, note);
-        BibleVerseEntity entity = bibleDao.getVerseById(verseId);
-        if (entity != null) {
-            entity.setNote(note);
-            bibleDao.updateVerse(entity);
-        } else {
-            // Fallback resolution for identifiers like "book.chapter.verse" or "2SA.5.20" or "KJV.2SA.5.20"
-            String[] parts = verseId.split("\\.");
+        BibleVerseEntity row = userRowFor(verseId.trim());
+        if (row != null) {
+            row.setNote(note);
+            bibleDao.updateVerse(row);
+        }
+    }
+
+    /**
+     * The private row that holds a verse's bookmark and note. Verse text lives in the separate text database,
+     * so the row is created from that text the first time the person marks the verse.
+     */
+    private BibleVerseEntity userRowFor(String verseId) {
+        BibleVerseEntity existing = bibleDao.getVerseById(verseId);
+        if (existing != null) {
+            return existing;
+        }
+        String[] parts = verseId.split("\\.");
+        String translation;
+        String book;
+        int chapter;
+        int verse;
+        try {
             if (parts.length == 3) {
-                try {
-                    int bNum = resolveBookNumber(null, parts[0]);
-                    int cNum = Integer.parseInt(parts[1]);
-                    int vNum = Integer.parseInt(parts[2]);
-                    BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
-                    if (verseEntity != null) {
-                        verseEntity.setNote(note);
-                        bibleDao.updateVerse(verseEntity);
-                    }
-                } catch (Exception ignored) {
-                }
+                translation = "KJV";
+                book = parts[0];
+                chapter = Integer.parseInt(parts[1]);
+                verse = Integer.parseInt(parts[2]);
             } else if (parts.length == 4) {
-                try {
-                    int bNum = resolveBookNumber(parts[0], parts[1]);
-                    int cNum = Integer.parseInt(parts[2]);
-                    int vNum = Integer.parseInt(parts[3]);
-                    BibleVerseEntity verseEntity = bibleDao.getVerse(bNum, cNum, vNum);
-                    if (verseEntity != null) {
-                        verseEntity.setNote(note);
-                        bibleDao.updateVerse(verseEntity);
-                    }
-                } catch (Exception ignored) {
-                }
+                translation = parts[0];
+                book = parts[1];
+                chapter = Integer.parseInt(parts[2]);
+                verse = Integer.parseInt(parts[3]);
+            } else {
+                return null;
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        int bookNumber = resolveBookNumber(translation, book);
+        BibleVerseEntity text = reader.getVerse(translation, bookNumber, chapter, verse);
+        if (text == null) {
+            return null;
+        }
+        BibleVerseEntity created = new BibleVerseEntity(verseId, translation, text.getChapterId(), bookNumber,
+                chapter, verse, text.getText(), false, null);
+        bibleDao.insertVerse(created);
+        return created;
+    }
+
+    /** Adds the person's bookmark and note (private database) to verses read from the text database. */
+    private List<BibleVerseEntity> withUserData(List<BibleVerseEntity> verses, String translationId, int bookNumber, int chapter) {
+        if (verses == null || verses.isEmpty()) {
+            return verses;
+        }
+        Map<Integer, BibleVerseEntity> mine = new HashMap<>();
+        for (BibleVerseEntity row : bibleDao.getVerses(translationId, bookNumber, chapter)) {
+            mine.put(row.getVerseNumber(), row);
+        }
+        for (BibleVerseEntity verse : verses) {
+            BibleVerseEntity row = mine.get(verse.getVerseNumber());
+            if (row != null && row != verse) {
+                verse.setId(row.getId());
+                verse.setFavorite(row.isFavorite());
+                verse.setNote(row.getNote());
             }
         }
+        return verses;
+    }
+
+    private BibleVerseEntity withUserData(BibleVerseEntity verse, String translationId) {
+        if (verse == null) {
+            return null;
+        }
+        BibleVerseEntity row = bibleDao.getVerse(translationId, verse.getBookNumber(), verse.getChapterNumber(), verse.getVerseNumber());
+        if (row != null && row != verse) {
+            verse.setId(row.getId());
+            verse.setFavorite(row.isFavorite());
+            verse.setNote(row.getNote());
+        }
+        return verse;
     }
 
     /** Pseudo-translation id for the Greek New Testament interlinear. */
@@ -267,7 +299,7 @@ public class RoomBibleRepository implements BibleRepository {
         ensureAssetsReady();
         List<BibleTranslation> readable = new ArrayList<>();
         for (BibleTranslation translation : getAvailableTranslations()) {
-            if (translation.getId() != null && bibleDao.countVerses(translation.getId()) > 0) {
+            if (translation.getId() != null && reader.count(translation.getId()) > 0) {
                 translation.setDownloaded(true);
                 readable.add(translation);
             }
@@ -289,7 +321,7 @@ public class RoomBibleRepository implements BibleRepository {
             return verses;
         }
         String translationId = greek ? GREEK_INTERLINEAR : HEBREW_INTERLINEAR;
-        for (BibleVerseEntity entity : bibleDao.getVerses("KJV", bookNumber, chapterNumber)) {
+        for (BibleVerseEntity entity : reader.getVerses("KJV", bookNumber, chapterNumber)) {
             List<InterlinearWord> words = interlinearWords(greek, bookNumber, chapterNumber, entity.getVerseNumber());
             if (words.isEmpty()) {
                 continue;
@@ -361,7 +393,7 @@ public class RoomBibleRepository implements BibleRepository {
             if (byReference.containsKey(key)) {
                 continue;
             }
-            BibleVerseEntity entity = bibleDao.getVerseInTranslation(translationId, highlight.getBookNumber(),
+            BibleVerseEntity entity = reader.getVerse(translationId, highlight.getBookNumber(),
                     highlight.getChapterNumber(), highlight.getVerseNumber());
             if (entity != null) {
                 BibleVerse verse = BibleMapper.toDomain(entity, translationId);
@@ -378,7 +410,7 @@ public class RoomBibleRepository implements BibleRepository {
         int bookNumber = resolveBookNumber(null, bookId);
         List<BibleVerse> verses = new ArrayList<>();
         for (BibleTranslation translation : getTranslationsWithText()) {
-            BibleVerseEntity entity = bibleDao.getVerseInTranslation(translation.getId(), bookNumber,
+            BibleVerseEntity entity = reader.getVerse(translation.getId(), bookNumber,
                     chapterNumber, verseNumber);
             if (entity != null) {
                 verses.add(BibleMapper.toDomain(entity, translation.getId(), bookId));
@@ -440,7 +472,7 @@ public class RoomBibleRepository implements BibleRepository {
         String translationId = resolveDefaultTranslationId();
         List<BibleVerse> verses = new ArrayList<>();
         for (BibleTopicVerseEntity link : bibleDao.getTopicVerses(topic)) {
-            BibleVerseEntity entity = bibleDao.getVerseInTranslation(translationId, link.getBookNumber(),
+            BibleVerseEntity entity = reader.getVerse(translationId, link.getBookNumber(),
                     link.getChapterNumber(), link.getVerseNumber());
             if (entity != null) {
                 String bookId = BibleDataSeeder.canonicalBookId(link.getBookNumber());
@@ -471,23 +503,32 @@ public class RoomBibleRepository implements BibleRepository {
                 links = new ArrayList<>();
             }
             Collections.sort(links);
-            notes.add(new BibleNote(note.getId(), note.getBody(), note.getUpdatedMillis(), links));
+            List<String> topicNames = new ArrayList<>();
+            if (note.getTopics() != null) {
+                for (String name : note.getTopics().split(",")) {
+                    if (!name.trim().isEmpty()) {
+                        topicNames.add(name.trim());
+                    }
+                }
+            }
+            notes.add(new BibleNote(note.getId(), note.getBody(), note.getUpdatedMillis(), links, topicNames));
         }
         return notes;
     }
 
     @Override
-    public long saveNote(long id, String body, List<VerseLocation> links) {
+    public long saveNote(long id, String body, List<VerseLocation> links, List<String> topics) {
         if (noteDao == null) {
             return 0L;
         }
         String text = body == null ? "" : body;
         long now = System.currentTimeMillis();
+        String topicText = joinTopics(topics);
         long noteId = id;
         if (id == 0L) {
-            noteId = noteDao.insertNote(new BibleNoteEntity(0L, text, now));
+            noteId = noteDao.insertNote(new BibleNoteEntity(0L, text, now, topicText));
         } else {
-            noteDao.updateNote(id, text, now);
+            noteDao.updateNote(id, text, now, topicText);
         }
         noteDao.deleteLinks(noteId);
         List<BibleNoteLinkEntity> rows = new ArrayList<>();
@@ -498,6 +539,23 @@ public class RoomBibleRepository implements BibleRepository {
             noteDao.insertLinks(rows);
         }
         return noteId;
+    }
+
+    private static String joinTopics(List<String> topics) {
+        if (topics == null || topics.isEmpty()) {
+            return "";
+        }
+        StringBuilder out = new StringBuilder();
+        for (String topic : topics) {
+            String clean = topic.trim().replace(",", " ");
+            if (!clean.isEmpty()) {
+                if (out.length() > 0) {
+                    out.append(',');
+                }
+                out.append(clean);
+            }
+        }
+        return out.toString();
     }
 
     @Override
