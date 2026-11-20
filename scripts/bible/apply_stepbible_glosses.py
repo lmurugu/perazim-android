@@ -55,6 +55,13 @@ def contextual_gloss(text):
     return pronoun
 
 
+# Reading fixes where the translators' context gloss is wrong for a very common word. Keyed by Strong's
+# number; applied to every occurrence. Checked against standard English readings of Gen 1:1, John 1:1 and
+# Psalm 23:1; the ESV and NASB text itself is not bundled.
+GREEK_OVERRIDES = {1722: "in", 4314: "with"}  # en (ἐν), pros (πρὸς)
+HEBREW_OVERRIDES = {7462: ("", "shepherd")}  # ro'eh (רֹעֶה), shepherd/tend
+
+
 def sanitize_cell(cell):
     """Glosses that are a single letter, contain a digit or are a stray placeholder show a dash instead."""
     fields = cell.split("|")
@@ -112,6 +119,16 @@ def apply(path, step_rows, books, hebrew):
                         fields[4] = gloss
                         cell_list[i] = "|".join(fields)
                         changed += 1
+                for i, c in enumerate(cell_list):
+                    f = c.split("|")
+                    if len(f) != 5:
+                        continue
+                    number = int(f[1] or 0)
+                    if not hebrew and number in GREEK_OVERRIDES:
+                        f[4] = GREEK_OVERRIDES[number]
+                    elif hebrew and number in HEBREW_OVERRIDES and f[2].startswith(HEBREW_OVERRIDES[number][0]):
+                        f[4] = HEBREW_OVERRIDES[number][1]
+                    cell_list[i] = "|".join(f)
             cell_list = [sanitize_cell(c) for c in cell_list]
             out_lines.append("%s\t%s\t%s\t%s\n" % (book, chapter, verse, " ".join(cell_list)))
     return out_lines, changed
