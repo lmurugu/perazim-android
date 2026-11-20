@@ -626,33 +626,32 @@ public class BibleReaderDialog extends Dialog {
         tvChapterProgress = GlassKit.text(getContext(), "Chapter " + currentChapter + " of " + currentChapterCount, 11, false, GlassKit.muted());
         tvChapterProgress.setGravity(Gravity.CENTER);
         middle.addView(tvChapterProgress);
+        // Two groups, one for size and one for boldness, each on its own row with room between them and larger targets.
         LinearLayout sizes = new LinearLayout(getContext());
-        sizes.setOrientation(LinearLayout.HORIZONTAL);
+        sizes.setOrientation(LinearLayout.VERTICAL);
         sizes.setGravity(Gravity.CENTER);
-        TextView smaller = GlassKit.text(getContext(), "A−", 12, true, GlassKit.muted());
-        smaller.setPadding(dp(8), dp(4), dp(8), dp(4));
-        smaller.setContentDescription("Smaller text");
-        smaller.setClickable(true);
+        LinearLayout sizeRow = new LinearLayout(getContext());
+        sizeRow.setOrientation(LinearLayout.HORIZONTAL);
+        sizeRow.setGravity(Gravity.CENTER);
+        LinearLayout boldRow = new LinearLayout(getContext());
+        boldRow.setOrientation(LinearLayout.HORIZONTAL);
+        boldRow.setGravity(Gravity.CENTER);
+        TextView smaller = sizeButton("A\u2212", "Smaller text", false);
         smaller.setOnClickListener(v -> changeVerseSize(-2f));
-        TextView lighter = GlassKit.text(getContext(), "B\u2212", 12, false, GlassKit.muted());
-        lighter.setPadding(dp(8), dp(4), dp(8), dp(4));
-        lighter.setContentDescription("Less bold text");
-        lighter.setClickable(true);
-        lighter.setOnClickListener(v -> changeVerseWeight(-100));
-        TextView bolder = GlassKit.text(getContext(), "B+", 12, true, GlassKit.muted());
-        bolder.setPadding(dp(8), dp(4), dp(8), dp(4));
-        bolder.setContentDescription("Bolder text");
-        bolder.setClickable(true);
-        bolder.setOnClickListener(v -> changeVerseWeight(100));
-        TextView larger = GlassKit.text(getContext(), "A+", 12, true, GlassKit.muted());
-        larger.setPadding(dp(8), dp(4), dp(8), dp(4));
-        larger.setContentDescription("Larger text");
-        larger.setClickable(true);
+        TextView larger = sizeButton("A+", "Larger text", true);
         larger.setOnClickListener(v -> changeVerseSize(2f));
-        sizes.addView(smaller);
-        sizes.addView(larger);
-        sizes.addView(lighter);
-        sizes.addView(bolder);
+        TextView lighter = sizeButton("B\u2212", "Less bold text", false);
+        lighter.setOnClickListener(v -> changeVerseWeight(-100));
+        TextView bolder = sizeButton("B+", "Bolder text", true);
+        bolder.setOnClickListener(v -> changeVerseWeight(100));
+        sizeRow.addView(smaller);
+        sizeRow.addView(larger);
+        boldRow.addView(lighter);
+        boldRow.addView(bolder);
+        sizes.addView(sizeRow);
+        LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(-2, -2);
+        gap.topMargin = dp(6);
+        sizes.addView(boldRow, gap);
         middle.addView(sizes);
         nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
@@ -668,6 +667,18 @@ public class BibleReaderDialog extends Dialog {
     private float verseTextSp = 18f;
     /** Stroke weight of the verse text: 300 is light, 400 is the normal default, 700 is bold, 800 is heavy. */
     private int verseWeight = 400;
+
+    /** One of the four text controls under the chapter line: bigger tap target, spaced apart. */
+    private TextView sizeButton(String label, String description, boolean bold) {
+        TextView b = GlassKit.text(getContext(), label, 17, bold, GlassKit.muted());
+        b.setPadding(dp(18), dp(8), dp(18), dp(8));
+        b.setContentDescription(description);
+        b.setClickable(true);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
+        lp.setMargins(dp(8), 0, dp(8), 0);
+        b.setLayoutParams(lp);
+        return b;
+    }
 
     private void changeVerseSize(float delta) {
         verseTextSp = Math.max(14f, Math.min(28f, verseTextSp + delta));
@@ -1042,6 +1053,29 @@ public class BibleReaderDialog extends Dialog {
             tvVerseText.setTextIsSelectable(true);
             tvVerseText.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
             tvVerseText.setCustomSelectionActionModeCallback(interlinearSelectionCallback(tvVerseText, verse));
+        }
+        if (!isSearchResult) {
+            // A quick sideways swipe across the verse selects the whole verse and opens the verse menu.
+            final android.view.GestureDetector swipe = new android.view.GestureDetector(getContext(),
+                    new android.view.GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onFling(android.view.MotionEvent e1, android.view.MotionEvent e2, float vx, float vy) {
+                            if (e1 == null || e2 == null) {
+                                return false;
+                            }
+                            float dx = Math.abs(e2.getX() - e1.getX());
+                            float dy = Math.abs(e2.getY() - e1.getY());
+                            if (dx > dp(60) && dx > 2 * dy) {
+                                showVerseActionBar(verse);
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+            tvVerseText.setOnTouchListener((v, ev) -> {
+                swipe.onTouchEvent(ev);
+                return false;
+            });
         }
         tvVerseText.setTextColor(verseInk());
         tvVerseText.setLineSpacing(0f, 1.45f);
