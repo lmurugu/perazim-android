@@ -76,6 +76,31 @@ def sanitize_cell(cell):
     return "|".join(fields)
 
 
+LEXICAL_PRONOUNS = {"he", "she", "it", "self", "i", "we", "you"}
+
+
+def greek_gloss(row):
+    """Lexical gloss, except that a lexical pronoun (he/it/self) takes the contextual form (him, his, ...)."""
+    lexical = lexical_gloss(row[4]) if len(row) > 4 else ""
+    contextual = contextual_gloss(row[2])
+    if lexical and lexical.lower() in LEXICAL_PRONOUNS and contextual:
+        return contextual
+    return lexical or contextual
+
+
+def lexical_gloss(text):
+    """First meaning of the lemma in the STEPBible lexical column, for example "βίβλος=book" gives "book",
+    "ἔχω=to have/be" gives "have"."""
+    if "=" not in (text or ""):
+        return ""
+    meaning = text.split("=", 1)[1]
+    first = re.split(r"[/,;]", meaning)[0].strip().rstrip(".!?")
+    first = re.sub(r"^to\s+", "", first, flags=re.IGNORECASE)
+    if not first or not PLAIN.match(first.lower()) or " " in first:
+        return ""
+    return first
+
+
 def strongs_of(field):
     numbers = re.findall(r"[GH](\d+)", field)
     return int(numbers[-1]) if numbers else 0
@@ -111,7 +136,8 @@ def apply(path, step_rows, books, hebrew):
                     glosses = [contextual_gloss(r[3]) for r in rows]
                 else:
                     theirs = [strongs_of(r[3]) for r in rows]
-                    glosses = [contextual_gloss(r[2]) for r in rows]
+                    # The lexical column is closer to word for word; the contextual gloss is the fallback.
+                    glosses = [greek_gloss(r) for r in rows]
                 matcher = difflib.SequenceMatcher(a=ours, b=theirs, autojunk=False)
                 for block in matcher.get_matching_blocks():
                     for offset in range(block.size):
@@ -129,6 +155,17 @@ def apply(path, step_rows, books, hebrew):
                         continue
                     number = int(f[1] or 0)
                     empty = f[4] in ("", "-")
+                    if not hebrew and number == 1510:
+                        # eimi, "to be", takes the tense shown by its grammar code.
+                        morph = f[2]
+                        if morph.startswith("V-I"):
+                            f[4] = "was"
+                        elif morph.startswith("V-PAI-3S"):
+                            f[4] = "is"
+                        elif morph.startswith("V-PAI-3P"):
+                            f[4] = "are"
+                        elif morph.startswith("V-FDI"):
+                            f[4] = "will_be"
                     if not hebrew and number in GREEK_OVERRIDES:
                         f[4] = GREEK_OVERRIDES[number]
                     elif not hebrew and f[2].startswith("T-") and f[4] in ("", "-", "the"):
