@@ -142,3 +142,17 @@ Source for the licence summary: https://help.planningcenter.com/en/copyright-con
 3. Confirm whether NASB should be used in AI answers, given that AI training is not permitted and RAG use needs the attribution format.
 4. Provide the KJV edition used in `kjv_manifest.json` so it can be matched to its publisher sheet.
 5. Obtain the Kenya Copyright Act text from the Kenya Gazette or legal counsel so the sermon and hymn analysis can rely on Kenyan law.
+
+### 6.8 KJV edition match attempt (added 2026-11-20)
+
+| Check | Result | Class |
+|---|---|---|
+| `src/main/assets/bible/kjv_manifest.json` | Contains only book metadata (`bookNumber`, `id`, `name`, `testament`, `chapterCount`). No source, edition, publisher or licence field | Verified (file read) |
+| `src/main/assets/bible/kjv_verses.json` and `text/KJV.tsv.gz` | Verse text only. No source or copyright field | Verified (file read) |
+| `docs/bible-source.md` §2.1 | States "Authorized Version, 1611 / 1769 Blayney Oxford Revision" and "Public Domain worldwide (United States and Universal)". Says Crown copyright applies only to printed copies in the UK under Letters Patent, and that digital use is "completely free of copyright restrictions" | Repo assertion, not verified |
+| `docs/bible-source.md` §3 (archive sources) | Cites an XML file named `SF_2009-01-23_ENG_KJV_(KING JAMES VERSION).xml` in a local scratch folder, plus Project Gutenberg eBook #10 and the CrossWire SWORD `KJV` module. The archive is outside the repo | Repo assertion; source not in repo |
+| Match to a CUP sheet | **Not possible.** The two CUP sheets (ISBN 978-0-521-16334-7 and 978-0-521-22862-6) cover printed CUP editions. Neither addresses digital text. The repo's text is not tied to either ISBN | Uncertain |
+| Digital-use claim | The CUP sheets set a 500-verse liturgical or educational allowance and require permission for other uses, but they do not say whether that covers digital copies. The repo's claim that digital use is free worldwide is therefore not confirmed by the CUP sheets | Uncertain |
+| Kenya/SUV "Section 23, 50 years" claim (`docs/bible-source.md` §2.2) | Could not be checked. The Kenya Act full text was not retrieved (see 6.5) | Uncertain |
+
+**Result:** the KJV text is probably derived from a public-domain base (Gutenberg / CrossWire / Blayney text), as the repo says. This has not been verified. The edition can't be matched to a CUP sheet from the files. Owner action: supply the archive file named in `docs/bible-source.md` §3 with its hash, so its provenance can be checked. Keep the KJV marked "verify before package" until then.
