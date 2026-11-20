@@ -1556,7 +1556,8 @@ public class BibleReaderDialog extends Dialog {
         circle.setShape(GradientDrawable.OVAL);
         circle.setColor(on ? 0x33E17D2F : 0x00000000);
         icon.setBackground(circle);
-        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : GlassKit.text());
+        // Dark ink on the light theme, bright ink on the dark theme; the on state stays orange.
+        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : (GlassKit.light() ? 0xFF2A1B3D : 0xFFF1EAFB));
     }
 
     /**
@@ -1977,16 +1978,17 @@ public class BibleReaderDialog extends Dialog {
         card.setPadding(dp(12), dp(4), dp(12), dp(4));
         GradientDrawable frost = new GradientDrawable();
         frost.setCornerRadius(dp(12));
-        frost.setColor(0x80FFFFFF);
-        frost.setStroke(dp(1), 0xD9FFFFFF);
+        frost.setColor(GlassKit.light() ? 0x80FFFFFF : 0x663A1F55);
+        frost.setStroke(dp(1), GlassKit.light() ? 0xD9FFFFFF : 0x33FFFFFF);
         card.setBackground(frost);
 
         final TrackSlider[] bars = new TrackSlider[2];
         final Runnable[] refresh = new Runnable[1];
         refresh[0] = () -> {
             int colour = intensityColour(st[0], st[1], st[2]);
-            bars[0].update(st[0] / 360f, hueStops(), COLOR_PICKER_THUMB);
-            bars[1].update(st[2], intensityStops(st[0], st[1]), COLOR_PICKER_THUMB);
+            int thumb = pickerThumbColour();
+            bars[0].update(st[0] / 360f, hueStops(), thumb);
+            bars[1].update(st[2], intensityStops(st[0], st[1]), thumb);
             bars[1].setTag(colour);
         };
         LinearLayout strips = new LinearLayout(getContext());
@@ -2052,9 +2054,10 @@ public class BibleReaderDialog extends Dialog {
         return card;
     }
 
-    /** Dark purple slider thumbs with a soft glow, as in the chosen picker design. */
-    private static final int COLOR_PICKER_THUMB = 0xFF4A1D6E;
-    private static final int COLOR_PICKER_GLOW = 0xCC9C4DFF;
+    /** Slider thumbs: dark purple on the light card, bright orange on the dark card. */
+    private int pickerThumbColour() {
+        return GlassKit.light() ? 0xFF4A1D6E : 0xFFE17D2F;
+    }
 
     /** A thin strip with a round thumb. The gradient is the strip; the thumb is dark purple with a glow. */
     private static final class TrackSlider extends View {
@@ -2064,7 +2067,7 @@ public class BibleReaderDialog extends Dialog {
 
         private float value;
         private int[] stops = {0xFF000000, 0xFFFFFFFF};
-        private int thumbFill = COLOR_PICKER_THUMB;
+        private int thumbFill = 0xFF4A1D6E;
         private final Listener listener;
         private final float density;
         private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
@@ -2094,7 +2097,7 @@ public class BibleReaderDialog extends Dialog {
             canvas.drawRoundRect(track, trackH / 2, trackH / 2, paint);
             paint.setShader(null);
             float x = track.left + value * track.width();
-            paint.setShadowLayer(4 * density, 0, 0, COLOR_PICKER_GLOW);
+            paint.setShadowLayer(4 * density, 0, 0, (thumbFill & 0x00FFFFFF) | 0xCC000000);
             paint.setColor(thumbFill);
             canvas.drawCircle(x, cy, 3.5f * density, paint);
             paint.clearShadowLayer();
