@@ -57,7 +57,7 @@ public final class StartupSplash {
         ImageView logo = new ImageView(activity);
         logo.setImageResource(R.drawable.perazim_logo_black);
         GlassKit.keep(logo);
-        root.addView(logo, new FrameLayout.LayoutParams(GlassKit.px(activity, 240), GlassKit.px(activity, 240), Gravity.CENTER));
+        root.addView(logo, new FrameLayout.LayoutParams(GlassKit.px(activity, 202), GlassKit.px(activity, 202), Gravity.CENTER));
 
         LinearLayout column = new LinearLayout(activity);
         column.setOrientation(LinearLayout.VERTICAL);
@@ -86,7 +86,7 @@ public final class StartupSplash {
         column.addView(slogan, lpSlogan);
 
         FrameLayout.LayoutParams lpColumn = new FrameLayout.LayoutParams(-1, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
-        lpColumn.topMargin = activity.getResources().getDisplayMetrics().heightPixels / 2 + GlassKit.px(activity, 132);
+        lpColumn.topMargin = activity.getResources().getDisplayMetrics().heightPixels / 2 + GlassKit.px(activity, 120);
         root.addView(column, lpColumn);
 
         title.setAlpha(0f);
@@ -105,7 +105,8 @@ public final class StartupSplash {
             @Override
             public boolean onPreDraw() {
                 root.getViewTreeObserver().removeOnPreDrawListener(this);
-                root.post(buildApp);
+                // Give the words time to fade in while the main thread is still free; building the app blocks it.
+                root.postDelayed(buildApp, WORDS_DELAY_MS + WORDS_IN_MS + 150);
                 return true;
             }
         });
