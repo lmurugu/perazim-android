@@ -934,7 +934,12 @@ public class BibleReaderDialog extends Dialog {
                 }
             }
         }
-        View picker = buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, false);
+        if (notesPanelView != null && notesPanelView.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams plp = (FrameLayout.LayoutParams) notesPanelView.getLayoutParams();
+            plp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            notesPanelView.setLayoutParams(plp);
+        }
+        View picker = buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, true);
         picker.setLayoutParams(new LinearLayout.LayoutParams(dp(300), dp(40)));
         list.addView(picker);
         ImageView done = new ImageView(getContext());
@@ -1559,6 +1564,10 @@ public class BibleReaderDialog extends Dialog {
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
             dialog.getWindow().setDimAmount(0f);
+            android.view.WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
+            attrs.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            attrs.y = dp(104);
+            dialog.getWindow().setAttributes(attrs);
         }
         holder[0] = dialog;
         dialog.show();
@@ -2089,7 +2098,9 @@ public class BibleReaderDialog extends Dialog {
      * verse action bar contrasts with that, so the picker and tool icons do the same.
      */
     private boolean phoneIsDark() {
-        return !GlassKit.light();
+        // The floating tools always use the light style (near-white circles, dark icons, purple thumbs),
+        // because they sit over verse text and must stay legible in both themes.
+        return false;
     }
 
     /** Slider thumbs contrast with the phone: purple on a light phone, orange on a dark phone. */
