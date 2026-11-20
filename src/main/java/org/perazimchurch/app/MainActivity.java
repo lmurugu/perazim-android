@@ -633,6 +633,36 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             }
         }
         root.requestApplyInsets();
+        if (Build.VERSION.SDK_INT >= 30) {
+            // The system resets bar appearance while the window attaches, so apply it again afterwards.
+            root.post(() -> applySystemBarLook(window));
+            root.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    v.post(() -> applySystemBarLook(window));
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                }
+            });
+        }
+    }
+
+    /** Transparent bars with dark icons in light mode and light icons in dark mode, no contrast scrim. */
+    private void applySystemBarLook(android.view.Window window) {
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        android.view.WindowInsetsController controller = window.getInsetsController();
+        if (controller != null) {
+            int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                    | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+            controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+        }
     }
 
     private View createBottomTabBar() {
