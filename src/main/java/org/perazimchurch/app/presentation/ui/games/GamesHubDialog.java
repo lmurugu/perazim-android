@@ -32,6 +32,7 @@ import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.MemoryMatch;
 import org.perazimchurch.app.domain.games.MiniCrossword;
 import org.perazimchurch.app.domain.games.RoadToJerusalem;
+import org.perazimchurch.app.domain.games.TestamentSort;
 import org.perazimchurch.app.domain.games.TimelineSort;
 import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
@@ -235,6 +236,9 @@ public final class GamesHubDialog extends Dialog {
         gameCard(org.perazimchurch.app.R.drawable.ic_game_road, explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
                 "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
                 solvedLine("ROAD"), this::roadToJerusalem);
+        gameCard(org.perazimchurch.app.R.drawable.ic_game_chest, shepherd, PerazimTheme.COLOR_ORANGE_SOFT, "Old or New?",
+                "Place each Bible book in the Old or New Testament. Learn where every book belongs in the story.",
+                bestLineOf("TESTAMENT_SORT", 8), this::testamentSort);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
     }
 
@@ -345,6 +349,11 @@ public final class GamesHubDialog extends Dialog {
             seed = System.nanoTime();
             start.run();
         });
+    }
+
+    private String bestLineOf(String key, int total) {
+        String full = scorePrefix + key;
+        return scores.contains(full) ? "Your best: " + scores.getInt(full, 0) + "/" + total : "Your best: not played yet";
     }
 
     private String modeBestLine(Mode selected, int total) {
@@ -672,6 +681,61 @@ public final class GamesHubDialog extends Dialog {
             squares[i].setText(label.toString());
             squares[i].setBackground(shape(game.hasNote(i) ? PerazimTheme.COLOR_ORANGE_GHOST : PerazimTheme.COLOR_SURFACE));
         }
+    }
+
+    // ---- Old or New?: sort each Bible book into its testament ----
+
+    private void testamentSort() {
+        renderTestamentSort(new TestamentSort(seed), null);
+    }
+
+    private void renderTestamentSort(TestamentSort game, String feedback) {
+        screen("Old or New?", "Place each book in its testament. Eight books per run.", true);
+        if (game.finished()) {
+            String key = scorePrefix + "TESTAMENT_SORT";
+            if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
+            text("Finished: " + game.score() + " of " + game.size() + " placed correctly.", 15, true);
+            text(game.score() == game.size()
+                    ? "Every book in the right place. Well done."
+                    : "Look back at the books you missed, then try again.", 13, false);
+            Button again = button("Play again", true);
+            again.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                seed = System.nanoTime();
+                testamentSort();
+            });
+            return;
+        }
+        TestamentSort.Book book = game.current();
+        text("Book " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        addText(card, book.name, 20, true);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(-1, -2);
+        cardParams.bottomMargin = dp(12);
+        page.addView(card, cardParams);
+        if (feedback != null) text(feedback, 13, false);
+        Button old = button("Old Testament", false);
+        old.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            renderTestamentSort(game, answerLine(game.place(TestamentSort.Testament.OLD), game));
+        });
+        Button neu = button("New Testament", false);
+        neu.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            renderTestamentSort(game, answerLine(game.place(TestamentSort.Testament.NEW), game));
+        });
+    }
+
+    private String answerLine(boolean right, TestamentSort game) {
+        TestamentSort.Book placed = game.lastBook();
+        if (placed == null) return null;
+        String home = placed.testament == TestamentSort.Testament.OLD ? "Old" : "New";
+        return (right ? "Correct. " : "Not quite. " + placed.name + " belongs in the " + home + " Testament. ") + placed.fact;
     }
 
     private LinearLayout.LayoutParams wrapParams(int bottomDp) {
