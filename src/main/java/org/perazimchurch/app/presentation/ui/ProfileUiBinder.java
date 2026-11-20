@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.domain.model.SpiritualLevel;
 import org.perazimchurch.app.ui.theme.AppDialogs;
 
 import org.perazimchurch.app.config.ChurchConfig;
@@ -1597,13 +1598,13 @@ public class ProfileUiBinder {
                                 hasStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_BORDER_GREY));
                     }
 
-                    int level = (liveXp / 500) + 1;
-                    int progress = liveXp % 500;
+                    int level = SpiritualLevel.levelFor(liveXp);
+                    int progress = SpiritualLevel.xpIntoLevel(liveXp);
                     if (xpProgressBar != null) {
                         xpProgressBar.setProgress(progress);
                     }
                     if (tvXpLevelLabel != null) {
-                        tvXpLevelLabel.setText("Level " + level + " Disciple — " + progress + " / 500 XP to Level " + (level + 1));
+                        tvXpLevelLabel.setText("Level " + level + " Disciple — " + progress + " / " + SpiritualLevel.XP_PER_LEVEL + " XP to Level " + (level + 1));
                     }
                     if (tvSyncStatusVal != null) {
                         tvSyncStatusVal.setText(SheetSyncManager.getLastSyncStatusText(context));
