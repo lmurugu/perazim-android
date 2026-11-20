@@ -206,37 +206,37 @@ public final class GamesHubDialog extends Dialog {
         round = null;
         screen("Bible Games", "Learn, remember and enjoy. All nine games work without internet.", false);
         statsBar();
-        int shepherd = org.perazimchurch.app.R.drawable.ic_char_shepherd;
-        int dove = org.perazimchurch.app.R.drawable.ic_char_dove;
-        int explorer = org.perazimchurch.app.R.drawable.ic_char_explorer;
-        gameCard(iconFor(Mode.QUIZ), shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Bible Quiz",
+        int shepherd = org.perazimchurch.app.R.drawable.game_char_shepherd;
+        int dove = org.perazimchurch.app.R.drawable.game_char_dove;
+        int explorer = org.perazimchurch.app.R.drawable.game_char_explorer;
+        gameCard(org.perazimchurch.app.R.drawable.game_art_quiz, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Bible Quiz",
                 "Five questions, four choices each. Discover the story behind every answer.",
                 modeBestLine(Mode.QUIZ, 5), () -> startMode(Mode.QUIZ));
-        gameCard(iconFor(Mode.WHO_AM_I), explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Who am I?",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_who_am_i, explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Who am I?",
                 "Read a Bible character's clues, ask for a hint, then type your answer.",
                 modeBestLine(Mode.WHO_AM_I, 5), () -> startMode(Mode.WHO_AM_I));
-        gameCard(iconFor(Mode.VERSE_ORDER), dove, PerazimTheme.COLOR_ORANGE_SOFT, "Verse Builder",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_verse_builder, dove, PerazimTheme.COLOR_ORANGE_SOFT, "Verse Builder",
                 "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.",
                 modeBestLine(Mode.VERSE_ORDER, 5), () -> startMode(Mode.VERSE_ORDER));
-        gameCard(iconFor(Mode.LADDER), shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Ladder of Faith",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_ladder, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Ladder of Faith",
                 "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.",
                 modeBestLine(Mode.LADDER, LadderOfFaith.RUNGS), () -> startMode(Mode.LADDER));
-        gameCard(org.perazimchurch.app.R.drawable.ic_game_grid, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Word Search",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_word_search, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Word Search",
                 "Find Bible names hidden in the letters. Tap a start letter, then the end letter of the word.",
                 solvedLine("WORD_SEARCH"), this::wordSearch);
-        gameCard(org.perazimchurch.app.R.drawable.ic_game_cards, dove, PerazimTheme.COLOR_PURPLE_SOFT, "Memory Match",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_memory_match, dove, PerazimTheme.COLOR_PURPLE_SOFT, "Memory Match",
                 "Flip two tiles at a time and match the Bible symbols. Each match shows its verse.",
                 solvedLine("MEMORY_MATCH"), this::memoryMatch);
-        gameCard(org.perazimchurch.app.R.drawable.ic_game_timeline, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_timeline, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
                 "Tap the Bible events in the order they happen in the story.",
                 solvedLine("TIMELINE"), this::timeline);
-        gameCard(org.perazimchurch.app.R.drawable.ic_game_crossword, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Mini Crossword",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_mini_crossword, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Mini Crossword",
                 "A five-by-five Bible crossword. Four clues cross: Moses, Abel, manna and Saul.",
                 solvedLine("CROSSWORD"), this::miniCrossword);
         gameCard(org.perazimchurch.app.R.drawable.ic_game_road, explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
                 "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
                 solvedLine("ROAD"), this::roadToJerusalem);
-        gameCard(org.perazimchurch.app.R.drawable.ic_game_chest, shepherd, PerazimTheme.COLOR_ORANGE_SOFT, "Old or New?",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_old_or_new, shepherd, PerazimTheme.COLOR_ORANGE_SOFT, "Old or New?",
                 "Place each Bible book in the Old or New Testament. Learn where every book belongs in the story.",
                 bestLineOf("TESTAMENT_SORT", 8), this::testamentSort);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
