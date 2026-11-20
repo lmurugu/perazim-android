@@ -626,29 +626,18 @@ public class BibleReaderDialog extends Dialog {
         tvChapterProgress = GlassKit.text(getContext(), "Chapter " + currentChapter + " of " + currentChapterCount, 11, false, GlassKit.muted());
         tvChapterProgress.setGravity(Gravity.CENTER);
         middle.addView(tvChapterProgress);
+        // One compact row: A- A+ (size) and B- B+ (weight), kept small so the bottom bar stays minimal.
         LinearLayout sizes = new LinearLayout(getContext());
         sizes.setOrientation(LinearLayout.HORIZONTAL);
         sizes.setGravity(Gravity.CENTER);
-        TextView smaller = GlassKit.text(getContext(), "A−", 12, true, GlassKit.muted());
-        smaller.setPadding(dp(8), dp(4), dp(8), dp(4));
-        smaller.setContentDescription("Smaller text");
-        smaller.setClickable(true);
+        TextView smaller = sizeButton("A\u2212", "Smaller text", false);
         smaller.setOnClickListener(v -> changeVerseSize(-2f));
-        TextView lighter = GlassKit.text(getContext(), "B\u2212", 12, false, GlassKit.muted());
-        lighter.setPadding(dp(8), dp(4), dp(8), dp(4));
-        lighter.setContentDescription("Less bold text");
-        lighter.setClickable(true);
-        lighter.setOnClickListener(v -> changeVerseWeight(-100));
-        TextView bolder = GlassKit.text(getContext(), "B+", 12, true, GlassKit.muted());
-        bolder.setPadding(dp(8), dp(4), dp(8), dp(4));
-        bolder.setContentDescription("Bolder text");
-        bolder.setClickable(true);
-        bolder.setOnClickListener(v -> changeVerseWeight(100));
-        TextView larger = GlassKit.text(getContext(), "A+", 12, true, GlassKit.muted());
-        larger.setPadding(dp(8), dp(4), dp(8), dp(4));
-        larger.setContentDescription("Larger text");
-        larger.setClickable(true);
+        TextView larger = sizeButton("A+", "Larger text", true);
         larger.setOnClickListener(v -> changeVerseSize(2f));
+        TextView lighter = sizeButton("B\u2212", "Less bold text", false);
+        lighter.setOnClickListener(v -> changeVerseWeight(-100));
+        TextView bolder = sizeButton("B+", "Bolder text", true);
+        bolder.setOnClickListener(v -> changeVerseWeight(100));
         sizes.addView(smaller);
         sizes.addView(larger);
         sizes.addView(lighter);
@@ -668,6 +657,18 @@ public class BibleReaderDialog extends Dialog {
     private float verseTextSp = 18f;
     /** Stroke weight of the verse text: 300 is light, 400 is the normal default, 700 is bold, 800 is heavy. */
     private int verseWeight = 400;
+
+    /** One of the four text controls under the chapter line: bigger tap target, spaced apart. */
+    private TextView sizeButton(String label, String description, boolean bold) {
+        TextView b = GlassKit.text(getContext(), label, 13, bold, GlassKit.muted());
+        b.setPadding(dp(9), dp(4), dp(9), dp(4));
+        b.setContentDescription(description);
+        b.setClickable(true);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
+        lp.setMargins(dp(2), 0, dp(2), 0);
+        b.setLayoutParams(lp);
+        return b;
+    }
 
     private void changeVerseSize(float delta) {
         verseTextSp = Math.max(14f, Math.min(28f, verseTextSp + delta));
@@ -725,32 +726,44 @@ public class BibleReaderDialog extends Dialog {
                 return;
             }
             rememberTranslationNames(translations);
-            final List<String> ids = new ArrayList<>();
-            List<String> labels = new ArrayList<>();
-            int selectedIndex = 0;
+            final LinearLayout list = new LinearLayout(getContext());
+            list.setOrientation(LinearLayout.VERTICAL);
+            final android.app.Dialog[] holder = new android.app.Dialog[1];
             for (BibleTranslation t : translations) {
                 if (t.getId() == null) {
                     continue;
                 }
-                if (t.getId().equalsIgnoreCase(currentTranslation)) {
-                    selectedIndex = ids.size();
-                }
-                ids.add(t.getId());
-                labels.add(t.getId() + " · " + (t.getName() != null ? t.getName() : t.getId()));
+                final String chosen = t.getId();
+                boolean selected = chosen.equalsIgnoreCase(currentTranslation);
+                LinearLayout row = new LinearLayout(getContext());
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                row.setPadding(dp(14), dp(11), dp(14), dp(11));
+                row.setBackground(cardTile(selected));
+                row.setClickable(true);
+                LinearLayout.LayoutParams lp = GlassKit.matchWrap(getContext(), 0);
+                lp.bottomMargin = dp(6);
+                row.setLayoutParams(lp);
+                TextView code = GlassKit.text(getContext(), chosen, 14, true, selected ? Color.WHITE : notesInk());
+                row.addView(code, new LinearLayout.LayoutParams(dp(56), -2));
+                String name = t.getName() != null ? t.getName() : chosen;
+                TextView label = GlassKit.text(getContext(), name, 13, false, selected ? Color.WHITE : notesMuted());
+                row.addView(label, new LinearLayout.LayoutParams(0, -2, 1f));
+                row.setOnClickListener(v -> {
+                    if (holder[0] != null) {
+                        holder[0].dismiss();
+                    }
+                    if (!chosen.equalsIgnoreCase(currentTranslation)) {
+                        // Stay on the verse the reader is on, rather than jumping back to verse 1.
+                        pendingScrollVerse = topVisibleVerse();
+                        currentTranslation = chosen;
+                        updateTranslationBadge();
+                        loadChapterVerses(currentBookId, currentChapter);
+                    }
+                });
+                list.addView(row);
             }
-            AppDialogs.builder(getContext())
-                    .setTitle("Select Translation / Chagua Tafsiri")
-                    .setSingleChoiceItems(labels.toArray(new String[0]), selectedIndex, (dialog, which) -> {
-                        String chosen = ids.get(which);
-                        dialog.dismiss();
-                        if (!chosen.equalsIgnoreCase(currentTranslation)) {
-                            currentTranslation = chosen;
-                            updateTranslationBadge();
-                            loadChapterVerses(currentBookId, currentChapter);
-                        }
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+            holder[0] = openCardDialog("Select translation", "Chagua tafsiri", list, null, null);
         });
     }
 
@@ -789,6 +802,7 @@ public class BibleReaderDialog extends Dialog {
 
     public void loadChapterVerses(@NonNull String bookId, int chapter) {
         dismissActionBar();
+        exitSelectMode();
         freshRender = true;
         this.currentBookId = bookId;
         saveLastPosition();
@@ -818,6 +832,10 @@ public class BibleReaderDialog extends Dialog {
                 currentVerses.clear();
                 currentVerses.addAll(verses);
                 renderVerseList(currentVerses, false);
+                if (pendingVersePicker) {
+                    pendingVersePicker = false;
+                    showVersePicker();
+                }
             } else {
                 currentVerses.clear();
                 tvEmptyState.setText("No " + currentTranslation + " text is downloaded for "
@@ -826,6 +844,197 @@ public class BibleReaderDialog extends Dialog {
                 tvEmptyState.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    /** Select mode: drag a finger across verses (or tap them) to choose several, then pick a colour for all of them. */
+    private boolean selectMode = false;
+    private final java.util.TreeSet<Integer> selectedVerses = new java.util.TreeSet<>();
+    private int dragVerse = -1;
+    private boolean dragAdds = true;
+
+    private void enterSelectMode(BibleVerse verse) {
+        dismissActionBar();
+        openSelectCard();
+        selectMode = true;
+        selectedVerses.clear();
+        selectedVerses.add(verse.getVerseNumber());
+        renderVerseList(currentVerses, false);
+    }
+
+    private void exitSelectMode() {
+        selectMode = false;
+        selectedVerses.clear();
+        dragVerse = -1;
+    }
+
+    /** Touch handling while selecting: the verse under the finger is added, or removed if the drag began on a chosen verse. */
+    private boolean selectTouch(android.view.MotionEvent ev) {
+        if (!selectMode) {
+            return false;
+        }
+        int action = ev.getActionMasked();
+        if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE) {
+            int hit = verseAtRawY(ev.getRawY());
+            if (action == android.view.MotionEvent.ACTION_DOWN) {
+                dragAdds = hit <= 0 || !selectedVerses.contains(hit);
+                dragVerse = -1;
+            }
+            if (hit > 0 && hit != dragVerse) {
+                dragVerse = hit;
+                if (dragAdds) {
+                    selectedVerses.add(hit);
+                } else {
+                    selectedVerses.remove(hit);
+                }
+                renderVerseList(currentVerses, false);
+            }
+            if (versesScrollView != null) {
+                versesScrollView.requestDisallowInterceptTouchEvent(true);
+            }
+        } else if (action == android.view.MotionEvent.ACTION_UP || action == android.view.MotionEvent.ACTION_CANCEL) {
+            dragVerse = -1;
+        }
+        return true;
+    }
+
+    /** The verse whose row is under a screen Y position, or 0. */
+    private int verseAtRawY(float rawY) {
+        int[] loc = new int[2];
+        for (Map.Entry<Integer, View> e : verseRows.entrySet()) {
+            View row = e.getValue();
+            row.getLocationOnScreen(loc);
+            if (rawY >= loc[1] && rawY < loc[1] + row.getHeight()) {
+                return e.getKey();
+            }
+        }
+        return 0;
+    }
+
+    /** The colour panel for select mode: stays open so one colour can be chosen, then another portion selected. */
+    private void openSelectCard() {
+        LinearLayout list = openFloatingCard("select", "Select verses", null, null);
+        TextView hint = GlassKit.text(getContext(),
+                "Drag across the verses, or tap them. Then pick a colour for everything chosen. Choose a new portion and colour again.",
+                12, false, notesMuted());
+        hint.setPadding(0, dp(4), 0, dp(6));
+        list.addView(hint);
+        addSwatchRow(list, HighlightColors.BOLD);
+        addSwatchRow(list, HighlightColors.ALL);
+        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
+            addSwatchRow(list, shadeRow);
+        }
+        TextView done = GlassKit.orangeButton(getContext(), "Done", 14);
+        done.setPadding(dp(28), 0, dp(28), 0);
+        done.setOnClickListener(v -> dismissNotesPanel());
+        LinearLayout doneRow = new LinearLayout(getContext());
+        doneRow.setGravity(Gravity.CENTER);
+        doneRow.addView(done, new LinearLayout.LayoutParams(-2, dp(40)));
+        LinearLayout.LayoutParams rowLp = GlassKit.matchWrap(getContext(), 10);
+        list.addView(doneRow, rowLp);
+    }
+
+    private void addSwatchRow(LinearLayout list, List<HighlightColors.Colour> colours) {
+        LinearLayout row = new LinearLayout(getContext());
+        row.setGravity(Gravity.CENTER);
+        for (final HighlightColors.Colour colour : colours) {
+            row.addView(swatchView(colour.swatch, false, v -> applyHighlightToSelected(colour.name)));
+        }
+        list.addView(row);
+    }
+
+    /** Colours every chosen verse, then clears the choice so the next portion can be selected. */
+    private void applyHighlightToSelected(final String colour) {
+        if (selectedVerses.isEmpty()) {
+            Toast.makeText(getContext(), "Drag across or tap the verses first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int count = 0;
+        for (BibleVerse v : currentVerses) {
+            if (selectedVerses.contains(v.getVerseNumber())) {
+                v.setHighlightColor(colour);
+                bibleViewModel.setHighlight(v.getBookId(), v.getChapterNumber(), v.getVerseNumber(), colour, () -> { });
+                count++;
+            }
+        }
+        selectedVerses.clear();
+        renderVerseList(currentVerses, false);
+        Toast.makeText(getContext(), "Highlighted " + count + (count == 1 ? " verse" : " verses"), Toast.LENGTH_SHORT).show();
+    }
+
+    /** Set when a chapter is chosen in the picker: the verse card opens once the chapter is on screen. */
+    private boolean pendingVersePicker = false;
+
+    /** One card with every verse number of the chapter, so a verse can be reached without scrolling. */
+    private void showVersePicker() {
+        int count = 0;
+        for (BibleVerse v : currentVerses) {
+            count = Math.max(count, v.getVerseNumber());
+        }
+        if (count <= 0) {
+            return;
+        }
+        final LinearLayout grid = new LinearLayout(getContext());
+        grid.setOrientation(LinearLayout.VERTICAL);
+        final android.app.Dialog[] holder = new android.app.Dialog[1];
+        final int columns = 6;
+        LinearLayout row = null;
+        for (int n = 1; n <= count; n++) {
+            if ((n - 1) % columns == 0) {
+                row = new LinearLayout(getContext());
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                grid.addView(row, GlassKit.matchWrap(getContext(), 0));
+            }
+            final int verseNumber = n;
+            TextView cell = GlassKit.text(getContext(), String.valueOf(n), 14, true, notesInk());
+            cell.setGravity(Gravity.CENTER);
+            cell.setBackground(cardTile(false));
+            cell.setClickable(true);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(42), 1f);
+            lp.setMargins(dp(3), dp(3), dp(3), dp(3));
+            cell.setOnClickListener(v -> {
+                if (holder[0] != null) {
+                    holder[0].dismiss();
+                }
+                scrollToVerse(verseNumber);
+            });
+            row.addView(cell, lp);
+        }
+        if (row != null) {
+            for (int i = row.getChildCount(); i < columns; i++) {
+                View filler = new View(getContext());
+                LinearLayout.LayoutParams fp = new LinearLayout.LayoutParams(0, dp(42), 1f);
+                fp.setMargins(dp(3), dp(3), dp(3), dp(3));
+                row.addView(filler, fp);
+            }
+        }
+        holder[0] = openCardDialog(currentBookName + " " + currentChapter, "Choose a verse", grid,
+                "\u2039 Start of chapter", () -> scrollToVerse(1));
+    }
+
+    /** Scrolls the chapter so the verse is at the top. */
+    private void scrollToVerse(int verseNumber) {
+        View row = verseRows.get(verseNumber);
+        if (row != null && versesScrollView != null) {
+            versesScrollView.post(() -> versesScrollView.smoothScrollTo(0, offsetWithin(row, versesScrollView)));
+        }
+    }
+
+    /** The verse nearest the top of the screen: kept when the translation changes. */
+    private int topVisibleVerse() {
+        if (versesScrollView == null || verseRows.isEmpty()) {
+            return 0;
+        }
+        int scrollY = versesScrollView.getScrollY();
+        int best = 0;
+        int bestY = Integer.MIN_VALUE;
+        for (Map.Entry<Integer, View> e : verseRows.entrySet()) {
+            int y = offsetWithin(e.getValue(), versesScrollView);
+            if (y <= scrollY + dp(24) && y > bestY) {
+                bestY = y;
+                best = e.getKey();
+            }
+        }
+        return best;
     }
 
     private void toggleSearchMode() {
@@ -1004,6 +1213,15 @@ public class BibleReaderDialog extends Dialog {
             row.setBackground(mark);
             row.setPadding(dp(8), dp(6), dp(8), dp(6));
         }
+        if (selectMode && !isSearchResult && selectedVerses.contains(verse.getVerseNumber())) {
+            // Chosen for colouring: a bordered panel in the highlight tint (or orange if not yet coloured).
+            GradientDrawable chosen = new GradientDrawable();
+            chosen.setCornerRadius(dp(12));
+            chosen.setColor(highlight != null ? Color.parseColor(highlight.tint) : Color.parseColor("#33E17D2F"));
+            chosen.setStroke(dp(2), Color.parseColor("#E17D2F"));
+            row.setBackground(chosen);
+            row.setPadding(dp(8), dp(6), dp(8), dp(6));
+        }
         GlassKit.keep(row);
 
         String label = isSearchResult ? formatCitation(verse) : String.valueOf(verse.getVerseNumber());
@@ -1019,7 +1237,13 @@ public class BibleReaderDialog extends Dialog {
         sb.setSpan(new android.text.style.TypefaceSpan("sans-serif"), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.append(isSearchResult ? "  " : " ");
         int textStart = sb.length();
-        sb.append(verse.getText() != null ? verse.getText() : "");
+        boolean interlinearVersion = org.perazimchurch.app.data.repository.RoomBibleRepository.GREEK_INTERLINEAR.equals(verse.getTranslationId())
+                || org.perazimchurch.app.data.repository.RoomBibleRepository.HEBREW_INTERLINEAR.equals(verse.getTranslationId());
+        if (interlinearVersion && !isSearchResult) {
+            appendInterlinearVerse(sb, verse.getText() != null ? verse.getText() : "");
+        } else {
+            sb.append(verse.getText() != null ? verse.getText() : "");
+        }
         if (isSearchResult && !TextUtils.isEmpty(lastQuery)) {
             highlightSearchTerms(sb, textStart, verse.getText() != null ? verse.getText() : "", lastQuery);
         }
@@ -1031,6 +1255,45 @@ public class BibleReaderDialog extends Dialog {
         tvVerseText.setText(sb);
         tvVerseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, verseTextSp);
         tvVerseText.setTypeface(verseTypeface());
+        if (interlinearVersion && !isSearchResult) {
+            // Selecting words opens their dictionary entry; selecting a range or the whole verse opens the verse menu.
+            tvVerseText.setTextIsSelectable(true);
+            tvVerseText.setMovementMethod(android.text.method.LinkMovementMethod.getInstance());
+            tvVerseText.setCustomSelectionActionModeCallback(interlinearSelectionCallback(tvVerseText, verse));
+        }
+        if (!isSearchResult) {
+            // A quick sideways swipe across the verse selects the whole verse and opens the verse menu.
+            final android.view.GestureDetector swipe = new android.view.GestureDetector(getContext(),
+                    new android.view.GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onFling(android.view.MotionEvent e1, android.view.MotionEvent e2, float vx, float vy) {
+                            if (e1 == null || e2 == null) {
+                                return false;
+                            }
+                            float dx = Math.abs(e2.getX() - e1.getX());
+                            float dy = Math.abs(e2.getY() - e1.getY());
+                            if (dx > dp(60) && dx > 2 * dy) {
+                                showVerseActionBar(verse);
+                                return true;
+                            }
+                            return false;
+                        }
+                    });
+            tvVerseText.setOnTouchListener((v, ev) -> {
+                if (selectTouch(ev)) {
+                    return true;
+                }
+                swipe.onTouchEvent(ev);
+                return false;
+            });
+        }
+        if (!isSearchResult) {
+            row.setOnTouchListener((v, ev) -> selectTouch(ev));
+            row.setOnLongClickListener(v -> {
+                enterSelectMode(verse);
+                return true;
+            });
+        }
         tvVerseText.setTextColor(verseInk());
         tvVerseText.setLineSpacing(0f, 1.45f);
         GlassKit.keep(tvVerseText);
@@ -1099,6 +1362,152 @@ public class BibleReaderDialog extends Dialog {
                         start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 from = at + needle.length();
             }
+        }
+    }
+
+    /** Parses the number from a code such as H7626 or G3588. Returns 0 when there is no code. */
+    private static int parseStrongsNumber(String code) {
+        if (code == null || code.length() < 2) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(code.substring(1));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Interlinear version text: "{original} gloss" pairs. The English gloss is bold; the original sits inside
+     * the braces in regular weight, so the reader sees the English first.
+     */
+    private void appendInterlinearVerse(android.text.SpannableStringBuilder sb, String text) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\{([^}]*)\\}\\s*([^{]*)").matcher(text);
+        int last = 0;
+        while (m.find()) {
+            if (m.start() > last) {
+                sb.append(text.substring(last, m.start()));
+            }
+            String token = m.group(1);
+            String code = "";
+            int bar = token.indexOf('|');
+            if (bar >= 0) {
+                code = token.substring(bar + 1);
+                token = token.substring(0, bar);
+            }
+            int wordStart = sb.length();
+            // The original word: smaller, regular weight, muted and underlined. Isolated (FSI...PDI) for right-to-left text.
+            int braceStart = sb.length();
+            sb.append('{').append('\u2068').append(token).append('\u2069').append('}');
+            int braceEnd = sb.length();
+            sb.setSpan(new android.text.style.StyleSpan(Typeface.NORMAL), braceStart, braceEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.RelativeSizeSpan(0.8f), braceStart, braceEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.ForegroundColorSpan(GlassKit.muted()), braceStart, braceEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.UnderlineSpan(), braceStart, braceEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.append(' ');
+            // The English gloss: bold and a little larger, so it is the first thing the eye reads.
+            int glossStart = sb.length();
+            sb.append(m.group(2).trim());
+            int glossEnd = sb.length();
+            sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), glossStart, glossEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.RelativeSizeSpan(1.15f), glossStart, glossEnd,
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // One span covers the whole word, so a tap on either part opens its dictionary entry.
+            int number = parseStrongsNumber(code);
+            if (number > 0 && glossEnd > wordStart) {
+                sb.setSpan(new InterlinearWordSpan(code, number), wordStart, glossEnd,
+                        android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            sb.append(' ');
+            last = m.end();
+        }
+        if (last < text.length()) {
+            sb.append(text.substring(last));
+        }
+    }
+
+    /** Chooses the action from the selection: one word opens its dictionary entry, anything wider opens the verse menu. */
+    private android.view.ActionMode.Callback interlinearSelectionCallback(final TextView tv, final BibleVerse verse) {
+        return new android.view.ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                int start = tv.getSelectionStart();
+                int end = tv.getSelectionEnd();
+                if (start < 0 || end <= start || !(tv.getText() instanceof android.text.Spannable)) {
+                    return false;
+                }
+                final android.text.Spannable text = (android.text.Spannable) tv.getText();
+                InterlinearWordSpan[] words = text.getSpans(start, end, InterlinearWordSpan.class);
+                InterlinearWordSpan only = null;
+                if (words.length == 1 && start >= text.getSpanStart(words[0]) && end <= text.getSpanEnd(words[0])) {
+                    only = words[0];
+                }
+                final InterlinearWordSpan single = only;
+                // Clear the selection first, so the card opens on a clean verse.
+                tv.post(() -> {
+                    android.text.Selection.removeSelection(text);
+                    if (single != null) {
+                        showStrongsDialog(single.code, single.number);
+                    } else {
+                        showVerseActionBar(verse);
+                    }
+                });
+                return false;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(android.view.ActionMode mode, android.view.Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(android.view.ActionMode mode, android.view.MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(android.view.ActionMode mode) {
+            }
+        };
+    }
+
+    /** Size scale for the word cards: follows the verse A- / A+ setting (18 is the default). */
+    private float cardScale() {
+        return verseTextSp / 18f;
+    }
+
+    /** Typeface for the word cards: follows the verse B- / B+ setting. */
+    private android.graphics.Typeface cardTypeface(String family, int weight) {
+        int w = Math.max(300, Math.min(900, weight));
+        if (android.os.Build.VERSION.SDK_INT >= 28) {
+            return Typeface.create(Typeface.create(family, Typeface.NORMAL), w, false);
+        }
+        return w >= 600 ? Typeface.create(family, Typeface.BOLD) : Typeface.create(family, Typeface.NORMAL);
+    }
+
+    /** A tappable interlinear word: opens its Strong's entry when it is tapped or selected on its own. */
+    private final class InterlinearWordSpan extends android.text.style.ClickableSpan {
+        final String code;
+        final int number;
+
+        InterlinearWordSpan(String code, int number) {
+            this.code = code;
+            this.number = number;
+        }
+
+        @Override
+        public void onClick(android.view.View widget) {
+            showStrongsDialog(code, number);
+        }
+
+        @Override
+        public void updateDrawState(android.text.TextPaint ds) {
+            ds.setUnderlineText(false);
         }
     }
 
@@ -1190,9 +1599,7 @@ public class BibleReaderDialog extends Dialog {
             } else if ("study".equals(openGroup[0])) {
                 LinearLayout row = barRow();
                 row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_compare, "Compare translations", v -> showCompareDialog(verse, citation)));
-                if (newTestament) {
-                    row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_interlinear, "Interlinear", v -> showInterlinearDialog(verse, citation)));
-                }
+                row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_interlinear, "Interlinear", v -> showInterlinearDialog(verse, citation, newTestament)));
                 row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_search, "Search the Bible", v -> {
                     dismissActionBar();
                     if (!isSearchMode) {
@@ -1246,8 +1653,25 @@ public class BibleReaderDialog extends Dialog {
                     v -> applyHighlight(verse, colour.name)));
         }
         mutedRow.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> applyHighlight(verse, null)));
+        LinearLayout boldRow = new LinearLayout(getContext());
+        boldRow.setGravity(Gravity.CENTER);
+        for (final HighlightColors.Colour colour : HighlightColors.BOLD) {
+            boldRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                    v -> applyHighlight(verse, colour.name)));
+        }
         palette.addView(majorRow);
         palette.addView(mutedRow);
+        palette.addView(boldRow);
+        // Washed out to darker, one row per shade, so the same hue can be chosen light or deep.
+        for (List<HighlightColors.Colour> shadeRow : HighlightColors.GRADIENT_ROWS) {
+            LinearLayout gradRow = new LinearLayout(getContext());
+            gradRow.setGravity(Gravity.CENTER);
+            for (final HighlightColors.Colour colour : shadeRow) {
+                gradRow.addView(swatchView(colour.swatch, colour.name.equals(verse.getHighlightColor()),
+                        v -> applyHighlight(verse, colour.name)));
+            }
+            palette.addView(gradRow);
+        }
         palette.addView(spectrumView(verse));
         return palette;
     }
@@ -1491,54 +1915,98 @@ public class BibleReaderDialog extends Dialog {
         }
     }
 
-    /** Word-by-word Greek with Strong's numbers and morphology for a New Testament verse. */
-    private void showInterlinearDialog(final BibleVerse verse, final String citation) {
-        bibleViewModel.loadGreekInterlinear(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), words -> {
+    /**
+     * Word-by-word view of a verse, laid out like a printed interlinear. Each column is one original word with
+     * its transliteration, English gloss, tappable Strong's number and plain-English parsing. Columns wrap onto
+     * new lines, so the verse fits the card without sideways scrolling. Hebrew runs right to left.
+     */
+    private void showInterlinearDialog(final BibleVerse verse, final String citation, final boolean newTestament) {
+        bibleViewModel.loadInterlinear(verse.getBookId(), verse.getChapterNumber(), verse.getVerseNumber(), words -> {
             if (words == null || words.isEmpty()) {
                 Toast.makeText(getContext(), "No interlinear is available for this verse.", Toast.LENGTH_SHORT).show();
                 return;
             }
+            final boolean hebrew = !newTestament;
+            WrapLayout flow = new WrapLayout(getContext(), dp(6), dp(8));
+            flow.setRightToLeft(hebrew);
+            for (org.perazimchurch.app.domain.model.InterlinearWord word : words) {
+                flow.addView(interlinearColumn(word, hebrew));
+            }
             LinearLayout box = new LinearLayout(getContext());
             box.setOrientation(LinearLayout.VERTICAL);
-            box.setPadding(dp(18), dp(8), dp(18), dp(12));
-            for (org.perazimchurch.app.domain.model.InterlinearWord word : words) {
-                LinearLayout cell = new LinearLayout(getContext());
-                cell.setOrientation(LinearLayout.VERTICAL);
-                cell.setPadding(0, dp(6), 0, dp(6));
-                if (word.getStrongsNumber() > 0) {
-                    final int strongs = word.getStrongsNumber();
-                    cell.setClickable(true);
-                    cell.setContentDescription("Strong's G" + strongs + " for " + word.getOriginal());
-                    cell.setOnClickListener(v -> showStrongsDialog("G" + strongs, strongs));
-                }
-                TextView greek = new TextView(getContext());
-                greek.setText(word.getOriginal());
-                greek.setTypeface(Typeface.SERIF);
-                greek.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                greek.setTextColor(GlassKit.text());
-                cell.addView(greek);
-                TextView meta = new TextView(getContext());
-                String strong = word.getStrongsNumber() > 0 ? "G" + word.getStrongsNumber() : "";
-                meta.setText((strong + (strong.isEmpty() || word.getMorphology().isEmpty() ? "" : " \u00b7 ") + word.getMorphology()).trim());
-                meta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-                meta.setTextColor(COLOR_TEXT_MUTED());
-                cell.addView(meta);
-                box.addView(cell);
-            }
-            TextView note = new TextView(getContext());
-            note.setText("Robinson-Pierpont style parsing from the Antoniades 1904/1912 text (public domain). Strong's numbers identify the lemma.");
-            note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            note.setTextColor(COLOR_TEXT_MUTED());
-            note.setPadding(0, dp(10), 0, 0);
+            box.addView(flow);
+            TextView note = GlassKit.text(getContext(), hebrew
+                    ? "Hebrew text and morphology: Open Scriptures Hebrew Bible (CC BY 4.0). English glosses: STEPBible.org Translators Amalgamated OT, Tyndale House Cambridge (CC BY 4.0). Strong's entries: Strong's dictionary. Tap a Strong's number for its entry."
+                    : "Greek text and parsing: Antoniades 1904/1912 (public domain). English glosses: STEPBible.org Translators Amalgamated NT, Tyndale House Cambridge (CC BY 4.0). Strong's entries: Strong's dictionary (public domain). Tap a Strong's number for its entry and occurrences.",
+                    11, false, notesMuted());
+            note.setPadding(0, dp(12), 0, 0);
             box.addView(note);
             ScrollView scroll = new ScrollView(getContext());
-            scroll.addView(box);
-            AppDialogs.builder(getContext())
-                    .setTitle(citation + " · Greek Interlinear")
-                    .setView(scroll)
-                    .setPositiveButton("Close", null)
-                    .show();
+            openCardDialog(citation + (hebrew ? " \u00b7 Hebrew Interlinear" : " \u00b7 Greek Interlinear"),
+                    "Word by word", box, null, null);
         });
+    }
+
+    /** One interlinear column: the word, its transliteration, gloss, Strong's number and parsing. */
+    private View interlinearColumn(final org.perazimchurch.app.domain.model.InterlinearWord word, boolean hebrew) {
+        LinearLayout column = new LinearLayout(getContext());
+        column.setOrientation(LinearLayout.VERTICAL);
+        column.setGravity(Gravity.CENTER_HORIZONTAL);
+        column.setPadding(dp(8), dp(8), dp(8), dp(8));
+        column.setLayoutParams(new ViewGroup.LayoutParams(dp(132), ViewGroup.LayoutParams.WRAP_CONTENT));
+        // No tile behind each word: the words sit directly on the one card, so there is no card inside a card.
+
+        TextView original = new TextView(getContext());
+        original.setText("{" + word.getOriginal() + "}");
+        original.setTypeface(cardTypeface("serif", verseWeight));
+        original.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16 * cardScale());
+        original.setTextColor(notesInk());
+        original.setGravity(Gravity.CENTER);
+        original.setTextDirection(hebrew ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
+        column.addView(original);
+
+        TextView translit = new TextView(getContext());
+        translit.setText(word.getTransliteration());
+        translit.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+        translit.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12 * cardScale());
+        translit.setTextColor(notesMuted());
+        translit.setGravity(Gravity.CENTER);
+        column.addView(translit);
+
+        TextView gloss = new TextView(getContext());
+        gloss.setText(word.getGloss().isEmpty() ? "\u2014" : word.getGloss());
+        gloss.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19 * cardScale());
+        // The English is bold by default; the B- / B+ setting moves it lighter or heavier.
+        gloss.setTypeface(cardTypeface("sans-serif", verseWeight + 300));
+        gloss.setTextColor(notesInk());
+        gloss.setGravity(Gravity.CENTER);
+        gloss.setPadding(0, dp(4), 0, dp(4));
+        column.addView(gloss);
+
+        if (word.getStrongsNumber() > 0) {
+            final String code = (hebrew ? "H" : "G") + word.getStrongsNumber();
+            final int number = word.getStrongsNumber();
+            TextView strongs = new TextView(getContext());
+            strongs.setText("{" + code + "}");
+            strongs.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12 * cardScale());
+            strongs.setTextColor(cardAccent());
+            strongs.setPaintFlags(strongs.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+            strongs.setGravity(Gravity.CENTER);
+            strongs.setPadding(dp(6), dp(4), dp(6), dp(4));
+            strongs.setClickable(true);
+            strongs.setContentDescription("Strong's " + code + " for " + word.getOriginal());
+            strongs.setOnClickListener(v -> showStrongsDialog(code, number));
+            column.addView(strongs);
+        }
+
+        TextView parsing = new TextView(getContext());
+        parsing.setText(word.getParsing().isEmpty() ? word.getMorphology() : word.getParsing());
+        parsing.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11 * cardScale());
+        parsing.setTextColor(notesMuted());
+        parsing.setGravity(Gravity.CENTER);
+        parsing.setPadding(0, dp(4), 0, 0);
+        column.addView(parsing);
+        return column;
     }
 
     /** Strong's dictionary entry and the New Testament occurrences of the same number. */
@@ -1554,8 +2022,9 @@ public class BibleReaderDialog extends Dialog {
             } else {
                 def.setText("No dictionary entry for " + code + " in the bundled Strong's dictionary.");
             }
-            def.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            def.setTextColor(GlassKit.text());
+            def.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14 * cardScale());
+            def.setTypeface(cardTypeface("sans-serif", verseWeight));
+            def.setTextColor(notesInk());
             def.setLineSpacing(0f, 1.3f);
             box.addView(def);
             TextView head = new TextView(getContext());
@@ -1563,7 +2032,7 @@ public class BibleReaderDialog extends Dialog {
             head.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             head.setLetterSpacing(0.08f);
             head.setTypeface(Typeface.DEFAULT_BOLD);
-            head.setTextColor(COLOR_PRIMARY_PURPLE());
+            head.setTextColor(cardAccent());
             head.setPadding(0, dp(16), 0, dp(4));
             box.addView(head);
             StringBuilder refs = new StringBuilder();
@@ -1573,17 +2042,12 @@ public class BibleReaderDialog extends Dialog {
             }
             TextView list = new TextView(getContext());
             list.setText(refs.length() == 0 ? "None" : refs.toString());
-            list.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            list.setTextColor(COLOR_TEXT_MUTED());
+            list.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13 * cardScale());
+            list.setTypeface(cardTypeface("sans-serif", verseWeight));
+            list.setTextColor(notesMuted());
             list.setLineSpacing(0f, 1.3f);
             box.addView(list);
-            ScrollView scroll = new ScrollView(getContext());
-            scroll.addView(box);
-            AppDialogs.builder(getContext())
-                    .setTitle("Strong's " + code)
-                    .setView(scroll)
-                    .setPositiveButton("Close", null)
-                    .show();
+            openCardDialog("Strong's " + code, "Dictionary entry and concordance", box, null, null);
         });
     }
 
@@ -1669,11 +2133,7 @@ public class BibleReaderDialog extends Dialog {
         GlassKit.keep(panel);  // keep the colours as built; the automatic glass pass would wash them out
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
-        GradientDrawable glass = new GradientDrawable();
-        glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#FF140B20") : Color.parseColor("#FFFFFF"));
-        glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
-        panel.setBackground(glass);
+        panel.setBackground(cardGlass());
         panel.setAlpha(1f);
         // Higher than the verse card, so the verses cannot draw over the Notes card.
         panel.setElevation(dp(48));
@@ -1788,6 +2248,10 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private void dismissNotesPanel() {
+        if ("select".equals(cardKind)) {
+            exitSelectMode();
+            renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
+        }
         if (notesPanelView != null && readerFrame != null) {
             readerFrame.removeView(notesPanelView);
         }
@@ -2318,11 +2782,7 @@ public class BibleReaderDialog extends Dialog {
         GlassKit.keep(card);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dp(18), dp(14), dp(18), dp(14));
-        GradientDrawable glass = new GradientDrawable();
-        glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#FF140B20") : Color.parseColor("#FFFFFF"));
-        glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
-        card.setBackground(glass);
+        card.setBackground(cardGlass());
 
         LinearLayout header = new LinearLayout(getContext());
         header.setOrientation(LinearLayout.HORIZONTAL);
@@ -2369,6 +2829,17 @@ public class BibleReaderDialog extends Dialog {
         }
         dialog.show();
         return dialog;
+    }
+
+    /** Gradient, rounded card surface shared by the word, picker and compare cards. Dark purple frosted in light mode, white in dark mode. */
+    private GradientDrawable cardGlass() {
+        GradientDrawable glass = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                GlassKit.light()
+                        ? new int[]{Color.parseColor("#F21C0E2A"), Color.parseColor("#E6140B20")}
+                        : new int[]{Color.parseColor("#FFFFFF"), Color.parseColor("#F4EEF8")});
+        glass.setCornerRadius(dp(24));
+        glass.setStroke(dp(1), GlassKit.light() ? Color.parseColor("#40FFFFFF") : Color.parseColor("#40241238"));
+        return glass;
     }
 
     /** Accent for text on the Notes-style card: bright orange on the dark card, deep orange on the white card. */
@@ -2491,6 +2962,7 @@ public class BibleReaderDialog extends Dialog {
                 if (holder[0] != null) {
                     holder[0].dismiss();
                 }
+                pendingVersePicker = true;
                 loadChapterVerses(book.getId(), chNum);
             });
             currentRow.addView(cell, lpCell);

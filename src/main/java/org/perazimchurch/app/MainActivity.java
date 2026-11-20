@@ -187,6 +187,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        // Press and selection colour follows the in-app mode, set before any view is built.
+        getTheme().applyStyle(org.perazimchurch.app.ui.theme.PerazimTheme.isLight()
+                ? R.style.PerazimPressLight : R.style.PerazimPressDark, true);
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             // Cold start: show the black logo screen first, then build the app behind it. While the words fade in,

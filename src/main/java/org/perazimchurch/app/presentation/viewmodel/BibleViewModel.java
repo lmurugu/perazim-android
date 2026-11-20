@@ -237,12 +237,12 @@ public class BibleViewModel extends ViewModel {
         });
     }
 
-    /** Loads the Greek interlinear words for a New Testament verse. */
-    public void loadGreekInterlinear(@NonNull String bookId, int chapter, int verse, @Nullable Consumer<List<InterlinearWord>> callback) {
+    /** Loads the interlinear words for a verse: Greek for the New Testament, Hebrew for the Old Testament. */
+    public void loadInterlinear(@NonNull String bookId, int chapter, int verse, @Nullable Consumer<List<InterlinearWord>> callback) {
         executor.execute(() -> {
             List<InterlinearWord> words;
             try {
-                words = bibleRepo.getGreekInterlinear(bookId, chapter, verse);
+                words = bibleRepo.getInterlinear(bookId, chapter, verse);
             } catch (Exception e) {
                 Log.e(TAG, "Error loading interlinear");
                 words = Collections.emptyList();
@@ -261,7 +261,10 @@ public class BibleViewModel extends ViewModel {
             List<VerseLocation> occurrences = Collections.emptyList();
             try {
                 entry = bibleRepo.getStrongsEntry(code);
-                occurrences = bibleRepo.getGreekConcordance(strongsNumber);
+                // The concordance is built from the Greek New Testament only; Hebrew numbers have none.
+                if (code == null || !code.toUpperCase(java.util.Locale.US).startsWith("H")) {
+                    occurrences = bibleRepo.getGreekConcordance(strongsNumber);
+                }
             } catch (Exception e) {
                 Log.e(TAG, "Error loading Strong's detail");
             }
