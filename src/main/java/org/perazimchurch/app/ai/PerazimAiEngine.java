@@ -66,7 +66,26 @@ public class PerazimAiEngine {
             Pattern.compile("\\b(?:dose|dosage|ibuprofen|paracetamol|acetaminophen|antibiotics?|aspirin)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:weather (?:today|tomorrow|forecast|this week)|forecast for (?:today|tomorrow|this week))\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:book|find|cheap)\\b.{0,30}\\b(?:flights?|hotels?|airbnb|train tickets?)\\b|\\bvisa application\\b", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("\\b(?:movie|movies|netflix|tv show|celebrity|box office)\\b", Pattern.CASE_INSENSITIVE)
+            Pattern.compile("\\b(?:movie|movies|netflix|tv show|celebrity|box office)\\b", Pattern.CASE_INSENSITIVE),
+            // Denylist applied to every query, including ones that contain allowlisted church or Bible words
+            // (for example "John", "Paul", "Grace", "offering", "profile"). Finance and investment first.
+            Pattern.compile("\\b(?:share prices?|stock prices?|stock market|stock exchange|dividends?|index funds?|mutual funds?|"
+                    + "etfs?|forex|crypto\\w*|bitcoin|ethereum|dogecoin|blockchain|nfts?|day trad(?:e|er|ers|ing)|beats? the market|"
+                    + "high[- ]yield|savings accounts?|fixed deposits?|mortgages?|lenders?|payday loans?|credit scores?|interest rates?|"
+                    + "pension funds?|retirement funds?|invest(?:ing|ment|ments)? (?:my |your |our |the )?(?:money|savings|cash|funds?)|"
+                    + "investment (?:advice|portfolio|returns?|strategy|options?))\\b", Pattern.CASE_INSENSITIVE),
+            // Entertainment, music charts and celebrity facts.
+            Pattern.compile("\\b(?:hit songs?|first hit|number one (?:hit|single)|top (?:\\w+ )?(?:songs?|albums?|charts?)|billboard|"
+                    + "album sales|net worth|celebrit(?:y|ies)|actors?|actress(?:es)?|movie stars?|film stars?|"
+                    + "height in (?:cm|centimet(?:re|er)s|inches|feet|met(?:er|re)s)|centimet(?:re|er)s|inches tall|feet tall)\\b",
+                    Pattern.CASE_INSENSITIVE),
+            // Job and career search: not an app or church service.
+            Pattern.compile("\\b(?:job search(?:ing)?|job applications?|job offers?|job vacanc(?:y|ies)|job listings?|"
+                    + "curriculum vitae|cover letters?|salar(?:y|ies)|career change|recruiters?)\\b", Pattern.CASE_INSENSITIVE),
+            // Gambling and property purchase.
+            Pattern.compile("\\b(?:sports betting|betting odds|bet on (?:the |a )?(?:match|game|team|horse|race)|casinos?|lottery numbers?|jackpots?|poker|"
+                    + "(?:buy|sell) (?:a |an |my |some )?(?:house|apartment|property|plot|land)|(?:house|property|land|plot) prices?)\\b",
+                    Pattern.CASE_INSENSITIVE)
     };
 
     private final Context context;
@@ -261,12 +280,23 @@ public class PerazimAiEngine {
                 if (sourceId.equals(item.optString("sourceId"))
                         && version.equals(item.optString("version"))
                         && APPROVED_OFFICIAL_CLASS.equals(item.optString("authorityClass"))
-                        && item.optBoolean("citationEligible", false)) {
+                        && item.optBoolean("citationEligible", false)
+                        && !isWithdrawn(item)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    /**
+     * An item that is superseded or revoked can never back an official claim, even if its own metadata says it is
+     * approved. The check does not rely on upstream retrieval having filtered such items.
+     */
+    static boolean isWithdrawn(@NonNull org.json.JSONObject item) {
+        return !item.optString("supersededBy", "").trim().isEmpty()
+                || item.optBoolean("revoked", false)
+                || !item.optString("revokedAt", "").trim().isEmpty();
     }
 
     @NonNull
