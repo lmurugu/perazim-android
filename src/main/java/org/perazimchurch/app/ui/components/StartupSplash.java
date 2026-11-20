@@ -39,14 +39,14 @@ public final class StartupSplash {
         overlay.setBackgroundColor(Color.BLACK);
         overlay.setClickable(true);
 
-        LinearLayout column = new LinearLayout(activity);
-        column.setOrientation(LinearLayout.VERTICAL);
-        column.setGravity(Gravity.CENTER);
-
+        // The logo sits exactly where the launch screen draws it, so the hand-over is seamless.
         final ImageView logo = new ImageView(activity);
         logo.setImageResource(R.drawable.perazim_logo_black);
-        logo.setAdjustViewBounds(true);
-        column.addView(logo, new LinearLayout.LayoutParams(GlassKit.px(activity, 240), GlassKit.px(activity, 240)));
+        overlay.addView(logo, new FrameLayout.LayoutParams(GlassKit.px(activity, 240), GlassKit.px(activity, 240), Gravity.CENTER));
+
+        LinearLayout column = new LinearLayout(activity);
+        column.setOrientation(LinearLayout.VERTICAL);
+        column.setGravity(Gravity.CENTER_HORIZONTAL);
 
         final TextView name = new TextView(activity);
         name.setText("Perazim Mission Church");
@@ -55,9 +55,7 @@ public final class StartupSplash {
         name.setTypeface(Typeface.DEFAULT_BOLD);
         name.setLetterSpacing(0.06f);
         name.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams lpName = new LinearLayout.LayoutParams(-2, -2);
-        lpName.topMargin = GlassKit.px(activity, 8);
-        column.addView(name, lpName);
+        column.addView(name, new LinearLayout.LayoutParams(-2, -2));
 
         final TextView tagline = new TextView(activity);
         tagline.setText("The Place of Great Breakthrough");
@@ -69,13 +67,12 @@ public final class StartupSplash {
         lpTag.topMargin = GlassKit.px(activity, 6);
         column.addView(tagline, lpTag);
 
-        overlay.addView(column, new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
+        FrameLayout.LayoutParams lpColumn = new FrameLayout.LayoutParams(-1, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+        lpColumn.topMargin = activity.getResources().getDisplayMetrics().heightPixels / 2 + GlassKit.px(activity, 132);
+        overlay.addView(column, lpColumn);
         decor.addView(overlay, new ViewGroup.LayoutParams(-1, -1));
         overlay.setElevation(GlassKit.px(activity, 100));
 
-        logo.setAlpha(0f);
-        logo.setScaleX(0.82f);
-        logo.setScaleY(0.82f);
         name.setAlpha(0f);
         name.setTranslationY(GlassKit.px(activity, 14));
         tagline.setAlpha(0f);
@@ -84,9 +81,8 @@ public final class StartupSplash {
         DecelerateInterpolator ease = new DecelerateInterpolator(1.6f);
         AnimatorSet logoIn = new AnimatorSet();
         logoIn.playTogether(
-                ObjectAnimator.ofFloat(logo, View.ALPHA, 0f, 1f),
-                ObjectAnimator.ofFloat(logo, View.SCALE_X, 0.82f, 1f),
-                ObjectAnimator.ofFloat(logo, View.SCALE_Y, 0.82f, 1f));
+                ObjectAnimator.ofFloat(logo, View.SCALE_X, 1f, 1.06f, 1f),
+                ObjectAnimator.ofFloat(logo, View.SCALE_Y, 1f, 1.06f, 1f));
         logoIn.setDuration(LOGO_IN_MS);
         logoIn.setInterpolator(ease);
 
@@ -98,7 +94,7 @@ public final class StartupSplash {
                 ObjectAnimator.ofFloat(tagline, View.TRANSLATION_Y, GlassKit.px(activity, 14), 0f));
         nameIn.setDuration(NAME_IN_MS);
         nameIn.setInterpolator(ease);
-        nameIn.setStartDelay(350);
+        nameIn.setStartDelay(150);
 
         ObjectAnimator fadeOut = ObjectAnimator.ofFloat(overlay, View.ALPHA, 1f, 0f);
         fadeOut.setDuration(FADE_OUT_MS);
