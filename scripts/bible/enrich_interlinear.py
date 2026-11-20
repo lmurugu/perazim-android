@@ -148,6 +148,19 @@ def load_strongs(path):
     return table
 
 
+BAD_GLOSS = re.compile(r"[0-9()\[\]{}×]")
+NOT_A_GLOSS = {"x", "-", "—", "see", "properly", "an", "a", "the", "of"}
+
+
+def usable_gloss(gloss):
+    """A gloss is kept only when it is a plain English word; otherwise the reader shows a dash."""
+    if not gloss or BAD_GLOSS.search(gloss) or gloss.lower() in NOT_A_GLOSS:
+        return ""
+    if not re.fullmatch(r"[A-Za-z][A-Za-z' -]*", gloss):
+        return ""
+    return gloss
+
+
 def clean_cell(text):
     return re.sub(r"[\s|]+", "_", text.strip()) or "-"
 
@@ -173,7 +186,7 @@ def enrich(path, strongs, language, out_lines):
                     translit = translit_greek(surface)
                 else:
                     translit = translit_hebrew(surface)
-                gloss = gloss_from_definition(definition, name)
+                gloss = usable_gloss(gloss_from_definition(definition, name))
                 new_cells.append("|".join([surface, strongs_no, morph,
                                            clean_cell(translit), clean_cell(gloss)]))
             lines.append("%s\t%s\t%s\t%s\n" % (book, chapter, verse, " ".join(new_cells)))

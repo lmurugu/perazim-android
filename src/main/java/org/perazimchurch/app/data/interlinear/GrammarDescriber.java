@@ -35,6 +35,11 @@ public final class GrammarDescriber {
         out.add(pos);
         if (parts[0].equals("V")) {
             String tvm = parts[1];
+            // Second-aorist and second-perfect forms carry a leading "2" (for example "2ADI" in egeneto).
+            if (tvm.length() == 4 && tvm.charAt(0) == '2') {
+                tvm = tvm.substring(1);
+                addOnce(out, "second");
+            }
             if (tvm.length() == 3) {
                 addOnce(out, GREEK_TENSE.get(tvm.substring(0, 1)));
                 addOnce(out, GREEK_VOICE.get(tvm.substring(1, 2)));

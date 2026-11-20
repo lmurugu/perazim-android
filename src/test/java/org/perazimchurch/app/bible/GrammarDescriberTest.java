@@ -22,6 +22,11 @@ public class GrammarDescriberTest {
     }
 
     @Test
+    public void describesSecondAorist() {
+        Assert.assertTrue(GrammarDescriber.describeGreek("V-2ADI-3S").startsWith("verb · second · aorist"));
+    }
+
+    @Test
     public void describesGreekIndeclinable() {
         Assert.assertEquals("conjunction", GrammarDescriber.describeGreek("CONJ"));
     }
