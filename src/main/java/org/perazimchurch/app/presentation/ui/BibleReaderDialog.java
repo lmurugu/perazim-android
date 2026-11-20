@@ -968,9 +968,10 @@ public class BibleReaderDialog extends Dialog {
         android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder();
         sb.append(label);
         int end = sb.length();
-        float numberScale = 11f / verseTextSp;
+        // Search-result citations (Genesis 46:32) match the verse text size; chapter verse numbers are a little bigger than before.
+        float numberScale = isSearchResult ? 1.0f : 13f / verseTextSp;
         sb.setSpan(new android.text.style.RelativeSizeSpan(numberScale), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#C06119" : "#F8A95A")),
+        sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#3A0870" : "#FF8A2B")),
                 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         sb.setSpan(new android.text.style.TypefaceSpan("sans-serif"), 0, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -1046,8 +1047,12 @@ public class BibleReaderDialog extends Dialog {
                 int start = textStart + at;
                 int end = start + needle.length();
                 // Light mode: a bold, readable purple. Dark mode: orange.
-                sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#6A2DA8" : "#FF8A2B")),
+                sb.setSpan(new android.text.style.ForegroundColorSpan(Color.parseColor(GlassKit.light() ? "#2E0560" : "#FF8A2B")),
                         start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                if (GlassKit.light()) {
+                    sb.setSpan(new android.text.style.BackgroundColorSpan(Color.parseColor("#33A06CE0")),
+                            start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
                 sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD),
                         start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 from = at + needle.length();
@@ -1569,7 +1574,24 @@ public class BibleReaderDialog extends Dialog {
     private LinearLayout openFloatingCard(String kind, String titleText, @Nullable String actionLabel, @Nullable Runnable action) {
         dismissNotesPanel();
         cardKind = kind;
-        final LinearLayout panel = new LinearLayout(getContext());
+        final android.view.ScaleGestureDetector[] pinch = new android.view.ScaleGestureDetector[1];
+        final LinearLayout panel = new LinearLayout(getContext()) {
+            @Override
+            public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+                // The card owns every touch that lands on it, so nothing reaches the verses behind it,
+                // and two fingers on it resize the card.
+                if (pinch[0] != null) {
+                    pinch[0].onTouchEvent(ev);
+                    if (pinch[0].isInProgress()) {
+                        getParent().requestDisallowInterceptTouchEvent(true);
+                        return true;
+                    }
+                }
+                super.dispatchTouchEvent(ev);
+                return true;
+            }
+        };
+        panel.setClickable(true);
         GlassKit.keep(panel);  // keep the colours as built; the automatic glass pass would wash them out
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
@@ -1634,7 +1656,7 @@ public class BibleReaderDialog extends Dialog {
         notesPanelList.setOrientation(LinearLayout.VERTICAL);
         ScrollView scroll = new ScrollView(getContext());
         scroll.addView(notesPanelList);
-        panel.addView(scroll, new LinearLayout.LayoutParams(-1, dp(230)));
+        panel.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1f));
 
         final int[] startHeight = new int[1];
         final float[] startY = new float[1];
@@ -1658,6 +1680,22 @@ public class BibleReaderDialog extends Dialog {
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(330), Gravity.BOTTOM);
         lp.setMargins(dp(12), 0, dp(12), dp(104));
+        // Pinch the card: spreading two fingers makes it taller and wider, pinching makes it smaller.
+        pinch[0] = new android.view.ScaleGestureDetector(getContext(),
+                new android.view.ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                    @Override
+                    public boolean onScale(android.view.ScaleGestureDetector d) {
+                        FrameLayout.LayoutParams plp = (FrameLayout.LayoutParams) panel.getLayoutParams();
+                        float f = d.getScaleFactor();
+                        int max = (int) (readerFrame.getHeight() * 0.9f);
+                        plp.height = Math.max(dp(140), Math.min(max, (int) (panel.getHeight() * f)));
+                        int side = Math.max(0, Math.min(dp(48), (int) (plp.leftMargin / Math.max(0.6f, f))));
+                        plp.leftMargin = side;
+                        plp.rightMargin = side;
+                        panel.setLayoutParams(plp);
+                        return true;
+                    }
+                });
         readerFrame.addView(panel, lp);
         panel.bringToFront();
         readerFrame.requestLayout();
