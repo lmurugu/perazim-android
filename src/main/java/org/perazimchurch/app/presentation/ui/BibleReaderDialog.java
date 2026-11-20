@@ -1543,7 +1543,7 @@ public class BibleReaderDialog extends Dialog {
         ImageView icon = new ImageView(getContext());
         icon.setImageResource(drawable);
         icon.setContentDescription(description);
-        icon.setPadding(dp(16), dp(16), dp(16), dp(16));
+        icon.setPadding(dp(8), dp(8), dp(8), dp(8));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(46), dp(46));
         lp.setMargins(dp(10), dp(4), dp(10), dp(4));
         icon.setLayoutParams(lp);
