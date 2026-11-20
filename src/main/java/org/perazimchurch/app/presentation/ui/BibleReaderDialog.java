@@ -923,7 +923,7 @@ public class BibleReaderDialog extends Dialog {
         if (notesPanelView instanceof LinearLayout) {
             LinearLayout panel = (LinearLayout) notesPanelView;
             panel.setBackground(null);
-            panel.setPadding(0, 0, 0, 0);
+            panel.setPadding(dp(16), 0, dp(16), 0);
             View content = list;
             while (content.getParent() instanceof View && content.getParent() != panel) {
                 content = (View) content.getParent();
@@ -934,7 +934,9 @@ public class BibleReaderDialog extends Dialog {
                 }
             }
         }
-        list.addView(buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, false));
+        View picker = buildColourPicker(name -> applyHighlightToSelected(name), null, false, null, false);
+        picker.setLayoutParams(new LinearLayout.LayoutParams(dp(300), dp(40)));
+        list.addView(picker);
         ImageView done = new ImageView(getContext());
         done.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_check);
         done.setContentDescription("Done");
