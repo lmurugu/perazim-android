@@ -1470,7 +1470,7 @@ public class BibleReaderDialog extends Dialog {
             TextView note = GlassKit.text(getContext(), hebrew
                     ? "Hebrew text and morphology: Open Scriptures Hebrew Bible (CC BY 4.0). Glosses and Strong's entries: Strong's dictionary. Tap a Strong's number for its entry."
                     : "Greek text and parsing: Antoniades 1904/1912 (public domain). Glosses and Strong's entries: Strong's dictionary (public domain). Tap a Strong's number for its entry and occurrences.",
-                    11, false, COLOR_TEXT_MUTED());
+                    11, false, notesMuted());
             note.setPadding(0, dp(12), 0, 0);
             box.addView(note);
             ScrollView scroll = new ScrollView(getContext());
@@ -1487,16 +1487,14 @@ public class BibleReaderDialog extends Dialog {
         column.setGravity(Gravity.CENTER_HORIZONTAL);
         column.setPadding(dp(8), dp(8), dp(8), dp(8));
         column.setLayoutParams(new ViewGroup.LayoutParams(dp(132), ViewGroup.LayoutParams.WRAP_CONTENT));
-        GradientDrawable panel = new GradientDrawable();
-        panel.setCornerRadius(dp(10));
-        panel.setColor(0x14000000 | (COLOR_TEXT_MUTED() & 0x00ffffff));
-        column.setBackground(panel);
+        // A flat tile inside the card, not a second frosted card: it only separates one word from the next.
+        column.setBackground(cardTile(false));
 
         TextView original = new TextView(getContext());
         original.setText(word.getOriginal());
         original.setTypeface(Typeface.SERIF);
         original.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        original.setTextColor(GlassKit.text());
+        original.setTextColor(notesInk());
         original.setGravity(Gravity.CENTER);
         original.setTextDirection(hebrew ? View.TEXT_DIRECTION_RTL : View.TEXT_DIRECTION_LTR);
         column.addView(original);
@@ -1505,14 +1503,14 @@ public class BibleReaderDialog extends Dialog {
         translit.setText(word.getTransliteration());
         translit.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         translit.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        translit.setTextColor(COLOR_TEXT_MUTED());
+        translit.setTextColor(notesMuted());
         translit.setGravity(Gravity.CENTER);
         column.addView(translit);
 
         TextView gloss = new TextView(getContext());
         gloss.setText(word.getGloss().isEmpty() ? "\u2014" : word.getGloss());
         gloss.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        gloss.setTextColor(GlassKit.text());
+        gloss.setTextColor(notesInk());
         gloss.setGravity(Gravity.CENTER);
         gloss.setPadding(0, dp(4), 0, dp(4));
         column.addView(gloss);
@@ -1523,7 +1521,7 @@ public class BibleReaderDialog extends Dialog {
             TextView strongs = new TextView(getContext());
             strongs.setText(code);
             strongs.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            strongs.setTextColor(COLOR_ACCENT_ORANGE());
+            strongs.setTextColor(cardAccent());
             strongs.setPaintFlags(strongs.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
             strongs.setGravity(Gravity.CENTER);
             strongs.setPadding(dp(6), dp(4), dp(6), dp(4));
@@ -1536,7 +1534,7 @@ public class BibleReaderDialog extends Dialog {
         TextView parsing = new TextView(getContext());
         parsing.setText(word.getParsing().isEmpty() ? word.getMorphology() : word.getParsing());
         parsing.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        parsing.setTextColor(COLOR_TEXT_MUTED());
+        parsing.setTextColor(notesMuted());
         parsing.setGravity(Gravity.CENTER);
         parsing.setPadding(0, dp(4), 0, 0);
         column.addView(parsing);
