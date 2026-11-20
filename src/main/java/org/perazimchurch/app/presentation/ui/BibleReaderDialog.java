@@ -643,9 +643,9 @@ public class BibleReaderDialog extends Dialog {
         sizes.addView(larger);
         sizes.addView(lighter);
         sizes.addView(bolder);
-        TextView swipe = sizeButton("Swipe", "Swipe across words to colour them purple", false);
-        swipe.setOnClickListener(v -> toggleSwipeColour(swipe));
-        sizes.addView(swipe);
+        TextView highlightTools = sizeButton("Highlight", "Highlight tools: swipe colouring and select verses", false);
+        highlightTools.setOnClickListener(v -> showHighlightTools());
+        sizes.addView(highlightTools);
         middle.addView(sizes);
         nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
@@ -856,12 +856,14 @@ public class BibleReaderDialog extends Dialog {
     private int dragVerse = -1;
     private boolean dragAdds = true;
 
-    private void enterSelectMode(BibleVerse verse) {
+    private void enterSelectMode(@Nullable BibleVerse verse) {
         dismissActionBar();
         openSelectCard();
         selectMode = true;
         selectedVerses.clear();
-        selectedVerses.add(verse.getVerseNumber());
+        if (verse != null) {
+            selectedVerses.add(verse.getVerseNumber());
+        }
         renderVerseList(currentVerses, false);
     }
 
@@ -1506,13 +1508,31 @@ public class BibleReaderDialog extends Dialog {
     /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
     private int swipeAnchor = -1;
 
-    private void toggleSwipeColour(TextView button) {
-        swipeColourOn = !swipeColourOn;
-        swipeAnchor = -1;
-        button.setText(swipeColourOn ? "Swipe on" : "Swipe");
-        button.setAlpha(swipeColourOn ? 1f : 0.75f);
-        Toast.makeText(getContext(), swipeColourOn ? "Swipe to colour words purple" : "Swipe colouring off",
-                Toast.LENGTH_SHORT).show();
+    /** One card for every highlight tool: swipe colouring and select verses. */
+    private void showHighlightTools() {
+        LinearLayout list = new LinearLayout(getContext());
+        list.setOrientation(LinearLayout.VERTICAL);
+        final android.app.Dialog[] holder = new android.app.Dialog[1];
+        TextView swipeRow = GlassKit.glassButton(getContext(), swipeLabel(), 14);
+        swipeRow.setOnClickListener(v -> {
+            swipeColourOn = !swipeColourOn;
+            swipeAnchor = -1;
+            swipeRow.setText(swipeLabel());
+        });
+        list.addView(swipeRow, GlassKit.matchWrap(getContext(), 8));
+        TextView selectRow = GlassKit.glassButton(getContext(), "Select verses", 14);
+        selectRow.setOnClickListener(v -> {
+            if (holder[0] != null) {
+                holder[0].dismiss();
+            }
+            enterSelectMode(null);
+        });
+        list.addView(selectRow, GlassKit.matchWrap(getContext(), 8));
+        holder[0] = openCardDialog("Highlight", "Colour words, sentences or whole verses", list, null, null);
+    }
+
+    private String swipeLabel() {
+        return swipeColourOn ? "Swipe colouring: on" : "Swipe colouring: off";
     }
 
     /**
