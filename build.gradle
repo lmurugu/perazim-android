@@ -90,7 +90,10 @@ android {
         debug {
             // One app: the debug build used on the phone talks to the pilot when it is configured.
             buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(pilotApiBaseUrl ?: localApiBaseUrl)
-            // On-phone Qwen is testable in debug builds only. Release keeps it off until gate L7 passes.
+        }
+        // Validation build: debuggable, on-phone Qwen enabled. Not a release build; release stays off until gate L7.
+        validation {
+            initWith debug
             buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "true"
         }
         release {
