@@ -51,20 +51,25 @@ public final class StartupSplash {
         final FrameLayout root = new FrameLayout(activity);
         root.setBackgroundColor(Color.BLACK);
         root.setClickable(true);
+        // The automatic glass styling must leave the splash exactly as built (it would paint a grey gradient).
+        GlassKit.keep(root);
 
         ImageView logo = new ImageView(activity);
         logo.setImageResource(R.drawable.perazim_logo_black);
+        GlassKit.keep(logo);
         root.addView(logo, new FrameLayout.LayoutParams(GlassKit.px(activity, 240), GlassKit.px(activity, 240), Gravity.CENTER));
 
         LinearLayout column = new LinearLayout(activity);
         column.setOrientation(LinearLayout.VERTICAL);
         column.setGravity(Gravity.CENTER_HORIZONTAL);
+        GlassKit.keep(column);
 
         TextView title = new TextView(activity);
         title.setText("Perazim Mission Church");
         title.setTextColor(Color.WHITE);
         title.setTextSize(20);
         title.setTypeface(Typeface.DEFAULT_BOLD);
+        GlassKit.keep(title);
         title.setLetterSpacing(0.06f);
         title.setGravity(Gravity.CENTER);
         column.addView(title, new LinearLayout.LayoutParams(-2, -2));
@@ -73,6 +78,7 @@ public final class StartupSplash {
         slogan.setText("The Place of Great Breakthrough");
         slogan.setTextColor(Color.parseColor("#E17D2F"));
         slogan.setTextSize(13);
+        GlassKit.keep(slogan);
         slogan.setLetterSpacing(0.08f);
         slogan.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams lpSlogan = new LinearLayout.LayoutParams(-2, -2);
@@ -122,6 +128,7 @@ public final class StartupSplash {
             parent.removeView(splash);
         }
         FrameLayout stack = new FrameLayout(activity);
+        GlassKit.keep(stack);
         stack.addView(app, new FrameLayout.LayoutParams(-1, -1));
         stack.addView(splash, new FrameLayout.LayoutParams(-1, -1));
         activity.setContentView(stack);
