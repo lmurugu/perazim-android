@@ -89,8 +89,10 @@ public final class GlassKit {
     public static Drawable glassControl(Context c, float radiusDp) {
         GradientDrawable d = new GradientDrawable();
         if (light()) {
-            d.setColor(Color.parseColor("#B3FFFFFF"));
-            d.setStroke(px(c, 1), Color.parseColor("#E6FFFFFF"));
+            // Frosted: a translucent white with a faint sheen, so the page shows through rather than a flat white.
+            d.setOrientation(GradientDrawable.Orientation.TOP_BOTTOM);
+            d.setColors(new int[]{Color.parseColor("#66FFFFFF"), Color.parseColor("#40FFFFFF")});
+            d.setStroke(px(c, 1), Color.parseColor("#B3FFFFFF"));
         } else {
             d.setColor(Color.parseColor("#1AFFFFFF"));
             d.setStroke(px(c, 1), Color.parseColor("#33FFFFFF"));

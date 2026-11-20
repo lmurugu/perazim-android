@@ -626,16 +626,10 @@ public class BibleReaderDialog extends Dialog {
         tvChapterProgress = GlassKit.text(getContext(), "Chapter " + currentChapter + " of " + currentChapterCount, 11, false, GlassKit.muted());
         tvChapterProgress.setGravity(Gravity.CENTER);
         middle.addView(tvChapterProgress);
-        // Two groups, one for size and one for boldness, each on its own row with room between them and larger targets.
+        // One compact row: A- A+ (size) and B- B+ (weight), kept small so the bottom bar stays minimal.
         LinearLayout sizes = new LinearLayout(getContext());
-        sizes.setOrientation(LinearLayout.VERTICAL);
+        sizes.setOrientation(LinearLayout.HORIZONTAL);
         sizes.setGravity(Gravity.CENTER);
-        LinearLayout sizeRow = new LinearLayout(getContext());
-        sizeRow.setOrientation(LinearLayout.HORIZONTAL);
-        sizeRow.setGravity(Gravity.CENTER);
-        LinearLayout boldRow = new LinearLayout(getContext());
-        boldRow.setOrientation(LinearLayout.HORIZONTAL);
-        boldRow.setGravity(Gravity.CENTER);
         TextView smaller = sizeButton("A\u2212", "Smaller text", false);
         smaller.setOnClickListener(v -> changeVerseSize(-2f));
         TextView larger = sizeButton("A+", "Larger text", true);
@@ -644,14 +638,10 @@ public class BibleReaderDialog extends Dialog {
         lighter.setOnClickListener(v -> changeVerseWeight(-100));
         TextView bolder = sizeButton("B+", "Bolder text", true);
         bolder.setOnClickListener(v -> changeVerseWeight(100));
-        sizeRow.addView(smaller);
-        sizeRow.addView(larger);
-        boldRow.addView(lighter);
-        boldRow.addView(bolder);
-        sizes.addView(sizeRow);
-        LinearLayout.LayoutParams gap = new LinearLayout.LayoutParams(-2, -2);
-        gap.topMargin = dp(6);
-        sizes.addView(boldRow, gap);
+        sizes.addView(smaller);
+        sizes.addView(larger);
+        sizes.addView(lighter);
+        sizes.addView(bolder);
         middle.addView(sizes);
         nav.addView(GlassKit.keep(middle), new LinearLayout.LayoutParams(0, -2, 1f));
 
@@ -670,12 +660,12 @@ public class BibleReaderDialog extends Dialog {
 
     /** One of the four text controls under the chapter line: bigger tap target, spaced apart. */
     private TextView sizeButton(String label, String description, boolean bold) {
-        TextView b = GlassKit.text(getContext(), label, 17, bold, GlassKit.muted());
-        b.setPadding(dp(18), dp(8), dp(18), dp(8));
+        TextView b = GlassKit.text(getContext(), label, 13, bold, GlassKit.muted());
+        b.setPadding(dp(9), dp(4), dp(9), dp(4));
         b.setContentDescription(description);
         b.setClickable(true);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
-        lp.setMargins(dp(8), 0, dp(8), 0);
+        lp.setMargins(dp(2), 0, dp(2), 0);
         b.setLayoutParams(lp);
         return b;
     }
@@ -736,32 +726,42 @@ public class BibleReaderDialog extends Dialog {
                 return;
             }
             rememberTranslationNames(translations);
-            final List<String> ids = new ArrayList<>();
-            List<String> labels = new ArrayList<>();
-            int selectedIndex = 0;
+            final LinearLayout list = new LinearLayout(getContext());
+            list.setOrientation(LinearLayout.VERTICAL);
+            final android.app.Dialog[] holder = new android.app.Dialog[1];
             for (BibleTranslation t : translations) {
                 if (t.getId() == null) {
                     continue;
                 }
-                if (t.getId().equalsIgnoreCase(currentTranslation)) {
-                    selectedIndex = ids.size();
-                }
-                ids.add(t.getId());
-                labels.add(t.getId() + " · " + (t.getName() != null ? t.getName() : t.getId()));
+                final String chosen = t.getId();
+                boolean selected = chosen.equalsIgnoreCase(currentTranslation);
+                LinearLayout row = new LinearLayout(getContext());
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                row.setPadding(dp(14), dp(11), dp(14), dp(11));
+                row.setBackground(cardTile(selected));
+                row.setClickable(true);
+                LinearLayout.LayoutParams lp = GlassKit.matchWrap(getContext(), 0);
+                lp.bottomMargin = dp(6);
+                row.setLayoutParams(lp);
+                TextView code = GlassKit.text(getContext(), chosen, 14, true, selected ? Color.WHITE : notesInk());
+                row.addView(code, new LinearLayout.LayoutParams(dp(56), -2));
+                String name = t.getName() != null ? t.getName() : chosen;
+                TextView label = GlassKit.text(getContext(), name, 13, false, selected ? Color.WHITE : notesMuted());
+                row.addView(label, new LinearLayout.LayoutParams(0, -2, 1f));
+                row.setOnClickListener(v -> {
+                    if (holder[0] != null) {
+                        holder[0].dismiss();
+                    }
+                    if (!chosen.equalsIgnoreCase(currentTranslation)) {
+                        currentTranslation = chosen;
+                        updateTranslationBadge();
+                        loadChapterVerses(currentBookId, currentChapter);
+                    }
+                });
+                list.addView(row);
             }
-            AppDialogs.builder(getContext())
-                    .setTitle("Select Translation / Chagua Tafsiri")
-                    .setSingleChoiceItems(labels.toArray(new String[0]), selectedIndex, (dialog, which) -> {
-                        String chosen = ids.get(which);
-                        dialog.dismiss();
-                        if (!chosen.equalsIgnoreCase(currentTranslation)) {
-                            currentTranslation = chosen;
-                            updateTranslationBadge();
-                            loadChapterVerses(currentBookId, currentChapter);
-                        }
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+            holder[0] = openCardDialog("Select translation", "Chagua tafsiri", list, null, null);
         });
     }
 
@@ -1899,11 +1899,7 @@ public class BibleReaderDialog extends Dialog {
         GlassKit.keep(panel);  // keep the colours as built; the automatic glass pass would wash them out
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(10), dp(16), dp(12));
-        GradientDrawable glass = new GradientDrawable();
-        glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#FF140B20") : Color.parseColor("#FFFFFF"));
-        glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
-        panel.setBackground(glass);
+        panel.setBackground(cardGlass());
         panel.setAlpha(1f);
         // Higher than the verse card, so the verses cannot draw over the Notes card.
         panel.setElevation(dp(48));
@@ -2548,11 +2544,7 @@ public class BibleReaderDialog extends Dialog {
         GlassKit.keep(card);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dp(18), dp(14), dp(18), dp(14));
-        GradientDrawable glass = new GradientDrawable();
-        glass.setCornerRadius(dp(24));
-        glass.setColor(GlassKit.light() ? Color.parseColor("#FF140B20") : Color.parseColor("#FFFFFF"));
-        glass.setStroke(dp(1), Color.parseColor("#40FFFFFF"));
-        card.setBackground(glass);
+        card.setBackground(cardGlass());
 
         LinearLayout header = new LinearLayout(getContext());
         header.setOrientation(LinearLayout.HORIZONTAL);
@@ -2599,6 +2591,17 @@ public class BibleReaderDialog extends Dialog {
         }
         dialog.show();
         return dialog;
+    }
+
+    /** Gradient, rounded card surface shared by the word, picker and compare cards. Dark purple frosted in light mode, white in dark mode. */
+    private GradientDrawable cardGlass() {
+        GradientDrawable glass = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                GlassKit.light()
+                        ? new int[]{Color.parseColor("#F21C0E2A"), Color.parseColor("#E6140B20")}
+                        : new int[]{Color.parseColor("#FFFFFF"), Color.parseColor("#F4EEF8")});
+        glass.setCornerRadius(dp(24));
+        glass.setStroke(dp(1), GlassKit.light() ? Color.parseColor("#40FFFFFF") : Color.parseColor("#40241238"));
+        return glass;
     }
 
     /** Accent for text on the Notes-style card: bright orange on the dark card, deep orange on the white card. */

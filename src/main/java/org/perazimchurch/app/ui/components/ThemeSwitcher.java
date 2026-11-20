@@ -41,12 +41,15 @@ public final class ThemeSwitcher {
         LinearLayout row = new LinearLayout(activity);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER);
-        int pad = GlassKit.px(activity, 8);
+        int pad = GlassKit.px(activity, 4);
         row.setPadding(pad, pad, pad, pad);
-        GradientDrawable panel = new GradientDrawable();
-        panel.setCornerRadius(GlassKit.px(activity, 24));
-        panel.setColor(PerazimTheme.isLight() ? Color.parseColor("#F7FFFFFF") : Color.parseColor("#F2241238"));
-        panel.setStroke(GlassKit.px(activity, 1), Color.parseColor("#33000000"));
+        // One frosted card holds all three choices. Light mode: translucent white glass. Dark mode: frosted purple.
+        GradientDrawable panel = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                PerazimTheme.isLight()
+                        ? new int[]{Color.parseColor("#D9FFFFFF"), Color.parseColor("#B3FFFFFF")}
+                        : new int[]{Color.parseColor("#E6341A4F"), Color.parseColor("#D9241238")});
+        panel.setCornerRadius(GlassKit.px(activity, 18));
+        panel.setStroke(GlassKit.px(activity, 1), PerazimTheme.isLight() ? Color.parseColor("#E6FFFFFF") : Color.parseColor("#33FFFFFF"));
         row.setBackground(panel);
         GlassKit.keep(row);
 
@@ -54,17 +57,12 @@ public final class ThemeSwitcher {
             final int picked = choice;
             ImageView icon = new ImageView(activity);
             icon.setImageResource(icons[choice]);
-            int inner = GlassKit.px(activity, 11);
+            int inner = GlassKit.px(activity, 6);
             icon.setPadding(inner, inner, inner, inner);
+            // The chosen icon is orange; the others take the ink colour. No circle behind each one.
             icon.setColorFilter(choice == current ? Color.parseColor("#E17D2F")
                     : (PerazimTheme.isLight() ? Color.parseColor("#2A0F33") : Color.parseColor("#F5F0F7")));
             icon.setContentDescription(names[choice]);
-            GradientDrawable circle = new GradientDrawable();
-            circle.setShape(GradientDrawable.OVAL);
-            circle.setColor(choice == current ? Color.parseColor("#33E17D2F")
-                    : (PerazimTheme.isLight() ? Color.parseColor("#B3FFFFFF") : Color.parseColor("#33FFFFFF")));
-            circle.setStroke(GlassKit.px(activity, 1), choice == current ? Color.parseColor("#E17D2F") : Color.parseColor("#33000000"));
-            icon.setBackground(circle);
             icon.setClickable(true);
             icon.setOnClickListener(v -> {
                 if (holder[0] != null) {
@@ -76,8 +74,8 @@ public final class ThemeSwitcher {
                     activity.recreate();
                 }
             });
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(GlassKit.px(activity, 44), GlassKit.px(activity, 44));
-            lp.setMargins(GlassKit.px(activity, 4), 0, GlassKit.px(activity, 4), 0);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(GlassKit.px(activity, 30), GlassKit.px(activity, 30));
+            lp.setMargins(GlassKit.px(activity, 2), 0, GlassKit.px(activity, 2), 0);
             row.addView(icon, lp);
         }
 
