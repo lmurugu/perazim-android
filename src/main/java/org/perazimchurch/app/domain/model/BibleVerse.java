@@ -16,6 +16,8 @@ public class BibleVerse implements Serializable {
     private String text;
     private boolean isFavorite;
     private String note;
+    /** Highlight colour name (for example "yellow"), or null when the verse is not highlighted. */
+    private String highlightColor;
 
     public BibleVerse() {
     }
@@ -56,4 +58,7 @@ public class BibleVerse implements Serializable {
 
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+
+    public String getHighlightColor() { return highlightColor; }
+    public void setHighlightColor(String highlightColor) { this.highlightColor = highlightColor; }
 }
