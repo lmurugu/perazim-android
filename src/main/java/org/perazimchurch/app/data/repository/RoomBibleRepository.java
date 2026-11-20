@@ -333,7 +333,12 @@ public class RoomBibleRepository implements BibleRepository {
                 if (text.length() > 0) {
                     text.append(' ');
                 }
-                text.append('{').append(word.getOriginal()).append("} ");
+                // {original|H1234}: the Strong's number rides along so the reader can open the dictionary entry.
+                text.append('{').append(word.getOriginal());
+                if (word.getStrongsNumber() > 0) {
+                    text.append('|').append(greek ? "G" : "H").append(word.getStrongsNumber());
+                }
+                text.append("} ");
                 text.append(englishGloss(word));
             }
             BibleVerse verse = BibleMapper.toDomain(entity, translationId, bookId);
