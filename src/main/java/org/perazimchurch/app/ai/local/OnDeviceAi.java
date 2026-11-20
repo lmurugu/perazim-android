@@ -123,7 +123,7 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(PerazimAiEngine.sensitivePastoralResponse().getMessageText()));
             return;
         }
-        if (PerazimAiEngine.isClearlyOutOfScopeQuery(question)) {
+        if (PerazimAiEngine.isOutOfScopeForModel(question)) {
             MAIN.post(() -> callback.onError(PerazimAiEngine.outOfScopeResponse().getMessageText()));
             return;
         }

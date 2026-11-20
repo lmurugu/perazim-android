@@ -201,6 +201,36 @@ public class PerazimAiEngine {
                 Arrays.asList("🙏 Open pastoral contacts", "🙏 Open prayer support"));
     }
 
+    /** Church, Bible, faith and app topics the on-phone model may answer. English, Swahili and Sheng. */
+    private static final Pattern MODEL_IN_SCOPE_TOPIC = Pattern.compile(
+            "\\b(?:bible|biblia|scripture|scriptures|verse|verses|aya|chapter|book of|gospel|injili|psalm|psalms|zaburi|proverbs|" +
+            "genesis|exodus|romans|corinthians|ephesians|galatians|hebrews|revelation|matthew|luke|john|isaiah|ruth|" +
+            "david|goliath|moses|paul|peter|abraham|noah|daniel|elijah|jonah|job|joseph|jacob|samuel|solomon|esther|timothy|titus|philippians|thessalonians|lazarus|mary|martha|bethlehem|" +
+            "warumi|korintho|wakorintho|waefeso|wagalatia|waebrania|ufunuo|mathayo|yesu|jesus|christ|god|mungu|lord|holy spirit|spirit|trinity|commandments?|amri|" +
+            "prayer|prayers|pray|praying|maombi|sala|devotional|devotion|faith|imani|grace|neema|mercy|forgiveness|parable|sabbath|" +
+            "commission|baptism|tithe|tithing|offering|offerings|sadaka|paybill|church|kanisa|perazim|bishop|ministry|" +
+            "cell group|fellowship|testimony|worship|hymn|hymns|hymnal|nyimbo|wimbo|sermon|sermons|livestream|sunday|" +
+            "the app|this app|perazim app|app theme|app account|profile|reader|highlight|highlights|streak|xp|level up|community wall|youtube|reminder|" +
+            "discussion questions|bible study|blessing|thanksgiving)\\b", Pattern.CASE_INSENSITIVE);
+    /** Instruction-override and role-play attempts. These are refused even when they mention church topics. */
+    private static final Pattern MODEL_OVERRIDE = Pattern.compile(
+            "\\b(?:ignore|forget|disregard|bypass)\\s+(?:all\\s+|the\\s+|your\\s+|previous\\s+|church\\s+|these\\s+)*(?:rules|instructions|guidelines|restrictions|prompt)\\b|" +
+            "\\bpretend\\s+(?:you\\s+are|to\\s+be|that)\\b|\\broleplay\\b|\\brole-play\\b|\\byou\\s+are\\s+now\\b|\\bfrom\\s+now\\s+on\\s+you\\b|" +
+            "\\bspeak\\s+as\\b|\\bact\\s+as\\s+(?:my|an?)\\s+(?!christian|church|pastor|believer|leader)|\\bsong\\s+lyrics\\b|" +
+            "\\banswer\\s+any\\s+question\\b|\\b(?:riddles?|trivia|jokes?|poems?|poetry)\\b", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Stricter gate for the on-phone model: refuses anything outside church, Bible, faith and app topics,
+     * plus role-play and instruction-override attempts. The rest of the app keeps {@link #isClearlyOutOfScopeQuery}.
+     */
+    public static boolean isOutOfScopeForModel(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return true;
+        if (isClearlyOutOfScopeQuery(query)) return true;
+        String normalized = query.replace('’', '\'').replaceAll("\\s+", " ").trim();
+        if (MODEL_OVERRIDE.matcher(normalized).find()) return true;
+        return !MODEL_IN_SCOPE_TOPIC.matcher(normalized).find();
+    }
+
     /** Deterministically blocks clear unrelated professional/general-interest advice requests. */
     public static boolean isClearlyOutOfScopeQuery(@Nullable String query) {
         if (query == null) return false;
