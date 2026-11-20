@@ -1,14 +1,14 @@
 package org.perazimchurch.app.ui.components;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,86 +18,127 @@ import org.perazimchurch.app.R;
 import org.perazimchurch.app.ui.theme.GlassKit;
 
 /**
- * Start-up screen: solid black, the Perazim logo glides in and settles, the church name rises under it,
- * then everything fades into the app. Shown on a cold start only, never when a theme switch rebuilds the screen.
+ * Cold-start screen. It is the first thing the activity shows: solid black with the logo exactly where the launch
+ * window draws it, so there is no jump. The church name and slogan fade in under the logo. The app is built right
+ * after the first frame; the moment it is ready, the words fade away and the black lifts, so nothing lingers.
+ *
+ * <p>The fades use view property animators, which run on the render thread, so they keep moving while the app is
+ * being built on the main thread.
  */
 public final class StartupSplash {
 
-    private static final long LOGO_IN_MS = 900;
-    private static final long NAME_IN_MS = 700;
-    private static final long HOLD_MS = 700;
-    private static final long FADE_OUT_MS = 500;
+    private static final long WORDS_DELAY_MS = 300;
+    private static final long WORDS_IN_MS = 700;
+    /** The words stay up at least this long, so a fast start still lets them be read. */
+    private static final long MIN_SHOWN_MS = 1800;
+    private static final long WORDS_OUT_MS = 200;
+    private static final long BLACK_OUT_MS = 350;
+
+    private static FrameLayout overlay;
+    private static View name;
+    private static View tagline;
+    private static long beganAt;
 
     private StartupSplash() {
     }
 
-    public static void show(Activity activity) {
-        final ViewGroup decor = (ViewGroup) activity.getWindow().getDecorView();
-        final FrameLayout overlay = new FrameLayout(activity);
-        overlay.setBackgroundColor(Color.BLACK);
-        overlay.setClickable(true);
+    /** Shows the splash as the activity's content, then runs {@code buildApp} after the first frame is drawn. */
+    public static void begin(final Activity activity, final Runnable buildApp) {
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Same full-screen space as the launch window, so the logo does not move.
+            activity.getWindow().setDecorFitsSystemWindows(false);
+        }
+        final FrameLayout root = new FrameLayout(activity);
+        root.setBackgroundColor(Color.BLACK);
+        root.setClickable(true);
 
-        // The logo sits exactly where the launch screen draws it, so the hand-over is seamless.
-        final ImageView logo = new ImageView(activity);
+        ImageView logo = new ImageView(activity);
         logo.setImageResource(R.drawable.perazim_logo_black);
-        overlay.addView(logo, new FrameLayout.LayoutParams(GlassKit.px(activity, 240), GlassKit.px(activity, 240), Gravity.CENTER));
+        root.addView(logo, new FrameLayout.LayoutParams(GlassKit.px(activity, 240), GlassKit.px(activity, 240), Gravity.CENTER));
 
         LinearLayout column = new LinearLayout(activity);
         column.setOrientation(LinearLayout.VERTICAL);
         column.setGravity(Gravity.CENTER_HORIZONTAL);
 
-        final TextView name = new TextView(activity);
-        name.setText("Perazim Mission Church");
-        name.setTextColor(Color.WHITE);
-        name.setTextSize(20);
-        name.setTypeface(Typeface.DEFAULT_BOLD);
-        name.setLetterSpacing(0.06f);
-        name.setGravity(Gravity.CENTER);
-        column.addView(name, new LinearLayout.LayoutParams(-2, -2));
+        TextView title = new TextView(activity);
+        title.setText("Perazim Mission Church");
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(20);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        title.setLetterSpacing(0.06f);
+        title.setGravity(Gravity.CENTER);
+        column.addView(title, new LinearLayout.LayoutParams(-2, -2));
 
-        final TextView tagline = new TextView(activity);
-        tagline.setText("The Place of Great Breakthrough");
-        tagline.setTextColor(Color.parseColor("#E17D2F"));
-        tagline.setTextSize(13);
-        tagline.setLetterSpacing(0.08f);
-        tagline.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams lpTag = new LinearLayout.LayoutParams(-2, -2);
-        lpTag.topMargin = GlassKit.px(activity, 6);
-        column.addView(tagline, lpTag);
+        TextView slogan = new TextView(activity);
+        slogan.setText("The Place of Great Breakthrough");
+        slogan.setTextColor(Color.parseColor("#E17D2F"));
+        slogan.setTextSize(13);
+        slogan.setLetterSpacing(0.08f);
+        slogan.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams lpSlogan = new LinearLayout.LayoutParams(-2, -2);
+        lpSlogan.topMargin = GlassKit.px(activity, 6);
+        column.addView(slogan, lpSlogan);
 
         FrameLayout.LayoutParams lpColumn = new FrameLayout.LayoutParams(-1, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         lpColumn.topMargin = activity.getResources().getDisplayMetrics().heightPixels / 2 + GlassKit.px(activity, 132);
-        overlay.addView(column, lpColumn);
-        decor.addView(overlay, new ViewGroup.LayoutParams(-1, -1));
-        overlay.setElevation(GlassKit.px(activity, 100));
+        root.addView(column, lpColumn);
 
-        name.setAlpha(0f);
-        tagline.setAlpha(0f);
+        title.setAlpha(0f);
+        slogan.setAlpha(0f);
+        title.animate().alpha(1f).setStartDelay(WORDS_DELAY_MS).setDuration(WORDS_IN_MS).start();
+        slogan.animate().alpha(1f).setStartDelay(WORDS_DELAY_MS + 150).setDuration(WORDS_IN_MS).start();
 
-        // One timeline from the moment the app process started: the name and slogan fade in from 1 s to 2 s
-        // and stay. The whole screen (black, logo, name and slogan) then fades away together from 7 s to 8 s.
-        final long total = 8000;
-        long sinceStart = android.os.SystemClock.elapsedRealtime() - android.os.Process.getStartElapsedRealtime();
-        final long startAt = Math.max(0, Math.min(sinceStart, total));
-        ValueAnimator clock = ValueAnimator.ofInt(0, (int) total);
-        clock.setDuration(total);
-        clock.setInterpolator(new android.view.animation.LinearInterpolator());
-        clock.addUpdateListener(a -> {
-            int t = (Integer) a.getAnimatedValue();
-            float textAlpha = t < 1000 ? 0f : (t < 2000 ? (t - 1000) / 1000f : 1f);
-            name.setAlpha(textAlpha);
-            tagline.setAlpha(textAlpha);
-            name.setTranslationY((1f - textAlpha) * GlassKit.px(activity, 10));
-            tagline.setTranslationY((1f - textAlpha) * GlassKit.px(activity, 10));
-            overlay.setAlpha(t < 7000 ? 1f : 1f - (t - 7000) / 1000f);
-        });
-        clock.addListener(new AnimatorListenerAdapter() {
+        overlay = root;
+        name = title;
+        tagline = slogan;
+        beganAt = SystemClock.elapsedRealtime();
+        activity.setContentView(root);
+
+        // Build the app after the splash has been drawn once, so the logo and fades are on screen first.
+        root.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
-            public void onAnimationEnd(Animator animation) {
-                decor.removeView(overlay);
+            public boolean onPreDraw() {
+                root.getViewTreeObserver().removeOnPreDrawListener(this);
+                root.post(buildApp);
+                return true;
             }
         });
-        clock.start();
-        clock.setCurrentPlayTime(startAt);
+    }
+
+    /** True while the cold-start splash is the current content. */
+    public static boolean isActive() {
+        return overlay != null;
+    }
+
+    /** Puts the finished app under the splash, then fades the words and the black away at once. */
+    public static void showApp(final Activity activity, View app) {
+        final FrameLayout splash = overlay;
+        if (splash == null) {
+            activity.setContentView(app);
+            return;
+        }
+        ViewGroup parent = (ViewGroup) splash.getParent();
+        if (parent != null) {
+            parent.removeView(splash);
+        }
+        FrameLayout stack = new FrameLayout(activity);
+        stack.addView(app, new FrameLayout.LayoutParams(-1, -1));
+        stack.addView(splash, new FrameLayout.LayoutParams(-1, -1));
+        activity.setContentView(stack);
+
+        long wait = Math.max(0, MIN_SHOWN_MS - (SystemClock.elapsedRealtime() - beganAt));
+        final View words1 = name;
+        final View words2 = tagline;
+        overlay = null;
+        name = null;
+        tagline = null;
+        splash.postDelayed(() -> {
+            words1.animate().cancel();
+            words2.animate().cancel();
+            words1.animate().alpha(0f).setStartDelay(0).setDuration(WORDS_OUT_MS).start();
+            words2.animate().alpha(0f).setStartDelay(0).setDuration(WORDS_OUT_MS).start();
+            splash.animate().alpha(0f).setStartDelay(WORDS_OUT_MS).setDuration(BLACK_OUT_MS)
+                    .withEndAction(() -> stack.removeView(splash)).start();
+        }, wait);
     }
 }

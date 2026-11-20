@@ -186,8 +186,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            // Cold start: show the black logo screen first, then build the app behind it.
+            org.perazimchurch.app.ui.components.StartupSplash.begin(this, () -> initApp(null));
+        } else {
+            initApp(savedInstanceState);
+        }
+    }
+
+    private void initApp(Bundle savedInstanceState) {
         org.perazimchurch.app.ui.theme.Glass.useDensity(getResources().getDisplayMetrics().density);
 
         // Initialize gamification persistence
@@ -262,7 +271,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
 
         // 5. Illustrated Quiet-Dark Splash Overlay
-        splashContainer = createSplashScreen();
+        splashContainer = getIntent() != null && getIntent().getBooleanExtra("show_splash", false)
+                ? createSplashScreen() : null;
         if (splashContainer != null) {
             rootWindow.addView(splashContainer);
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
@@ -279,11 +289,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             }, 1200);
         }
 
-        setContentView(rootWindow);
-        if (savedInstanceState == null) {
-            // Cold start only: a black start-up screen with the logo, not a theme switch rebuild.
-            org.perazimchurch.app.ui.components.StartupSplash.show(this);
-        }
+        // On a cold start the app goes under the black logo screen, which then fades away.
+        org.perazimchurch.app.ui.components.StartupSplash.showApp(this, rootWindow);
         handleIntent(getIntent());
     }
 
