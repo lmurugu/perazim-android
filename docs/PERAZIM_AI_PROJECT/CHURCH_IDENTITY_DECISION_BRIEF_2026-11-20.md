@@ -1,5 +1,7 @@
 # Church identity decision brief (2026-11-20)
 
+> **Correction (2026-11-20).** The launcher and application label is "Perazim", not "Perazim Mission Church" (section 4 below is wrong on this). Vision, Mission A and the core values exist only in dead legacy code and are not shown to members. Mission B is the only mission a member sees. See `CHURCH_IDENTITY_DOSSIER_2026-11-20.md` section 2 for all corrections and `CHURCH_IDENTITY_SCREEN_INVENTORY_2026-11-20.md` for live/dead status.
+
 **Purpose:** evidence for leadership decisions. **Nothing here approves a motto, mission, vision, slogan or values statement.** Repository history shows when text entered the code. It does not show who approved it. Commit messages are not approval evidence.
 
 ## 1. Confirmed decision (owner, 2026-11-20)
