@@ -36,6 +36,9 @@ public interface GameSession {
     /** Lives value meaning the game is played without lives. */
     int NO_LIVES = -1;
 
-    /** Result of one answer. */
-    enum Outcome { CORRECT, WRONG, IGNORED }
+    /**
+     * Result of one answer. MOVED is a valid move that neither solves the question nor fails it
+     * (for example, sliding a tile to a new square). Existing games never return it.
+     */
+    enum Outcome { CORRECT, WRONG, IGNORED, MOVED }
 }
