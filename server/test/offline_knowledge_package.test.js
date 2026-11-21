@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const { signApproval } = require('../src/phase-b/sourceApprovalSignature');
 const { createOfflinePackage, verifyOfflinePackage, createRollbackAuthorization,
   verifyRollbackAuthorization, createWithdrawalManifest, verifyWithdrawalManifest } = require('../src/phase-b/offlineKnowledgePackage');
 
@@ -126,10 +127,17 @@ process.stdout.write('PASS: synthetic public package signing, trust, expiry, ver
 // S2-governance: approval status is carried in the signed payload's governance array, and that array is
 // covered by the signature, so altering it must fail verification.
 {
+  // Official sources need an approver signature over the entry (S2-06 item 3). The approver key is synthetic.
+  const approverPair = crypto.generateKeyPairSync('ed25519');
+  const official = { ...source, authority_class: 'APPROVED_OFFICIAL', approval_authority: 'approver-synthetic' };
+  const approvalSignature = signApproval({ id: official.source_id, version: official.version, category: 'CHURCH_APPROVED',
+    approvedBy: 'approver-synthetic', approvedAt: official.approved_at, scope: 'OFFLINE:OFFLINE',
+    sha256: official.content_hash }, approverPair.privateKey);
   const signed = createOfflinePackage({
     packageId: 'governance-contract', version: '1', publishedAt: now, expiresAt: now + 60_000,
     minimumAppVersion: '1', signingKeyId: 'synthetic-key-v1', privateKey: keys.privateKey,
-    sources: [{ ...source, authority_class: 'APPROVED_OFFICIAL' }]
+    sources: [{ ...official, approval_signature: approvalSignature }],
+    approverKeys: { 'approver-synthetic': approverPair.publicKey }
   });
   assert.equal(signed.payload.governance.length, 1);
   assert.equal(signed.payload.governance[0].category, 'CHURCH_APPROVED');

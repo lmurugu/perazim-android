@@ -123,6 +123,7 @@ router.post('/:sourceId/:version/approve', async (req, res) => {
     const result = await action(req, 'knowledge.source.approve.institutional', client => governance.approveSource(client, {
       sourceId: req.params.sourceId, version: req.params.version, actorId: req.user.id,
       approvalAuthority: req.body?.approvalAuthority, approvalReference: req.body?.approvalReference,
+      approvedAt: req.body?.approvedAt, approvalSignature: req.body?.approvalSignature,
       requestId: requestId(req.body)
     }));
     return res.json(result);

@@ -2,6 +2,7 @@
 
 const { isPostgresActive, withTransaction } = require('../db');
 const { PhaseBError, requireAdminAuthority, userPermission, writeAudit, newId } = require('./security');
+const { CHURCH_APPROVED, approverPublicKeys, verifyApprovalSignature } = require('./sourceApprovalSignature');
 
 const REASONS = new Set(['SOURCE_REVIEW', 'SOURCE_APPROVAL', 'SOURCE_PUBLICATION', 'SOURCE_WITHDRAWAL', 'SOURCE_SUPERSESSION', 'CONFLICT_CLASSIFICATION', 'SCRIPTURE_IMPORT', 'SCRIPTURE_PUBLICATION', 'ADMIN_READ']);
 const CONFLICT_CLASSES = new Set(['AUTHORITY_SCOPE', 'TEXTUAL_CONTRADICTION', 'VERSION', 'INCOMPLETE_SOURCE', 'OTHER']);
@@ -93,7 +94,7 @@ async function recordReview(client, { sourceId, version, actorId, decision, reas
   return { sourceId, version, approvalStatus: status, reviewDecision: decision, reviewedAt: now };
 }
 
-async function approveSource(client, { sourceId, version, actorId, approvalAuthority, approvalReference, requestId, now = Date.now() }) {
+async function approveSource(client, { sourceId, version, actorId, approvalAuthority, approvalReference, approvedAt, approvalSignature, requestId, now = Date.now(), approverKeys = approverPublicKeys() }) {
   requireUuid(requestId);
   if (typeof approvalAuthority !== 'string' || !approvalAuthority.trim() || approvalAuthority.length > 200 ||
       typeof approvalReference !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._:/# -]{3,199}$/.test(approvalReference.trim())) {
@@ -106,10 +107,29 @@ async function approveSource(client, { sourceId, version, actorId, approvalAutho
   if (!source.created_by || source.created_by === actorId || source.reviewed_by === actorId) {
     fail(403, 'SEPARATION_OF_DUTIES', 'The submitter and reviewer cannot provide the institutional approval.');
   }
+  // Approved-official sources need the approver's own signed approval time and signature. Other sources keep the
+  // server time, and they are never packaged as church-approved.
+  let approvedAtValue = now;
+  let signature = null;
+  if (source.authority_class === 'APPROVED_OFFICIAL') {
+    if (!Number.isSafeInteger(approvedAt) || approvedAt <= 0 || approvedAt > now || typeof approvalSignature !== 'string') {
+      fail(400, 'APPROVAL_SIGNATURE_REQUIRED', 'An official source needs the approver-signed approval time and signature.');
+    }
+    const entry = {
+      id: source.source_id, version: source.version, category: CHURCH_APPROVED,
+      approvedBy: approvalAuthority.trim(), approvedAt, scope: 'OFFLINE:' + source.permitted_uses.join(','),
+      sha256: source.content_hash, approvalSignature
+    };
+    if (!verifyApprovalSignature(entry, approverKeys)) {
+      fail(403, 'APPROVAL_SIGNATURE_INVALID', 'The approval signature is not valid for this approver.');
+    }
+    approvedAtValue = approvedAt;
+    signature = approvalSignature;
+  }
   await client.query(
     `UPDATE ai_knowledge_sources SET approval_status='APPROVED',approval_authority=$3,approval_reference=$4,
-       approved_at=$5,approval_actor_id=$6,updated_at=$5 WHERE source_id=$1 AND version=$2`,
-    [sourceId, version, approvalAuthority.trim(), approvalReference.trim(), now, actorId]
+       approved_at=$5,approval_actor_id=$6,approval_signature=$7,updated_at=$8 WHERE source_id=$1 AND version=$2`,
+    [sourceId, version, approvalAuthority.trim(), approvalReference.trim(), approvedAtValue, actorId, signature, now]
   );
   await recordEvent(client, { sourceId, version, type: 'APPROVED', actorId, role: 'INSTITUTIONAL_APPROVER', authorityReference: approvalReference.trim(), reason: 'SOURCE_APPROVAL', requestId, now });
   await writeAudit(client, { actorId, action: 'AI_SOURCE_APPROVAL', resourceType: 'ai_knowledge_source', resourceId: `${sourceId}:${version}`, reason: 'SOURCE_APPROVAL', requestId, createdAt: now });

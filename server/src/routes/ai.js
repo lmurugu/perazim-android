@@ -49,7 +49,7 @@ router.get('/offline-package/current', requireAuth, async (_req, res) => {
       `SELECT s.source_id, s.version, s.title, s.authority_class, s.approval_status,
               s.publication_status, s.confidentiality, s.permitted_audiences,
               s.permitted_uses, s.approval_authority, s.approval_reference,
-              s.approved_at, c.location, c.content_hash, c.content AS text,
+              s.approved_at, s.approval_signature, c.location, c.content_hash, c.content AS text,
               s.language, s.translation_id AS license
          FROM ai_knowledge_sources s
          JOIN ai_knowledge_chunks c ON c.source_id=s.source_id AND c.source_version=s.version
