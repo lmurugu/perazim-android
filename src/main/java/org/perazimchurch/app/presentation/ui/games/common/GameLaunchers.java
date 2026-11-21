@@ -2,6 +2,7 @@ package org.perazimchurch.app.presentation.ui.games.common;
 
 import org.perazimchurch.app.presentation.ui.games.LadderScreen;
 import org.perazimchurch.app.presentation.ui.games.MemoryScreen;
+import org.perazimchurch.app.presentation.ui.games.RoadScreen;
 import org.perazimchurch.app.presentation.ui.games.StoryTimelineScreen;
 import org.perazimchurch.app.presentation.ui.games.WordSearchScreen;
 import org.perazimchurch.app.presentation.ui.games.WhoAmIScreen;
@@ -22,5 +23,6 @@ public final class GameLaunchers {
         GameRegistry.register("word_search", WordSearchScreen::show);
         GameRegistry.register("memory_match", MemoryScreen::show);
         GameRegistry.register("ladder_of_faith", LadderScreen::show);
+        GameRegistry.register("road_to_jerusalem", RoadScreen::show);
     }
 }
