@@ -19,8 +19,7 @@ import static org.junit.Assert.assertTrue;
  * Passing tests here show that the rules layers behave as described for these inputs. They do not show how a
  * real on-phone model answers, and they do not cover the Android runtime path (OnDeviceAi.ask needs a Context).
  *
- * The three former known-gap tests were un-ignored after the integrated feature branch (4a3edd1) passed them.
- * Re-add @Ignore only with a reason if a regression is confirmed and the owning session agrees.
+ * Tests annotated @Ignore are open gaps owned by another session (currently only the retrieval wiring, Session 1).
  */
 public class OfflineAssistantQaTest {
 
@@ -113,10 +112,9 @@ public class OfflineAssistantQaTest {
     // ---------------------------------------------------------------- known gaps (confirmed; expected to fail)
 
     /**
-     * Confirmed gap. Church and Bible vocabulary in the allowlist lets some off-topic requests reach the model.
-     * Each entry below passes isOutOfScopeForModel today. This test now passes on the integrated build.
+     * Fixed on ai/s6-integration: a denylist of finance, investment, entertainment, job-search, gambling and property
+     * terms now applies to every query, so allowlisted church or Bible words no longer let these requests through.
      */
-
     @Test
     public void outOfScopeRequestsContainingChurchWordsAreRefused() {
         String[] leakyInputs = {
@@ -141,7 +139,6 @@ public class OfflineAssistantQaTest {
      * does not check category, approval, hash, revocation or supersession, so approval metadata that the
      * package carries is used as is. This tripwire fails until retrieval is wired to SourceGovernance.
      */
-
     @Test
     public void retrievalPathUsesSourceGovernance() throws Exception {
         String store = new String(Files.readAllBytes(Paths.get(
@@ -152,10 +149,8 @@ public class OfflineAssistantQaTest {
     /**
      * Engine-level gap (defence in depth). officialClaimHasApprovedProvenance trusts the authorityClass field on
      * each evidence item. On ai/s1-governance and later, retrieval sets authorityClass from the manifest, so the
-     * item reaching this check is governed. This test still fails because the check does not look at supersession
-     * itself. This test now passes on the integrated build, where retrieval filters superseded items upstream.
+     * item reaching this check is governed. Fixed on ai/s6-integration: the check itself rejects superseded or revoked items.
      */
-
     @Test
     public void supersededSelfApprovedItemDoesNotBackOfficialClaim() throws Exception {
         org.json.JSONArray evidence = new org.json.JSONArray();
