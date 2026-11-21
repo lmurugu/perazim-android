@@ -10,6 +10,7 @@ import org.perazimchurch.app.domain.games.catalog.WhoSaidItDefinition;
 import org.perazimchurch.app.domain.games.catalog.WhoSaidItSession;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.domain.games.catalog.Streak;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
@@ -52,6 +53,10 @@ public final class WhoSaidItScreen {
         }
         TextView scoreLine = ui.text("Quotation " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
         if (popScore) GameFx.pulse(scoreLine, 0xFFFFAA3C);
+        if (game.streak().current() >= 2) {
+            TextView streakBadge = ui.text("🔥 x" + game.streak().current(), 13, true);
+            if (popScore) GameFx.pulse(streakBadge, 0xFFFFAA3C);
+        }
         ui.text(game.prompt(), 18, true);
         if (feedback != null) ui.text(feedback, 13, false);
         new GameChrome(ui).pauseButton(() -> render(game, feedback, false));
@@ -77,7 +82,8 @@ public final class WhoSaidItScreen {
         String lead = outcome == GameSession.Outcome.CORRECT
                 ? "Correct. "
                 : "Not quite. It was " + answered.answer + ". ";
-        return lead + answered.reference + ".";
+        String bonus = game.streak().bonusAwarded() ? " Streak bonus +" + Streak.BONUS_POINTS + "." : "";
+        return lead + answered.reference + "." + bonus;
     }
 
     /** Correct or wrong feedback on the tapped button. */

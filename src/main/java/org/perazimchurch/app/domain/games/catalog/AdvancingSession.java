@@ -8,6 +8,13 @@ import org.perazimchurch.app.domain.games.engine.GameSession;
  */
 abstract class AdvancingSession implements GameSession {
 
+    private final Streak streak = new Streak();
+
+    /** The right-answer streak for this run. */
+    public final Streak streak() {
+        return streak;
+    }
+
     /** Submits an answer to the wrapped game. Returns true when it was right, and it advances. */
     protected abstract boolean submit(String value);
 
@@ -17,7 +24,9 @@ abstract class AdvancingSession implements GameSession {
     @Override
     public final Outcome answer(String value) {
         if (!hasQuestion()) return Outcome.IGNORED;
-        return submit(value) ? Outcome.CORRECT : Outcome.WRONG;
+        boolean right = submit(value);
+        streak.record(right);
+        return right ? Outcome.CORRECT : Outcome.WRONG;
     }
 
     @Override

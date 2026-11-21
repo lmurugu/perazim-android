@@ -32,7 +32,7 @@ public final class TestamentSession extends AdvancingSession {
     @Override public int size() { return game.size(); }
     @Override public int position() { return game.position(); }
     @Override public boolean finished() { return game.finished(); }
-    @Override public int score() { return game.score(); }
+    @Override public int score() { return game.score() + streak().bonusPoints(); }
 
     @Override
     public String prompt() {
