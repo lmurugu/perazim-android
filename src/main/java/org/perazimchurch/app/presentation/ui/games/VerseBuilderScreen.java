@@ -17,7 +17,6 @@ import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
-import org.perazimchurch.app.presentation.ui.games.common.LevelPicker;
 
 /**
  * Play screen for Verse Builder. Drives {@link VerseBuilderSession}: tap the shuffled word tiles
@@ -32,23 +31,21 @@ public final class VerseBuilderScreen {
     private final GameContext ctx;
     private final GameDefinition definition;
     private int level = 1;
-    private int page;
 
     public VerseBuilderScreen(GameContext ctx) {
         this.ctx = ctx;
         this.definition = QuizScreen.find("verse_builder");
     }
 
-    /** Opens the level picker on the current screen, on the page that holds the last level played. */
+    /** Opens the level picker on the current screen. */
     public void start() {
-        renderPicker(LevelPicker.pageOf(level));
+        renderPicker();
     }
 
-    private void renderPicker(int shown) {
-        page = shown;
+    private void renderPicker() {
         GameUi ui = ctx.ui();
         ctx.activity().setContentView(ui.page(TITLE, "Pick a level. A level opens after two stars on the one before.", true));
-        LevelPicker.addPage(ui, ctx.scores(), ctx.scorePrefix() + definition.id(), page, this::startRun, this::renderPicker);
+        ui.levelPicker(definition.id(), Levels.COUNT, this::startRun);
     }
 
     /** Starts a run on one level, drawn from the verse bank for its band. */
