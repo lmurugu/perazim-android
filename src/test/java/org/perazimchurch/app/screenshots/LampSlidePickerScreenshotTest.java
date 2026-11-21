@@ -45,6 +45,15 @@ public class LampSlidePickerScreenshotTest {
                 if (frames.length() > 1500) break;
                 frames.append(" | ").append(el);
             }
+            // Diagnostic: the small copies are pushed to a git ref, so the full trace is readable from there.
+            java.io.StringWriter trace = new java.io.StringWriter();
+            failure.printStackTrace(new java.io.PrintWriter(trace));
+            File small = new File("build/ui-screenshots/small");
+            //noinspection ResultOfMethodCallIgnored
+            small.mkdirs();
+            try (java.io.FileWriter out = new java.io.FileWriter(new File(small, "picker_error.jpg"))) {
+                out.write(trace.toString());
+            }
             throw new AssertionError(frames.toString(), failure);
         }
         Dialog dialog = ShadowDialog.getLatestDialog();
