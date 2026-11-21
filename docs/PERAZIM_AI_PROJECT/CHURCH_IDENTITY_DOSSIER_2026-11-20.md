@@ -347,3 +347,7 @@ Levi wrote "yes" to the recommendations and said the rest will be confirmed late
 - The relationship between PMCI and PERAZIM MISSION CHURCH needs a written answer (12.2).
 - The 2018 registration year is read from the certificate's printed "18". It should be checked against the original.
 - The ODPC registration status and the privacy contact details are not supplied.
+
+### 12.6 Decision on the legal name (Levi, 2026-11-21)
+
+Levi decided: legal text uses the registered name, **PERAZIM MISSION CHURCH** (as written on Certificate No. 23319), with **PMCI** as the short form. This closes the open question in 12.2 for legal and privacy text. The privacy drafts already follow this (commit `fed3b1e`). Member-facing name and AI naming are unchanged by this decision. Decision 5 in section 12.4 is therefore adjusted as recorded.
