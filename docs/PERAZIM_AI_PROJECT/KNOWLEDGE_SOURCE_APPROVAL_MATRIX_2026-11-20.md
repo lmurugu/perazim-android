@@ -22,3 +22,7 @@ Allowlist principle: a document enters the official retrieval collection only wh
 - Approved: 1 (instruction set only). Not approved as church information: all others.
 - Excluded pending rights or currency: 4, 5, 7, 8.
 - Leadership conflicts blocking identity sources: 3.
+
+## Update 2026-11-21
+- Bible translations for the AI: **KJV and NASB only** (owner option B). ESV is out of the AI. Row 10 and the ESV row apply accordingly.
+- No church source has been approved by this update. The Constitution is not in `docs/PERAZIM_AI_PROJECT/` (checked 2026-11-21; the folder contains design specs that only mention the Constitution). The owner has asked for the files to be located on the attached paths, and the constitution is still missing.

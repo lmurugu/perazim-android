@@ -156,3 +156,11 @@ Source for the licence summary: https://help.planningcenter.com/en/copyright-con
 | Kenya/SUV "Section 23, 50 years" claim (`docs/bible-source.md` §2.2) | Could not be checked. The Kenya Act full text was not retrieved (see 6.5) | Uncertain |
 
 **Result:** the KJV text is probably derived from a public-domain base (Gutenberg / CrossWire / Blayney text), as the repo says. This has not been verified. The edition can't be matched to a CUP sheet from the files. Owner action: supply the archive file named in `docs/bible-source.md` §3 with its hash, so its provenance can be checked. Keep the KJV marked "verify before package" until then.
+
+## Owner decisions, 2026-11-21
+
+- **Option B confirmed by owner:** the AI uses **KJV and NASB only**. **ESV is excluded from the AI** and remains only in the Bible reader.
+- **NASB:** quoting is allowed with attribution (owner decision, 2026-11-21).
+- **KJV:** allowed for AI use in principle. The digital edition's source and licence still need recording before any text enters the approved package (see section 1 above).
+- **Hymns, sermons, lyrics, chords:** unchanged. Excluded until permission is established.
+- **Still open:** NASB and KJV edition-level evidence (publisher page and date checked) for the register.
