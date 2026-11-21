@@ -75,6 +75,13 @@ public final class ReviewScheduler {
         return group.get(random.nextInt(group.size()));
     }
 
+    /** The record after one answer on {@code day}: the correct or missed count grows by one. */
+    public static Record afterAnswer(Record previous, boolean correct, long day) {
+        int right = (previous == null ? 0 : previous.correct) + (correct ? 1 : 0);
+        int missed = (previous == null ? 0 : previous.missed) + (correct ? 0 : 1);
+        return new Record(right, missed, day);
+    }
+
     /** True when the last answers (newest last) show the player is ready for harder questions. */
     public static boolean shouldStepUp(List<Boolean> recentAnswers) {
         if (recentAnswers == null || recentAnswers.size() < STEP_UP_WINDOW) return false;

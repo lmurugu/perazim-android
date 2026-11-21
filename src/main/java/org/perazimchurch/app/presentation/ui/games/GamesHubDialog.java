@@ -1228,7 +1228,12 @@ public final class GamesHubDialog extends Dialog {
 
     private void startLadder() {
         seed = System.nanoTime();
-        ladder = new LadderOfFaith(seed);
+        org.perazimchurch.app.domain.games.GameSettings settings =
+                org.perazimchurch.app.data.local.preference.GameSettingsStore.load(activity);
+        ladder = new LadderOfFaith(seed,
+                org.perazimchurch.app.data.local.preference.QuestionHistoryStore.load(
+                        activity, org.perazimchurch.app.data.local.preference.QuestionHistoryStore.LADDER),
+                settings.unseenPercent, settings.missedPercent);
         showMap();
     }
 
@@ -1357,7 +1362,10 @@ public final class GamesHubDialog extends Dialog {
         if (!activeOwner() || ladder.answered()) return;
         hideKeyboard();
         Card card = ladder.current();
-        if (ladder.answer(value)) addStar(); else lastMissedCitation = card.reference;
+        boolean right = ladder.answer(value);
+        org.perazimchurch.app.data.local.preference.QuestionHistoryStore.record(
+                activity, org.perazimchurch.app.data.local.preference.QuestionHistoryStore.LADDER, card.prompt, right);
+        if (right) addStar(); else lastMissedCitation = card.reference;
         List<LadderOfFaith.Event> events = ladder.drainEvents();
         announce(events);
         boolean milestone = ladder.milestone();
