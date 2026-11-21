@@ -40,6 +40,7 @@ import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
+import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -757,38 +758,29 @@ public final class GamesHubDialog extends Dialog {
 
     // ---- Shared results and pause for every run ----
 
-    /** Results screen for a finished run: stars, score, today's verse, Replay and Back to Games. */
+    /** Results screen for a finished run. The shared logic lives in GameChrome. */
     private void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
-        int stars = GameResults.recordRun(scores, scorePrefix + gameId, score, size);
-        screen(title, "Run complete", false);
-        text(GameResults.starLine(stars), 28, true);
-        text("Score: " + score + " of " + size, 16, true);
-        TextView verse = text("Loading today's verse...", 13, false);
-        GameResults.loadVerseOfDay(activity, loaded -> verse.setText(loaded));
-        Button again = button("Replay", true);
-        again.setOnClickListener(v -> {
-            if (!activeOwner()) return;
-            seed = System.nanoTime();
-            replay.run();
-        });
-        Button next = button("Next level", false);
-        next.setEnabled(false);
-        text("More levels are coming soon.", 12, false);
-        button("Back to Games", false).setOnClickListener(v -> hub());
+        chrome().finishedRun(gameId, title, score, size, replay);
     }
 
-    /** Pause button for an active run. Resume re-renders the same question. */
+    /** Pause button for an active run. The shared logic lives in GameChrome. */
     private void pauseButton(Runnable resume) {
-        Button pause = button("Pause", false);
-        pause.setOnClickListener(v -> {
-            if (!activeOwner()) return;
-            feedback().click(v);
-            screen("Paused", "Your run is saved on this screen. Take a breath.", false);
-            button("Resume", true).setOnClickListener(r -> {
-                if (!activeOwner()) return;
-                resume.run();
-            });
-            button("Back to Games", false).setOnClickListener(r -> hub());
+        chrome().pauseButton(resume);
+    }
+
+    /** Adapter that lets GameChrome draw on this dialog's page. */
+    private GameChrome chrome() {
+        return new GameChrome(new GameChrome.Host() {
+            @Override public Activity activity() { return activity; }
+            @Override public SharedPreferences scores() { return scores; }
+            @Override public String scorePrefix() { return scorePrefix; }
+            @Override public boolean activeOwner() { return GamesHubDialog.this.activeOwner(); }
+            @Override public void screen(String title, String subtitle) { GamesHubDialog.this.screen(title, subtitle, false); }
+            @Override public TextView text(String value, int size, boolean bold) { return GamesHubDialog.this.text(value, size, bold); }
+            @Override public Button button(String label, boolean primary) { return GamesHubDialog.this.button(label, primary); }
+            @Override public void click(View v) { feedback().click(v); }
+            @Override public void newSeed() { seed = System.nanoTime(); }
+            @Override public void hub() { GamesHubDialog.this.hub(); }
         });
     }
 
