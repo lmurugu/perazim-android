@@ -1252,7 +1252,7 @@ public final class GamesHubDialog extends Dialog {
         Window window = getWindow();
         if (input != null && window != null) input.hideSoftInputFromWindow(window.getDecorView().getWindowToken(), 0);
     }
-    static String ownerKey(String owner) {
+    public static String ownerKey(String owner) {
         try {
             byte[] bytes = MessageDigest.getInstance("SHA-256").digest(owner.getBytes(StandardCharsets.UTF_8));
             StringBuilder key = new StringBuilder();
