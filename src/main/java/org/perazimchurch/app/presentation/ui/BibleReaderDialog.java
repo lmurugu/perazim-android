@@ -345,6 +345,8 @@ public class BibleReaderDialog extends Dialog {
     private View actionBarView;
     private BibleVerse actionVerse;
     private int focusedVerseNumber = 0;
+    /** Further verses tapped while the verse bar is open; the bar's highlight applies to these as well. */
+    private final java.util.TreeSet<Integer> extraActionVerses = new java.util.TreeSet<>();
 
     /** One background gradient behind everything; status and navigation bars are transparent so it flows top to bottom. */
     private void applyWindowChrome() {
@@ -917,17 +919,66 @@ public class BibleReaderDialog extends Dialog {
     }
 
     /** The colour panel for select mode: stays open so one colour can be chosen, then another portion selected. */
+    /** The picker for swipe colouring: choose the colour here, then drag across words to paint them. */
+    private void openSwipeColourPanel() {
+        swipeColourOn = true;
+        swipeAnchor = -1;
+        openSelectCard(true);
+    }
+
     private void openSelectCard() {
-        LinearLayout list = openFloatingCard("select", "Select verses", null, null);
-        list.addView(buildColourPicker(name -> applyHighlightToSelected(name), null, false, null));
-        TextView done = GlassKit.orangeButton(getContext(), "Done", 14);
-        done.setPadding(dp(28), 0, dp(28), 0);
+        openSelectCard(false);
+    }
+
+    private void openSelectCard(final boolean forSwipe) {
+        LinearLayout list = openFloatingCard(forSwipe ? "swipecolour" : "select", "Colour", null, null);
+        // No backdrop card: strip the panel to its content, so only the picker and the Done icon show.
+        if (notesPanelView instanceof LinearLayout) {
+            LinearLayout panel = (LinearLayout) notesPanelView;
+            panel.setBackground(null);
+            panel.setPadding(dp(16), 0, dp(16), 0);
+            View content = list;
+            while (content.getParent() instanceof View && content.getParent() != panel) {
+                content = (View) content.getParent();
+            }
+            for (int i = panel.getChildCount() - 1; i >= 0; i--) {
+                if (panel.getChildAt(i) != content) {
+                    panel.removeViewAt(i);
+                }
+            }
+        }
+        if (notesPanelView != null && notesPanelView.getLayoutParams() instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams plp = (FrameLayout.LayoutParams) notesPanelView.getLayoutParams();
+            plp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            notesPanelView.setLayoutParams(plp);
+        }
+        View picker = buildColourPicker(name -> {
+            if (forSwipe) {
+                swipeColourName = name;
+            } else {
+                applyHighlightToSelected(name);
+            }
+        }, forSwipe ? swipeColourName : null, false, null, true);
+        LinearLayout.LayoutParams pickerLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46));
+        pickerLp.gravity = Gravity.CENTER_HORIZONTAL;
+        picker.setLayoutParams(pickerLp);
+        list.addView(picker);
+        ImageView done = new ImageView(getContext());
+        done.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_check);
+        done.setContentDescription("Done");
+        done.setPadding(dp(8), dp(8), dp(8), dp(8));
+        GradientDrawable doneBg = new GradientDrawable();
+        doneBg.setShape(GradientDrawable.OVAL);
+        doneBg.setColor(COLOR_ACCENT_ORANGE());
+        done.setBackground(doneBg);
+        LinearLayout.LayoutParams doneLp = new LinearLayout.LayoutParams(dp(36), dp(36));
+        doneLp.setMargins(0, dp(8), 0, 0);
+        done.setLayoutParams(doneLp);
         done.setOnClickListener(v -> dismissNotesPanel());
         LinearLayout doneRow = new LinearLayout(getContext());
         doneRow.setGravity(Gravity.CENTER);
-        doneRow.addView(done, new LinearLayout.LayoutParams(-2, dp(40)));
-        LinearLayout.LayoutParams rowLp = GlassKit.matchWrap(getContext(), 10);
-        list.addView(doneRow, rowLp);
+        doneRow.addView(done);
+        list.addView(doneRow);
     }
 
     /** Colours every chosen verse, then clears the choice so the next portion can be selected. */
@@ -1235,7 +1286,7 @@ public class BibleReaderDialog extends Dialog {
             // Drag across words to select a range: Highlight, Clear highlight or Select verses from the menu.
             tvVerseText.setTextIsSelectable(true);
             tvVerseText.setCustomSelectionActionModeCallback(wordSelectionCallback(tvVerseText, verse, textStart));
-            tvVerseText.setOnClickListener(v -> showVerseActionBar(verse));
+            tvVerseText.setOnClickListener(v -> onVerseTapped(verse));
         }
         if (!isSearchResult) {
             // A quick sideways swipe across the verse selects the whole verse and opens the verse menu.
@@ -1292,11 +1343,12 @@ public class BibleReaderDialog extends Dialog {
         row.setContentDescription("Verse " + verse.getVerseNumber() + ". Tap to highlight, bookmark, add a note, copy, share or compare.");
         if (!isSearchResult) {
             verseRows.put(verse.getVerseNumber(), row);
-            if (focusedVerseNumber > 0 && verse.getVerseNumber() != focusedVerseNumber) {
+            if (focusedVerseNumber > 0 && verse.getVerseNumber() != focusedVerseNumber
+                    && !extraActionVerses.contains(verse.getVerseNumber())) {
                 row.setAlpha(0.35f);
             }
         }
-        row.setOnClickListener(v -> showVerseActionBar(verse));
+        row.setOnClickListener(v -> onVerseTapped(verse));
         return row;
     }
 
@@ -1500,6 +1552,8 @@ public class BibleReaderDialog extends Dialog {
 
     /** Swipe-to-colour mode: when on, dragging across a plain-text verse colours the words in bold purple. */
     private boolean swipeColourOn;
+    /** The colour swipe colouring paints with; the hamburger picker sets it. */
+    private String swipeColourName = "bold-purple";
     /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
     private int swipeAnchor = -1;
 
@@ -1523,20 +1577,33 @@ public class BibleReaderDialog extends Dialog {
             if (holder[0] != null) {
                 holder[0].dismiss();
             }
-            enterSelectMode(null);
+            openSwipeColourPanel();
         });
         row.addView(select);
 
-        holder[0] = openCardDialog("Highlight", null, row, null, null);
+        // Icons only: no card, no title and no words.
+        final android.app.Dialog dialog = new android.app.Dialog(getContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setContentView(row);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setDimAmount(0f);
+            android.view.WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
+            attrs.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            attrs.y = dp(104);
+            dialog.getWindow().setAttributes(attrs);
+        }
+        holder[0] = dialog;
+        dialog.show();
     }
 
     private ImageView highlightIcon(int drawable, boolean on, String description) {
         ImageView icon = new ImageView(getContext());
         icon.setImageResource(drawable);
         icon.setContentDescription(description);
-        icon.setPadding(dp(16), dp(16), dp(16), dp(16));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(60), dp(60));
-        lp.setMargins(dp(8), dp(4), dp(8), dp(4));
+        icon.setPadding(dp(8), dp(8), dp(8), dp(8));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(46), dp(46));
+        lp.setMargins(dp(10), dp(4), dp(10), dp(4));
         icon.setLayoutParams(lp);
         styleHighlightIcon(icon, on);
         return icon;
@@ -1545,9 +1612,12 @@ public class BibleReaderDialog extends Dialog {
     private void styleHighlightIcon(ImageView icon, boolean on) {
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
-        circle.setColor(on ? COLOR_ACCENT_ORANGE() : (GlassKit.light() ? 0x1A000000 : 0x33FFFFFF));
+        // Translucent circle behind each tool, as on the verse action bar: dark on a dark phone, light on a light one.
+        // Solid enough to read, like the verse action bar: deep purple behind light icons on dark, near-white behind dark icons on light.
+        circle.setColor(on ? 0x33E17D2F : (phoneIsDark() ? 0xF2301848 : 0xF2FFFFFF));
         icon.setBackground(circle);
-        icon.setColorFilter(on ? 0xFFFFFFFF : notesMuted());
+        // Dark ink on the light theme, bright ink on the dark theme; the on state stays orange.
+        icon.setColorFilter(on ? COLOR_ACCENT_ORANGE() : (phoneIsDark() ? 0xFFF1EAFB : 0xFF2A1B3D));
     }
 
     /**
@@ -1578,9 +1648,9 @@ public class BibleReaderDialog extends Dialog {
             swipeAnchor = -1;
             int[] range = trimmedBodyRange(verse, from, to);
             if (action == android.view.MotionEvent.ACTION_UP && range != null) {
-                applyWordHighlight(verse, range[0], range[1], "bold-purple");
+                applyWordHighlight(verse, range[0], range[1], swipeColourName);
             } else if (action == android.view.MotionEvent.ACTION_UP) {
-                showVerseActionBar(verse);
+                onVerseTapped(verse);
             }
             return true;
         }
@@ -1702,7 +1772,7 @@ public class BibleReaderDialog extends Dialog {
     /** Colour card for a chosen word or range. */
     private void pickWordColour(final BibleVerse verse, final int start, final int end) {
         wordColourDialog = openCardDialog("Highlight", null,
-                buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, false, null), null, null);
+                buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, false, null, false), null, null);
     }
 
     /** Adds a word range to the verse, updates the loaded verse lists and redraws. */
@@ -1947,65 +2017,216 @@ public class BibleReaderDialog extends Dialog {
     }
 
     /**
-     * The one colour picker used everywhere: the most used colours in a row, then a spectrum
-     * to pick any other colour. Calls onPick with the chosen colour name or "#RRGGBB".
+     * The one colour picker used everywhere, as a compact panel: a hue track, a saturation track and an
+     * intensity track (washed out to dark), a row of frequently used colours, and a check to apply the mix.
+     * Presets apply straight away; the tracks preview until the check is pressed.
      */
     private View buildColourPicker(final java.util.function.Consumer<String> onPick, @Nullable final String current,
-                                   boolean allowRemove, @Nullable final Runnable onRemove) {
-        LinearLayout picker = new LinearLayout(getContext());
-        picker.setOrientation(LinearLayout.VERTICAL);
-        picker.setGravity(Gravity.CENTER_HORIZONTAL);
-        LinearLayout row = new LinearLayout(getContext());
-        row.setGravity(Gravity.CENTER);
+                                   boolean allowRemove, @Nullable final Runnable onRemove, boolean framed) {
+        final String seed = current != null && HighlightColors.byName(current) != null ? current : frequentColours().get(0);
+        HighlightColors.Colour seedColour = HighlightColors.byName(seed);
+        int seedRgb = seedColour != null ? Color.parseColor(seedColour.swatch) : 0xFF8E24AA;
+        final float[] hsv = new float[3];
+        Color.colorToHSV(seedRgb, hsv);
+        // State: hue in degrees, saturation 0..1, intensity position 0 (dark) .. 1 (washed out).
+        final float[] st = {hsv[0], hsv[1], Math.max(0f, Math.min(1f, 0.5f * (hsv[2] - 0.35f) / 0.65f))};
+
+        // Frosted, slightly curved card with a single row: two strips on the left, colour circles on the right.
+        LinearLayout card = new LinearLayout(getContext());
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        if (framed) {
+            card.setPadding(dp(12), dp(4), dp(12), dp(4));
+            GradientDrawable frost = new GradientDrawable();
+            frost.setCornerRadius(dp(12));
+            // Dark card on a light page, light card on a dark page, nearly opaque so verse text does not show through.
+            frost.setColor(phoneIsDark() ? 0xF22D0938 : 0xF7FFFFFF);
+            frost.setStroke(dp(1), phoneIsDark() ? 0x33FFFFFF : 0xD9FFFFFF);
+            card.setBackground(frost);
+        }
+
+        final TrackSlider[] bars = new TrackSlider[2];
+        final Runnable[] refresh = new Runnable[1];
+        refresh[0] = () -> {
+            int colour = intensityColour(st[0], st[1], st[2]);
+            int thumb = pickerThumbColour();
+            bars[0].update(st[0] / 360f, hueStops(), thumb);
+            bars[1].update(st[2], intensityStops(st[0], st[1]), thumb);
+            bars[1].setTag(colour);
+        };
+        LinearLayout strips = new LinearLayout(getContext());
+        strips.setOrientation(LinearLayout.VERTICAL);
+        strips.setGravity(Gravity.CENTER_VERTICAL);
+        // Releasing a thumb applies the colour, the same as tapping a circle.
+        final Runnable applyMix = () -> {
+            int rgb = intensityColour(st[0], st[1], st[2]);
+            String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
+            recordColourUse(hex);
+            onPick.accept(hex);
+        };
+        bars[0] = new TrackSlider(getContext(), st[0] / 360f, (f, done) -> {
+            st[0] = f * 360f;
+            refresh[0].run();
+            if (done) {
+                applyMix.run();
+            }
+        });
+        bars[1] = new TrackSlider(getContext(), st[2], (f, done) -> {
+            st[2] = f;
+            refresh[0].run();
+            if (done) {
+                applyMix.run();
+            }
+        });
+        for (TrackSlider bar : bars) {
+            strips.addView(bar, new LinearLayout.LayoutParams(-1, dp(16)));
+        }
+        // The strips take 70% of the picker, the circles 30%.
+        card.addView(strips, new LinearLayout.LayoutParams(0, -2, 7f));
+        refresh[0].run();
+
+        LinearLayout dots = new LinearLayout(getContext());
+        dots.setOrientation(LinearLayout.HORIZONTAL);
+        dots.setGravity(Gravity.CENTER);
+        int shown = 0;
         for (final String name : frequentColours()) {
             HighlightColors.Colour colour = HighlightColors.byName(name);
-            if (colour != null) {
-                row.addView(swatchView(colour.swatch, name.equals(current), v -> {
-                    recordColourUse(name);
-                    onPick.accept(name);
-                }));
+            if (colour == null || shown >= 4) {
+                continue;
             }
+            shown++;
+            final boolean chosen = name.equals(current);
+            View dot = swatchView(colour.swatch, false, v -> {
+                recordColourUse(name);
+                onPick.accept(name);
+            });
+            LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dp(16), dp(16));
+            dotLp.setMargins(dp(3), 0, dp(3), 0);
+            dot.setLayoutParams(dotLp);
+            // The chosen circle grows to 1.5 times its size instead of showing a ring.
+            dot.setScaleX(chosen ? 1.5f : 1f);
+            dot.setScaleY(chosen ? 1.5f : 1f);
+            dots.addView(dot);
         }
         if (allowRemove && onRemove != null) {
-            row.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
+            dots.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
         }
-        picker.addView(row);
-        picker.addView(spectrumBar(onPick));
-        return picker;
+        card.addView(dots, new LinearLayout.LayoutParams(0, -2, 3f));
+        return card;
     }
 
-    /** One hue spectrum: tap or drag across it, and the colour under the finger is chosen on release. */
-    private View spectrumBar(final java.util.function.Consumer<String> onPick) {
-        final View spectrum = new View(getContext());
-        GradientDrawable hues = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{
-                0xFFFF0000, 0xFFFFFF00, 0xFF00FF00, 0xFF00FFFF, 0xFF0000FF, 0xFFFF00FF, 0xFFFF0000});
-        hues.setCornerRadius(dp(10));
-        spectrum.setBackground(hues);
-        spectrum.setContentDescription("Pick any colour from the spectrum");
-        spectrum.setOnTouchListener((v, event) -> {
-            int action = event.getActionMasked();
-            if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
-                    || action == android.view.MotionEvent.ACTION_UP) {
-                float frac = Math.max(0f, Math.min(1f, event.getX() / Math.max(1, v.getWidth())));
-                int rgb = Color.HSVToColor(new float[]{frac * 359f, 0.55f, 0.98f});
-                String hex = String.format(java.util.Locale.US, "#%06X", rgb & 0xFFFFFF);
-                if (action == android.view.MotionEvent.ACTION_UP) {
-                    recordColourUse(hex);
-                    onPick.accept(hex);
-                }
+    /**
+     * True when the reader is drawn dark. The reader's background follows the app's theme (GlassKit), and the
+     * verse action bar contrasts with that, so the picker and tool icons do the same.
+     */
+    private boolean phoneIsDark() {
+        // Despite the name: true means the tools use the DARK style (deep purple card and circles, light
+        // icons, orange thumbs). That is when the page is light, so the tools always contrast with the page.
+        return GlassKit.light();
+    }
+
+    /** Slider thumbs contrast with the phone: purple on a light phone, orange on a dark phone. */
+    private int pickerThumbColour() {
+        return phoneIsDark() ? 0xFFE17D2F : 0xFF4A1D6E;
+    }
+
+    /** A thin strip with a round thumb. The gradient is the strip; the thumb is dark purple with a glow. */
+    private static final class TrackSlider extends View {
+        interface Listener {
+            void onMove(float value, boolean done);
+        }
+
+        private float value;
+        private int[] stops = {0xFF000000, 0xFFFFFFFF};
+        private int thumbFill = 0xFF4A1D6E;
+        private final Listener listener;
+        private final float density;
+        private final android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+        TrackSlider(android.content.Context context, float initial, Listener listener) {
+            super(context);
+            this.value = initial;
+            this.listener = listener;
+            this.density = context.getResources().getDisplayMetrics().density;
+        }
+
+        void update(float newValue, int[] newStops, int fill) {
+            value = Math.max(0f, Math.min(1f, newValue));
+            stops = newStops;
+            thumbFill = fill;
+            invalidate();
+        }
+
+        @Override
+        protected void onDraw(android.graphics.Canvas canvas) {
+            float inset = 4 * density;
+            float trackH = 3.5f * density;
+            float cy = getHeight() / 2f;
+            android.graphics.RectF track = new android.graphics.RectF(inset, cy - trackH / 2, getWidth() - inset, cy + trackH / 2);
+            paint.setShader(new android.graphics.LinearGradient(track.left, 0, track.right, 0, stops, null,
+                    android.graphics.Shader.TileMode.CLAMP));
+            canvas.drawRoundRect(track, trackH / 2, trackH / 2, paint);
+            paint.setShader(null);
+            float x = track.left + value * track.width();
+            paint.setShadowLayer(4 * density, 0, 0, (thumbFill & 0x00FFFFFF) | 0xCC000000);
+            paint.setColor(thumbFill);
+            canvas.drawCircle(x, cy, 4f * density, paint);
+            paint.clearShadowLayer();
+        }
+
+        @Override
+        public boolean onTouchEvent(android.view.MotionEvent ev) {
+            int action = ev.getActionMasked();
+            if (action == android.view.MotionEvent.ACTION_DOWN) {
+                getParent().requestDisallowInterceptTouchEvent(true);
             }
-            return true;
-        });
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(260), dp(20));
-        lp.setMargins(0, dp(8), 0, dp(4));
-        spectrum.setLayoutParams(lp);
-        return spectrum;
+            if (action == android.view.MotionEvent.ACTION_DOWN || action == android.view.MotionEvent.ACTION_MOVE
+                    || action == android.view.MotionEvent.ACTION_UP || action == android.view.MotionEvent.ACTION_CANCEL) {
+                float inset = 4 * density;
+                float span = Math.max(1f, getWidth() - 2 * inset);
+                value = Math.max(0f, Math.min(1f, (ev.getX() - inset) / span));
+                invalidate();
+                listener.onMove(value, action == android.view.MotionEvent.ACTION_UP
+                        || action == android.view.MotionEvent.ACTION_CANCEL);
+                return true;
+            }
+            return super.onTouchEvent(ev);
+        }
+    }
+
+    private static int hsvInt(float hue, float sat, float val) {
+        return Color.HSVToColor(new float[]{hue, sat, val});
+    }
+
+    private static int[] hueStops() {
+        return new int[]{hsvInt(0, 1, 1), hsvInt(60, 1, 1), hsvInt(120, 1, 1), hsvInt(180, 1, 1),
+                hsvInt(240, 1, 1), hsvInt(300, 1, 1), hsvInt(360, 1, 1)};
+    }
+
+    /** Dark, the colour itself, then washed out. */
+    private static int[] intensityStops(float hue, float sat) {
+        return new int[]{hsvInt(hue, sat, 0.35f), hsvInt(hue, sat, 1f), hsvInt(hue, sat * 0.25f, 1f)};
+    }
+
+    private static int intensityColour(float hue, float sat, float position) {
+        return lerpStops(intensityStops(hue, sat), position);
+    }
+
+    private static int lerpStops(int[] stops, float position) {
+        float pos = Math.max(0f, Math.min(1f, position)) * (stops.length - 1);
+        int i = Math.min(stops.length - 2, (int) pos);
+        float f = pos - i;
+        int a = stops[i];
+        int b = stops[i + 1];
+        return Color.rgb(Math.round(Color.red(a) + (Color.red(b) - Color.red(a)) * f),
+                Math.round(Color.green(a) + (Color.green(b) - Color.green(a)) * f),
+                Math.round(Color.blue(a) + (Color.blue(b) - Color.blue(a)) * f));
     }
 
     /** Colours for the verse action bar: the shared picker, with remove. */
     private View buildPalette(final BibleVerse verse) {
         return buildColourPicker(name -> applyHighlight(verse, name), verse.getHighlightColor(),
-                true, () -> applyHighlight(verse, null));
+                true, () -> applyHighlight(verse, null), true);
     }
 
     /** Active group icons turn orange; the rest use the normal ink. */
@@ -2018,10 +2239,28 @@ public class BibleReaderDialog extends Dialog {
             readerFrame.removeView(actionBarView);
         }
         actionBarView = null;
+        extraActionVerses.clear();
         if (focusedVerseNumber != 0) {
             focusedVerseNumber = 0;
             renderVerseList(isSearchMode ? searchResults : currentVerses, isSearchMode);
         }
+    }
+
+    /**
+     * A tap on a verse. With the verse bar closed it opens the bar for that verse. With the bar open, a tap on
+     * another verse adds it to (or removes it from) the group the bar acts on, so many verses can be chosen one by one.
+     */
+    private void onVerseTapped(BibleVerse verse) {
+        if (actionBarView != null && !isSearchMode && actionVerse != null
+                && verse.getVerseNumber() != actionVerse.getVerseNumber()) {
+            if (!extraActionVerses.remove(verse.getVerseNumber())) {
+                extraActionVerses.add(verse.getVerseNumber());
+            }
+            renderVerseList(currentVerses, false);
+            return;
+        }
+        extraActionVerses.clear();
+        showVerseActionBar(verse);
     }
 
     private LinearLayout barRow() {
@@ -2153,6 +2392,15 @@ public class BibleReaderDialog extends Dialog {
     private void applyHighlight(final BibleVerse verse, @Nullable final String colour) {
         final String previous = verse.getHighlightColor();
         verse.setHighlightColor(colour);
+        recordColourUse(colour);
+        // The same colour goes on every other verse chosen with the bar.
+        final java.util.TreeSet<Integer> group = new java.util.TreeSet<>(extraActionVerses);
+        for (BibleVerse other : currentVerses) {
+            if (group.contains(other.getVerseNumber())) {
+                other.setHighlightColor(colour);
+                bibleViewModel.setHighlight(other.getBookId(), other.getChapterNumber(), other.getVerseNumber(), colour, () -> { });
+            }
+        }
         showUndoPill(verse, previous, colour);
         if (actionVerse != null) {
             dismissActionBar();
