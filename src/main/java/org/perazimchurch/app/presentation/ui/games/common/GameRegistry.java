@@ -35,6 +35,9 @@ public final class GameRegistry {
     public static boolean launch(String gameId, GameContext ctx) {
         Launcher launcher = LAUNCHERS.get(gameId);
         if (launcher == null) return false;
+        GameAudio audio = GameAudio.get(ctx.activity());
+        audio.bindAccount(ctx.scores(), ctx.scorePrefix());
+        audio.enterGame(gameId);
         launcher.launch(ctx);
         return true;
     }

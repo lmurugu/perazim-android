@@ -22,13 +22,23 @@ public class PerazimApplication extends Application {
             @Override public void onLowMemory() { }
         });
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            private int startedActivities;
             @Override public void onActivityCreated(android.app.Activity a, android.os.Bundle b) { }
             @Override public void onActivityStarted(android.app.Activity a) {
                 org.perazimchurch.app.ui.theme.GlassPolish.install(a);
+                if (startedActivities++ == 0) {
+                    org.perazimchurch.app.presentation.ui.games.common.GameAudio.get(a).onAppForegroundChanged(true);
+                }
             }
             @Override public void onActivityResumed(android.app.Activity a) { }
             @Override public void onActivityPaused(android.app.Activity a) { }
-            @Override public void onActivityStopped(android.app.Activity a) { }
+            @Override public void onActivityStopped(android.app.Activity a) {
+                // Music pauses only when no activity is visible any more, not when one screen replaces another.
+                if (--startedActivities <= 0) {
+                    startedActivities = 0;
+                    org.perazimchurch.app.presentation.ui.games.common.GameAudio.get(a).onAppForegroundChanged(false);
+                }
+            }
             @Override public void onActivitySaveInstanceState(android.app.Activity a, android.os.Bundle b) { }
             @Override public void onActivityDestroyed(android.app.Activity a) { }
         });
