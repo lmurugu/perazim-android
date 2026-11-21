@@ -43,7 +43,7 @@ public final class GameChrome {
     /** Results for a run that is scored by score and size only (the older games). */
     public void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
         int stars = GameResults.recordRun(host.scores(), host.scorePrefix() + gameId, score, size);
-        showResults(host.scores(), host.scorePrefix() + gameId, title, stars, score, size, replay);
+        showResults(host.scores(), host.scorePrefix() + gameId, title, stars, score, size, replay, null);
     }
 
     /**
@@ -56,18 +56,30 @@ public final class GameChrome {
 
     /** Results for a catalog game, using that game's own star rule. */
     public void finishedRun(GameDefinition game, String title, GameSession session, int level, Runnable replay) {
-        int stars = GameResults.finishRun(host.scores(), game, level, session);
-        showResults(host.scores(), host.scorePrefix() + game.id(), title, stars, session.score(), session.size(), replay);
+        finishedRun(game, title, session, level, replay, null);
+    }
+
+    /**
+     * Results for a catalog game with a Next level action. Next level is enabled when the level
+     * after this one is unlocked; pass null to leave it off.
+     */
+    public void finishedRun(GameDefinition game, String title, GameSession session, int level, Runnable replay, Runnable next) {
+        String storedId = host.scorePrefix() + game.id();
+        int stars = GameResults.finishRun(host.scores(), storedId, game, level, session);
+        boolean canNext = next != null && level < game.levelCount()
+                && GameResults.unlockedLevel(host.scores(), storedId) > level;
+        showResults(host.scores(), storedId, title, stars, session.score(), session.size(), replay, canNext ? next : null);
     }
 
     /** Results for an engine run on a given level. Stars are saved for that level only. */
     public void finishedRun(String gameId, String title, GameSession session, int level, int levelCount, Runnable replay) {
         int stars = GameResults.finishRun(host.scores(), host.scorePrefix() + gameId, level, levelCount, session);
-        showResults(host.scores(), host.scorePrefix() + gameId, title, stars, session.score(), session.size(), replay);
+        showResults(host.scores(), host.scorePrefix() + gameId, title, stars, session.score(), session.size(), replay, null);
     }
 
     /** Results screen: stars, score, today's verse, Replay and Back to Games. */
-    private void showResults(SharedPreferences prefs, String storedId, String title, int stars, int score, int size, Runnable replay) {
+    private void showResults(SharedPreferences prefs, String storedId, String title, int stars, int score, int size,
+                             Runnable replay, Runnable next) {
         host.screen(title, "Run complete");
         host.text(GameResults.starLine(stars), 28, true);
         host.text("Score: " + score + " of " + size, 16, true);
@@ -79,8 +91,12 @@ public final class GameChrome {
             host.newSeed();
             replay.run();
         });
-        Button next = host.button("Next level", false);
-        next.setEnabled(false);
+        Button nextButton = host.button("Next level", false);
+        nextButton.setEnabled(next != null);
+        if (next != null) nextButton.setOnClickListener(v -> {
+            if (!host.activeOwner()) return;
+            next.run();
+        });
         host.text("Best on this phone: " + GameResults.starLine(GameResults.bestStars(prefs, storedId)), 13, false);
         host.text("Get 2 stars or more to unlock the next level.", 12, false);
         host.button("Back to Games", false).setOnClickListener(v -> host.hub());

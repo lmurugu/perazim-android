@@ -42,5 +42,5 @@ public interface GameDefinition {
      * How this game turns a finished run into stars. Defaults to the shared rule in
      * {@link StarRating}. A game overrides this to use its own rule.
      */
-    default StarRule starRule() { return StarRating::stars; }
+    default StarRule starRule() { return s -> StarRating.stars(s.score(), s.size(), s.lives()); }
 }

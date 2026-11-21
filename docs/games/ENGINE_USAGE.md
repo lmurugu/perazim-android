@@ -41,3 +41,40 @@ does and the one call a game makes when a run ends.
 - Keep the adapters thin. The rules live in the session, not in the screen.
 - Do not hard-code `lives` as `NO_LIVES` when the game has lives; pass `session.lives()`.
 - Art follows `docs/games/ART_BRIEFS.md`. A game uses `game_<id>` art when it exists, else its icon.
+
+## Registering a game screen (GameContext)
+
+A game with its own dialog registers a launcher once, from `GameLaunchers.registerAll()`
+(called from `PerazimApplication.onCreate`). The hub passes a `GameContext` when the card is tapped:
+
+```java
+GameRegistry.register("story_mosaic", ctx -> StoryMosaicDialog.show(ctx.activity(), ctx.ui()));
+```
+
+- `ctx.activity()` is the activity to open a dialog on.
+- `ctx.hub()` is the back action that returns to the Games list.
+- `ctx.scores()` is the games preferences file. `ctx.scorePrefix()` is the owner key from
+  `GamesHubDialog.ownerKey(ownerId)`, so stars and progress belong to the account, not the device.
+  Store a game's stars under `ctx.scorePrefix() + gameId`, which is what `GameChrome` and
+  `LevelProgression` already do.
+- `ctx.ui()` returns a `GameUi`, already configured with the context. Its `page(title, subtitle, playing)`
+  builds the scrolling page with the back button, and `text`, `button` and `gap` draw on it.
+- `ctx.ownerCheck()` and `ctx.seedReset()` cover the account check and the seed reset for Replay.
+
+## Star rules and hints
+
+- `GameDefinition.starRule()` returns a `StarRule`, which takes the whole finished `GameSession`.
+  The default uses `StarRating` (score, size and lives). A game overrides it to use hints, for example
+  `session.hintsUsed()`.
+- `GameSession.hintsUsed()` defaults to 0. A session that shows hints overrides it.
+
+## Next level
+
+`GameChrome.finishedRun(game, title, session, level, replay, next)` enables Next level when the level
+after this one is unlocked (`LevelProgression`, two or more stars). Pass `null` to keep it off.
+
+## Existing register lines
+
+Story Mosaic and Lamp Slide register their own launchers on their feature branches. Those lines use the
+earlier `activity -> ...` form and move to `ctx -> ...` (with `ctx.activity()` and `ctx.ui()`) when those
+branches merge onto this one. The deepen threads adapt their own lines.
