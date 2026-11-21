@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import org.perazimchurch.app.R;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.domain.games.catalog.VineWordsDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.domain.games.engine.LevelProgression;
 import org.perazimchurch.app.domain.games.vine.VineWordsLevel;
@@ -39,6 +40,7 @@ import java.util.List;
 public final class VineWordsDialog extends Dialog implements GameChrome.Host {
 
     private static final String GAME_ID = "vine_words";
+    private static final VineWordsDefinition DEFINITION = new VineWordsDefinition(0, VineWordsContent::levels);
 
     private final Activity activity;
     private final String ownerId;
@@ -223,8 +225,10 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         if (session.finished()) {
             feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
             feedback().celebrateIn(getWindow());
-            chrome().finishedRun(GAME_ID, "Vine Words", session, levelNumber, VineWordsLevels.LEVEL_COUNT,
-                    () -> startLevel(levelNumber));
+            int finished = levelNumber;
+            Runnable next = finished < VineWordsLevels.LEVEL_COUNT ? () -> startLevel(finished + 1) : null;
+            chrome().finishedRun(DEFINITION, "Vine Words", session, levelNumber,
+                    () -> startLevel(finished), next);
         }
     }
 

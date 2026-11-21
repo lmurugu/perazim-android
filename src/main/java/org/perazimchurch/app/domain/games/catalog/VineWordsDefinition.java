@@ -2,6 +2,8 @@ package org.perazimchurch.app.domain.games.catalog;
 
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.domain.games.engine.StarRating;
+import org.perazimchurch.app.domain.games.engine.StarRule;
 import org.perazimchurch.app.domain.games.vine.VineWordsLevel;
 import org.perazimchurch.app.domain.games.vine.VineWordsLevels;
 import org.perazimchurch.app.domain.games.vine.VineWordsSession;
@@ -27,6 +29,15 @@ public final class VineWordsDefinition implements GameDefinition {
     @Override public int iconResource() { return iconResource; }
     @Override public int levelCount() { return VineWordsLevels.LEVEL_COUNT; }
     @Override public String levelName(int level) { return "Level " + level; }
+
+    /** Stars as usual, but a run that used any hint is capped at two stars. */
+    @Override
+    public StarRule starRule() {
+        return session -> {
+            int stars = StarRating.stars(session.score(), session.size(), session.lives());
+            return session.hintsUsed() > 0 && stars > 2 ? 2 : stars;
+        };
+    }
 
     @Override
     public GameSession createSession(int level, long seed) {
