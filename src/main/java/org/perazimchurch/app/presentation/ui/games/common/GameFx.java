@@ -204,12 +204,13 @@ public final class GameFx {
             star.setScaleX(0f);
             star.setScaleY(0f);
             final boolean lit = i < stars;
+            final int step = i;
             star.animate().scaleX(1f).scaleY(1f).setStartDelay(160L * i).setDuration(320)
                     .setInterpolator(new android.view.animation.OvershootInterpolator(2.2f))
                     .withStartAction(() -> {
                         if (lit && particles != null) particles.burst(star.getX() + star.getWidth() / 2f, star.getY() + star.getHeight() / 2f);
                         if (lit) haptic(star, true);
-                        if (lit) audio.playPitched(GameAudio.Sfx.STAR, 1f + 0.12f * (i + 1));
+                        if (lit) audio.playPitched(GameAudio.Sfx.STAR, 1f + 0.12f * (step + 1));
                     }).start();
         }
         if (stars >= 3) audio.playPitched(GameAudio.Sfx.COMPLETE, 1f);
