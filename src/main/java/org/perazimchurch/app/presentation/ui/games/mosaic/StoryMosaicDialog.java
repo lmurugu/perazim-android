@@ -18,6 +18,7 @@ import android.widget.TextView;
 import org.perazimchurch.app.domain.games.catalog.StoryMosaicSession;
 import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.domain.games.engine.KeyValueStore;
 import org.perazimchurch.app.domain.games.engine.LevelProgression;
 import org.perazimchurch.app.domain.games.mosaic.MosaicBoard;
@@ -33,32 +34,33 @@ import java.util.List;
  */
 public final class StoryMosaicDialog extends Dialog {
 
-    private static final String PREFS = "perazim_game_scores_v1";
     private static final String GAME_ID = "story_mosaic";
     private static final int BG = Color.parseColor("#2D0938");
     private static final int ORANGE = Color.parseColor("#E17D2F");
 
     private final Context appContext;
     private final SharedPreferences prefs;
+    private final String progressId;
     private final LevelProgression progression;
     private final int levelCount = MosaicPuzzles.all().size();
     private final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private FrameLayout root;
     private Bitmap scene;
 
-    public StoryMosaicDialog(Context context) {
+    public StoryMosaicDialog(Context context, SharedPreferences prefs, String progressId) {
         super(context, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
         this.appContext = context.getApplicationContext();
-        this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        this.prefs = prefs;
+        this.progressId = progressId;
         this.progression = new LevelProgression(new PrefsStore(prefs));
         this.root = new FrameLayout(context);
         this.root.setBackgroundColor(BG);
         setContentView(root);
     }
 
-    /** Opens Story Mosaic on top of the given activity. Used by the Games hub through GameRegistry. */
-    public static void show(android.app.Activity activity) {
-        new StoryMosaicDialog(activity).show();
+    /** Opens Story Mosaic from the Games hub through GameRegistry. Progress is per account. */
+    public static void show(GameContext ctx) {
+        new StoryMosaicDialog(ctx.activity(), ctx.scores(), ctx.scorePrefix() + GAME_ID).show();
     }
 
     @Override
@@ -90,7 +92,7 @@ public final class StoryMosaicDialog extends Dialog {
             int last = (c + 1 < starts.size() ? starts.get(c + 1) : levelCount) - 1;
             int done = 0;
             for (int i = first; i <= last; i++) {
-                if (progression.bestStars(GAME_ID, i + 1) > 0) done++;
+                if (progression.bestStars(progressId, i + 1) > 0) done++;
             }
             final int target = nextUnfinished(first, last);
             Button row = new Button(getContext());
@@ -114,7 +116,7 @@ public final class StoryMosaicDialog extends Dialog {
 
     private int nextUnfinished(int first, int last) {
         for (int i = first; i <= last; i++) {
-            if (progression.bestStars(GAME_ID, i + 1) == 0) return i;
+            if (progression.bestStars(progressId, i + 1) == 0) return i;
         }
         return first;
     }
@@ -178,8 +180,8 @@ public final class StoryMosaicDialog extends Dialog {
 
     private void onFinished(StoryMosaicSession session, int level, MosaicPuzzles.Puzzle puzzle,
                             TextView caption, Button hintButton, TextView hint, LinearLayout column) {
-        int stars = MosaicStars.RULE.stars(session.score(), session.size(), GameSession.NO_LIVES);
-        progression.record(GAME_ID, level, stars, levelCount);
+        int stars = MosaicStars.RULE.stars(session);
+        progression.record(progressId, level, stars, levelCount);
         hintButton.setVisibility(View.GONE);
         hint.setText("");
         // Show the title at once; swap in the KJV text when the background read finishes.

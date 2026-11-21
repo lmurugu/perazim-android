@@ -1,5 +1,6 @@
 package org.perazimchurch.app.domain.games.mosaic;
 
+import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.domain.games.engine.StarRule;
 
 /**
@@ -12,7 +13,12 @@ public final class MosaicStars implements StarRule {
     public static final MosaicStars RULE = new MosaicStars();
 
     @Override
-    public int stars(int score, int size, int lives) {
+    public int stars(GameSession session) {
+        return starsFor(session.score(), session.size());
+    }
+
+    /** The rule on plain numbers, so it can be tested without a session. */
+    public static int starsFor(int score, int size) {
         if (size < 1) throw new IllegalArgumentException("size must be at least 1");
         int clamped = Math.max(0, Math.min(score, size));
         int wrong = size - clamped;

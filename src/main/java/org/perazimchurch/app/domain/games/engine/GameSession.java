@@ -27,6 +27,9 @@ public interface GameSession {
     /** The hint text for the current question, or null when none is available. */
     String hint();
 
+    /** Hints shown so far in this run. Star rules can use it. */
+    default int hintsUsed() { return 0; }
+
     /** The question or clue text a play screen shows, or null when the screen uses its own. */
     default String prompt() { return null; }
 
