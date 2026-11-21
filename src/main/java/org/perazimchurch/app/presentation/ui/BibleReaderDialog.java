@@ -1297,12 +1297,24 @@ public class BibleReaderDialog extends Dialog {
             // Drag across words to select a range: Highlight, Clear highlight or Select verses from the menu.
             tvVerseText.setTextIsSelectable(true);
             tvVerseText.setCustomSelectionActionModeCallback(wordSelectionCallback(tvVerseText, verse, textStart));
-            tvVerseText.setOnClickListener(v -> onVerseTapped(verse));
+            // The tap is handled by the gesture detector below, not a click listener: selectable text takes focus
+            // on the first tap and swallows the click, so a click listener needed two taps.
         }
         if (!isSearchResult) {
             // A quick sideways swipe across the verse selects the whole verse and opens the verse menu.
             final android.view.GestureDetector swipe = new android.view.GestureDetector(getContext(),
                     new android.view.GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onSingleTapUp(android.view.MotionEvent e) {
+                            // One tap on plain verse text opens the verse bar (or adds the verse to the group).
+                            // Interlinear text keeps its own word taps.
+                            if (!interlinearVersion) {
+                                onVerseTapped(verse);
+                                return true;
+                            }
+                            return false;
+                        }
+
                         @Override
                         public boolean onFling(android.view.MotionEvent e1, android.view.MotionEvent e2, float vx, float vy) {
                             if (e1 == null || e2 == null) {
