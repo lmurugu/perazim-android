@@ -9,6 +9,7 @@ import org.perazimchurch.app.domain.games.catalog.QuizSession;
 import org.perazimchurch.app.domain.games.catalog.Streak;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.BibleBanks;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
@@ -27,29 +28,45 @@ public final class QuizScreen {
     private final GameContext ctx;
     private final GameDefinition definition;
     private long seed = System.nanoTime();
+    private String difficulty = BibleBanks.DIFFICULTIES[0];
 
     public QuizScreen(GameContext ctx) {
         this.ctx = ctx;
         this.definition = find("bible_quiz");
     }
 
-    /** Starts a fresh run on the current screen. */
+    /** Opens the difficulty picker on the current screen. */
     public void start() {
-        newRun();
+        renderPicker();
     }
 
-    private void newRun() {
+    private void renderPicker() {
+        GameUi ui = ctx.ui();
+        ctx.activity().setContentView(ui.page(TITLE, "Choose a difficulty. Five questions per run.", true));
+        for (String level : BibleBanks.DIFFICULTIES) {
+            Button choice = ui.button(BibleBanks.label(level), false);
+            choice.setOnClickListener(v -> {
+                if (!ui.activeOwner()) return;
+                ui.click(v);
+                startRun(level);
+            });
+        }
+    }
+
+    /** Starts a run at one difficulty, drawn from the bundled bank. */
+    private void startRun(String level) {
+        difficulty = level;
         seed = System.nanoTime();
-        render((QuizSession) definition.createSession(1, seed), null, false);
+        render(new QuizSession(new BibleGames.Round(BibleBanks.quiz(ctx.activity(), level), seed), seed), null, false);
     }
 
     private void render(QuizSession game, String feedback, boolean popScore) {
         GameUi ui = ctx.ui();
         ctx.activity().setContentView(ui.page(TITLE, "Choose the answer to each question. Five questions per run.", true));
         if (game.finished()) {
-            String key = ctx.scorePrefix() + "BIBLE_QUIZ";
+            String key = ctx.scorePrefix() + "BIBLE_QUIZ_" + difficulty.toUpperCase(java.util.Locale.ROOT);
             if (game.score() > ctx.scores().getInt(key, 0)) ctx.scores().edit().putInt(key, game.score()).apply();
-            new GameChrome(ui).finishedRun(definition, TITLE, game, 1, this::newRun);
+            new GameChrome(ui).finishedRun(definition, TITLE, game, 1, () -> startRun(difficulty));
             return;
         }
         TextView scoreLine = ui.text("Question " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);

@@ -10,6 +10,7 @@ import org.perazimchurch.app.domain.games.catalog.Streak;
 import org.perazimchurch.app.domain.games.catalog.VerseBuilderSession;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.BibleBanks;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
@@ -28,29 +29,45 @@ public final class VerseBuilderScreen {
     private final GameContext ctx;
     private final GameDefinition definition;
     private long seed = System.nanoTime();
+    private String difficulty = BibleBanks.DIFFICULTIES[0];
 
     public VerseBuilderScreen(GameContext ctx) {
         this.ctx = ctx;
         this.definition = QuizScreen.find("verse_builder");
     }
 
-    /** Starts a fresh run on the current screen. */
+    /** Opens the difficulty picker on the current screen. */
     public void start() {
-        newRun();
+        renderPicker();
     }
 
-    private void newRun() {
+    private void renderPicker() {
+        GameUi ui = ctx.ui();
+        ctx.activity().setContentView(ui.page(TITLE, "Choose a difficulty. Five verses per run.", true));
+        for (String level : BibleBanks.DIFFICULTIES) {
+            Button choice = ui.button(BibleBanks.label(level), false);
+            choice.setOnClickListener(v -> {
+                if (!ui.activeOwner()) return;
+                ui.click(v);
+                startRun(level);
+            });
+        }
+    }
+
+    /** Starts a run at one difficulty, drawn from the bundled bank. */
+    private void startRun(String level) {
+        difficulty = level;
         seed = System.nanoTime();
-        render((VerseBuilderSession) definition.createSession(1, seed), null, false);
+        render(new VerseBuilderSession(new BibleGames.Round(BibleBanks.verses(ctx.activity(), level), seed), seed), null, false);
     }
 
     private void render(VerseBuilderSession game, String feedback, boolean popScore) {
         GameUi ui = ctx.ui();
         ctx.activity().setContentView(ui.page(TITLE, "Tap the words in order to rebuild the verse. One try per verse.", true));
         if (game.finished()) {
-            String key = ctx.scorePrefix() + "VERSE_BUILDER";
+            String key = ctx.scorePrefix() + "VERSE_BUILDER_" + difficulty.toUpperCase(java.util.Locale.ROOT);
             if (game.score() > ctx.scores().getInt(key, 0)) ctx.scores().edit().putInt(key, game.score()).apply();
-            new GameChrome(ui).finishedRun(definition, TITLE, game, 1, this::newRun);
+            new GameChrome(ui).finishedRun(definition, TITLE, game, 1, () -> startRun(difficulty));
             return;
         }
         TextView scoreLine = ui.text("Verse " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
@@ -136,7 +153,7 @@ public final class VerseBuilderScreen {
                 ? "Correct. "
                 : "Not quite. The verse reads: " + answered.answer + ". ";
         String bonus = game.streak().bonusAwarded() ? " Streak bonus +" + Streak.BONUS_POINTS + "." : "";
-        return lead + answered.explanation + " " + answered.reference + "." + bonus;
+        return lead + answered.reference + "." + bonus;
     }
 
     private static void tapFeedback(View v, GameSession.Outcome outcome) {
