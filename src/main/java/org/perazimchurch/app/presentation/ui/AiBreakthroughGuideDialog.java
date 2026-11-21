@@ -612,6 +612,15 @@ public class AiBreakthroughGuideDialog extends Dialog {
             return;
         }
 
+        // Scope, referral and human-authority checks run before the model-installed check, so an off-topic
+        // question is refused even when no model is installed.
+        AiResponse deterministic = PerazimAiEngine.deterministicModelRefusal(query);
+        if (deterministic != null) {
+            localHistory.clear();
+            displayAiMessage(deterministic, "Perazim Guide · built-in");
+            return;
+        }
+
         String mode = guideMode();
         if ("local".equals(mode)) {
             if (!BuildConfig.OFFLINE_QWEN_ENABLED) {

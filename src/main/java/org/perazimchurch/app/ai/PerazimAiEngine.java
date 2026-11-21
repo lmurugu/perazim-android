@@ -313,6 +313,20 @@ public class PerazimAiEngine {
                 Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
+    /**
+     * Deterministic refusal or referral that must run before any model check, so it holds whether or not the
+     * on-phone model is installed. Returns null when the question may go to the model.
+     */
+    @Nullable
+    public static AiResponse deterministicModelRefusal(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return null;
+        if (isCrisisQuery(query)) return crisisResponse();
+        if (isSensitivePastoralDisclosure(query)) return sensitivePastoralResponse();
+        if (isHumanDecisionQuery(query)) return humanDecisionResponse();
+        if (isOutOfScopeForModel(query)) return boundaryResponseFor(query);
+        return null;
+    }
+
     /** Chooses the boundary wording: professional referral for medical, legal and financial matters, church referral otherwise. */
     @NonNull
     public static AiResponse boundaryResponseFor(@Nullable String query) {
