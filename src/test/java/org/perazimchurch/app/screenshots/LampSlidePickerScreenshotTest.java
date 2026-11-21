@@ -36,7 +36,13 @@ public class LampSlidePickerScreenshotTest {
         SharedPreferences prefs = ApplicationProvider.getApplicationContext()
                 .getSharedPreferences("lamp_picker_shot", 0);
         GameContext ctx = new GameContext(activity, () -> { }, prefs, "", () -> true, () -> { });
-        LampSlideLauncher.open(ctx);
+        try {
+            LampSlideLauncher.open(ctx);
+        } catch (Throwable failure) {
+            // Print the full trace: Gradle trims frames inside test failures, and the CI log needs the origin.
+            failure.printStackTrace(System.out);
+            throw failure;
+        }
         Dialog dialog = ShadowDialog.getLatestDialog();
         if (dialog == null || dialog.getWindow() == null) {
             throw new AssertionError("Lamp Slide picker dialog did not open");
