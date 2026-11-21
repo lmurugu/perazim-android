@@ -5,11 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -259,7 +261,8 @@ public final class GameFx {
 
     /** Particle burst layer. Draws circles that fly out and fade; no bitmaps. */
     static final class ParticleView extends android.view.View {
-        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+        private final Bitmap sheet;
         private final List<float[]> particles = new ArrayList<>();
         private float progress = 1f;
         private float cx;
@@ -268,6 +271,7 @@ public final class GameFx {
         ParticleView(Context context) {
             super(context);
             paint.setColor(Color.rgb(255, 180, 70));
+            sheet = GameArt.particles(context);
         }
 
         void burst(float x, float y) {
@@ -279,7 +283,7 @@ public final class GameFx {
             for (int i = 0; i < 12; i++) {
                 double angle = (Math.PI * 2 * i) / 12 + RANDOM.nextFloat() * 0.3;
                 float v = speed * (0.6f + RANDOM.nextFloat() * 0.5f);
-                particles.add(new float[] {(float) Math.cos(angle) * v, (float) Math.sin(angle) * v});
+                particles.add(new float[] {(float) Math.cos(angle) * v, (float) Math.sin(angle) * v, RANDOM.nextInt(3)});
             }
             ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
             animator.setDuration(600);
@@ -296,8 +300,17 @@ public final class GameFx {
             int alpha = Math.round(255 * (1f - progress));
             paint.setAlpha(alpha);
             float radius = dp(this, 4) * (1f - progress * 0.5f);
+            float size = dp(this, 22) * (1f - progress * 0.5f);
+            int[][] kinds = {GameArt.PARTICLE_STAR, GameArt.PARTICLE_SPARKLE, GameArt.PARTICLE_FLARE};
             for (float[] p : particles) {
-                canvas.drawCircle(cx + p[0] * progress, cy + p[1] * progress, radius, paint);
+                float x = cx + p[0] * progress;
+                float y = cy + p[1] * progress;
+                if (sheet == null) {
+                    canvas.drawCircle(x, y, radius, paint);
+                } else {
+                    Rect from = GameArt.source(sheet, kinds[(int) p[2]]);
+                    canvas.drawBitmap(sheet, from, new RectF(x - size / 2, y - size / 2, x + size / 2, y + size / 2), paint);
+                }
             }
         }
     }
