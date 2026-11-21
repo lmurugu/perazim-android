@@ -67,7 +67,7 @@ public class LampSlidePickerScreenshotTest {
             root.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
             root.layout(0, 0, w, h);
-            org.perazimchurch.app.ui.theme.GlassPolish.apply(root);
+            // The picker paints its own background, so the GlassPolish pass used for tabs is not needed here.
         }
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         root.draw(new Canvas(bitmap));
