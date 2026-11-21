@@ -1,7 +1,6 @@
 package org.perazimchurch.app.ai.local;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Map;
 import org.json.JSONObject;
 
@@ -32,7 +31,7 @@ final class SourceApprovals {
         }
         String approvedBy = entry.optString("approvedBy", "");
         byte[] approverKey = TrustAnchors.resolve(trust, approvedBy, TrustAnchors.Purpose.APPROVER);
-        byte[] signature = Base64.getDecoder().decode(entry.getString("approvalSignature"));
+        byte[] signature = StrictBase64.decode(entry.getString("approvalSignature"));
         if (signature.length != 64) throw new SecurityException("Source approval signature is malformed.");
         JSONObject signed = new JSONObject();
         for (String field : SIGNED_FIELDS) {

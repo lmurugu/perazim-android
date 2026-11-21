@@ -1,6 +1,5 @@
 package org.perazimchurch.app.ai.local;
 
-import java.util.Base64;
 import java.util.Map;
 
 /**
@@ -34,7 +33,7 @@ final class TrustAnchors {
         if (purpose != required) throw new SecurityException(REFUSED);
         byte[] raw;
         try {
-            raw = Base64.getDecoder().decode(value.substring(separator + 1));
+            raw = StrictBase64.decode(value.substring(separator + 1));
         } catch (IllegalArgumentException error) {
             throw new SecurityException("Trusted Ed25519 public key is not valid base64.");
         }
