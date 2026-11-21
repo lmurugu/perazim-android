@@ -28,14 +28,8 @@ public final class MemoryScreen {
     /** Opens the level picker. Only unlocked levels can be played. */
     public static void show(GameContext ctx) {
         GameUi ui = ctx.ui();
-        int unlocked = GameResults.unlockedLevel(ctx.scores(), ctx.scorePrefix() + ID);
         ui.page(GAME.title(), "Choose a level");
-        for (int level = 1; level <= GAME.levelCount(); level++) {
-            final int chosen = level;
-            Button button = ui.button(GAME.levelName(level), level == unlocked);
-            button.setEnabled(level <= unlocked);
-            button.setOnClickListener(v -> startRun(ctx, chosen));
-        }
+        ui.levelPicker(ID, GAME.levelCount(), level -> startRun(ctx, level));
     }
 
     static void startRun(GameContext ctx, int level) {
