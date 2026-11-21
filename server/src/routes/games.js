@@ -139,6 +139,14 @@ router.post('/scores', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/games/settings
+// Game tuning the app caches and falls back to its built-in defaults when offline. No personal data, no auth.
+const GAME_SETTINGS = { dailyStarCap: 50, unseenPercent: 50, missedPercent: 30 };
+router.get('/settings', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=3600');
+  return res.json(GAME_SETTINGS);
+});
+
 // GET /api/games/leaderboard?period=week|all
 // Only members who opted in are listed, by first name. A signed-in caller also gets their own rank.
 router.get('/leaderboard', optionalAuth, async (req, res) => {
@@ -191,4 +199,4 @@ router.get('/leaderboard', optionalAuth, async (req, res) => {
 });
 
 module.exports = router;
-module.exports._internal = { weekStart, firstName, validUpload, isAdultConfirmed, MAX_POINTS_PER_UPLOAD, MAX_POINTS_PER_WEEK, memory };
+module.exports._internal = { GAME_SETTINGS, weekStart, firstName, validUpload, isAdultConfirmed, MAX_POINTS_PER_UPLOAD, MAX_POINTS_PER_WEEK, memory };

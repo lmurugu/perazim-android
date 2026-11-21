@@ -40,6 +40,11 @@ public final class GamesLeaderboardRemoteSource {
         ApiClient.get(context, "/api/games/leaderboard?period=" + (allTime ? "all" : "week"), token, wrap(callback));
     }
 
+    /** Downloads the public game settings. Needs no sign-in. */
+    public static void settings(@NonNull Context context, @NonNull Callback callback) {
+        ApiClient.get(context, "/api/games/settings", null, wrap(callback));
+    }
+
     public static void profile(@NonNull Context context, @NonNull String token, @NonNull Callback callback) {
         ApiClient.get(context, "/api/games/leaderboard/me", token, wrap(callback));
     }

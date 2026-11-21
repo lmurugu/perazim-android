@@ -255,6 +255,7 @@ public final class GamesHubDialog extends Dialog {
 
     private void hub() {
         if (!activeOwner()) return;
+        refreshGameSettings();
         round = null;
         openRow = null;
         screen("Bible Games", "Learn, remember and enjoy. Every game works without internet.", false);
@@ -386,7 +387,7 @@ public final class GamesHubDialog extends Dialog {
         String dayKey = scorePrefix + "starDay", countKey = scorePrefix + "starDayCount";
         int earnedToday = today.equals(scores.getString(dayKey, "")) ? scores.getInt(countKey, 0) : 0;
         int allowed = org.perazimchurch.app.domain.games.StarCap.allowed(earnedToday, 1,
-                org.perazimchurch.app.domain.games.StarCap.DEFAULT_DAILY_CAP);
+                org.perazimchurch.app.data.local.preference.GameSettingsStore.load(activity).dailyStarCap);
         if (allowed <= 0) return;
         scores.edit().putInt(scorePrefix + "stars", stars() + 1)
                 .putString(dayKey, today).putInt(countKey, earnedToday + 1)
@@ -1328,11 +1329,35 @@ public final class GamesHubDialog extends Dialog {
         return tier == 1 ? "Easy" : tier == 2 ? "Medium" : "Hard";
     }
 
+    /** Downloads the game settings in the background. Failures keep the cached or default values. */
+    private void refreshGameSettings() {
+        org.perazimchurch.app.data.remote.GamesLeaderboardRemoteSource.settings(activity,
+                new org.perazimchurch.app.data.remote.GamesLeaderboardRemoteSource.Callback() {
+                    @Override public void onSuccess(@NonNull JSONObject json) {
+                        org.perazimchurch.app.data.local.preference.GameSettingsStore.save(activity,
+                                json.optInt("dailyStarCap", -1), json.optInt("unseenPercent", -1), json.optInt("missedPercent", -1));
+                    }
+                    @Override public void onError(int statusCode, @NonNull String message) { /* keep cached values */ }
+                });
+    }
+
+    /** Opens the Bible reader at the verse the member last missed in a lost Ladder run. */
+    private void practiseLastMiss() {
+        org.perazimchurch.app.domain.games.BookReference.Target target =
+                org.perazimchurch.app.domain.games.BookReference.parse(lastMissedCitation);
+        if (target == null) return;
+        org.perazimchurch.app.presentation.ui.BibleReaderDialog reader = new org.perazimchurch.app.presentation.ui.BibleReaderDialog(activity);
+        reader.setTargetPassage(target.bookId, target.chapter);
+        reader.show();
+    }
+
+    private String lastMissedCitation;
+
     private void ladderAnswer(String value) {
         if (!activeOwner() || ladder.answered()) return;
         hideKeyboard();
         Card card = ladder.current();
-        if (ladder.answer(value)) addStar();
+        if (ladder.answer(value)) addStar(); else lastMissedCitation = card.reference;
         List<LadderOfFaith.Event> events = ladder.drainEvents();
         announce(events);
         boolean milestone = ladder.milestone();
@@ -1360,6 +1385,10 @@ public final class GamesHubDialog extends Dialog {
         text(ladder.score() + " / " + LadderOfFaith.RUNGS, 40, true);
         text(ladder.score() == LadderOfFaith.RUNGS ? "You climbed the whole ladder. Keep putting what you learn into practice." : "Every rung is a chance to learn. Read the references and climb again.", 19, false);
         text("Your best on this phone: " + best + "/" + LadderOfFaith.RUNGS, 17, false);
+        if (ladder.lives() <= 0 && lastMissedCitation != null
+                && org.perazimchurch.app.domain.games.BookReference.parse(lastMissedCitation) != null) {
+            button("Practise " + lastMissedCitation, false).setOnClickListener(v -> practiseLastMiss());
+        }
         button("Climb again", true).setOnClickListener(v -> startLadder());
         button("View ladder map", false).setOnClickListener(v -> showMap());
         button("Choose another game", false).setOnClickListener(v -> hub());

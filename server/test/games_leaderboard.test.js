@@ -98,6 +98,9 @@ async function main() {
     const all = await call(origin, 'GET', '/api/games/leaderboard?period=all', null, alice);
     assert(all.body.period === 'all' && all.body.me.points === 17, 'all-time totals are available');
 
+    const settings = await call(origin, 'GET', '/api/games/settings');
+    assert(settings.status === 200 && settings.body.dailyStarCap === 50 && settings.body.missedPercent === 30, 'game settings are public and carry the agreed defaults');
+
     await call(origin, 'PUT', '/api/games/leaderboard/me', { optIn: false }, alice);
     board = await call(origin, 'GET', '/api/games/leaderboard?period=week', null, alice);
     assert(!board.body.entries.some(e => e.points === 17) && board.body.me === null, 'opting out removes the member at once');
