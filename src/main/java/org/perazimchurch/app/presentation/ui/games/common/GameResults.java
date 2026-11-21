@@ -63,6 +63,11 @@ public final class GameResults {
         return new LevelProgression(new PrefsKeyValueStore(prefs)).unlockedLevel(storedId);
     }
 
+    /** Best stars saved for a stored id on one level, from 0 to 3. */
+    public static int bestStars(SharedPreferences prefs, String storedId, int level) {
+        return new LevelProgression(new PrefsKeyValueStore(prefs)).bestStars(storedId, level);
+    }
+
     /** Best stars saved for a game on level 1, from 0 to 3. */
     public static int bestStars(SharedPreferences prefs, String gameId) {
         return new LevelProgression(new PrefsKeyValueStore(prefs)).bestStars(gameId, 1);

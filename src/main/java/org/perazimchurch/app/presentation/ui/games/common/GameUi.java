@@ -1,7 +1,11 @@
 package org.perazimchurch.app.presentation.ui.games.common;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.widget.FrameLayout;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -18,6 +22,7 @@ import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.function.BooleanSupplier;
+import java.util.function.IntConsumer;
 
 /**
  * Everything a game screen draws with: the scrolling page with its title and back button, text,
@@ -229,6 +234,116 @@ public final class GameUi implements GameChrome.Host {
         panel.setBackground(frame != null ? frame : shape(PerazimTheme.COLOR_SURFACE));
         page.addView(panel, wrapParams(12));
         return panel;
+    }
+
+    /** Level nodes on one page of the level map. */
+    public static final int LEVEL_NODES_PER_PAGE = GameArt.LEVEL_NODES.length;
+    private static final int LEVEL_NODE_DP = 84;
+    private static final int LEVEL_MAP_DP = 360;
+
+    /**
+     * The shared level picker. Levels are drawn on the level-map art, eight nodes per page, with Earlier
+     * and Later to turn the page. A level is open once the one before it has two or more stars. Locked
+     * levels are dimmed, each open node shows its best stars, and the newest unlocked level shimmers.
+     * The picker opens on the page that holds the newest unlocked level. {@code onPick} runs with the
+     * level the player taps. Uses the games preferences and the owner prefix from {@link #configure}.
+     */
+    public void levelPicker(String gameId, int levelCount, IntConsumer onPick) {
+        String storedId = (scorePrefix == null ? "" : scorePrefix) + gameId;
+        int count = Math.max(1, levelCount);
+        int unlocked = Math.min(count, GameResults.unlockedLevel(scores, storedId));
+        int pages = (count + LEVEL_NODES_PER_PAGE - 1) / LEVEL_NODES_PER_PAGE;
+        int startPage = Math.max(0, Math.min(pages - 1, (unlocked - 1) / LEVEL_NODES_PER_PAGE));
+        LinearLayout holder = new LinearLayout(activity);
+        holder.setOrientation(LinearLayout.VERTICAL);
+        page.addView(holder, wrapParams(0));
+        drawLevelPage(holder, storedId, count, pages, startPage, onPick);
+    }
+
+    private void drawLevelPage(LinearLayout holder, String storedId, int count, int pages, int pageIndex, IntConsumer onPick) {
+        holder.removeAllViews();
+        int first = pageIndex * LEVEL_NODES_PER_PAGE + 1;
+        int last = Math.min(count, first + LEVEL_NODES_PER_PAGE - 1);
+        int unlocked = Math.min(count, GameResults.unlockedLevel(scores, storedId));
+
+        LevelMapView map = new LevelMapView(activity, dp(LEVEL_NODE_DP));
+        Bitmap art = GameArt.levelMap(activity);
+        if (art != null) map.setBackground(new BitmapDrawable(activity.getResources(), art));
+        Button newest = null;
+        for (int level = first; level <= last; level++) {
+            boolean open = level <= unlocked;
+            boolean isNewest = level == unlocked;
+            String label = open
+                    ? level + "\n" + GameResults.starLine(GameResults.bestStars(scores, storedId, level))
+                    : level + "\nLocked";
+            Button node = new Button(activity);
+            styleButton(node, label, isNewest);
+            node.setMinHeight(dp(LEVEL_NODE_DP));
+            node.setMinimumWidth(dp(LEVEL_NODE_DP));
+            GameFx.attachPress(node);
+            node.setEnabled(open);
+            node.setAlpha(open ? 1f : 0.4f);
+            final int chosen = level;
+            node.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                click(v);
+                onPick.accept(chosen);
+            });
+            map.addView(node);
+            if (isNewest) newest = node;
+        }
+        holder.addView(map, new LinearLayout.LayoutParams(-1, dp(LEVEL_MAP_DP)));
+        if (newest != null) {
+            Button shine = newest;
+            shine.post(() -> GameFx.shimmer(shine));
+        }
+
+        if (pages > 1) {
+            LinearLayout nav = new LinearLayout(activity);
+            nav.setOrientation(LinearLayout.HORIZONTAL);
+            if (pageIndex > 0) {
+                nav.addView(pageButton("Earlier", () -> drawLevelPage(holder, storedId, count, pages, pageIndex - 1, onPick)));
+            }
+            if (pageIndex < pages - 1) {
+                nav.addView(pageButton("Later", () -> drawLevelPage(holder, storedId, count, pages, pageIndex + 1, onPick)));
+            }
+            holder.addView(nav, wrapParams(0));
+        }
+    }
+
+    private Button pageButton(String label, Runnable turn) {
+        Button button = new Button(activity);
+        styleButton(button, label, false);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -2, 1f);
+        lp.setMargins(dp(4), 0, dp(4), dp(10));
+        button.setLayoutParams(lp);
+        GameFx.attachPress(button);
+        button.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            click(v);
+            turn.run();
+        });
+        return button;
+    }
+
+    /** Places each node on a point of the level map, in the order of {@link GameArt#LEVEL_NODES}. */
+    private static final class LevelMapView extends FrameLayout {
+        private final int nodePx;
+
+        LevelMapView(Context context, int nodePx) {
+            super(context);
+            this.nodePx = nodePx;
+        }
+
+        @Override protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+            float[][] nodes = GameArt.levelNodesFor(right - left, bottom - top);
+            int count = Math.min(getChildCount(), nodes.length);
+            for (int i = 0; i < count; i++) {
+                int cx = Math.round(nodes[i][0]);
+                int cy = Math.round(nodes[i][1]);
+                getChildAt(i).layout(cx - nodePx / 2, cy - nodePx / 2, cx + nodePx / 2, cy + nodePx / 2);
+            }
+        }
     }
 
     /** Vertical space of the given height in dp on the current page. */
