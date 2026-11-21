@@ -30,6 +30,8 @@ public final class RoundDefinition implements GameDefinition {
     @Override
     public GameSession createSession(int level, long seed) {
         final BibleGames.Round round = new BibleGames.Round(mode, seed);
+        if (mode == BibleGames.Mode.QUIZ) return new QuizSession(round, seed);
+        if (mode == BibleGames.Mode.VERSE_ORDER) return new VerseBuilderSession(round, seed);
         return new AdvancingSession() {
             @Override protected boolean hasQuestion() { return !round.finished(); }
             @Override protected boolean submit(String value) {
