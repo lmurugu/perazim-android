@@ -20,9 +20,9 @@ import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.domain.games.engine.KeyValueStore;
 import org.perazimchurch.app.domain.games.engine.LevelProgression;
-import org.perazimchurch.app.domain.games.engine.StarRating;
 import org.perazimchurch.app.domain.games.mosaic.MosaicBoard;
 import org.perazimchurch.app.domain.games.mosaic.MosaicPuzzles;
+import org.perazimchurch.app.domain.games.mosaic.MosaicStars;
 
 import java.io.InputStream;
 import java.util.List;
@@ -54,6 +54,11 @@ public final class StoryMosaicDialog extends Dialog {
         this.root = new FrameLayout(context);
         this.root.setBackgroundColor(BG);
         setContentView(root);
+    }
+
+    /** Opens Story Mosaic on top of the given activity. Used by the Games hub through GameRegistry. */
+    public static void show(android.app.Activity activity) {
+        new StoryMosaicDialog(activity).show();
     }
 
     @Override
@@ -173,7 +178,7 @@ public final class StoryMosaicDialog extends Dialog {
 
     private void onFinished(StoryMosaicSession session, int level, MosaicPuzzles.Puzzle puzzle,
                             TextView caption, Button hintButton, TextView hint, LinearLayout column) {
-        int stars = StarRating.stars(session.score(), session.size(), GameSession.NO_LIVES);
+        int stars = MosaicStars.RULE.stars(session.score(), session.size(), GameSession.NO_LIVES);
         progression.record(GAME_ID, level, stars, levelCount);
         hintButton.setVisibility(View.GONE);
         hint.setText("");

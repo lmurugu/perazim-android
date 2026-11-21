@@ -8,8 +8,8 @@ import org.perazimchurch.app.domain.games.mosaic.MosaicPuzzles;
  * One run of Story Mosaic: one scene, cut into a square grid. Answers are "piece:slot" strings,
  * so the hub's shared results screen works. The drag view calls {@link #answer} directly.
  *
- * <p>Score is pieces placed without a wrong drop, so a run with no wrong drops is 3 stars and one
- * with few mistakes is still 2 stars under {@code StarRating}'s 60 percent rule.
+ * <p>Score is pieces placed without a wrong drop. Stars come from {@code MosaicStars}, not
+ * {@code StarRating}, through the definition's {@code starRule()}.
  */
 public final class StoryMosaicSession implements GameSession {
 

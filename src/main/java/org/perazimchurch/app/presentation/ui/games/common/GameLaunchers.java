@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui.games.common;
 
+import org.perazimchurch.app.presentation.ui.games.mosaic.StoryMosaicDialog;
+
 /**
  * Registers the play screens of games that have their own dialog. Called once from
  * PerazimApplication.onCreate. A game branch adds one {@code GameRegistry.register(...)} line here.
@@ -11,6 +13,6 @@ public final class GameLaunchers {
 
     /** Registers every game launcher. Add one line per game. */
     public static void registerAll() {
-        // GameRegistry.register("story_mosaic", activity -> StoryMosaicDialog.show(activity));
+        GameRegistry.register("story_mosaic", StoryMosaicDialog::show);
     }
 }
