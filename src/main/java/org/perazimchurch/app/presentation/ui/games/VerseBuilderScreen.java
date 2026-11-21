@@ -32,21 +32,23 @@ public final class VerseBuilderScreen {
     private final GameContext ctx;
     private final GameDefinition definition;
     private int level = 1;
+    private int page;
 
     public VerseBuilderScreen(GameContext ctx) {
         this.ctx = ctx;
         this.definition = QuizScreen.find("verse_builder");
     }
 
-    /** Opens the level picker on the current screen. */
+    /** Opens the level picker on the current screen, on the page that holds the last level played. */
     public void start() {
-        renderPicker();
+        renderPicker(LevelPicker.pageOf(level));
     }
 
-    private void renderPicker() {
+    private void renderPicker(int shown) {
+        page = shown;
         GameUi ui = ctx.ui();
-        ctx.activity().setContentView(ui.page(TITLE, "Pick a level. Each band has four levels, and a level opens after two stars.", true));
-        LevelPicker.addLevels(ui, ctx.scores(), ctx.scorePrefix() + definition.id(), this::startRun);
+        ctx.activity().setContentView(ui.page(TITLE, "Pick a level. A level opens after two stars on the one before.", true));
+        LevelPicker.addPage(ui, ctx.scores(), ctx.scorePrefix() + definition.id(), page, this::startRun, this::renderPicker);
     }
 
     /** Starts a run on one level, drawn from the verse bank for its band. */
