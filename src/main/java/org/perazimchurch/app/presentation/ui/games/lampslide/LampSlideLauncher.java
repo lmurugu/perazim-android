@@ -8,7 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.GridLayout;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -22,6 +22,7 @@ import org.perazimchurch.app.domain.games.lampslide.LampSlideLevels;
 import org.perazimchurch.app.domain.games.lampslide.LampSlidePuzzle;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideSession;
+import org.perazimchurch.app.presentation.ui.games.common.GameArt;
 import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
@@ -35,6 +36,10 @@ import org.perazimchurch.app.ui.theme.PerazimTheme;
  * unlock through LevelProgression. Works offline.
  */
 public final class LampSlideLauncher {
+    /** Levels per page of the level map: one per node on the painted path. */
+    static final int MAP_PAGE_SIZE = 8;
+    /** Size of each level node in dp. */
+    private static final int NODE_DP = 72;
 
     static final String GAME_ID = "lamp_slide";
     private static final String TITLE = "Lamp Slide";
@@ -67,6 +72,8 @@ public final class LampSlideLauncher {
         private final LevelProgression progression;
         private LinearLayout page;
         private int selected;
+        /** Which page of the level map is showing: eight levels per page. */
+        private int mapPage;
         private long seed;
         private boolean pickerShown;
 
@@ -84,6 +91,7 @@ public final class LampSlideLauncher {
             Window window = dialog.getWindow();
             if (window != null) window.setLayout(-1, -1);
             this.selected = Math.max(1, progression.unlockedLevel(storedId));
+            this.mapPage = (selected - 1) / MAP_PAGE_SIZE;
         }
 
         /** The level picker: bands of levels, stars per level, a preview and Start. */
@@ -107,9 +115,7 @@ public final class LampSlideLauncher {
             text("“" + scene.verse() + "”", 14, false);
             boolean first = !pickerShown;
             pickerShown = true;
-            band("3 × 3 board", 1, 10, unlocked, first);
-            band("4 × 4 board", 11, 25, unlocked, first);
-            band("5 × 5 board", 26, 40, unlocked, first);
+            levelMap(unlocked, first);
             Button start = button("Start level " + selected, true);
             start.setOnClickListener(v -> start(selected, System.nanoTime()));
             GameFx.attachPress(start);
@@ -119,33 +125,78 @@ public final class LampSlideLauncher {
             if (first) GameFx.enter(page);
         }
 
-        private void band(String heading, int from, int to, int unlocked, boolean first) {
-            text(heading.toUpperCase(java.util.Locale.ROOT), 12, true);
-            GridLayout grid = new GridLayout(activity);
-            grid.setColumnCount(5);
-            for (int level = from; level <= to; level++) {
+        /**
+         * The level map: eight levels at a time on the painted path, five pages for forty levels.
+         * Locked nodes are dimmed. Earlier and Later move between pages.
+         */
+        private void levelMap(int unlocked, boolean animate) {
+            final int pages = (LampSlideLevels.LEVEL_COUNT + MAP_PAGE_SIZE - 1) / MAP_PAGE_SIZE;
+            mapPage = Math.max(0, Math.min(mapPage, pages - 1));
+            final int pageFirst = mapPage * MAP_PAGE_SIZE + 1;
+            final int pageLast = Math.min(LampSlideLevels.LEVEL_COUNT, pageFirst + MAP_PAGE_SIZE - 1);
+
+            text("Levels " + pageFirst + " to " + pageLast, 12, true);
+            FrameLayout frame = new FrameLayout(activity);
+            ImageView scene = new ImageView(activity);
+            scene.setScaleType(ImageView.ScaleType.FIT_XY);
+            scene.setAdjustViewBounds(true);
+            android.graphics.Bitmap map = GameArt.levelMap(activity);
+            if (map != null) scene.setImageBitmap(map);
+            else scene.setMinimumHeight(dp(240));
+            frame.addView(scene, new FrameLayout.LayoutParams(-1, -2));
+
+            for (int level = pageFirst; level <= pageLast; level++) {
                 final int value = level;
                 boolean open = level <= unlocked;
                 int stars = progression.bestStars(storedId, level);
-                Button cell = button(level + "\n" + starText(stars), false);
-                cell.setEnabled(open);
-                cell.setAlpha(open ? 1f : 0.4f);
-                cell.setOnClickListener(v -> {
+                Button node = button(level + "\n" + starText(stars), false);
+                node.setTextSize(12);
+                node.setMinWidth(0);
+                node.setMinimumWidth(0);
+                node.setPadding(0, 0, 0, 0);
+                node.setEnabled(open);
+                node.setAlpha(open ? 1f : 0.4f);
+                node.setOnClickListener(v -> {
                     selected = value;
                     showPicker();
                 });
-                GameFx.attachPress(cell);
+                GameFx.attachPress(node);
                 // The newest unlocked level sweeps a light shimmer once, when the picker opens.
-                if (first && open && level == unlocked && unlocked > 1) {
-                    cell.post(() -> GameFx.shimmer(cell));
+                if (animate && open && level == unlocked && unlocked > 1) {
+                    node.post(() -> GameFx.shimmer(node));
                 }
-                GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-                params.width = 0;
-                params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-                params.setMargins(dp(3), dp(3), dp(3), dp(3));
-                grid.addView(cell, params);
+                frame.addView(node, new FrameLayout.LayoutParams(dp(NODE_DP), dp(NODE_DP)));
             }
-            page.addView(grid, new LinearLayout.LayoutParams(-1, -2));
+            final int count = pageLast - pageFirst + 1;
+            frame.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, orr, ob) -> {
+                float[][] at = GameArt.levelNodesFor(frame.getWidth(), frame.getHeight());
+                for (int i = 0; i < count && i < at.length; i++) {
+                    View node = frame.getChildAt(i + 1);
+                    node.setX(at[i][0] - dp(NODE_DP) / 2f);
+                    node.setY(at[i][1] - dp(NODE_DP) / 2f);
+                }
+            });
+            page.addView(frame, new LinearLayout.LayoutParams(-1, -2));
+
+            LinearLayout nav = new LinearLayout(activity);
+            nav.setOrientation(LinearLayout.HORIZONTAL);
+            Button earlier = button("Earlier levels", false);
+            earlier.setEnabled(mapPage > 0);
+            earlier.setOnClickListener(v -> {
+                mapPage--;
+                showPicker();
+            });
+            GameFx.attachPress(earlier);
+            Button later = button("Later levels", false);
+            later.setEnabled(mapPage < pages - 1);
+            later.setOnClickListener(v -> {
+                mapPage++;
+                showPicker();
+            });
+            GameFx.attachPress(later);
+            nav.addView(earlier, new LinearLayout.LayoutParams(0, -2, 1f));
+            nav.addView(later, new LinearLayout.LayoutParams(0, -2, 1f));
+            page.addView(nav, new LinearLayout.LayoutParams(-1, -2));
         }
 
         private void start(int level, long newSeed) {
