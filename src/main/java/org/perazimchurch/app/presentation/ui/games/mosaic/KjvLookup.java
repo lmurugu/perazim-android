@@ -39,7 +39,8 @@ final class KjvLookup {
             if (verse == null || verse.getText() == null) return null;
             String text = verse.getText().trim();
             return text.isEmpty() ? null : text;
-        } catch (RuntimeException | android.database.sqlite.SQLiteException e) {
+        } catch (Exception e) {
+            // Missing store, unreadable asset or malformed manifest: the caller keeps the title.
             return null;
         }
     }
