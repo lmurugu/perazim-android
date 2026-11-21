@@ -11,7 +11,7 @@ This draft describes information currently handled by the Perazim app. Registrat
 
 ## Who operates the app
 
-Perazim is operated by [exact registered legal name of PMCI]. Privacy contact: [email] | [telephone] | [postal/physical address]. These details must be completed before publication.
+Perazim is operated by PERAZIM MISSION CHURCH, registered under the Societies Act (Certificate of Registration No. 23319; formerly Perazim Mission Centre), referred to in this notice as PMCI. Privacy contact: [email] | [telephone] | P.O. Box 831-60100, Embu, Kenya (Embu Meru Road). These details must be completed before publication.
 
 ## Information the app handles
 

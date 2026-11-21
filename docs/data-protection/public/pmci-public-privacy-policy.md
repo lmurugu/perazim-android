@@ -12,7 +12,7 @@ DRAFT FOR REVIEW. This policy describes how Perazim Missions Church Internationa
 
 ## 2. Who is responsible
 
-Data controller: [Insert exact registered legal name of PMCI]. Address: [insert]. Privacy contact: [insert dedicated email and telephone]. Responsible officer: [insert title/name]. ODPC registration: [insert registration number or status]. PMCI must verify its registration obligations and complete any required registration before operational processing.
+Data controller: PERAZIM MISSION CHURCH, registered under the Societies Act (Certificate of Registration No. 23319, file SOC/45143; formerly Perazim Mission Centre), referred to in this policy as PMCI. Address: P.O. Box 831-60100, Embu, Kenya (Embu Meru Road). Privacy contact: [insert dedicated email and telephone]. Responsible officer: [insert title/name]. ODPC registration: [insert registration number or status]. PMCI must verify its registration obligations and complete any required registration before operational processing.
 
 ## 3. Personal data PMCI may process
 
