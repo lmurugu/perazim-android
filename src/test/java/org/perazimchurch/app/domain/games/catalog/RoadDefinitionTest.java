@@ -27,9 +27,9 @@ public class RoadDefinitionTest {
 
     @Test
     public void everyTierHasEnoughStagesForARun() {
-        assertTrue(RoadBank.EASY.length >= RoadSession.STAGES);
-        assertTrue(RoadBank.MEDIUM.length >= RoadSession.STAGES);
-        assertTrue(RoadBank.HARD.length >= RoadSession.STAGES);
+        assertTrue(RoadBank.EASY.length >= RoadSession.TURNS);
+        assertTrue(RoadBank.MEDIUM.length >= RoadSession.TURNS);
+        assertTrue(RoadBank.HARD.length >= RoadSession.TURNS);
         assertTrue(RoadBank.EASY.length + RoadBank.MEDIUM.length + RoadBank.HARD.length >= 30);
     }
 
@@ -52,8 +52,8 @@ public class RoadDefinitionTest {
     public void runHasSixStagesAndOptionsContainTheAnswer() {
         for (int level = 1; level <= RoadDefinition.LEVELS; level++) {
             RoadSession run = (RoadSession) definition.createSession(level, 900L + level);
-            assertEquals(RoadSession.STAGES, run.size());
-            for (int stage = 0; stage < RoadSession.STAGES; stage++) {
+            assertEquals(RoadSession.TURNS, run.size());
+            while (!run.finished()) {
                 assertEquals(4, run.options().size());
                 String answer = answerOf(run);
                 assertTrue(run.options().contains(answer));
@@ -62,6 +62,17 @@ public class RoadDefinitionTest {
             assertTrue(run.finished());
             assertNull(run.prompt());
         }
+    }
+
+    @Test
+    public void correctAnswerMovesTheTravellerByTheRollAndWrongLeavesThemInPlace() {
+        RoadSession road = (RoadSession) definition.createSession(1, 11L);
+        assertEquals(0, road.square());
+        road.answer("no such place");
+        assertEquals(0, road.square());
+        int roll = road.roll();
+        road.answer(answerOf(road));
+        assertEquals(Math.min(roll, RoadSession.FINISH), road.square());
     }
 
     @Test
@@ -93,7 +104,7 @@ public class RoadDefinitionTest {
     @Test
     public void ignoresAnswersAfterTheRun() {
         RoadSession road = (RoadSession) definition.createSession(1, 2L);
-        for (int i = 0; i < RoadSession.STAGES; i++) road.answer(answerOf(road));
+        while (!road.finished()) road.answer(answerOf(road));
         assertEquals(Outcome.IGNORED, road.answer("anything"));
     }
 
