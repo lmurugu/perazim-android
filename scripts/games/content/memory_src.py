@@ -34,6 +34,24 @@ SETS = [
  ("Proverbs", [("WISDOM","FEAR","Proverbs 1:7"),("PRIDE","FALL","Proverbs 16:18"),("SOFT","WRATH","Proverbs 15:1"),("HONEYCOMB","PLEASANT","Proverbs 16:24"),("TRUST","HEART","Proverbs 3:5"),("LEAN","ACKNOWLEDGE","Proverbs 3:6")]),
 ]
 
+# Added sets. Each pair has both words in the cited verse, and each word is used once per set.
+NEW_SETS = [
+ ("Abraham", [("ABRAM","COUNTRY","Genesis 12:1"),("LORD","KINDRED","Genesis 12:1"),("ISAAC","MORIAH","Genesis 22:2"),("OFFER","BURNT","Genesis 22:2"),("ALTAR","WOOD","Genesis 22:9"),("RAM","THICKET","Genesis 22:13")]),
+ ("Jacob", [("LADDER","ANGELS","Genesis 28:12"),("STONES","PILLOWS","Genesis 28:11"),("JACOB","WRESTLED","Genesis 32:24"),("ISRAEL","JACOB","Genesis 32:28"),("RACHEL","SEVEN","Genesis 29:20"),("MAN","DAY","Genesis 32:24")]),
+ ("Moses in Midian", [("MIDIAN","WELL","Exodus 2:15"),("PRIEST","DAUGHTERS","Exodus 2:16"),("SEVEN","FLOCK","Exodus 2:16"),("JETHRO","MIDIAN","Exodus 3:1"),("ZIPPORAH","MOSES","Exodus 2:21"),("GERSHOM","STRANGER","Exodus 2:22")]),
+ ("Gideon", [("GIDEON","WHEAT","Judges 6:11"),("LORD","MIGHTY","Judges 6:12"),("FLEECE","DEW","Judges 6:37"),("TRUMPET","PITCHERS","Judges 7:16"),("SWORD","FELLOW","Judges 7:22"),("MIDIANITES","WHEAT","Judges 6:11")]),
+ ("Jericho falls", [("WALL","TRUMPETS","Joshua 6:20"),("PEOPLE","SHOUT","Joshua 6:20"),("FIRSTBORN","YOUNGEST","Joshua 6:26"),("ASS","SHEEP","Joshua 6:21"),("BURNT","FIRE","Joshua 6:24"),("SCARLET","WINDOW","Joshua 2:18")]),
+ ("Nehemiah", [("JERUSALEM","WASTE","Nehemiah 2:17"),("WALL","BUILT","Nehemiah 4:6"),("BURDENS","WALL","Nehemiah 4:17"),("BOOK","LAW","Nehemiah 8:8"),("JOY","STRENGTH","Nehemiah 8:10"),("GOD","HEAVEN","Nehemiah 2:20")]),
+ ("Esther", [("KINGDOM","TIME","Esther 4:14"),("FAST","THREE","Esther 4:16"),("ESTHER","ROYAL","Esther 5:1"),("HAMAN","GALLOWS","Esther 7:10"),("KING","WOMEN","Esther 2:17"),("MORDECAI","GALLOWS","Esther 7:10")]),
+ ("Hezekiah", [("WALL","PRAYED","2 Kings 20:2"),("TEARS","HEAL","2 Kings 20:5"),("FIFTEEN","YEARS","2 Kings 20:6"),("FIGS","LUMP","2 Kings 20:7"),("SHADOW","DEGREES","2 Kings 20:11"),("DIAL","AHAZ","2 Kings 20:11")]),
+ ("Josiah and the book", [("HILKIAH","BOOK","2 Kings 22:8"),("WRATH","LORD","2 Kings 22:13"),("TENDER","HUMBLED","2 Kings 22:19"),("COVENANT","ELDERS","2 Kings 23:2"),("PASSOVER","KEEP","2 Kings 23:21")]),
+ ("Psalms of David", [("MERCY","BLOT","Psalms 51:1"),("CLEAN","HEART","Psalms 51:10"),("JOY","SALVATION","Psalms 51:12"),("HILLS","EYES","Psalms 121:1"),("HELP","LORD","Psalms 121:2"),("REFUGE","STRENGTH","Psalms 46:1")]),
+ ("Blessed man", [("COUNSEL","UNGODLY","Psalms 1:1"),("LAW","MEDITATE","Psalms 1:2"),("RIVERS","FRUIT","Psalms 1:3"),("CHAFF","WIND","Psalms 1:4"),("WAY","PERISH","Psalms 1:6"),("LEAF","WITHER","Psalms 1:3")]),
+ ("Isaiah's promises", [("CHILD","BORN","Isaiah 9:6"),("PRINCE","PEACE","Isaiah 9:6"),("COUNSELLOR","WONDERFUL","Isaiah 9:6"),("WOUNDED","BRUISED","Isaiah 53:5"),("WINGS","EAGLES","Isaiah 40:31"),("EVERLASTING","FATHER","Isaiah 9:6")]),
+ ("Jeremiah", [("THOUGHTS","PEACE","Jeremiah 29:11"),("PROPHET","NATIONS","Jeremiah 1:5"),("WOMB","SANCTIFIED","Jeremiah 1:5"),("ANSWER","CALL","Jeremiah 33:3"),("EVERLASTING","LOVE","Jeremiah 31:3"),("EXPECTED","END","Jeremiah 29:11")]),
+ ("The nativity", [("SWADDLING","MANGER","Luke 2:7"),("INN","ROOM","Luke 2:7"),("SHEPHERDS","FIELD","Luke 2:8"),("TIDINGS","JOY","Luke 2:10"),("HOST","PRAISING","Luke 2:13"),("GLORY","PEACE","Luke 2:14")]),
+]
+
 # Extra candidates for sets that were short. Same rules: one word per pair appears in the cited verse.
 EXTRA = {
  "Creation": [("SEA","FISH","Genesis 1:26"),("FOWL","AIR","Genesis 1:26"),("BEAST","EARTH","Genesis 1:24")],
@@ -61,4 +79,4 @@ EXTRA = {
  "Job": [("JOB","SORES","Job 2:7"),("JOB","CHILDREN","Job 1:2"),("LORD","TOOK","Job 1:21"),("LORD","SPOKE","Job 38:1")],
 }
 
-SETS = [(t, ps + EXTRA.get(t, [])) for t, ps in SETS]
+SETS = [(t, ps + EXTRA.get(t, [])) for t, ps in SETS] + NEW_SETS

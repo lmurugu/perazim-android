@@ -638,6 +638,480 @@
      "reference": "Proverbs 3:6"
     }
    ]
+  },
+  {
+   "id": "m31",
+   "title": "Abraham",
+   "pairs": [
+    {
+     "a": "ABRAM",
+     "b": "COUNTRY",
+     "reference": "Genesis 12:1"
+    },
+    {
+     "a": "LORD",
+     "b": "KINDRED",
+     "reference": "Genesis 12:1"
+    },
+    {
+     "a": "ISAAC",
+     "b": "MORIAH",
+     "reference": "Genesis 22:2"
+    },
+    {
+     "a": "OFFER",
+     "b": "BURNT",
+     "reference": "Genesis 22:2"
+    },
+    {
+     "a": "ALTAR",
+     "b": "WOOD",
+     "reference": "Genesis 22:9"
+    },
+    {
+     "a": "RAM",
+     "b": "THICKET",
+     "reference": "Genesis 22:13"
+    }
+   ]
+  },
+  {
+   "id": "m32",
+   "title": "Jacob",
+   "pairs": [
+    {
+     "a": "LADDER",
+     "b": "ANGELS",
+     "reference": "Genesis 28:12"
+    },
+    {
+     "a": "STONES",
+     "b": "PILLOWS",
+     "reference": "Genesis 28:11"
+    },
+    {
+     "a": "JACOB",
+     "b": "WRESTLED",
+     "reference": "Genesis 32:24"
+    },
+    {
+     "a": "RACHEL",
+     "b": "SEVEN",
+     "reference": "Genesis 29:20"
+    },
+    {
+     "a": "MAN",
+     "b": "DAY",
+     "reference": "Genesis 32:24"
+    }
+   ]
+  },
+  {
+   "id": "m33",
+   "title": "Moses in Midian",
+   "pairs": [
+    {
+     "a": "MIDIAN",
+     "b": "WELL",
+     "reference": "Exodus 2:15"
+    },
+    {
+     "a": "PRIEST",
+     "b": "DAUGHTERS",
+     "reference": "Exodus 2:16"
+    },
+    {
+     "a": "SEVEN",
+     "b": "FLOCK",
+     "reference": "Exodus 2:16"
+    },
+    {
+     "a": "ZIPPORAH",
+     "b": "MOSES",
+     "reference": "Exodus 2:21"
+    },
+    {
+     "a": "GERSHOM",
+     "b": "STRANGER",
+     "reference": "Exodus 2:22"
+    }
+   ]
+  },
+  {
+   "id": "m34",
+   "title": "Gideon",
+   "pairs": [
+    {
+     "a": "GIDEON",
+     "b": "WHEAT",
+     "reference": "Judges 6:11"
+    },
+    {
+     "a": "LORD",
+     "b": "MIGHTY",
+     "reference": "Judges 6:12"
+    },
+    {
+     "a": "FLEECE",
+     "b": "DEW",
+     "reference": "Judges 6:37"
+    },
+    {
+     "a": "TRUMPET",
+     "b": "PITCHERS",
+     "reference": "Judges 7:16"
+    },
+    {
+     "a": "SWORD",
+     "b": "FELLOW",
+     "reference": "Judges 7:22"
+    }
+   ]
+  },
+  {
+   "id": "m35",
+   "title": "Jericho falls",
+   "pairs": [
+    {
+     "a": "WALL",
+     "b": "TRUMPETS",
+     "reference": "Joshua 6:20"
+    },
+    {
+     "a": "PEOPLE",
+     "b": "SHOUT",
+     "reference": "Joshua 6:20"
+    },
+    {
+     "a": "FIRSTBORN",
+     "b": "YOUNGEST",
+     "reference": "Joshua 6:26"
+    },
+    {
+     "a": "ASS",
+     "b": "SHEEP",
+     "reference": "Joshua 6:21"
+    },
+    {
+     "a": "BURNT",
+     "b": "FIRE",
+     "reference": "Joshua 6:24"
+    },
+    {
+     "a": "SCARLET",
+     "b": "WINDOW",
+     "reference": "Joshua 2:18"
+    }
+   ]
+  },
+  {
+   "id": "m36",
+   "title": "Nehemiah",
+   "pairs": [
+    {
+     "a": "JERUSALEM",
+     "b": "WASTE",
+     "reference": "Nehemiah 2:17"
+    },
+    {
+     "a": "WALL",
+     "b": "BUILT",
+     "reference": "Nehemiah 4:6"
+    },
+    {
+     "a": "BOOK",
+     "b": "LAW",
+     "reference": "Nehemiah 8:8"
+    },
+    {
+     "a": "JOY",
+     "b": "STRENGTH",
+     "reference": "Nehemiah 8:10"
+    },
+    {
+     "a": "GOD",
+     "b": "HEAVEN",
+     "reference": "Nehemiah 2:20"
+    }
+   ]
+  },
+  {
+   "id": "m37",
+   "title": "Esther",
+   "pairs": [
+    {
+     "a": "KINGDOM",
+     "b": "TIME",
+     "reference": "Esther 4:14"
+    },
+    {
+     "a": "FAST",
+     "b": "THREE",
+     "reference": "Esther 4:16"
+    },
+    {
+     "a": "ESTHER",
+     "b": "ROYAL",
+     "reference": "Esther 5:1"
+    },
+    {
+     "a": "HAMAN",
+     "b": "GALLOWS",
+     "reference": "Esther 7:10"
+    },
+    {
+     "a": "KING",
+     "b": "WOMEN",
+     "reference": "Esther 2:17"
+    }
+   ]
+  },
+  {
+   "id": "m38",
+   "title": "Hezekiah",
+   "pairs": [
+    {
+     "a": "WALL",
+     "b": "PRAYED",
+     "reference": "2 Kings 20:2"
+    },
+    {
+     "a": "TEARS",
+     "b": "HEAL",
+     "reference": "2 Kings 20:5"
+    },
+    {
+     "a": "FIFTEEN",
+     "b": "YEARS",
+     "reference": "2 Kings 20:6"
+    },
+    {
+     "a": "FIGS",
+     "b": "LUMP",
+     "reference": "2 Kings 20:7"
+    },
+    {
+     "a": "SHADOW",
+     "b": "DEGREES",
+     "reference": "2 Kings 20:11"
+    },
+    {
+     "a": "DIAL",
+     "b": "AHAZ",
+     "reference": "2 Kings 20:11"
+    }
+   ]
+  },
+  {
+   "id": "m39",
+   "title": "Josiah and the book",
+   "pairs": [
+    {
+     "a": "HILKIAH",
+     "b": "BOOK",
+     "reference": "2 Kings 22:8"
+    },
+    {
+     "a": "WRATH",
+     "b": "LORD",
+     "reference": "2 Kings 22:13"
+    },
+    {
+     "a": "TENDER",
+     "b": "HUMBLED",
+     "reference": "2 Kings 22:19"
+    },
+    {
+     "a": "COVENANT",
+     "b": "ELDERS",
+     "reference": "2 Kings 23:2"
+    },
+    {
+     "a": "PASSOVER",
+     "b": "KEEP",
+     "reference": "2 Kings 23:21"
+    }
+   ]
+  },
+  {
+   "id": "m40",
+   "title": "Psalms of David",
+   "pairs": [
+    {
+     "a": "MERCY",
+     "b": "BLOT",
+     "reference": "Psalms 51:1"
+    },
+    {
+     "a": "CLEAN",
+     "b": "HEART",
+     "reference": "Psalms 51:10"
+    },
+    {
+     "a": "JOY",
+     "b": "SALVATION",
+     "reference": "Psalms 51:12"
+    },
+    {
+     "a": "HILLS",
+     "b": "EYES",
+     "reference": "Psalms 121:1"
+    },
+    {
+     "a": "HELP",
+     "b": "LORD",
+     "reference": "Psalms 121:2"
+    },
+    {
+     "a": "REFUGE",
+     "b": "STRENGTH",
+     "reference": "Psalms 46:1"
+    }
+   ]
+  },
+  {
+   "id": "m41",
+   "title": "Blessed man",
+   "pairs": [
+    {
+     "a": "COUNSEL",
+     "b": "UNGODLY",
+     "reference": "Psalms 1:1"
+    },
+    {
+     "a": "LAW",
+     "b": "MEDITATE",
+     "reference": "Psalms 1:2"
+    },
+    {
+     "a": "RIVERS",
+     "b": "FRUIT",
+     "reference": "Psalms 1:3"
+    },
+    {
+     "a": "CHAFF",
+     "b": "WIND",
+     "reference": "Psalms 1:4"
+    },
+    {
+     "a": "WAY",
+     "b": "PERISH",
+     "reference": "Psalms 1:6"
+    },
+    {
+     "a": "LEAF",
+     "b": "WITHER",
+     "reference": "Psalms 1:3"
+    }
+   ]
+  },
+  {
+   "id": "m42",
+   "title": "Isaiah's promises",
+   "pairs": [
+    {
+     "a": "CHILD",
+     "b": "BORN",
+     "reference": "Isaiah 9:6"
+    },
+    {
+     "a": "PRINCE",
+     "b": "PEACE",
+     "reference": "Isaiah 9:6"
+    },
+    {
+     "a": "COUNSELLOR",
+     "b": "WONDERFUL",
+     "reference": "Isaiah 9:6"
+    },
+    {
+     "a": "WOUNDED",
+     "b": "BRUISED",
+     "reference": "Isaiah 53:5"
+    },
+    {
+     "a": "WINGS",
+     "b": "EAGLES",
+     "reference": "Isaiah 40:31"
+    },
+    {
+     "a": "EVERLASTING",
+     "b": "FATHER",
+     "reference": "Isaiah 9:6"
+    }
+   ]
+  },
+  {
+   "id": "m43",
+   "title": "Jeremiah",
+   "pairs": [
+    {
+     "a": "THOUGHTS",
+     "b": "PEACE",
+     "reference": "Jeremiah 29:11"
+    },
+    {
+     "a": "PROPHET",
+     "b": "NATIONS",
+     "reference": "Jeremiah 1:5"
+    },
+    {
+     "a": "WOMB",
+     "b": "SANCTIFIED",
+     "reference": "Jeremiah 1:5"
+    },
+    {
+     "a": "ANSWER",
+     "b": "CALL",
+     "reference": "Jeremiah 33:3"
+    },
+    {
+     "a": "EVERLASTING",
+     "b": "LOVE",
+     "reference": "Jeremiah 31:3"
+    },
+    {
+     "a": "EXPECTED",
+     "b": "END",
+     "reference": "Jeremiah 29:11"
+    }
+   ]
+  },
+  {
+   "id": "m44",
+   "title": "The nativity",
+   "pairs": [
+    {
+     "a": "SWADDLING",
+     "b": "MANGER",
+     "reference": "Luke 2:7"
+    },
+    {
+     "a": "INN",
+     "b": "ROOM",
+     "reference": "Luke 2:7"
+    },
+    {
+     "a": "SHEPHERDS",
+     "b": "FIELD",
+     "reference": "Luke 2:8"
+    },
+    {
+     "a": "TIDINGS",
+     "b": "JOY",
+     "reference": "Luke 2:10"
+    },
+    {
+     "a": "HOST",
+     "b": "PRAISING",
+     "reference": "Luke 2:13"
+    },
+    {
+     "a": "GLORY",
+     "b": "PEACE",
+     "reference": "Luke 2:14"
+    }
+   ]
   }
  ]
 }
