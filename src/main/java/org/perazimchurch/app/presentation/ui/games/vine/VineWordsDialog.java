@@ -27,6 +27,7 @@ import org.perazimchurch.app.domain.games.vine.VineWordsLevels;
 import org.perazimchurch.app.domain.games.vine.VineWordsSession;
 import org.perazimchurch.app.presentation.ui.games.GamesHubDialog;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameArt;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
@@ -134,25 +135,40 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
             newlyUnlocked = unlocked;
             scores.edit().putInt(seenKey, unlocked).apply();
         }
-        LinearLayout row = null;
-        for (int number = 1; number <= levels.size(); number++) {
-            if ((number - 1) % 5 == 0) {
-                row = new LinearLayout(activity);
-                row.setOrientation(LinearLayout.HORIZONTAL);
-                page.addView(row, new LinearLayout.LayoutParams(-1, -2));
+        // Level-map path: scenes stack from the top band down to level 1 at the bottom, each
+        // with up to NODES_PER_SCENE levels along the painted path. The page scrolls through them.
+        android.graphics.Bitmap map = GameArt.levelMap(activity);
+        int sceneCount = (levels.size() + NODES_PER_SCENE - 1) / NODES_PER_SCENE;
+        LevelMapScene[] scenes = new LevelMapScene[sceneCount];
+        for (int scene = sceneCount - 1; scene >= 0; scene--) {
+            LevelMapScene view = new LevelMapScene(activity, map);
+            scenes[scene] = view;
+            int first = scene * NODES_PER_SCENE + 1;
+            int last = Math.min(levels.size(), first + NODES_PER_SCENE - 1);
+            for (int number = first; number <= last; number++) {
+                TextView tile = levelTile(number, number <= unlocked,
+                        progression.bestStars(scorePrefix + GAME_ID, number), number == highlight);
+                view.addView(tile);
+                if (number == newlyUnlocked) tile.post(() -> GameFx.shimmer(tile));
             }
-            TextView tile = levelTile(number, number <= unlocked, progression.bestStars(scorePrefix + GAME_ID, number), number == highlight);
-            row.addView(tile, new LinearLayout.LayoutParams(0, -2, 1f));
-            if (number == newlyUnlocked) tile.post(() -> GameFx.shimmer(tile));
+            page.addView(view, new LinearLayout.LayoutParams(-1, -2));
+        }
+        // Open the scroll on the scene with the level to play, so it is in view.
+        LevelMapScene current = scenes[(highlight - 1) / NODES_PER_SCENE];
+        if (scrollView != null) {
+            scrollView.post(() -> scrollView.scrollTo(0, Math.max(0, current.getTop() - dp(120))));
         }
     }
+
+    private static final int NODES_PER_SCENE = 8;
+    private ScrollView scrollView;
 
     private int newlyUnlocked = -1;
 
     private TextView levelTile(int number, boolean open, int stars, boolean current) {
         TextView tile = new TextView(activity);
         tile.setGravity(Gravity.CENTER);
-        tile.setTextSize(15);
+        tile.setTextSize(13);
         tile.setTypeface(null, android.graphics.Typeface.BOLD);
         tile.setText(open && stars > 0 ? number + "\n" + GameResults.starLine(stars) : String.valueOf(number));
         tile.setTextColor(current ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
@@ -162,10 +178,7 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         tile.setBackground(shape);
         tile.setAlpha(open ? 1f : 0.4f);
         tile.setContentDescription((open ? "Level " : "Locked level ") + number);
-        tile.setMinHeight(dp(56));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(60), 1f);
-        params.setMargins(dp(3), dp(3), dp(3), dp(3));
-        tile.setLayoutParams(params);
+        tile.setLayoutParams(new android.widget.FrameLayout.LayoutParams(dp(46), dp(46)));
         if (open) {
             tile.setOnClickListener(v -> { click(v); startLevel(number); });
             GameFx.attachPress(tile);
@@ -268,6 +281,7 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
     }
     @Override public void screen(String title, String subtitle) {
         ScrollView scroll = new ScrollView(activity);
+        scrollView = scroll;
         scroll.setFillViewport(true);
         GameFx.enter(scroll);
         scroll.setBackground(PerazimTheme.createBackgroundGradient());
