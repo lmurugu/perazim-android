@@ -40,8 +40,8 @@ public final class GameCatalog {
         games.add(new WordSearchDefinition(R.drawable.game_art_word_search));
         games.add(new MemoryDefinition(R.drawable.game_art_memory_match));
         games.add(new TimelineDefinition(R.drawable.game_art_timeline));
-        // Vine Words replaces Mini Crossword. Its art stands in until game_vine_words is delivered.
-        games.add(new VineWordsDefinition(R.drawable.game_art_mini_crossword, VineWordsContent::levels));
+        // Vine Words replaces Mini Crossword. Icon: game_vine_words.
+        games.add(new VineWordsDefinition(R.drawable.game_vine_words, VineWordsContent::levels));
         games.add(new RoadDefinition(R.drawable.ic_game_road));
         games.add(new TestamentDefinition(R.drawable.game_art_old_or_new));
         games.add(new WhoSaidItDefinition(R.drawable.game_art_who_said_it));
