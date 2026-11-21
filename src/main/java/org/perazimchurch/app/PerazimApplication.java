@@ -9,6 +9,7 @@ public class PerazimApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        org.perazimchurch.app.presentation.ui.games.common.GameLaunchers.registerAll();
         PerazimTheme.init(this);
         // When the phone switches light or dark, follow it if the app is set to System. Activities that
         // are running recreate themselves, and they read the new mode when they are built.
