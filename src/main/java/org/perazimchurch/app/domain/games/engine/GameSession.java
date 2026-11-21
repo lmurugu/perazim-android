@@ -27,6 +27,9 @@ public interface GameSession {
     /** The hint text for the current question, or null when none is available. */
     String hint();
 
+    /** The question or clue text a play screen shows, or null when the screen uses its own. */
+    default String prompt() { return null; }
+
     /** Answers the current question. Returns the outcome; the session then moves on or stays. */
     Outcome answer(String value);
 
