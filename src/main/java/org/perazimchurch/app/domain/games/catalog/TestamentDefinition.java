@@ -23,21 +23,6 @@ public final class TestamentDefinition implements GameDefinition {
 
     @Override
     public GameSession createSession(int level, long seed) {
-        final TestamentSort game = new TestamentSort(seed);
-        return new AdvancingSession() {
-            @Override protected boolean hasQuestion() { return !game.finished(); }
-            @Override protected boolean submit(String value) {
-                TestamentSort.Testament choice = "OLD".equals(value) ? TestamentSort.Testament.OLD
-                        : TestamentSort.Testament.NEW;
-                return game.place(choice);
-            }
-            @Override public int size() { return game.size(); }
-            @Override public String prompt() {
-                return game.finished() ? null : "Which testament is " + game.current().name + " in?";
-            }
-            @Override public int position() { return game.position(); }
-            @Override public boolean finished() { return game.finished(); }
-            @Override public int score() { return game.score(); }
-        };
+        return new TestamentSession(new TestamentSort(seed));
     }
 }
