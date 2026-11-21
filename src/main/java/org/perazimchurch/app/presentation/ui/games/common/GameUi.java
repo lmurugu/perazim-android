@@ -112,6 +112,7 @@ public final class GameUi implements GameChrome.Host {
         text(title, 24, true);
         text(subtitle == null ? "" : subtitle, 13, false);
         gap(16);
+        GameFx.enter(scroll);
         return scroll;
     }
 
@@ -141,6 +142,8 @@ public final class GameUi implements GameChrome.Host {
     @Override public void screen(String title, String subtitle) { page(title, subtitle, false); }
 
     @Override public void newSeed() { if (newSeed != null) newSeed.run(); }
+
+    @Override public void addRow(View row) { page.addView(row, wrapParams(12)); }
 
     @Override public void hub() { runHub(); }
 
@@ -192,6 +195,7 @@ public final class GameUi implements GameChrome.Host {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
         params.bottomMargin = dp(10);
         page.addView(view, params);
+        GameFx.attachPress(view);
         return view;
     }
 
