@@ -75,6 +75,22 @@ public final class GamesHubDialog extends Dialog {
     private long seed;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
+    /** Set before showing when a single game should open straight away, for example from Home. */
+    private String pendingGame;
+
+    /** Opens the Games tab directly on one game. Unknown ids open the hub. */
+    public static void open(Activity activity, String gameId) {
+        if (activity.isFinishing() || activity.isDestroyed()) return;
+        GamesHubDialog dialog = new GamesHubDialog(activity);
+        dialog.pendingGame = gameId;
+        dialog.show();
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            window.getDecorView().setBackground(PerazimTheme.createBackgroundGradient());
+        }
+    }
+
     public static void show(Activity activity) {
         if (activity.isFinishing() || activity.isDestroyed()) return;
         GamesHubDialog dialog = new GamesHubDialog(activity);
@@ -112,6 +128,7 @@ public final class GamesHubDialog extends Dialog {
         applyWindow();
         Window window = getWindow();
         if (window != null) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        if (pendingGame != null && launchGame(pendingGame)) return;
         hub();
     }
 
@@ -250,6 +267,27 @@ public final class GamesHubDialog extends Dialog {
                 "A famous verse has one word missing. Choose the word that completes it. Five verses per run.",
                 bestLineOf("FILL_THE_GAP", FillTheGap.ROUND_SIZE), this::fillTheGap);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
+    }
+
+    /** Starts one game by its catalog id. Returns false for an unknown id. */
+    private boolean launchGame(String gameId) {
+        if (!activeOwner()) return true;
+        seed = System.nanoTime();
+        switch (gameId) {
+            case "bible_quiz": startMode(Mode.QUIZ); return true;
+            case "who_am_i": startMode(Mode.WHO_AM_I); return true;
+            case "verse_builder": startMode(Mode.VERSE_ORDER); return true;
+            case "ladder_of_faith": startMode(Mode.LADDER); return true;
+            case "word_search": wordSearch(); return true;
+            case "memory_match": memoryMatch(); return true;
+            case "story_timeline": timeline(); return true;
+            case "mini_crossword": miniCrossword(); return true;
+            case "road_to_jerusalem": roadToJerusalem(); return true;
+            case "old_or_new": testamentSort(); return true;
+            case "who_said_it": whoSaidIt(); return true;
+            case "fill_the_gap": fillTheGap(); return true;
+            default: return false;
+        }
     }
 
     private void statsBar() {
@@ -721,7 +759,7 @@ public final class GamesHubDialog extends Dialog {
 
     /** Results screen for a finished run: stars, score, today's verse, Replay and Back to Games. */
     private void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
-        int stars = GameResults.recordRun(scores, gameId, score, size);
+        int stars = GameResults.recordRun(scores, scorePrefix + gameId, score, size);
         screen(title, "Run complete", false);
         text(GameResults.starLine(stars), 28, true);
         text("Score: " + score + " of " + size, 16, true);
