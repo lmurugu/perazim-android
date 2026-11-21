@@ -26,6 +26,7 @@ import org.perazimchurch.app.domain.games.vine.VineWordsLevels;
 import org.perazimchurch.app.domain.games.vine.VineWordsSession;
 import org.perazimchurch.app.presentation.ui.games.GamesHubDialog;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
@@ -80,7 +81,80 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         Window window = getWindow();
         if (window != null) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        startLevel(new LevelProgression(new Store()).unlockedLevel(scorePrefix + GAME_ID));
+        renderPicker();
+    }
+
+    /** Level picker: the passage of the highest unlocked level, then one tile per level. */
+    private void renderPicker() {
+        int unlocked = new LevelProgression(new Store()).unlockedLevel(scorePrefix + GAME_ID);
+        List<VineWordsLevel> levels = VineWordsContent.levels();
+        int highlight = Math.max(1, Math.min(unlocked, levels.size()));
+        screen("Vine Words", "Choose a level");
+        text("PASSAGE", 12, true);
+        VineWordsLevel current = levels.get(highlight - 1);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        GradientDrawable cardShape = new GradientDrawable();
+        cardShape.setColor(PerazimTheme.COLOR_SURFACE);
+        cardShape.setCornerRadius(dp(14));
+        card.setBackground(cardShape);
+        TextView reference = new TextView(activity);
+        reference.setText(current.passage());
+        reference.setTextSize(18);
+        reference.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        reference.setTypeface(null, android.graphics.Typeface.BOLD);
+        card.addView(reference);
+        StringBuilder verse = new StringBuilder();
+        for (VineWordsLevel.Verse v : current.verses()) {
+            if (verse.length() > 0) verse.append(' ');
+            verse.append(v.text);
+        }
+        TextView quote = new TextView(activity);
+        quote.setText("\u201C" + verse + "\u201D");
+        quote.setTextSize(14);
+        quote.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        quote.setPadding(0, dp(6), 0, dp(6));
+        card.addView(quote);
+        TextView words = new TextView(activity);
+        words.setText("Words to find: " + String.join(" \u00B7 ", current.targetWords()).toLowerCase(java.util.Locale.ROOT));
+        words.setTextSize(13);
+        words.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+        card.addView(words);
+        page.addView(card, new LinearLayout.LayoutParams(-1, -2));
+        text("LEVEL " + highlight + " OF " + levels.size(), 12, true);
+        LevelProgression progression = new LevelProgression(new Store());
+        LinearLayout row = null;
+        for (int number = 1; number <= levels.size(); number++) {
+            if ((number - 1) % 5 == 0) {
+                row = new LinearLayout(activity);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                page.addView(row, new LinearLayout.LayoutParams(-1, -2));
+            }
+            row.addView(levelTile(number, number <= unlocked, progression.bestStars(scorePrefix + GAME_ID, number), number == highlight),
+                    new LinearLayout.LayoutParams(0, -2, 1f));
+        }
+    }
+
+    private TextView levelTile(int number, boolean open, int stars, boolean current) {
+        TextView tile = new TextView(activity);
+        tile.setGravity(Gravity.CENTER);
+        tile.setTextSize(15);
+        tile.setTypeface(null, android.graphics.Typeface.BOLD);
+        tile.setText(open && stars > 0 ? number + "\n" + GameResults.starLine(stars) : String.valueOf(number));
+        tile.setTextColor(current ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
+        GradientDrawable shape = new GradientDrawable();
+        shape.setCornerRadius(dp(12));
+        shape.setColor(current ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE_2);
+        tile.setBackground(shape);
+        tile.setAlpha(open ? 1f : 0.4f);
+        tile.setContentDescription((open ? "Level " : "Locked level ") + number);
+        tile.setMinHeight(dp(56));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(60), 1f);
+        params.setMargins(dp(3), dp(3), dp(3), dp(3));
+        tile.setLayoutParams(params);
+        if (open) tile.setOnClickListener(v -> { click(v); startLevel(number); });
+        return tile;
     }
 
     // ---- levels and the play screen ----
