@@ -28,7 +28,7 @@ public class LampSlideScenesTest {
     }
 
     @Test
-    public void verseTextIsTheKjvTextForPsalm23() throws Exception {
+    public void missingPrayerParsesAsEmpty() throws Exception {
         String json = "{\"scenes\":[{\"id\":\"p\",\"image\":\"game_art_quiz\",\"reference\":\"Psalm 23:1\","
                 + "\"verse\":\"The LORD is my shepherd; I shall not want.\"}]}";
         List<LampSlideScene> scenes = LampSlideScenes.parse(json);
