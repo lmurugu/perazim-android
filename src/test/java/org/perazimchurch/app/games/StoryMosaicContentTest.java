@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 public class StoryMosaicContentTest {
 
     private static final Pattern REFERENCE = Pattern.compile("^([1-3] )?[A-Za-z]+( [A-Za-z]+)* \\d+:\\d+$");
-    private static final Pattern ASSET = Pattern.compile("^story_c\\d{2}_\\d+\\.webp$");
+    private static final Pattern ASSET = Pattern.compile("^story_c\\d{2}\\.webp$");
 
     @Test public void atLeastEightChaptersAreUsed() {
         Set<String> chapters = new HashSet<>();
@@ -44,11 +44,19 @@ public class StoryMosaicContentTest {
         }
     }
 
-    @Test public void sceneNamesFollowTheArtConventionAndAreUnique() {
+    @Test public void oneSceneFilePerChapterFollowsTheArtConvention() {
         Set<String> names = new HashSet<>();
+        for (StoryChapterBank.Chapter c : StoryChapterBank.CHAPTERS) {
+            String name = MosaicPuzzles.assetName(c.id);
+            assertTrue(name, ASSET.matcher(name).matches());
+            assertTrue("duplicate scene " + name, names.add(name));
+        }
+        assertEquals(StoryChapterBank.CHAPTERS.size(), names.size());
+    }
+
+    @Test public void allPuzzlesOfAChapterShareItsScene() {
         for (MosaicPuzzles.Puzzle p : MosaicPuzzles.all()) {
-            assertTrue(p.assetName(), ASSET.matcher(p.assetName()).matches());
-            assertTrue("duplicate scene " + p.assetName(), names.add(p.assetName()));
+            assertEquals(MosaicPuzzles.assetName(p.chapterId), p.assetName());
         }
     }
 

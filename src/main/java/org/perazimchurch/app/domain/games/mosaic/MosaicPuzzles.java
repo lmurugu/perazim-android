@@ -7,10 +7,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Every Story Mosaic puzzle, in story order. Each event of each shared chapter is one puzzle: the
- * scene for it is drawn from {@code story_<chapter>_<n>.webp}, where n is the event's 1-based
- * position in its chapter. Built from {@link StoryChapterBank} so Story Timeline and Story Mosaic
- * never disagree about the story.
+ * Every Story Mosaic puzzle, in story order. Each event of each shared chapter is one puzzle. All
+ * puzzles of a chapter use one scene, {@code story_<chapter>.webp}; the grid size changes with the
+ * level, so each event is a different puzzle on the same picture. Built from
+ * {@link StoryChapterBank} so Story Timeline and Story Mosaic never disagree about the story.
  */
 public final class MosaicPuzzles {
 
@@ -30,9 +30,9 @@ public final class MosaicPuzzles {
             this.reference = reference;
         }
 
-        /** Art file name for this scene, for example story_c01_1.webp. */
+        /** Art file name for this chapter's scene, for example story_c01.webp. */
         public String assetName() {
-            return MosaicPuzzles.assetName(chapterId, number);
+            return MosaicPuzzles.assetName(chapterId);
         }
     }
 
@@ -40,8 +40,8 @@ public final class MosaicPuzzles {
 
     private MosaicPuzzles() {}
 
-    public static String assetName(String chapterId, int number) {
-        return "story_" + chapterId + "_" + number + ".webp";
+    public static String assetName(String chapterId) {
+        return "story_" + chapterId + ".webp";
     }
 
     /** Every puzzle in story order. Unmodifiable. */

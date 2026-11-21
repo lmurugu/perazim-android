@@ -176,7 +176,10 @@ public final class StoryMosaicDialog extends Dialog {
         progression.record(GAME_ID, level, stars, levelCount);
         hintButton.setVisibility(View.GONE);
         hint.setText("");
-        caption.setText(puzzle.title + "\n— " + puzzle.reference);
+        String verse = KjvLookup.text(appContext, puzzle.reference);
+        caption.setText(verse != null
+                ? "\u201c" + verse + "\u201d\n— " + puzzle.reference
+                : puzzle.title + "\n— " + puzzle.reference);
         caption.setVisibility(View.VISIBLE);
         Button next = smallButton(level < levelCount ? "Next scene" : "Back to chapters");
         next.setOnClickListener(v -> {
