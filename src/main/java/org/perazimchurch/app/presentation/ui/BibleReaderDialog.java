@@ -956,11 +956,20 @@ public class BibleReaderDialog extends Dialog {
         View picker = buildColourPicker(name -> {
             if (forSwipe) {
                 swipeColourName = name;
+                swipeErase = false;
                 chosen[0] = name;
             } else {
                 applyHighlightToSelected(name);
             }
-        }, forSwipe ? swipeColourName : null, false, null, true);
+        }, forSwipe ? swipeColourName : null, () -> {
+            if (forSwipe) {
+                // Swiping now erases: dragging across words removes their highlight.
+                swipeErase = true;
+                chosen[0] = null;
+            } else {
+                applyHighlightToSelected(null);
+            }
+        }, true);
         LinearLayout.LayoutParams pickerLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(46));
         pickerLp.gravity = Gravity.CENTER_HORIZONTAL;
         picker.setLayoutParams(pickerLp);
@@ -980,7 +989,7 @@ public class BibleReaderDialog extends Dialog {
             // With a verse open on the verse bar, the check applies the picked colour to it (and to any verses
             // added with taps), so it is saved, shown and can be undone. Without one it only closes the picker.
             final BibleVerse target = (forSwipe && actionBarView != null) ? actionVerse : null;
-            final String colour = chosen[0] != null ? chosen[0] : swipeColourName;
+            final String colour = swipeErase ? null : (chosen[0] != null ? chosen[0] : swipeColourName);
             dismissNotesPanel();
             if (target != null) {
                 applyHighlight(target, colour);
@@ -1009,7 +1018,8 @@ public class BibleReaderDialog extends Dialog {
         }
         selectedVerses.clear();
         renderVerseList(currentVerses, false);
-        Toast.makeText(getContext(), "Highlighted " + count + (count == 1 ? " verse" : " verses"), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), (colour == null ? "Cleared " : "Highlighted ") + count
+                + (count == 1 ? " verse" : " verses"), Toast.LENGTH_SHORT).show();
     }
 
     /** Set when a chapter is chosen in the picker: the verse card opens once the chapter is on screen. */
@@ -1577,6 +1587,8 @@ public class BibleReaderDialog extends Dialog {
     private boolean swipeColourOn;
     /** The colour swipe colouring paints with; the hamburger picker sets it. */
     private String swipeColourName = "bold-purple";
+    /** When true, swiping across words removes their highlight instead of painting one. */
+    private boolean swipeErase;
     /** Verse offset where the current swipe started, or -1 when no swipe is in progress. */
     private int swipeAnchor = -1;
 
@@ -1671,7 +1683,11 @@ public class BibleReaderDialog extends Dialog {
             swipeAnchor = -1;
             int[] range = trimmedBodyRange(verse, from, to);
             if (action == android.view.MotionEvent.ACTION_UP && range != null) {
-                applyWordHighlight(verse, range[0], range[1], swipeColourName);
+                if (swipeErase) {
+                    clearWordHighlight(verse, range[0], range[1]);
+                } else {
+                    applyWordHighlight(verse, range[0], range[1], swipeColourName);
+                }
             } else if (action == android.view.MotionEvent.ACTION_UP) {
                 onVerseTapped(verse);
             }
@@ -1795,7 +1811,13 @@ public class BibleReaderDialog extends Dialog {
     /** Colour card for a chosen word or range. */
     private void pickWordColour(final BibleVerse verse, final int start, final int end) {
         wordColourDialog = openCardDialog("Highlight", null,
-                buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, false, null, false), null, null);
+                buildColourPicker(name -> applyWordHighlight(verse, start, end, name), null, () -> {
+                    if (wordColourDialog != null) {
+                        wordColourDialog.dismiss();
+                        wordColourDialog = null;
+                    }
+                    clearWordHighlight(verse, start, end);
+                }, false), null, null);
     }
 
     /** Adds a word range to the verse, updates the loaded verse lists and redraws. */
@@ -2045,7 +2067,7 @@ public class BibleReaderDialog extends Dialog {
      * Presets apply straight away; the tracks preview until the check is pressed.
      */
     private View buildColourPicker(final java.util.function.Consumer<String> onPick, @Nullable final String current,
-                                   boolean allowRemove, @Nullable final Runnable onRemove, boolean framed) {
+                                   @Nullable final Runnable onClear, boolean framed) {
         final String seed = current != null && HighlightColors.byName(current) != null ? current : frequentColours().get(0);
         HighlightColors.Colour seedColour = HighlightColors.byName(seed);
         int seedRgb = seedColour != null ? Color.parseColor(seedColour.swatch) : 0xFF8E24AA;
@@ -2131,8 +2153,22 @@ public class BibleReaderDialog extends Dialog {
             dot.setScaleY(chosen ? 1.5f : 1f);
             dots.addView(dot);
         }
-        if (allowRemove && onRemove != null) {
-            dots.addView(barIconRes(org.perazimchurch.app.R.drawable.ic_bar_close, "Remove highlight", v -> onRemove.run()));
+        if (onClear != null) {
+            // Clear: a minimal icon on a small translucent circle, after the colours. It removes the highlight.
+            ImageView clear = new ImageView(getContext());
+            clear.setImageResource(org.perazimchurch.app.R.drawable.ic_hl_clear);
+            clear.setContentDescription("Clear highlight");
+            clear.setPadding(dp(3), dp(3), dp(3), dp(3));
+            GradientDrawable clearBg = new GradientDrawable();
+            clearBg.setShape(GradientDrawable.OVAL);
+            clearBg.setColor(0x40808080);
+            clear.setBackground(clearBg);
+            clear.setColorFilter(framed ? (phoneIsDark() ? 0xFFF1EAFB : 0xFF2A1B3D) : GlassKit.text());
+            LinearLayout.LayoutParams clearLp = new LinearLayout.LayoutParams(dp(20), dp(20));
+            clearLp.setMargins(dp(5), 0, dp(1), 0);
+            clear.setLayoutParams(clearLp);
+            clear.setOnClickListener(v -> onClear.run());
+            dots.addView(clear);
         }
         card.addView(dots, new LinearLayout.LayoutParams(0, -2, 3f));
         return card;
@@ -2249,7 +2285,7 @@ public class BibleReaderDialog extends Dialog {
     /** Colours for the verse action bar: the shared picker, with remove. */
     private View buildPalette(final BibleVerse verse) {
         return buildColourPicker(name -> applyHighlight(verse, name), verse.getHighlightColor(),
-                true, () -> applyHighlight(verse, null), true);
+                () -> applyHighlight(verse, null), true);
     }
 
     /** Active group icons turn orange; the rest use the normal ink. */
