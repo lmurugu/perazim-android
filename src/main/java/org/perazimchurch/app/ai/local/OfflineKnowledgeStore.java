@@ -115,18 +115,18 @@ public final class OfflineKnowledgeStore {
                 byte[] decoded = Base64.decode(key, Base64.DEFAULT);
                 if (decoded.length != 32) return Collections.emptyMap();
                 Map<String, String> keys = new java.util.HashMap<>();
-                keys.put("synthetic-device-key", key);
+                keys.put("synthetic-device-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, key));
                 try (InputStream controlKeyInput = context.getAssets().open("ai/knowledge/control-public-key.txt");
                      ByteArrayOutputStream controlKeyOutput = new ByteArrayOutputStream()) {
                     copyBounded(controlKeyInput, controlKeyOutput, 256);
                     String controlKey = controlKeyOutput.toString("UTF-8").trim();
                     byte[] controlBytes = Base64.decode(controlKey, Base64.DEFAULT);
                     if (controlBytes.length != 32) return Collections.emptyMap();
-                    keys.put("synthetic-control-key", controlKey);
-                    keys.put("synthetic-rollback-key", readValidationPublicKey(context,
-                            "ai/knowledge/rollback-package-public-key.txt"));
-                    keys.put("synthetic-rollback-download-key", readValidationPublicKey(context,
-                            "ai/knowledge/rollback-authorization-public-key.txt"));
+                    keys.put("synthetic-control-key", TrustAnchors.encode(TrustAnchors.Purpose.CONTROL, controlKey));
+                    keys.put("synthetic-rollback-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE,
+                            readValidationPublicKey(context, "ai/knowledge/rollback-package-public-key.txt")));
+                    keys.put("synthetic-rollback-download-key", TrustAnchors.encode(TrustAnchors.Purpose.ROLLBACK_AUTH,
+                            readValidationPublicKey(context, "ai/knowledge/rollback-authorization-public-key.txt")));
                     return Collections.unmodifiableMap(keys);
                 }
             }
@@ -164,14 +164,22 @@ public final class OfflineKnowledgeStore {
             if (!keyId.matches("[A-Za-z0-9._-]{1,80}") || !(value instanceof String)) {
                 throw new SecurityException("Trusted key entry is malformed.");
             }
-            String encodedKey = (String) value;
+            String taggedKey = (String) value;
+            int separator = taggedKey.indexOf(':');
+            if (separator <= 0) throw new SecurityException("Trusted key purpose is missing.");
+            try {
+                TrustAnchors.Purpose.valueOf(taggedKey.substring(0, separator));
+            } catch (IllegalArgumentException error) {
+                throw new SecurityException("Trusted key purpose is unknown.");
+            }
+            String encodedKey = taggedKey.substring(separator + 1);
             if (!encodedKey.matches("[A-Za-z0-9+/]+={0,2}")) {
                 throw new SecurityException("Trusted Ed25519 public key is not valid base64.");
             }
             byte[] decoded = Base64.decode(encodedKey, Base64.DEFAULT);
             String canonicalKey = Base64.encodeToString(decoded, Base64.NO_WRAP);
-            if ((decoded.length != 32 && decoded.length != 44) || !canonicalKey.equals(encodedKey)
-                    || keys.put(keyId, encodedKey) != null) {
+            if (decoded.length != 32 || !canonicalKey.equals(encodedKey)
+                    || keys.put(keyId, taggedKey) != null) {
                 throw new SecurityException("Trusted Ed25519 public key is malformed.");
             }
         }
@@ -212,8 +220,7 @@ public final class OfflineKnowledgeStore {
         JSONObject envelope = new JSONObject(envelopeJson);
         JSONObject payload = envelope.getJSONObject("payload");
         String keyId = envelope.getString("signingKeyId");
-        String encodedKey = trustedKeys == null ? null : trustedKeys.get(keyId);
-        if (encodedKey == null) throw new SecurityException("Package signing key is not trusted.");
+        byte[] rawPublicKey = TrustAnchors.resolve(trustedKeys, keyId, TrustAnchors.Purpose.PACKAGE);
 
         JSONObject unsigned = new JSONObject(payload.toString());
         String contentDigest = unsigned.getString("contentDigest");
@@ -224,9 +231,6 @@ public final class OfflineKnowledgeStore {
             throw new SecurityException("Package content digest is invalid.");
         }
 
-        byte[] publicKeyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
-        byte[] rawPublicKey = publicKeyBytes.length == 32 ? publicKeyBytes
-                : java.util.Arrays.copyOfRange(publicKeyBytes, publicKeyBytes.length - 32, publicKeyBytes.length);
         byte[] signedBytes = canonical(payload).getBytes(StandardCharsets.UTF_8);
         if (!Ed25519Verifier.verify(rawPublicKey, signedBytes,
                 Base64.decode(envelope.getString("signature"), Base64.DEFAULT))) {
@@ -271,6 +275,13 @@ public final class OfflineKnowledgeStore {
                     || !citationFieldIsSafe(document.optString("version"), ":]")
                     || !citationFieldIsSafe(document.optString("location"), "]")) {
                 throw new SecurityException("A package source is missing provenance.");
+            }
+        }
+        Object governanceField = payload.opt("governance");
+        if (governanceField instanceof JSONArray) {
+            JSONArray governanceEntries = (JSONArray) governanceField;
+            for (int i = 0; i < governanceEntries.length(); i++) {
+                SourceApprovals.verifyEntry(governanceEntries.getJSONObject(i), trustedKeys);
             }
         }
         long publishedAtValue = payload.getLong("publishedAt");
@@ -495,8 +506,7 @@ public final class OfflineKnowledgeStore {
         JSONObject envelope = new JSONObject(envelopeJson);
         JSONObject payload = envelope.getJSONObject("payload");
         String keyId = envelope.getString("signingKeyId");
-        String encodedKey = trustedKeys == null ? null : trustedKeys.get(keyId);
-        if (encodedKey == null) throw new SecurityException("Rollback signing key is not trusted.");
+        byte[] rawPublicKey = TrustAnchors.resolve(trustedKeys, keyId, TrustAnchors.Purpose.ROLLBACK_AUTH);
         JSONObject unsigned = new JSONObject(payload.toString());
         String digest = unsigned.getString("controlDigest");
         unsigned.remove("controlDigest");
@@ -505,9 +515,6 @@ public final class OfflineKnowledgeStore {
                 actualDigest.getBytes(StandardCharsets.US_ASCII))) {
             throw new SecurityException("Rollback authorization digest is invalid.");
         }
-        byte[] publicKeyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
-        byte[] rawPublicKey = publicKeyBytes.length == 32 ? publicKeyBytes
-                : java.util.Arrays.copyOfRange(publicKeyBytes, publicKeyBytes.length - 32, publicKeyBytes.length);
         if (!Ed25519Verifier.verify(rawPublicKey, canonical(payload).getBytes(StandardCharsets.UTF_8),
                 Base64.decode(envelope.getString("signature"), Base64.DEFAULT))) {
             throw new SecurityException("Rollback authorization signature is invalid.");
@@ -586,8 +593,7 @@ public final class OfflineKnowledgeStore {
         JSONObject envelope = new JSONObject(envelopeJson);
         JSONObject payload = envelope.getJSONObject("payload");
         String keyId = envelope.getString("signingKeyId");
-        String encodedKey = trustedKeys == null ? null : trustedKeys.get(keyId);
-        if (encodedKey == null) throw new SecurityException("Withdrawal control signing key is not trusted.");
+        byte[] rawPublicKey = TrustAnchors.resolve(trustedKeys, keyId, TrustAnchors.Purpose.CONTROL);
         JSONObject unsigned = new JSONObject(payload.toString());
         String digest = unsigned.getString("controlDigest");
         unsigned.remove("controlDigest");
@@ -596,9 +602,6 @@ public final class OfflineKnowledgeStore {
                 actualDigest.getBytes(StandardCharsets.US_ASCII))) {
             throw new SecurityException("Withdrawal control digest is invalid.");
         }
-        byte[] publicKeyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
-        byte[] rawPublicKey = publicKeyBytes.length == 32 ? publicKeyBytes
-                : java.util.Arrays.copyOfRange(publicKeyBytes, publicKeyBytes.length - 32, publicKeyBytes.length);
         String signature = envelope.getString("signature");
         byte[] signatureBytes = Base64.decode(signature, Base64.DEFAULT);
         if (signatureBytes.length != 64 || !Base64.encodeToString(signatureBytes, Base64.NO_WRAP).equals(signature)
