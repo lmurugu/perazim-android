@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.catalog.LampSlideDefinition;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.KeyValueStore;
@@ -23,8 +22,8 @@ import org.perazimchurch.app.domain.games.lampslide.LampSlideLevels;
 import org.perazimchurch.app.domain.games.lampslide.LampSlidePuzzle;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideSession;
-import org.perazimchurch.app.presentation.ui.games.GamesHubDialog;
 import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
+import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -38,15 +37,14 @@ public final class LampSlideLauncher {
 
     static final String GAME_ID = "lamp_slide";
     private static final String TITLE = "Lamp Slide";
-    private static final String SCORES_PREFS = "perazim_game_scores_v1";
 
     private LampSlideLauncher() {}
 
-    /** Opens the level picker. */
-    public static void open(Activity activity) {
+    /** Opens the level picker. Progress is saved under the signed-in account's prefix. */
+    public static void open(GameContext ctx) {
         GameDefinition game = find();
         if (game == null) return;
-        new Run(activity, game).showPicker();
+        new Run(ctx, game).showPicker();
     }
 
     private static GameDefinition find() {
@@ -58,20 +56,24 @@ public final class LampSlideLauncher {
 
     /** One open dialog: the picker, the play screen and the results. Also the chrome's host. */
     private static final class Run implements GameChrome.Host {
+        private final GameContext ctx;
         private final Activity activity;
         private final GameDefinition game;
+        /** Stars and progress key: the account prefix plus the game id, as GameResults uses. */
+        private final String storedId;
         private final Dialog dialog;
         private final ScrollView scroll;
         private final LevelProgression progression;
         private LinearLayout page;
-        private Button lastNext;
         private int selected;
         private long seed;
 
-        Run(Activity activity, GameDefinition game) {
-            this.activity = activity;
+        Run(GameContext ctx, GameDefinition game) {
+            this.ctx = ctx;
+            this.activity = ctx.activity();
             this.game = game;
-            this.progression = new LevelProgression(new ProgressStore(prefsFile()));
+            this.storedId = ctx.scorePrefix() + game.id();
+            this.progression = new LevelProgression(new ProgressStore(ctx.scores()));
             this.dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
             this.scroll = new ScrollView(activity);
             scroll.setBackground(PerazimTheme.createBackgroundGradient());
@@ -79,17 +81,13 @@ public final class LampSlideLauncher {
             dialog.setContentView(scroll);
             Window window = dialog.getWindow();
             if (window != null) window.setLayout(-1, -1);
-            this.selected = Math.max(1, progression.unlockedLevel(GAME_ID));
-        }
-
-        private SharedPreferences prefsFile() {
-            return activity.getSharedPreferences(SCORES_PREFS, Activity.MODE_PRIVATE);
+            this.selected = Math.max(1, progression.unlockedLevel(storedId));
         }
 
         /** The level picker: bands of levels, stars per level, a preview and Start. */
         void showPicker() {
             if (!dialog.isShowing()) dialog.show();
-            int unlocked = progression.unlockedLevel(GAME_ID);
+            int unlocked = progression.unlockedLevel(storedId);
             page = newPage();
             text("Lamp Slide", 24, true);
             text("Choose a painting", 13, false);
@@ -121,7 +119,7 @@ public final class LampSlideLauncher {
             for (int level = from; level <= to; level++) {
                 final int value = level;
                 boolean open = level <= unlocked;
-                int stars = progression.bestStars(GAME_ID, level);
+                int stars = progression.bestStars(storedId, level);
                 Button cell = button(level + "\n" + starText(stars), false);
                 cell.setEnabled(open);
                 cell.setAlpha(open ? 1f : 0.4f);
@@ -147,23 +145,17 @@ public final class LampSlideLauncher {
             page.addView(screen, new LinearLayout.LayoutParams(-1, -2));
         }
 
-        /** Shows the shared results, then enables Next level when the next level is open. */
+        /** Shared results. Next level is offered by GameChrome once the following level is unlocked. */
         private void finish(LampSlideSession session, int level) {
-            lastNext = null;
-            new GameChrome(this).finishedRun(game, TITLE, session, level, () -> start(level, System.nanoTime()));
-            if (lastNext != null && level < LampSlideLevels.LEVEL_COUNT
-                    && progression.unlockedLevel(GAME_ID) > level) {
-                Button next = lastNext;
-                next.setEnabled(true);
-                next.setAlpha(1f);
-                next.setOnClickListener(v -> start(level + 1, System.nanoTime()));
-            }
+            new GameChrome(this).finishedRun(game, TITLE, session, level,
+                    () -> start(level, System.nanoTime()),
+                    () -> start(level + 1, System.nanoTime()));
         }
 
         private int totalStars() {
             int total = 0;
             for (int level = 1; level <= LampSlideLevels.LEVEL_COUNT; level++) {
-                total += progression.bestStars(GAME_ID, level);
+                total += progression.bestStars(storedId, level);
             }
             return total;
         }
@@ -187,15 +179,11 @@ public final class LampSlideLauncher {
 
         @Override public Activity activity() { return activity; }
 
-        @Override public SharedPreferences scores() {
-            return prefsFile();
-        }
+        @Override public SharedPreferences scores() { return ctx.scores(); }
 
-        @Override public String scorePrefix() {
-            return GamesHubDialog.ownerKey(SessionManager.getInstance(activity).getActiveUserId());
-        }
+        @Override public String scorePrefix() { return ctx.scorePrefix(); }
 
-        @Override public boolean activeOwner() { return dialog.isShowing(); }
+        @Override public boolean activeOwner() { return ctx.ownerCheck().getAsBoolean(); }
 
         @Override public void screen(String title, String subtitle) {
             page = newPage();
@@ -220,7 +208,6 @@ public final class LampSlideLauncher {
             button.setText(label);
             button.setAllCaps(false);
             button.setTextColor(0xFFFFFFFF);
-            if ("Next level".equals(label)) lastNext = button;
             page.addView(button, new LinearLayout.LayoutParams(-1, -2));
             return button;
         }
@@ -231,6 +218,7 @@ public final class LampSlideLauncher {
 
         @Override public void newSeed() {
             seed = System.nanoTime();
+            ctx.seedReset().run();
         }
 
         /** "Back to Games" in the results returns to the picker. */

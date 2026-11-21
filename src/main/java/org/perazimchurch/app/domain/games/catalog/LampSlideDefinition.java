@@ -36,7 +36,7 @@ public final class LampSlideDefinition implements GameDefinition {
 
     /** The session's score is already the stars earned on a solved board (1 to 3). */
     @Override public StarRule starRule() {
-        return (score, size, lives) -> Math.max(1, Math.min(3, score));
+        return session -> Math.max(1, Math.min(3, session.score()));
     }
     @Override public String levelName(int level) { return "Level " + level; }
 

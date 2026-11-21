@@ -11,7 +11,7 @@ public final class GameLaunchers {
 
     /** Registers every game launcher. Add one line per game. */
     public static void registerAll() {
-        // GameRegistry.register("story_mosaic", activity -> StoryMosaicDialog.show(activity));
+        // GameRegistry.register("story_mosaic", ctx -> StoryMosaicDialog.show(ctx.activity(), ctx.ui()));
         GameRegistry.register("lamp_slide", org.perazimchurch.app.presentation.ui.games.lampslide.LampSlideLauncher::open);
     }
 }
