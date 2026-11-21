@@ -10,7 +10,7 @@ import org.perazimchurch.app.domain.games.engine.GameSession;
  * combo bonus for consecutive correct answers within this run only. A hint costs a few points on
  * that question. Wrong answers reset the combo and show the explanation and reference gently.
  */
-final class WhoAmISession implements GameSession {
+public final class WhoAmISession implements GameSession {
 
     static final int BASE_POINTS = 10;
     static final int COMBO_STEP = 5;

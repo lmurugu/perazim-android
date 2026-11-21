@@ -11,7 +11,7 @@ import org.perazimchurch.app.domain.games.engine.GameSession;
  * A correct tap scores with a combo bonus for consecutive correct taps in this run only. A wrong
  * tap resets the combo and gives a gentle nudge. Hints name the book of the next event.
  */
-final class StoryTimelineSession implements GameSession {
+public final class StoryTimelineSession implements GameSession {
 
     static final int BASE_POINTS = 10;
     static final int COMBO_STEP = 5;
@@ -65,6 +65,9 @@ final class StoryTimelineSession implements GameSession {
 
     /** Explanation with the reference after the last answer, or null before the first answer. */
     public String lastFeedback() { return lastFeedback; }
+
+    /** Events placed in order so far. */
+    public int placed() { return placed; }
 
     /** Current combo streak within this run. */
     int combo() { return combo; }
