@@ -1,5 +1,8 @@
 package org.perazimchurch.app.presentation.ui.games.mosaic;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,6 +12,9 @@ import android.graphics.RectF;
 import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
+
+import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 
 import org.perazimchurch.app.domain.games.catalog.StoryMosaicSession;
 import org.perazimchurch.app.domain.games.engine.GameSession;
@@ -51,6 +57,15 @@ public final class StoryMosaicView extends View {
     private int dragPiece = -1;
     private float dragX;
     private float dragY;
+
+    // A piece that was dropped right flies into its slot with a small overshoot.
+    private int snapPiece = -1;
+    private float snapFromX;
+    private float snapFromY;
+    private float snapToX;
+    private float snapToY;
+    private float snapT;
+    private ValueAnimator snapAnim;
 
     public StoryMosaicView(Context context, StoryMosaicSession session, Bitmap scene, Listener listener) {
         super(context);
@@ -130,7 +145,7 @@ public final class StoryMosaicView extends View {
 
         // Placed pieces sit in their slots.
         for (int piece = 0; piece < board.pieceCount(); piece++) {
-            if (!board.isPlaced(piece)) continue;
+            if (!board.isPlaced(piece) || piece == snapPiece) continue;
             float left = gridLeft + board.column(piece) * cell;
             float top = gridTop + board.row(piece) * cell;
             dst.set(left + 2, top + 2, left + cell - 2, top + cell - 2);
@@ -142,6 +157,15 @@ public final class StoryMosaicView extends View {
             if (board.isPlaced(piece) || piece == dragPiece) continue;
             dst.set(trayRects[piece]);
             drawPiece(canvas, piece, side, dst);
+        }
+        if (snapPiece >= 0) {
+            float t = snapT;
+            float x = snapFromX + (snapToX - snapFromX) * t;
+            float y = snapFromY + (snapToY - snapFromY) * t;
+            float size = trayCell + (cell - 4f - trayCell) * Math.min(1f, Math.max(0f, t));
+            float half = size / 2f;
+            dst.set(x - half, y - half, x + half, y + half);
+            drawPiece(canvas, snapPiece, side, dst);
         }
         if (dragPiece >= 0) {
             float half = trayCell / 2f;
@@ -173,6 +197,38 @@ public final class StoryMosaicView extends View {
             canvas.drawRoundRect(target, 8f * density, 8f * density, stroke);
             stroke.setColor(Color.argb(72, 255, 255, 255));
         }
+    }
+
+    private void startSnap(int piece, float fromX, float fromY, int slot) {
+        MosaicBoard board = session.board();
+        snapPiece = piece;
+        snapFromX = fromX;
+        snapFromY = fromY;
+        snapToX = gridLeft + board.column(slot) * cell + cell / 2f;
+        snapToY = gridTop + board.row(slot) * cell + cell / 2f;
+        snapT = 0f;
+        if (snapAnim != null) snapAnim.cancel();
+        snapAnim = ValueAnimator.ofFloat(0f, 1f);
+        snapAnim.setDuration(GameFx.motionEnabled(getContext()) ? 220 : 0);
+        snapAnim.setInterpolator(new OvershootInterpolator(1.2f));
+        snapAnim.addUpdateListener(a -> {
+            snapT = (Float) a.getAnimatedValue();
+            invalidate();
+        });
+        snapAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                snapPiece = -1;
+                invalidate();
+            }
+        });
+        snapAnim.start();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (snapAnim != null) snapAnim.cancel();
+        super.onDetachedFromWindow();
     }
 
     @Override
@@ -208,6 +264,12 @@ public final class StoryMosaicView extends View {
                 GameSession.Outcome outcome = slot < 0
                         ? GameSession.Outcome.IGNORED
                         : session.answer(value);
+                if (outcome == GameSession.Outcome.CORRECT) {
+                    startSnap(dragPiece, x, y, slot);
+                    GameFx.correct(this);
+                } else if (outcome == GameSession.Outcome.WRONG) {
+                    GameFx.wrong(this);
+                }
                 dragPiece = -1;
                 invalidate();
                 if (listener != null) listener.onDrop(outcome);

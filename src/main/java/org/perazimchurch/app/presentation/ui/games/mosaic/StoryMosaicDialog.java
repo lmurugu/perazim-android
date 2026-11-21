@@ -19,6 +19,7 @@ import org.perazimchurch.app.domain.games.catalog.StoryMosaicSession;
 import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
+import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.domain.games.engine.KeyValueStore;
 import org.perazimchurch.app.domain.games.engine.LevelProgression;
 import org.perazimchurch.app.domain.games.mosaic.MosaicBoard;
@@ -87,6 +88,19 @@ public final class StoryMosaicDialog extends Dialog {
         column.addView(text("Put each Bible scene together. Every chapter is open.", 14, false));
 
         List<Integer> starts = MosaicPuzzles.chapterStarts();
+        // The first chapter with a scene still to finish gets the shimmer.
+        int nextChapter = -1;
+        for (int c = 0; c < starts.size() && nextChapter < 0; c++) {
+            int first0 = starts.get(c);
+            int last0 = (c + 1 < starts.size() ? starts.get(c + 1) : levelCount) - 1;
+            for (int i = first0; i <= last0; i++) {
+                if (progression.bestStars(progressId, i + 1) == 0) {
+                    nextChapter = c;
+                    break;
+                }
+            }
+        }
+        View shimmerRow = null;
         for (int c = 0; c < starts.size(); c++) {
             int first = starts.get(c);
             int last = (c + 1 < starts.size() ? starts.get(c + 1) : levelCount) - 1;
@@ -102,16 +116,38 @@ public final class StoryMosaicDialog extends Dialog {
             row.setTextColor(Color.WHITE);
             row.setBackgroundColor(done == last - first + 1 ? ORANGE : Color.argb(36, 255, 255, 255));
             row.setOnClickListener(v -> showPuzzle(target));
+            GameFx.attachPress(row);
+            boolean complete = done == last - first + 1;
+            // A rail on the left: the dot and the line below it light up when the chapter is finished.
+            LinearLayout rail = new LinearLayout(getContext());
+            rail.setOrientation(LinearLayout.VERTICAL);
+            rail.setGravity(Gravity.CENTER_HORIZONTAL);
+            View dot = new View(getContext());
+            dot.setBackgroundColor(complete ? ORANGE : Color.argb(60, 255, 255, 255));
+            rail.addView(dot, new LinearLayout.LayoutParams(dp(14), dp(14)));
+            View link = new View(getContext());
+            link.setBackgroundColor(complete ? ORANGE : Color.argb(60, 255, 255, 255));
+            rail.addView(link, new LinearLayout.LayoutParams(dp(3), dp(50)));
+            LinearLayout line = new LinearLayout(getContext());
+            line.setOrientation(LinearLayout.HORIZONTAL);
+            line.addView(rail, new LinearLayout.LayoutParams(dp(20), LinearLayout.LayoutParams.WRAP_CONTENT));
+            line.addView(row, new LinearLayout.LayoutParams(0, dp(64), 1f));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(64));
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             lp.topMargin = dp(10);
-            column.addView(row, lp);
+            column.addView(line, lp);
+            if (c == nextChapter) shimmerRow = row;
         }
 
         ScrollView scroll = new ScrollView(getContext());
         scroll.addView(column);
         root.addView(scroll, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        GameFx.enter(column);
+        if (shimmerRow != null) {
+            final View target = shimmerRow;
+            target.post(() -> GameFx.shimmer(target));
+        }
     }
 
     private int nextUnfinished(int first, int last) {
@@ -145,6 +181,7 @@ public final class StoryMosaicDialog extends Dialog {
         heading.setPadding(dp(12), 0, 0, 0);
         header.addView(heading, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         column.addView(header);
+        GameFx.enter(column);
 
         TextView progress = text(puzzle.reference + "  ·  scene " + puzzle.number, 14, false);
         column.addView(progress);
@@ -187,6 +224,10 @@ public final class StoryMosaicDialog extends Dialog {
         // Show the title at once; swap in the KJV text when the background read finishes.
         caption.setText(puzzle.title + "\n— " + puzzle.reference);
         caption.setVisibility(View.VISIBLE);
+        GameFx.enter(caption);
+        android.widget.FrameLayout burst = GameFx.starRow(getContext(), stars);
+        column.addView(burst, column.indexOfChild(caption));
+        GameFx.popStars(burst, stars);
         final Context ctx = appContext;
         final String reference = puzzle.reference;
         new Thread(() -> {
@@ -246,6 +287,7 @@ public final class StoryMosaicDialog extends Dialog {
         button.setText(label);
         button.setTextColor(Color.WHITE);
         button.setBackgroundColor(ORANGE);
+        GameFx.attachPress(button);
         return button;
     }
 
