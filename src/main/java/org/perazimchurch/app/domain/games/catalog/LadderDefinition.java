@@ -12,10 +12,6 @@ import org.perazimchurch.app.domain.games.engine.GameSession;
 public final class LadderDefinition implements GameDefinition {
 
     public static final int LEVELS = 12;
-    static final int BASE_POINTS = 10;
-    static final int COMBO_STEP = 5;
-    static final int COMBO_CAP = 5;
-    static final int HINT_COST = 3;
 
     /** Difficulty tier of a level. */
     public enum Tier { EASY, MEDIUM, HARD }
@@ -65,46 +61,7 @@ public final class LadderDefinition implements GameDefinition {
     @Override
     public GameSession createSession(int level, long seed) {
         Tier tier = tier(level);
-        final LadderOfFaith ladder = new LadderOfFaith(seed, easyRungsFor(tier), mediumRungsFor(tier));
-        return new GameSession() {
-            private int points;
-            private int combo;
-            private boolean hintShown;
-
-            @Override public int size() { return LadderOfFaith.RUNGS; }
-            @Override public int position() { return Math.min(ladder.position(), LadderOfFaith.RUNGS); }
-            @Override public boolean finished() { return ladder.finished(); }
-            @Override public int score() { return points; }
-            @Override public int lives() { return ladder.lives(); }
-
-            @Override public boolean hintAvailable() {
-                return !ladder.finished() && !ladder.answered() && ladder.peekAvailable();
-            }
-
-            @Override public String hint() {
-                if (ladder.finished() || ladder.answered()) return null;
-                if (!ladder.usePeek() && !ladder.peeked()) return null;
-                hintShown = true;
-                return ladder.current().reference;
-            }
-
-            @Override public int hintsUsed() { return hintShown ? 1 : 0; }
-
-            @Override public Outcome answer(String value) {
-                if (ladder.finished() || ladder.answered()) return Outcome.IGNORED;
-                boolean right = ladder.answer(value);
-                if (right) {
-                    int bonus = Math.min(combo, COMBO_CAP) * COMBO_STEP;
-                    points += BASE_POINTS + bonus - (hintShown ? HINT_COST : 0);
-                    combo++;
-                } else {
-                    combo = 0;
-                }
-                hintShown = false;
-                ladder.next();
-                return right ? Outcome.CORRECT : Outcome.WRONG;
-            }
-        };
+        return new LadderSession(new LadderOfFaith(seed, easyRungsFor(tier), mediumRungsFor(tier)), seed);
     }
 
     static int clamp(int level) {

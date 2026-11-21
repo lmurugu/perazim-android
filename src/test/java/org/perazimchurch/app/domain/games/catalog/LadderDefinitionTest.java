@@ -116,4 +116,23 @@ public class LadderDefinitionTest {
         assertFalse(session.hintAvailable());
         assertNull(session.hint());
     }
+
+    @Test
+    public void everyRungOffersItsAnswerAsAnOption() {
+        for (int level = 1; level <= LadderDefinition.LEVELS; level++) {
+            LadderSession session = (LadderSession) definition.createSession(level, 100L + level);
+            LadderOfFaith reference = new LadderOfFaith(100L + level,
+                    LadderDefinition.easyRungsFor(LadderDefinition.tier(level)),
+                    LadderDefinition.mediumRungsFor(LadderDefinition.tier(level)));
+            for (int rung = 0; rung < LadderOfFaith.RUNGS; rung++) {
+                assertTrue(session.options().contains(reference.current().answer));
+                assertEquals(4, session.options().size());
+                session.answer(reference.current().answer);
+                reference.answer(reference.current().answer);
+                reference.next();
+            }
+            assertTrue(session.finished());
+            assertNull(session.prompt());
+        }
+    }
 }

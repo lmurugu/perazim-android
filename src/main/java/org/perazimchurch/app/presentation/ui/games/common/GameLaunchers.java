@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.ui.games.common;
 
+import org.perazimchurch.app.presentation.ui.games.LadderScreen;
 import org.perazimchurch.app.presentation.ui.games.MemoryScreen;
 import org.perazimchurch.app.presentation.ui.games.StoryTimelineScreen;
 import org.perazimchurch.app.presentation.ui.games.WordSearchScreen;
@@ -20,5 +21,6 @@ public final class GameLaunchers {
         GameRegistry.register("story_timeline", StoryTimelineScreen::show);
         GameRegistry.register("word_search", WordSearchScreen::show);
         GameRegistry.register("memory_match", MemoryScreen::show);
+        GameRegistry.register("ladder_of_faith", LadderScreen::show);
     }
 }
