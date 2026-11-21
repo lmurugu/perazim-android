@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ import org.perazimchurch.app.ai.local.OfflineScriptureLookup;
 import org.perazimchurch.app.ai.local.OnDeviceAi;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.R;
 import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
@@ -149,7 +151,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private View buildRootLayout() {
         LinearLayout root = new LinearLayout(activity);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.parseColor("#99000000")); // Scrim
+        root.setBackgroundColor(PerazimTheme.isLight() ? Color.parseColor("#B32A0F33") : Color.parseColor("#99000000")); // Scrim
         root.setGravity(Gravity.BOTTOM);
         root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -164,7 +166,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         sheet.setPadding(dp(16), dp(12), dp(16), dp(16));
 
         LinearLayout.LayoutParams lpSheet = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.82));
+                LinearLayout.LayoutParams.MATCH_PARENT, (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.66));
         sheet.setLayoutParams(lpSheet);
 
         // Drag Handle
@@ -185,11 +187,15 @@ public class AiBreakthroughGuideDialog extends Dialog {
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(0, 0, 0, dp(10));
 
-        TextView tvIcon = new TextView(activity);
-        tvIcon.setText("🤖");
-        tvIcon.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        tvIcon.setPadding(0, 0, dp(10), 0);
-        header.addView(tvIcon);
+        ImageView logo = new ImageView(activity);
+        logo.setImageResource(R.drawable.ic_perazim_logo);
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        logo.setBackground(GlassKit.glassControl(activity, 999));
+        logo.setPadding(dp(6), dp(6), dp(6), dp(6));
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(40), dp(40));
+        lpLogo.setMargins(0, 0, dp(12), 0);
+        logo.setLayoutParams(lpLogo);
+        header.addView(logo);
 
         LinearLayout titleCol = new LinearLayout(activity);
         titleCol.setOrientation(LinearLayout.VERTICAL);
@@ -226,10 +232,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
         btnMode.setAllCaps(false);
         btnMode.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnMode.setTextColor(GlassKit.text());
+        btnMode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnMode.setBackground(GlassKit.glassControl(activity, 999));
-        btnMode.setPadding(dp(16), dp(8), dp(16), dp(8));
+        btnMode.setPadding(dp(14), dp(6), dp(14), dp(6));
         btnMode.setMinHeight(0);
         btnMode.setMinimumHeight(0);
+        LinearLayout.LayoutParams lpMode = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(34));
+        lpMode.gravity = Gravity.START;
+        lpMode.setMargins(0, 0, 0, dp(8));
+        btnMode.setLayoutParams(lpMode);
         btnMode.setOnClickListener(v -> {
             if (localRequest) { OnDeviceAi.cancel(); return; }
             if (!requestInFlight) showModeOptions();
@@ -291,9 +303,21 @@ public class AiBreakthroughGuideDialog extends Dialog {
         inputBar.addView(etInput);
 
         btnSend = new Button(activity);
-        btnSend.setText("➤ Send");
+        btnSend.setText("");
         styleOrangePill(btnSend, 13);
-        btnSend.setPadding(dp(16), dp(8), dp(16), dp(8));
+        android.graphics.drawable.GradientDrawable sendBg = new android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{GlassKit.ORANGE_TOP, GlassKit.ORANGE_BOTTOM});
+        sendBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        btnSend.setBackground(sendBg);
+        android.graphics.drawable.Drawable sendIcon = activity.getResources()
+                .getDrawable(android.R.drawable.ic_menu_send).mutate();
+        sendIcon.setTint(COLOR_WHITE);
+        btnSend.setCompoundDrawablesWithIntrinsicBounds(sendIcon, null, null, null);
+        btnSend.setContentDescription("Send");
+        btnSend.setPadding(0, 0, 0, 0);
+        LinearLayout.LayoutParams lpSend = new LinearLayout.LayoutParams(dp(44), dp(44));
+        btnSend.setLayoutParams(lpSend);
         btnSend.setOnClickListener(v -> submitQuery(etInput.getText().toString()));
         inputBar.addView(btnSend);
 
