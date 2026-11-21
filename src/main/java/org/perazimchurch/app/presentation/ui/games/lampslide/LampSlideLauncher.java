@@ -98,8 +98,8 @@ public final class LampSlideLauncher {
             LampSlideScene scene = definition.sceneFor(selected);
             int size = LampSlideLevels.boardSize(selected);
             ImageView image = new ImageView(activity);
-            int resource = LampSlideScenes.imageResource(activity, scene.image());
-            if (resource != 0) image.setImageResource(resource);
+            android.graphics.Bitmap painting = LampSlideScenes.loadImage(activity, scene.image(), null);
+            if (painting != null) image.setImageBitmap(painting);
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             page.addView(image, new LinearLayout.LayoutParams(-1, dp(220)));
             text("Level " + selected + " · " + scene.reference(), 16, true);

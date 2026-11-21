@@ -1,6 +1,8 @@
 package org.perazimchurch.app.presentation.ui.games.lampslide;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,9 +64,16 @@ public final class LampSlideScenes {
         return out;
     }
 
-    /** Drawable id for a scene image name, or 0 when the art is not in the build yet. */
-    public static int imageResource(Context context, String name) {
-        return context.getResources().getIdentifier(name, "drawable", context.getPackageName());
+    /**
+     * Decodes a scene painting from assets/games/lamp/&lt;name&gt;.webp.
+     * Returns null when the file is missing, so the board shows a plain background instead.
+     */
+    public static Bitmap loadImage(Context context, String name, BitmapFactory.Options options) {
+        try (InputStream in = context.getAssets().open("games/lamp/" + name + ".webp")) {
+            return BitmapFactory.decodeStream(in, null, options);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     private static String read(InputStream in) throws IOException {

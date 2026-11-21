@@ -130,13 +130,11 @@ public final class LampSlideScreen {
         return page;
     }
 
-    /** Decodes the scene picture once. The art is a drawable name, so a missing file gives a blank board. */
+    /** Decodes the scene picture once from assets. A missing file gives a plain board. */
     private static Bitmap decode(Context context, LampSlideScene scene) {
-        int resource = LampSlideScenes.imageResource(context, scene.image());
-        if (resource == 0) return null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.RGB_565;
-        return BitmapFactory.decodeResource(context.getResources(), resource, options);
+        return LampSlideScenes.loadImage(context, scene.image(), options);
     }
 
     private static Button smallButton(Context context, String label, View.OnClickListener action) {

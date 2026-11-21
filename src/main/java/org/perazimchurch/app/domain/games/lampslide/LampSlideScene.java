@@ -11,7 +11,7 @@ public final class LampSlideScene {
 
     /**
      * @param id        stable key, for example "psalm_23_1"
-     * @param image     drawable name of the picture, for example "game_art_quiz"
+     * @param image     file name of the painting in assets/games/lamp, for example "lamp_psalm_23_1"
      * @param reference Bible reference, for example "Psalm 23:1"
      * @param verse     the KJV text of that reference
      * @param prayer    one short line from the prayer card, may be empty
