@@ -46,8 +46,7 @@ public final class GameCatalog {
         games.add(new TestamentDefinition(R.drawable.game_art_old_or_new));
         games.add(new WhoSaidItDefinition(R.drawable.game_art_who_said_it));
         games.add(new FillTheGapDefinition(R.drawable.game_art_verse_builder));
-        // Placeholder icon until the art thread delivers game_lamp_slide.png.
-        games.add(new LampSlideDefinition(R.drawable.ic_game_puzzle, LampSlideScenes::bundled));
+        games.add(new LampSlideDefinition(R.drawable.game_lamp_slide, LampSlideScenes::bundled));
         return games;
     }
 }
