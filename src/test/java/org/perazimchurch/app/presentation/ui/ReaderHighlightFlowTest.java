@@ -2,6 +2,8 @@ package org.perazimchurch.app.presentation.ui;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.os.SystemClock;
@@ -22,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.data.repository.RoomBibleRepository;
 import org.perazimchurch.app.domain.model.BibleVerse;
+import org.perazimchurch.app.domain.model.WordHighlight;
 import org.perazimchurch.app.presentation.viewmodel.BibleViewModel;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
@@ -173,5 +176,98 @@ public class ReaderHighlightFlowTest {
         up.recycle();
 
         assertNotNull("one tap on the verse text must open the verse bar", field(dialog, "actionBarView"));
+    }
+
+    private BibleVerse verseFour() throws Exception {
+        dialog.show();
+        BibleVerse verse = new BibleVerse();
+        verse.setBookId("2SA");
+        verse.setChapterNumber(5);
+        verse.setVerseNumber(4);
+        verse.setTranslationId("KJV");
+        verse.setText("David was thirty years old when he began to reign.");
+        @SuppressWarnings("unchecked")
+        List<BibleVerse> current = (List<BibleVerse>) field(dialog, "currentVerses");
+        current.clear();
+        current.add(verse);
+        return verse;
+    }
+
+    /** Clear in the verse bar removes the stored highlight of the open verse. */
+    @Test
+    public void clearInTheVerseBarRemovesTheStoredVerseHighlight() throws Exception {
+        BibleVerse verse = verseFour();
+        repository.setHighlight("2SA", 5, 4, "bold-green");
+        verse.setHighlightColor("bold-green");
+        assertEquals("bold-green", repository.getHighlightsForChapter("2SA", 5).get(4));
+
+        call(dialog, "onVerseTapped", new Class<?>[]{BibleVerse.class}, verse);
+        View bar = (View) field(dialog, "actionBarView");
+        assertNotNull(bar);
+        View droplet = findByDescription(bar, "Highlight colours");
+        assertNotNull("the colour group must be reachable", droplet);
+        droplet.performClick();
+        View clear = findByDescription(bar, "Clear highlight");
+        assertNotNull("the picker must have a Clear control", clear);
+        clear.performClick();
+
+        assertNull("the stored highlight must be gone", repository.getHighlightsForChapter("2SA", 5).get(4));
+        assertNull(verse.getHighlightColor());
+    }
+
+    /** Clear in the word card removes the stored range under the chosen words and leaves the verse alone. */
+    @Test
+    public void clearInTheWordCardRemovesTheStoredRange() throws Exception {
+        BibleVerse verse = verseFour();
+        int book = org.perazimchurch.app.data.mapper.BibleMapper.resolveBookNumber("2SA");
+        repository.setHighlight("2SA", 5, 4, "bold-green");
+        repository.addWordHighlight("KJV", "2SA", 5, 4, 0, 5, "red");
+        List<WordHighlight> ranges = new ArrayList<>();
+        ranges.add(new WordHighlight(0, 5, "red"));
+        verse.setWordHighlights(ranges);
+        assertEquals(1, database.bibleDao().getWordHighlightsForChapter("KJV", book, 5).size());
+
+        call(dialog, "pickWordColour", new Class<?>[]{BibleVerse.class, int.class, int.class}, verse, 0, 5);
+        android.app.Dialog card = (android.app.Dialog) field(dialog, "wordColourDialog");
+        assertNotNull(card);
+        View clear = findByDescription(card.getWindow().getDecorView(), "Clear highlight");
+        assertNotNull("the word card must have a Clear control", clear);
+        clear.performClick();
+
+        assertTrue("the stored range must be gone", database.bibleDao().getWordHighlightsForChapter("KJV", book, 5).isEmpty());
+        assertTrue(verse.getWordHighlights().isEmpty());
+        assertEquals("the whole-verse highlight is untouched", "bold-green",
+                repository.getHighlightsForChapter("2SA", 5).get(4));
+    }
+
+    /** Clear in the select panel removes the highlight of every chosen verse. */
+    @Test
+    public void clearInTheSelectPanelRemovesTheChosenVerses() throws Exception {
+        BibleVerse verse = verseFour();
+        repository.setHighlight("2SA", 5, 4, "red");
+        verse.setHighlightColor("red");
+
+        call(dialog, "enterSelectMode", new Class<?>[]{BibleVerse.class}, verse);
+        View panel = (View) field(dialog, "notesPanelView");
+        assertNotNull(panel);
+        View clear = findByDescription(panel, "Clear highlight");
+        assertNotNull("the select panel must have a Clear control", clear);
+        clear.performClick();
+
+        assertNull(repository.getHighlightsForChapter("2SA", 5).get(4));
+        assertNull(verse.getHighlightColor());
+    }
+
+    /** Clear in the swipe panel turns swiping into an eraser. */
+    @Test
+    public void clearInTheSwipePanelSwitchesSwipingToErase() throws Exception {
+        verseFour();
+        call(dialog, "openSwipeColourPanel", new Class<?>[]{});
+        View panel = (View) field(dialog, "notesPanelView");
+        View clear = findByDescription(panel, "Clear highlight");
+        assertNotNull(clear);
+        clear.performClick();
+
+        assertTrue((Boolean) field(dialog, "swipeErase"));
     }
 }
