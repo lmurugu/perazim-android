@@ -32,6 +32,7 @@ final class LetterWheelView extends View {
     private final Paint disc = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint trail = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint glowTrail = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final List<Character> letters = new ArrayList<>();
     private final List<Integer> path = new ArrayList<>();
     private float[] cx = new float[0];
@@ -48,6 +49,10 @@ final class LetterWheelView extends View {
         trail.setStrokeWidth(dp(6));
         trail.setStrokeCap(Paint.Cap.ROUND);
         trail.setColor(PerazimTheme.COLOR_ORANGE_SOFT);
+        glowTrail.setStyle(Paint.Style.STROKE);
+        glowTrail.setStrokeWidth(dp(16));
+        glowTrail.setStrokeCap(Paint.Cap.ROUND);
+        glowTrail.setColor(PerazimTheme.COLOR_ORANGE_SOFT);
         text.setTextAlign(Paint.Align.CENTER);
         text.setTypeface(Typeface.DEFAULT_BOLD);
         setContentDescription("Letter wheel. Drag across letters to spell a word.");
@@ -114,10 +119,20 @@ final class LetterWheelView extends View {
             ring.setAlpha((int) (200 * pulse));
             canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, ringRadius, ring);
         }
+        // Glowing trail: a wide soft stroke under the solid line, with a bright tip at the finger.
         for (int i = 1; i < path.size(); i++) {
             int a = path.get(i - 1);
             int b = path.get(i);
+            glowTrail.setAlpha(90);
+            canvas.drawLine(cx[a], cy[a], cx[b], cy[b], glowTrail);
             canvas.drawLine(cx[a], cy[a], cx[b], cy[b], trail);
+        }
+        if (!path.isEmpty()) {
+            int tip = path.get(path.size() - 1);
+            glowTrail.setStyle(Paint.Style.FILL);
+            glowTrail.setAlpha(140);
+            canvas.drawCircle(cx[tip], cy[tip], discPx * 0.42f, glowTrail);
+            glowTrail.setStyle(Paint.Style.STROKE);
         }
         for (int i = 0; i < n; i++) {
             boolean picked = path.contains(i);

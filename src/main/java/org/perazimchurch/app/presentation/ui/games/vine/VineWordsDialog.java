@@ -27,6 +27,7 @@ import org.perazimchurch.app.domain.games.vine.VineWordsLevels;
 import org.perazimchurch.app.domain.games.vine.VineWordsSession;
 import org.perazimchurch.app.presentation.ui.games.GamesHubDialog;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -126,6 +127,13 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         page.addView(card, new LinearLayout.LayoutParams(-1, -2));
         text("LEVEL " + highlight + " OF " + levels.size(), 12, true);
         LevelProgression progression = new LevelProgression(new Store());
+        String seenKey = scorePrefix + GAME_ID + ".seenUnlock";
+        int seen = scores.getInt(seenKey, 1);
+        if (unlocked > seen) {
+            // Shimmer the level that was just unlocked, then remember it as seen.
+            newlyUnlocked = unlocked;
+            scores.edit().putInt(seenKey, unlocked).apply();
+        }
         LinearLayout row = null;
         for (int number = 1; number <= levels.size(); number++) {
             if ((number - 1) % 5 == 0) {
@@ -133,10 +141,13 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
                 row.setOrientation(LinearLayout.HORIZONTAL);
                 page.addView(row, new LinearLayout.LayoutParams(-1, -2));
             }
-            row.addView(levelTile(number, number <= unlocked, progression.bestStars(scorePrefix + GAME_ID, number), number == highlight),
-                    new LinearLayout.LayoutParams(0, -2, 1f));
+            TextView tile = levelTile(number, number <= unlocked, progression.bestStars(scorePrefix + GAME_ID, number), number == highlight);
+            row.addView(tile, new LinearLayout.LayoutParams(0, -2, 1f));
+            if (number == newlyUnlocked) tile.post(() -> GameFx.shimmer(tile));
         }
     }
+
+    private int newlyUnlocked = -1;
 
     private TextView levelTile(int number, boolean open, int stars, boolean current) {
         TextView tile = new TextView(activity);
@@ -155,7 +166,10 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(60), 1f);
         params.setMargins(dp(3), dp(3), dp(3), dp(3));
         tile.setLayoutParams(params);
-        if (open) tile.setOnClickListener(v -> { click(v); startLevel(number); });
+        if (open) {
+            tile.setOnClickListener(v -> { click(v); startLevel(number); });
+            GameFx.attachPress(tile);
+        }
         return tile;
     }
 
@@ -186,6 +200,7 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         LinearLayout row = new LinearLayout(activity);
         row.setOrientation(LinearLayout.HORIZONTAL);
         Button hint = button("Hint", false);
+        GameFx.attachPress(hint);
         hint.setOnClickListener(v -> {
             click(v);
             String text = session.hint();
@@ -194,6 +209,7 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
             board.invalidate();
         });
         Button shuffle = button("Shuffle", false);
+        GameFx.attachPress(shuffle);
         shuffle.setOnClickListener(v -> {
             click(v);
             shuffleSeed = System.nanoTime();
@@ -210,25 +226,29 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         if (session == null || session.finished()) return;
         GameSession.Outcome outcome = session.answer(word);
         if (outcome == GameSession.Outcome.CORRECT) {
-            feedback().gameCue(FeedbackManager.GameCue.MATCH);
             boolean bonus = word.equals(level.bonus());
             message.setText(bonus ? "Bonus word: " + word + ". One extra point." : "Found " + word + ".");
-            if (!bonus) {
-                board.glowWord(word);
+            if (bonus) {
+                GameFx.correct(message);
+            } else {
+                GameFx.correct(board);
+                board.flyWord(word);
                 wheel.pulseRing();
             }
+        } else if (word.length() >= 2) {
+            message.setText("Not a word in this puzzle. Try another swipe.");
+            GameFx.wrong(wheel);
         } else {
-            message.setText(word.length() < 2 ? " " : "Not a word in this puzzle. Try another swipe.");
+            message.setText(" ");
         }
         updateStatus();
-        board.invalidate();
         if (session.finished()) {
             feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
             feedback().celebrateIn(getWindow());
             int finished = levelNumber;
             Runnable next = finished < VineWordsLevels.LEVEL_COUNT ? () -> startLevel(finished + 1) : null;
-            chrome().finishedRun(DEFINITION, "Vine Words", session, levelNumber,
-                    () -> startLevel(finished), next);
+            board.burst(() -> chrome().finishedRun(DEFINITION, "Vine Words", session, finished,
+                    () -> startLevel(finished), next));
         }
     }
 
@@ -249,6 +269,7 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
     @Override public void screen(String title, String subtitle) {
         ScrollView scroll = new ScrollView(activity);
         scroll.setFillViewport(true);
+        GameFx.enter(scroll);
         scroll.setBackground(PerazimTheme.createBackgroundGradient());
         page = new LinearLayout(activity);
         page.setOrientation(LinearLayout.VERTICAL);
