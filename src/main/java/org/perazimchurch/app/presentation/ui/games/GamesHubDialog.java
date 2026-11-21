@@ -275,9 +275,7 @@ public final class GamesHubDialog extends Dialog {
         gameCard(org.perazimchurch.app.R.drawable.game_art_timeline, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
                 "Tap the Bible events in the order they happen in the story.",
                 solvedLine("TIMELINE"), this::timeline);
-        gameCard(org.perazimchurch.app.R.drawable.game_art_mini_crossword, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Mini Crossword",
-                "A five-by-five Bible crossword. Four clues cross: Moses, Abel, manna and Saul.",
-                solvedLine("CROSSWORD"), this::miniCrossword);
+        // Mini Crossword is replaced by Vine Words (catalog card). Its code stays in place.
         gameCard(org.perazimchurch.app.R.drawable.ic_game_road, explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
                 "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
                 solvedLine("ROAD"), this::roadToJerusalem);

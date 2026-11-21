@@ -132,6 +132,11 @@ public final class VineWordsSession implements GameSession {
         return level.grid().letterAt(row, col);
     }
 
+    /** True when a hint has revealed this cell's letter. */
+    public boolean hintedCell(int row, int col) {
+        return revealed[row][col] != 0;
+    }
+
     /** True when a cell belongs to a placed word. */
     public boolean isLetterCell(int row, int col) {
         return level.grid().isLetterCell(row, col);
