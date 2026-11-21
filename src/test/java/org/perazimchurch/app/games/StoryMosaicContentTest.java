@@ -6,6 +6,10 @@ import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.domain.games.mosaic.MosaicPuzzles;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -95,5 +99,27 @@ public class StoryMosaicContentTest {
         }
         assertTrue(session.finished());
         assertEquals(session.size(), session.score());
+    }
+
+    /** Scene files the app loads must sit under src/main/assets, where Android packages them. */
+    @Test public void presentSceneFilesAreWebpUnderMainAssets() throws IOException {
+        File dir = new File("src/main/assets/games/story");
+        int present = 0;
+        for (StoryChapterBank.Chapter c : StoryChapterBank.CHAPTERS) {
+            File file = new File(dir, MosaicPuzzles.assetName(c.id));
+            if (!file.exists()) continue;
+            present++;
+            byte[] head = new byte[12];
+            try (InputStream in = Files.newInputStream(file.toPath())) {
+                assertEquals(12, in.read(head));
+            }
+            assertEquals("RIFF", new String(head, 0, 4, "US-ASCII"));
+            assertEquals("WEBP", new String(head, 8, 4, "US-ASCII"));
+        }
+        assertTrue("at least the first ten scenes are present", present >= 10);
+    }
+
+    @Test public void iconIsPackagedAsDrawable() {
+        assertTrue(new File("src/main/res/drawable-nodpi/game_story_mosaic.webp").exists());
     }
 }
