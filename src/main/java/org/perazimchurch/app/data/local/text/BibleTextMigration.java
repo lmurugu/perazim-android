@@ -100,30 +100,30 @@ public final class BibleTextMigration {
     }
 
     /** Copies one translation book by book; returns true only when the text database holds every row. */
-    private static boolean copyFromPrivate(BibleDao dao, BibleTextDao textDao, String translationId) {
-        int expected = dao.countVerses(translationId);
+    private static boolean copyFromPrivate(BibleDao dao, BibleTextDao textDao, String translationCode) {
+        int expected = dao.countVerses(translationCode);
         if (expected == 0) {
             return false;
         }
-        textDao.deleteTranslation(translationId);
+        textDao.deleteTranslation(translationCode);
         for (int book = 1; book <= 66; book++) {
-            List<BibleVerseEntity> rows = dao.getVersesForBook(translationId, book);
+            List<BibleVerseEntity> rows = dao.getVersesForBook(translationCode, book);
             if (rows == null || rows.isEmpty()) {
                 continue;
             }
             List<BibleTextVerseEntity> batch = new ArrayList<>(rows.size());
             for (BibleVerseEntity row : rows) {
                 if (row.getText() != null) {
-                    batch.add(new BibleTextVerseEntity(translationId, row.getBookNumber(), row.getChapterNumber(),
+                    batch.add(new BibleTextVerseEntity(translationCode, row.getBookNumber(), row.getChapterNumber(),
                             row.getVerseNumber(), row.getText()));
                 }
             }
             textDao.insertAll(batch);
         }
         // Rows with the same position in the private database collapse into one here, so compare to distinct positions.
-        int copied = textDao.count(translationId);
+        int copied = textDao.count(translationCode);
         boolean complete = copied > 0 && copied <= expected && copied >= expected - duplicateAllowance(expected);
-        Log.i(TAG, "Copied " + translationId + ": " + copied + " of " + expected + " rows, complete=" + complete);
+        Log.i(TAG, "Copied " + translationCode + ": " + copied + " of " + expected + " rows, complete=" + complete);
         return complete;
     }
 

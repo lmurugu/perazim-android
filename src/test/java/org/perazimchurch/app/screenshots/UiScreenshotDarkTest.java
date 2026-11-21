@@ -15,6 +15,12 @@ public class UiScreenshotDarkTest {
     @Test
     public void captureTabs() throws Exception {
         Assume.assumeTrue(UiScreenshotSupport.enabled());
-        UiScreenshotSupport.captureAllTabs(false);
+        try {
+            UiScreenshotSupport.captureAllTabs(false);
+        } catch (Throwable failure) {
+            // Print the full trace: Gradle trims frames inside test failures, and the CI log needs the origin.
+            failure.printStackTrace(System.out);
+            throw failure;
+        }
     }
 }
