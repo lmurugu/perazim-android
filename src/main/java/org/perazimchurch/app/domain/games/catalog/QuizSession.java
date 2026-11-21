@@ -54,4 +54,10 @@ public final class QuizSession extends AdvancingSession {
     public String prompt() {
         return round.finished() ? null : round.current().prompt;
     }
+
+    @Override
+    protected String hintText() {
+        if (round.finished() || round.current().hint.isEmpty()) return null;
+        return "Hint: " + round.current().hint;
+    }
 }

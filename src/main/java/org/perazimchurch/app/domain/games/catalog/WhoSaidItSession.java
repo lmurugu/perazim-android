@@ -41,4 +41,9 @@ public final class WhoSaidItSession extends AdvancingSession {
     public String prompt() {
         return game.finished() ? null : "“" + game.current().quote + "”";
     }
+
+    @Override
+    protected String hintText() {
+        return null;
+    }
 }

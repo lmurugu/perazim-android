@@ -38,4 +38,9 @@ public final class TestamentSession extends AdvancingSession {
     public String prompt() {
         return game.finished() ? null : "Which testament is " + game.current().name + " in?";
     }
+
+    @Override
+    protected String hintText() {
+        return null;
+    }
 }

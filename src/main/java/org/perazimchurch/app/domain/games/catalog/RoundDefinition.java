@@ -2,6 +2,8 @@ package org.perazimchurch.app.domain.games.catalog;
 
 import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
+import org.perazimchurch.app.domain.games.engine.StarRating;
+import org.perazimchurch.app.domain.games.engine.StarRule;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 
 /** Adapter for the Bible Quiz and Verse Builder rounds in {@link BibleGames}. */
@@ -24,8 +26,13 @@ public final class RoundDefinition implements GameDefinition {
     @Override public String title() { return title; }
     @Override public String description() { return description; }
     @Override public int iconResource() { return iconResource; }
-    @Override public int levelCount() { return 1; }
+    @Override public int levelCount() { return Levels.COUNT; }
     @Override public String levelName(int level) { return "Level " + level; }
+
+    @Override
+    public StarRule starRule() {
+        return HintRules.capped(session -> StarRating.stars(session.score(), session.size(), session.lives()));
+    }
 
     @Override
     public GameSession createSession(int level, long seed) {
@@ -33,6 +40,7 @@ public final class RoundDefinition implements GameDefinition {
         if (mode == BibleGames.Mode.QUIZ) return new QuizSession(round, seed);
         if (mode == BibleGames.Mode.VERSE_ORDER) return new VerseBuilderSession(round, seed);
         return new AdvancingSession() {
+            @Override protected String hintText() { return null; }
             @Override protected boolean hasQuestion() { return !round.finished(); }
             @Override protected boolean submit(String value) {
                 boolean right = round.answer(value);

@@ -9,6 +9,8 @@ import org.perazimchurch.app.domain.games.engine.GameSession;
 abstract class AdvancingSession implements GameSession {
 
     private final Streak streak = new Streak();
+    private int hintCount;
+    private boolean hintedThisQuestion;
 
     /** The right-answer streak for this run. */
     public final Streak streak() {
@@ -26,6 +28,7 @@ abstract class AdvancingSession implements GameSession {
         if (!hasQuestion()) return Outcome.IGNORED;
         boolean right = submit(value);
         streak.record(right);
+        hintedThisQuestion = false;
         return right ? Outcome.CORRECT : Outcome.WRONG;
     }
 
@@ -34,13 +37,25 @@ abstract class AdvancingSession implements GameSession {
         return NO_LIVES;
     }
 
+    /** The hint for the current question, or null when it has none. */
+    protected abstract String hintText();
+
     @Override
     public final boolean hintAvailable() {
-        return false;
+        return hasQuestion() && !hintedThisQuestion && hintCount < HintRules.HINTS_PER_RUN
+                && hintText() != null;
     }
 
     @Override
     public final String hint() {
-        return null;
+        if (!hintAvailable()) return null;
+        hintedThisQuestion = true;
+        hintCount++;
+        return hintText();
+    }
+
+    @Override
+    public final int hintsUsed() {
+        return hintCount;
     }
 }

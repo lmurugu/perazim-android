@@ -50,4 +50,10 @@ public final class VerseBuilderSession extends AdvancingSession {
     public String prompt() {
         return round.finished() ? null : "Put the words of the verse in order";
     }
+
+    @Override
+    protected String hintText() {
+        if (round.finished()) return null;
+        return "Hint: the verse begins with \u201c" + round.current().words().get(0) + "\u201d.";
+    }
 }

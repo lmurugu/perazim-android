@@ -44,4 +44,9 @@ public final class FillTheGapSession extends AdvancingSession {
     public String prompt() {
         return game.finished() ? null : game.current().before + "_____" + game.current().after;
     }
+
+    @Override
+    protected String hintText() {
+        return null;
+    }
 }
