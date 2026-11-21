@@ -162,6 +162,16 @@ public class LampSlidePuzzleTest {
         assertEquals(1, LampSlidePuzzle.stars(5, 20, 5));
     }
 
+    @Test
+    public void inPlaceCountsTilesOnTheirSquareOnly() {
+        LampSlidePuzzle solved = LampSlidePuzzle.ofBoard(3, LampSlidePuzzle.solvedTiles(3), 1);
+        assertEquals(8, solved.inPlace());
+        LampSlidePuzzle puzzle = LampSlidePuzzle.ofBoard(3, new int[] {1, 2, 3, 4, 5, 6, 7, 0, 8}, 1);
+        assertEquals(7, puzzle.inPlace());
+        assertTrue(puzzle.tap(8));
+        assertEquals(8, puzzle.inPlace());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void sizeOutsideRangeIsRejected() {
         LampSlidePuzzle.scrambled(6, 1);

@@ -181,6 +181,15 @@ public final class LampSlidePuzzle {
 
     public boolean solved() { return isSolvedArray(tiles); }
 
+    /** Number of tiles that sit on their own square. The gap is not counted. */
+    public int inPlace() {
+        int count = 0;
+        for (int i = 0; i < tiles.length; i++) {
+            if (tiles[i] != 0 && tiles[i] == i + 1) count++;
+        }
+        return count;
+    }
+
     /** True when the tile at this index is next to the gap, so it can slide in. */
     public boolean canTap(int index) {
         if (index < 0 || index >= tiles.length || index == gap) return false;

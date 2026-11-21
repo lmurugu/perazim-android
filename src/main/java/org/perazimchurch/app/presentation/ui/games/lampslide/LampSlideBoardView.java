@@ -12,7 +12,7 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import org.perazimchurch.app.domain.games.lampslide.LampSlidePuzzle;
 
@@ -93,7 +93,7 @@ public final class LampSlideBoardView extends View {
         slideTo = to;
         slideAnimator = ValueAnimator.ofFloat(0f, 1f);
         slideAnimator.setDuration(SLIDE_MS);
-        slideAnimator.setInterpolator(new DecelerateInterpolator());
+        slideAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         slideAnimator.addUpdateListener(a -> {
             slideProgress = (float) a.getAnimatedValue();
             invalidate();

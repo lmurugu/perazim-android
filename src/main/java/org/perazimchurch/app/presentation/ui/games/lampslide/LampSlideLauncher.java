@@ -24,6 +24,7 @@ import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideSession;
 import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
+import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -67,6 +68,7 @@ public final class LampSlideLauncher {
         private LinearLayout page;
         private int selected;
         private long seed;
+        private boolean pickerShown;
 
         Run(GameContext ctx, GameDefinition game) {
             this.ctx = ctx;
@@ -103,16 +105,21 @@ public final class LampSlideLauncher {
             text("Level " + selected + " · " + scene.reference(), 16, true);
             text(size + " × " + size + " board · par " + LampSlidePuzzle.walkLength(size) + " moves", 13, false);
             text("“" + scene.verse() + "”", 14, false);
-            band("3 × 3 board", 1, 10, unlocked);
-            band("4 × 4 board", 11, 25, unlocked);
-            band("5 × 5 board", 26, 40, unlocked);
+            boolean first = !pickerShown;
+            pickerShown = true;
+            band("3 × 3 board", 1, 10, unlocked, first);
+            band("4 × 4 board", 11, 25, unlocked, first);
+            band("5 × 5 board", 26, 40, unlocked, first);
             Button start = button("Start level " + selected, true);
             start.setOnClickListener(v -> start(selected, System.nanoTime()));
+            GameFx.attachPress(start);
             Button close = button("Close", false);
             close.setOnClickListener(v -> dialog.dismiss());
+            GameFx.attachPress(close);
+            if (first) GameFx.enter(page);
         }
 
-        private void band(String heading, int from, int to, int unlocked) {
+        private void band(String heading, int from, int to, int unlocked, boolean first) {
             text(heading.toUpperCase(java.util.Locale.ROOT), 12, true);
             GridLayout grid = new GridLayout(activity);
             grid.setColumnCount(5);
@@ -127,6 +134,11 @@ public final class LampSlideLauncher {
                     selected = value;
                     showPicker();
                 });
+                GameFx.attachPress(cell);
+                // The newest unlocked level sweeps a light shimmer once, when the picker opens.
+                if (first && open && level == unlocked && unlocked > 1) {
+                    cell.post(() -> GameFx.shimmer(cell));
+                }
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
                 params.width = 0;
                 params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);

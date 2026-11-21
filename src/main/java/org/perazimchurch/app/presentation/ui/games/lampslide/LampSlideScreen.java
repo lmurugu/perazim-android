@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideSession;
 
@@ -75,6 +76,7 @@ public final class LampSlideScreen {
             refresh.run();
             if (session.finished()) {
                 board.celebrate();
+                GameFx.pulse(board, 0x88FFB74D);
                 LampSlideScene scene = session.scene();
                 banner.setText("“" + scene.verse() + "”\n— " + scene.reference()
                         + (scene.prayer().isEmpty() ? "" : "\n\n" + scene.prayer()));
@@ -85,8 +87,10 @@ public final class LampSlideScreen {
 
         board.setListener(index -> {
             int gapBefore = session.puzzle().gapIndex();
+            int inPlaceBefore = session.puzzle().inPlace();
             if (session.tapTile(index) == GameSession.Outcome.IGNORED) return;
             board.animateSlide(index, gapBefore);
+            if (session.puzzle().inPlace() > inPlaceBefore) GameFx.correct(board);
             afterMove[0].run();
         });
 
@@ -115,8 +119,10 @@ public final class LampSlideScreen {
         }));
 
         next.setOnClickListener(v -> onNext.run());
+        GameFx.attachPress(next);
         Button back = button(context, "Back to games");
         back.setOnClickListener(v -> onBack.run());
+        GameFx.attachPress(back);
         page.addView(back);
         return page;
     }
@@ -136,6 +142,7 @@ public final class LampSlideScreen {
         params.setMargins(dp(context, 4), 0, dp(context, 4), 0);
         button.setLayoutParams(params);
         button.setOnClickListener(action);
+        GameFx.attachPress(button);
         return button;
     }
 
