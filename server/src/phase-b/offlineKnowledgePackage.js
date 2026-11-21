@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto');
 const { KnowledgeError } = require('./governedKnowledge');
+const { CHURCH_APPROVED, approverPublicKeys, verifyApprovalSignature } = require('./sourceApprovalSignature');
 
 const FORMAT = 'perazim-knowledge-v1';
 const ROLLBACK_FORMAT = 'perazim-knowledge-rollback-v1';
@@ -20,7 +21,7 @@ function canonical(value) {
 }
 
 function createOfflinePackage({ packageId, version, publishedAt, expiresAt,
-  minimumAppVersion, signingKeyId, privateKey, sources, allowEmptySnapshot = false }) {
+  minimumAppVersion, signingKeyId, privateKey, sources, allowEmptySnapshot = false, approverKeys = approverPublicKeys() }) {
   if (!packageId || !version || !Number.isSafeInteger(publishedAt) || !minimumAppVersion ||
       !signingKeyId || !privateKey || !Array.isArray(sources) ||
       (!sources.length && allowEmptySnapshot !== true)) {
@@ -36,6 +37,7 @@ function createOfflinePackage({ packageId, version, publishedAt, expiresAt,
         !source.approval_reference || !Number.isSafeInteger(Number(source.approved_at)) || Number(source.approved_at) <= 0 ||
         ['source_id', 'version', 'title', 'authority_class', 'location', 'language', 'text']
           .some(field => typeof source[field] !== 'string' || !source[field].trim()) ||
+        (source.authority_class === 'APPROVED_OFFICIAL' && typeof source.approval_signature !== 'string') ||
         !/^[a-f0-9]{64}$/.test(source.content_hash) ||
         crypto.createHash('sha256').update(source.text, 'utf8').digest('hex') !== source.content_hash) {
       throw new KnowledgeError('SOURCE_NOT_ELIGIBLE', 'Every package source must be approved, public, intact, and authorized for offline use.');
@@ -59,7 +61,7 @@ function createOfflinePackage({ packageId, version, publishedAt, expiresAt,
   // document fields. Category mapping follows the device's SourceGovernance categories.
   const governance = sources.map((source, index) => {
     const document = documents[index];
-    return {
+    const entry = {
       id: document.sourceId,
       version: document.version,
       category: GOVERNANCE_CATEGORY[document.authorityClass] || 'UNAPPROVED',
@@ -68,6 +70,14 @@ function createOfflinePackage({ packageId, version, publishedAt, expiresAt,
       scope: 'OFFLINE:' + source.permitted_uses.join(','),
       sha256: document.contentHash
     };
+    if (entry.category === CHURCH_APPROVED) {
+      // The package is refused unless the approver's signature verifies over exactly the entry being packaged.
+      entry.approvalSignature = source.approval_signature;
+      if (!verifyApprovalSignature(entry, approverKeys)) {
+        throw new KnowledgeError('SOURCE_NOT_ELIGIBLE', 'Approved source lacks a valid approver signature.');
+      }
+    }
+    return entry;
   });
   const payload = { format: FORMAT, packageId, version, publishedAt, issuedAt: publishedAt,
     expiresAt, issuer: 'Perazim AI knowledge service', minimumAppVersion,
