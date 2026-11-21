@@ -23,17 +23,6 @@ public final class WhoSaidItDefinition implements GameDefinition {
 
     @Override
     public GameSession createSession(int level, long seed) {
-        final WhoSaidIt game = new WhoSaidIt(seed);
-        return new AdvancingSession() {
-            @Override protected boolean hasQuestion() { return !game.finished(); }
-            @Override protected boolean submit(String value) { return game.answer(value); }
-            @Override public int size() { return game.size(); }
-            @Override public String prompt() {
-                return game.finished() ? null : "Who said: \"" + game.current().quote + "\"";
-            }
-            @Override public int position() { return game.position(); }
-            @Override public boolean finished() { return game.finished(); }
-            @Override public int score() { return game.score(); }
-        };
+        return new WhoSaidItSession(new WhoSaidIt(seed));
     }
 }
