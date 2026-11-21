@@ -1,0 +1,2124 @@
+{
+ "version": 1,
+ "items": [
+  {
+   "id": "gap_genesis_1_1",
+   "reference": "Genesis 1:1",
+   "text": "In the beginning God created the heaven and the earth.",
+   "gapIndex": 4,
+   "answer": "created",
+   "choices": [
+    "created",
+    "made",
+    "formed",
+    "built"
+   ]
+  },
+  {
+   "id": "gap_john_3_16",
+   "reference": "John 3:16",
+   "text": "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
+   "gapIndex": 3,
+   "answer": "loved",
+   "choices": [
+    "loved",
+    "saw",
+    "blessed",
+    "made"
+   ]
+  },
+  {
+   "id": "gap_proverbs_3_5",
+   "reference": "Proverbs 3:5",
+   "text": "Trust in the LORD with all thine heart; and lean not unto thine own understanding.",
+   "gapIndex": 14,
+   "answer": "understanding",
+   "choices": [
+    "understanding",
+    "wisdom",
+    "strength",
+    "knowledge"
+   ]
+  },
+  {
+   "id": "gap_philippians_4_13",
+   "reference": "Philippians 4:13",
+   "text": "I can do all things through Christ which strengtheneth me.",
+   "gapIndex": 8,
+   "answer": "strengtheneth",
+   "choices": [
+    "strengtheneth",
+    "helpeth",
+    "guideth",
+    "comforteth"
+   ]
+  },
+  {
+   "id": "gap_psalms_27_1",
+   "reference": "Psalms 27:1",
+   "text": "The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?",
+   "gapIndex": 11,
+   "answer": "fear",
+   "choices": [
+    "fear",
+    "trust",
+    "seek",
+    "follow"
+   ]
+  },
+  {
+   "id": "gap_joshua_1_9",
+   "reference": "Joshua 1:9",
+   "text": "Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.",
+   "gapIndex": 11,
+   "answer": "courage",
+   "choices": [
+    "courage",
+    "faith",
+    "hope",
+    "joy"
+   ]
+  },
+  {
+   "id": "gap_psalms_119_105",
+   "reference": "Psalms 119:105",
+   "text": "Thy word is a lamp unto my feet, and a light unto my path.",
+   "gapIndex": 4,
+   "answer": "lamp",
+   "choices": [
+    "lamp",
+    "candle",
+    "torch",
+    "star"
+   ]
+  },
+  {
+   "id": "gap_psalms_46_1",
+   "reference": "Psalms 46:1",
+   "text": "God is our refuge and strength, a very present help in trouble.",
+   "gapIndex": 3,
+   "answer": "refuge",
+   "choices": [
+    "refuge",
+    "fortress",
+    "shield",
+    "tower"
+   ]
+  },
+  {
+   "id": "gap_psalms_46_10",
+   "reference": "Psalms 46:10",
+   "text": "Be still, and know that I am God: I will be exalted among the heathen, I will be exalted in the earth.",
+   "gapIndex": 1,
+   "answer": "still",
+   "choices": [
+    "still",
+    "quiet",
+    "silent",
+    "calm"
+   ]
+  },
+  {
+   "id": "gap_isaiah_40_31",
+   "reference": "Isaiah 40:31",
+   "text": "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.",
+   "gapIndex": 8,
+   "answer": "renew",
+   "choices": [
+    "renew",
+    "restore",
+    "strengthen",
+    "gather"
+   ]
+  },
+  {
+   "id": "gap_isaiah_41_10",
+   "reference": "Isaiah 41:10",
+   "text": "Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.",
+   "gapIndex": 10,
+   "answer": "dismayed",
+   "choices": [
+    "dismayed",
+    "afraid",
+    "troubled",
+    "ashamed"
+   ]
+  },
+  {
+   "id": "gap_matthew_11_28",
+   "reference": "Matthew 11:28",
+   "text": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
+   "gapIndex": 16,
+   "answer": "rest",
+   "choices": [
+    "rest",
+    "peace",
+    "strength",
+    "hope"
+   ]
+  },
+  {
+   "id": "gap_matthew_6_33",
+   "reference": "Matthew 6:33",
+   "text": "But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.",
+   "gapIndex": 5,
+   "answer": "kingdom",
+   "choices": [
+    "kingdom",
+    "glory",
+    "love",
+    "house"
+   ]
+  },
+  {
+   "id": "gap_matthew_5_16",
+   "reference": "Matthew 5:16",
+   "text": "Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven.",
+   "gapIndex": 2,
+   "answer": "light",
+   "choices": [
+    "light",
+    "fire",
+    "lamp",
+    "sun"
+   ]
+  },
+  {
+   "id": "gap_matthew_5_9",
+   "reference": "Matthew 5:9",
+   "text": "Blessed are the peacemakers: for they shall be called the children of God.",
+   "gapIndex": 3,
+   "answer": "peacemakers",
+   "choices": [
+    "peacemakers",
+    "witnesses",
+    "servants",
+    "followers"
+   ]
+  },
+  {
+   "id": "gap_matthew_22_37",
+   "reference": "Matthew 22:37",
+   "text": "Jesus said unto him, Thou shalt love the Lord thy God with all thy heart, and with all thy soul, and with all thy mind.",
+   "gapIndex": 14,
+   "answer": "heart",
+   "choices": [
+    "heart",
+    "spirit",
+    "thoughts",
+    "feelings"
+   ]
+  },
+  {
+   "id": "gap_mark_10_27",
+   "reference": "Mark 10:27",
+   "text": "And Jesus looking upon them saith, With men it is impossible, but not with God: for with God all things are possible.",
+   "gapIndex": 21,
+   "answer": "possible",
+   "choices": [
+    "possible",
+    "easy",
+    "hard",
+    "near"
+   ]
+  },
+  {
+   "id": "gap_luke_1_37",
+   "reference": "Luke 1:37",
+   "text": "For with God nothing shall be impossible.",
+   "gapIndex": 6,
+   "answer": "impossible",
+   "choices": [
+    "impossible",
+    "difficult",
+    "hard",
+    "harder"
+   ]
+  },
+  {
+   "id": "gap_luke_6_31",
+   "reference": "Luke 6:31",
+   "text": "And as ye would that men should do to you, do ye also to them likewise.",
+   "gapIndex": 5,
+   "answer": "men",
+   "choices": [
+    "men",
+    "others",
+    "neighbours",
+    "people"
+   ]
+  },
+  {
+   "id": "gap_john_14_6",
+   "reference": "John 14:6",
+   "text": "Jesus saith unto him, I am the way, the truth, and the life: no man cometh unto the Father, but by me.",
+   "gapIndex": 7,
+   "answer": "way",
+   "choices": [
+    "way",
+    "path",
+    "road",
+    "door"
+   ]
+  },
+  {
+   "id": "gap_john_14_27",
+   "reference": "John 14:27",
+   "text": "Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.",
+   "gapIndex": 25,
+   "answer": "troubled",
+   "choices": [
+    "troubled",
+    "sad",
+    "anxious",
+    "worried"
+   ]
+  },
+  {
+   "id": "gap_john_8_32",
+   "reference": "John 8:32",
+   "text": "And ye shall know the truth, and the truth shall make you free.",
+   "gapIndex": 12,
+   "answer": "free",
+   "choices": [
+    "free",
+    "saved",
+    "healed",
+    "made"
+   ]
+  },
+  {
+   "id": "gap_john_10_10",
+   "reference": "John 10:10",
+   "text": "The thief cometh not, but for to steal, and to kill, and to destroy: I am come that they might have life, and that they might have it more abundantly.",
+   "gapIndex": 29,
+   "answer": "abundantly",
+   "choices": [
+    "abundantly",
+    "plentifully",
+    "fully",
+    "greatly"
+   ]
+  },
+  {
+   "id": "gap_john_11_25",
+   "reference": "John 11:25",
+   "text": "Jesus said unto her, I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live:",
+   "gapIndex": 7,
+   "answer": "resurrection",
+   "choices": [
+    "resurrection",
+    "judgement",
+    "hope",
+    "salvation"
+   ]
+  },
+  {
+   "id": "gap_romans_8_28",
+   "reference": "Romans 8:28",
+   "text": "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.",
+   "gapIndex": 7,
+   "answer": "together",
+   "choices": [
+    "together",
+    "forever",
+    "always",
+    "again"
+   ]
+  },
+  {
+   "id": "gap_romans_12_21",
+   "reference": "Romans 12:21",
+   "text": "Be not overcome of evil, but overcome evil with good.",
+   "gapIndex": 9,
+   "answer": "good",
+   "choices": [
+    "good",
+    "well",
+    "right",
+    "kind"
+   ]
+  },
+  {
+   "id": "gap_romans_3_23",
+   "reference": "Romans 3:23",
+   "text": "For all have sinned, and come short of the glory of God;",
+   "gapIndex": 3,
+   "answer": "sinned",
+   "choices": [
+    "sinned",
+    "failed",
+    "fallen",
+    "wandered"
+   ]
+  },
+  {
+   "id": "gap_romans_6_23",
+   "reference": "Romans 6:23",
+   "text": "For the wages of sin is death; but the gift of God is eternal life through Jesus Christ our Lord.",
+   "gapIndex": 2,
+   "answer": "wages",
+   "choices": [
+    "wages",
+    "reward",
+    "price",
+    "pay"
+   ]
+  },
+  {
+   "id": "gap_romans_10_9",
+   "reference": "Romans 10:9",
+   "text": "That if thou shalt confess with thy mouth the Lord Jesus, and shalt believe in thine heart that God hath raised him from the dead, thou shalt be saved.",
+   "gapIndex": 4,
+   "answer": "confess",
+   "choices": [
+    "confess",
+    "declare",
+    "admit",
+    "proclaim"
+   ]
+  },
+  {
+   "id": "gap_romans_5_8",
+   "reference": "Romans 5:8",
+   "text": "But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.",
+   "gapIndex": 2,
+   "answer": "commendeth",
+   "choices": [
+    "commendeth",
+    "showeth",
+    "proveth",
+    "giveth"
+   ]
+  },
+  {
+   "id": "gap_romans_15_13",
+   "reference": "Romans 15:13",
+   "text": "Now the God of hope fill you with all joy and peace in believing, that ye may abound in hope, through the power of the Holy Ghost.",
+   "gapIndex": 13,
+   "answer": "believing",
+   "choices": [
+    "believing",
+    "trusting",
+    "hoping",
+    "praying"
+   ]
+  },
+  {
+   "id": "gap_1_corinthians_13_4",
+   "reference": "1 Corinthians 13:4",
+   "text": "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up,",
+   "gapIndex": 1,
+   "answer": "suffereth",
+   "choices": [
+    "suffereth",
+    "endureth",
+    "bears",
+    "waits"
+   ]
+  },
+  {
+   "id": "gap_1_corinthians_15_57",
+   "reference": "1 Corinthians 15:57",
+   "text": "But thanks be to God, which giveth us the victory through our Lord Jesus Christ.",
+   "gapIndex": 9,
+   "answer": "victory",
+   "choices": [
+    "victory",
+    "peace",
+    "freedom",
+    "grace"
+   ]
+  },
+  {
+   "id": "gap_2_corinthians_12_9",
+   "reference": "2 Corinthians 12:9",
+   "text": "And he said unto me, My grace is sufficient for thee: for my strength is made perfect in weakness. Most gladly therefore will I rather glory in my infirmities, that the power of Christ may rest upon me.",
+   "gapIndex": 13,
+   "answer": "strength",
+   "choices": [
+    "strength",
+    "peace",
+    "help",
+    "hope"
+   ]
+  },
+  {
+   "id": "gap_2_corinthians_9_7",
+   "reference": "2 Corinthians 9:7",
+   "text": "Every man according as he purposeth in his heart, so let him give; not grudgingly, or of necessity: for God loveth a cheerful giver.",
+   "gapIndex": 22,
+   "answer": "cheerful",
+   "choices": [
+    "cheerful",
+    "joyful",
+    "willing",
+    "generous"
+   ]
+  },
+  {
+   "id": "gap_galatians_5_22",
+   "reference": "Galatians 5:22",
+   "text": "But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith,",
+   "gapIndex": 11,
+   "answer": "gentleness",
+   "choices": [
+    "gentleness",
+    "kindness",
+    "humility",
+    "patience"
+   ]
+  },
+  {
+   "id": "gap_galatians_6_9",
+   "reference": "Galatians 6:9",
+   "text": "And let us not be weary in well doing: for in due season we shall reap, if we faint not.",
+   "gapIndex": 5,
+   "answer": "weary",
+   "choices": [
+    "weary",
+    "tired",
+    "sad",
+    "idle"
+   ]
+  },
+  {
+   "id": "gap_ephesians_2_8",
+   "reference": "Ephesians 2:8",
+   "text": "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God:",
+   "gapIndex": 2,
+   "answer": "grace",
+   "choices": [
+    "grace",
+    "mercy",
+    "love",
+    "hope"
+   ]
+  },
+  {
+   "id": "gap_ephesians_2_10",
+   "reference": "Ephesians 2:10",
+   "text": "For we are his workmanship, created in Christ Jesus unto good works, which God hath before ordained that we should walk in them.",
+   "gapIndex": 4,
+   "answer": "workmanship",
+   "choices": [
+    "workmanship",
+    "handiwork",
+    "creation",
+    "design"
+   ]
+  },
+  {
+   "id": "gap_ephesians_4_32",
+   "reference": "Ephesians 4:32",
+   "text": "And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ’s sake hath forgiven you.",
+   "gapIndex": 3,
+   "answer": "kind",
+   "choices": [
+    "kind",
+    "gentle",
+    "tender",
+    "patient"
+   ]
+  },
+  {
+   "id": "gap_ephesians_6_10",
+   "reference": "Ephesians 6:10",
+   "text": "Finally, my brethren, be strong in the Lord, and in the power of his might.",
+   "gapIndex": 4,
+   "answer": "strong",
+   "choices": [
+    "strong",
+    "brave",
+    "mighty",
+    "valiant"
+   ]
+  },
+  {
+   "id": "gap_ephesians_3_20",
+   "reference": "Ephesians 3:20",
+   "text": "Now unto him that is able to do exceeding abundantly above all that we ask or think, according to the power that worketh in us,",
+   "gapIndex": 8,
+   "answer": "exceeding",
+   "choices": [
+    "exceeding",
+    "greatly",
+    "richly",
+    "far"
+   ]
+  },
+  {
+   "id": "gap_philippians_4_6",
+   "reference": "Philippians 4:6",
+   "text": "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.",
+   "gapIndex": 1,
+   "answer": "careful",
+   "choices": [
+    "careful",
+    "anxious",
+    "worried",
+    "afraid"
+   ]
+  },
+  {
+   "id": "gap_philippians_4_7",
+   "reference": "Philippians 4:7",
+   "text": "And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus.",
+   "gapIndex": 8,
+   "answer": "understanding",
+   "choices": [
+    "understanding",
+    "wisdom",
+    "knowledge",
+    "reason"
+   ]
+  },
+  {
+   "id": "gap_philippians_4_4",
+   "reference": "Philippians 4:4",
+   "text": "Rejoice in the Lord alway: and again I say, Rejoice.",
+   "gapIndex": 4,
+   "answer": "alway",
+   "choices": [
+    "alway",
+    "always",
+    "forever",
+    "daily"
+   ]
+  },
+  {
+   "id": "gap_philippians_1_6",
+   "reference": "Philippians 1:6",
+   "text": "Being confident of this very thing, that he which hath begun a good work in you will perform it until the day of Jesus Christ:",
+   "gapIndex": 17,
+   "answer": "perform",
+   "choices": [
+    "perform",
+    "finish",
+    "complete",
+    "bring"
+   ]
+  },
+  {
+   "id": "gap_colossians_3_23",
+   "reference": "Colossians 3:23",
+   "text": "And what soever ye do, do it heartily, as to the Lord, and not unto men;",
+   "gapIndex": 7,
+   "answer": "heartily",
+   "choices": [
+    "heartily",
+    "gladly",
+    "willingly",
+    "fully"
+   ]
+  },
+  {
+   "id": "gap_colossians_3_2",
+   "reference": "Colossians 3:2",
+   "text": "Set your affection on things above, not on things on the earth.",
+   "gapIndex": 5,
+   "answer": "above",
+   "choices": [
+    "above",
+    "beyond",
+    "higher",
+    "over"
+   ]
+  },
+  {
+   "id": "gap_1_thessalonians_5_17",
+   "reference": "1 Thessalonians 5:17",
+   "text": "Pray without ceasing.",
+   "gapIndex": 2,
+   "answer": "ceasing",
+   "choices": [
+    "ceasing",
+    "stopping",
+    "ending",
+    "pausing"
+   ]
+  },
+  {
+   "id": "gap_1_thessalonians_5_18",
+   "reference": "1 Thessalonians 5:18",
+   "text": "In every thing give thanks: for this is the will of God in Christ Jesus concerning you.",
+   "gapIndex": 4,
+   "answer": "thanks",
+   "choices": [
+    "thanks",
+    "praise",
+    "gratitude",
+    "blessing"
+   ]
+  },
+  {
+   "id": "gap_2_timothy_1_7",
+   "reference": "2 Timothy 1:7",
+   "text": "For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.",
+   "gapIndex": 12,
+   "answer": "power",
+   "choices": [
+    "power",
+    "peace",
+    "joy",
+    "hope"
+   ]
+  },
+  {
+   "id": "gap_2_timothy_3_16",
+   "reference": "2 Timothy 3:16",
+   "text": "All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness:",
+   "gapIndex": 5,
+   "answer": "inspiration",
+   "choices": [
+    "inspiration",
+    "breath",
+    "gift",
+    "word"
+   ]
+  },
+  {
+   "id": "gap_hebrews_11_1",
+   "reference": "Hebrews 11:1",
+   "text": "Now faith is the substance of things hoped for, the evidence of things not seen.",
+   "gapIndex": 4,
+   "answer": "substance",
+   "choices": [
+    "substance",
+    "hope",
+    "proof",
+    "sight"
+   ]
+  },
+  {
+   "id": "gap_hebrews_11_6",
+   "reference": "Hebrews 11:6",
+   "text": "But without faith it is impossible to please him: for he that cometh to God must believe that he is, and that he is a rewarder of them that diligently seek him.",
+   "gapIndex": 29,
+   "answer": "diligently",
+   "choices": [
+    "diligently",
+    "earnestly",
+    "sincerely",
+    "daily"
+   ]
+  },
+  {
+   "id": "gap_hebrews_12_1",
+   "reference": "Hebrews 12:1",
+   "text": "Wherefore seeing we also are compassed about with so great a cloud of witnesses, let us lay aside every weight, and the sin which doth so easily beset us, and let us run with patience the race that is set before us,",
+   "gapIndex": 13,
+   "answer": "witnesses",
+   "choices": [
+    "witnesses",
+    "angels",
+    "prophets",
+    "friends"
+   ]
+  },
+  {
+   "id": "gap_hebrews_13_8",
+   "reference": "Hebrews 13:8",
+   "text": "Jesus Christ the same yesterday, and to day, and for ever.",
+   "gapIndex": 4,
+   "answer": "yesterday",
+   "choices": [
+    "yesterday",
+    "today",
+    "forever",
+    "always"
+   ]
+  },
+  {
+   "id": "gap_hebrews_4_12",
+   "reference": "Hebrews 4:12",
+   "text": "For the word of God is quick, and powerful, and sharper than any twoedged sword, piercing even to the dividing asunder of soul and spirit, and of the joints and marrow, and is a discerner of the thoughts and intents of the heart.",
+   "gapIndex": 6,
+   "answer": "quick",
+   "choices": [
+    "quick",
+    "living",
+    "sharp",
+    "alive"
+   ]
+  },
+  {
+   "id": "gap_james_1_5",
+   "reference": "James 1:5",
+   "text": "If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him.",
+   "gapIndex": 16,
+   "answer": "liberally",
+   "choices": [
+    "liberally",
+    "freely",
+    "generously",
+    "gladly"
+   ]
+  },
+  {
+   "id": "gap_james_1_19",
+   "reference": "James 1:19",
+   "text": "Wherefore, my beloved brethren, let every man be swift to hear, slow to speak, slow to wrath:",
+   "gapIndex": 8,
+   "answer": "swift",
+   "choices": [
+    "swift",
+    "quick",
+    "rapid",
+    "ready"
+   ]
+  },
+  {
+   "id": "gap_james_4_7",
+   "reference": "James 4:7",
+   "text": "Submit yourselves therefore to God. Resist the devil, and he will flee from you.",
+   "gapIndex": 5,
+   "answer": "resist",
+   "choices": [
+    "resist",
+    "oppose",
+    "fight",
+    "avoid"
+   ]
+  },
+  {
+   "id": "gap_1_peter_5_7",
+   "reference": "1 Peter 5:7",
+   "text": "Casting all your care upon him; for he careth for you.",
+   "gapIndex": 3,
+   "answer": "care",
+   "choices": [
+    "care",
+    "worry",
+    "fear",
+    "load"
+   ]
+  },
+  {
+   "id": "gap_1_peter_2_9",
+   "reference": "1 Peter 2:9",
+   "text": "But ye are a chosen generation, a royal priesthood, an holy nation, a peculiar people; that ye should shew forth the praises of him who hath called you out of darkness into his marvellous light:",
+   "gapIndex": 13,
+   "answer": "peculiar",
+   "choices": [
+    "peculiar",
+    "special",
+    "unique",
+    "treasured"
+   ]
+  },
+  {
+   "id": "gap_1_john_1_9",
+   "reference": "1 John 1:9",
+   "text": "If we confess our sins, he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness.",
+   "gapIndex": 2,
+   "answer": "confess",
+   "choices": [
+    "confess",
+    "repent",
+    "admit",
+    "declare"
+   ]
+  },
+  {
+   "id": "gap_1_john_4_8",
+   "reference": "1 John 4:8",
+   "text": "He that loveth not knoweth not God; for God is love.",
+   "gapIndex": 10,
+   "answer": "love",
+   "choices": [
+    "love",
+    "light",
+    "life",
+    "truth"
+   ]
+  },
+  {
+   "id": "gap_1_john_4_18",
+   "reference": "1 John 4:18",
+   "text": "There is no fear in love; but perfect love casteth out fear: because fear hath torment. He that feareth is not made perfect in love.",
+   "gapIndex": 15,
+   "answer": "torment",
+   "choices": [
+    "torment",
+    "sorrow",
+    "trouble",
+    "pain"
+   ]
+  },
+  {
+   "id": "gap_1_john_4_19",
+   "reference": "1 John 4:19",
+   "text": "We love him, because he first loved us.",
+   "gapIndex": 5,
+   "answer": "first",
+   "choices": [
+    "first",
+    "last",
+    "early",
+    "alone"
+   ]
+  },
+  {
+   "id": "gap_revelation_21_4",
+   "reference": "Revelation 21:4",
+   "text": "And God shall wipe away all tears from their eyes; and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain: for the former things are passed away.",
+   "gapIndex": 6,
+   "answer": "tears",
+   "choices": [
+    "tears",
+    "weeping",
+    "wounds",
+    "night"
+   ]
+  },
+  {
+   "id": "gap_genesis_2_24",
+   "reference": "Genesis 2:24",
+   "text": "Therefore shall a man leave his father and his mother, and shall cleave unto his wife: and they shall be one flesh.",
+   "gapIndex": 12,
+   "answer": "cleave",
+   "choices": [
+    "cleave",
+    "join",
+    "depart",
+    "remain"
+   ]
+  },
+  {
+   "id": "gap_genesis_12_2",
+   "reference": "Genesis 12:2",
+   "text": "And I will make of thee a great nation, and I will bless thee, and make thy name great; and thou shalt be a blessing:",
+   "gapIndex": 24,
+   "answer": "blessing",
+   "choices": [
+    "blessing",
+    "gift",
+    "covenant",
+    "inheritance"
+   ]
+  },
+  {
+   "id": "gap_genesis_28_15",
+   "reference": "Genesis 28:15",
+   "text": "And, behold, I am with thee, and will keep thee in all places whither thou goest, and will bring thee again into this land; for I will not leave thee, until I have done that which I have spoken to thee of.",
+   "gapIndex": 8,
+   "answer": "keep",
+   "choices": [
+    "keep",
+    "guard",
+    "help",
+    "save"
+   ]
+  },
+  {
+   "id": "gap_genesis_50_20",
+   "reference": "Genesis 50:20",
+   "text": "But as for you, ye thought evil against me; but God meant it unto good, to bring to pass, as it is this day, to save much people alive.",
+   "gapIndex": 14,
+   "answer": "good",
+   "choices": [
+    "good",
+    "well",
+    "right",
+    "best"
+   ]
+  },
+  {
+   "id": "gap_exodus_14_14",
+   "reference": "Exodus 14:14",
+   "text": "The LORD shall fight for you, and ye shall hold your peace.",
+   "gapIndex": 3,
+   "answer": "fight",
+   "choices": [
+    "fight",
+    "battle",
+    "stand",
+    "wait"
+   ]
+  },
+  {
+   "id": "gap_exodus_20_12",
+   "reference": "Exodus 20:12",
+   "text": "Honour thy father and thy mother: that thy days may be long upon the land which the LORD thy God giveth thee.",
+   "gapIndex": 0,
+   "answer": "Honour",
+   "choices": [
+    "Honour",
+    "Obey",
+    "Respect",
+    "Serve"
+   ]
+  },
+  {
+   "id": "gap_exodus_33_14",
+   "reference": "Exodus 33:14",
+   "text": "And he said, My presence shall go with thee, and I will give thee rest.",
+   "gapIndex": 14,
+   "answer": "rest",
+   "choices": [
+    "rest",
+    "peace",
+    "home",
+    "ease"
+   ]
+  },
+  {
+   "id": "gap_numbers_6_24",
+   "reference": "Numbers 6:24",
+   "text": "The LORD bless thee, and keep thee:",
+   "gapIndex": 5,
+   "answer": "keep",
+   "choices": [
+    "keep",
+    "guard",
+    "help",
+    "save"
+   ]
+  },
+  {
+   "id": "gap_deuteronomy_6_5",
+   "reference": "Deuteronomy 6:5",
+   "text": "And thou shalt love the LORD thy God with all thine heart, and with all thy soul, and with all thy might.",
+   "gapIndex": 16,
+   "answer": "soul",
+   "choices": [
+    "soul",
+    "spirit",
+    "life",
+    "strength"
+   ]
+  },
+  {
+   "id": "gap_deuteronomy_31_6",
+   "reference": "Deuteronomy 31:6",
+   "text": "Be strong and of a good courage, fear not, nor be afraid of them: for the LORD thy God, he it is that doth go with thee; he will not fail thee, nor forsake thee.",
+   "gapIndex": 11,
+   "answer": "afraid",
+   "choices": [
+    "afraid",
+    "troubled",
+    "dismayed",
+    "ashamed"
+   ]
+  },
+  {
+   "id": "gap_deuteronomy_31_8",
+   "reference": "Deuteronomy 31:8",
+   "text": "And the LORD, he it is that doth go before thee; he will be with thee, he will not fail thee, neither forsake thee: fear not, neither be dismayed.",
+   "gapIndex": 22,
+   "answer": "forsake",
+   "choices": [
+    "forsake",
+    "leave",
+    "abandon",
+    "desert"
+   ]
+  },
+  {
+   "id": "gap_joshua_24_15",
+   "reference": "Joshua 24:15",
+   "text": "And if it seem evil unto you to serve the LORD, choose you this day whom ye will serve; whether the gods which your fathers served that were on the other side of the flood, or the gods of the Amorites, in whose land ye dwell: but as for me and my house, we will serve the LORD.",
+   "gapIndex": 11,
+   "answer": "choose",
+   "choices": [
+    "choose",
+    "follow",
+    "trust",
+    "love"
+   ]
+  },
+  {
+   "id": "gap_1_samuel_16_7",
+   "reference": "1 Samuel 16:7",
+   "text": "But the LORD said unto Samuel, Look not on his countenance, or on the height of his stature; because I have refused him: for the Lord seeth not as man seeth; for man looketh on the outward appearance, but the LORD looketh on the heart.",
+   "gapIndex": 44,
+   "answer": "heart",
+   "choices": [
+    "heart",
+    "mind",
+    "soul",
+    "spirit"
+   ]
+  },
+  {
+   "id": "gap_1_chronicles_16_34",
+   "reference": "1 Chronicles 16:34",
+   "text": "O give thanks unto the LORD; for he is good; for his mercy endureth for ever.",
+   "gapIndex": 9,
+   "answer": "good",
+   "choices": [
+    "good",
+    "kind",
+    "right",
+    "fair"
+   ]
+  },
+  {
+   "id": "gap_2_chronicles_7_14",
+   "reference": "2 Chronicles 7:14",
+   "text": "If my people, which are called by my name, shall humble themselves, and pray, and seek my face, and turn from their wicked ways; then will I hear from heaven, and will forgive their sin, and will heal their land.",
+   "gapIndex": 10,
+   "answer": "humble",
+   "choices": [
+    "humble",
+    "proud",
+    "meek",
+    "lowly"
+   ]
+  },
+  {
+   "id": "gap_nehemiah_8_10",
+   "reference": "Nehemiah 8:10",
+   "text": "Then he said unto them, Go your way, eat the fat, and drink the sweet, and send portions unto them for whom nothing is prepared: for this day is holy unto our Lord: neither be ye sorry; for the joy of the LORD is your strength.",
+   "gapIndex": 45,
+   "answer": "strength",
+   "choices": [
+    "strength",
+    "power",
+    "courage",
+    "hope"
+   ]
+  },
+  {
+   "id": "gap_esther_4_14",
+   "reference": "Esther 4:14",
+   "text": "For if thou altogether holdest thy peace at this time, then shall there enlargement and deliverance arise to the Jews from another place; but thou and thy father’s house shall be destroyed: and who knoweth whether thou art come to the kingdom for such a time as this?",
+   "gapIndex": 13,
+   "answer": "enlargement",
+   "choices": [
+    "enlargement",
+    "release",
+    "help",
+    "relief"
+   ]
+  },
+  {
+   "id": "gap_job_19_25",
+   "reference": "Job 19:25",
+   "text": "For I know that my redeemer liveth, and that he shall stand at the latter day upon the earth:",
+   "gapIndex": 5,
+   "answer": "redeemer",
+   "choices": [
+    "redeemer",
+    "saviour",
+    "father",
+    "friend"
+   ]
+  },
+  {
+   "id": "gap_job_1_21",
+   "reference": "Job 1:21",
+   "text": "And said, Naked came I out of my mother’s womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD.",
+   "gapIndex": 23,
+   "answer": "taken",
+   "choices": [
+    "taken",
+    "lost",
+    "stolen",
+    "removed"
+   ]
+  },
+  {
+   "id": "gap_psalms_121_1",
+   "reference": "Psalms 121:1",
+   "text": "I will lift up mine eyes unto the hills, from whence cometh my help.",
+   "gapIndex": 8,
+   "answer": "hills",
+   "choices": [
+    "hills",
+    "mountains",
+    "valleys",
+    "rivers"
+   ]
+  },
+  {
+   "id": "gap_psalms_121_2",
+   "reference": "Psalms 121:2",
+   "text": "My help cometh from the LORD, which made heaven and earth.",
+   "gapIndex": 7,
+   "answer": "made",
+   "choices": [
+    "made",
+    "created",
+    "formed",
+    "built"
+   ]
+  },
+  {
+   "id": "gap_psalms_34_8",
+   "reference": "Psalms 34:8",
+   "text": "O taste and see that the LORD is good: blessed is the man that trusteth in him.",
+   "gapIndex": 1,
+   "answer": "taste",
+   "choices": [
+    "taste",
+    "hear",
+    "smell",
+    "feel"
+   ]
+  },
+  {
+   "id": "gap_psalms_37_4",
+   "reference": "Psalms 37:4",
+   "text": "Delight thyself also in the LORD; and he shall give thee the desires of thine heart.",
+   "gapIndex": 0,
+   "answer": "delight",
+   "choices": [
+    "delight",
+    "enjoy",
+    "seek",
+    "gladden"
+   ]
+  },
+  {
+   "id": "gap_psalms_37_5",
+   "reference": "Psalms 37:5",
+   "text": "Commit thy way unto the LORD; trust also in him; and he shall bring it to pass.",
+   "gapIndex": 0,
+   "answer": "commit",
+   "choices": [
+    "commit",
+    "entrust",
+    "give",
+    "hand"
+   ]
+  },
+  {
+   "id": "gap_psalms_55_22",
+   "reference": "Psalms 55:22",
+   "text": "Cast thy burden upon the LORD, and he shall sustain thee: he shall never suffer the righteous to be moved.",
+   "gapIndex": 0,
+   "answer": "cast",
+   "choices": [
+    "cast",
+    "throw",
+    "carry",
+    "bear"
+   ]
+  },
+  {
+   "id": "gap_psalms_56_3",
+   "reference": "Psalms 56:3",
+   "text": "What time I am afraid, I will trust in thee.",
+   "gapIndex": 7,
+   "answer": "trust",
+   "choices": [
+    "trust",
+    "hope",
+    "fear",
+    "rely"
+   ]
+  },
+  {
+   "id": "gap_psalms_51_10",
+   "reference": "Psalms 51:10",
+   "text": "Create in me a clean heart, O God; and renew a right spirit within me.",
+   "gapIndex": 4,
+   "answer": "clean",
+   "choices": [
+    "clean",
+    "pure",
+    "new",
+    "whole"
+   ]
+  },
+  {
+   "id": "gap_psalms_90_12",
+   "reference": "Psalms 90:12",
+   "text": "So teach us to number our days, that we may apply our hearts unto wisdom.",
+   "gapIndex": 4,
+   "answer": "number",
+   "choices": [
+    "number",
+    "count",
+    "measure",
+    "weigh"
+   ]
+  },
+  {
+   "id": "gap_psalms_91_1",
+   "reference": "Psalms 91:1",
+   "text": "He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty.",
+   "gapIndex": 5,
+   "answer": "secret",
+   "choices": [
+    "secret",
+    "shelter",
+    "hidden",
+    "safe"
+   ]
+  },
+  {
+   "id": "gap_psalms_91_11",
+   "reference": "Psalms 91:11",
+   "text": "For he shall give his angels charge over thee, to keep thee in all thy ways.",
+   "gapIndex": 5,
+   "answer": "angels",
+   "choices": [
+    "angels",
+    "servants",
+    "guardians",
+    "messengers"
+   ]
+  },
+  {
+   "id": "gap_psalms_103_1",
+   "reference": "Psalms 103:1",
+   "text": "Bless the LORD, O my soul: and all that is within me, bless his holy name.",
+   "gapIndex": 5,
+   "answer": "soul",
+   "choices": [
+    "soul",
+    "spirit",
+    "heart",
+    "life"
+   ]
+  },
+  {
+   "id": "gap_psalms_103_12",
+   "reference": "Psalms 103:12",
+   "text": "As far as the east is from the west, so far hath he removed our transgressions from us.",
+   "gapIndex": 4,
+   "answer": "east",
+   "choices": [
+    "east",
+    "north",
+    "south",
+    "sea"
+   ]
+  },
+  {
+   "id": "gap_psalms_139_14",
+   "reference": "Psalms 139:14",
+   "text": "I will praise thee; for I am fearfully and wonderfully made: marvellous are thy works; and that my soul knoweth right well.",
+   "gapIndex": 7,
+   "answer": "fearfully",
+   "choices": [
+    "fearfully",
+    "gladly",
+    "gently",
+    "beautifully"
+   ]
+  },
+  {
+   "id": "gap_psalms_16_11",
+   "reference": "Psalms 16:11",
+   "text": "Thou wilt shew me the path of life: in thy presence is fulness of joy; at thy right hand there are pleasures for evermore.",
+   "gapIndex": 12,
+   "answer": "fulness",
+   "choices": [
+    "fulness",
+    "abundance",
+    "gladness",
+    "treasure"
+   ]
+  },
+  {
+   "id": "gap_psalms_73_26",
+   "reference": "Psalms 73:26",
+   "text": "My flesh and my heart faileth: but God is the strength of my heart, and my portion for ever.",
+   "gapIndex": 16,
+   "answer": "portion",
+   "choices": [
+    "portion",
+    "inheritance",
+    "treasure",
+    "hope"
+   ]
+  },
+  {
+   "id": "gap_psalms_62_1",
+   "reference": "Psalms 62:1",
+   "text": "Truly my soul waiteth upon God: from him cometh my salvation.",
+   "gapIndex": 3,
+   "answer": "waiteth",
+   "choices": [
+    "waiteth",
+    "hopeth",
+    "rests",
+    "trusts"
+   ]
+  },
+  {
+   "id": "gap_psalms_19_1",
+   "reference": "Psalms 19:1",
+   "text": "The heavens declare the glory of God; and the firmament sheweth his handywork.",
+   "gapIndex": 9,
+   "answer": "firmament",
+   "choices": [
+    "firmament",
+    "clouds",
+    "stars",
+    "sun"
+   ]
+  },
+  {
+   "id": "gap_proverbs_3_6",
+   "reference": "Proverbs 3:6",
+   "text": "In all thy ways acknowledge him, and he shall direct thy paths.",
+   "gapIndex": 4,
+   "answer": "acknowledge",
+   "choices": [
+    "acknowledge",
+    "remember",
+    "honour",
+    "seek"
+   ]
+  },
+  {
+   "id": "gap_proverbs_4_23",
+   "reference": "Proverbs 4:23",
+   "text": "Keep thy heart with all diligence; for out of it are the issues of life.",
+   "gapIndex": 0,
+   "answer": "keep",
+   "choices": [
+    "keep",
+    "guard",
+    "watch",
+    "protect"
+   ]
+  },
+  {
+   "id": "gap_proverbs_16_3",
+   "reference": "Proverbs 16:3",
+   "text": "Commit thy works unto the LORD, and thy thoughts shall be established.",
+   "gapIndex": 0,
+   "answer": "commit",
+   "choices": [
+    "commit",
+    "entrust",
+    "bring",
+    "give"
+   ]
+  },
+  {
+   "id": "gap_proverbs_16_18",
+   "reference": "Proverbs 16:18",
+   "text": "Pride goeth before destruction, and an haughty spirit before a fall.",
+   "gapIndex": 0,
+   "answer": "pride",
+   "choices": [
+    "pride",
+    "haughtiness",
+    "anger",
+    "vanity"
+   ]
+  },
+  {
+   "id": "gap_proverbs_17_17",
+   "reference": "Proverbs 17:17",
+   "text": "A friend loveth at all times, and a brother is born for adversity.",
+   "gapIndex": 12,
+   "answer": "adversity",
+   "choices": [
+    "adversity",
+    "trouble",
+    "poverty",
+    "hardship"
+   ]
+  },
+  {
+   "id": "gap_proverbs_18_10",
+   "reference": "Proverbs 18:10",
+   "text": "The name of the LORD is a strong tower: the righteous runneth into it, and is safe.",
+   "gapIndex": 8,
+   "answer": "tower",
+   "choices": [
+    "tower",
+    "fortress",
+    "castle",
+    "wall"
+   ]
+  },
+  {
+   "id": "gap_proverbs_22_6",
+   "reference": "Proverbs 22:6",
+   "text": "Train up a child in the way he should go: and when he is old, he will not depart from it.",
+   "gapIndex": 0,
+   "answer": "train",
+   "choices": [
+    "train",
+    "teach",
+    "raise",
+    "guide"
+   ]
+  },
+  {
+   "id": "gap_proverbs_31_30",
+   "reference": "Proverbs 31:30",
+   "text": "Favour is deceitful, and beauty is vain: but a woman that feareth the LORD, she shall be praised.",
+   "gapIndex": 11,
+   "answer": "feareth",
+   "choices": [
+    "feareth",
+    "honoureth",
+    "trusteth",
+    "praiseth"
+   ]
+  },
+  {
+   "id": "gap_proverbs_9_10",
+   "reference": "Proverbs 9:10",
+   "text": "The fear of the LORD is the beginning of wisdom: and the knowledge of the holy is understanding.",
+   "gapIndex": 7,
+   "answer": "beginning",
+   "choices": [
+    "beginning",
+    "start",
+    "end",
+    "foundation"
+   ]
+  },
+  {
+   "id": "gap_proverbs_15_1",
+   "reference": "Proverbs 15:1",
+   "text": "A soft answer turneth away wrath: but grievous words stir up anger.",
+   "gapIndex": 1,
+   "answer": "soft",
+   "choices": [
+    "soft",
+    "gentle",
+    "kind",
+    "mild"
+   ]
+  },
+  {
+   "id": "gap_proverbs_11_25",
+   "reference": "Proverbs 11:25",
+   "text": "The liberal soul shall be made fat: and he that watereth shall be watered also himself.",
+   "gapIndex": 2,
+   "answer": "soul",
+   "choices": [
+    "soul",
+    "spirit",
+    "life",
+    "heart"
+   ]
+  },
+  {
+   "id": "gap_proverbs_12_25",
+   "reference": "Proverbs 12:25",
+   "text": "Heaviness in the heart of man maketh it stoop: but a good word maketh it glad.",
+   "gapIndex": 0,
+   "answer": "heaviness",
+   "choices": [
+    "heaviness",
+    "sorrow",
+    "burden",
+    "worry"
+   ]
+  },
+  {
+   "id": "gap_ecclesiastes_3_1",
+   "reference": "Ecclesiastes 3:1",
+   "text": "To every thing there is a season, and a time to every purpose under the heaven:",
+   "gapIndex": 6,
+   "answer": "season",
+   "choices": [
+    "season",
+    "moment",
+    "day",
+    "hour"
+   ]
+  },
+  {
+   "id": "gap_ecclesiastes_4_9",
+   "reference": "Ecclesiastes 4:9",
+   "text": "Two are better than one; because they have a good reward for their labour.",
+   "gapIndex": 2,
+   "answer": "better",
+   "choices": [
+    "better",
+    "best",
+    "worse",
+    "greater"
+   ]
+  },
+  {
+   "id": "gap_isaiah_40_8",
+   "reference": "Isaiah 40:8",
+   "text": "The grass withereth, the flower fadeth: but the word of our God shall stand for ever.",
+   "gapIndex": 13,
+   "answer": "stand",
+   "choices": [
+    "stand",
+    "abide",
+    "remain",
+    "endure"
+   ]
+  },
+  {
+   "id": "gap_isaiah_43_1",
+   "reference": "Isaiah 43:1",
+   "text": "But now thus saith the LORD that created thee, O Jacob, and he that formed thee, O Israel, Fear not: for I have redeemed thee, I have called thee by thy name; thou art mine.",
+   "gapIndex": 23,
+   "answer": "redeemed",
+   "choices": [
+    "redeemed",
+    "saved",
+    "bought",
+    "chosen"
+   ]
+  },
+  {
+   "id": "gap_isaiah_1_18",
+   "reference": "Isaiah 1:18",
+   "text": "Come now, and let us reason together, saith the LORD: though your sins be as scarlet, they shall be as white as snow; though they be red like crimson, they shall be as wool.",
+   "gapIndex": 20,
+   "answer": "white",
+   "choices": [
+    "white",
+    "clean",
+    "pure",
+    "bright"
+   ]
+  },
+  {
+   "id": "gap_isaiah_26_3",
+   "reference": "Isaiah 26:3",
+   "text": "Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.",
+   "gapIndex": 5,
+   "answer": "perfect",
+   "choices": [
+    "perfect",
+    "whole",
+    "complete",
+    "firm"
+   ]
+  },
+  {
+   "id": "gap_isaiah_53_5",
+   "reference": "Isaiah 53:5",
+   "text": "But he was wounded for our transgressions, he was bruised for our iniquities: the chastisement of our peace was upon him; and with his stripes we are healed.",
+   "gapIndex": 14,
+   "answer": "chastisement",
+   "choices": [
+    "chastisement",
+    "punishment",
+    "judgement",
+    "discipline"
+   ]
+  },
+  {
+   "id": "gap_isaiah_9_6",
+   "reference": "Isaiah 9:6",
+   "text": "For unto us a child is born, unto us a son is given: and the government shall be upon his shoulder: and his name shall be called Wonderful, Counsellor, The mighty God, The everlasting Father, The Prince of Peace.",
+   "gapIndex": 36,
+   "answer": "Prince",
+   "choices": [
+    "Prince",
+    "King",
+    "Lord",
+    "Saviour"
+   ]
+  },
+  {
+   "id": "gap_jeremiah_33_3",
+   "reference": "Jeremiah 33:3",
+   "text": "Call unto me, and I will answer thee, and shew thee great and mighty things, which thou knowest not.",
+   "gapIndex": 11,
+   "answer": "great",
+   "choices": [
+    "great",
+    "wonderful",
+    "high",
+    "good"
+   ]
+  },
+  {
+   "id": "gap_jeremiah_17_7",
+   "reference": "Jeremiah 17:7",
+   "text": "Blessed is the man that trusteth in the LORD, and whose hope the LORD is.",
+   "gapIndex": 5,
+   "answer": "trusteth",
+   "choices": [
+    "trusteth",
+    "relieth",
+    "hopeth",
+    "leaneth"
+   ]
+  },
+  {
+   "id": "gap_jeremiah_31_3",
+   "reference": "Jeremiah 31:3",
+   "text": "The LORD hath appeared of old unto me, saying, Yea, I have loved thee with an everlasting love: therefore with lovingkindness have I drawn thee.",
+   "gapIndex": 16,
+   "answer": "everlasting",
+   "choices": [
+    "everlasting",
+    "eternal",
+    "endless",
+    "forever"
+   ]
+  },
+  {
+   "id": "gap_lamentations_3_23",
+   "reference": "Lamentations 3:23",
+   "text": "They are new every morning: great is thy faithfulness.",
+   "gapIndex": 4,
+   "answer": "morning",
+   "choices": [
+    "morning",
+    "dawn",
+    "daily",
+    "night"
+   ]
+  },
+  {
+   "id": "gap_lamentations_3_22",
+   "reference": "Lamentations 3:22",
+   "text": "It is of the LORD’s mercies that we are not consumed, because his compassions fail not.",
+   "gapIndex": 10,
+   "answer": "consumed",
+   "choices": [
+    "consumed",
+    "destroyed",
+    "ended",
+    "lost"
+   ]
+  },
+  {
+   "id": "gap_micah_6_8",
+   "reference": "Micah 6:8",
+   "text": "He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?",
+   "gapIndex": 28,
+   "answer": "humbly",
+   "choices": [
+    "humbly",
+    "gently",
+    "quietly",
+    "meekly"
+   ]
+  },
+  {
+   "id": "gap_habakkuk_2_4",
+   "reference": "Habakkuk 2:4",
+   "text": "Behold, his soul which is lifted up is not upright in him: but the just shall live by his faith.",
+   "gapIndex": 19,
+   "answer": "faith",
+   "choices": [
+    "faith",
+    "trust",
+    "hope",
+    "works"
+   ]
+  },
+  {
+   "id": "gap_zephaniah_3_17",
+   "reference": "Zephaniah 3:17",
+   "text": "The LORD thy God in the midst of thee is mighty; he will save, he will rejoice over thee with joy; he will rest in his love, he will joy over thee with singing.",
+   "gapIndex": 16,
+   "answer": "rejoice",
+   "choices": [
+    "rejoice",
+    "dance",
+    "celebrate",
+    "shout"
+   ]
+  },
+  {
+   "id": "gap_zechariah_4_6",
+   "reference": "Zechariah 4:6",
+   "text": "Then he answered and spake unto me, saying, This is the word of the LORD unto Zerubbabel, saying, Not by might, nor by power, but by my spirit, saith the LORD of hosts.",
+   "gapIndex": 20,
+   "answer": "might",
+   "choices": [
+    "might",
+    "strength",
+    "force",
+    "wisdom"
+   ]
+  },
+  {
+   "id": "gap_malachi_3_10",
+   "reference": "Malachi 3:10",
+   "text": "Bring ye all the tithes into the storehouse, that there may be meat in mine house, and prove me now herewith, saith the LORD of hosts, if I will not open you the windows of heaven, and pour you out a blessing, that there shall not be room enough to receive it.",
+   "gapIndex": 4,
+   "answer": "tithes",
+   "choices": [
+    "tithes",
+    "offerings",
+    "gifts",
+    "gold"
+   ]
+  },
+  {
+   "id": "gap_joel_2_28",
+   "reference": "Joel 2:28",
+   "text": "And it shall come to pass afterward, that I will pour out my spirit upon all flesh; and your sons and your daughters shall prophesy, your old men shall dream dreams, your young men shall see visions:",
+   "gapIndex": 13,
+   "answer": "spirit",
+   "choices": [
+    "spirit",
+    "breath",
+    "wind",
+    "power"
+   ]
+  },
+  {
+   "id": "gap_matthew_5_3",
+   "reference": "Matthew 5:3",
+   "text": "Blessed are the poor in spirit: for theirs is the kingdom of heaven.",
+   "gapIndex": 3,
+   "answer": "poor",
+   "choices": [
+    "poor",
+    "humble",
+    "weak",
+    "needy"
+   ]
+  },
+  {
+   "id": "gap_matthew_5_14",
+   "reference": "Matthew 5:14",
+   "text": "Ye are the light of the world. A city that is set on an hill cannot be hid.",
+   "gapIndex": 8,
+   "answer": "city",
+   "choices": [
+    "city",
+    "town",
+    "village",
+    "house"
+   ]
+  },
+  {
+   "id": "gap_matthew_7_7",
+   "reference": "Matthew 7:7",
+   "text": "Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you:",
+   "gapIndex": 7,
+   "answer": "seek",
+   "choices": [
+    "seek",
+    "search",
+    "beg",
+    "look"
+   ]
+  },
+  {
+   "id": "gap_matthew_11_29",
+   "reference": "Matthew 11:29",
+   "text": "Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls.",
+   "gapIndex": 2,
+   "answer": "yoke",
+   "choices": [
+    "yoke",
+    "burden",
+    "load",
+    "chain"
+   ]
+  },
+  {
+   "id": "gap_matthew_19_26",
+   "reference": "Matthew 19:26",
+   "text": "But Jesus beheld them, and said unto them, With men this is impossible; but with God all things are possible.",
+   "gapIndex": 19,
+   "answer": "possible",
+   "choices": [
+    "possible",
+    "easy",
+    "likely",
+    "simple"
+   ]
+  },
+  {
+   "id": "gap_matthew_17_20",
+   "reference": "Matthew 17:20",
+   "text": "And Jesus said unto them, Because of your unbelief: for verily I say unto you, If ye have faith as a grain of mustard seed, ye shall say unto this mountain, Remove hence to yonder place; and it shall remove; and nothing shall be impossible unto you.",
+   "gapIndex": 30,
+   "answer": "mountain",
+   "choices": [
+    "mountain",
+    "hill",
+    "valley",
+    "rock"
+   ]
+  },
+  {
+   "id": "gap_matthew_18_20",
+   "reference": "Matthew 18:20",
+   "text": "For where two or three are gathered together in my name, there am I in the midst of them.",
+   "gapIndex": 6,
+   "answer": "gathered",
+   "choices": [
+    "gathered",
+    "assembled",
+    "met",
+    "collected"
+   ]
+  },
+  {
+   "id": "gap_matthew_25_21",
+   "reference": "Matthew 25:21",
+   "text": "His lord said unto him, Well done, thou good and faithful servant: thou hast been faithful over a few things, I will make thee ruler over many things: enter thou into the joy of thy lord.",
+   "gapIndex": 11,
+   "answer": "servant",
+   "choices": [
+    "servant",
+    "master",
+    "friend",
+    "worker"
+   ]
+  },
+  {
+   "id": "gap_matthew_28_20",
+   "reference": "Matthew 28:20",
+   "text": "Teaching them to observe all things whatsoever I have commanded you: and, lo, I am with you alway, even unto the end of the world. Amen.",
+   "gapIndex": 17,
+   "answer": "alway",
+   "choices": [
+    "alway",
+    "always",
+    "forever",
+    "daily"
+   ]
+  },
+  {
+   "id": "gap_mark_9_23",
+   "reference": "Mark 9:23",
+   "text": "Jesus said unto him, If thou canst believe, all things are possible to him that believeth.",
+   "gapIndex": 11,
+   "answer": "possible",
+   "choices": [
+    "possible",
+    "easy",
+    "likely",
+    "simple"
+   ]
+  },
+  {
+   "id": "gap_mark_12_30",
+   "reference": "Mark 12:30",
+   "text": "And thou shalt love the Lord thy God with all thy heart, and with all thy soul, and with all thy mind, and with all thy strength: this is the first commandment.",
+   "gapIndex": 26,
+   "answer": "strength",
+   "choices": [
+    "strength",
+    "power",
+    "might",
+    "force"
+   ]
+  },
+  {
+   "id": "gap_mark_16_15",
+   "reference": "Mark 16:15",
+   "text": "And he said unto them, Go ye into all the world, and preach the gospel to every creature.",
+   "gapIndex": 14,
+   "answer": "gospel",
+   "choices": [
+    "gospel",
+    "message",
+    "news",
+    "word"
+   ]
+  },
+  {
+   "id": "gap_luke_2_10",
+   "reference": "Luke 2:10",
+   "text": "And the angel said unto them, Fear not: for, behold, I bring you good tidings of great joy, which shall be to all people.",
+   "gapIndex": 17,
+   "answer": "joy",
+   "choices": [
+    "joy",
+    "gladness",
+    "peace",
+    "hope"
+   ]
+  },
+  {
+   "id": "gap_luke_10_27",
+   "reference": "Luke 10:27",
+   "text": "And he answering said, Thou shalt love the Lord thy God with all thy heart, and with all thy soul, and with all thy strength, and with all thy mind; and thy neighbour as thyself.",
+   "gapIndex": 32,
+   "answer": "neighbour",
+   "choices": [
+    "neighbour",
+    "friend",
+    "brother",
+    "stranger"
+   ]
+  },
+  {
+   "id": "gap_luke_15_7",
+   "reference": "Luke 15:7",
+   "text": "I say unto you, that likewise joy shall be in heaven over one sinner that repenteth, more than over ninety and nine just persons, which need no repentance.",
+   "gapIndex": 15,
+   "answer": "repenteth",
+   "choices": [
+    "repenteth",
+    "returneth",
+    "turns",
+    "rejoices"
+   ]
+  },
+  {
+   "id": "gap_luke_19_10",
+   "reference": "Luke 19:10",
+   "text": "For the Son of man is come to seek and to save that which was lost.",
+   "gapIndex": 15,
+   "answer": "lost",
+   "choices": [
+    "lost",
+    "found",
+    "gone",
+    "missing"
+   ]
+  },
+  {
+   "id": "gap_luke_1_45",
+   "reference": "Luke 1:45",
+   "text": "And blessed is she that believed: for there shall be a performance of those things which were told her from the Lord.",
+   "gapIndex": 5,
+   "answer": "believed",
+   "choices": [
+    "believed",
+    "trusted",
+    "hoped",
+    "knew"
+   ]
+  },
+  {
+   "id": "gap_luke_12_15",
+   "reference": "Luke 12:15",
+   "text": "And he said unto them, Take heed, and beware of covetousness: for a man’s life consisteth not in the abundance of the things which he possesseth.",
+   "gapIndex": 10,
+   "answer": "covetousness",
+   "choices": [
+    "covetousness",
+    "greed",
+    "envy",
+    "pride"
+   ]
+  },
+  {
+   "id": "gap_acts_1_8",
+   "reference": "Acts 1:8",
+   "text": "But ye shall receive power, after that the Holy Ghost is come upon you: and ye shall be witnesses unto me both in Jerusalem, and in all Judæa, and in Samaria, and unto the uttermost part of the earth.",
+   "gapIndex": 4,
+   "answer": "power",
+   "choices": [
+    "power",
+    "strength",
+    "might",
+    "grace"
+   ]
+  },
+  {
+   "id": "gap_acts_4_12",
+   "reference": "Acts 4:12",
+   "text": "Neither is there salvation in any other: for there is none other name under heaven given among men, whereby we must be saved.",
+   "gapIndex": 3,
+   "answer": "salvation",
+   "choices": [
+    "salvation",
+    "freedom",
+    "healing",
+    "deliverance"
+   ]
+  },
+  {
+   "id": "gap_acts_16_31",
+   "reference": "Acts 16:31",
+   "text": "And they said, Believe on the Lord Jesus Christ, and thou shalt be saved, and thy house.",
+   "gapIndex": 3,
+   "answer": "believe",
+   "choices": [
+    "believe",
+    "trust",
+    "hope",
+    "love"
+   ]
+  },
+  {
+   "id": "gap_acts_20_35",
+   "reference": "Acts 20:35",
+   "text": "I have shewed you all things, how that so labouring ye ought to support the weak, and to remember the words of the Lord Jesus, how he said, It is more blessed to give than to receive.",
+   "gapIndex": 31,
+   "answer": "blessed",
+   "choices": [
+    "blessed",
+    "happy",
+    "favoured",
+    "rich"
+   ]
+  },
+  {
+   "id": "gap_acts_2_38",
+   "reference": "Acts 2:38",
+   "text": "Then Peter said unto them, Repent, and be baptized every one of you in the name of Jesus Christ for the remission of sins, and ye shall receive the gift of the Holy Ghost.",
+   "gapIndex": 5,
+   "answer": "repent",
+   "choices": [
+    "repent",
+    "turn",
+    "believe",
+    "confess"
+   ]
+  },
+  {
+   "id": "gap_romans_12_12",
+   "reference": "Romans 12:12",
+   "text": "Rejoicing in hope; patient in tribulation; continuing instant in prayer;",
+   "gapIndex": 3,
+   "answer": "patient",
+   "choices": [
+    "patient",
+    "enduring",
+    "steadfast",
+    "persevering"
+   ]
+  },
+  {
+   "id": "gap_romans_12_1",
+   "reference": "Romans 12:1",
+   "text": "I beseech you therefore, brethren, by the mercies of God, that ye present your bodies a living sacrifice, holy, acceptable unto God, which is your reasonable service.",
+   "gapIndex": 17,
+   "answer": "sacrifice",
+   "choices": [
+    "sacrifice",
+    "offering",
+    "gift",
+    "worship"
+   ]
+  },
+  {
+   "id": "gap_romans_12_2",
+   "reference": "Romans 12:2",
+   "text": "And be not conformed to this world: but be ye transformed by the renewing of your mind, that ye may prove what is that good, and acceptable, and perfect, will of God.",
+   "gapIndex": 10,
+   "answer": "transformed",
+   "choices": [
+    "transformed",
+    "changed",
+    "reformed",
+    "shaped"
+   ]
+  },
+  {
+   "id": "gap_galatians_5_1",
+   "reference": "Galatians 5:1",
+   "text": "Stand fast therefore in the liberty wherewith Christ hath made us free, and be not entangled again with the yoke of bondage.",
+   "gapIndex": 5,
+   "answer": "liberty",
+   "choices": [
+    "liberty",
+    "freedom",
+    "rights",
+    "choice"
+   ]
+  },
+  {
+   "id": "gap_1_corinthians_16_13",
+   "reference": "1 Corinthians 16:13",
+   "text": "Watch ye, stand fast in the faith, quit you like men, be strong.",
+   "gapIndex": 7,
+   "answer": "quit",
+   "choices": [
+    "quit",
+    "steadfast",
+    "brave",
+    "firm"
+   ]
+  }
+ ]
+}

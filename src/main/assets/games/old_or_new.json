@@ -1,0 +1,1021 @@
+{
+ "version": 1,
+ "items": [
+  {
+   "id": "book_genesis",
+   "kind": "book",
+   "name": "Genesis",
+   "testament": "OLD",
+   "fact": "The first book: creation, Abraham and Joseph.",
+   "reference": "Genesis 1:1"
+  },
+  {
+   "id": "book_exodus",
+   "kind": "book",
+   "name": "Exodus",
+   "testament": "OLD",
+   "fact": "Moses leads Israel out of Egypt.",
+   "reference": "Exodus 1:1"
+  },
+  {
+   "id": "book_leviticus",
+   "kind": "book",
+   "name": "Leviticus",
+   "testament": "OLD",
+   "fact": "Laws for worship and holiness.",
+   "reference": "Leviticus 1:1"
+  },
+  {
+   "id": "book_numbers",
+   "kind": "book",
+   "name": "Numbers",
+   "testament": "OLD",
+   "fact": "Israel's counting and wandering in the wilderness.",
+   "reference": "Numbers 1:1"
+  },
+  {
+   "id": "book_deuteronomy",
+   "kind": "book",
+   "name": "Deuteronomy",
+   "testament": "OLD",
+   "fact": "Moses' farewell speeches before Israel enters the land.",
+   "reference": "Deuteronomy 1:1"
+  },
+  {
+   "id": "book_joshua",
+   "kind": "book",
+   "name": "Joshua",
+   "testament": "OLD",
+   "fact": "Israel enters and takes the promised land.",
+   "reference": "Joshua 1:1"
+  },
+  {
+   "id": "book_judges",
+   "kind": "book",
+   "name": "Judges",
+   "testament": "OLD",
+   "fact": "A cycle of rebellion, oppression and deliverance.",
+   "reference": "Judges 1:1"
+  },
+  {
+   "id": "book_ruth",
+   "kind": "book",
+   "name": "Ruth",
+   "testament": "OLD",
+   "fact": "A loyal daughter-in-law in Bethlehem.",
+   "reference": "Ruth 1:1"
+  },
+  {
+   "id": "book_1_samuel",
+   "kind": "book",
+   "name": "1 Samuel",
+   "testament": "OLD",
+   "fact": "Samuel, Saul and the rise of David.",
+   "reference": "1 Samuel 1:1"
+  },
+  {
+   "id": "book_2_samuel",
+   "kind": "book",
+   "name": "2 Samuel",
+   "testament": "OLD",
+   "fact": "David's reign in Jerusalem.",
+   "reference": "2 Samuel 1:1"
+  },
+  {
+   "id": "book_1_kings",
+   "kind": "book",
+   "name": "1 Kings",
+   "testament": "OLD",
+   "fact": "Solomon's temple and the divided kingdom.",
+   "reference": "1 Kings 1:1"
+  },
+  {
+   "id": "book_2_kings",
+   "kind": "book",
+   "name": "2 Kings",
+   "testament": "OLD",
+   "fact": "Elijah, Elisha and the fall of Israel and Judah.",
+   "reference": "2 Kings 1:1"
+  },
+  {
+   "id": "book_1_chronicles",
+   "kind": "book",
+   "name": "1 Chronicles",
+   "testament": "OLD",
+   "fact": "A history of David's family and reign.",
+   "reference": "1 Chronicles 1:1"
+  },
+  {
+   "id": "book_2_chronicles",
+   "kind": "book",
+   "name": "2 Chronicles",
+   "testament": "OLD",
+   "fact": "The kings of Judah and the temple.",
+   "reference": "2 Chronicles 1:1"
+  },
+  {
+   "id": "book_ezra",
+   "kind": "book",
+   "name": "Ezra",
+   "testament": "OLD",
+   "fact": "The return from exile and the rebuilding of the temple.",
+   "reference": "Ezra 1:1"
+  },
+  {
+   "id": "book_nehemiah",
+   "kind": "book",
+   "name": "Nehemiah",
+   "testament": "OLD",
+   "fact": "Nehemiah rebuilds the walls of Jerusalem.",
+   "reference": "Nehemiah 1:1"
+  },
+  {
+   "id": "book_esther",
+   "kind": "book",
+   "name": "Esther",
+   "testament": "OLD",
+   "fact": "A queen in Persia saves her people.",
+   "reference": "Esther 1:1"
+  },
+  {
+   "id": "book_job",
+   "kind": "book",
+   "name": "Job",
+   "testament": "OLD",
+   "fact": "A righteous man tested through great suffering.",
+   "reference": "Job 1:1"
+  },
+  {
+   "id": "book_psalms",
+   "kind": "book",
+   "name": "Psalms",
+   "testament": "OLD",
+   "fact": "A book of 150 songs and prayers.",
+   "reference": "Psalms 1:1"
+  },
+  {
+   "id": "book_proverbs",
+   "kind": "book",
+   "name": "Proverbs",
+   "testament": "OLD",
+   "fact": "Wise sayings for daily life.",
+   "reference": "Proverbs 1:1"
+  },
+  {
+   "id": "book_ecclesiastes",
+   "kind": "book",
+   "name": "Ecclesiastes",
+   "testament": "OLD",
+   "fact": "Reflections on the meaning of life.",
+   "reference": "Ecclesiastes 1:1"
+  },
+  {
+   "id": "book_song_of_solomon",
+   "kind": "book",
+   "name": "Song of Solomon",
+   "testament": "OLD",
+   "fact": "A love poem between a bride and bridegroom.",
+   "reference": "Song of Solomon 1:1"
+  },
+  {
+   "id": "book_isaiah",
+   "kind": "book",
+   "name": "Isaiah",
+   "testament": "OLD",
+   "fact": "Many prophecies about the coming Messiah.",
+   "reference": "Isaiah 1:1"
+  },
+  {
+   "id": "book_jeremiah",
+   "kind": "book",
+   "name": "Jeremiah",
+   "testament": "OLD",
+   "fact": "The weeping prophet before Jerusalem falls.",
+   "reference": "Jeremiah 1:1"
+  },
+  {
+   "id": "book_lamentations",
+   "kind": "book",
+   "name": "Lamentations",
+   "testament": "OLD",
+   "fact": "Laments over the fall of Jerusalem.",
+   "reference": "Lamentations 1:1"
+  },
+  {
+   "id": "book_ezekiel",
+   "kind": "book",
+   "name": "Ezekiel",
+   "testament": "OLD",
+   "fact": "Visions of God's glory and the valley of dry bones.",
+   "reference": "Ezekiel 1:1"
+  },
+  {
+   "id": "book_daniel",
+   "kind": "book",
+   "name": "Daniel",
+   "testament": "OLD",
+   "fact": "Daniel in the lions' den and Shadrach, Meshach and Abed-nego.",
+   "reference": "Daniel 1:1"
+  },
+  {
+   "id": "book_hosea",
+   "kind": "book",
+   "name": "Hosea",
+   "testament": "OLD",
+   "fact": "A prophet's marriage pictures God's love for Israel.",
+   "reference": "Hosea 1:1"
+  },
+  {
+   "id": "book_joel",
+   "kind": "book",
+   "name": "Joel",
+   "testament": "OLD",
+   "fact": "The day of the Lord and the outpouring of the Spirit.",
+   "reference": "Joel 1:1"
+  },
+  {
+   "id": "book_amos",
+   "kind": "book",
+   "name": "Amos",
+   "testament": "OLD",
+   "fact": "A shepherd from Tekoa who speaks about justice.",
+   "reference": "Amos 1:1"
+  },
+  {
+   "id": "book_obadiah",
+   "kind": "book",
+   "name": "Obadiah",
+   "testament": "OLD",
+   "fact": "The shortest book of the Old Testament, a message against Edom.",
+   "reference": "Obadiah 1:1"
+  },
+  {
+   "id": "book_jonah",
+   "kind": "book",
+   "name": "Jonah",
+   "testament": "OLD",
+   "fact": "A prophet swallowed by a great fish.",
+   "reference": "Jonah 1:1"
+  },
+  {
+   "id": "book_micah",
+   "kind": "book",
+   "name": "Micah",
+   "testament": "OLD",
+   "fact": "The ruler from Bethlehem and what God requires.",
+   "reference": "Micah 1:1"
+  },
+  {
+   "id": "book_nahum",
+   "kind": "book",
+   "name": "Nahum",
+   "testament": "OLD",
+   "fact": "The judgement of Nineveh.",
+   "reference": "Nahum 1:1"
+  },
+  {
+   "id": "book_habakkuk",
+   "kind": "book",
+   "name": "Habakkuk",
+   "testament": "OLD",
+   "fact": "A prophet asks God why and receives an answer of faith.",
+   "reference": "Habakkuk 1:1"
+  },
+  {
+   "id": "book_zephaniah",
+   "kind": "book",
+   "name": "Zephaniah",
+   "testament": "OLD",
+   "fact": "The day of the Lord and the rejoicing that follows.",
+   "reference": "Zephaniah 1:1"
+  },
+  {
+   "id": "book_haggai",
+   "kind": "book",
+   "name": "Haggai",
+   "testament": "OLD",
+   "fact": "A call to rebuild the temple.",
+   "reference": "Haggai 1:1"
+  },
+  {
+   "id": "book_zechariah",
+   "kind": "book",
+   "name": "Zechariah",
+   "testament": "OLD",
+   "fact": "Visions of restoration and the coming king.",
+   "reference": "Zechariah 1:1"
+  },
+  {
+   "id": "book_malachi",
+   "kind": "book",
+   "name": "Malachi",
+   "testament": "OLD",
+   "fact": "The last book of the Old Testament.",
+   "reference": "Malachi 1:1"
+  },
+  {
+   "id": "book_matthew",
+   "kind": "book",
+   "name": "Matthew",
+   "testament": "NEW",
+   "fact": "The first Gospel, with the Sermon on the Mount.",
+   "reference": "Matthew 1:1"
+  },
+  {
+   "id": "book_mark",
+   "kind": "book",
+   "name": "Mark",
+   "testament": "NEW",
+   "fact": "The shortest Gospel, full of action.",
+   "reference": "Mark 1:1"
+  },
+  {
+   "id": "book_luke",
+   "kind": "book",
+   "name": "Luke",
+   "testament": "NEW",
+   "fact": "The Gospel written by a physician.",
+   "reference": "Luke 1:1"
+  },
+  {
+   "id": "book_john",
+   "kind": "book",
+   "name": "John",
+   "testament": "NEW",
+   "fact": "The Gospel that says 'In the beginning was the Word'.",
+   "reference": "John 1:1"
+  },
+  {
+   "id": "book_acts",
+   "kind": "book",
+   "name": "Acts",
+   "testament": "NEW",
+   "fact": "The early church, from Pentecost onward.",
+   "reference": "Acts 1:1"
+  },
+  {
+   "id": "book_romans",
+   "kind": "book",
+   "name": "Romans",
+   "testament": "NEW",
+   "fact": "Paul's letter on grace and faith.",
+   "reference": "Romans 1:1"
+  },
+  {
+   "id": "book_1_corinthians",
+   "kind": "book",
+   "name": "1 Corinthians",
+   "testament": "NEW",
+   "fact": "Paul's letter to a church full of problems and gifts.",
+   "reference": "1 Corinthians 1:1"
+  },
+  {
+   "id": "book_2_corinthians",
+   "kind": "book",
+   "name": "2 Corinthians",
+   "testament": "NEW",
+   "fact": "Paul's letter on comfort and ministry.",
+   "reference": "2 Corinthians 1:1"
+  },
+  {
+   "id": "book_galatians",
+   "kind": "book",
+   "name": "Galatians",
+   "testament": "NEW",
+   "fact": "Paul's letter on freedom in Christ.",
+   "reference": "Galatians 1:1"
+  },
+  {
+   "id": "book_ephesians",
+   "kind": "book",
+   "name": "Ephesians",
+   "testament": "NEW",
+   "fact": "Paul's letter on the church as one body.",
+   "reference": "Ephesians 1:1"
+  },
+  {
+   "id": "book_philippians",
+   "kind": "book",
+   "name": "Philippians",
+   "testament": "NEW",
+   "fact": "Paul's letter of joy from prison.",
+   "reference": "Philippians 1:1"
+  },
+  {
+   "id": "book_colossians",
+   "kind": "book",
+   "name": "Colossians",
+   "testament": "NEW",
+   "fact": "Paul's letter on Christ's supremacy.",
+   "reference": "Colossians 1:1"
+  },
+  {
+   "id": "book_1_thessalonians",
+   "kind": "book",
+   "name": "1 Thessalonians",
+   "testament": "NEW",
+   "fact": "Paul's encouragement to a young church about Christ's return.",
+   "reference": "1 Thessalonians 1:1"
+  },
+  {
+   "id": "book_2_thessalonians",
+   "kind": "book",
+   "name": "2 Thessalonians",
+   "testament": "NEW",
+   "fact": "Paul's letter about the day of the Lord.",
+   "reference": "2 Thessalonians 1:1"
+  },
+  {
+   "id": "book_1_timothy",
+   "kind": "book",
+   "name": "1 Timothy",
+   "testament": "NEW",
+   "fact": "Paul's instructions to a young pastor.",
+   "reference": "1 Timothy 1:1"
+  },
+  {
+   "id": "book_2_timothy",
+   "kind": "book",
+   "name": "2 Timothy",
+   "testament": "NEW",
+   "fact": "Paul's last letter, urging faithfulness.",
+   "reference": "2 Timothy 1:1"
+  },
+  {
+   "id": "book_titus",
+   "kind": "book",
+   "name": "Titus",
+   "testament": "NEW",
+   "fact": "Paul's letter on sound teaching in Crete.",
+   "reference": "Titus 1:1"
+  },
+  {
+   "id": "book_philemon",
+   "kind": "book",
+   "name": "Philemon",
+   "testament": "NEW",
+   "fact": "A short letter about a runaway slave.",
+   "reference": "Philemon 1:1"
+  },
+  {
+   "id": "book_hebrews",
+   "kind": "book",
+   "name": "Hebrews",
+   "testament": "NEW",
+   "fact": "Jesus is better than the old covenant.",
+   "reference": "Hebrews 1:1"
+  },
+  {
+   "id": "book_james",
+   "kind": "book",
+   "name": "James",
+   "testament": "NEW",
+   "fact": "Faith shows itself in action.",
+   "reference": "James 1:1"
+  },
+  {
+   "id": "book_1_peter",
+   "kind": "book",
+   "name": "1 Peter",
+   "testament": "NEW",
+   "fact": "Peter's letter of hope to suffering believers.",
+   "reference": "1 Peter 1:1"
+  },
+  {
+   "id": "book_2_peter",
+   "kind": "book",
+   "name": "2 Peter",
+   "testament": "NEW",
+   "fact": "Peter's warning against false teachers.",
+   "reference": "2 Peter 1:1"
+  },
+  {
+   "id": "book_1_john",
+   "kind": "book",
+   "name": "1 John",
+   "testament": "NEW",
+   "fact": "God is light and love.",
+   "reference": "1 John 1:1"
+  },
+  {
+   "id": "book_2_john",
+   "kind": "book",
+   "name": "2 John",
+   "testament": "NEW",
+   "fact": "A short letter about walking in truth and love.",
+   "reference": "2 John 1:1"
+  },
+  {
+   "id": "book_3_john",
+   "kind": "book",
+   "name": "3 John",
+   "testament": "NEW",
+   "fact": "A short letter to Gaius about hospitality.",
+   "reference": "3 John 1:1"
+  },
+  {
+   "id": "book_jude",
+   "kind": "book",
+   "name": "Jude",
+   "testament": "NEW",
+   "fact": "A short letter warning against false teaching.",
+   "reference": "Jude 1:1"
+  },
+  {
+   "id": "book_revelation",
+   "kind": "book",
+   "name": "Revelation",
+   "testament": "NEW",
+   "fact": "The last book of the Bible, a vision of the end.",
+   "reference": "Revelation 1:1"
+  },
+  {
+   "id": "person_abraham",
+   "kind": "person",
+   "name": "Abraham",
+   "testament": "OLD",
+   "fact": "Called from Ur to become the father of many nations.",
+   "reference": "Genesis 12:1"
+  },
+  {
+   "id": "person_sarah",
+   "kind": "person",
+   "name": "Sarah",
+   "testament": "OLD",
+   "fact": "Abraham's wife, mother of Isaac.",
+   "reference": "Genesis 17:15"
+  },
+  {
+   "id": "person_isaac",
+   "kind": "person",
+   "name": "Isaac",
+   "testament": "OLD",
+   "fact": "The son of promise born to Abraham and Sarah.",
+   "reference": "Genesis 21:3"
+  },
+  {
+   "id": "person_jacob",
+   "kind": "person",
+   "name": "Jacob",
+   "testament": "OLD",
+   "fact": "Isaac's son, renamed Israel.",
+   "reference": "Genesis 32:28"
+  },
+  {
+   "id": "person_joseph",
+   "kind": "person",
+   "name": "Joseph",
+   "testament": "OLD",
+   "fact": "Sold into Egypt and later rose to power there.",
+   "reference": "Genesis 37:28"
+  },
+  {
+   "id": "person_moses",
+   "kind": "person",
+   "name": "Moses",
+   "testament": "OLD",
+   "fact": "Led Israel out of Egypt.",
+   "reference": "Exodus 3:10"
+  },
+  {
+   "id": "person_aaron",
+   "kind": "person",
+   "name": "Aaron",
+   "testament": "OLD",
+   "fact": "Moses' brother and the first high priest.",
+   "reference": "Exodus 4:14"
+  },
+  {
+   "id": "person_joshua",
+   "kind": "person",
+   "name": "Joshua",
+   "testament": "OLD",
+   "fact": "Moses' successor who led Israel into the land.",
+   "reference": "Joshua 1:1"
+  },
+  {
+   "id": "person_rahab",
+   "kind": "person",
+   "name": "Rahab",
+   "testament": "OLD",
+   "fact": "A woman of Jericho who hid the spies.",
+   "reference": "Joshua 2:1"
+  },
+  {
+   "id": "person_gideon",
+   "kind": "person",
+   "name": "Gideon",
+   "testament": "OLD",
+   "fact": "A judge who defeated Midian with three hundred men.",
+   "reference": "Judges 6:11"
+  },
+  {
+   "id": "person_samson",
+   "kind": "person",
+   "name": "Samson",
+   "testament": "OLD",
+   "fact": "A judge of great strength.",
+   "reference": "Judges 13:24"
+  },
+  {
+   "id": "person_samuel",
+   "kind": "person",
+   "name": "Samuel",
+   "testament": "OLD",
+   "fact": "A prophet who anointed Israel's first kings.",
+   "reference": "1 Samuel 3:20"
+  },
+  {
+   "id": "person_saul",
+   "kind": "person",
+   "name": "Saul",
+   "testament": "OLD",
+   "fact": "Israel's first king.",
+   "reference": "1 Samuel 10:1"
+  },
+  {
+   "id": "person_david",
+   "kind": "person",
+   "name": "David",
+   "testament": "OLD",
+   "fact": "The shepherd king who defeated Goliath.",
+   "reference": "1 Samuel 16:13"
+  },
+  {
+   "id": "person_solomon",
+   "kind": "person",
+   "name": "Solomon",
+   "testament": "OLD",
+   "fact": "David's son who built the temple.",
+   "reference": "1 Kings 1:39"
+  },
+  {
+   "id": "person_elijah",
+   "kind": "person",
+   "name": "Elijah",
+   "testament": "OLD",
+   "fact": "A prophet who confronted Ahab on Mount Carmel.",
+   "reference": "1 Kings 17:1"
+  },
+  {
+   "id": "person_elisha",
+   "kind": "person",
+   "name": "Elisha",
+   "testament": "OLD",
+   "fact": "Elijah's successor, who received a double portion.",
+   "reference": "2 Kings 2:9"
+  },
+  {
+   "id": "person_esther",
+   "kind": "person",
+   "name": "Esther",
+   "testament": "OLD",
+   "fact": "A queen who saved the Jews in Persia.",
+   "reference": "Esther 2:17"
+  },
+  {
+   "id": "person_job",
+   "kind": "person",
+   "name": "Job",
+   "testament": "OLD",
+   "fact": "A righteous man who endured great suffering.",
+   "reference": "Job 1:1"
+  },
+  {
+   "id": "person_daniel",
+   "kind": "person",
+   "name": "Daniel",
+   "testament": "OLD",
+   "fact": "A young man in Babylon who was faithful to God.",
+   "reference": "Daniel 1:6"
+  },
+  {
+   "id": "person_jonah",
+   "kind": "person",
+   "name": "Jonah",
+   "testament": "OLD",
+   "fact": "A prophet who went to Nineveh after a great fish.",
+   "reference": "Jonah 1:1"
+  },
+  {
+   "id": "person_ruth",
+   "kind": "person",
+   "name": "Ruth",
+   "testament": "OLD",
+   "fact": "A loyal Moabite woman who settled in Bethlehem.",
+   "reference": "Ruth 1:16"
+  },
+  {
+   "id": "person_peter",
+   "kind": "person",
+   "name": "Peter",
+   "testament": "NEW",
+   "fact": "A fisherman and leader among the twelve apostles.",
+   "reference": "Matthew 4:18"
+  },
+  {
+   "id": "person_andrew",
+   "kind": "person",
+   "name": "Andrew",
+   "testament": "NEW",
+   "fact": "Peter's brother, who brought him to Jesus.",
+   "reference": "John 1:40"
+  },
+  {
+   "id": "person_james",
+   "kind": "person",
+   "name": "James",
+   "testament": "NEW",
+   "fact": "One of the sons of Zebedee and a leader in Jerusalem.",
+   "reference": "Matthew 4:21"
+  },
+  {
+   "id": "person_john",
+   "kind": "person",
+   "name": "John",
+   "testament": "NEW",
+   "fact": "The apostle whom Jesus loved, and writer of a Gospel.",
+   "reference": "John 13:23"
+  },
+  {
+   "id": "person_thomas",
+   "kind": "person",
+   "name": "Thomas",
+   "testament": "NEW",
+   "fact": "The apostle called Doubting.",
+   "reference": "John 20:24"
+  },
+  {
+   "id": "person_matthew",
+   "kind": "person",
+   "name": "Matthew",
+   "testament": "NEW",
+   "fact": "A tax collector who became an apostle.",
+   "reference": "Matthew 9:9"
+  },
+  {
+   "id": "person_mary_magdalene",
+   "kind": "person",
+   "name": "Mary Magdalene",
+   "testament": "NEW",
+   "fact": "A woman who was the first to see the risen Jesus.",
+   "reference": "John 20:1"
+  },
+  {
+   "id": "person_lydia",
+   "kind": "person",
+   "name": "Lydia",
+   "testament": "NEW",
+   "fact": "A seller of purple cloth who believed in Philippi.",
+   "reference": "Acts 16:14"
+  },
+  {
+   "id": "person_stephen",
+   "kind": "person",
+   "name": "Stephen",
+   "testament": "NEW",
+   "fact": "The first martyr of the church.",
+   "reference": "Acts 6:5"
+  },
+  {
+   "id": "person_barnabas",
+   "kind": "person",
+   "name": "Barnabas",
+   "testament": "NEW",
+   "fact": "A companion of Paul on his first journey.",
+   "reference": "Acts 4:36"
+  },
+  {
+   "id": "person_timothy",
+   "kind": "person",
+   "name": "Timothy",
+   "testament": "NEW",
+   "fact": "Paul's young companion and son in the faith.",
+   "reference": "Acts 16:1"
+  },
+  {
+   "id": "person_priscilla",
+   "kind": "person",
+   "name": "Priscilla",
+   "testament": "NEW",
+   "fact": "A tentmaker who worked with Paul in Corinth.",
+   "reference": "Acts 18:2"
+  },
+  {
+   "id": "person_luke",
+   "kind": "person",
+   "name": "Luke",
+   "testament": "NEW",
+   "fact": "The physician and writer of a Gospel and Acts.",
+   "reference": "Colossians 4:14"
+  },
+  {
+   "id": "person_paul",
+   "kind": "person",
+   "name": "Paul",
+   "testament": "NEW",
+   "fact": "Once Saul, later the apostle to the Gentiles.",
+   "reference": "Acts 9:1"
+  },
+  {
+   "id": "person_nicodemus",
+   "kind": "person",
+   "name": "Nicodemus",
+   "testament": "NEW",
+   "fact": "A Jewish ruler who came to Jesus at night.",
+   "reference": "John 3:1"
+  },
+  {
+   "id": "person_zacchaeus",
+   "kind": "person",
+   "name": "Zacchaeus",
+   "testament": "NEW",
+   "fact": "A tax collector who climbed a tree to see Jesus.",
+   "reference": "Luke 19:2"
+  },
+  {
+   "id": "person_pontius_pilate",
+   "kind": "person",
+   "name": "Pontius Pilate",
+   "testament": "NEW",
+   "fact": "The Roman governor who condemned Jesus.",
+   "reference": "Matthew 27:2"
+  },
+  {
+   "id": "event_the_flood",
+   "kind": "event",
+   "name": "The Flood",
+   "testament": "OLD",
+   "fact": "God sent rain for forty days and saved Noah's family.",
+   "reference": "Genesis 7:12"
+  },
+  {
+   "id": "event_the_tower_of_babel",
+   "kind": "event",
+   "name": "The Tower of Babel",
+   "testament": "OLD",
+   "fact": "People tried to build a tower to heaven, and their language was confused.",
+   "reference": "Genesis 11:4"
+  },
+  {
+   "id": "event_the_exodus",
+   "kind": "event",
+   "name": "The Exodus",
+   "testament": "OLD",
+   "fact": "Israel left Egypt under the leadership of Moses.",
+   "reference": "Exodus 12:37"
+  },
+  {
+   "id": "event_the_crossing_of_the_red_sea",
+   "kind": "event",
+   "name": "The crossing of the Red Sea",
+   "testament": "OLD",
+   "fact": "The waters divided so Israel could cross on dry land.",
+   "reference": "Exodus 14:21"
+  },
+  {
+   "id": "event_the_golden_calf",
+   "kind": "event",
+   "name": "The golden calf",
+   "testament": "OLD",
+   "fact": "Israel made an idol while Moses was on the mountain.",
+   "reference": "Exodus 32:4"
+  },
+  {
+   "id": "event_the_fall_of_jericho",
+   "kind": "event",
+   "name": "The fall of Jericho",
+   "testament": "OLD",
+   "fact": "The walls fell after the people marched around the city.",
+   "reference": "Joshua 6:20"
+  },
+  {
+   "id": "event_the_battle_with_goliath",
+   "kind": "event",
+   "name": "The battle with Goliath",
+   "testament": "OLD",
+   "fact": "A young shepherd defeated a giant with a sling.",
+   "reference": "1 Samuel 17:49"
+  },
+  {
+   "id": "event_the_dedication_of_the_temple",
+   "kind": "event",
+   "name": "The dedication of the temple",
+   "testament": "OLD",
+   "fact": "Solomon's temple was finished and dedicated to God.",
+   "reference": "1 Kings 8:1"
+  },
+  {
+   "id": "event_the_exile_to_babylon",
+   "kind": "event",
+   "name": "The exile to Babylon",
+   "testament": "OLD",
+   "fact": "Judah was taken into captivity in Babylon.",
+   "reference": "2 Kings 25:11"
+  },
+  {
+   "id": "event_the_return_from_exile",
+   "kind": "event",
+   "name": "The return from exile",
+   "testament": "OLD",
+   "fact": "The Jews came back to Jerusalem and rebuilt the temple.",
+   "reference": "Ezra 1:1"
+  },
+  {
+   "id": "event_the_birth_of_jesus",
+   "kind": "event",
+   "name": "The birth of Jesus",
+   "testament": "NEW",
+   "fact": "Jesus was born in Bethlehem.",
+   "reference": "Luke 2:7"
+  },
+  {
+   "id": "event_the_baptism_of_jesus",
+   "kind": "event",
+   "name": "The baptism of Jesus",
+   "testament": "NEW",
+   "fact": "Jesus was baptised by John in the Jordan.",
+   "reference": "Matthew 3:13"
+  },
+  {
+   "id": "event_the_temptation_in_the_wilderness",
+   "kind": "event",
+   "name": "The temptation in the wilderness",
+   "testament": "NEW",
+   "fact": "Jesus fasted forty days and resisted the devil.",
+   "reference": "Matthew 4:2"
+  },
+  {
+   "id": "event_the_sermon_on_the_mount",
+   "kind": "event",
+   "name": "The Sermon on the Mount",
+   "testament": "NEW",
+   "fact": "Jesus taught the crowds about blessing and the kingdom.",
+   "reference": "Matthew 5:1"
+  },
+  {
+   "id": "event_the_feeding_of_the_five_thousand",
+   "kind": "event",
+   "name": "The feeding of the five thousand",
+   "testament": "NEW",
+   "fact": "Jesus fed a great crowd from five loaves and two fish.",
+   "reference": "Matthew 14:19"
+  },
+  {
+   "id": "event_the_transfiguration",
+   "kind": "event",
+   "name": "The transfiguration",
+   "testament": "NEW",
+   "fact": "Jesus shone with glory on a mountain with three disciples.",
+   "reference": "Matthew 17:2"
+  },
+  {
+   "id": "event_the_crucifixion",
+   "kind": "event",
+   "name": "The crucifixion",
+   "testament": "NEW",
+   "fact": "Jesus was put to death on a cross at Golgotha.",
+   "reference": "Matthew 27:35"
+  },
+  {
+   "id": "event_the_resurrection",
+   "kind": "event",
+   "name": "The resurrection",
+   "testament": "NEW",
+   "fact": "Jesus rose from the dead on the third day.",
+   "reference": "Matthew 28:6"
+  },
+  {
+   "id": "event_the_ascension",
+   "kind": "event",
+   "name": "The ascension",
+   "testament": "NEW",
+   "fact": "Jesus was taken up into heaven.",
+   "reference": "Acts 1:9"
+  },
+  {
+   "id": "event_pentecost",
+   "kind": "event",
+   "name": "Pentecost",
+   "testament": "NEW",
+   "fact": "The Holy Spirit came upon the disciples in Jerusalem.",
+   "reference": "Acts 2:1"
+  },
+  {
+   "id": "event_the_conversion_of_saul",
+   "kind": "event",
+   "name": "The conversion of Saul",
+   "testament": "NEW",
+   "fact": "Saul met Jesus on the road to Damascus.",
+   "reference": "Acts 9:3"
+  },
+  {
+   "id": "event_the_council_of_jerusalem",
+   "kind": "event",
+   "name": "The Council of Jerusalem",
+   "testament": "NEW",
+   "fact": "The apostles met to decide about Gentile believers.",
+   "reference": "Acts 15:6"
+  }
+ ]
+}

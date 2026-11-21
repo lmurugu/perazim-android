@@ -51,7 +51,12 @@ public final class BibleGames {
         private boolean correct;
 
         public Round(Mode mode, long seed) {
-            List<Card> shuffled = new ArrayList<>(cards(mode));
+            this(cards(mode), seed);
+        }
+
+        /** A round of five cards drawn from the given pool with a fixed seed. */
+        public Round(List<Card> pool, long seed) {
+            List<Card> shuffled = new ArrayList<>(pool);
             Collections.shuffle(shuffled, new Random(seed));
             cards = Collections.unmodifiableList(new ArrayList<>(shuffled.subList(0, Math.min(5, shuffled.size()))));
         }
@@ -116,6 +121,17 @@ public final class BibleGames {
             for (int id : selected) result.add(words.get(id));
             return String.join(" ", result);
         }
+    }
+
+    /** A multiple-choice card from a bank file. The answer must be one of the options. */
+    public static Card trivia(String question, String answer, String reference, String explanation,
+                              String hint, List<String> options) {
+        return new Card(question, answer, reference, explanation, hint, String.join("|", options), "");
+    }
+
+    /** A verse-order card from a bank file. The explanation is empty; the reference is shown after the check. */
+    public static Card verse(String text, String reference) {
+        return new Card("Put the words in order", text, reference, "", "", "", "");
     }
 
     private static Card c(String q, String a, String ref, String explanation, String hint, String options, String aliases) {
