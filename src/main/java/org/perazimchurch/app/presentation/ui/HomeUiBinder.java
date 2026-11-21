@@ -459,12 +459,11 @@ public class HomeUiBinder {
         titles.addView(GlassKit.text(context, "Bible games to enjoy", 12, false, GlassKit.muted()));
         header.addView(titles, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
 
-        TextView more = new TextView(context);
-        more.setText("\u2192");
-        more.setTextSize(18);
-        more.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        more.setTextColor(Color.WHITE);
-        more.setGravity(Gravity.CENTER);
+        // A vector chevron rather than a text arrow, so it draws the same whatever font the device uses.
+        ImageView more = new ImageView(context);
+        more.setImageResource(R.drawable.ic_chevron_right);
+        more.setScaleType(ImageView.ScaleType.CENTER);
+        more.setContentDescription("Open the Bible games");
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
         circle.setColor(PerazimTheme.COLOR_ORANGE_BRAND);
