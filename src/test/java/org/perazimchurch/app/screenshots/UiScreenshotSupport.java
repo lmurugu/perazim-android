@@ -55,7 +55,10 @@ final class UiScreenshotSupport {
         PerazimTheme.saveChoice(ctx, light ? PerazimTheme.CHOICE_LIGHT : PerazimTheme.CHOICE_DARK);
         PerazimTheme.applyMode(light);
 
-        ActivityController<MainActivity> controller = Robolectric.buildActivity(MainActivity.class).setup();
+        // A cold start shows the splash and defers initApp() to its end callback, which Robolectric never reaches
+        // in this helper, so tabViews stay null. Passing a saved state builds the tabs immediately.
+        ActivityController<MainActivity> controller = Robolectric.buildActivity(MainActivity.class)
+                .create(new android.os.Bundle()).postCreate(null).start().resume().visible();
         MainActivity activity = controller.get();
         idle();
 

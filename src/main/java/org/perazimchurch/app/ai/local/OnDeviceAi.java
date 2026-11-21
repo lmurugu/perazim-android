@@ -154,20 +154,20 @@ public final class OnDeviceAi {
                         System.currentTimeMillis(), evidenceQuery);
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
-                String prompt = LocalPrompt.build(question, history, evidence);
+                LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence);
+                // Only excerpts the model actually saw may be cited, verified, or titled.
+                JSONArray shown = built.shownEvidence;
+                if (shown.length() == 0) throw new IOException("The question is too long for the on-device model. Ask a shorter question.");
                 if (!isInstalled(c)) throw new IOException("Download the on-device model first.");
-                if (!MODEL_SHA.equals(sha256(modelFile(c)))) {
-                    cacheModelStatus(modelFile(c), false);
-                    throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
-                }
-                cacheModelStatus(modelFile(c), true);
+                // Uses the cached verification; a full 491 MB digest runs only when the file changed.
+                if (!isModelVerified(c)) throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
                 if (cancelled) throw new IOException("Generation cancelled.");
                 String dir = c.getApplicationInfo().nativeLibraryDir;
                 int answerLimit = LocalPrompt.requiresStructuredBiblicalAnswer(question) ? 280 : 120;
                 ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
-                        "-m", modelFile(c).getAbsolutePath(), "-p", prompt,
+                        "-m", modelFile(c).getAbsolutePath(), "-p", built.prompt,
                         "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
-                        "--grammar", CitationGrammar.build(evidence, answerLimit),
+                        "--grammar", CitationGrammar.build(shown, answerLimit),
                         "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
                 builder.environment().put("LD_LIBRARY_PATH", dir);
                 process = builder.start(); active = process;
@@ -201,13 +201,13 @@ public final class OnDeviceAi {
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
                 if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
                         || (PerazimAiEngine.claimsOfficialStatus(result)
-                        && !PerazimAiEngine.officialClaimHasApprovedProvenance(result, evidence))) {
+                        && !PerazimAiEngine.officialClaimHasApprovedProvenance(result, shown))) {
                     throw new IOException("The local model made a claim the app cannot verify. Ask again or contact the church office.");
                 }
-                if (!hasVerifiedCitations(result, evidence)) {
+                if (!hasVerifiedCitations(result, shown)) {
                     throw new IOException("The local model did not return a verified source citation.");
                 }
-                String citedResult = appendVerifiedSourceTitles(result, evidence);
+                String citedResult = appendVerifiedSourceTitles(result, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();
@@ -345,7 +345,10 @@ public final class OnDeviceAi {
                 if (!part.renameTo(target)) throw new IOException("Cannot finish model installation.");
                 cacheModelStatus(target, true);
                 MAIN.post(callback::onComplete);
-            } catch (Exception e) { String error = e.getMessage(); MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
+            } catch (Exception e) {
+                // Cancel closes the socket, which surfaces as a low-level error; report it as a pause instead.
+                String error = cancelled ? "Download paused. Tap Download to resume." : e.getMessage();
+                MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
             finally { if (connection != null) connection.disconnect(); activeDownload = null; busy.set(false); }
         });
     }

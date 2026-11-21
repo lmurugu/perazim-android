@@ -46,15 +46,7 @@ public final class OfflineKnowledgeStore {
     private static final String CONTROL_STATE_PREFS = "perazim_ai_package_control_state_v1";
     private static final String INSTALL_STATE_KEY_ALIAS = "org.perazimchurch.app.ai.package-state.v1";
     private static final String UPDATE_STATUS_PREFS = "perazim_ai_package_update_status_v1";
-    private static final java.util.Set<String> QUERY_STOP_WORDS = new java.util.HashSet<>(java.util.Arrays.asList(
-            "about", "after", "also", "and", "are", "because", "been", "before", "being", "but",
-            "can", "could", "did", "does", "doing", "down", "for", "from", "had", "has", "have",
-            "bible", "chapter", "how", "into", "just", "kjv", "like", "not", "of", "off", "on", "once", "only", "or", "our",
-            "out", "over", "own", "please", "read", "show", "same", "should", "so", "some", "such",
-            "scripture", "passage", "mean", "means", "meaning", "explain", "interpret", "interpreting", "say",
-            "tell", "than", "that", "the", "their", "them", "there", "these", "they", "this", "those",
-            "through", "too", "under", "until", "very", "what", "when", "where", "which", "while",
-            "verse", "verses", "who", "with", "would", "you", "your"));
+    private static final java.util.Set<String> QUERY_STOP_WORDS = GovernedEvidence.STOP_WORDS;
     private OfflineKnowledgeStore() {}
 
     public static final class VerifiedPackage {
@@ -62,8 +54,12 @@ public final class OfflineKnowledgeStore {
         public final String digest;
         public final JSONArray documents;
         public final long publishedAt;
+        /** Governance parsed from the signed payload only. Empty means no source is authorised. */
+        public final java.util.List<SourceGovernance.Source> governance;
 
-        private VerifiedPackage(String version, String digest, JSONArray documents, long publishedAt) {
+        private VerifiedPackage(String version, String digest, JSONArray documents, long publishedAt,
+                                java.util.List<SourceGovernance.Source> governance) {
+            this.governance = java.util.Collections.unmodifiableList(new java.util.ArrayList<>(governance));
             this.version = version;
             this.digest = digest;
             this.documents = documents;
@@ -277,7 +273,10 @@ public final class OfflineKnowledgeStore {
                 throw new SecurityException("A package source is missing provenance.");
             }
         }
-        return new VerifiedPackage(payload.getString("version"), contentDigest, documents, payload.getLong("publishedAt"));
+        long publishedAtValue = payload.getLong("publishedAt");
+        java.util.List<SourceGovernance.Source> governance =
+                SourceGovernance.fromVerifiedPayload(payload.opt("governance"), publishedAtValue);
+        return new VerifiedPackage(payload.getString("version"), contentDigest, documents, publishedAtValue, governance);
     }
 
     public static synchronized VerifiedPackage install(Context context, String envelope,
@@ -342,6 +341,12 @@ public final class OfflineKnowledgeStore {
                         controlCheckpoint == null ? 0L : controlCheckpoint.sequence)) {
             throw new SecurityException("Rollback authorization does not match the exact installed target or is stale.");
         }
+
+        VerifiedControl withdrawal = null;
+        try { withdrawal = readWithdrawalControl(context, trustedKeys, nowMillis); }
+        catch (Exception ignored) { withdrawal = null; }
+        GovernedEvidence.assertRollbackAllowed(target.governance, target.documents,
+                withdrawal == null ? null : withdrawal.withdrawnSources);
 
         writeEnvelope(context, PREVIOUS_PACKAGE_FILE, currentEnvelope);
         writeEnvelope(context, PACKAGE_FILE, targetEnvelope);
@@ -1016,48 +1021,34 @@ public final class OfflineKnowledgeStore {
                 && new File(context.getFilesDir(), PREVIOUS_PACKAGE_FILE).isFile();
     }
 
+    /**
+     * Returns the evidence that may be shown to the model. Authority comes only from the governance manifest, never
+     * from fields inside the package document. Documents without a governed, hash-matching, non-withdrawn entry are
+     * dropped; nothing here fails open.
+     */
     @NonNull
     public static JSONArray retrieve(Context context, Map<String, String> trustedKeys,
                                      String appVersion, long nowMillis, String question) throws Exception {
         VerifiedPackage installed = read(context, trustedKeys, appVersion, nowMillis);
         if (question == null || question.trim().isEmpty()) return new JSONArray();
         if (isUnderspecifiedReferenceQuestion(question)) return new JSONArray();
-        java.util.List<JSONObject> candidates = new java.util.ArrayList<>();
-        VerifiedControl control = null;
+        JSONArray selected = new JSONArray();
         if (installed != null && installed.documents.length() > 0) {
+            VerifiedControl control = null;
             try { control = readWithdrawalControl(context, trustedKeys, nowMillis); }
             catch (Exception ignored) { control = null; }
-        }
-        if (installed != null && (installed.documents.length() == 0 || control != null)) {
-            String[] terms = question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+");
-            for (int i = 0; i < installed.documents.length(); i++) {
-                JSONObject document = installed.documents.getJSONObject(i);
-                if (control != null && control.withdrawnSources.contains(sourceKey(
-                        document.optString("sourceId"), document.optString("version")))) continue;
-                String text = document.getString("text");
-                String normalized = text.toLowerCase(java.util.Locale.ROOT);
-                int score = 0;
-                for (String term : terms) {
-                    if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
-                }
-                if (score > 0) candidates.add(document);
+            // Fail closed: without a current withdrawal manifest no package document is offered as evidence.
+            // Governance comes only from the signed payload; an absent array means nothing is authorised.
+            if (control != null) {
+                int documentLimit = LocalScriptureRetriever.isScriptureRelated(question) ? 2 : 3;
+                selected = GovernedEvidence.select(installed.documents, control.withdrawnSources,
+                        installed.governance, question, documentLimit);
             }
         }
-        candidates.sort((left, right) -> {
-            try {
-                return Integer.compare(overlap(right.getString("text"), question), overlap(left.getString("text"), question));
-            } catch (JSONException error) { return 0; }
-        });
-        JSONArray selected = new JSONArray();
-        int chars = 0;
         boolean scriptureQuestion = LocalScriptureRetriever.isScriptureRelated(question);
-        int documentLimit = scriptureQuestion ? 2 : 3;
-        for (JSONObject document : candidates) {
-            if (selected.length() >= documentLimit || chars >= 3600) break;
-            selected.put(document);
-            chars += Math.min(1200, document.optString("text").length());
-        }
         if (scriptureQuestion && selected.length() < 3) {
+            int chars = 0;
+            for (int i = 0; i < selected.length(); i++) chars += Math.min(1200, selected.getJSONObject(i).optString("text").length());
             JSONArray scripture = LocalScriptureRetriever.retrieve(context, question);
             for (int i = 0; i < scripture.length() && selected.length() < 3; i++) {
                 JSONObject passage = scripture.getJSONObject(i);
@@ -1067,15 +1058,6 @@ public final class OfflineKnowledgeStore {
             }
         }
         return selected;
-    }
-
-    private static int overlap(String text, String question) {
-        int score = 0;
-        String normalized = text.toLowerCase(java.util.Locale.ROOT);
-        for (String term : question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+")) {
-            if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
-        }
-        return score;
     }
 
     static boolean isUnderspecifiedReferenceQuestion(String question) {
@@ -1110,7 +1092,7 @@ public final class OfflineKnowledgeStore {
             for (Map.Entry<String, Object> entry : sorted.entrySet()) {
                 if (!first) result.append(',');
                 first = false;
-                result.append(JSONObject.quote(entry.getKey())).append(':').append(canonical(entry.getValue()));
+                result.append(CanonicalJson.jsonString(entry.getKey())).append(':').append(canonical(entry.getValue()));
             }
             return result.append('}').toString();
         }
@@ -1123,7 +1105,7 @@ public final class OfflineKnowledgeStore {
             }
             return result.append(']').toString();
         }
-        if (value instanceof String) return JSONObject.quote((String) value);
+        if (value instanceof String) return CanonicalJson.jsonString((String) value);
         if (value instanceof Number || value instanceof Boolean) return value.toString();
         throw new JSONException("Unsupported package JSON value.");
     }

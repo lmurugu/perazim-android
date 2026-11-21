@@ -78,7 +78,7 @@ assert.throws(() => createOfflinePackage({
   minimumAppVersion: '1', signingKeyId: 'synthetic-key-v1', privateKey: keys.privateKey,
   sources: [source]
 }), { code: 'INVALID_PACKAGE' });
-const nearLimitText = 'x'.repeat(2 * 1024 * 1024 - 750);
+const nearLimitText = 'x'.repeat(2 * 1024 * 1024 - 1000); // governance adds bytes; this margin reaches the envelope limit
 assert.throws(() => createOfflinePackage({
   packageId: 'oversized-envelope', version: '1', publishedAt: now,
   expiresAt: now + 60_000,
@@ -122,3 +122,22 @@ assert.throws(() => createWithdrawalManifest({ controlSequence: 3, issuedAt: now
     { sourceId: 'synthetic-source', version: 'v1', reasonCode: 'REPLACED' }] }),
 { code: 'INVALID_CONTROL_MANIFEST' }, 'duplicate withdrawn source versions are rejected');
 process.stdout.write('PASS: synthetic public package signing, trust, expiry, version, and content integrity.\n');
+
+// S2-governance: approval status is carried in the signed payload's governance array, and that array is
+// covered by the signature, so altering it must fail verification.
+{
+  const signed = createOfflinePackage({
+    packageId: 'governance-contract', version: '1', publishedAt: now, expiresAt: now + 60_000,
+    minimumAppVersion: '1', signingKeyId: 'synthetic-key-v1', privateKey: keys.privateKey,
+    sources: [{ ...source, authority_class: 'APPROVED_OFFICIAL' }]
+  });
+  assert.equal(signed.payload.governance.length, 1);
+  assert.equal(signed.payload.governance[0].category, 'CHURCH_APPROVED');
+  assert.equal(signed.payload.governance[0].approvedAt, source.approved_at);
+  assert.equal(signed.payload.governance[0].sha256, source.content_hash);
+  verifyOfflinePackage(signed, { trustedKeys, now, appVersion: '2.2.0' });
+  const forged = structuredClone(signed);
+  forged.payload.governance[0].category = 'CHURCH_APPROVED_FORGED';
+  assert.throws(() => verifyOfflinePackage(forged, { trustedKeys, now, appVersion: '2.2.0' }),
+    { code: 'PACKAGE_INVALID' });
+}
