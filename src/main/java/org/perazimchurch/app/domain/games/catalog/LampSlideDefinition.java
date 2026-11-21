@@ -2,6 +2,7 @@ package org.perazimchurch.app.domain.games.catalog;
 
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.domain.games.engine.StarRule;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideLevels;
 import org.perazimchurch.app.domain.games.lampslide.LampSlidePuzzle;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
@@ -32,6 +33,11 @@ public final class LampSlideDefinition implements GameDefinition {
     }
     @Override public int iconResource() { return iconResource; }
     @Override public int levelCount() { return LampSlideLevels.LEVEL_COUNT; }
+
+    /** The session's score is already the stars earned on a solved board (1 to 3). */
+    @Override public StarRule starRule() {
+        return (score, size, lives) -> Math.max(1, Math.min(3, score));
+    }
     @Override public String levelName(int level) { return "Level " + level; }
 
     @Override
