@@ -40,6 +40,7 @@ import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
+import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
@@ -73,6 +74,22 @@ public final class GamesHubDialog extends Dialog {
     private LadderOfFaith ladder;
     private long seed;
     private final Handler handler = new Handler(Looper.getMainLooper());
+
+    /** Set before showing when a single game should open straight away, for example from Home. */
+    private String pendingGame;
+
+    /** Opens the Games tab directly on one game. Unknown ids open the hub. */
+    public static void open(Activity activity, String gameId) {
+        if (activity.isFinishing() || activity.isDestroyed()) return;
+        GamesHubDialog dialog = new GamesHubDialog(activity);
+        dialog.pendingGame = gameId;
+        dialog.show();
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            window.getDecorView().setBackground(PerazimTheme.createBackgroundGradient());
+        }
+    }
 
     public static void show(Activity activity) {
         if (activity.isFinishing() || activity.isDestroyed()) return;
@@ -111,6 +128,7 @@ public final class GamesHubDialog extends Dialog {
         applyWindow();
         Window window = getWindow();
         if (window != null) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        if (pendingGame != null && launchGame(pendingGame)) return;
         hub();
     }
 
@@ -249,6 +267,27 @@ public final class GamesHubDialog extends Dialog {
                 "A famous verse has one word missing. Choose the word that completes it. Five verses per run.",
                 bestLineOf("FILL_THE_GAP", FillTheGap.ROUND_SIZE), this::fillTheGap);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
+    }
+
+    /** Starts one game by its catalog id. Returns false for an unknown id. */
+    private boolean launchGame(String gameId) {
+        if (!activeOwner()) return true;
+        seed = System.nanoTime();
+        switch (gameId) {
+            case "bible_quiz": startMode(Mode.QUIZ); return true;
+            case "who_am_i": startMode(Mode.WHO_AM_I); return true;
+            case "verse_builder": startMode(Mode.VERSE_ORDER); return true;
+            case "ladder_of_faith": startMode(Mode.LADDER); return true;
+            case "word_search": wordSearch(); return true;
+            case "memory_match": memoryMatch(); return true;
+            case "story_timeline": timeline(); return true;
+            case "mini_crossword": miniCrossword(); return true;
+            case "road_to_jerusalem": roadToJerusalem(); return true;
+            case "old_or_new": testamentSort(); return true;
+            case "who_said_it": whoSaidIt(); return true;
+            case "fill_the_gap": fillTheGap(); return true;
+            default: return false;
+        }
     }
 
     private void statsBar() {
@@ -716,6 +755,43 @@ public final class GamesHubDialog extends Dialog {
         }
     }
 
+    // ---- Shared results and pause for every run ----
+
+    /** Results screen for a finished run: stars, score, today's verse, Replay and Back to Games. */
+    private void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
+        int stars = GameResults.recordRun(scores, scorePrefix + gameId, score, size);
+        screen(title, "Run complete", false);
+        text(GameResults.starLine(stars), 28, true);
+        text("Score: " + score + " of " + size, 16, true);
+        TextView verse = text("Loading today's verse...", 13, false);
+        GameResults.loadVerseOfDay(activity, loaded -> verse.setText(loaded));
+        Button again = button("Replay", true);
+        again.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            seed = System.nanoTime();
+            replay.run();
+        });
+        Button next = button("Next level", false);
+        next.setEnabled(false);
+        text("More levels are coming soon.", 12, false);
+        button("Back to Games", false).setOnClickListener(v -> hub());
+    }
+
+    /** Pause button for an active run. Resume re-renders the same question. */
+    private void pauseButton(Runnable resume) {
+        Button pause = button("Pause", false);
+        pause.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            screen("Paused", "Your run is saved on this screen. Take a breath.", false);
+            button("Resume", true).setOnClickListener(r -> {
+                if (!activeOwner()) return;
+                resume.run();
+            });
+            button("Back to Games", false).setOnClickListener(r -> hub());
+        });
+    }
+
     // ---- Old or New?: sort each Bible book into its testament ----
 
     private void testamentSort() {
@@ -727,16 +803,7 @@ public final class GamesHubDialog extends Dialog {
         if (game.finished()) {
             String key = scorePrefix + "TESTAMENT_SORT";
             if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
-            text("Finished: " + game.score() + " of " + game.size() + " placed correctly.", 15, true);
-            text(game.score() == game.size()
-                    ? "Every book in the right place. Well done."
-                    : "Look back at the books you missed, then try again.", 13, false);
-            Button again = button("Play again", true);
-            again.setOnClickListener(v -> {
-                if (!activeOwner()) return;
-                seed = System.nanoTime();
-                testamentSort();
-            });
+            finishedRun("old_or_new", "Old or New?", game.score(), game.size(), this::testamentSort);
             return;
         }
         TestamentSort.Book book = game.current();
@@ -750,6 +817,7 @@ public final class GamesHubDialog extends Dialog {
         cardParams.bottomMargin = dp(12);
         page.addView(card, cardParams);
         if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderTestamentSort(game, feedback));
         Button old = button("Old Testament", false);
         old.setOnClickListener(v -> {
             if (!activeOwner()) return;
@@ -782,16 +850,7 @@ public final class GamesHubDialog extends Dialog {
         if (game.finished()) {
             String key = scorePrefix + "WHO_SAID_IT";
             if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
-            text("Finished: " + game.score() + " of " + game.size() + " correct.", 15, true);
-            text(game.score() == game.size()
-                    ? "Every speaker named. Well done."
-                    : "Read the references again and try once more.", 13, false);
-            Button again = button("Play again", true);
-            again.setOnClickListener(v -> {
-                if (!activeOwner()) return;
-                seed = System.nanoTime();
-                whoSaidIt();
-            });
+            finishedRun("who_said_it", "Who Said It?", game.score(), game.size(), this::whoSaidIt);
             return;
         }
         WhoSaidIt.Question question = game.current();
@@ -803,6 +862,7 @@ public final class GamesHubDialog extends Dialog {
         addText(card, "\u201C" + question.quote + "\u201D", 18, true);
         page.addView(card, wrapParams(12));
         if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderWhoSaidIt(game, feedback));
         for (String choice : question.choices) {
             Button option = button(choice, false);
             option.setOnClickListener(v -> {
@@ -828,16 +888,7 @@ public final class GamesHubDialog extends Dialog {
         if (game.finished()) {
             String key = scorePrefix + "FILL_THE_GAP";
             if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
-            text("Finished: " + game.score() + " of " + game.size() + " correct.", 15, true);
-            text(game.score() == game.size()
-                    ? "Every verse completed. Well done."
-                    : "Read the verses again and try once more.", 13, false);
-            Button again = button("Play again", true);
-            again.setOnClickListener(v -> {
-                if (!activeOwner()) return;
-                seed = System.nanoTime();
-                fillTheGap();
-            });
+            finishedRun("fill_the_gap", "Fill the Gap", game.score(), game.size(), this::fillTheGap);
             return;
         }
         FillTheGap.Question question = game.current();
@@ -849,6 +900,7 @@ public final class GamesHubDialog extends Dialog {
         addText(card, question.before + "_____" + question.after, 18, true);
         page.addView(card, wrapParams(12));
         if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderFillTheGap(game, feedback));
         for (String choice : question.choices) {
             Button option = button(choice, false);
             option.setOnClickListener(v -> {
@@ -1200,7 +1252,7 @@ public final class GamesHubDialog extends Dialog {
         Window window = getWindow();
         if (input != null && window != null) input.hideSoftInputFromWindow(window.getDecorView().getWindowToken(), 0);
     }
-    static String ownerKey(String owner) {
+    public static String ownerKey(String owner) {
         try {
             byte[] bytes = MessageDigest.getInstance("SHA-256").digest(owner.getBytes(StandardCharsets.UTF_8));
             StringBuilder key = new StringBuilder();
