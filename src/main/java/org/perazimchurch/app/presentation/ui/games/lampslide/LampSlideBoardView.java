@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
@@ -53,6 +54,16 @@ public final class LampSlideBoardView extends View {
     private ValueAnimator slideAnimator;
     private ValueAnimator fadeAnimator;
     private boolean peeking;
+    private final Paint flashPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint sweepPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Path sweepPath = new Path();
+    private static final long FLASH_MS = 420L;
+    private static final long SWEEP_MS = 700L;
+    private int flashCell = -1;
+    private float flashProgress = 1f;
+    private float sweepProgress = 1f;
+    private ValueAnimator flashAnimator;
+    private ValueAnimator sweepAnimator;
     private int highlight = -1;
     private int downIndex = -1;
     private final float density;
@@ -66,6 +77,10 @@ public final class LampSlideBoardView extends View {
         outlinePaint.setStyle(Paint.Style.STROKE);
         outlinePaint.setStrokeWidth(2f * density);
         outlinePaint.setColor(0x66FFFFFF);
+        flashPaint.setStyle(Paint.Style.STROKE);
+        flashPaint.setStrokeWidth(3f * density);
+        flashPaint.setColor(0xFFFFB74D);
+        sweepPaint.setColor(0xFFFFFFFF);
         setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
@@ -111,6 +126,31 @@ public final class LampSlideBoardView extends View {
             invalidate();
         });
         fadeAnimator.start();
+    }
+
+    /** Flashes the edge of the square a tile has just landed on, for a correct placement. */
+    public void flashCorrect(int index) {
+        if (flashAnimator != null) flashAnimator.cancel();
+        flashCell = index;
+        flashAnimator = ValueAnimator.ofFloat(0f, 1f);
+        flashAnimator.setDuration(FLASH_MS);
+        flashAnimator.addUpdateListener(a -> {
+            flashProgress = (float) a.getAnimatedValue();
+            invalidate();
+        });
+        flashAnimator.start();
+    }
+
+    /** Sweeps one band of light across the finished picture. Call when the board is solved. */
+    public void sweepReveal() {
+        if (sweepAnimator != null) sweepAnimator.cancel();
+        sweepAnimator = ValueAnimator.ofFloat(0f, 1f);
+        sweepAnimator.setDuration(SWEEP_MS);
+        sweepAnimator.addUpdateListener(a -> {
+            sweepProgress = (float) a.getAnimatedValue();
+            invalidate();
+        });
+        sweepAnimator.start();
     }
 
     /** Shows the whole picture in full colour while peeking. */
@@ -171,6 +211,26 @@ public final class LampSlideBoardView extends View {
         if (highlight >= 0 && highlight != gap) {
             setCell(dst, highlight, cell, inset);
             canvas.drawRoundRect(dst, corner, corner, outlinePaint);
+        }
+        if (flashProgress < 1f && flashCell >= 0) {
+            setCell(dst, flashCell, cell, inset);
+            flashPaint.setAlpha((int) (255 * (1f - flashProgress)));
+            canvas.drawRoundRect(dst, corner, corner, flashPaint);
+        }
+        if (sweepProgress < 1f) {
+            // A slanted band that crosses the board from left to right, clipped to the picture.
+            canvas.save();
+            canvas.clipRect(0, 0, side, side);
+            float x = -side * 0.4f + side * 1.8f * sweepProgress;
+            sweepPath.rewind();
+            sweepPath.moveTo(x, 0f);
+            sweepPath.lineTo(x + side * 0.2f, 0f);
+            sweepPath.lineTo(x + side * 0.1f, side);
+            sweepPath.lineTo(x - side * 0.1f, side);
+            sweepPath.close();
+            sweepPaint.setAlpha((int) (110 * Math.sin(Math.PI * sweepProgress)));
+            canvas.drawPath(sweepPath, sweepPaint);
+            canvas.restore();
         }
     }
 

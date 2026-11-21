@@ -76,7 +76,7 @@ public final class LampSlideScreen {
             refresh.run();
             if (session.finished()) {
                 board.celebrate();
-                GameFx.pulse(board, 0x88FFB74D);
+                board.sweepReveal();
                 LampSlideScene scene = session.scene();
                 banner.setText("“" + scene.verse() + "”\n— " + scene.reference()
                         + (scene.prayer().isEmpty() ? "" : "\n\n" + scene.prayer()));
@@ -90,7 +90,10 @@ public final class LampSlideScreen {
             int inPlaceBefore = session.puzzle().inPlace();
             if (session.tapTile(index) == GameSession.Outcome.IGNORED) return;
             board.animateSlide(index, gapBefore);
-            if (session.puzzle().inPlace() > inPlaceBefore) GameFx.correct(board);
+            if (session.puzzle().inPlace() > inPlaceBefore) {
+                board.flashCorrect(gapBefore);
+                GameFx.haptic(board, true);
+            }
             afterMove[0].run();
         });
 
