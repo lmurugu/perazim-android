@@ -42,7 +42,20 @@ public final class ReviewScheduler {
      * a missing id counts as unseen. Returns null when there are no candidates.
      */
     public static String pick(List<String> candidates, Map<String, Record> history, Random random) {
+        return pick(candidates, history, random, UNSEEN_PERCENT, MISSED_PERCENT);
+    }
+
+    /**
+     * Same as {@link #pick(List, Map, Random)} with the question shares from the cached game settings.
+     * Shares outside 0 to 100 or adding past 100 fall back to the built-in values.
+     */
+    public static String pick(List<String> candidates, Map<String, Record> history, Random random,
+                              int unseenPercent, int missedPercent) {
         if (candidates == null || candidates.isEmpty()) return null;
+        if (unseenPercent < 0 || missedPercent < 0 || unseenPercent + missedPercent > 100) {
+            unseenPercent = UNSEEN_PERCENT;
+            missedPercent = MISSED_PERCENT;
+        }
         List<String> unseen = new ArrayList<>();
         List<String> missed = new ArrayList<>();
         List<String> known = new ArrayList<>();
@@ -53,7 +66,7 @@ public final class ReviewScheduler {
             else known.add(id);
         }
         int roll = random.nextInt(100);
-        List<String> chosen = roll < UNSEEN_PERCENT ? unseen : roll < UNSEEN_PERCENT + MISSED_PERCENT ? missed : known;
+        List<String> chosen = roll < unseenPercent ? unseen : roll < unseenPercent + missedPercent ? missed : known;
         if (!chosen.isEmpty()) return chosen.get(random.nextInt(chosen.size()));
         // The chosen group is empty: pick evenly from the groups that have questions.
         List<List<String>> filled = new ArrayList<>();

@@ -64,6 +64,25 @@ public class ReviewSchedulerTest {
         assertFalse(ReviewScheduler.shouldStepUp(null));
     }
 
+    @Test public void cachedSharesFallBackToBuiltInWhenInvalid() {
+        // Invalid shares give the same picks as the built-in ones for the same seed.
+        List<String> ids = Arrays.asList("a", "b", "c");
+        for (int seed = 0; seed < 50; seed++) {
+            assertEquals(ReviewScheduler.pick(ids, new HashMap<>(), new Random(seed)),
+                    ReviewScheduler.pick(ids, new HashMap<>(), new Random(seed), 80, 80));
+        }
+    }
+
+    @Test public void cachedSharesChangeTheMix() {
+        // With every pick from unseen questions, only unseen ids come back.
+        List<String> ids = Arrays.asList("a", "b");
+        Map<String, Record> history = new HashMap<>();
+        history.put("a", new Record(3, 0, 1));
+        for (int seed = 0; seed < 50; seed++) {
+            assertEquals("b", ReviewScheduler.pick(ids, history, new Random(seed), 100, 0));
+        }
+    }
+
     @Test public void starCapLimitsTheDay() {
         assertEquals(50, StarCap.allowed(0, 80, StarCap.DEFAULT_DAILY_CAP));
         assertEquals(10, StarCap.allowed(40, 20, StarCap.DEFAULT_DAILY_CAP));
