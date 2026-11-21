@@ -42,6 +42,7 @@ public final class StoryMosaicDialog extends Dialog {
     private final SharedPreferences prefs;
     private final LevelProgression progression;
     private final int levelCount = MosaicPuzzles.all().size();
+    private final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private FrameLayout root;
     private Bitmap scene;
 
@@ -176,11 +177,16 @@ public final class StoryMosaicDialog extends Dialog {
         progression.record(GAME_ID, level, stars, levelCount);
         hintButton.setVisibility(View.GONE);
         hint.setText("");
-        String verse = KjvLookup.text(appContext, puzzle.reference);
-        caption.setText(verse != null
-                ? "\u201c" + verse + "\u201d\n— " + puzzle.reference
-                : puzzle.title + "\n— " + puzzle.reference);
+        // Show the title at once; swap in the KJV text when the background read finishes.
+        caption.setText(puzzle.title + "\n— " + puzzle.reference);
         caption.setVisibility(View.VISIBLE);
+        final Context ctx = appContext;
+        final String reference = puzzle.reference;
+        new Thread(() -> {
+            String verse = KjvLookup.text(ctx, reference);
+            if (verse == null) return;
+            mainHandler.post(() -> caption.setText("\u201c" + verse + "\u201d\n— " + reference));
+        }, "kjv-caption").start();
         Button next = smallButton(level < levelCount ? "Next scene" : "Back to chapters");
         next.setOnClickListener(v -> {
             if (level < levelCount) showPuzzle(level);
