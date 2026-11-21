@@ -303,6 +303,9 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         page.addView(view, new LinearLayout.LayoutParams(-1, -2));
         return view;
     }
+    @Override public void addRow(View row) {
+        page.addView(row, new LinearLayout.LayoutParams(-1, -2));
+    }
     @Override public Button button(String label, boolean primary) {
         Button view = new Button(activity);
         styleButton(view, label, primary);
