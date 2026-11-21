@@ -45,12 +45,17 @@ public final class LampSlideDefinition implements GameDefinition {
         int clamped = Math.max(1, Math.min(LampSlideLevels.LEVEL_COUNT, level));
         int size = LampSlideLevels.boardSize(clamped);
         LampSlidePuzzle puzzle = LampSlidePuzzle.scrambled(size, seed * 31L + clamped);
+        return new LampSlideSession(puzzle, sceneFor(level));
+    }
+
+    /** The painting for a level. Fixed per level, so the level picker previews the same scene. */
+    public LampSlideScene sceneFor(int level) {
         List<LampSlideScene> list = scenes.get();
         if (list == null || list.isEmpty()) {
-            list = Collections.singletonList(new LampSlideScene("fallback", "ic_game_puzzle",
-                    "Psalm 119:105", "Thy word is a lamp unto my feet, and a light unto my path.", ""));
+            return new LampSlideScene("fallback", "ic_game_puzzle",
+                    "Psalm 119:105", "Thy word is a lamp unto my feet, and a light unto my path.", "");
         }
-        LampSlideScene scene = list.get((int) Math.floorMod(seed + clamped, (long) list.size()));
-        return new LampSlideSession(puzzle, scene);
+        int clamped = Math.max(1, Math.min(LampSlideLevels.LEVEL_COUNT, level));
+        return list.get((clamped - 1) % list.size());
     }
 }
