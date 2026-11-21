@@ -26,6 +26,6 @@ Server signer (needs Levi's approval, as already agreed): each governance entry 
 over `"perazim-source-approval-v1\n" + canonical({id, version, category, approvedBy, approvedAt, scope, sha256})`, with nulls for absent fields.
 Levi signs these offline with the APPROVER key. The server stores the signature and does not hold the key.
 
-Known limits: TrustAnchors and CanonicalJson use `java.util.Base64`, which needs API 26. Check the minSdk before merging, or switch
-to `android.util.Base64`. Revocation (`revoked`) and `supersededBy` are not covered by the approval signature. They stay package-signed
+Base64: TrustAnchors and SourceApprovals use StrictBase64 (API 24 safe, matches Node on 300 random inputs), not java.util.Base64.
+Revocation (`revoked`) and `supersededBy` are not covered by the approval signature. They stay package-signed
 and authoritative through the withdrawal and rollback guards.
