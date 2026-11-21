@@ -60,17 +60,18 @@ public class LampSlidePickerScreenshotTest {
         if (dialog == null || dialog.getWindow() == null) {
             throw new AssertionError("Lamp Slide picker dialog did not open");
         }
-        View root = dialog.getWindow().getDecorView();
+        // Render the picker's own content (its scroll view), not the dialog's decor view, which fails to lay out here.
+        View content = dialog.getWindow().getDecorView().findViewById(android.R.id.content);
+        View picker = content instanceof android.view.ViewGroup && ((android.view.ViewGroup) content).getChildCount() > 0
+                ? ((android.view.ViewGroup) content).getChildAt(0) : content;
         int w = UiScreenshotSupport.WIDTH_PX;
-        int h = UiScreenshotSupport.HEIGHT_PX;
-        for (int pass = 0; pass < 2; pass++) {
-            root.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
-                    View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY));
-            root.layout(0, 0, w, h);
-            // The picker paints its own background, so the GlassPolish pass used for tabs is not needed here.
-        }
-        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        root.draw(new Canvas(bitmap));
+        int h = Math.min(4000, UiScreenshotSupport.HEIGHT_PX * 2);
+        picker.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        int height = Math.max(1, Math.min(h, picker.getMeasuredHeight()));
+        picker.layout(0, 0, w, height);
+        Bitmap bitmap = Bitmap.createBitmap(w, height, Bitmap.Config.ARGB_8888);
+        picker.draw(new Canvas(bitmap));
         File outDir = new File("build/ui-screenshots");
         //noinspection ResultOfMethodCallIgnored
         outDir.mkdirs();
