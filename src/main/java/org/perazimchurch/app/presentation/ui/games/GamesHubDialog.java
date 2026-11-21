@@ -381,7 +381,15 @@ public final class GamesHubDialog extends Dialog {
 
     private int stars() { return scores.getInt(scorePrefix + "stars", 0); }
     private void addStar() {
+        // Levi's Q2: at most StarCap.DEFAULT_DAILY_CAP stars a local day count toward the leaderboard.
+        String today = org.perazimchurch.app.data.local.preference.GamificationStore.getTodayDateNairobi();
+        String dayKey = scorePrefix + "starDay", countKey = scorePrefix + "starDayCount";
+        int earnedToday = today.equals(scores.getString(dayKey, "")) ? scores.getInt(countKey, 0) : 0;
+        int allowed = org.perazimchurch.app.domain.games.StarCap.allowed(earnedToday, 1,
+                org.perazimchurch.app.domain.games.StarCap.DEFAULT_DAILY_CAP);
+        if (allowed <= 0) return;
         scores.edit().putInt(scorePrefix + "stars", stars() + 1)
+                .putString(dayKey, today).putInt(countKey, earnedToday + 1)
                 .putInt(scorePrefix + "pendingStars", scores.getInt(scorePrefix + "pendingStars", 0) + 1).apply();
     }
 

@@ -217,6 +217,12 @@ public class HomeUiBinder {
             routineStep = 1;
             progressPercent = 0;
         }
+        // Levi's Q1: a chapter read in the reader completes the Read step.
+        if (routineStep == 1 && org.perazimchurch.app.domain.games.RoutineReadRule.readStepDone(
+                org.perazimchurch.app.data.local.preference.ReadingLog.chaptersToday(context))) {
+            routineStep = 2;
+            progressPercent = 33;
+        }
     }
 
     public static View createView(@NonNull Context context,
