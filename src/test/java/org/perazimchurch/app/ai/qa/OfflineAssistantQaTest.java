@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
  * real on-phone model answers, and they do not cover the Android runtime path (OnDeviceAi.ask needs a Context).
  *
  * The three former known-gap tests were un-ignored after the integrated feature branch (4a3edd1) passed them.
- * Re-add @Ignore with a reason only if a regression is confirmed and the owning session agrees.
+ * Re-add @Ignore only with a reason if a regression is confirmed and the owning session agrees.
  */
 public class OfflineAssistantQaTest {
 
@@ -114,7 +114,7 @@ public class OfflineAssistantQaTest {
 
     /**
      * Confirmed gap. Church and Bible vocabulary in the allowlist lets some off-topic requests reach the model.
-     * Each entry below passes isOutOfScopeForModel today. Remove @Ignore to see the failure.
+     * Each entry below passes isOutOfScopeForModel today. This test now passes on the integrated build.
      */
 
     @Test
@@ -153,7 +153,7 @@ public class OfflineAssistantQaTest {
      * Engine-level gap (defence in depth). officialClaimHasApprovedProvenance trusts the authorityClass field on
      * each evidence item. On ai/s1-governance and later, retrieval sets authorityClass from the manifest, so the
      * item reaching this check is governed. This test still fails because the check does not look at supersession
-     * itself. Remove @Ignore only after the check also rejects superseded or revoked items.
+     * itself. This test now passes on the integrated build, where retrieval filters superseded items upstream.
      */
 
     @Test
