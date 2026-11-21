@@ -215,6 +215,10 @@ public final class LampSlideLauncher {
             return view;
         }
 
+        @Override public void addRow(View row) {
+            page.addView(row, new LinearLayout.LayoutParams(-1, -2));
+        }
+
         @Override public Button button(String label, boolean primary) {
             Button button = new Button(activity);
             button.setText(label);
