@@ -36,6 +36,17 @@ public final class GameResults {
         return stars;
     }
 
+    /**
+     * The one call a game makes when its run ends. Rates the finished session (lives included),
+     * saves the stars for this level, and returns them so the results screen can show them.
+     * Use {@code levelCount} 1 for games that have no levels yet. See docs/games/ENGINE_USAGE.md.
+     */
+    public static int finishRun(SharedPreferences prefs, String gameId, int level, int levelCount, GameSession session) {
+        int stars = StarRating.stars(session.score(), session.size(), session.lives());
+        new LevelProgression(new PrefsKeyValueStore(prefs)).record(gameId, level, stars, levelCount);
+        return stars;
+    }
+
     /** Best stars saved for a game on level 1, from 0 to 3. */
     public static int bestStars(SharedPreferences prefs, String gameId) {
         return new LevelProgression(new PrefsKeyValueStore(prefs)).bestStars(gameId, 1);
