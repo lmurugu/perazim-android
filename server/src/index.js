@@ -68,6 +68,7 @@ app.use('/api/sync', syncRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/classroom-calls', require('./routes/classroomCalls'));
 app.use('/api/media', require('./routes/mediaFeed').createMediaFeedRouter());
+app.use('/api/games', require('./routes/games'));
 app.use('/api', membershipRoutes);
 app.use('/api/admin', adminMembershipRoutes);
 app.use('/api/admin/ai-sources', require('./routes/knowledgeGovernance'));
