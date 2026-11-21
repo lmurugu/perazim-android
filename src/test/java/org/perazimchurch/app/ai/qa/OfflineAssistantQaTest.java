@@ -19,8 +19,8 @@ import static org.junit.Assert.assertTrue;
  * Passing tests here show that the rules layers behave as described for these inputs. They do not show how a
  * real on-phone model answers, and they do not cover the Android runtime path (OnDeviceAi.ask needs a Context).
  *
- * Tests annotated @Ignore are confirmed known gaps. Remove @Ignore to see them fail, which is the intended
- * state until the owning session fixes the gap and un-ignores the test.
+ * The three former known-gap tests were un-ignored after the integrated feature branch (4a3edd1) passed them.
+ * Re-add @Ignore with a reason only if a regression is confirmed and the owning session agrees.
  */
 public class OfflineAssistantQaTest {
 
@@ -116,7 +116,7 @@ public class OfflineAssistantQaTest {
      * Confirmed gap. Church and Bible vocabulary in the allowlist lets some off-topic requests reach the model.
      * Each entry below passes isOutOfScopeForModel today. Remove @Ignore to see the failure.
      */
-    @Ignore("KNOWN GAP: allowlist words (john, paul, grace, offering, profile, reader...) let off-topic requests through")
+
     @Test
     public void outOfScopeRequestsContainingChurchWordsAreRefused() {
         String[] leakyInputs = {
@@ -141,7 +141,7 @@ public class OfflineAssistantQaTest {
      * does not check category, approval, hash, revocation or supersession, so approval metadata that the
      * package carries is used as is. This tripwire fails until retrieval is wired to SourceGovernance.
      */
-    @Ignore("KNOWN GAP: SourceGovernance has no production call site; retrieval does not enforce it")
+
     @Test
     public void retrievalPathUsesSourceGovernance() throws Exception {
         String store = new String(Files.readAllBytes(Paths.get(
@@ -155,7 +155,7 @@ public class OfflineAssistantQaTest {
      * item reaching this check is governed. This test still fails because the check does not look at supersession
      * itself. Remove @Ignore only after the check also rejects superseded or revoked items.
      */
-    @Ignore("KNOWN GAP: provenance check trusts self-declared authorityClass on superseded items")
+
     @Test
     public void supersededSelfApprovedItemDoesNotBackOfficialClaim() throws Exception {
         org.json.JSONArray evidence = new org.json.JSONArray();
