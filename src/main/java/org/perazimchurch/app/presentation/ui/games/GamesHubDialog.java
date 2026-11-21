@@ -818,6 +818,7 @@ public final class GamesHubDialog extends Dialog {
             @Override public void click(View v) { feedback().click(v); }
             @Override public void newSeed() { seed = System.nanoTime(); }
             @Override public void hub() { GamesHubDialog.this.hub(); }
+            @Override public void addRow(View row) { GamesHubDialog.this.page.addView(row, GamesHubDialog.this.wrapParams(12)); }
         });
     }
 

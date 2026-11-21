@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
@@ -26,6 +27,8 @@ public final class GameChrome {
         /** Draws a new page header: title and subtitle, no playing layout. */
         void screen(String title, String subtitle);
         TextView text(String value, int size, boolean bold);
+        /** Adds a full-width row (for example the star row) to the page. */
+        void addRow(View row);
         Button button(String label, boolean primary);
         void click(View v);
         /** Gives the next run a fresh seed before a replay. */
@@ -81,8 +84,11 @@ public final class GameChrome {
     private void showResults(SharedPreferences prefs, String storedId, String title, int stars, int score, int size,
                              Runnable replay, Runnable next) {
         host.screen(title, "Run complete");
-        host.text(GameResults.starLine(stars), 28, true);
-        host.text("Score: " + score + " of " + size, 16, true);
+        FrameLayout starFrame = GameFx.starRow(host.activity(), stars);
+        host.addRow(starFrame);
+        GameFx.popStars(starFrame, stars);
+        TextView scoreLine = host.text("Score: 0 of " + size, 16, true);
+        GameFx.countUp(scoreLine, score, "Score: ", " of " + size);
         TextView verse = host.text("Loading today's verse...", 13, false);
         GameResults.loadVerseOfDay(host.activity(), loaded -> verse.setText(loaded));
         Button again = host.button("Replay", true);
@@ -97,6 +103,7 @@ public final class GameChrome {
             if (!host.activeOwner()) return;
             next.run();
         });
+        if (next != null) nextButton.post(() -> GameFx.shimmer(nextButton));
         host.text("Best on this phone: " + GameResults.starLine(GameResults.bestStars(prefs, storedId)), 13, false);
         host.text("Get 2 stars or more to unlock the next level.", 12, false);
         host.button("Back to Games", false).setOnClickListener(v -> host.hub());

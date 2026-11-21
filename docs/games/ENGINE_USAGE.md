@@ -78,3 +78,27 @@ after this one is unlocked (`LevelProgression`, two or more stars). Pass `null` 
 Story Mosaic and Lamp Slide register their own launchers on their feature branches. Those lines use the
 earlier `activity -> ...` form and move to `ctx -> ...` (with `ctx.activity()` and `ctx.ui()`) when those
 branches merge onto this one. The deepen threads adapt their own lines.
+
+## Motion and feel (GameFx)
+
+`presentation/ui/games/common/GameFx` is the motion kit. It uses only ValueAnimator, ViewPropertyAnimator,
+ObjectAnimator and Canvas, so it runs on small phones. When the system's "Remove animations" setting is on
+(animator duration scale 0), every effect jumps to its end state.
+
+| Call | What it does |
+|---|---|
+| `GameFx.attachPress(button)` | Press bounce to 0.94 and a spring back. `GameUi.button` calls it for every button. |
+| `GameFx.enter(screen)` / `GameFx.exit(screen, end)` | Slide up and fade in on enter, slide down and fade out on exit. `GameUi.page` calls enter. |
+| `GameFx.correct(view)` / `GameFx.wrong(view)` | Correct: glow pulse, tick and light haptic. Wrong: horizontal shake, buzz and haptic. |
+| `GameFx.pulse(view, glowColor)` / `GameFx.shake(view)` | The parts of the two calls above, for use on their own. |
+| `GameFx.starRow(context, stars)` + `GameFx.popStars(frame, stars)` | Three stars that pop in one by one with a particle burst. `GameChrome` results use these. Add the frame with `GameChrome.Host.addRow`. |
+| `GameFx.countUp(textView, target, prefix, suffix)` | Counts a score up. |
+| `GameFx.shimmer(view)` | One light sweep across a view, used for Next level when the level unlocks. |
+| `GameFx.dim(root)` | Dims the screen behind a pause overlay. Returns the shade view; remove it on resume. Blur is not used (it needs Android 12 and is costly on small phones). |
+| `GameFx.setSoundEnabled(bool)` / `GameFx.setHapticsEnabled(bool)` | Both default on. The settings screen calls these when the player changes them. |
+
+Sounds are short system tones from `ToneGenerator`, so there are no audio files and no licensed audio.
+If no tone device is available, the game runs silently.
+
+`GameChrome` already uses the results effects. Game screens call `GameFx.correct` and `GameFx.wrong` on each answer.
+
