@@ -45,8 +45,7 @@ public final class GameCatalog {
         games.add(new TestamentDefinition(R.drawable.game_art_old_or_new));
         games.add(new WhoSaidItDefinition(R.drawable.game_art_who_said_it));
         games.add(new FillTheGapDefinition(R.drawable.game_art_verse_builder));
-        // Icon is a placeholder until the art thread delivers game_story_mosaic.
-        games.add(new StoryMosaicDefinition(R.drawable.game_art_timeline));
+        games.add(new StoryMosaicDefinition(R.drawable.game_story_mosaic));
         return games;
     }
 }
