@@ -68,17 +68,24 @@ public final class GameFx {
 
     /** Press bounce: the button scales to 0.94 while pressed and springs back on release. Clicks still fire. */
     public static void attachPress(View button) {
-        if (!motionEnabled(button.getContext())) return;
         button.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
-                    v.animate().cancel();
-                    v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(90).start();
+                    if (motionEnabled(v.getContext())) {
+                        v.animate().cancel();
+                        v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(90).start();
+                    }
                     break;
                 case MotionEvent.ACTION_UP:
+                    if (v instanceof android.widget.Button && "Hint".equalsIgnoreCase(((android.widget.Button) v).getText().toString())) {
+                        GameAudio.get(v.getContext()).play(GameAudio.Sfx.HINT);
+                    }
+                    // fall through
                 case MotionEvent.ACTION_CANCEL:
-                    v.animate().scaleX(1f).scaleY(1f).setDuration(220)
-                            .setInterpolator(new android.view.animation.OvershootInterpolator(2f)).start();
+                    if (motionEnabled(v.getContext())) {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(220)
+                                .setInterpolator(new android.view.animation.OvershootInterpolator(2f)).start();
+                    }
                     break;
                 default:
                     break;
