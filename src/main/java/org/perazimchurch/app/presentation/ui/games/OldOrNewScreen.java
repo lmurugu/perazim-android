@@ -1,7 +1,5 @@
 package org.perazimchurch.app.presentation.ui.games;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.widget.Button;
 
 import org.perazimchurch.app.domain.games.TestamentSort;
@@ -10,31 +8,24 @@ import org.perazimchurch.app.domain.games.catalog.TestamentSession;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
-
-import java.util.function.BooleanSupplier;
 
 /**
  * Play screen for Old or New?. Drives the engine session and finishes through
  * {@link GameChrome#finishedRun(GameDefinition, String, GameSession, int, Runnable)}.
- * Stars are saved for level 1 through GameResults.finishRun.
+ * Registered in GameLaunchers with {@code GameRegistry.register("old_or_new", ctx -> ...)}.
  */
 public final class OldOrNewScreen {
 
     private static final String TITLE = "Old or New?";
 
-    private final Activity activity;
-    private final SharedPreferences scores;
-    private final String scorePrefix;
-    private final BooleanSupplier ownerCheck;
+    private final GameContext ctx;
     private final GameDefinition definition = new TestamentDefinition(0);
     private long seed = System.nanoTime();
 
-    public OldOrNewScreen(Activity activity, SharedPreferences scores, String scorePrefix, BooleanSupplier ownerCheck) {
-        this.activity = activity;
-        this.scores = scores;
-        this.scorePrefix = scorePrefix;
-        this.ownerCheck = ownerCheck;
+    public OldOrNewScreen(GameContext ctx) {
+        this.ctx = ctx;
     }
 
     /** Starts a fresh run on the current screen. */
@@ -43,19 +34,16 @@ public final class OldOrNewScreen {
     }
 
     private void newRun() {
+        seed = System.nanoTime();
         render((TestamentSession) definition.createSession(1, seed), null);
     }
 
-    private GameUi ui(Runnable backAction) {
-        return new GameUi(activity, backAction).configure(scores, scorePrefix, ownerCheck, () -> seed = System.nanoTime());
-    }
-
     private void render(TestamentSession game, String feedback) {
-        GameUi ui = ui(() -> activity.onBackPressed());
-        activity.setContentView(ui.page(TITLE, "Place each book in its testament. Eight books per run.", true));
+        GameUi ui = ctx.ui();
+        ctx.activity().setContentView(ui.page(TITLE, "Place each book in its testament. Eight books per run.", true));
         if (game.finished()) {
-            String key = scorePrefix + "TESTAMENT_SORT";
-            if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
+            String key = ctx.scorePrefix() + "TESTAMENT_SORT";
+            if (game.score() > ctx.scores().getInt(key, 0)) ctx.scores().edit().putInt(key, game.score()).apply();
             new GameChrome(ui).finishedRun(definition, TITLE, game, 1, this::newRun);
             return;
         }
