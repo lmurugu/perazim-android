@@ -508,6 +508,10 @@ public final class GamesHubDialog extends Dialog {
         GamesLeaderboardRemoteSource.profile(activity, token, new GamesLeaderboardRemoteSource.Callback() {
             @Override public void onSuccess(@NonNull JSONObject json) {
                 toggle.setChecked(json.optBoolean("optIn", false));
+                if (!json.optBoolean("eligible", false)) {
+                    label.setText("The church leaderboard is open to adult members. Your stars stay on this phone.");
+                    return;
+                }
                 String name = json.optString("displayName", "");
                 if (!name.isEmpty()) label.setText("Show me as \u201c" + name + "\u201d on the leaderboard");
                 toggle.setEnabled(true);
