@@ -53,6 +53,12 @@ final class WhoAmISession implements GameSession {
         return finished() ? Collections.emptyList() : current().clues;
     }
 
+    @Override
+    public String prompt() {
+        if (finished()) return null;
+        return String.join("\n", current().clues) + "\n\nWho am I?";
+    }
+
     /** Explanation and reference for the last answered person, or null before the first answer. */
     public String lastFeedback() { return lastFeedback; }
 
