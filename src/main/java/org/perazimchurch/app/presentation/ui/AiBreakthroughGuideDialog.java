@@ -40,6 +40,7 @@ import org.perazimchurch.app.ai.local.OfflineScriptureLookup;
 import org.perazimchurch.app.ai.local.OnDeviceAi;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.ArrayList;
@@ -224,7 +225,11 @@ public class AiBreakthroughGuideDialog extends Dialog {
         btnMode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnMode.setAllCaps(false);
         btnMode.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnMode.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
+        btnMode.setTextColor(GlassKit.text());
+        btnMode.setBackground(GlassKit.glassControl(activity, 999));
+        btnMode.setPadding(dp(16), dp(8), dp(16), dp(8));
+        btnMode.setMinHeight(0);
+        btnMode.setMinimumHeight(0);
         btnMode.setOnClickListener(v -> {
             if (localRequest) { OnDeviceAi.cancel(); return; }
             if (!requestInFlight) showModeOptions();
@@ -262,14 +267,15 @@ public class AiBreakthroughGuideDialog extends Dialog {
         LinearLayout inputBar = new LinearLayout(activity);
         inputBar.setOrientation(LinearLayout.HORIZONTAL);
         inputBar.setGravity(Gravity.CENTER_VERTICAL);
-        inputBar.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-        inputBar.setPadding(dp(12), dp(2), dp(6), dp(2));
+        inputBar.setBackground(GlassKit.glassControl(activity, 999));
+        inputBar.setPadding(dp(16), dp(4), dp(6), dp(4));
 
         etInput = new EditText(activity);
         etInput.setHint("Ask about Scripture, breakthrough, sermons...");
         etInput.setHintTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         etInput.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        etInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        etInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        etInput.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         etInput.setBackground(null);
         etInput.setSingleLine(true);
         etInput.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEND);
@@ -286,11 +292,8 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         btnSend = new Button(activity);
         btnSend.setText("➤ Send");
-        btnSend.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnSend.setTypeface(Typeface.DEFAULT_BOLD);
-        btnSend.setTextColor(COLOR_WHITE);
-        btnSend.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 2));
-        btnSend.setPadding(dp(12), dp(6), dp(12), dp(6));
+        styleOrangePill(btnSend, 13);
+        btnSend.setPadding(dp(16), dp(8), dp(16), dp(8));
         btnSend.setOnClickListener(v -> submitQuery(etInput.getText().toString()));
         inputBar.addView(btnSend);
 
@@ -710,15 +713,11 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         TextView tv = new TextView(activity);
         tv.setText("🤖 Pondering with Scripture...");
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tv.setTypeface(Typeface.DEFAULT_BOLD);
-        tv.setTextColor(COLOR_PRIMARY_PURPLE);
-        tv.setPadding(dp(12), dp(6), dp(12), dp(6));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_PURPLE_TINT);
-        bg.setCornerRadius(dp(12));
-        tv.setBackground(bg);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tv.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+        tv.setTextColor(GlassKit.muted());
+        tv.setPadding(dp(14), dp(10), dp(14), dp(10));
+        tv.setBackground(GlassKit.glass(activity, 18));
 
         row.addView(tv);
         messagesContainer.addView(row);
@@ -739,18 +738,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
         LinearLayout row = new LinearLayout(activity);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.END);
-        row.setPadding(dp(40), dp(4), 0, dp(6));
+        row.setPadding(dp(48), dp(4), 0, dp(8));
 
         TextView tv = new TextView(activity);
         tv.setText(text);
         tv.setTextColor(COLOR_WHITE);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tv.setPadding(dp(12), dp(8), dp(12), dp(8));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_PRIMARY_PURPLE);
-        bg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), dp(2), dp(2), dp(14), dp(14)});
-        tv.setBackground(bg);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tv.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        tv.setLineSpacing(dp(2), 1.1f);
+        tv.setPadding(dp(16), dp(10), dp(16), dp(10));
+        tv.setBackground(GlassKit.orange(activity, 18));
 
         row.addView(tv);
         messagesContainer.addView(row);
@@ -760,46 +757,40 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private void displayAiMessage(AiResponse response, @Nullable String badgeText) {
         LinearLayout bubbleCol = new LinearLayout(activity);
         bubbleCol.setOrientation(LinearLayout.VERTICAL);
-        bubbleCol.setPadding(0, dp(4), dp(40), dp(8));
+        bubbleCol.setPadding(0, dp(4), dp(24), dp(10));
 
         // Badge pill
         if (badgeText != null && !badgeText.isEmpty()) {
             TextView tvBadge = new TextView(activity);
             tvBadge.setText(badgeText);
-            tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvBadge.setTypeface(Typeface.DEFAULT_BOLD);
-            tvBadge.setTextColor((int) (badgeText.contains("Offline") ? PerazimTheme.COLOR_PURPLE_MUTED : PerazimTheme.COLOR_ORANGE_BRAND));
-            tvBadge.setPadding(dp(4), 0, 0, dp(2));
+            tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            tvBadge.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+            tvBadge.setTextColor(badgeText.contains("Offline") ? GlassKit.muted() : GlassKit.accent());
+            tvBadge.setPadding(dp(4), 0, 0, dp(6));
             bubbleCol.addView(tvBadge);
         }
 
         // Message text
         TextView tv = new TextView(activity);
         tv.setText(response.getMessageText());
-        tv.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tv.setPadding(dp(14), dp(10), dp(14), dp(10));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(PerazimTheme.COLOR_SURFACE_2);
-        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        bg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), dp(14), dp(14), dp(2), dp(2)});
-        tv.setBackground(bg);
+        tv.setTextColor(GlassKit.text());
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        tv.setTypeface(Typeface.create(Typeface.SERIF, Typeface.NORMAL));
+        tv.setLineSpacing(dp(2), 1.15f);
+        tv.setPadding(dp(16), dp(14), dp(16), dp(14));
+        tv.setBackground(GlassKit.glass(activity, 18));
         bubbleCol.addView(tv);
 
         // Interactive Action Button
         if (response.hasAction()) {
             Button btnAction = new Button(activity);
             btnAction.setText(response.getActionButtonLabel());
-            btnAction.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            btnAction.setTypeface(Typeface.DEFAULT_BOLD);
-            btnAction.setTextColor(COLOR_WHITE);
-            btnAction.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
-            btnAction.setPadding(dp(14), dp(8), dp(14), dp(8));
+            styleOrangePill(btnAction, 13);
+            btnAction.setPadding(dp(20), dp(10), dp(20), dp(10));
 
             LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lpBtn.setMargins(0, dp(6), 0, dp(4));
+            lpBtn.setMargins(0, dp(10), 0, dp(4));
             btnAction.setLayoutParams(lpBtn);
 
             btnAction.setOnClickListener(v -> {
@@ -859,15 +850,20 @@ public class AiBreakthroughGuideDialog extends Dialog {
         for (final String chipText : chips) {
             Button chip = new Button(activity);
             chip.setText(chipText);
-            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            chip.setTypeface(Typeface.DEFAULT_BOLD);
-            chip.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-            chip.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-            chip.setPadding(dp(10), dp(4), dp(10), dp(4));
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            chip.setAllCaps(false);
+            chip.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+            chip.setTextColor(GlassKit.text());
+            chip.setBackground(GlassKit.glass(activity, 999));
+            chip.setPadding(dp(16), dp(8), dp(16), dp(8));
+            chip.setMinHeight(0);
+            chip.setMinimumHeight(0);
+            chip.setMinWidth(0);
+            chip.setMinimumWidth(0);
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, dp(32));
-            lp.setMargins(0, 0, dp(6), 0);
+                    LinearLayout.LayoutParams.WRAP_CONTENT, dp(36));
+            lp.setMargins(0, 0, dp(8), 0);
             chip.setLayoutParams(lp);
 
             chip.setOnClickListener(v -> submitQuery(chipText));
@@ -877,6 +873,20 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void scrollToBottom() {
         chatScrollView.post(() -> chatScrollView.fullScroll(ScrollView.FOCUS_DOWN));
+    }
+
+    /** Orange gradient pill with the Bible tab's glow; used for Send and for action buttons. */
+    private void styleOrangePill(Button b, float textSp) {
+        b.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+        b.setAllCaps(false);
+        b.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+        b.setTextColor(COLOR_WHITE);
+        b.setBackground(GlassKit.orange(activity, 999));
+        b.setMinHeight(0);
+        b.setMinimumHeight(0);
+        b.setMinWidth(0);
+        b.setMinimumWidth(0);
+        GlassKit.glow(b, GlassKit.ORANGE, 8);
     }
 
     private int dp(int value) {
