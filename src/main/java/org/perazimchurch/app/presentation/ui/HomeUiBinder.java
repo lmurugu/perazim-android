@@ -27,9 +27,11 @@ import android.net.Uri;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.TypedValue;
+import android.graphics.Outline;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -509,11 +511,19 @@ public class HomeUiBinder {
         bg.setStroke(dp(1), PerazimTheme.COLOR_ORANGE_SOFT);
         square.setBackground(bg);
         square.setElevation(dp(6));
+        // The art fills the card edge to edge, inside the 1dp border, and is clipped to the card's rounded corners.
         ImageView art = new ImageView(context);
-        art.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        art.setPadding(dp(6), dp(6), dp(6), dp(6));
+        art.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        art.setClipToOutline(true);
+        art.setOutlineProvider(new ViewOutlineProvider() {
+            @Override public void getOutline(View view, Outline outline) {
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(21));
+            }
+        });
         art.setImageResource(artFor(game));
-        square.addView(art, new FrameLayout.LayoutParams(dp(96), dp(96)));
+        FrameLayout.LayoutParams artParams = new FrameLayout.LayoutParams(dp(94), dp(94));
+        artParams.setMargins(dp(1), dp(1), dp(1), dp(1));
+        square.addView(art, artParams);
         tile.addView(square, new LinearLayout.LayoutParams(dp(96), dp(96)));
 
         TextView name = GlassKit.text(context, game.title(), 13, true, GlassKit.text());
