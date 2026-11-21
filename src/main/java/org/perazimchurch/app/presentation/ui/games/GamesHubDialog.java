@@ -34,6 +34,7 @@ import org.perazimchurch.app.domain.games.MiniCrossword;
 import org.perazimchurch.app.domain.games.RoadToJerusalem;
 import org.perazimchurch.app.domain.games.TestamentSort;
 import org.perazimchurch.app.domain.games.TimelineSort;
+import org.perazimchurch.app.domain.games.WhoSaidIt;
 import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
@@ -204,7 +205,7 @@ public final class GamesHubDialog extends Dialog {
     private void hub() {
         if (!activeOwner()) return;
         round = null;
-        screen("Bible Games", "Learn, remember and enjoy. All nine games work without internet.", false);
+        screen("Bible Games", "Learn, remember and enjoy. Every game works without internet.", false);
         statsBar();
         int shepherd = org.perazimchurch.app.R.drawable.game_char_shepherd;
         int dove = org.perazimchurch.app.R.drawable.game_char_dove;
@@ -239,6 +240,9 @@ public final class GamesHubDialog extends Dialog {
         gameCard(org.perazimchurch.app.R.drawable.game_art_old_or_new, shepherd, PerazimTheme.COLOR_ORANGE_SOFT, "Old or New?",
                 "Place each Bible book in the Old or New Testament. Learn where every book belongs in the story.",
                 bestLineOf("TESTAMENT_SORT", 8), this::testamentSort);
+        gameCard(org.perazimchurch.app.R.drawable.game_art_quiz, dove, PerazimTheme.COLOR_PURPLE_SOFT, "Who Said It?",
+                "Read a Bible quotation and choose the person who spoke it. Five quotations, four names each.",
+                bestLineOf("WHO_SAID_IT", WhoSaidIt.ROUND_SIZE), this::whoSaidIt);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
     }
 
@@ -736,6 +740,52 @@ public final class GamesHubDialog extends Dialog {
         if (placed == null) return null;
         String home = placed.testament == TestamentSort.Testament.OLD ? "Old" : "New";
         return (right ? "Correct. " : "Not quite. " + placed.name + " belongs in the " + home + " Testament. ") + placed.fact;
+    }
+
+    // ---- Who Said It?: pick the speaker of a short KJV quotation ----
+
+    private void whoSaidIt() {
+        renderWhoSaidIt(new WhoSaidIt(seed), null);
+    }
+
+    private void renderWhoSaidIt(WhoSaidIt game, String feedback) {
+        screen("Who Said It?", "Choose who spoke each quotation. Five quotations per run.", true);
+        if (game.finished()) {
+            String key = scorePrefix + "WHO_SAID_IT";
+            if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
+            text("Finished: " + game.score() + " of " + game.size() + " correct.", 15, true);
+            text(game.score() == game.size()
+                    ? "Every speaker named. Well done."
+                    : "Read the references again and try once more.", 13, false);
+            Button again = button("Play again", true);
+            again.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                seed = System.nanoTime();
+                whoSaidIt();
+            });
+            return;
+        }
+        WhoSaidIt.Question question = game.current();
+        text("Quotation " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        addText(card, "\u201C" + question.quote + "\u201D", 18, true);
+        page.addView(card, wrapParams(12));
+        if (feedback != null) text(feedback, 13, false);
+        for (String choice : question.choices) {
+            Button option = button(choice, false);
+            option.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                feedback().click(v);
+                boolean right = game.answer(choice);
+                WhoSaidIt.Question answered = game.lastQuestion();
+                String line = (right ? "Correct. " : "Not quite. It was " + answered.answer + ". ")
+                        + answered.reference + ".";
+                renderWhoSaidIt(game, line);
+            });
+        }
     }
 
     private LinearLayout.LayoutParams wrapParams(int bottomDp) {
