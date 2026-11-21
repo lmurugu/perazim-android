@@ -27,6 +27,9 @@ import android.widget.Toast;
 
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.BibleGames;
+import org.perazimchurch.app.domain.games.engine.GameDefinition;
+import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
 import org.perazimchurch.app.domain.games.FillTheGap;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
@@ -41,6 +44,9 @@ import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameContext;
+import org.perazimchurch.app.presentation.ui.games.common.GameUi;
+import org.perazimchurch.app.presentation.ui.games.common.GameRegistry;
 import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -64,6 +70,7 @@ public final class GamesHubDialog extends Dialog {
         org.perazimchurch.app.ui.theme.GlassPolish.install(this);
     }
     private final Activity activity;
+    private final GameUi ui;
     private final String ownerId;
     private final SharedPreferences scores;
     private final String scorePrefix;
@@ -117,6 +124,7 @@ public final class GamesHubDialog extends Dialog {
     private GamesHubDialog(Activity activity) {
         super(activity, windowTheme());
         this.activity = activity;
+        this.ui = new GameUi(activity);
         ownerId = SessionManager.getInstance(activity).getActiveUserId();
         scorePrefix = ownerKey(ownerId);
         scores = activity.getSharedPreferences("perazim_game_scores_v1", Context.MODE_PRIVATE);
@@ -194,6 +202,7 @@ public final class GamesHubDialog extends Dialog {
             return insets;
         });
         page = new LinearLayout(activity);
+        ui.setPage(page);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setPadding(dp(14), dp(16), dp(14), dp(28));
         scroll.addView(page, new ScrollView.LayoutParams(-1, -2));
@@ -220,6 +229,25 @@ public final class GamesHubDialog extends Dialog {
         text(title, 24, true);
         text(subtitle, 13, false);
         gap(16);
+    }
+
+    /** Games the hub draws by hand. Any other catalog game gets a card from its catalog entry. */
+    private static final Set<String> HAND_LISTED = new HashSet<>();
+    static {
+        Collections.addAll(HAND_LISTED, "bible_quiz", "who_am_i", "verse_builder", "ladder_of_faith",
+                "word_search", "memory_match", "story_timeline", "mini_crossword", "road_to_jerusalem",
+                "old_or_new", "who_said_it", "fill_the_gap");
+    }
+
+    /** A card for a catalog game the hub does not draw by hand: title, description and icon from the catalog. */
+    private void catalogCard(GameDefinition def) {
+        int best = GameResults.bestStars(scores, scorePrefix + def.id());
+        String bestLine = best == 0 ? "not played yet" : "Best: " + GameResults.starLine(best);
+        int icon = def.iconResource() != 0 ? def.iconResource() : org.perazimchurch.app.R.drawable.game_char_shepherd;
+        gameCard(icon, org.perazimchurch.app.R.drawable.game_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND,
+                def.title(), def.description(), bestLine, () -> {
+                    if (!launchGame(def.id())) Toast.makeText(activity, "Coming soon", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void hub() {
@@ -267,6 +295,9 @@ public final class GamesHubDialog extends Dialog {
         gameCard(org.perazimchurch.app.R.drawable.game_art_verse_builder, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Fill the Gap",
                 "A famous verse has one word missing. Choose the word that completes it. Five verses per run.",
                 bestLineOf("FILL_THE_GAP", FillTheGap.ROUND_SIZE), this::fillTheGap);
+        for (GameDefinition def : GameCatalog.all()) {
+            if (!HAND_LISTED.contains(def.id())) catalogCard(def);
+        }
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
     }
 
@@ -287,7 +318,8 @@ public final class GamesHubDialog extends Dialog {
             case "old_or_new": testamentSort(); return true;
             case "who_said_it": whoSaidIt(); return true;
             case "fill_the_gap": fillTheGap(); return true;
-            default: return false;
+            default: return GameRegistry.launch(gameId, new GameContext(activity, () -> hub(), scores, scorePrefix,
+                    () -> activeOwner(), () -> seed = System.nanoTime()));
         }
     }
 
@@ -453,7 +485,7 @@ public final class GamesHubDialog extends Dialog {
         scores.edit().putInt(scorePrefix + key, scores.getInt(scorePrefix + key, 0) + 1).apply();
     }
 
-    private FeedbackManager feedback() { return FeedbackManager.get(activity); }
+    private FeedbackManager feedback() { return ui.feedback(); }
 
     private void wordSearch() {
         WordSearch game = new WordSearch(seed);
@@ -763,6 +795,11 @@ public final class GamesHubDialog extends Dialog {
         chrome().finishedRun(gameId, title, score, size, replay);
     }
 
+    /** Results for an engine GameSession. Stars are saved once, through GameResults.finishRun. */
+    private void finishedRun(String gameId, String title, GameSession session, int level, int levelCount, Runnable replay) {
+        chrome().finishedRun(gameId, title, session, level, levelCount, replay);
+    }
+
     /** Pause button for an active run. The shared logic lives in GameChrome. */
     private void pauseButton(Runnable resume) {
         chrome().pauseButton(resume);
@@ -781,6 +818,7 @@ public final class GamesHubDialog extends Dialog {
             @Override public void click(View v) { feedback().click(v); }
             @Override public void newSeed() { seed = System.nanoTime(); }
             @Override public void hub() { GamesHubDialog.this.hub(); }
+            @Override public void addRow(View row) { GamesHubDialog.this.page.addView(row, GamesHubDialog.this.wrapParams(12)); }
         });
     }
 
@@ -907,11 +945,7 @@ public final class GamesHubDialog extends Dialog {
         }
     }
 
-    private LinearLayout.LayoutParams wrapParams(int bottomDp) {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
-        lp.bottomMargin = dp(bottomDp);
-        return lp;
-    }
+    private LinearLayout.LayoutParams wrapParams(int bottomDp) { return ui.wrapParams(bottomDp); }
 
     // ---- Ladder of Faith ----
 
@@ -1196,49 +1230,13 @@ public final class GamesHubDialog extends Dialog {
         button("Choose another game", false).setOnClickListener(v -> hub());
     }
 
-    private TextView text(String value, int size, boolean bold) { return addText(page, value, size, bold); }
-    private TextView addText(LinearLayout parent, String value, int size, boolean bold) {
-        TextView view = new TextView(activity);
-        view.setText(value);
-        view.setTextSize(size);
-        view.setTextColor(bold ? PerazimTheme.COLOR_TEXT_PRIMARY : PerazimTheme.COLOR_TEXT_SECONDARY);
-        if (bold) view.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        view.setLineSpacing(dp(3), 1f);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
-        params.bottomMargin = dp(12);
-        parent.addView(view, params);
-        return view;
-    }
-    private Button button(String label, boolean primary) {
-        Button view = new Button(activity);
-        styleButton(view, label, primary);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
-        params.bottomMargin = dp(10);
-        page.addView(view, params);
-        return view;
-    }
-    private void styleButton(Button button, String label, boolean primary) {
-        button.setText(label);
-        button.setAllCaps(false);
-        button.setTextSize(17);
-        button.setTextColor(primary ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
-        button.setMinHeight(dp(52));
-        button.setMinimumWidth(0);
-        button.setMinWidth(0);
-        button.setGravity(Gravity.CENTER);
-        button.setPadding(dp(12), dp(12), dp(12), dp(12));
-        button.setBackground(shape(primary ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE_2));
-    }
-    private GradientDrawable shape(int color) {
-        GradientDrawable shape = new GradientDrawable();
-        shape.setColor(color);
-        shape.setCornerRadius(dp(14));
-        return shape;
-    }
-    private void gap(int height) {
-        page.addView(new View(activity), new LinearLayout.LayoutParams(1, dp(height)));
-    }
-    private int dp(int value) { return Math.round(value * activity.getResources().getDisplayMetrics().density); }
+    private TextView text(String value, int size, boolean bold) { return ui.text(value, size, bold); }
+    private TextView addText(LinearLayout parent, String value, int size, boolean bold) { return ui.addText(parent, value, size, bold); }
+    private Button button(String label, boolean primary) { return ui.button(label, primary); }
+    private void styleButton(Button button, String label, boolean primary) { ui.styleButton(button, label, primary); }
+    private GradientDrawable shape(int color) { return ui.shape(color); }
+    private void gap(int height) { ui.gap(height); }
+    private int dp(int value) { return ui.dp(value); }
     private void hideKeyboard() {
         InputMethodManager input = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         Window window = getWindow();

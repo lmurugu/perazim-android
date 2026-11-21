@@ -37,4 +37,10 @@ public interface GameDefinition {
      * @param seed  seed for shuffling; the same seed gives the same run
      */
     GameSession createSession(int level, long seed);
+
+    /**
+     * How this game turns a finished run into stars. Defaults to the shared rule in
+     * {@link StarRating}. A game overrides this to use its own rule.
+     */
+    default StarRule starRule() { return s -> StarRating.stars(s.score(), s.size(), s.lives()); }
 }

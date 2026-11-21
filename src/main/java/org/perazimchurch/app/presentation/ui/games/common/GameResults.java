@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.data.local.entity.DailyVerseEntity;
+import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.domain.games.engine.LevelProgression;
 import org.perazimchurch.app.domain.games.engine.StarRating;
@@ -45,6 +46,21 @@ public final class GameResults {
         int stars = StarRating.stars(session.score(), session.size(), session.lives());
         new LevelProgression(new PrefsKeyValueStore(prefs)).record(gameId, level, stars, levelCount);
         return stars;
+    }
+
+    /**
+     * Ends a run for a catalog game and uses that game's own star rule ({@link GameDefinition#starRule()}).
+     * Saves the stars for the level and returns them.
+     */
+    public static int finishRun(SharedPreferences prefs, String storedId, GameDefinition game, int level, GameSession session) {
+        int stars = game.starRule().stars(session);
+        new LevelProgression(new PrefsKeyValueStore(prefs)).record(storedId, level, stars, game.levelCount());
+        return stars;
+    }
+
+    /** The highest level unlocked for a stored id (1 when nothing is unlocked yet). */
+    public static int unlockedLevel(SharedPreferences prefs, String storedId) {
+        return new LevelProgression(new PrefsKeyValueStore(prefs)).unlockedLevel(storedId);
     }
 
     /** Best stars saved for a game on level 1, from 0 to 3. */
