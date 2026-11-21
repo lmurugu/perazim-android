@@ -19,6 +19,7 @@ import org.perazimchurch.app.domain.games.catalog.StoryMosaicSession;
 import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
+import org.perazimchurch.app.presentation.ui.games.common.GameArt;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.domain.games.engine.KeyValueStore;
 import org.perazimchurch.app.domain.games.engine.LevelProgression;
@@ -114,10 +115,17 @@ public final class StoryMosaicDialog extends Dialog {
             row.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
             row.setText(MosaicPuzzles.at(first).chapterTitle + "\n" + done + " of " + (last - first + 1) + " scenes");
             row.setTextColor(Color.WHITE);
-            row.setBackgroundColor(done == last - first + 1 ? ORANGE : Color.argb(36, 255, 255, 255));
+            boolean complete = done == last - first + 1;
+            android.graphics.drawable.Drawable pill = GameArt.frame(getContext(),
+                    complete ? GameArt.FRAME_PILL_ORANGE : GameArt.FRAME_PILL_PURPLE,
+                    GameArt.FRAME_BORDER, dp(18));
+            if (pill != null) {
+                row.setBackground(pill);
+            } else {
+                row.setBackgroundColor(complete ? ORANGE : Color.argb(36, 255, 255, 255));
+            }
             row.setOnClickListener(v -> showPuzzle(target));
             GameFx.attachPress(row);
-            boolean complete = done == last - first + 1;
             // A rail on the left: the dot and the line below it light up when the chapter is finished.
             LinearLayout rail = new LinearLayout(getContext());
             rail.setOrientation(LinearLayout.VERTICAL);
