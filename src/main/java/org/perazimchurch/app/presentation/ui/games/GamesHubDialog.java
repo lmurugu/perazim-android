@@ -44,6 +44,7 @@ import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
 import org.perazimchurch.app.presentation.ui.games.common.GameRegistry;
 import org.perazimchurch.app.presentation.ui.games.common.GameResults;
@@ -317,7 +318,8 @@ public final class GamesHubDialog extends Dialog {
             case "old_or_new": testamentSort(); return true;
             case "who_said_it": whoSaidIt(); return true;
             case "fill_the_gap": fillTheGap(); return true;
-            default: return GameRegistry.launch(activity, gameId);
+            default: return GameRegistry.launch(gameId, new GameContext(activity, () -> hub(), scores, scorePrefix,
+                    () -> activeOwner(), () -> seed = System.nanoTime()));
         }
     }
 
