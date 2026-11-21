@@ -40,6 +40,7 @@ import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
+import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
@@ -716,6 +717,43 @@ public final class GamesHubDialog extends Dialog {
         }
     }
 
+    // ---- Shared results and pause for every run ----
+
+    /** Results screen for a finished run: stars, score, today's verse, Replay and Back to Games. */
+    private void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
+        int stars = GameResults.recordRun(scores, gameId, score, size);
+        screen(title, "Run complete", false);
+        text(GameResults.starLine(stars), 28, true);
+        text("Score: " + score + " of " + size, 16, true);
+        TextView verse = text("Loading today's verse...", 13, false);
+        GameResults.loadVerseOfDay(activity, loaded -> verse.setText(loaded));
+        Button again = button("Replay", true);
+        again.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            seed = System.nanoTime();
+            replay.run();
+        });
+        Button next = button("Next level", false);
+        next.setEnabled(false);
+        text("More levels are coming soon.", 12, false);
+        button("Back to Games", false).setOnClickListener(v -> hub());
+    }
+
+    /** Pause button for an active run. Resume re-renders the same question. */
+    private void pauseButton(Runnable resume) {
+        Button pause = button("Pause", false);
+        pause.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            screen("Paused", "Your run is saved on this screen. Take a breath.", false);
+            button("Resume", true).setOnClickListener(r -> {
+                if (!activeOwner()) return;
+                resume.run();
+            });
+            button("Back to Games", false).setOnClickListener(r -> hub());
+        });
+    }
+
     // ---- Old or New?: sort each Bible book into its testament ----
 
     private void testamentSort() {
@@ -727,16 +765,7 @@ public final class GamesHubDialog extends Dialog {
         if (game.finished()) {
             String key = scorePrefix + "TESTAMENT_SORT";
             if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
-            text("Finished: " + game.score() + " of " + game.size() + " placed correctly.", 15, true);
-            text(game.score() == game.size()
-                    ? "Every book in the right place. Well done."
-                    : "Look back at the books you missed, then try again.", 13, false);
-            Button again = button("Play again", true);
-            again.setOnClickListener(v -> {
-                if (!activeOwner()) return;
-                seed = System.nanoTime();
-                testamentSort();
-            });
+            finishedRun("old_or_new", "Old or New?", game.score(), game.size(), this::testamentSort);
             return;
         }
         TestamentSort.Book book = game.current();
@@ -750,6 +779,7 @@ public final class GamesHubDialog extends Dialog {
         cardParams.bottomMargin = dp(12);
         page.addView(card, cardParams);
         if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderTestamentSort(game, feedback));
         Button old = button("Old Testament", false);
         old.setOnClickListener(v -> {
             if (!activeOwner()) return;
@@ -782,16 +812,7 @@ public final class GamesHubDialog extends Dialog {
         if (game.finished()) {
             String key = scorePrefix + "WHO_SAID_IT";
             if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
-            text("Finished: " + game.score() + " of " + game.size() + " correct.", 15, true);
-            text(game.score() == game.size()
-                    ? "Every speaker named. Well done."
-                    : "Read the references again and try once more.", 13, false);
-            Button again = button("Play again", true);
-            again.setOnClickListener(v -> {
-                if (!activeOwner()) return;
-                seed = System.nanoTime();
-                whoSaidIt();
-            });
+            finishedRun("who_said_it", "Who Said It?", game.score(), game.size(), this::whoSaidIt);
             return;
         }
         WhoSaidIt.Question question = game.current();
@@ -803,6 +824,7 @@ public final class GamesHubDialog extends Dialog {
         addText(card, "\u201C" + question.quote + "\u201D", 18, true);
         page.addView(card, wrapParams(12));
         if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderWhoSaidIt(game, feedback));
         for (String choice : question.choices) {
             Button option = button(choice, false);
             option.setOnClickListener(v -> {
@@ -828,16 +850,7 @@ public final class GamesHubDialog extends Dialog {
         if (game.finished()) {
             String key = scorePrefix + "FILL_THE_GAP";
             if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
-            text("Finished: " + game.score() + " of " + game.size() + " correct.", 15, true);
-            text(game.score() == game.size()
-                    ? "Every verse completed. Well done."
-                    : "Read the verses again and try once more.", 13, false);
-            Button again = button("Play again", true);
-            again.setOnClickListener(v -> {
-                if (!activeOwner()) return;
-                seed = System.nanoTime();
-                fillTheGap();
-            });
+            finishedRun("fill_the_gap", "Fill the Gap", game.score(), game.size(), this::fillTheGap);
             return;
         }
         FillTheGap.Question question = game.current();
@@ -849,6 +862,7 @@ public final class GamesHubDialog extends Dialog {
         addText(card, question.before + "_____" + question.after, 18, true);
         page.addView(card, wrapParams(12));
         if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderFillTheGap(game, feedback));
         for (String choice : question.choices) {
             Button option = button(choice, false);
             option.setOnClickListener(v -> {
