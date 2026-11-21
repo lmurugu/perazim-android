@@ -27,7 +27,9 @@ import android.widget.Toast;
 
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.BibleGames;
+import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
 import org.perazimchurch.app.domain.games.FillTheGap;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
@@ -42,6 +44,7 @@ import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameRegistry;
 import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
@@ -223,6 +226,25 @@ public final class GamesHubDialog extends Dialog {
         gap(16);
     }
 
+    /** Games the hub draws by hand. Any other catalog game gets a card from its catalog entry. */
+    private static final Set<String> HAND_LISTED = new HashSet<>();
+    static {
+        Collections.addAll(HAND_LISTED, "bible_quiz", "who_am_i", "verse_builder", "ladder_of_faith",
+                "word_search", "memory_match", "story_timeline", "mini_crossword", "road_to_jerusalem",
+                "old_or_new", "who_said_it", "fill_the_gap");
+    }
+
+    /** A card for a catalog game the hub does not draw by hand: title, description and icon from the catalog. */
+    private void catalogCard(GameDefinition def) {
+        int best = GameResults.bestStars(scores, scorePrefix + def.id());
+        String bestLine = best == 0 ? "not played yet" : "Best: " + GameResults.starLine(best);
+        int icon = def.iconResource() != 0 ? def.iconResource() : org.perazimchurch.app.R.drawable.game_char_shepherd;
+        gameCard(icon, org.perazimchurch.app.R.drawable.game_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND,
+                def.title(), def.description(), bestLine, () -> {
+                    if (!launchGame(def.id())) Toast.makeText(activity, "Coming soon", Toast.LENGTH_SHORT).show();
+                });
+    }
+
     private void hub() {
         if (!activeOwner()) return;
         round = null;
@@ -268,6 +290,9 @@ public final class GamesHubDialog extends Dialog {
         gameCard(org.perazimchurch.app.R.drawable.game_art_verse_builder, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Fill the Gap",
                 "A famous verse has one word missing. Choose the word that completes it. Five verses per run.",
                 bestLineOf("FILL_THE_GAP", FillTheGap.ROUND_SIZE), this::fillTheGap);
+        for (GameDefinition def : GameCatalog.all()) {
+            if (!HAND_LISTED.contains(def.id())) catalogCard(def);
+        }
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
     }
 
@@ -288,7 +313,7 @@ public final class GamesHubDialog extends Dialog {
             case "old_or_new": testamentSort(); return true;
             case "who_said_it": whoSaidIt(); return true;
             case "fill_the_gap": fillTheGap(); return true;
-            default: return false;
+            default: return GameRegistry.launch(activity, gameId);
         }
     }
 

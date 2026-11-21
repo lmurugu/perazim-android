@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 
 /**
@@ -42,7 +43,7 @@ public final class GameChrome {
     /** Results for a run that is scored by score and size only (the older games). */
     public void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
         int stars = GameResults.recordRun(host.scores(), host.scorePrefix() + gameId, score, size);
-        showResults(title, stars, score, size, replay);
+        showResults(host.scores(), host.scorePrefix() + gameId, title, stars, score, size, replay);
     }
 
     /**
@@ -53,14 +54,20 @@ public final class GameChrome {
         finishedRun(gameId, title, session, 1, 1, replay);
     }
 
+    /** Results for a catalog game, using that game's own star rule. */
+    public void finishedRun(GameDefinition game, String title, GameSession session, int level, Runnable replay) {
+        int stars = GameResults.finishRun(host.scores(), game, level, session);
+        showResults(host.scores(), host.scorePrefix() + game.id(), title, stars, session.score(), session.size(), replay);
+    }
+
     /** Results for an engine run on a given level. Stars are saved for that level only. */
     public void finishedRun(String gameId, String title, GameSession session, int level, int levelCount, Runnable replay) {
         int stars = GameResults.finishRun(host.scores(), host.scorePrefix() + gameId, level, levelCount, session);
-        showResults(title, stars, session.score(), session.size(), replay);
+        showResults(host.scores(), host.scorePrefix() + gameId, title, stars, session.score(), session.size(), replay);
     }
 
     /** Results screen: stars, score, today's verse, Replay and Back to Games. */
-    private void showResults(String title, int stars, int score, int size, Runnable replay) {
+    private void showResults(SharedPreferences prefs, String storedId, String title, int stars, int score, int size, Runnable replay) {
         host.screen(title, "Run complete");
         host.text(GameResults.starLine(stars), 28, true);
         host.text("Score: " + score + " of " + size, 16, true);
@@ -74,7 +81,8 @@ public final class GameChrome {
         });
         Button next = host.button("Next level", false);
         next.setEnabled(false);
-        host.text("More levels are coming soon.", 12, false);
+        host.text("Best on this phone: " + GameResults.starLine(GameResults.bestStars(prefs, storedId)), 13, false);
+        host.text("Get 2 stars or more to unlock the next level.", 12, false);
         host.button("Back to Games", false).setOnClickListener(v -> host.hub());
     }
 
