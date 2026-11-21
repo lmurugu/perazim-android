@@ -122,6 +122,11 @@ public final class GameUi implements GameChrome.Host {
         return scroll;
     }
 
+    /** Sets the illustrated scene behind the current page (see {@link GameScene}). Call after {@link #page}. */
+    public void scene(String name) {
+        if (scroll != null) scroll.setBackground(GameScene.background(activity, name));
+    }
+
     /**
      * Uses an existing page as the target of text, buttons and gaps. For hosts that build their own
      * page (the games hub) and still want these helpers.
