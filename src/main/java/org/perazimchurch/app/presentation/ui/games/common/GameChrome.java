@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 
 /**
@@ -51,6 +52,12 @@ public final class GameChrome {
      */
     public void finishedRun(String gameId, String title, GameSession session, Runnable replay) {
         finishedRun(gameId, title, session, 1, 1, replay);
+    }
+
+    /** Results for a catalog game, using that game's own star rule. */
+    public void finishedRun(GameDefinition game, String title, GameSession session, int level, Runnable replay) {
+        int stars = GameResults.finishRun(host.scores(), game, level, session);
+        showResults(host.scores(), host.scorePrefix() + game.id(), title, stars, session.score(), session.size(), replay);
     }
 
     /** Results for an engine run on a given level. Stars are saved for that level only. */
