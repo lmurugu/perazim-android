@@ -3,6 +3,7 @@ package org.perazimchurch.app.presentation.ui.games.common;
 import org.perazimchurch.app.R;
 import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.catalog.FillTheGapDefinition;
+import org.perazimchurch.app.domain.games.catalog.LampSlideDefinition;
 import org.perazimchurch.app.domain.games.catalog.LadderDefinition;
 import org.perazimchurch.app.domain.games.catalog.MemoryDefinition;
 import org.perazimchurch.app.domain.games.catalog.CrosswordDefinition;
@@ -14,6 +15,7 @@ import org.perazimchurch.app.domain.games.catalog.WhoAmIDefinition;
 import org.perazimchurch.app.domain.games.catalog.WhoSaidItDefinition;
 import org.perazimchurch.app.domain.games.catalog.WordSearchDefinition;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
+import org.perazimchurch.app.presentation.ui.games.lampslide.LampSlideScenes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,8 @@ public final class GameCatalog {
         games.add(new TestamentDefinition(R.drawable.game_art_old_or_new));
         games.add(new WhoSaidItDefinition(R.drawable.game_art_who_said_it));
         games.add(new FillTheGapDefinition(R.drawable.game_art_verse_builder));
+        // Placeholder icon until the art thread delivers game_lamp_slide.png.
+        games.add(new LampSlideDefinition(R.drawable.ic_game_puzzle, LampSlideScenes::bundled));
         return games;
     }
 }

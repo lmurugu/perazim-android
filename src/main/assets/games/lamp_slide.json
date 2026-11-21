@@ -1,0 +1,17 @@
+{
+  "note": "Placeholder scenes. Replace image names with the art thread's paintings (1024 px WebP or drawable-nodpi PNG). Verses are KJV text from assets/bible/text/KJV.tsv.gz.",
+  "scenes": [
+    {"id": "psalm_23_1", "image": "game_art_quiz", "reference": "Psalm 23:1", "verse": "The LORD is my shepherd; I shall not want.", "prayer": "Lord, lead me today and let me rest in you."},
+    {"id": "john_1_5", "image": "game_art_ladder", "reference": "John 1:5", "verse": "And the light shineth in darkness; and the darkness comprehended it not.", "prayer": "Shine into my dark places, Lord."},
+    {"id": "psalm_119_105", "image": "game_art_memory_match", "reference": "Psalm 119:105", "verse": "Thy word is a lamp unto my feet, and a light unto my path.", "prayer": "Let your word light the next step."},
+    {"id": "proverbs_3_5", "image": "game_art_mini_crossword", "reference": "Proverbs 3:5", "verse": "Trust in the LORD with all thine heart; and lean not unto thine own understanding.", "prayer": "Help me trust you more than my own plans."},
+    {"id": "matthew_5_14", "image": "game_art_old_or_new", "reference": "Matthew 5:14", "verse": "Ye are the light of the world. A city that is set on an hill cannot be hid.", "prayer": "Make me a light where I am today."},
+    {"id": "psalm_27_1", "image": "game_art_timeline", "reference": "Psalm 27:1", "verse": "The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?", "prayer": "You are my light. I am not afraid."},
+    {"id": "isaiah_40_31", "image": "game_art_verse_builder", "reference": "Isaiah 40:31", "verse": "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.", "prayer": "Renew my strength while I wait for you."},
+    {"id": "john_8_12", "image": "game_art_who_am_i", "reference": "John 8:12", "verse": "Then spake Jesus again unto them, saying, I am the light of the world: he that followeth me shall not walk in darkness, but shall have the light of life.", "prayer": "Jesus, I choose to follow you."},
+    {"id": "philippians_4_13", "image": "game_art_who_said_it", "reference": "Philippians 4:13", "verse": "I can do all things through Christ which strengtheneth me.", "prayer": "Strengthen me for what you ask today."},
+    {"id": "psalm_46_1", "image": "game_art_word_search", "reference": "Psalm 46:1", "verse": "God is our refuge and strength, a very present help in trouble.", "prayer": "Be my refuge when things feel hard."},
+    {"id": "romans_8_28", "image": "game_char_dove", "reference": "Romans 8:28", "verse": "And we know that all things work together for good to them that love God, to them who are the called according to his purpose.", "prayer": "Work your good purpose in my life."},
+    {"id": "john_3_16", "image": "game_char_explorer", "reference": "John 3:16", "verse": "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.", "prayer": "Thank you for the love that gives life."}
+  ]
+}
