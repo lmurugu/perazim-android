@@ -154,9 +154,9 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
             page.addView(view, new LinearLayout.LayoutParams(-1, -2));
         }
         // Open the scroll on the scene with the level to play, so it is in view.
-        LevelMapScene current = scenes[(highlight - 1) / NODES_PER_SCENE];
+        LevelMapScene playScene = scenes[(highlight - 1) / NODES_PER_SCENE];
         if (scrollView != null) {
-            scrollView.post(() -> scrollView.scrollTo(0, Math.max(0, current.getTop() - dp(120))));
+            scrollView.post(() -> scrollView.scrollTo(0, Math.max(0, playScene.getTop() - dp(120))));
         }
     }
 
