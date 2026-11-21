@@ -952,9 +952,11 @@ public class BibleReaderDialog extends Dialog {
             plp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             notesPanelView.setLayoutParams(plp);
         }
+        final String[] chosen = {null};
         View picker = buildColourPicker(name -> {
             if (forSwipe) {
                 swipeColourName = name;
+                chosen[0] = name;
             } else {
                 applyHighlightToSelected(name);
             }
@@ -974,7 +976,16 @@ public class BibleReaderDialog extends Dialog {
         LinearLayout.LayoutParams doneLp = new LinearLayout.LayoutParams(dp(36), dp(36));
         doneLp.setMargins(0, dp(8), 0, 0);
         done.setLayoutParams(doneLp);
-        done.setOnClickListener(v -> dismissNotesPanel());
+        done.setOnClickListener(v -> {
+            // With a verse open on the verse bar, the check applies the picked colour to it (and to any verses
+            // added with taps), so it is saved, shown and can be undone. Without one it only closes the picker.
+            final BibleVerse target = (forSwipe && actionBarView != null) ? actionVerse : null;
+            final String colour = chosen[0] != null ? chosen[0] : swipeColourName;
+            dismissNotesPanel();
+            if (target != null) {
+                applyHighlight(target, colour);
+            }
+        });
         LinearLayout doneRow = new LinearLayout(getContext());
         doneRow.setGravity(Gravity.CENTER);
         doneRow.addView(done);
