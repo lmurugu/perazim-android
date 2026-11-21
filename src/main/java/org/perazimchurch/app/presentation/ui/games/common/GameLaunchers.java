@@ -37,5 +37,6 @@ public final class GameLaunchers {
         GameRegistry.register("road_to_jerusalem", RoadScreen::show);
         GameRegistry.register("vine_words", ctx -> org.perazimchurch.app.presentation.ui.games.vine.VineWordsDialog.show(ctx.activity()));
         // GameRegistry.register("story_mosaic", ctx -> StoryMosaicDialog.show(ctx.activity(), ctx.ui()));
+        GameRegistry.register("lamp_slide", org.perazimchurch.app.presentation.ui.games.lampslide.LampSlideLauncher::open);
     }
 }

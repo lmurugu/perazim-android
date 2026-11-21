@@ -168,7 +168,7 @@ final class UiScreenshotSupport {
         return bitmap;
     }
 
-    private static void writePng(Bitmap bitmap, File file) throws Exception {
+    static void writePng(Bitmap bitmap, File file) throws Exception {
         try (FileOutputStream out = new FileOutputStream(file)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
         }
