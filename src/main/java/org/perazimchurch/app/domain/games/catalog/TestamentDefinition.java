@@ -32,6 +32,9 @@ public final class TestamentDefinition implements GameDefinition {
                 return game.place(choice);
             }
             @Override public int size() { return game.size(); }
+            @Override public String prompt() {
+                return game.finished() ? null : "Which testament is " + game.current().name + " in?";
+            }
             @Override public int position() { return game.position(); }
             @Override public boolean finished() { return game.finished(); }
             @Override public int score() { return game.score(); }

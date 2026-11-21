@@ -38,6 +38,9 @@ public final class RoundDefinition implements GameDefinition {
                 return right;
             }
             @Override public int size() { return round.size(); }
+            @Override public String prompt() {
+                return round.finished() ? null : round.current().prompt;
+            }
             @Override public int position() { return Math.min(round.position(), round.size()); }
             @Override public boolean finished() { return round.finished(); }
             @Override public int score() { return round.score(); }
