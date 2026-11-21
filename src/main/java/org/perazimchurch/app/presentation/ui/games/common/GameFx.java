@@ -128,14 +128,14 @@ public final class GameFx {
     public static void correct(View view) {
         pulse(view, Color.argb(160, 255, 170, 60));
         haptic(view, true);
-        tone(ToneGenerator.TONE_PROP_ACK);
+        if (!GameAudio.get(view.getContext()).play(GameAudio.Sfx.CORRECT)) tone(ToneGenerator.TONE_PROP_ACK);
     }
 
     /** Wrong answer: a shake, a soft buzz and a short haptic. */
     public static void wrong(View view) {
         shake(view);
         haptic(view, false);
-        tone(ToneGenerator.TONE_PROP_NACK);
+        if (!GameAudio.get(view.getContext()).play(GameAudio.Sfx.WRONG)) tone(ToneGenerator.TONE_PROP_NACK);
     }
 
     /** Scale pulse with a glow in {@code glow}. */
@@ -190,6 +190,7 @@ public final class GameFx {
         LinearLayout row = (LinearLayout) frame.getChildAt(0);
         ParticleView particles = frame.getChildCount() > 1 ? (ParticleView) frame.getChildAt(1) : null;
         boolean motion = motionEnabled(frame.getContext());
+        GameAudio audio = GameAudio.get(frame.getContext());
         for (int i = 0; i < row.getChildCount(); i++) {
             View star = row.getChildAt(i);
             if (!motion) continue;
@@ -201,8 +202,10 @@ public final class GameFx {
                     .withStartAction(() -> {
                         if (lit && particles != null) particles.burst(star.getX() + star.getWidth() / 2f, star.getY() + star.getHeight() / 2f);
                         if (lit) haptic(star, true);
+                        if (lit) audio.playPitched(GameAudio.Sfx.STAR, 1f + 0.12f * (i + 1));
                     }).start();
         }
+        if (stars >= 3) audio.playPitched(GameAudio.Sfx.COMPLETE, 1f);
     }
 
     /** Counts a score up from 0 to {@code target}, showing "prefix N suffix". */
