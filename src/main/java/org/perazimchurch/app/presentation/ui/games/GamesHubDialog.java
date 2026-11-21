@@ -206,6 +206,7 @@ public final class GamesHubDialog extends Dialog {
     private void hub() {
         if (!activeOwner()) return;
         round = null;
+        openRow = null;
         screen("Bible Games", "Learn, remember and enjoy. Every game works without internet.", false);
         statsBar();
         int shepherd = org.perazimchurch.app.R.drawable.game_char_shepherd;
@@ -319,37 +320,50 @@ public final class GamesHubDialog extends Dialog {
     }
 
     /** One card layout for every game on the hub: icon, character, title, one line, best score, play. */
+    /** Row that holds two cards side by side; closed after the second card. */
+    private LinearLayout openRow;
+
     private void gameCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
+        boolean played = !bestLine.contains("not played yet") && !bestLine.contains("Solved: not yet");
         LinearLayout card = new LinearLayout(activity);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(12), dp(10), dp(12), dp(12));
+        card.setPadding(dp(10), dp(10), dp(10), dp(10));
         GradientDrawable cardBg = shape(PerazimTheme.COLOR_SURFACE);
         cardBg.setStroke(dp(1), accent);
         card.setBackground(cardBg);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
-        params.bottomMargin = dp(12);
-        page.addView(card, params);
+
         LinearLayout head = new LinearLayout(activity);
         head.setOrientation(LinearLayout.HORIZONTAL);
         head.setGravity(Gravity.CENTER_VERTICAL);
-        head.addView(icon(iconRes, 40), new LinearLayout.LayoutParams(dp(40), dp(40)));
+        head.addView(icon(iconRes, 36), new LinearLayout.LayoutParams(dp(36), dp(36)));
+        head.addView(icon(characterRes, 28), new LinearLayout.LayoutParams(dp(28), dp(28)));
+        card.addView(head, wrapParams(6));
+
+        if (!played) {
+            TextView badge = new TextView(activity);
+            badge.setText("New");
+            badge.setTextSize(10);
+            badge.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            badge.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            badge.setPadding(dp(6), dp(2), dp(6), dp(2));
+            GradientDrawable pill = shape(accent);
+            badge.setBackground(pill);
+            card.addView(badge, new LinearLayout.LayoutParams(-2, -2));
+        }
+
         TextView titleView = new TextView(activity);
         titleView.setText(title);
-        titleView.setTextSize(16);
+        titleView.setTextSize(14);
         titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        titleView.setPadding(dp(10), 0, 0, 0);
-        head.addView(titleView, new LinearLayout.LayoutParams(0, -2, 1f));
-        head.addView(icon(characterRes, 36), new LinearLayout.LayoutParams(dp(36), dp(36)));
-        LinearLayout.LayoutParams headParams = new LinearLayout.LayoutParams(-1, -2);
-        headParams.bottomMargin = dp(6);
-        card.addView(head, headParams);
-        addText(card, description, 13, false);
-        addText(card, bestLine, 12, false);
+        card.addView(titleView, wrapParams(2));
+        addText(card, description, 12, false);
+        addText(card, bestLine, 11, false);
+
         Button play = new Button(activity);
-        styleButton(play, "Play " + title, false);
-        play.setTextSize(14);
-        play.setMinHeight(dp(44));
+        styleButton(play, "Play", false);
+        play.setTextSize(13);
+        play.setMinHeight(dp(40));
         card.addView(play, new LinearLayout.LayoutParams(-1, -2));
         play.setOnClickListener(v -> {
             if (!activeOwner()) return;
@@ -357,6 +371,17 @@ public final class GamesHubDialog extends Dialog {
             seed = System.nanoTime();
             start.run();
         });
+
+        if (openRow == null) {
+            openRow = new LinearLayout(activity);
+            openRow.setOrientation(LinearLayout.HORIZONTAL);
+            page.addView(openRow, wrapParams(10));
+        }
+        LinearLayout.LayoutParams cell = new LinearLayout.LayoutParams(0, -2, 1f);
+        cell.rightMargin = openRow.getChildCount() == 0 ? dp(5) : 0;
+        if (openRow.getChildCount() == 1) cell.leftMargin = dp(5);
+        openRow.addView(card, cell);
+        if (openRow.getChildCount() == 2) openRow = null;
     }
 
     private String bestLineOf(String key, int total) {
