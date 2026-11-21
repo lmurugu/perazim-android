@@ -1,0 +1,28 @@
+# Items removed after review: trick questions, dubious facts or wording that does not match the Bible text.
+# Matched by a prefix of the question text (case-sensitive).
+DROP_PREFIXES = [
+    "Who was the king who was cast into a lions' den before Daniel?",
+    "Which of the sons of Jacob was a judge of Israel?",
+    "How many loaves did the boy have",
+    "Who was the prophet who was taken from the threshing floor",
+    "Who wrote 'Thou hast the words of eternal life'?",
+    "Which king of Israel's son was the one who sat",
+    "What is the name of the valley where Gideon's men drank water?",
+    "Which prophet was taken into Babylon with Ezekiel?",
+    "How many gates did Samson carry away",
+    "Who was the Ethiopian who was a centurion?",
+    "Which church father described",
+    "Which apostle is said to have written the three letters",
+    "Which priest was the first to tell Jesus",
+    "Which Gospel was written by a man who had no direct link",
+    "Which Ethiopian",
+    "Who was the Ethiopian who was a centurion?",
+    "Which apostle wrote about the perseverance of the saints",
+    "Which apostle is said to have led the church at Antioch",
+    "Who was the father of John the Baptist's mother?",
+    "Who was the father of Jesus according to Joseph's story?",
+    "Which apostle wrote the letter that says 'faith without works is dead'",
+    "Which Old Testament prophet did Jesus quote on the cross",
+    "Who was the seller of cloth who believed in Jesus and was the first European convert?",
+    "Which Gospel says the wise men came from the east?",
+]
