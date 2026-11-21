@@ -9,6 +9,7 @@ import org.perazimchurch.app.domain.games.catalog.MemoryDefinition;
 import org.perazimchurch.app.domain.games.catalog.VineWordsDefinition;
 import org.perazimchurch.app.domain.games.catalog.RoadDefinition;
 import org.perazimchurch.app.domain.games.catalog.RoundDefinition;
+import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.catalog.TestamentDefinition;
 import org.perazimchurch.app.domain.games.catalog.TimelineDefinition;
 import org.perazimchurch.app.domain.games.catalog.WhoAmIDefinition;
@@ -49,6 +50,7 @@ public final class GameCatalog {
         games.add(new WhoSaidItDefinition(R.drawable.game_art_who_said_it));
         games.add(new FillTheGapDefinition(R.drawable.game_art_verse_builder));
         games.add(new LampSlideDefinition(R.drawable.game_lamp_slide, LampSlideScenes::bundled));
+        games.add(new StoryMosaicDefinition(R.drawable.game_story_mosaic));
         return games;
     }
 }

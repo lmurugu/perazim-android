@@ -11,6 +11,7 @@ import org.perazimchurch.app.presentation.ui.games.RoadScreen;
 import org.perazimchurch.app.presentation.ui.games.StoryTimelineScreen;
 import org.perazimchurch.app.presentation.ui.games.WordSearchScreen;
 import org.perazimchurch.app.presentation.ui.games.WhoAmIScreen;
+import org.perazimchurch.app.presentation.ui.games.mosaic.StoryMosaicDialog;
 
 /**
  * Registers the play screens of games that have their own dialog. Called once from
@@ -38,5 +39,6 @@ public final class GameLaunchers {
         GameRegistry.register("vine_words", ctx -> org.perazimchurch.app.presentation.ui.games.vine.VineWordsDialog.show(ctx.activity()));
         // GameRegistry.register("story_mosaic", ctx -> StoryMosaicDialog.show(ctx.activity(), ctx.ui()));
         GameRegistry.register("lamp_slide", org.perazimchurch.app.presentation.ui.games.lampslide.LampSlideLauncher::open);
+        GameRegistry.register("story_mosaic", StoryMosaicDialog::show);
     }
 }
