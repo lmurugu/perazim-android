@@ -26,12 +26,13 @@ public final class WhoSaidIt {
         }
     }
 
-    private static final class Quote {
-        final String text;
-        final String reference;
-        final String speaker;
+    /** One quotation with its speaker and reference, from the built-in list or a bank file. */
+    public static final class Quote {
+        public final String text;
+        public final String reference;
+        public final String speaker;
 
-        Quote(String text, String reference, String speaker) {
+        public Quote(String text, String reference, String speaker) {
             this.text = text;
             this.reference = reference;
             this.speaker = speaker;
@@ -64,11 +65,16 @@ public final class WhoSaidIt {
     private Question last;
 
     public WhoSaidIt(long seed) {
-        List<Quote> pool = new ArrayList<>(QUOTES);
+        this(QUOTES, DISTRACTORS, seed);
+    }
+
+    /** A run drawn from the given quotations, with wrong speakers taken from {@code distractors}. */
+    public WhoSaidIt(List<Quote> source, List<String> distractors, long seed) {
+        List<Quote> pool = new ArrayList<>(source);
         Collections.shuffle(pool, new Random(seed));
         Random choiceRandom = new Random(seed ^ 0x2545F4914F6CDD1DL);
         for (Quote quote : pool.subList(0, Math.min(ROUND_SIZE, pool.size()))) {
-            List<String> wrong = new ArrayList<>(DISTRACTORS);
+            List<String> wrong = new ArrayList<>(distractors);
             Collections.shuffle(wrong, choiceRandom);
             List<String> choices = new ArrayList<>();
             choices.add(quote.speaker);

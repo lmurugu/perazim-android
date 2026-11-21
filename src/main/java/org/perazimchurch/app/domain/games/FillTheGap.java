@@ -28,14 +28,15 @@ public final class FillTheGap {
         }
     }
 
-    private static final class Verse {
-        final String before;
-        final String answer;
-        final String after;
-        final String reference;
-        final List<String> wrong;
+    /** One verse with the missing word; {@code wrong} holds the other choices. */
+    public static final class Verse {
+        public final String before;
+        public final String answer;
+        public final String after;
+        public final String reference;
+        public final List<String> wrong;
 
-        Verse(String before, String answer, String after, String reference, String... wrong) {
+        public Verse(String before, String answer, String after, String reference, String... wrong) {
             this.before = before;
             this.answer = answer;
             this.after = after;
@@ -64,7 +65,12 @@ public final class FillTheGap {
     private Question last;
 
     public FillTheGap(long seed) {
-        List<Verse> pool = new ArrayList<>(VERSES);
+        this(VERSES, seed);
+    }
+
+    /** A run drawn from the given verses. */
+    public FillTheGap(List<Verse> source, long seed) {
+        List<Verse> pool = new ArrayList<>(source);
         Collections.shuffle(pool, new Random(seed));
         Random choiceRandom = new Random(seed ^ 0x9E3779B97F4A7C15L);
         for (Verse verse : pool.subList(0, Math.min(ROUND_SIZE, pool.size()))) {

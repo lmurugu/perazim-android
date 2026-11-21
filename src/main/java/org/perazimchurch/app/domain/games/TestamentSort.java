@@ -18,7 +18,7 @@ public final class TestamentSort {
         public final Testament testament;
         public final String fact;
 
-        Book(String name, Testament testament, String fact) {
+        public Book(String name, Testament testament, String fact) {
             this.name = name;
             this.testament = testament;
             this.fact = fact;
@@ -50,7 +50,12 @@ public final class TestamentSort {
     private Testament lastGuess;
 
     public TestamentSort(long seed) {
-        List<Book> pool = new ArrayList<>(BOOKS);
+        this(BOOKS, seed);
+    }
+
+    /** A run drawn from the given books, four from each testament when the bank has both. */
+    public TestamentSort(List<Book> source, long seed) {
+        List<Book> pool = new ArrayList<>(source);
         Collections.shuffle(pool, new Random(seed));
         // Keep the run to eight books, balanced between the two testaments.
         List<Book> old = new ArrayList<>();
