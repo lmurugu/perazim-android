@@ -149,7 +149,7 @@ public final class LampSlideLauncher {
                 final int value = level;
                 boolean open = level <= unlocked;
                 int stars = progression.bestStars(storedId, level);
-                Button node = button(level + "\n" + starText(stars), false);
+                Button node = detached(level + "\n" + starText(stars), false);
                 node.setTextSize(12);
                 node.setMinWidth(0);
                 node.setMinimumWidth(0);
@@ -180,14 +180,14 @@ public final class LampSlideLauncher {
 
             LinearLayout nav = new LinearLayout(activity);
             nav.setOrientation(LinearLayout.HORIZONTAL);
-            Button earlier = button("Earlier levels", false);
+            Button earlier = detached("Earlier levels", false);
             earlier.setEnabled(mapPage > 0);
             earlier.setOnClickListener(v -> {
                 mapPage--;
                 showPicker();
             });
             GameFx.attachPress(earlier);
-            Button later = button("Later levels", false);
+            Button later = detached("Later levels", false);
             later.setEnabled(mapPage < pages - 1);
             later.setOnClickListener(v -> {
                 mapPage++;
@@ -277,6 +277,13 @@ public final class LampSlideLauncher {
             button.setTextColor(0xFFFFFFFF);
             page.addView(button, new LinearLayout.LayoutParams(-1, -2));
             return button;
+        }
+
+        /** A button that is not on the page yet. button() adds to the page, so it is taken back out here. */
+        private Button detached(String label, boolean primary) {
+            Button b = button(label, primary);
+            page.removeView(b);
+            return b;
         }
 
         @Override public void click(View v) {
