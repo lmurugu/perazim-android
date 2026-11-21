@@ -46,12 +46,31 @@ public final class LadderOfFaith {
 
     /** The same seed always produces the same run, which keeps tests and replays predictable. */
     public LadderOfFaith(long seed) {
+        this(seed, EASY_RUNGS, MEDIUM_RUNGS);
+    }
+
+    /**
+     * A run with a chosen difficulty mix: {@code easy} easy rungs, {@code medium} medium rungs and the
+     * rest hard, always {@link #RUNGS} in total. Levels use this to get harder as the player goes on.
+     */
+    public LadderOfFaith(long seed, int easy, int medium) {
+        if (easy < 0 || medium < 0 || easy + medium > RUNGS) {
+            throw new IllegalArgumentException("difficulty mix does not fit the ladder");
+        }
         Random random = new Random(seed);
         List<Card> draw = new ArrayList<>();
-        draw.addAll(pick(LadderBank.EASY, EASY_RUNGS, random));
-        draw.addAll(pick(LadderBank.MEDIUM, MEDIUM_RUNGS, random));
-        draw.addAll(pick(LadderBank.HARD, RUNGS - EASY_RUNGS - MEDIUM_RUNGS, random));
+        draw.addAll(pick(LadderBank.EASY, easy, random));
+        draw.addAll(pick(LadderBank.MEDIUM, medium, random));
+        draw.addAll(pick(LadderBank.HARD, RUNGS - easy - medium, random));
         rungs = Collections.unmodifiableList(draw);
+    }
+
+    /** How many rungs of this run come from the given tier (1 easy, 2 medium, 3 hard). */
+    public int rungsOfTier(int tier) {
+        List<Card> pool = tier == 1 ? LadderBank.EASY : tier == 2 ? LadderBank.MEDIUM : LadderBank.HARD;
+        int count = 0;
+        for (Card card : rungs) if (pool.contains(card)) count++;
+        return count;
     }
 
     private static List<Card> pick(List<Card> tier, int count, Random random) {

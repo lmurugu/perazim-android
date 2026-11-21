@@ -5,6 +5,12 @@ import org.perazimchurch.app.presentation.ui.games.OldOrNewScreen;
 import org.perazimchurch.app.presentation.ui.games.QuizScreen;
 import org.perazimchurch.app.presentation.ui.games.VerseBuilderScreen;
 import org.perazimchurch.app.presentation.ui.games.WhoSaidItScreen;
+import org.perazimchurch.app.presentation.ui.games.LadderScreen;
+import org.perazimchurch.app.presentation.ui.games.MemoryScreen;
+import org.perazimchurch.app.presentation.ui.games.RoadScreen;
+import org.perazimchurch.app.presentation.ui.games.StoryTimelineScreen;
+import org.perazimchurch.app.presentation.ui.games.WordSearchScreen;
+import org.perazimchurch.app.presentation.ui.games.WhoAmIScreen;
 
 /**
  * Registers the play screens of games that have their own dialog. Called once from
@@ -23,5 +29,11 @@ public final class GameLaunchers {
         GameRegistry.register("fill_the_gap", ctx -> new FillTheGapScreen(ctx).start());
         GameRegistry.register("bible_quiz", ctx -> new QuizScreen(ctx).start());
         GameRegistry.register("verse_builder", ctx -> new VerseBuilderScreen(ctx).start());
+        GameRegistry.register("who_am_i", WhoAmIScreen::show);
+        GameRegistry.register("story_timeline", StoryTimelineScreen::show);
+        GameRegistry.register("word_search", WordSearchScreen::show);
+        GameRegistry.register("memory_match", MemoryScreen::show);
+        GameRegistry.register("ladder_of_faith", LadderScreen::show);
+        GameRegistry.register("road_to_jerusalem", RoadScreen::show);
     }
 }

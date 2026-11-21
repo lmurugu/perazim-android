@@ -1,60 +1,77 @@
 package org.perazimchurch.app.domain.games.catalog;
 
-import org.perazimchurch.app.domain.games.WordSearch;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 
 /**
- * Adapter for Word Search. An answer is the selection "r1,c1,r2,c2" (zero-based grid cells).
- * A selection that spells a new word is correct; anything else is wrong.
+ * Word Search: find the themed Bible words in an 8 by 8 grid. Twelve levels in three tiers: Easy
+ * (1 to 4) hunts four words and offers a hint, Medium (5 to 8) hunts five words with a hint, and
+ * Hard (9 to 12) hunts six words with no hint. Each level uses a different theme from the bank.
  */
 public final class WordSearchDefinition implements GameDefinition {
+
+    public static final int LEVELS = 12;
+
+    /** Difficulty tier. Easy and Medium offer a hint; Hard does not. */
+    public enum Tier { EASY, MEDIUM, HARD }
+
     private final int iconResource;
 
     public WordSearchDefinition(int iconResource) { this.iconResource = iconResource; }
 
     @Override public String id() { return "word_search"; }
     @Override public String title() { return "Word Search"; }
-    @Override public String description() { return "Find Bible names hidden in the letters."; }
+    @Override public String description() { return "Find the Bible words hidden in the letters."; }
     @Override public int iconResource() { return iconResource; }
-    @Override public int levelCount() { return 1; }
-    @Override public String levelName(int level) { return "Level " + level; }
+    @Override public int levelCount() { return LEVELS; }
+
+    @Override
+    public String levelName(int level) {
+        int n = clamp(level);
+        return tierLabel(tier(n)) + " " + ((n - 1) % 4 + 1);
+    }
+
+    /** Tier for a 1-based level, clamped to the valid range. */
+    public static Tier tier(int level) {
+        int n = clamp(level);
+        if (n <= 4) return Tier.EASY;
+        if (n <= 8) return Tier.MEDIUM;
+        return Tier.HARD;
+    }
+
+    /** Words to find on a level: four on Easy, five on Medium, six on Hard. */
+    public static int wordsFor(Tier tier) {
+        switch (tier) {
+            case EASY: return 4;
+            case MEDIUM: return 5;
+            default: return 6;
+        }
+    }
 
     @Override
     public GameSession createSession(int level, long seed) {
-        final WordSearch game = new WordSearch(seed);
-        return new GameSession() {
-            @Override public int size() { return game.words().size(); }
-            @Override public int position() { return Math.min(game.found().size() + 1, size()); }
-            @Override public boolean finished() { return game.complete(); }
-            @Override public int score() { return game.found().size(); }
-            @Override public int lives() { return NO_LIVES; }
-            @Override public boolean hintAvailable() { return false; }
-            @Override public String hint() { return null; }
-            @Override public Outcome answer(String value) {
-                if (game.complete()) return Outcome.IGNORED;
-                int[] cells = parse(value);
-                if (cells == null) return Outcome.IGNORED;
-                return game.select(cells[0], cells[1], cells[2], cells[3]) != null
-                        ? Outcome.CORRECT : Outcome.WRONG;
-            }
-        };
+        int n = clamp(level);
+        Tier tier = tier(n);
+        List<WordSearchBank.Theme> themes = new ArrayList<>(WordSearchBank.THEMES);
+        Collections.shuffle(themes, new Random(seed));
+        WordSearchBank.Theme theme = themes.get((n - 1) % themes.size());
+        List<WordSearchBank.Entry> words = new ArrayList<>(theme.words.subList(0, wordsFor(tier)));
+        return new WordSearchSession(theme.title, words, tier, seed);
     }
 
-    /** Parses "r1,c1,r2,c2" with each value 0 to {@link WordSearch#SIZE} minus one. Null when invalid. */
-    static int[] parse(String value) {
-        if (value == null) return null;
-        String[] parts = value.split(",");
-        if (parts.length != 4) return null;
-        int[] cells = new int[4];
-        try {
-            for (int i = 0; i < 4; i++) {
-                cells[i] = Integer.parseInt(parts[i].trim());
-                if (cells[i] < 0 || cells[i] >= WordSearch.SIZE) return null;
-            }
-        } catch (NumberFormatException e) {
-            return null;
+    static int clamp(int level) {
+        return Math.max(1, Math.min(LEVELS, level));
+    }
+
+    private static String tierLabel(Tier tier) {
+        switch (tier) {
+            case EASY: return "Easy";
+            case MEDIUM: return "Medium";
+            default: return "Hard";
         }
-        return cells;
     }
 }
