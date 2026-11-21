@@ -295,7 +295,7 @@ An interactive artifact shows six game screens side by side in this system. It
 is linked from the draft PR once published. The artifact is a design reference,
 not shipped code.
 
-Artifact link: _(added after publish)_
+Artifact link: https://claude.ai/artifact/368417eRufp3wQHd8TjjDt (private to the project owner until shared from the page's Share menu)
 
 ---
 
