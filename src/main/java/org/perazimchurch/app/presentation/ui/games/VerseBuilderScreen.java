@@ -6,6 +6,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.perazimchurch.app.domain.games.BibleGames;
+import org.perazimchurch.app.domain.games.catalog.HintRules;
+import org.perazimchurch.app.domain.games.catalog.Levels;
 import org.perazimchurch.app.domain.games.catalog.Streak;
 import org.perazimchurch.app.domain.games.catalog.VerseBuilderSession;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
@@ -15,6 +17,7 @@ import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
+import org.perazimchurch.app.presentation.ui.games.common.LevelPicker;
 
 /**
  * Play screen for Verse Builder. Drives {@link VerseBuilderSession}: tap the shuffled word tiles
@@ -28,46 +31,37 @@ public final class VerseBuilderScreen {
 
     private final GameContext ctx;
     private final GameDefinition definition;
-    private long seed = System.nanoTime();
-    private String difficulty = BibleBanks.DIFFICULTIES[0];
+    private int level = 1;
 
     public VerseBuilderScreen(GameContext ctx) {
         this.ctx = ctx;
         this.definition = QuizScreen.find("verse_builder");
     }
 
-    /** Opens the difficulty picker on the current screen. */
+    /** Opens the level picker on the current screen. */
     public void start() {
         renderPicker();
     }
 
     private void renderPicker() {
         GameUi ui = ctx.ui();
-        ctx.activity().setContentView(ui.page(TITLE, "Choose a difficulty. Five verses per run.", true));
-        for (String level : BibleBanks.DIFFICULTIES) {
-            Button choice = ui.button(BibleBanks.label(level), false);
-            choice.setOnClickListener(v -> {
-                if (!ui.activeOwner()) return;
-                ui.click(v);
-                startRun(level);
-            });
-        }
+        ctx.activity().setContentView(ui.page(TITLE, "Pick a level. Each band has four levels, and a level opens after two stars.", true));
+        LevelPicker.addLevels(ui, ctx.scores(), ctx.scorePrefix() + definition.id(), this::startRun);
     }
 
-    /** Starts a run at one difficulty, drawn from the bundled bank. */
-    private void startRun(String level) {
-        difficulty = level;
-        seed = System.nanoTime();
-        render(new VerseBuilderSession(new BibleGames.Round(BibleBanks.verses(ctx.activity(), level), seed), seed), null, false);
+    /** Starts a run on one level, drawn from the verse bank for its band. */
+    private void startRun(int chosen) {
+        level = Levels.clamp(chosen);
+        long seed = Levels.seed(level);
+        render(new VerseBuilderSession(new BibleGames.Round(BibleBanks.verses(ctx.activity(), Levels.band(level)), seed), seed),
+                null, false);
     }
 
     private void render(VerseBuilderSession game, String feedback, boolean popScore) {
         GameUi ui = ctx.ui();
-        ctx.activity().setContentView(ui.page(TITLE, "Tap the words in order to rebuild the verse. One try per verse.", true));
+        ctx.activity().setContentView(ui.page(TITLE, "Level " + level + " · Tap the words in order. One try per verse.", true));
         if (game.finished()) {
-            String key = ctx.scorePrefix() + "VERSE_BUILDER_" + difficulty.toUpperCase(java.util.Locale.ROOT);
-            if (game.score() > ctx.scores().getInt(key, 0)) ctx.scores().edit().putInt(key, game.score()).apply();
-            new GameChrome(ui).finishedRun(definition, TITLE, game, 1, () -> startRun(difficulty));
+            new GameChrome(ui).finishedRun(definition, TITLE, game, level, () -> startRun(level), () -> startRun(level + 1));
             return;
         }
         TextView scoreLine = ui.text("Verse " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
@@ -79,6 +73,14 @@ public final class VerseBuilderScreen {
         if (feedback != null) ui.text(feedback, 13, false);
         new GameChrome(ui).pauseButton(() -> render(game, feedback, false));
 
+        if (game.hintAvailable()) {
+            Button hint = ui.button("Hint (" + (HintRules.HINTS_PER_RUN - game.hintsUsed()) + " left)", false);
+            hint.setOnClickListener(v -> {
+                if (!ui.activeOwner()) return;
+                ui.click(v);
+                render(game, game.hint(), false);
+            });
+        }
         BibleGames.VersePuzzle puzzle = game.puzzle();
         String built = puzzle.sentence();
         TextView sentence = ui.text(built.isEmpty() ? "Tap the first word." : built, 17, true);

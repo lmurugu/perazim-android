@@ -5,20 +5,24 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.perazimchurch.app.domain.games.BibleGames;
+import org.perazimchurch.app.domain.games.catalog.HintRules;
+import org.perazimchurch.app.domain.games.catalog.Levels;
 import org.perazimchurch.app.domain.games.catalog.QuizSession;
 import org.perazimchurch.app.domain.games.catalog.Streak;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.presentation.ui.games.common.BibleBanks;
-import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
+import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
+import org.perazimchurch.app.presentation.ui.games.common.LevelPicker;
 
 /**
- * Play screen for Bible Quiz. Drives {@link QuizSession} and finishes through
- * {@link GameChrome#finishedRun(GameDefinition, String, GameSession, int, Runnable)}.
+ * Play screen for Bible Quiz. Levels 1 to 12 in three bands; each level draws its five questions
+ * from the bundled bank for its band. Finishes through
+ * {@link GameChrome#finishedRun(GameDefinition, String, GameSession, int, Runnable, Runnable)}.
  * Registered in GameLaunchers with {@code GameRegistry.register("bible_quiz", ctx -> ...)}.
  */
 public final class QuizScreen {
@@ -27,46 +31,37 @@ public final class QuizScreen {
 
     private final GameContext ctx;
     private final GameDefinition definition;
-    private long seed = System.nanoTime();
-    private String difficulty = BibleBanks.DIFFICULTIES[0];
+    private int level = 1;
 
     public QuizScreen(GameContext ctx) {
         this.ctx = ctx;
-        this.definition = find("bible_quiz");
+        this.definition = QuizScreen.find("bible_quiz");
     }
 
-    /** Opens the difficulty picker on the current screen. */
+    /** Opens the level picker on the current screen. */
     public void start() {
         renderPicker();
     }
 
     private void renderPicker() {
         GameUi ui = ctx.ui();
-        ctx.activity().setContentView(ui.page(TITLE, "Choose a difficulty. Five questions per run.", true));
-        for (String level : BibleBanks.DIFFICULTIES) {
-            Button choice = ui.button(BibleBanks.label(level), false);
-            choice.setOnClickListener(v -> {
-                if (!ui.activeOwner()) return;
-                ui.click(v);
-                startRun(level);
-            });
-        }
+        ctx.activity().setContentView(ui.page(TITLE, "Pick a level. Each band has four levels, and a level opens after two stars.", true));
+        LevelPicker.addLevels(ui, ctx.scores(), ctx.scorePrefix() + definition.id(), this::startRun);
     }
 
-    /** Starts a run at one difficulty, drawn from the bundled bank. */
-    private void startRun(String level) {
-        difficulty = level;
-        seed = System.nanoTime();
-        render(new QuizSession(new BibleGames.Round(BibleBanks.quiz(ctx.activity(), level), seed), seed), null, false);
+    /** Starts a run on one level, drawn from the bank for its band. */
+    private void startRun(int chosen) {
+        level = Levels.clamp(chosen);
+        long seed = Levels.seed(level);
+        render(new QuizSession(new BibleGames.Round(BibleBanks.quiz(ctx.activity(), Levels.band(level)), seed), seed),
+                null, false);
     }
 
     private void render(QuizSession game, String feedback, boolean popScore) {
         GameUi ui = ctx.ui();
-        ctx.activity().setContentView(ui.page(TITLE, "Choose the answer to each question. Five questions per run.", true));
+        ctx.activity().setContentView(ui.page(TITLE, "Level " + level + " · Five questions per run.", true));
         if (game.finished()) {
-            String key = ctx.scorePrefix() + "BIBLE_QUIZ_" + difficulty.toUpperCase(java.util.Locale.ROOT);
-            if (game.score() > ctx.scores().getInt(key, 0)) ctx.scores().edit().putInt(key, game.score()).apply();
-            new GameChrome(ui).finishedRun(definition, TITLE, game, 1, () -> startRun(difficulty));
+            new GameChrome(ui).finishedRun(definition, TITLE, game, level, () -> startRun(level), () -> startRun(level + 1));
             return;
         }
         TextView scoreLine = ui.text("Question " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
@@ -78,6 +73,14 @@ public final class QuizScreen {
         ui.text(game.prompt(), 18, true);
         if (feedback != null) ui.text(feedback, 13, false);
         new GameChrome(ui).pauseButton(() -> render(game, feedback, false));
+        if (game.hintAvailable()) {
+            Button hint = ui.button("Hint (" + (2 - game.hintsUsed()) + " left)", false);
+            hint.setOnClickListener(v -> {
+                if (!ui.activeOwner()) return;
+                ui.click(v);
+                render(game, game.hint(), false);
+            });
+        }
         int slot = 0;
         for (String choice : game.choices()) {
             Button option = ui.button(choice, false);
