@@ -63,3 +63,13 @@ background. Keep each prompt to the subject and the style above.
   centred square, so it is padded to square on its own lavender background.
 - Road to Jerusalem keeps its vector icon (`ic_game_road.xml`). Its generated
   art was not produced, so no new asset exists for it.
+
+## Who Said It? (added 2026-11-21)
+
+- Art: `game_art_who_said_it` (256 px square). Generated at 16:9 with
+  gpt-image-2.5-sunburst, one take, centre-cropped to square. The shepherd,
+  lamb, dove and lamp all stay in frame.
+- Prompt: "Flat cartoon illustration, centred square composition, of a friendly
+  Bible-era shepherd with a speech bubble that contains no words, a small dove and
+  a lamp nearby, warm orange and lilac purple palette, soft gradient plain
+  background, clean vector style, no text, no letters."

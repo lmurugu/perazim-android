@@ -240,7 +240,7 @@ public final class GamesHubDialog extends Dialog {
         gameCard(org.perazimchurch.app.R.drawable.game_art_old_or_new, shepherd, PerazimTheme.COLOR_ORANGE_SOFT, "Old or New?",
                 "Place each Bible book in the Old or New Testament. Learn where every book belongs in the story.",
                 bestLineOf("TESTAMENT_SORT", 8), this::testamentSort);
-        gameCard(org.perazimchurch.app.R.drawable.game_art_quiz, dove, PerazimTheme.COLOR_PURPLE_SOFT, "Who Said It?",
+        gameCard(org.perazimchurch.app.R.drawable.game_art_who_said_it, shepherd, PerazimTheme.COLOR_PURPLE_SOFT, "Who Said It?",
                 "Read a Bible quotation and choose the person who spoke it. Five quotations, four names each.",
                 bestLineOf("WHO_SAID_IT", WhoSaidIt.ROUND_SIZE), this::whoSaidIt);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
