@@ -19,6 +19,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -393,22 +394,44 @@ public final class GamesHubDialog extends Dialog {
     /** Row that holds two cards side by side; closed after the second card. */
     private LinearLayout openRow;
 
+    /**
+     * One hub card: the game's art fills the top edge to edge (square, so it is never cropped), clipped to the
+     * card's rounded corners. The title, description, best line and a pill Play button sit below it.
+     * characterRes is no longer drawn; it is kept so existing callers still compile.
+     */
     private void gameCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
         boolean played = !bestLine.contains("not played yet") && !bestLine.contains("Solved: not yet");
+        final int radius = dp(18);
         LinearLayout card = new LinearLayout(activity);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(10), dp(10), dp(10), dp(10));
-        GradientDrawable cardBg = shape(PerazimTheme.COLOR_SURFACE);
+        GradientDrawable cardBg = new GradientDrawable();
+        cardBg.setColor(PerazimTheme.COLOR_SURFACE);
+        cardBg.setCornerRadius(radius);
         cardBg.setStroke(dp(1), accent);
         card.setBackground(cardBg);
+        card.setClipToOutline(true);
+        card.setOutlineProvider(new android.view.ViewOutlineProvider() {
+            @Override public void getOutline(View view, android.graphics.Outline outline) {
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
+            }
+        });
 
-        LinearLayout head = new LinearLayout(activity);
-        head.setOrientation(LinearLayout.HORIZONTAL);
-        head.setGravity(Gravity.CENTER_VERTICAL);
-        head.addView(icon(iconRes, 36), new LinearLayout.LayoutParams(dp(36), dp(36)));
-        head.addView(icon(characterRes, 28), new LinearLayout.LayoutParams(dp(28), dp(28)));
-        card.addView(head, wrapParams(6));
+        // A square frame: its height always equals its width, so the square art fills it without cropping.
+        FrameLayout artFrame = new FrameLayout(activity) {
+            @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+            }
+        };
+        ImageView art = new ImageView(activity);
+        art.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        art.setImageResource(iconRes);
+        art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        artFrame.addView(art, new FrameLayout.LayoutParams(-1, -1));
+        card.addView(artFrame, new LinearLayout.LayoutParams(-1, -2));
 
+        LinearLayout body = new LinearLayout(activity);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setPadding(dp(12), dp(10), dp(12), dp(12));
         if (!played) {
             TextView badge = new TextView(activity);
             badge.setText("New");
@@ -416,25 +439,40 @@ public final class GamesHubDialog extends Dialog {
             badge.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
             badge.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
             badge.setPadding(dp(6), dp(2), dp(6), dp(2));
-            GradientDrawable pill = shape(accent);
-            badge.setBackground(pill);
-            card.addView(badge, new LinearLayout.LayoutParams(-2, -2));
+            badge.setBackground(shape(accent));
+            body.addView(badge, new LinearLayout.LayoutParams(-2, -2));
         }
-
         TextView titleView = new TextView(activity);
         titleView.setText(title);
         titleView.setTextSize(14);
         titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        card.addView(titleView, wrapParams(2));
-        addText(card, description, 12, false);
-        addText(card, bestLine, 11, false);
+        body.addView(titleView, wrapParams(2));
+        addText(body, description, 12, false);
+        addText(body, bestLine, 11, false);
 
+        // The pill is a plain rounded fill, so no sprite-sheet corners show behind it.
         Button play = new Button(activity);
-        styleButton(play, "Play", false);
-        play.setTextSize(13);
-        play.setMinHeight(dp(40));
-        card.addView(play, new LinearLayout.LayoutParams(-1, -2));
+        play.setText("Play");
+        play.setAllCaps(false);
+        play.setTextSize(15);
+        play.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        boolean orange = accent == PerazimTheme.COLOR_ORANGE_BRAND || accent == PerazimTheme.COLOR_ORANGE_SOFT;
+        play.setTextColor(orange ? PerazimTheme.COLOR_BG_DEEP : Color.WHITE);
+        GradientDrawable pill = new GradientDrawable();
+        pill.setColor(orange ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_PURPLE_SOFT);
+        pill.setCornerRadius(dp(22));
+        play.setBackground(pill);
+        play.setStateListAnimator(null);
+        play.setMinHeight(dp(44));
+        play.setMinimumHeight(dp(44));
+        play.setPadding(dp(12), 0, dp(12), 0);
+        LinearLayout.LayoutParams playParams = new LinearLayout.LayoutParams(-1, -2);
+        playParams.topMargin = dp(10);
+        body.addView(play, playParams);
+        card.addView(body, new LinearLayout.LayoutParams(-1, -2));
+
+        card.setClickable(true);
         play.setOnClickListener(v -> {
             if (!activeOwner()) return;
             feedback().click(v);
