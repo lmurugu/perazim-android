@@ -1,0 +1,1187 @@
+{
+ "translation": "KJV",
+ "chapters": [
+  {
+   "id": "c01",
+   "title": "Creation and the first family",
+   "events": [
+    {
+     "title": "God creates the heavens and the earth",
+     "reference": "Genesis 1:1"
+    },
+    {
+     "title": "God creates humankind in his image",
+     "reference": "Genesis 1:27"
+    },
+    {
+     "title": "God forms Adam from the dust",
+     "reference": "Genesis 2:7"
+    },
+    {
+     "title": "God makes Eve from Adam's rib",
+     "reference": "Genesis 2:22"
+    },
+    {
+     "title": "Eve takes the forbidden fruit",
+     "reference": "Genesis 3:6"
+    }
+   ]
+  },
+  {
+   "id": "c02",
+   "title": "Exile from the garden",
+   "events": [
+    {
+     "title": "Adam and Eve hide from God",
+     "reference": "Genesis 3:8"
+    },
+    {
+     "title": "Adam and Eve are sent out of Eden",
+     "reference": "Genesis 3:23"
+    },
+    {
+     "title": "Cain kills his brother Abel",
+     "reference": "Genesis 4:8"
+    },
+    {
+     "title": "God gives Seth in Abel's place",
+     "reference": "Genesis 4:25"
+    },
+    {
+     "title": "Enoch walks with God",
+     "reference": "Genesis 5:24"
+    }
+   ]
+  },
+  {
+   "id": "c03",
+   "title": "Noah and the flood",
+   "events": [
+    {
+     "title": "God tells Noah to build an ark",
+     "reference": "Genesis 6:14"
+    },
+    {
+     "title": "The flood waters burst forth",
+     "reference": "Genesis 7:11"
+    },
+    {
+     "title": "God remembers Noah",
+     "reference": "Genesis 8:1"
+    },
+    {
+     "title": "Noah builds an altar to the LORD",
+     "reference": "Genesis 8:20"
+    },
+    {
+     "title": "God sets the rainbow as a sign",
+     "reference": "Genesis 9:13"
+    }
+   ]
+  },
+  {
+   "id": "c04",
+   "title": "The tower of Babel",
+   "events": [
+    {
+     "title": "The people decide to build a city and tower",
+     "reference": "Genesis 11:4"
+    },
+    {
+     "title": "The LORD confuses their language",
+     "reference": "Genesis 11:7"
+    },
+    {
+     "title": "The people are scattered across the earth",
+     "reference": "Genesis 11:8"
+    },
+    {
+     "title": "The city is named Babel",
+     "reference": "Genesis 11:9"
+    }
+   ]
+  },
+  {
+   "id": "c05",
+   "title": "God calls Abram",
+   "events": [
+    {
+     "title": "God calls Abram to leave his country",
+     "reference": "Genesis 12:1"
+    },
+    {
+     "title": "Abram leaves Haran",
+     "reference": "Genesis 12:4"
+    },
+    {
+     "title": "God promises the land to Abram's offspring",
+     "reference": "Genesis 12:7"
+    },
+    {
+     "title": "Abram believes God, and it is counted to him",
+     "reference": "Genesis 15:6"
+    },
+    {
+     "title": "God changes his name to Abraham",
+     "reference": "Genesis 17:5"
+    }
+   ]
+  },
+  {
+   "id": "c06",
+   "title": "Sodom and Lot",
+   "events": [
+    {
+     "title": "Three visitors come to Abraham",
+     "reference": "Genesis 18:2"
+    },
+    {
+     "title": "Abraham pleads for the city",
+     "reference": "Genesis 18:23"
+    },
+    {
+     "title": "The angels reach Lot in Sodom",
+     "reference": "Genesis 19:1"
+    },
+    {
+     "title": "Lot is urged to flee the city",
+     "reference": "Genesis 19:16"
+    },
+    {
+     "title": "Lot's wife looks back and is lost",
+     "reference": "Genesis 19:26"
+    }
+   ]
+  },
+  {
+   "id": "c07",
+   "title": "The promise of Isaac",
+   "events": [
+    {
+     "title": "God promises Sarah will have a son",
+     "reference": "Genesis 17:19"
+    },
+    {
+     "title": "Isaac is born to Abraham and Sarah",
+     "reference": "Genesis 21:3"
+    },
+    {
+     "title": "God tells Abraham to offer Isaac",
+     "reference": "Genesis 22:2"
+    },
+    {
+     "title": "A ram is caught in the thicket",
+     "reference": "Genesis 22:13"
+    },
+    {
+     "title": "Isaac meets Rebekah and marries her",
+     "reference": "Genesis 24:67"
+    }
+   ]
+  },
+  {
+   "id": "c08",
+   "title": "Jacob and Esau",
+   "events": [
+    {
+     "title": "Two nations are in Rebekah's womb",
+     "reference": "Genesis 25:23"
+    },
+    {
+     "title": "Esau sells his birthright for stew",
+     "reference": "Genesis 25:34"
+    },
+    {
+     "title": "Jacob takes Esau's blessing",
+     "reference": "Genesis 27:36"
+    },
+    {
+     "title": "Jacob dreams of a ladder to heaven",
+     "reference": "Genesis 28:12"
+    },
+    {
+     "title": "Jacob is tricked into marrying Leah",
+     "reference": "Genesis 29:25"
+    }
+   ]
+  },
+  {
+   "id": "c09",
+   "title": "Jacob wrestles at Peniel",
+   "events": [
+    {
+     "title": "Jacob wrestles with a man until daybreak",
+     "reference": "Genesis 32:24"
+    },
+    {
+     "title": "Jacob is renamed Israel",
+     "reference": "Genesis 32:28"
+    },
+    {
+     "title": "Esau runs to meet Jacob and embraces him",
+     "reference": "Genesis 33:4"
+    },
+    {
+     "title": "Rachel dies giving birth to Benjamin",
+     "reference": "Genesis 35:18"
+    },
+    {
+     "title": "Isaac dies at a great age",
+     "reference": "Genesis 35:29"
+    }
+   ]
+  },
+  {
+   "id": "c10",
+   "title": "Joseph in Egypt",
+   "events": [
+    {
+     "title": "Joseph is sold to traders",
+     "reference": "Genesis 37:28"
+    },
+    {
+     "title": "Joseph is put in prison",
+     "reference": "Genesis 39:20"
+    },
+    {
+     "title": "Joseph is brought out to interpret dreams",
+     "reference": "Genesis 41:14"
+    },
+    {
+     "title": "Pharaoh sets Joseph over Egypt",
+     "reference": "Genesis 41:41"
+    },
+    {
+     "title": "Joseph's brothers bow before him",
+     "reference": "Genesis 42:6"
+    }
+   ]
+  },
+  {
+   "id": "c11",
+   "title": "Joseph forgives his brothers",
+   "events": [
+    {
+     "title": "Joseph reveals who he is",
+     "reference": "Genesis 45:4"
+    },
+    {
+     "title": "Joseph says God sent him ahead",
+     "reference": "Genesis 45:8"
+    },
+    {
+     "title": "Jacob's family goes down to Egypt",
+     "reference": "Genesis 46:3"
+    },
+    {
+     "title": "Joseph provides food for his family",
+     "reference": "Genesis 47:12"
+    },
+    {
+     "title": "Joseph says God meant it for good",
+     "reference": "Genesis 50:20"
+    }
+   ]
+  },
+  {
+   "id": "c12",
+   "title": "Baby Moses",
+   "events": [
+    {
+     "title": "Pharaoh orders the Hebrew boys to be killed",
+     "reference": "Exodus 1:22"
+    },
+    {
+     "title": "Moses' mother hides him in a basket",
+     "reference": "Exodus 2:3"
+    },
+    {
+     "title": "Pharaoh's daughter finds the child",
+     "reference": "Exodus 2:5"
+    },
+    {
+     "title": "The child is named Moses",
+     "reference": "Exodus 2:10"
+    },
+    {
+     "title": "Moses flees to Midian",
+     "reference": "Exodus 2:15"
+    }
+   ]
+  },
+  {
+   "id": "c13",
+   "title": "The burning bush",
+   "events": [
+    {
+     "title": "Moses sees a bush burning but not consumed",
+     "reference": "Exodus 3:2"
+    },
+    {
+     "title": "God sends Moses to Pharaoh",
+     "reference": "Exodus 3:10"
+    },
+    {
+     "title": "Moses returns to Egypt with his family",
+     "reference": "Exodus 4:20"
+    },
+    {
+     "title": "Moses and Aaron ask Pharaoh to let Israel go",
+     "reference": "Exodus 5:1"
+    }
+   ]
+  },
+  {
+   "id": "c14",
+   "title": "The plagues of Egypt",
+   "events": [
+    {
+     "title": "The Nile turns to blood",
+     "reference": "Exodus 7:20"
+    },
+    {
+     "title": "Swarms of flies come upon Egypt",
+     "reference": "Exodus 8:24"
+    },
+    {
+     "title": "The livestock of Egypt die",
+     "reference": "Exodus 9:6"
+    },
+    {
+     "title": "Darkness covers the land of Egypt",
+     "reference": "Exodus 10:22"
+    },
+    {
+     "title": "The firstborn in Egypt are to die",
+     "reference": "Exodus 11:5"
+    }
+   ]
+  },
+  {
+   "id": "c15",
+   "title": "The first Passover",
+   "events": [
+    {
+     "title": "The lamb is chosen for each household",
+     "reference": "Exodus 12:3"
+    },
+    {
+     "title": "The blood is put on the doorposts",
+     "reference": "Exodus 12:7"
+    },
+    {
+     "title": "The blood is a sign for the Israelites",
+     "reference": "Exodus 12:13"
+    },
+    {
+     "title": "At midnight the firstborn of Egypt die",
+     "reference": "Exodus 12:29"
+    },
+    {
+     "title": "Pharaoh calls for Moses and Aaron",
+     "reference": "Exodus 12:31"
+    }
+   ]
+  },
+  {
+   "id": "c16",
+   "title": "Crossing the Red Sea",
+   "events": [
+    {
+     "title": "God tells Moses to divide the sea",
+     "reference": "Exodus 14:16"
+    },
+    {
+     "title": "The waters are divided and Israel walks through",
+     "reference": "Exodus 14:21"
+    },
+    {
+     "title": "The sea returns over the Egyptians",
+     "reference": "Exodus 14:27"
+    },
+    {
+     "title": "Israel sees the Egyptians dead on the shore",
+     "reference": "Exodus 14:30"
+    },
+    {
+     "title": "Moses and Israel sing a song to the LORD",
+     "reference": "Exodus 15:1"
+    }
+   ]
+  },
+  {
+   "id": "c17",
+   "title": "Manna in the wilderness",
+   "events": [
+    {
+     "title": "God promises bread from heaven",
+     "reference": "Exodus 16:4"
+    },
+    {
+     "title": "The people find manna on the ground",
+     "reference": "Exodus 16:15"
+    },
+    {
+     "title": "Water flows from the rock at Horeb",
+     "reference": "Exodus 17:6"
+    },
+    {
+     "title": "Hur and Aaron hold up Moses' hands",
+     "reference": "Exodus 17:12"
+    },
+    {
+     "title": "God commands that Amalek be remembered",
+     "reference": "Exodus 17:14"
+    }
+   ]
+  },
+  {
+   "id": "c18",
+   "title": "At Mount Sinai",
+   "events": [
+    {
+     "title": "The mountain smokes and trembles",
+     "reference": "Exodus 19:18"
+    },
+    {
+     "title": "God speaks the ten commandments",
+     "reference": "Exodus 20:1"
+    },
+    {
+     "title": "Moses writes the words of the LORD",
+     "reference": "Exodus 24:4"
+    },
+    {
+     "title": "Moses stays on the mountain forty days",
+     "reference": "Exodus 24:18"
+    },
+    {
+     "title": "God gives Moses the tables of the testimony",
+     "reference": "Exodus 31:18"
+    }
+   ]
+  },
+  {
+   "id": "c19",
+   "title": "The golden calf",
+   "events": [
+    {
+     "title": "The people ask Aaron to make a god",
+     "reference": "Exodus 32:1"
+    },
+    {
+     "title": "Aaron makes a golden calf",
+     "reference": "Exodus 32:4"
+    },
+    {
+     "title": "Moses breaks the tables of stone",
+     "reference": "Exodus 32:19"
+    },
+    {
+     "title": "Moses burns the calf",
+     "reference": "Exodus 32:20"
+    },
+    {
+     "title": "God gives new tables of stone",
+     "reference": "Exodus 34:1"
+    }
+   ]
+  },
+  {
+   "id": "c20",
+   "title": "Building the tabernacle",
+   "events": [
+    {
+     "title": "The people bring offerings for the work",
+     "reference": "Exodus 35:21"
+    },
+    {
+     "title": "Bezalel is called to craft the furnishings",
+     "reference": "Exodus 36:1"
+    },
+    {
+     "title": "The work of the tabernacle is finished",
+     "reference": "Exodus 39:43"
+    },
+    {
+     "title": "The tabernacle is set up",
+     "reference": "Exodus 40:17"
+    },
+    {
+     "title": "The glory of the LORD fills the tabernacle",
+     "reference": "Exodus 40:34"
+    }
+   ]
+  },
+  {
+   "id": "c21",
+   "title": "The twelve spies",
+   "events": [
+    {
+     "title": "Moses sends spies into Canaan",
+     "reference": "Numbers 13:2"
+    },
+    {
+     "title": "The spies bring back a cluster of grapes",
+     "reference": "Numbers 13:23"
+    },
+    {
+     "title": "Caleb says the people should go up",
+     "reference": "Numbers 13:30"
+    },
+    {
+     "title": "The unfaithful spies die",
+     "reference": "Numbers 14:37"
+    },
+    {
+     "title": "Joshua and Caleb are spared",
+     "reference": "Numbers 14:38"
+    }
+   ]
+  },
+  {
+   "id": "c22",
+   "title": "The bronze serpent",
+   "events": [
+    {
+     "title": "The people speak against God and Moses",
+     "reference": "Numbers 21:5"
+    },
+    {
+     "title": "Fiery serpents bite the people",
+     "reference": "Numbers 21:6"
+    },
+    {
+     "title": "Moses is told to make a bronze serpent",
+     "reference": "Numbers 21:8"
+    },
+    {
+     "title": "Those who look at the serpent live",
+     "reference": "Numbers 21:9"
+    }
+   ]
+  },
+  {
+   "id": "c23",
+   "title": "Balaam and the donkey",
+   "events": [
+    {
+     "title": "Balaam sets out with the princes of Moab",
+     "reference": "Numbers 22:21"
+    },
+    {
+     "title": "The donkey speaks to Balaam",
+     "reference": "Numbers 22:28"
+    },
+    {
+     "title": "Balaam sees the angel of the LORD",
+     "reference": "Numbers 22:31"
+    },
+    {
+     "title": "Balaam blesses Israel instead of cursing",
+     "reference": "Numbers 23:11"
+    },
+    {
+     "title": "Balaam prophesies a star out of Jacob",
+     "reference": "Numbers 24:17"
+    }
+   ]
+  },
+  {
+   "id": "c24",
+   "title": "The death of Moses",
+   "events": [
+    {
+     "title": "Moses charges Joshua to be strong",
+     "reference": "Deuteronomy 31:7"
+    },
+    {
+     "title": "Moses sees the land from Mount Nebo",
+     "reference": "Deuteronomy 34:1"
+    },
+    {
+     "title": "Moses dies in the land of Moab",
+     "reference": "Deuteronomy 34:5"
+    },
+    {
+     "title": "Joshua is full of the spirit of wisdom",
+     "reference": "Deuteronomy 34:9"
+    }
+   ]
+  },
+  {
+   "id": "c25",
+   "title": "Crossing the Jordan",
+   "events": [
+    {
+     "title": "The LORD commands Joshua to lead Israel over",
+     "reference": "Joshua 1:1"
+    },
+    {
+     "title": "Two spies are sent to Jericho",
+     "reference": "Joshua 2:1"
+    },
+    {
+     "title": "The waters of the Jordan are held back",
+     "reference": "Joshua 3:16"
+    },
+    {
+     "title": "Twelve stones are set up as a memorial",
+     "reference": "Joshua 4:7"
+    },
+    {
+     "title": "Israel keeps the Passover at Gilgal",
+     "reference": "Joshua 5:10"
+    }
+   ]
+  },
+  {
+   "id": "c26",
+   "title": "The fall of Jericho",
+   "events": [
+    {
+     "title": "Rahab hides the spies on her roof",
+     "reference": "Joshua 2:6"
+    },
+    {
+     "title": "The people shout and march around the city",
+     "reference": "Joshua 6:5"
+    },
+    {
+     "title": "The walls of Jericho fall down flat",
+     "reference": "Joshua 6:20"
+    },
+    {
+     "title": "Rahab and her family are brought out",
+     "reference": "Joshua 6:23"
+    },
+    {
+     "title": "Joshua pronounces a curse on the city",
+     "reference": "Joshua 6:26"
+    }
+   ]
+  },
+  {
+   "id": "c27",
+   "title": "Achan's sin",
+   "events": [
+    {
+     "title": "Israel commits a trespass in the devoted things",
+     "reference": "Joshua 7:1"
+    },
+    {
+     "title": "Israel is defeated at Ai",
+     "reference": "Joshua 7:4"
+    },
+    {
+     "title": "Achan confesses his theft",
+     "reference": "Joshua 7:20"
+    },
+    {
+     "title": "Achan and his family are stoned",
+     "reference": "Joshua 7:25"
+    }
+   ]
+  },
+  {
+   "id": "c28",
+   "title": "Gideon's victory",
+   "events": [
+    {
+     "title": "The angel finds Gideon threshing wheat",
+     "reference": "Judges 6:11"
+    },
+    {
+     "title": "Gideon asks for a sign with a fleece",
+     "reference": "Judges 6:37"
+    },
+    {
+     "title": "God reduces Gideon's army to three hundred",
+     "reference": "Judges 7:7"
+    },
+    {
+     "title": "The trumpets and jars break in the camp of Midian",
+     "reference": "Judges 7:20"
+    }
+   ]
+  },
+  {
+   "id": "c29",
+   "title": "Samson",
+   "events": [
+    {
+     "title": "The child Samson is born",
+     "reference": "Judges 13:24"
+    },
+    {
+     "title": "Samson tears a lion apart",
+     "reference": "Judges 14:6"
+    },
+    {
+     "title": "Samson strikes a thousand men with a jawbone",
+     "reference": "Judges 15:15"
+    },
+    {
+     "title": "Delilah cuts Samson's hair",
+     "reference": "Judges 16:19"
+    },
+    {
+     "title": "Samson pulls down the temple of Dagon",
+     "reference": "Judges 16:30"
+    }
+   ]
+  },
+  {
+   "id": "c30",
+   "title": "Ruth and Boaz",
+   "events": [
+    {
+     "title": "Ruth says she will go with Naomi",
+     "reference": "Ruth 1:16"
+    },
+    {
+     "title": "Ruth gleans in the field of Boaz",
+     "reference": "Ruth 2:3"
+    },
+    {
+     "title": "Ruth asks Boaz to redeem her family",
+     "reference": "Ruth 3:9"
+    },
+    {
+     "title": "Obed is born to Ruth and Boaz",
+     "reference": "Ruth 4:13"
+    },
+    {
+     "title": "Obed becomes the father of Jesse",
+     "reference": "Ruth 4:17"
+    }
+   ]
+  },
+  {
+   "id": "c31",
+   "title": "Samuel's calling",
+   "events": [
+    {
+     "title": "Hannah names her son Samuel",
+     "reference": "1 Samuel 1:20"
+    },
+    {
+     "title": "Samuel answers the voice of God",
+     "reference": "1 Samuel 3:10"
+    },
+    {
+     "title": "Samuel offers a sacrifice and the LORD answers Israel",
+     "reference": "1 Samuel 7:9"
+    },
+    {
+     "title": "The elders ask Samuel for a king",
+     "reference": "1 Samuel 8:5"
+    },
+    {
+     "title": "Samuel anoints Saul as king",
+     "reference": "1 Samuel 10:1"
+    }
+   ]
+  },
+  {
+   "id": "c32",
+   "title": "David is anointed",
+   "events": [
+    {
+     "title": "Samuel is sent to Jesse of Bethlehem",
+     "reference": "1 Samuel 16:1"
+    },
+    {
+     "title": "Samuel anoints David",
+     "reference": "1 Samuel 16:13"
+    },
+    {
+     "title": "David plays the harp for Saul",
+     "reference": "1 Samuel 16:23"
+    },
+    {
+     "title": "Goliath challenges Israel",
+     "reference": "1 Samuel 17:4"
+    },
+    {
+     "title": "David defeats Goliath",
+     "reference": "1 Samuel 17:50"
+    }
+   ]
+  },
+  {
+   "id": "c33",
+   "title": "David and Jonathan",
+   "events": [
+    {
+     "title": "The soul of Jonathan is knit to David",
+     "reference": "1 Samuel 18:1"
+    },
+    {
+     "title": "Jonathan warns David of Saul's plan",
+     "reference": "1 Samuel 19:2"
+    },
+    {
+     "title": "Jonathan makes a covenant with David",
+     "reference": "1 Samuel 20:17"
+    },
+    {
+     "title": "David and Jonathan weep together",
+     "reference": "1 Samuel 20:41"
+    },
+    {
+     "title": "David mourns Jonathan",
+     "reference": "2 Samuel 1:26"
+    }
+   ]
+  },
+  {
+   "id": "c34",
+   "title": "David becomes king",
+   "events": [
+    {
+     "title": "David is anointed king over Judah",
+     "reference": "2 Samuel 2:4"
+    },
+    {
+     "title": "David is made king over all Israel",
+     "reference": "2 Samuel 5:3"
+    },
+    {
+     "title": "David takes the stronghold of Zion",
+     "reference": "2 Samuel 5:7"
+    },
+    {
+     "title": "The ark is brought up to Jerusalem",
+     "reference": "2 Samuel 6:15"
+    },
+    {
+     "title": "God promises David an everlasting throne",
+     "reference": "2 Samuel 7:16"
+    }
+   ]
+  },
+  {
+   "id": "c35",
+   "title": "David and Bathsheba",
+   "events": [
+    {
+     "title": "David sees Bathsheba from his roof",
+     "reference": "2 Samuel 11:2"
+    },
+    {
+     "title": "David sends a letter to have Uriah killed",
+     "reference": "2 Samuel 11:14"
+    },
+    {
+     "title": "Bathsheba becomes David's wife",
+     "reference": "2 Samuel 11:27"
+    },
+    {
+     "title": "Nathan says to David, Thou art the man",
+     "reference": "2 Samuel 12:7"
+    },
+    {
+     "title": "David confesses that he has sinned",
+     "reference": "2 Samuel 12:13"
+    }
+   ]
+  },
+  {
+   "id": "c36",
+   "title": "Absalom's rebellion",
+   "events": [
+    {
+     "title": "Absalom steals the hearts of the men of Israel",
+     "reference": "2 Samuel 15:6"
+    },
+    {
+     "title": "David flees from Jerusalem",
+     "reference": "2 Samuel 15:14"
+    },
+    {
+     "title": "Absalom is hanged in an oak",
+     "reference": "2 Samuel 18:9"
+    },
+    {
+     "title": "Joab kills Absalom",
+     "reference": "2 Samuel 18:14"
+    },
+    {
+     "title": "David weeps for his son",
+     "reference": "2 Samuel 19:4"
+    }
+   ]
+  },
+  {
+   "id": "c37",
+   "title": "Solomon's wisdom and the temple",
+   "events": [
+    {
+     "title": "God appears to Solomon in a dream",
+     "reference": "1 Kings 3:5"
+    },
+    {
+     "title": "Solomon asks for an understanding heart",
+     "reference": "1 Kings 3:9"
+    },
+    {
+     "title": "Israel sees the wisdom of Solomon's judgment",
+     "reference": "1 Kings 3:28"
+    },
+    {
+     "title": "Solomon begins to build the temple",
+     "reference": "1 Kings 6:1"
+    },
+    {
+     "title": "The glory of the LORD fills the temple",
+     "reference": "1 Kings 8:10"
+    }
+   ]
+  },
+  {
+   "id": "c38",
+   "title": "Elijah and the widow",
+   "events": [
+    {
+     "title": "Ravens bring bread and meat to Elijah",
+     "reference": "1 Kings 17:6"
+    },
+    {
+     "title": "The widow's jar of oil does not run dry",
+     "reference": "1 Kings 17:16"
+    },
+    {
+     "title": "Fire falls on Elijah's sacrifice",
+     "reference": "1 Kings 18:38"
+    },
+    {
+     "title": "Elijah hears the still small voice",
+     "reference": "1 Kings 19:12"
+    },
+    {
+     "title": "Elijah is taken up in a whirlwind",
+     "reference": "2 Kings 2:11"
+    }
+   ]
+  },
+  {
+   "id": "c39",
+   "title": "Elisha and Naaman",
+   "events": [
+    {
+     "title": "Elisha asks for a double portion of Elijah's spirit",
+     "reference": "2 Kings 2:9"
+    },
+    {
+     "title": "Elisha raises the Shunammite's son",
+     "reference": "2 Kings 4:34"
+    },
+    {
+     "title": "Naaman is healed in the Jordan",
+     "reference": "2 Kings 5:14"
+    },
+    {
+     "title": "Elisha's servant sees the horses of fire",
+     "reference": "2 Kings 6:17"
+    }
+   ]
+  },
+  {
+   "id": "c40",
+   "title": "Jonah and Nineveh",
+   "events": [
+    {
+     "title": "Jonah flees from the presence of the LORD",
+     "reference": "Jonah 1:3"
+    },
+    {
+     "title": "A great fish swallows Jonah",
+     "reference": "Jonah 1:17"
+    },
+    {
+     "title": "The fish vomits Jonah onto dry land",
+     "reference": "Jonah 2:10"
+    },
+    {
+     "title": "The people of Nineveh believe Jonah",
+     "reference": "Jonah 3:5"
+    },
+    {
+     "title": "God relents from the evil he had said",
+     "reference": "Jonah 3:10"
+    }
+   ]
+  },
+  {
+   "id": "c41",
+   "title": "The birth of Jesus",
+   "events": [
+    {
+     "title": "The angel Gabriel greets Mary",
+     "reference": "Luke 1:28"
+    },
+    {
+     "title": "Joseph and Mary travel to Bethlehem",
+     "reference": "Luke 2:4"
+    },
+    {
+     "title": "Jesus is born and laid in a manger",
+     "reference": "Luke 2:7"
+    },
+    {
+     "title": "The shepherds hear the good news",
+     "reference": "Luke 2:10"
+    },
+    {
+     "title": "The child is circumcised and named Jesus",
+     "reference": "Luke 2:21"
+    }
+   ]
+  },
+  {
+   "id": "c42",
+   "title": "Baptism and temptation",
+   "events": [
+    {
+     "title": "Jesus comes to John to be baptised",
+     "reference": "Matthew 3:13"
+    },
+    {
+     "title": "The Spirit descends like a dove",
+     "reference": "Matthew 3:16"
+    },
+    {
+     "title": "Jesus is led into the wilderness to be tempted",
+     "reference": "Matthew 4:1"
+    },
+    {
+     "title": "Angels come and minister to Jesus",
+     "reference": "Matthew 4:11"
+    }
+   ]
+  },
+  {
+   "id": "c43",
+   "title": "Jesus calls his disciples",
+   "events": [
+    {
+     "title": "Jesus calls Simon and Andrew to follow him",
+     "reference": "Matthew 4:18"
+    },
+    {
+     "title": "Jesus calls James and John",
+     "reference": "Matthew 4:21"
+    },
+    {
+     "title": "Jesus calls Matthew from the tax booth",
+     "reference": "Matthew 9:9"
+    },
+    {
+     "title": "Jesus names the twelve apostles",
+     "reference": "Matthew 10:2"
+    }
+   ]
+  },
+  {
+   "id": "c44",
+   "title": "Feeding the five thousand",
+   "events": [
+    {
+     "title": "Jesus blesses five loaves and two fish",
+     "reference": "Matthew 14:19"
+    },
+    {
+     "title": "Five thousand men are fed",
+     "reference": "Matthew 14:21"
+    },
+    {
+     "title": "Jesus walks on the sea",
+     "reference": "Matthew 14:25"
+    },
+    {
+     "title": "Four thousand are fed with seven loaves",
+     "reference": "Matthew 15:37"
+    }
+   ]
+  },
+  {
+   "id": "c45",
+   "title": "The Last Supper and the cross",
+   "events": [
+    {
+     "title": "Judas agrees to betray Jesus",
+     "reference": "Matthew 26:14"
+    },
+    {
+     "title": "Jesus shares the bread and the cup",
+     "reference": "Matthew 26:26"
+    },
+    {
+     "title": "Jesus is crucified",
+     "reference": "Matthew 27:35"
+    },
+    {
+     "title": "Jesus yields up the spirit",
+     "reference": "Matthew 27:50"
+    },
+    {
+     "title": "The angel declares that Jesus is risen",
+     "reference": "Matthew 28:6"
+    }
+   ]
+  },
+  {
+   "id": "c46",
+   "title": "The early church begins",
+   "events": [
+    {
+     "title": "Jesus is taken up into heaven",
+     "reference": "Acts 1:9"
+    },
+    {
+     "title": "The day of Pentecost comes",
+     "reference": "Acts 2:1"
+    },
+    {
+     "title": "The disciples are filled with the Holy Ghost",
+     "reference": "Acts 2:4"
+    },
+    {
+     "title": "About three thousand are baptised",
+     "reference": "Acts 2:41"
+    },
+    {
+     "title": "Stephen is stoned as the first martyr",
+     "reference": "Acts 7:58"
+    }
+   ]
+  },
+  {
+   "id": "c47",
+   "title": "Saul meets Jesus",
+   "events": [
+    {
+     "title": "Saul is consenting to Stephen's death",
+     "reference": "Acts 8:1"
+    },
+    {
+     "title": "Saul sees a light on the road to Damascus",
+     "reference": "Acts 9:3"
+    },
+    {
+     "title": "Ananias restores Saul's sight",
+     "reference": "Acts 9:18"
+    },
+    {
+     "title": "The Holy Ghost calls Barnabas and Saul",
+     "reference": "Acts 13:2"
+    },
+    {
+     "title": "Paul and Barnabas set out on the first journey",
+     "reference": "Acts 13:4"
+    }
+   ]
+  }
+ ]
+}
