@@ -9,6 +9,8 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, ".."))
 import kjv  # noqa: E402
 import verse_and_gap as src  # noqa: E402
+import quotes_more  # noqa: E402
+import testament_bank  # noqa: E402
 
 ASSETS = os.path.join(HERE, "..", "..", "..", "src", "main", "assets", "games")
 
@@ -80,7 +82,7 @@ def fill_the_gap():
 
 def who_said_it():
     items, rejected = [], []
-    for speaker, ref, phrase in src.QUOTES:
+    for speaker, ref, phrase in src.QUOTES + quotes_more.QUOTES_MORE:
         try:
             text = kjv.verse_text(ref)
         except ValueError as e:
@@ -96,6 +98,28 @@ def who_said_it():
     return items, rejected, speakers
 
 
+def testaments():
+    items, rejected, seen = [], [], set()
+    for kind, name, testament, fact, ref in testament_bank.BOOKS + testament_bank.PEOPLE:
+        if testament not in ("OLD", "NEW"):
+            rejected.append("bad testament: " + name)
+            continue
+        try:
+            kjv.verse_text(ref)
+        except ValueError as e:
+            rejected.append(str(e))
+            continue
+        key = (kind, name)
+        if key in seen:
+            rejected.append("duplicate " + name)
+            continue
+        seen.add(key)
+        items.append({"id": kind + "_" + slug(name), "kind": kind, "name": name,
+                      "testament": testament, "fact": fact, "reference": kjv.canonical_ref(ref)})
+    write("old_or_new.json", {"version": 1, "items": items})
+    return items, rejected
+
+
 if __name__ == "__main__":
     v, vr = verse_builder()
     g, gr = fill_the_gap()
@@ -109,4 +133,8 @@ if __name__ == "__main__":
         print("  ", r)
     print("who_said_it:", len(q), "speakers:", len(sp), "rejected:", len(qr))
     for r in qr:
+        print("  ", r)
+    t, tr = testaments()
+    print("old_or_new:", len(t), "books:", sum(1 for i in t if i["kind"] == "book"), "rejected:", len(tr))
+    for r in tr:
         print("  ", r)

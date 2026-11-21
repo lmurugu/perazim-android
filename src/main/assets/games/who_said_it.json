@@ -2,19 +2,26 @@
  "version": 1,
  "speakers": [
   "Abraham",
+  "Agrippa",
   "Ananias",
   "Balaam",
   "Bartimaeus",
+  "Caiaphas",
   "Cain",
   "Daniel",
   "David",
   "Elijah",
   "Elisha",
+  "Elizabeth",
+  "Esau",
   "Esther",
+  "Gideon",
   "God",
+  "Hagar",
   "Isaac",
   "Isaiah",
   "Jacob",
+  "Jephthah",
   "Jeremiah",
   "Jesus",
   "Job",
@@ -33,9 +40,11 @@
   "Pharaoh",
   "Philip",
   "Pilate",
+  "Rebekah",
   "Ruth",
   "Samson",
   "Samuel",
+  "Sarah",
   "Saul",
   "Solomon",
   "Stephen",
@@ -695,6 +704,279 @@
    "quote": "I am the vine, ye are the branches",
    "reference": "John 15:5",
    "verseText": "I am the vine, ye are the branches: He that abideth in me, and I in him, the same bringeth forth much fruit: for without me ye can do nothing."
+  },
+  {
+   "id": "quote_jesus_blessed_are_the_peacemakers",
+   "speaker": "Jesus",
+   "quote": "Blessed are the peacemakers",
+   "reference": "Matthew 5:9",
+   "verseText": "Blessed are the peacemakers: for they shall be called the children of God."
+  },
+  {
+   "id": "quote_jesus_ye_are_the_salt_of_the_earth",
+   "speaker": "Jesus",
+   "quote": "Ye are the salt of the earth",
+   "reference": "Matthew 5:13",
+   "verseText": "Ye are the salt of the earth: but if the salt have lost his savour, wherewith shall it be salted? it is thenceforth good for nothing, but to be cast out, and to be trodden under foot of men."
+  },
+  {
+   "id": "quote_jesus_take_therefore_no_thought_for_the_morrow",
+   "speaker": "Jesus",
+   "quote": "Take therefore no thought for the morrow",
+   "reference": "Matthew 6:34",
+   "verseText": "Take therefore no thought for the morrow: for the morrow shall take thought for the things of itself. Sufficient unto the day is the evil thereof."
+  },
+  {
+   "id": "quote_jesus_ask_and_it_shall_be_given_you",
+   "speaker": "Jesus",
+   "quote": "Ask, and it shall be given you",
+   "reference": "Matthew 7:7",
+   "verseText": "Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you:"
+  },
+  {
+   "id": "quote_jesus_they_that_be_whole_need_not_a_physician",
+   "speaker": "Jesus",
+   "quote": "They that be whole need not a physician",
+   "reference": "Matthew 9:12",
+   "verseText": "But when Jesus heard that, he said unto them, They that be whole need not a physician, but they that are sick."
+  },
+  {
+   "id": "quote_jesus_suffer_little_children_and_forbid_them_not",
+   "speaker": "Jesus",
+   "quote": "Suffer little children, and forbid them not",
+   "reference": "Matthew 19:14",
+   "verseText": "But Jesus said, Suffer little children, and forbid them not, to come unto me: for of such is the kingdom of heaven."
+  },
+  {
+   "id": "quote_jesus_i_came_not_to_call_the_righteous_but_sinners",
+   "speaker": "Jesus",
+   "quote": "I came not to call the righteous, but sinners",
+   "reference": "Mark 2:17",
+   "verseText": "When Jesus heard it, he saith unto them, They that are whole have no need of the physician, but they that are sick: I came not to call the righteous, but sinners to repentance."
+  },
+  {
+   "id": "quote_jesus_ye_must_be_born_again",
+   "speaker": "Jesus",
+   "quote": "Ye must be born again",
+   "reference": "John 3:7",
+   "verseText": "Marvel not that I said unto thee, Ye must be born again."
+  },
+  {
+   "id": "quote_jesus_god_is_a_spirit",
+   "speaker": "Jesus",
+   "quote": "God is a Spirit",
+   "reference": "John 4:24",
+   "verseText": "God is a Spirit: and they that worship him must worship him in spirit and in truth."
+  },
+  {
+   "id": "quote_jesus_that_ye_love_one_another_as_i_have_loved_you",
+   "speaker": "Jesus",
+   "quote": "That ye love one another, as I have loved you",
+   "reference": "John 15:12",
+   "verseText": "This is my commandment, That ye love one another, as I have loved you."
+  },
+  {
+   "id": "quote_jesus_in_the_world_ye_shall_have_tribulation",
+   "speaker": "Jesus",
+   "quote": "In the world ye shall have tribulation",
+   "reference": "John 16:33",
+   "verseText": "These things I have spoken unto you, that in me ye might have peace. In the world ye shall have tribulation: but be of good cheer; I have overcome the world."
+  },
+  {
+   "id": "quote_jesus_surely_i_come_quickly",
+   "speaker": "Jesus",
+   "quote": "Surely I come quickly",
+   "reference": "Revelation 22:20",
+   "verseText": "He which testifieth these things saith, Surely I come quickly. Amen. Even so, come, Lord Jesus."
+  },
+  {
+   "id": "quote_jesus_behold_i_stand_at_the_door_and_knock",
+   "speaker": "Jesus",
+   "quote": "Behold, I stand at the door, and knock",
+   "reference": "Revelation 3:20",
+   "verseText": "Behold, I stand at the door, and knock: if any man hear my voice, and open the door, I will come in to him, and will sup with him, and he with me."
+  },
+  {
+   "id": "quote_john_the_baptist_repent_ye_for_the_kingdom_of_heaven_is_at_h",
+   "speaker": "John the Baptist",
+   "quote": "Repent ye: for the kingdom of heaven is at hand",
+   "reference": "Matthew 3:2",
+   "verseText": "And saying, Repent ye: for the kingdom of heaven is at hand."
+  },
+  {
+   "id": "quote_paul_i_am_persuaded",
+   "speaker": "Paul",
+   "quote": "I am persuaded",
+   "reference": "Romans 8:38",
+   "verseText": "For I am persuaded, that neither death, nor life, nor angels, nor principalities, nor powers, nor things present, nor things to come,"
+  },
+  {
+   "id": "quote_paul_i_can_do_all_things_through_christ",
+   "speaker": "Paul",
+   "quote": "I can do all things through Christ",
+   "reference": "Philippians 4:13",
+   "verseText": "I can do all things through Christ which strengtheneth me."
+  },
+  {
+   "id": "quote_paul_rejoice_in_the_lord_alway",
+   "speaker": "Paul",
+   "quote": "Rejoice in the Lord alway",
+   "reference": "Philippians 4:4",
+   "verseText": "Rejoice in the Lord alway: and again I say, Rejoice."
+  },
+  {
+   "id": "quote_agrippa_almost_thou_persuadest_me",
+   "speaker": "Agrippa",
+   "quote": "Almost thou persuadest me",
+   "reference": "Acts 26:28",
+   "verseText": "Then Agrippa said unto Paul, Almost thou persuadest me to be a Christian."
+  },
+  {
+   "id": "quote_elijah_how_long_halt_ye_between_two_opinions",
+   "speaker": "Elijah",
+   "quote": "How long halt ye between two opinions",
+   "reference": "1 Kings 18:21",
+   "verseText": "And Elijah came unto all the people, and said, How long halt ye between two opinions? if the LORD be God, follow him: but if Baal, then follow him. And the people answered him not a word."
+  },
+  {
+   "id": "quote_jonah_i_cried_by_reason_of_mine_affliction_unto_the_lord",
+   "speaker": "Jonah",
+   "quote": "I cried by reason of mine affliction unto the LORD",
+   "reference": "Jonah 2:2",
+   "verseText": "And said, I cried by reason of mine affliction unto the LORD, and he heard me; out of the belly of hell cried I, and thou heardest my voice."
+  },
+  {
+   "id": "quote_job_naked_came_i_out_of_my_mother_s_womb",
+   "speaker": "Job",
+   "quote": "Naked came I out of my mother's womb",
+   "reference": "Job 1:21",
+   "verseText": "And said, Naked came I out of my mother’s womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD."
+  },
+  {
+   "id": "quote_job_shall_we_receive_good_at_the_hand_of_god",
+   "speaker": "Job",
+   "quote": "Shall we receive good at the hand of God",
+   "reference": "Job 2:10",
+   "verseText": "But he said unto her, Thou speakest as one of the foolish women speaketh. What? shall we receive good at the hand of God, and shall we not receive evil? In all this did not Job sin with his lips."
+  },
+  {
+   "id": "quote_david_the_lord_is_my_shepherd",
+   "speaker": "David",
+   "quote": "The LORD is my shepherd",
+   "reference": "Psalms 23:1",
+   "verseText": "The LORD is my shepherd; I shall not want."
+  },
+  {
+   "id": "quote_ruth_thy_people_shall_be_my_people",
+   "speaker": "Ruth",
+   "quote": "Thy people shall be my people",
+   "reference": "Ruth 1:16",
+   "verseText": "And Ruth said, Intreat me not to leave thee, or to return from following after thee: for whither thou goest, I will go; and where thou lodgest, I will lodge: thy people shall be my people, and thy God my God:"
+  },
+  {
+   "id": "quote_gideon_the_sword_of_the_lord_and_of_gideon",
+   "speaker": "Gideon",
+   "quote": "The sword of the LORD, and of Gideon",
+   "reference": "Judges 7:20",
+   "verseText": "And the three companies blew the trumpets, and brake the pitchers, and held the lamps in their left hands, and the trumpets in their right hands to blow withal: and they cried, The sword of the LORD, and of Gideon."
+  },
+  {
+   "id": "quote_samson_with_the_jawbone_of_an_ass",
+   "speaker": "Samson",
+   "quote": "With the jawbone of an ass",
+   "reference": "Judges 15:16",
+   "verseText": "And Samson said, With the jawbone of an ass, heaps upon heaps, with the jaw of an ass have I slain a thousand men."
+  },
+  {
+   "id": "quote_jephthah_i_have_opened_my_mouth_unto_the_lord",
+   "speaker": "Jephthah",
+   "quote": "I have opened my mouth unto the LORD",
+   "reference": "Judges 11:35",
+   "verseText": "And it came to pass, when he saw her, that he rent his clothes, and said, Alas, my daughter! thou hast brought me very low, and thou art one of them that trouble me: for I have opened my mouth unto the LORD, and I cannot go back."
+  },
+  {
+   "id": "quote_abraham_i_have_taken_upon_me_to_speak_unto_the_lord",
+   "speaker": "Abraham",
+   "quote": "I have taken upon me to speak unto the Lord",
+   "reference": "Genesis 18:27",
+   "verseText": "And Abraham answered and said, Behold now, I have taken upon me to speak unto the Lord, which am but dust and ashes:"
+  },
+  {
+   "id": "quote_joseph_god_did_send_me_before_you_to_preserve_life",
+   "speaker": "Joseph",
+   "quote": "God did send me before you to preserve life",
+   "reference": "Genesis 45:5",
+   "verseText": "Now therefore be not grieved, nor angry with yourselves, that ye sold me hither: for God did send me before you to preserve life."
+  },
+  {
+   "id": "quote_esau_hast_thou_but_one_blessing",
+   "speaker": "Esau",
+   "quote": "Hast thou but one blessing",
+   "reference": "Genesis 27:38",
+   "verseText": "And Esau said unto his father, Hast thou but one blessing, my father? bless me, even me also, O my father. And Esau lifted up his voice, and wept."
+  },
+  {
+   "id": "quote_rebekah_why_am_i_thus",
+   "speaker": "Rebekah",
+   "quote": "why am I thus",
+   "reference": "Genesis 25:22",
+   "verseText": "And the children struggled together within her; and she said, If it be so, why am I thus? And she went to enquire of the LORD."
+  },
+  {
+   "id": "quote_hagar_thou_god_seest_me",
+   "speaker": "Hagar",
+   "quote": "Thou God seest me",
+   "reference": "Genesis 16:13",
+   "verseText": "And she called the name of the LORD that spake unto her, Thou God seest me: for she said, Have I also here looked after him that seeth me?"
+  },
+  {
+   "id": "quote_sarah_shall_i_have_pleasure_my_lord_being_old",
+   "speaker": "Sarah",
+   "quote": "Shall I have pleasure, my lord being old",
+   "reference": "Genesis 18:12",
+   "verseText": "Therefore Sarah laughed within herself, saying, After I am waxed old shall I have pleasure, my lord being old also?"
+  },
+  {
+   "id": "quote_peter_though_i_should_die_with_thee_yet_will_i_not_deny_thee",
+   "speaker": "Peter",
+   "quote": "Though I should die with thee, yet will I not deny thee",
+   "reference": "Matthew 26:35",
+   "verseText": "Peter said unto him, Though I should die with thee, yet will I not deny thee. Likewise also said all the disciples."
+  },
+  {
+   "id": "quote_thomas_let_us_also_go_that_we_may_die_with_him",
+   "speaker": "Thomas",
+   "quote": "Let us also go, that we may die with him",
+   "reference": "John 11:16",
+   "verseText": "Then said Thomas, which is called Didymus, unto his fellowdisciples, Let us also go, that we may die with him."
+  },
+  {
+   "id": "quote_caiaphas_he_hath_spoken_blasphemy",
+   "speaker": "Caiaphas",
+   "quote": "He hath spoken blasphemy",
+   "reference": "Matthew 26:65",
+   "verseText": "Then the high priest rent his clothes, saying, He hath spoken blasphemy; what further need have we of witnesses? behold, now ye have heard his blasphemy."
+  },
+  {
+   "id": "quote_pilate_i_am_innocent_of_the_blood_of_this_just_person",
+   "speaker": "Pilate",
+   "quote": "I am innocent of the blood of this just person",
+   "reference": "Matthew 27:24",
+   "verseText": "When Pilate saw that he could prevail nothing, but that rather a tumult was made, he took water, and washed his hands before the multitude, saying, I am innocent of the blood of this just person: see ye to it."
+  },
+  {
+   "id": "quote_mary_all_generations_shall_call_me_blessed",
+   "speaker": "Mary",
+   "quote": "all generations shall call me blessed",
+   "reference": "Luke 1:48",
+   "verseText": "For he hath regarded the low estate of his handmaiden: for, behold, from henceforth all generations shall call me blessed."
+  },
+  {
+   "id": "quote_elizabeth_the_mother_of_my_lord_should_come_to_me",
+   "speaker": "Elizabeth",
+   "quote": "the mother of my Lord should come to me",
+   "reference": "Luke 1:43",
+   "verseText": "And whence is this to me, that the mother of my Lord should come to me?"
   }
  ]
 }
