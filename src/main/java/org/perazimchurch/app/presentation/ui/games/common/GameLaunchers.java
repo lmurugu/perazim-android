@@ -1,6 +1,7 @@
 package org.perazimchurch.app.presentation.ui.games.common;
 
 import org.perazimchurch.app.presentation.ui.games.StoryTimelineScreen;
+import org.perazimchurch.app.presentation.ui.games.WordSearchScreen;
 import org.perazimchurch.app.presentation.ui.games.WhoAmIScreen;
 
 /**
@@ -16,5 +17,6 @@ public final class GameLaunchers {
     public static void registerAll() {
         GameRegistry.register("who_am_i", WhoAmIScreen::show);
         GameRegistry.register("story_timeline", StoryTimelineScreen::show);
+        GameRegistry.register("word_search", WordSearchScreen::show);
     }
 }
