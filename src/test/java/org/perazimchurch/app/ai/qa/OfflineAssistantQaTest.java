@@ -139,7 +139,6 @@ public class OfflineAssistantQaTest {
      * does not check category, approval, hash, revocation or supersession, so approval metadata that the
      * package carries is used as is. This tripwire fails until retrieval is wired to SourceGovernance.
      */
-    @Ignore("KNOWN GAP: SourceGovernance has no production call site; retrieval does not enforce it")
     @Test
     public void retrievalPathUsesSourceGovernance() throws Exception {
         String store = new String(Files.readAllBytes(Paths.get(
