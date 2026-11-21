@@ -156,3 +156,20 @@ Source for the licence summary: https://help.planningcenter.com/en/copyright-con
 | Kenya/SUV "Section 23, 50 years" claim (`docs/bible-source.md` §2.2) | Could not be checked. The Kenya Act full text was not retrieved (see 6.5) | Uncertain |
 
 **Result:** the KJV text is probably derived from a public-domain base (Gutenberg / CrossWire / Blayney text), as the repo says. This has not been verified. The edition can't be matched to a CUP sheet from the files. Owner action: supply the archive file named in `docs/bible-source.md` §3 with its hash, so its provenance can be checked. Keep the KJV marked "verify before package" until then.
+
+### 6.9 Source archives retrieved from the internet (added 2026-11-21)
+
+Retrieved from the internet on 2026-11-21 to give the owner archives with hashes. These are **not** the repo's original `SF_2009` XML source (that file is outside the repo and was not obtained). They are candidate sources for a provenance check. Each hash is of the file as downloaded on 2026-11-21.
+
+| Archive | URL | Size (bytes) | SHA-256 | What the file says about rights |
+|---|---|---|---|---|
+| CrossWire SWORD module `KJV` v3.1 | https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/KJV.zip | 4,026,621 | `873815aa4b4123025616d1f41eae75f412111275f4c3884e36f92d4f46dcba1d` | `mods.d/kjv.conf` (About): "The rights to the base text are held by the Crown of England." `DistributionLicense=GPL`, which covers the module packaging, not the base text. Module history runs to 2023-07-27 |
+| eBible.org `eng-kjv_html.zip` (generated 15 Nov 2026) | https://ebible.org/Scriptures/eng-kjv_html.zip | 4,356,434 | `a16325156cbc381e7c40ebd5872952ce4d9ed2cc84208f4034d13b6ad4650db3` | `copyright.htm` inside the archive labels the text "Public Domain". It states that letters patent mean printing in the UK, or importing printed copies into the UK, needs permission, currently held by CUP, OUP and Collins; the patent "has no effect outside of the UK." It cites no CUP sheet and does not address digital copies in the UK |
+| Project Gutenberg eBook #10 | https://www.gutenberg.org/cache/epub/10/pg10.txt | — | **Not obtained.** Server returned HTTP 503 on all tested URLs | — |
+
+**Checks made:**
+- The CrossWire `About` text and the eBible `copyright.htm` text are both recorded above. Neither is a CUP sheet.
+- Spot check: John 3:16 in the repo's `KJV.tsv.gz` matches standard KJV wording. A full verse-by-verse comparison against either archive has not been done.
+- Kenya Copyright Act: the WIPO Lex record (https://www.wipo.int/wipolex/en/legislation/details/23267) lists the 2022 consolidation as the latest version (KE045). Its PDF link returned an HTML page, not the Act. Kenya Law pages returned 404 or an empty 202 response. **The Act text was not obtained.** The Kenya sections in 6.5 and the SUV "section 23, 50 years" claim in `docs/bible-source.md` remain uncertain.
+
+**Status:** no rights approved. The UK letters-patent point is a publisher statement and is not a legal conclusion for the app's use.
