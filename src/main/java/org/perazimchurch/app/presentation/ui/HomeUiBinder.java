@@ -63,6 +63,13 @@ import org.perazimchurch.app.presentation.viewmodel.BibleViewModel;
 import org.perazimchurch.app.presentation.viewmodel.HomeData;
 import org.perazimchurch.app.presentation.viewmodel.HomeViewModel;
 import org.perazimchurch.app.presentation.viewmodel.ViewModelFactory;
+import org.perazimchurch.app.presentation.ui.games.GamesHubDialog;
+import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
+import org.perazimchurch.app.presentation.ui.games.common.GameResults;
+import org.perazimchurch.app.domain.games.engine.GameDefinition;
+import android.content.SharedPreferences;
+import java.util.Collections;
+import java.util.Comparator;
 import org.perazimchurch.app.R;
 import org.perazimchurch.app.ui.theme.FrostPane;
 import org.perazimchurch.app.ui.theme.GlassKit;
@@ -279,6 +286,8 @@ public class HomeUiBinder {
 
         // 3. Continue today's reading
         contentContainer.addView(createTodayCard(), GlassKit.matchWrap(context, 16));
+        // 3b. Play & Learn: a row of game tiles, the same list as the Games tab
+        contentContainer.addView(createPlayAndLearnRow(), GlassKit.matchWrap(context, 16));
 
         // 4. Sanctuary doors (2x2) and the Bible games row
         contentContainer.addView(createDoorsGrid(), GlassKit.matchWrap(context, 16));
@@ -432,6 +441,104 @@ public class HomeUiBinder {
 
         container.addView(createGamesRow(), GlassKit.matchWrap(context, 8));
         return container;
+    }
+
+    /** Home's Play & Learn row: a title, an arrow to the Games tab, then a strip of game tiles. */
+    private View createPlayAndLearnRow() {
+        LinearLayout col = new LinearLayout(context);
+        col.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout header = new LinearLayout(context);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout titles = new LinearLayout(context);
+        titles.setOrientation(LinearLayout.VERTICAL);
+        titles.addView(GlassKit.text(context, "Play & Learn", 17, true, GlassKit.text()));
+        titles.addView(GlassKit.text(context, "Bible games to enjoy", 12, false, GlassKit.muted()));
+        header.addView(titles, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+        TextView more = new TextView(context);
+        more.setText("\u2192");
+        more.setTextSize(18);
+        more.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        more.setTextColor(Color.WHITE);
+        more.setGravity(Gravity.CENTER);
+        GradientDrawable circle = new GradientDrawable();
+        circle.setShape(GradientDrawable.OVAL);
+        circle.setColor(PerazimTheme.COLOR_ORANGE_BRAND);
+        more.setBackground(circle);
+        more.setOnClickListener(v -> {
+            if (context instanceof android.app.Activity) {
+                GamesHubDialog.show((android.app.Activity) context);
+            }
+        });
+        header.addView(more, new LinearLayout.LayoutParams(dp(40), dp(40)));
+        col.addView(GlassKit.keep(header), GlassKit.matchWrap(context, 0));
+
+        // Games with progress come first, then the new ones. The order is stable within each group.
+        final SharedPreferences prefs = context.getSharedPreferences("perazim_game_scores_v1", Context.MODE_PRIVATE);
+        final String owner = GamesHubDialog.ownerKey(SessionManager.getInstance(context).getActiveUserId());
+        List<GameDefinition> games = new ArrayList<>(GameCatalog.all());
+        Collections.sort(games, Comparator.comparingInt(
+                (GameDefinition g) -> GameResults.bestStars(prefs, owner + g.id()) > 0 ? 0 : 1));
+
+        android.widget.HorizontalScrollView scroll = new android.widget.HorizontalScrollView(context);
+        scroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout strip = new LinearLayout(context);
+        strip.setOrientation(LinearLayout.HORIZONTAL);
+        for (GameDefinition game : games) {
+            int best = GameResults.bestStars(prefs, owner + game.id());
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(96), ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.rightMargin = dp(12);
+            strip.addView(gameTile(game, best), lp);
+        }
+        scroll.addView(strip);
+        col.addView(scroll, GlassKit.matchWrap(context, 10));
+        return col;
+    }
+
+    /** One tile: a rounded icon square with a soft shadow, the title on one line and the stars or "New". */
+    private View gameTile(GameDefinition game, int best) {
+        LinearLayout tile = new LinearLayout(context);
+        tile.setOrientation(LinearLayout.VERTICAL);
+
+        FrameLayout square = new FrameLayout(context);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setCornerRadius(dp(22));
+        bg.setColor(PerazimTheme.COLOR_SURFACE);
+        bg.setStroke(dp(1), PerazimTheme.COLOR_ORANGE_SOFT);
+        square.setBackground(bg);
+        square.setElevation(dp(6));
+        ImageView art = new ImageView(context);
+        art.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        art.setPadding(dp(6), dp(6), dp(6), dp(6));
+        art.setImageResource(artFor(game));
+        square.addView(art, new FrameLayout.LayoutParams(dp(96), dp(96)));
+        tile.addView(square, new LinearLayout.LayoutParams(dp(96), dp(96)));
+
+        TextView name = GlassKit.text(context, game.title(), 13, true, GlassKit.text());
+        name.setMaxLines(1);
+        name.setEllipsize(TextUtils.TruncateAt.END);
+        tile.addView(name, GlassKit.matchWrap(context, 6));
+
+        TextView status = GlassKit.text(context,
+                best > 0 ? GameResults.starLine(best) : "New", 11, false, GlassKit.muted());
+        status.setMaxLines(1);
+        tile.addView(status, GlassKit.matchWrap(context, 2));
+
+        tile.setClickable(true);
+        tile.setOnClickListener(v -> {
+            if (context instanceof android.app.Activity) {
+                GamesHubDialog.open((android.app.Activity) context, game.id());
+            }
+        });
+        return tile;
+    }
+
+    /** Art named game_&lt;id&gt; when the art thread has delivered it, otherwise the game's own icon. */
+    private int artFor(GameDefinition game) {
+        int id = context.getResources().getIdentifier("game_" + game.id(), "drawable", context.getPackageName());
+        return id != 0 ? id : game.iconResource();
     }
 
     /** Two equal cards side by side with an 8dp gap. */

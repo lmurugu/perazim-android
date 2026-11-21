@@ -1,0 +1,3962 @@
+{
+ "version": 1,
+ "levelCount": 60,
+ "levels": [
+  {
+   "id": "vine-01",
+   "level": 1,
+   "band": 1,
+   "passage": "Philippians 4:6-7",
+   "seed": 1000,
+   "verses": [
+    {
+     "ref": "Philippians 4:6",
+     "text": "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God."
+    },
+    {
+     "ref": "Philippians 4:7",
+     "text": "And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus."
+    }
+   ],
+   "rows": 5,
+   "cols": 6,
+   "words": [
+    {
+     "word": "KNOWN",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "MINDS",
+     "row": 4,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "THING",
+     "row": 1,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ADEGHIKMNNOSTW",
+   "bonus": "MADE"
+  },
+  {
+   "id": "vine-02",
+   "level": 2,
+   "band": 1,
+   "passage": "2 Timothy 1:7",
+   "seed": 2000,
+   "verses": [
+    {
+     "ref": "2 Timothy 1:7",
+     "text": "For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind."
+    }
+   ],
+   "rows": 4,
+   "cols": 5,
+   "words": [
+    {
+     "word": "FEAR",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LOVE",
+     "row": 0,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "POWER",
+     "row": 1,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "AEFLOPRVW",
+   "bonus": null
+  },
+  {
+   "id": "vine-03",
+   "level": 3,
+   "band": 1,
+   "passage": "Psalm 23:5-6",
+   "seed": 3000,
+   "verses": [
+    {
+     "ref": "Psalm 23:5",
+     "text": "Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over."
+    },
+    {
+     "ref": "Psalm 23:6",
+     "text": "Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the LORD for ever."
+    }
+   ],
+   "rows": 4,
+   "cols": 5,
+   "words": [
+    {
+     "word": "DAYS",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "HEAD",
+     "row": 1,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "HOUSE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEHOPSUY",
+   "bonus": "CUP"
+  },
+  {
+   "id": "vine-04",
+   "level": 4,
+   "band": 1,
+   "passage": "Ephesians 6:10-11",
+   "seed": 4000,
+   "verses": [
+    {
+     "ref": "Ephesians 6:10",
+     "text": "Finally, my brethren, be strong in the Lord, and in the power of his might."
+    },
+    {
+     "ref": "Ephesians 6:11",
+     "text": "Put on the whole armour of God, that ye may be able to stand against the wiles of the devil."
+    }
+   ],
+   "rows": 5,
+   "cols": 5,
+   "words": [
+    {
+     "word": "MIGHT",
+     "row": 0,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "POWER",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "WHOLE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ABEGHILMOPRTW",
+   "bonus": "ABLE"
+  },
+  {
+   "id": "vine-05",
+   "level": 5,
+   "band": 1,
+   "passage": "Psalm 119:105",
+   "seed": 5000,
+   "verses": [
+    {
+     "ref": "Psalm 119:105",
+     "text": "Thy word is a lamp unto my feet, and a light unto my path."
+    }
+   ],
+   "rows": 4,
+   "cols": 5,
+   "words": [
+    {
+     "word": "LAMP",
+     "row": 0,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "LIGHT",
+     "row": 2,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "PATH",
+     "row": 0,
+     "col": 4,
+     "across": false
+    }
+   ],
+   "wheel": "AGHILMPT",
+   "bonus": null
+  },
+  {
+   "id": "vine-06",
+   "level": 6,
+   "band": 1,
+   "passage": "Psalm 100:1-3",
+   "seed": 6000,
+   "verses": [
+    {
+     "ref": "Psalm 100:1",
+     "text": "Make a joyful noise unto the LORD, all ye lands."
+    },
+    {
+     "ref": "Psalm 100:2",
+     "text": "Serve the LORD with gladness: come before his presence with singing."
+    },
+    {
+     "ref": "Psalm 100:3",
+     "text": "Know ye that the LORD he is God: it is he that hath made us, and not we ourselves; we are his people, and the sheep of his pasture."
+    }
+   ],
+   "rows": 5,
+   "cols": 4,
+   "words": [
+    {
+     "word": "COME",
+     "row": 1,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "MADE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 0,
+     "col": 3,
+     "across": false
+    }
+   ],
+   "wheel": "ACDEEHIMNOPS",
+   "bonus": "NOISE"
+  },
+  {
+   "id": "vine-07",
+   "level": 7,
+   "band": 1,
+   "passage": "Matthew 11:28-30",
+   "seed": 7000,
+   "verses": [
+    {
+     "ref": "Matthew 11:28",
+     "text": "Come unto me, all ye that labour and are heavy laden, and I will give you rest."
+    },
+    {
+     "ref": "Matthew 11:29",
+     "text": "Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls."
+    },
+    {
+     "ref": "Matthew 11:30",
+     "text": "For my yoke is easy, and my burden is light."
+    }
+   ],
+   "rows": 4,
+   "cols": 4,
+   "words": [
+    {
+     "word": "EASY",
+     "row": 2,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "MEEK",
+     "row": 0,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "REST",
+     "row": 0,
+     "col": 2,
+     "across": false
+    }
+   ],
+   "wheel": "AEEHKMRSTVY",
+   "bonus": "HEAVY"
+  },
+  {
+   "id": "vine-08",
+   "level": 8,
+   "band": 1,
+   "passage": "Luke 15:4-6",
+   "seed": 8000,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 5,
+   "cols": 7,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 1,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "HOME",
+     "row": 1,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "LOSE",
+     "row": 2,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 0,
+     "col": 3,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEHLMOPSTV",
+   "bonus": "LEAVE"
+  },
+  {
+   "id": "vine-09",
+   "level": 9,
+   "band": 1,
+   "passage": "Isaiah 40:29-31",
+   "seed": 9000,
+   "verses": [
+    {
+     "ref": "Isaiah 40:29",
+     "text": "He giveth power to the faint; and to them that have no might he increaseth strength."
+    },
+    {
+     "ref": "Isaiah 40:30",
+     "text": "Even the youths shall faint and be weary, and the young men shall utterly fall:"
+    },
+    {
+     "ref": "Isaiah 40:31",
+     "text": "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint."
+    }
+   ],
+   "rows": 5,
+   "cols": 7,
+   "words": [
+    {
+     "word": "FALL",
+     "row": 2,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "POWER",
+     "row": 0,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "WEARY",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "YOUNG",
+     "row": 4,
+     "col": 2,
+     "across": true
+    }
+   ],
+   "wheel": "AEFGLLNOPRUWY",
+   "bonus": "RUN"
+  },
+  {
+   "id": "vine-10",
+   "level": 10,
+   "band": 1,
+   "passage": "Luke 15:4-6",
+   "seed": 10000,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 5,
+   "cols": 5,
+   "words": [
+    {
+     "word": "FOUND",
+     "row": 2,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "HOME",
+     "row": 1,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "LEAVE",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "MAN",
+     "row": 0,
+     "col": 3,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEFHILMNNOUV",
+   "bonus": "NINE"
+  },
+  {
+   "id": "vine-11",
+   "level": 11,
+   "band": 1,
+   "passage": "John 14:1-3",
+   "seed": 11000,
+   "verses": [
+    {
+     "ref": "John 14:1",
+     "text": "Let not your heart be troubled: ye believe in God, believe also in me."
+    },
+    {
+     "ref": "John 14:2",
+     "text": "In my Father’s house are many mansions: if it were not so, I would have told you. I go to prepare a place for you."
+    },
+    {
+     "ref": "John 14:3",
+     "text": "And if I go and prepare a place for you, I will come again, and receive you unto myself; that where I am, there ye may be also."
+    }
+   ],
+   "rows": 7,
+   "cols": 4,
+   "words": [
+    {
+     "word": "COME",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "MANY",
+     "row": 3,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "MAY",
+     "row": 6,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "PLACE",
+     "row": 0,
+     "col": 0,
+     "across": false
+    }
+   ],
+   "wheel": "ACDELMNOPTY",
+   "bonus": "TOLD"
+  },
+  {
+   "id": "vine-12",
+   "level": 12,
+   "band": 1,
+   "passage": "John 14:1-3",
+   "seed": 12000,
+   "verses": [
+    {
+     "ref": "John 14:1",
+     "text": "Let not your heart be troubled: ye believe in God, believe also in me."
+    },
+    {
+     "ref": "John 14:2",
+     "text": "In my Father’s house are many mansions: if it were not so, I would have told you. I go to prepare a place for you."
+    },
+    {
+     "ref": "John 14:3",
+     "text": "And if I go and prepare a place for you, I will come again, and receive you unto myself; that where I am, there ye may be also."
+    }
+   ],
+   "rows": 5,
+   "cols": 5,
+   "words": [
+    {
+     "word": "HEART",
+     "row": 1,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "MANY",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "MAY",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "TOLD",
+     "row": 1,
+     "col": 4,
+     "across": false
+    }
+   ],
+   "wheel": "ACDEHLMNORTY",
+   "bonus": "COME"
+  },
+  {
+   "id": "vine-13",
+   "level": 13,
+   "band": 1,
+   "passage": "John 3:16-17",
+   "seed": 13000,
+   "verses": [
+    {
+     "ref": "John 3:16",
+     "text": "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
+    },
+    {
+     "ref": "John 3:17",
+     "text": "For God sent not his Son into the world to condemn the world; but that the world through him might be saved."
+    }
+   ],
+   "rows": 7,
+   "cols": 5,
+   "words": [
+    {
+     "word": "GAVE",
+     "row": 3,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "LIFE",
+     "row": 1,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "MIGHT",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SENT",
+     "row": 0,
+     "col": 4,
+     "across": false
+    }
+   ],
+   "wheel": "ADEFGHILMNOSTV",
+   "bonus": "LOVED"
+  },
+  {
+   "id": "vine-14",
+   "level": 14,
+   "band": 1,
+   "passage": "John 11:25-26",
+   "seed": 14000,
+   "verses": [
+    {
+     "ref": "John 11:25",
+     "text": "Jesus said unto her, I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live:"
+    },
+    {
+     "ref": "John 11:26",
+     "text": "And whosoever liveth and believeth in me shall never die. Believest thou this?"
+    }
+   ],
+   "rows": 7,
+   "cols": 4,
+   "words": [
+    {
+     "word": "DEAD",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "DIE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LIFE",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "SAID",
+     "row": 1,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ADDEFILSV",
+   "bonus": "LIVE"
+  },
+  {
+   "id": "vine-15",
+   "level": 15,
+   "band": 1,
+   "passage": "Luke 15:4-6",
+   "seed": 15000,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 6,
+   "cols": 6,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 1,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "HOME",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LOSE",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "MAN",
+     "row": 3,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "NINE",
+     "row": 5,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ADEHILMNNOST",
+   "bonus": "LOST"
+  },
+  {
+   "id": "vine-16",
+   "level": 16,
+   "band": 1,
+   "passage": "Psalm 139:13-14",
+   "seed": 16000,
+   "verses": [
+    {
+     "ref": "Psalm 139:13",
+     "text": "For thou hast possessed my reins: thou hast covered me in my mother’s womb."
+    },
+    {
+     "ref": "Psalm 139:14",
+     "text": "I will praise thee; for I am fearfully and wonderfully made: marvellous are thy works; and that my soul knoweth right well."
+    }
+   ],
+   "rows": 6,
+   "cols": 7,
+   "words": [
+    {
+     "word": "HAST",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "MADE",
+     "row": 1,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "REINS",
+     "row": 1,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "RIGHT",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "WELL",
+     "row": 0,
+     "col": 6,
+     "across": false
+    }
+   ],
+   "wheel": "ADEGHILLMNRSTW",
+   "bonus": null
+  },
+  {
+   "id": "vine-17",
+   "level": 17,
+   "band": 1,
+   "passage": "Psalm 139:13-14",
+   "seed": 17001,
+   "verses": [
+    {
+     "ref": "Psalm 139:13",
+     "text": "For thou hast possessed my reins: thou hast covered me in my mother’s womb."
+    },
+    {
+     "ref": "Psalm 139:14",
+     "text": "I will praise thee; for I am fearfully and wonderfully made: marvellous are thy works; and that my soul knoweth right well."
+    }
+   ],
+   "rows": 5,
+   "cols": 7,
+   "words": [
+    {
+     "word": "MADE",
+     "row": 1,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "SOUL",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "WELL",
+     "row": 1,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "WOMB",
+     "row": 1,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "WORKS",
+     "row": 0,
+     "col": 0,
+     "across": false
+    }
+   ],
+   "wheel": "ABDEKLLMORSUW",
+   "bonus": null
+  },
+  {
+   "id": "vine-18",
+   "level": 18,
+   "band": 1,
+   "passage": "Mark 4:30-32",
+   "seed": 18000,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 7,
+   "cols": 5,
+   "words": [
+    {
+     "word": "AIR",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "EARTH",
+     "row": 2,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "LODGE",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "MAY",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "SEED",
+     "row": 2,
+     "col": 1,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEGHILMORSTY",
+   "bonus": "SAID"
+  },
+  {
+   "id": "vine-19",
+   "level": 19,
+   "band": 1,
+   "passage": "John 14:1-3",
+   "seed": 19000,
+   "verses": [
+    {
+     "ref": "John 14:1",
+     "text": "Let not your heart be troubled: ye believe in God, believe also in me."
+    },
+    {
+     "ref": "John 14:2",
+     "text": "In my Father’s house are many mansions: if it were not so, I would have told you. I go to prepare a place for you."
+    },
+    {
+     "ref": "John 14:3",
+     "text": "And if I go and prepare a place for you, I will come again, and receive you unto myself; that where I am, there ye may be also."
+    }
+   ],
+   "rows": 7,
+   "cols": 6,
+   "words": [
+    {
+     "word": "COME",
+     "row": 3,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "MANY",
+     "row": 3,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "MAY",
+     "row": 6,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "PLACE",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "TOLD",
+     "row": 1,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEHLMNOPRTY",
+   "bonus": "HEART"
+  },
+  {
+   "id": "vine-20",
+   "level": 20,
+   "band": 1,
+   "passage": "Luke 15:4-6",
+   "seed": 20000,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 6,
+   "cols": 6,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 0,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "HOME",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LOSE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LOST",
+     "row": 2,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "MAN",
+     "row": 2,
+     "col": 3,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEHLMNOPST",
+   "bonus": "SHEEP"
+  },
+  {
+   "id": "vine-21",
+   "level": 21,
+   "band": 2,
+   "passage": "Genesis 2:7",
+   "seed": 21001,
+   "verses": [
+    {
+     "ref": "Genesis 2:7",
+     "text": "And the LORD God formed man of the dust of the ground, and breathed into his nostrils the breath of life; and man became a living soul."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "DUST",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "FORMED",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "GROUND",
+     "row": 0,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "LIFE",
+     "row": 7,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "SOUL",
+     "row": 4,
+     "col": 1,
+     "across": false
+    }
+   ],
+   "wheel": "DEFGIILMNORSTUV",
+   "bonus": "LIVING"
+  },
+  {
+   "id": "vine-22",
+   "level": 22,
+   "band": 2,
+   "passage": "Matthew 11:28-30",
+   "seed": 22000,
+   "verses": [
+    {
+     "ref": "Matthew 11:28",
+     "text": "Come unto me, all ye that labour and are heavy laden, and I will give you rest."
+    },
+    {
+     "ref": "Matthew 11:29",
+     "text": "Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls."
+    },
+    {
+     "ref": "Matthew 11:30",
+     "text": "For my yoke is easy, and my burden is light."
+    }
+   ],
+   "rows": 7,
+   "cols": 6,
+   "words": [
+    {
+     "word": "EASY",
+     "row": 3,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "GIVE",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LIGHT",
+     "row": 0,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "MEEK",
+     "row": 3,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "REST",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "SOULS",
+     "row": 5,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "AEEGHIKLMORSSTUVY",
+   "bonus": "YOKE"
+  },
+  {
+   "id": "vine-23",
+   "level": 23,
+   "band": 2,
+   "passage": "Micah 6:8",
+   "seed": 23000,
+   "verses": [
+    {
+     "ref": "Micah 6:8",
+     "text": "He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?"
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 1,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "GOOD",
+     "row": 1,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "JUSTLY",
+     "row": 6,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "LOVE",
+     "row": 0,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "SHEWED",
+     "row": 4,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "WALK",
+     "row": 4,
+     "col": 5,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEGHJKLOOSTUVWY",
+   "bonus": null
+  },
+  {
+   "id": "vine-24",
+   "level": 24,
+   "band": 2,
+   "passage": "Psalm 1:1-3",
+   "seed": 24001,
+   "verses": [
+    {
+     "ref": "Psalm 1:1",
+     "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+    },
+    {
+     "ref": "Psalm 1:2",
+     "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+     "ref": "Psalm 1:3",
+     "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    }
+   ],
+   "rows": 7,
+   "cols": 7,
+   "words": [
+    {
+     "word": "DOETH",
+     "row": 6,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "FORTH",
+     "row": 1,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "RIVERS",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SEAT",
+     "row": 3,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "TREE",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "WATER",
+     "row": 0,
+     "col": 1,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEFGHINORRSTVW",
+   "bonus": "NIGHT"
+  },
+  {
+   "id": "vine-25",
+   "level": 25,
+   "band": 2,
+   "passage": "Luke 2:10-11",
+   "seed": 25000,
+   "verses": [
+    {
+     "ref": "Luke 2:10",
+     "text": "And the angel said unto them, Fear not: for, behold, I bring you good tidings of great joy, which shall be to all people."
+    },
+    {
+     "ref": "Luke 2:11",
+     "text": "For unto you is born this day in the city of David a Saviour, which is Christ the Lord."
+    }
+   ],
+   "rows": 8,
+   "cols": 6,
+   "words": [
+    {
+     "word": "ANGEL",
+     "row": 3,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "BEHOLD",
+     "row": 1,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "CITY",
+     "row": 3,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "GOOD",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "GREAT",
+     "row": 5,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 3,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ABCDEGHILNOORSTY",
+   "bonus": "BRING"
+  },
+  {
+   "id": "vine-26",
+   "level": 26,
+   "band": 2,
+   "passage": "Psalm 1:1-3",
+   "seed": 26000,
+   "verses": [
+    {
+     "ref": "Psalm 1:1",
+     "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+    },
+    {
+     "ref": "Psalm 1:2",
+     "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+     "ref": "Psalm 1:3",
+     "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    }
+   ],
+   "rows": 7,
+   "cols": 7,
+   "words": [
+    {
+     "word": "DOETH",
+     "row": 2,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "DOTH",
+     "row": 1,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 3,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "SEAT",
+     "row": 6,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "WATER",
+     "row": 0,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "WITHER",
+     "row": 4,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ADEFHIKLORSTW",
+   "bonus": "FORTH"
+  },
+  {
+   "id": "vine-27",
+   "level": 27,
+   "band": 2,
+   "passage": "Isaiah 53:5-6",
+   "seed": 27002,
+   "verses": [
+    {
+     "ref": "Isaiah 53:5",
+     "text": "But he was wounded for our transgressions, he was bruised for our iniquities: the chastisement of our peace was upon him; and with his stripes we are healed."
+    },
+    {
+     "ref": "Isaiah 53:6",
+     "text": "All we like sheep have gone astray; we have turned every one to his own way; and the LORD hath laid on him the iniquity of us all."
+    }
+   ],
+   "rows": 8,
+   "cols": 7,
+   "words": [
+    {
+     "word": "ASTRAY",
+     "row": 2,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "HEALED",
+     "row": 0,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "LAID",
+     "row": 1,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "PEACE",
+     "row": 6,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 0,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "TURNED",
+     "row": 2,
+     "col": 3,
+     "across": false
+    }
+   ],
+   "wheel": "AACDEEHIKLNPRSTUY",
+   "bonus": "LIKE"
+  },
+  {
+   "id": "vine-28",
+   "level": 28,
+   "band": 2,
+   "passage": "Revelation 21:4",
+   "seed": 28001,
+   "verses": [
+    {
+     "ref": "Revelation 21:4",
+     "text": "And God shall wipe away all tears from their eyes; and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain: for the former things are passed away."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "AWAY",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "DEATH",
+     "row": 1,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "PAIN",
+     "row": 0,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "PASSED",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "TEARS",
+     "row": 3,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "THINGS",
+     "row": 3,
+     "col": 2,
+     "across": true
+    }
+   ],
+   "wheel": "AADEGHINPRSSTWY",
+   "bonus": "WIPE"
+  },
+  {
+   "id": "vine-29",
+   "level": 29,
+   "band": 2,
+   "passage": "Genesis 1:1-3",
+   "seed": 29000,
+   "verses": [
+    {
+     "ref": "Genesis 1:1",
+     "text": "In the beginning God created the heaven and the earth."
+    },
+    {
+     "ref": "Genesis 1:2",
+     "text": "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters."
+    },
+    {
+     "ref": "Genesis 1:3",
+     "text": "And God said, Let there be light: and there was light."
+    }
+   ],
+   "rows": 7,
+   "cols": 7,
+   "words": [
+    {
+     "word": "EARTH",
+     "row": 2,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "FACE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "FORM",
+     "row": 0,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "HEAVEN",
+     "row": 6,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "MOVED",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "SAID",
+     "row": 0,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "VOID",
+     "row": 2,
+     "col": 3,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEEFHIMNOPRSTV",
+   "bonus": "DEEP"
+  },
+  {
+   "id": "vine-30",
+   "level": 30,
+   "band": 2,
+   "passage": "Psalm 139:13-14",
+   "seed": 30000,
+   "verses": [
+    {
+     "ref": "Psalm 139:13",
+     "text": "For thou hast possessed my reins: thou hast covered me in my mother’s womb."
+    },
+    {
+     "ref": "Psalm 139:14",
+     "text": "I will praise thee; for I am fearfully and wonderfully made: marvellous are thy works; and that my soul knoweth right well."
+    }
+   ],
+   "rows": 6,
+   "cols": 8,
+   "words": [
+    {
+     "word": "MADE",
+     "row": 1,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "MOTHER",
+     "row": 0,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "REINS",
+     "row": 1,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "SOUL",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "WELL",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "WOMB",
+     "row": 0,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "WORKS",
+     "row": 5,
+     "col": 3,
+     "across": true
+    }
+   ],
+   "wheel": "ABDEHIKLLMNORSTUW",
+   "bonus": "HAST"
+  },
+  {
+   "id": "vine-31",
+   "level": 31,
+   "band": 2,
+   "passage": "Genesis 1:1-3",
+   "seed": 31000,
+   "verses": [
+    {
+     "ref": "Genesis 1:1",
+     "text": "In the beginning God created the heaven and the earth."
+    },
+    {
+     "ref": "Genesis 1:2",
+     "text": "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters."
+    },
+    {
+     "ref": "Genesis 1:3",
+     "text": "And God said, Let there be light: and there was light."
+    }
+   ],
+   "rows": 7,
+   "cols": 7,
+   "words": [
+    {
+     "word": "EARTH",
+     "row": 2,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "FACE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "FORM",
+     "row": 0,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "HEAVEN",
+     "row": 6,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "MOVED",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "SAID",
+     "row": 0,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "VOID",
+     "row": 2,
+     "col": 3,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEEFHIMNORSTVW",
+   "bonus": "WATERS"
+  },
+  {
+   "id": "vine-32",
+   "level": 32,
+   "band": 2,
+   "passage": "Psalm 1:1-3",
+   "seed": 32005,
+   "verses": [
+    {
+     "ref": "Psalm 1:1",
+     "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+    },
+    {
+     "ref": "Psalm 1:2",
+     "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+     "ref": "Psalm 1:3",
+     "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 4,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "FRUIT",
+     "row": 1,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 2,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "RIVERS",
+     "row": 1,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "SEAT",
+     "row": 6,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "TREE",
+     "row": 0,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "WITHER",
+     "row": 4,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEFHIKLORRSTUVW",
+   "bonus": "DOETH"
+  },
+  {
+   "id": "vine-33",
+   "level": 33,
+   "band": 2,
+   "passage": "Psalm 121:1-2",
+   "seed": 33001,
+   "verses": [
+    {
+     "ref": "Psalm 121:1",
+     "text": "I will lift up mine eyes unto the hills, from whence cometh my help."
+    },
+    {
+     "ref": "Psalm 121:2",
+     "text": "My help cometh from the LORD, which made heaven and earth."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "EYES",
+     "row": 0,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "HELP",
+     "row": 3,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "HILLS",
+     "row": 3,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "LIFT",
+     "row": 5,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "MADE",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "MINE",
+     "row": 4,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "WHENCE",
+     "row": 0,
+     "col": 2,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEEFHILLMNPSTWY",
+   "bonus": null
+  },
+  {
+   "id": "vine-34",
+   "level": 34,
+   "band": 2,
+   "passage": "Mark 4:30-32",
+   "seed": 34003,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 8,
+   "cols": 5,
+   "words": [
+    {
+     "word": "GRAIN",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LESS",
+     "row": 0,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 0,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LODGE",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 4,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "SEEDS",
+     "row": 2,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SOWN",
+     "row": 2,
+     "col": 4,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEGHIKLNORSSTW",
+   "bonus": "EARTH"
+  },
+  {
+   "id": "vine-35",
+   "level": 35,
+   "band": 2,
+   "passage": "Genesis 1:1-3",
+   "seed": 35002,
+   "verses": [
+    {
+     "ref": "Genesis 1:1",
+     "text": "In the beginning God created the heaven and the earth."
+    },
+    {
+     "ref": "Genesis 1:2",
+     "text": "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters."
+    },
+    {
+     "ref": "Genesis 1:3",
+     "text": "And God said, Let there be light: and there was light."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "DEEP",
+     "row": 2,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "EARTH",
+     "row": 3,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "FACE",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "FORM",
+     "row": 4,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "LIGHT",
+     "row": 0,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "MOVED",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 2,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEEFGHILMOPRSTV",
+   "bonus": "VOID"
+  },
+  {
+   "id": "vine-36",
+   "level": 36,
+   "band": 2,
+   "passage": "Mark 4:30-32",
+   "seed": 36011,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 8,
+   "cols": 7,
+   "words": [
+    {
+     "word": "HERBS",
+     "row": 7,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "LESS",
+     "row": 2,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "LIKE",
+     "row": 4,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LIKEN",
+     "row": 5,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 0,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "SEED",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "SEEDS",
+     "row": 0,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SOWN",
+     "row": 2,
+     "col": 6,
+     "across": false
+    }
+   ],
+   "wheel": "ABDEEHIKLNORSSW",
+   "bonus": "SHADOW"
+  },
+  {
+   "id": "vine-37",
+   "level": 37,
+   "band": 2,
+   "passage": "Exodus 14:13-14",
+   "seed": 37006,
+   "verses": [
+    {
+     "ref": "Exodus 14:13",
+     "text": "And Moses said unto the people, Fear ye not, stand still, and see the salvation of the LORD, which he will shew to you to day: for the Egyptians whom ye have seen to day, ye shall see them again no more for ever."
+    },
+    {
+     "ref": "Exodus 14:14",
+     "text": "The LORD shall fight for you, and ye shall hold your peace."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "EVER",
+     "row": 6,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "HOLD",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "PEACE",
+     "row": 0,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "PEOPLE",
+     "row": 1,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SEEN",
+     "row": 4,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "SHEW",
+     "row": 4,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "STAND",
+     "row": 3,
+     "col": 0,
+     "across": false
+    }
+   ],
+   "wheel": "ACDEEHILNOPPRSTVW",
+   "bonus": null
+  },
+  {
+   "id": "vine-38",
+   "level": 38,
+   "band": 2,
+   "passage": "Psalm 1:1-3",
+   "seed": 38042,
+   "verses": [
+    {
+     "ref": "Psalm 1:1",
+     "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+    },
+    {
+     "ref": "Psalm 1:2",
+     "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+     "ref": "Psalm 1:3",
+     "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "DOETH",
+     "row": 3,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "DOTH",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "FORTH",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LEAF",
+     "row": 4,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "NIGHT",
+     "row": 0,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "SEASON",
+     "row": 0,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "TREE",
+     "row": 5,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "WATER",
+     "row": 3,
+     "col": 2,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEFGHILNORSSTW",
+   "bonus": "SEAT"
+  },
+  {
+   "id": "vine-39",
+   "level": 39,
+   "band": 2,
+   "passage": "Mark 4:30-32",
+   "seed": 39028,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "EARTH",
+     "row": 1,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "GREAT",
+     "row": 3,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "HERBS",
+     "row": 1,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "LESS",
+     "row": 5,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "LODGE",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 2,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "SEED",
+     "row": 4,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "SEEDS",
+     "row": 0,
+     "col": 0,
+     "across": false
+    }
+   ],
+   "wheel": "ABDEEGHILNORSST",
+   "bonus": "GRAIN"
+  },
+  {
+   "id": "vine-40",
+   "level": 40,
+   "band": 2,
+   "passage": "Mark 4:30-32",
+   "seed": 40000,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 8,
+   "cols": 8,
+   "words": [
+    {
+     "word": "FOWLS",
+     "row": 1,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "GREAT",
+     "row": 2,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "LESS",
+     "row": 4,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LODGE",
+     "row": 4,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 1,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "SEED",
+     "row": 7,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "SOWN",
+     "row": 0,
+     "col": 2,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEFGIKLNORSSTW",
+   "bonus": "LIKEN"
+  },
+  {
+   "id": "vine-41",
+   "level": 41,
+   "band": 3,
+   "passage": "Mark 4:30-32",
+   "seed": 41002,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 9,
+   "cols": 7,
+   "words": [
+    {
+     "word": "BECOMETH",
+     "row": 1,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "GROWETH",
+     "row": 8,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "KINGDOM",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LESS",
+     "row": 2,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "LIKE",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "SEED",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "SEEDS",
+     "row": 2,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "SOWN",
+     "row": 0,
+     "col": 2,
+     "across": true
+    }
+   ],
+   "wheel": "BCDEEGHIKLMNORSSTW",
+   "bonus": "HERBS"
+  },
+  {
+   "id": "vine-42",
+   "level": 42,
+   "band": 3,
+   "passage": "Matthew 5:14-16",
+   "seed": 42000,
+   "verses": [
+    {
+     "ref": "Matthew 5:14",
+     "text": "Ye are the light of the world. A city that is set on an hill cannot be hid."
+    },
+    {
+     "ref": "Matthew 5:15",
+     "text": "Neither do men light a candle, and put it under a bushel, but on a candlestick; and it giveth light unto all that are in the house."
+    },
+    {
+     "ref": "Matthew 5:16",
+     "text": "Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven."
+    }
+   ],
+   "rows": 8,
+   "cols": 9,
+   "words": [
+    {
+     "word": "CANNOT",
+     "row": 7,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "GIVETH",
+     "row": 5,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "HEAVEN",
+     "row": 2,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "HILL",
+     "row": 2,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "HOUSE",
+     "row": 0,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "LIGHT",
+     "row": 2,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "SHINE",
+     "row": 3,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "WORKS",
+     "row": 1,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEEGHIKLLNNORSTUVW",
+   "bonus": "CANDLE"
+  },
+  {
+   "id": "vine-43",
+   "level": 43,
+   "band": 3,
+   "passage": "Matthew 11:28-30",
+   "seed": 43003,
+   "verses": [
+    {
+     "ref": "Matthew 11:28",
+     "text": "Come unto me, all ye that labour and are heavy laden, and I will give you rest."
+    },
+    {
+     "ref": "Matthew 11:29",
+     "text": "Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls."
+    },
+    {
+     "ref": "Matthew 11:30",
+     "text": "For my yoke is easy, and my burden is light."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "EASY",
+     "row": 4,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "FIND",
+     "row": 6,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "HEART",
+     "row": 3,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "LADEN",
+     "row": 0,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "LEARN",
+     "row": 2,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "LIGHT",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "LOWLY",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "MEEK",
+     "row": 5,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "REST",
+     "row": 7,
+     "col": 4,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEFGHIKLLMNORSTWY",
+   "bonus": "YOKE"
+  },
+  {
+   "id": "vine-44",
+   "level": 44,
+   "band": 3,
+   "passage": "Matthew 11:28-30",
+   "seed": 44000,
+   "verses": [
+    {
+     "ref": "Matthew 11:28",
+     "text": "Come unto me, all ye that labour and are heavy laden, and I will give you rest."
+    },
+    {
+     "ref": "Matthew 11:29",
+     "text": "Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls."
+    },
+    {
+     "ref": "Matthew 11:30",
+     "text": "For my yoke is easy, and my burden is light."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "EASY",
+     "row": 5,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "FIND",
+     "row": 7,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "GIVE",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "HEAVY",
+     "row": 3,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "LABOUR",
+     "row": 0,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "LEARN",
+     "row": 3,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LIGHT",
+     "row": 3,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "REST",
+     "row": 0,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "YOKE",
+     "row": 5,
+     "col": 8,
+     "across": false
+    }
+   ],
+   "wheel": "ABDEEFGHIKLMNORSTUVY",
+   "bonus": "MEEK"
+  },
+  {
+   "id": "vine-45",
+   "level": 45,
+   "band": 3,
+   "passage": "Mark 4:30-32",
+   "seed": 45000,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "BECOMETH",
+     "row": 1,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "BRANCHES",
+     "row": 1,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "FOWLS",
+     "row": 4,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 7,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "LODGE",
+     "row": 3,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "SAID",
+     "row": 3,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "SEED",
+     "row": 0,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "SEEDS",
+     "row": 8,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "SHADOW",
+     "row": 6,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ABCDEEFGHIKLMNORSSTW",
+   "bonus": "LESS"
+  },
+  {
+   "id": "vine-46",
+   "level": 46,
+   "band": 3,
+   "passage": "John 10:11-13",
+   "seed": 46005,
+   "verses": [
+    {
+     "ref": "John 10:11",
+     "text": "I am the good shepherd: the good shepherd giveth his life for the sheep."
+    },
+    {
+     "ref": "John 10:12",
+     "text": "But he that is an hireling, and not the shepherd, whose own the sheep are not, seeth the wolf coming, and leaveth the sheep, and fleeth: and the wolf catcheth them, and scattereth the sheep."
+    },
+    {
+     "ref": "John 10:13",
+     "text": "The hireling fleeth, because he is an hireling, and careth not for the sheep."
+    }
+   ],
+   "rows": 9,
+   "cols": 8,
+   "words": [
+    {
+     "word": "FLEETH",
+     "row": 2,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "GIVETH",
+     "row": 0,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "GOOD",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "LEAVETH",
+     "row": 2,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "LIFE",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "SEETH",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 4,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "WHOSE",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "WOLF",
+     "row": 2,
+     "col": 1,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEEFGHILOOPRSTVW",
+   "bonus": "CARETH"
+  },
+  {
+   "id": "vine-47",
+   "level": 47,
+   "band": 3,
+   "passage": "Genesis 1:1-3",
+   "seed": 47006,
+   "verses": [
+    {
+     "ref": "Genesis 1:1",
+     "text": "In the beginning God created the heaven and the earth."
+    },
+    {
+     "ref": "Genesis 1:2",
+     "text": "And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters."
+    },
+    {
+     "ref": "Genesis 1:3",
+     "text": "And God said, Let there be light: and there was light."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "DEEP",
+     "row": 3,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "EARTH",
+     "row": 8,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "FACE",
+     "row": 5,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "FORM",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "MOVED",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 6,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "VOID",
+     "row": 3,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "WATERS",
+     "row": 1,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "WITHOUT",
+     "row": 1,
+     "col": 0,
+     "across": true
+    }
+   ],
+   "wheel": "ACDEEFGHILMOPRSTTUVW",
+   "bonus": "LIGHT"
+  },
+  {
+   "id": "vine-48",
+   "level": 48,
+   "band": 3,
+   "passage": "Luke 15:4-6",
+   "seed": 48003,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 4,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "FIND",
+     "row": 2,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "FOUND",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "HOME",
+     "row": 6,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "LEAVE",
+     "row": 8,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "LOSE",
+     "row": 5,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "LOST",
+     "row": 0,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "NINE",
+     "row": 5,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "NINETY",
+     "row": 3,
+     "col": 3,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEFHILMNNOPSTUVY",
+   "bonus": "SHEEP"
+  },
+  {
+   "id": "vine-49",
+   "level": 49,
+   "band": 3,
+   "passage": "Luke 15:4-6",
+   "seed": 49005,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 1,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "HOME",
+     "row": 0,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "LEAVE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LOSE",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "LOST",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "NINE",
+     "row": 5,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "SAYING",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 0,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "TOGETHER",
+     "row": 8,
+     "col": 1,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEGHILMNNOPRSTTVY",
+   "bonus": "LAYETH"
+  },
+  {
+   "id": "vine-50",
+   "level": 50,
+   "band": 3,
+   "passage": "Psalm 1:1-3",
+   "seed": 50030,
+   "verses": [
+    {
+     "ref": "Psalm 1:1",
+     "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+    },
+    {
+     "ref": "Psalm 1:2",
+     "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+     "ref": "Psalm 1:3",
+     "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "DELIGHT",
+     "row": 6,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "DOETH",
+     "row": 4,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LEAF",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "NIGHT",
+     "row": 8,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SEASON",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "SEAT",
+     "row": 3,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "TREE",
+     "row": 4,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "WALKETH",
+     "row": 2,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "WATER",
+     "row": 0,
+     "col": 6,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEFGHIKLNORSSTUW",
+   "bonus": "FRUIT"
+  },
+  {
+   "id": "vine-51",
+   "level": 51,
+   "band": 3,
+   "passage": "Luke 15:4-6",
+   "seed": 51103,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "CALLETH",
+     "row": 1,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "DOTH",
+     "row": 8,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "FIND",
+     "row": 5,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "FRIENDS",
+     "row": 1,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "LEAVE",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LOSE",
+     "row": 4,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "LOST",
+     "row": 3,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "NINE",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "NINETY",
+     "row": 6,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 1,
+     "col": 8,
+     "across": false
+    }
+   ],
+   "wheel": "ACDEEFHILLMNNOPRSTVY",
+   "bonus": "HOME"
+  },
+  {
+   "id": "vine-52",
+   "level": 52,
+   "band": 3,
+   "passage": "Mark 4:30-32",
+   "seed": 52001,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "FOWLS",
+     "row": 8,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "GREATER",
+     "row": 1,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "LESS",
+     "row": 5,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LIKEN",
+     "row": 3,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "LODGE",
+     "row": 6,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 3,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "SEED",
+     "row": 3,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "SEEDS",
+     "row": 0,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "SOWN",
+     "row": 7,
+     "col": 5,
+     "across": true
+    }
+   ],
+   "wheel": "ADEEFGHIKLNORRSSTW",
+   "bonus": "EARTH"
+  },
+  {
+   "id": "vine-53",
+   "level": 53,
+   "band": 3,
+   "passage": "Psalm 1:1-3",
+   "seed": 53035,
+   "verses": [
+    {
+     "ref": "Psalm 1:1",
+     "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+    },
+    {
+     "ref": "Psalm 1:2",
+     "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+     "ref": "Psalm 1:3",
+     "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "DELIGHT",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "DOETH",
+     "row": 0,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "DOTH",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LEAF",
+     "row": 5,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 2,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "NIGHT",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "PROSPER",
+     "row": 2,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "SEAT",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "TREE",
+     "row": 7,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "WATER",
+     "row": 3,
+     "col": 6,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEFGHIKLNOPPRRSTUW",
+   "bonus": "FRUIT"
+  },
+  {
+   "id": "vine-54",
+   "level": 54,
+   "band": 3,
+   "passage": "Matthew 11:28-30",
+   "seed": 54014,
+   "verses": [
+    {
+     "ref": "Matthew 11:28",
+     "text": "Come unto me, all ye that labour and are heavy laden, and I will give you rest."
+    },
+    {
+     "ref": "Matthew 11:29",
+     "text": "Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls."
+    },
+    {
+     "ref": "Matthew 11:30",
+     "text": "For my yoke is easy, and my burden is light."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "EASY",
+     "row": 5,
+     "col": 2,
+     "across": true
+    },
+    {
+     "word": "HEART",
+     "row": 0,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "HEAVY",
+     "row": 3,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LEARN",
+     "row": 2,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "LIGHT",
+     "row": 3,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LOWLY",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "MEEK",
+     "row": 8,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "REST",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "SOULS",
+     "row": 2,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "YOKE",
+     "row": 5,
+     "col": 5,
+     "across": false
+    }
+   ],
+   "wheel": "AEEGHIKLLMNORSSTUVWY",
+   "bonus": "GIVE"
+  },
+  {
+   "id": "vine-55",
+   "level": 55,
+   "band": 3,
+   "passage": "Luke 15:4-6",
+   "seed": 55033,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "DOTH",
+     "row": 1,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "FIND",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "FOUND",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "FRIENDS",
+     "row": 2,
+     "col": 1,
+     "across": false
+    },
+    {
+     "word": "LEAVE",
+     "row": 6,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "LOSE",
+     "row": 0,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "NINE",
+     "row": 3,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "NINETY",
+     "row": 3,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "SAYING",
+     "row": 8,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 0,
+     "col": 8,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEFGHILNNOPRSTUVY",
+   "bonus": "LAYETH"
+  },
+  {
+   "id": "vine-56",
+   "level": 56,
+   "band": 3,
+   "passage": "Mark 4:30-32",
+   "seed": 56034,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "BRANCHES",
+     "row": 0,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "EARTH",
+     "row": 3,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "FOWLS",
+     "row": 0,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "HERBS",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LESS",
+     "row": 3,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 5,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "LIKEN",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "SAID",
+     "row": 6,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "SEED",
+     "row": 8,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "SOWN",
+     "row": 0,
+     "col": 8,
+     "across": false
+    }
+   ],
+   "wheel": "ABCDEEFHIKLNORSSTW",
+   "bonus": "SHADOW"
+  },
+  {
+   "id": "vine-57",
+   "level": 57,
+   "band": 3,
+   "passage": "Mark 4:30-32",
+   "seed": 57007,
+   "verses": [
+    {
+     "ref": "Mark 4:30",
+     "text": "And he said, Whereunto shall we liken the kingdom of God? or with what comparison shall we compare it?"
+    },
+    {
+     "ref": "Mark 4:31",
+     "text": "It is like a grain of mustard seed, which, when it is sown in the earth, is less than all the seeds that be in the earth:"
+    },
+    {
+     "ref": "Mark 4:32",
+     "text": "But when it is sown, it groweth up, and becometh greater than all herbs, and shooteth out great branches; so that the fowls of the air may lodge under the shadow of it."
+    }
+   ],
+   "rows": 8,
+   "cols": 9,
+   "words": [
+    {
+     "word": "EARTH",
+     "row": 0,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "GRAIN",
+     "row": 3,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "GREAT",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "HERBS",
+     "row": 1,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "LESS",
+     "row": 0,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "LIKEN",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "LODGE",
+     "row": 0,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "MUSTARD",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SEED",
+     "row": 2,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SEEDS",
+     "row": 2,
+     "col": 6,
+     "across": false
+    }
+   ],
+   "wheel": "ABDEEGHIKLMNORSSTU",
+   "bonus": "LIKE"
+  },
+  {
+   "id": "vine-58",
+   "level": 58,
+   "band": 3,
+   "passage": "Luke 15:4-6",
+   "seed": 58008,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "COMETH",
+     "row": 7,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "DOTH",
+     "row": 5,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "FIND",
+     "row": 2,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "FOUND",
+     "row": 2,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "FRIENDS",
+     "row": 1,
+     "col": 8,
+     "across": false
+    },
+    {
+     "word": "HOME",
+     "row": 5,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "LOSE",
+     "row": 4,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "LOST",
+     "row": 4,
+     "col": 5,
+     "across": false
+    },
+    {
+     "word": "NINE",
+     "row": 0,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "NINETY",
+     "row": 0,
+     "col": 1,
+     "across": true
+    }
+   ],
+   "wheel": "CDEEFHILMNNOPRSTUY",
+   "bonus": "SHEEP"
+  },
+  {
+   "id": "vine-59",
+   "level": 59,
+   "band": 3,
+   "passage": "Psalm 1:1-3",
+   "seed": 59036,
+   "verses": [
+    {
+     "ref": "Psalm 1:1",
+     "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+    },
+    {
+     "ref": "Psalm 1:2",
+     "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+     "ref": "Psalm 1:3",
+     "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "DOETH",
+     "row": 4,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "DOTH",
+     "row": 4,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "FORTH",
+     "row": 3,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "LEAF",
+     "row": 0,
+     "col": 4,
+     "across": false
+    },
+    {
+     "word": "LIKE",
+     "row": 1,
+     "col": 1,
+     "across": true
+    },
+    {
+     "word": "NIGHT",
+     "row": 0,
+     "col": 2,
+     "across": false
+    },
+    {
+     "word": "PROSPER",
+     "row": 2,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "SEAT",
+     "row": 7,
+     "col": 5,
+     "across": true
+    },
+    {
+     "word": "TREE",
+     "row": 7,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "WITHER",
+     "row": 0,
+     "col": 8,
+     "across": false
+    }
+   ],
+   "wheel": "ADEEFGHIKLNOPPRRSTUW",
+   "bonus": "FRUIT"
+  },
+  {
+   "id": "vine-60",
+   "level": 60,
+   "band": 3,
+   "passage": "Luke 15:4-6",
+   "seed": 60056,
+   "verses": [
+    {
+     "ref": "Luke 15:4",
+     "text": "What man of you, having an hundred sheep, if he lose one of them, doth not leave the ninety and nine in the wilderness, and go after that which is lost, until he find it?"
+    },
+    {
+     "ref": "Luke 15:5",
+     "text": "And when he hath found it, he layeth it on his shoulders, rejoicing."
+    },
+    {
+     "ref": "Luke 15:6",
+     "text": "And when he cometh home, he calleth together his friends and neighbours, saying unto them, Rejoice with me; for I have found my sheep which was lost."
+    }
+   ],
+   "rows": 9,
+   "cols": 9,
+   "words": [
+    {
+     "word": "CALLETH",
+     "row": 2,
+     "col": 3,
+     "across": false
+    },
+    {
+     "word": "COMETH",
+     "row": 2,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "DOTH",
+     "row": 0,
+     "col": 7,
+     "across": false
+    },
+    {
+     "word": "FIND",
+     "row": 0,
+     "col": 4,
+     "across": true
+    },
+    {
+     "word": "FOUND",
+     "row": 3,
+     "col": 0,
+     "across": false
+    },
+    {
+     "word": "HOME",
+     "row": 8,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "LAYETH",
+     "row": 5,
+     "col": 3,
+     "across": true
+    },
+    {
+     "word": "LEAVE",
+     "row": 4,
+     "col": 6,
+     "across": false
+    },
+    {
+     "word": "NINE",
+     "row": 6,
+     "col": 0,
+     "across": true
+    },
+    {
+     "word": "SHEEP",
+     "row": 4,
+     "col": 8,
+     "across": false
+    }
+   ],
+   "wheel": "ACDEEFHILLMNNOPSTUVY",
+   "bonus": "LOSE"
+  }
+ ]
+}
