@@ -32,7 +32,7 @@ public final class MosaicPuzzles {
 
         /** Art file name for this scene, for example story_c01_1.webp. */
         public String assetName() {
-            return assetName(chapterId, number);
+            return MosaicPuzzles.assetName(chapterId, number);
         }
     }
 

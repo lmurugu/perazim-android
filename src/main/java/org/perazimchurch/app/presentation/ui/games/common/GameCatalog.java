@@ -8,6 +8,7 @@ import org.perazimchurch.app.domain.games.catalog.MemoryDefinition;
 import org.perazimchurch.app.domain.games.catalog.CrosswordDefinition;
 import org.perazimchurch.app.domain.games.catalog.RoadDefinition;
 import org.perazimchurch.app.domain.games.catalog.RoundDefinition;
+import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.catalog.TestamentDefinition;
 import org.perazimchurch.app.domain.games.catalog.TimelineDefinition;
 import org.perazimchurch.app.domain.games.catalog.WhoAmIDefinition;
@@ -44,6 +45,8 @@ public final class GameCatalog {
         games.add(new TestamentDefinition(R.drawable.game_art_old_or_new));
         games.add(new WhoSaidItDefinition(R.drawable.game_art_who_said_it));
         games.add(new FillTheGapDefinition(R.drawable.game_art_verse_builder));
+        // Icon is a placeholder until the art thread delivers game_story_mosaic.
+        games.add(new StoryMosaicDefinition(R.drawable.game_art_timeline));
         return games;
     }
 }

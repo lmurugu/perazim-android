@@ -12,7 +12,7 @@ import org.perazimchurch.app.domain.games.mosaic.MosaicPuzzles;
 public final class StoryMosaicDefinition implements GameDefinition {
 
     /** Levels with a hint button. */
-    static final int GUIDED_LEVELS = 10;
+    public static final int GUIDED_LEVELS = 10;
 
     private final int iconResource;
 
