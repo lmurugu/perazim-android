@@ -1355,6 +1355,52 @@
     "I was struck with leprosy as a result."
    ],
    "hint": "I was the servant of a prophet who healed Naaman."
+  },
+  {
+   "answer": "Peter",
+   "aliases": [
+    "Simon Peter",
+    "Simon",
+    "Cephas"
+   ],
+   "reference": "Luke 22:54-62; John 21:15-19",
+   "explanation": "Peter denied Jesus three times, then was restored and led the early church.",
+   "clues": [
+    "I was a fisherman called by Jesus from the lake.",
+    "I denied knowing Jesus three times before the cock crowed.",
+    "I was restored by Jesus and fed his sheep."
+   ],
+   "hint": "My brother was Andrew."
+  },
+  {
+   "answer": "Paul",
+   "aliases": [
+    "Saul of Tarsus",
+    "Paulus"
+   ],
+   "reference": "Acts 9:1-22",
+   "explanation": "Paul's encounter with Jesus on the road to Damascus changed his life.",
+   "clues": [
+    "I once persecuted the church before my conversion.",
+    "I was a tentmaker who travelled to many cities.",
+    "I wrote many letters that are now part of the New Testament."
+   ],
+   "hint": "I was born in Tarsus."
+  },
+  {
+   "answer": "The Samaritan woman",
+   "aliases": [
+    "Woman at the well",
+    "Samaritan woman"
+   ],
+   "reference": "John 4:4-30",
+   "explanation": "John does not give her name; her testimony led others to meet Jesus.",
+   "clues": [
+    "I met Jesus at a well in Samaria.",
+    "I had been married several times.",
+    "I told my town about the man who knew everything I did."
+   ],
+   "hint": "The conversation happened at Jacob's well."
   }
  ]
 }
