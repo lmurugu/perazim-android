@@ -83,3 +83,5 @@ src/main/assets/bible/local/
 
 # Brand logos are tracked so they stay available.
 !docs/brand/*.png
+
+__pycache__/

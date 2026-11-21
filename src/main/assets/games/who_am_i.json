@@ -1,0 +1,1406 @@
+{
+ "game": "who_am_i",
+ "version": 1,
+ "translation": "KJV",
+ "people": [
+  {
+   "answer": "Adam",
+   "aliases": [],
+   "reference": "Genesis 2:7",
+   "explanation": "God formed the first man from the dust of the ground.",
+   "clues": [
+    "I was the first man God made.",
+    "I was formed from the dust of the ground.",
+    "I was placed in the garden of Eden to tend it."
+   ],
+   "hint": "My name means 'man' or 'earth'."
+  },
+  {
+   "answer": "Eve",
+   "aliases": [
+    "Eva"
+   ],
+   "reference": "Genesis 3:20",
+   "explanation": "Adam named his wife Eve, the mother of all living.",
+   "clues": [
+    "I was made from a rib taken from the man.",
+    "The serpent deceived me in the garden.",
+    "I was the first woman."
+   ],
+   "hint": "My husband named me."
+  },
+  {
+   "answer": "Abel",
+   "aliases": [],
+   "reference": "Genesis 4:2-8",
+   "explanation": "Abel was a keeper of sheep whose offering was accepted by God.",
+   "clues": [
+    "I was the second son of Adam and Eve.",
+    "I kept sheep.",
+    "My brother Cain killed me."
+   ],
+   "hint": "My brother was older."
+  },
+  {
+   "answer": "Enoch",
+   "aliases": [],
+   "reference": "Genesis 5:24",
+   "explanation": "Enoch walked with God, and God took him.",
+   "clues": [
+    "I walked faithfully with God.",
+    "I was the father of Methuselah.",
+    "I did not die but was taken by God."
+   ],
+   "hint": "My name is also a city in Cain's line."
+  },
+  {
+   "answer": "Noah",
+   "aliases": [],
+   "reference": "Genesis 6:8-9",
+   "explanation": "Noah found grace with God and built the ark.",
+   "clues": [
+    "I built a large ark on God's instructions.",
+    "I was saved with my family from the flood.",
+    "After the flood I offered sacrifice to God."
+   ],
+   "hint": "A rainbow is God's sign to me."
+  },
+  {
+   "answer": "Abraham",
+   "aliases": [
+    "Abram"
+   ],
+   "reference": "Genesis 12:1-3",
+   "explanation": "God called Abram from Ur and promised to make him a great nation.",
+   "clues": [
+    "I was called out of Ur of the Chaldees.",
+    "God made a covenant of descendants as many as the stars.",
+    "I was willing to offer my son Isaac."
+   ],
+   "hint": "My name means 'father of many'."
+  },
+  {
+   "answer": "Sarah",
+   "aliases": [
+    "Sarai"
+   ],
+   "reference": "Genesis 17:15-16",
+   "explanation": "God gave Sarah a new name and promised she would be a mother of nations.",
+   "clues": [
+    "I laughed when I heard I would have a son in old age.",
+    "I was the wife of Abraham.",
+    "I was the mother of Isaac."
+   ],
+   "hint": "My name was changed by God."
+  },
+  {
+   "answer": "Isaac",
+   "aliases": [],
+   "reference": "Genesis 22:1-14",
+   "explanation": "Isaac was the son of promise, born to Abraham and Sarah.",
+   "clues": [
+    "I was the son of promise.",
+    "My name means 'laughter'.",
+    "My father nearly offered me on Mount Moriah."
+   ],
+   "hint": "I married Rebekah."
+  },
+  {
+   "answer": "Rebekah",
+   "aliases": [
+    "Rebecca"
+   ],
+   "reference": "Genesis 24:15-27",
+   "explanation": "Rebekah was chosen as Isaac's wife after showing kindness at the well.",
+   "clues": [
+    "I offered water to a stranger and his camels at a well.",
+    "I was the wife of Isaac.",
+    "I was the mother of Jacob and Esau."
+   ],
+   "hint": "I came from Nahor's family."
+  },
+  {
+   "answer": "Jacob",
+   "aliases": [
+    "Israel"
+   ],
+   "reference": "Genesis 32:24-28",
+   "explanation": "Jacob wrestled with God and received the name Israel.",
+   "clues": [
+    "I bought my brother's birthright for a meal.",
+    "I wrestled with a man until the break of day.",
+    "My twelve sons became the tribes of Israel."
+   ],
+   "hint": "I was renamed Israel."
+  },
+  {
+   "answer": "Esau",
+   "aliases": [
+    "Edom"
+   ],
+   "reference": "Genesis 25:25-34",
+   "explanation": "Esau sold his birthright to his brother for food.",
+   "clues": [
+    "I was a skilful hunter.",
+    "I sold my birthright for a bowl of stew.",
+    "I was the twin brother of Jacob."
+   ],
+   "hint": "My name is linked to a people called Edom."
+  },
+  {
+   "answer": "Joseph",
+   "aliases": [],
+   "reference": "Genesis 37:3-4; Genesis 41:39-43",
+   "explanation": "Joseph was sold by his brothers, rose to power in Egypt and forgave them.",
+   "clues": [
+    "I wore a coat of many colours.",
+    "I interpreted dreams in prison and then in Pharaoh's court.",
+    "I forgave the brothers who sold me into Egypt."
+   ],
+   "hint": "I was the son of Jacob and Rachel."
+  },
+  {
+   "answer": "Moses",
+   "aliases": [
+    "Musa"
+   ],
+   "reference": "Exodus 3:1-10",
+   "explanation": "God called Moses from the burning bush to lead Israel out of Egypt.",
+   "clues": [
+    "I was found in the reeds of the Nile as a baby.",
+    "I received the law on Mount Sinai.",
+    "I led Israel out of Egypt."
+   ],
+   "hint": "My brother was Aaron."
+  },
+  {
+   "answer": "Aaron",
+   "aliases": [],
+   "reference": "Exodus 4:14-16",
+   "explanation": "Aaron served as Moses' spokesman and became the first high priest.",
+   "clues": [
+    "I spoke on behalf of my brother before Pharaoh.",
+    "I made the golden calf when the people asked.",
+    "I became Israel's first high priest."
+   ],
+   "hint": "I was the older brother of Moses."
+  },
+  {
+   "answer": "Miriam",
+   "aliases": [],
+   "reference": "Exodus 15:20-21",
+   "explanation": "Miriam led the women in song after the crossing of the Red Sea.",
+   "clues": [
+    "I watched over my baby brother in the river.",
+    "I was a prophetess.",
+    "I led the women in singing after the Red Sea crossing."
+   ],
+   "hint": "I was the sister of Moses."
+  },
+  {
+   "answer": "Joshua",
+   "aliases": [],
+   "reference": "Joshua 1:1-9",
+   "explanation": "Joshua succeeded Moses and led Israel into the promised land.",
+   "clues": [
+    "I was Moses' assistant.",
+    "I was one of the twelve spies who trusted God.",
+    "I led Israel across the Jordan into Canaan."
+   ],
+   "hint": "I was the son of Nun."
+  },
+  {
+   "answer": "Caleb",
+   "aliases": [],
+   "reference": "Numbers 13:30; Joshua 14:6-14",
+   "explanation": "Caleb trusted God to take the land and was given Hebron.",
+   "clues": [
+    "I was one of the twelve spies who believed God would give the land.",
+    "I was loyal alongside Joshua.",
+    "I received Hebron as my inheritance."
+   ],
+   "hint": "I wholly followed the LORD."
+  },
+  {
+   "answer": "Rahab",
+   "aliases": [],
+   "reference": "Joshua 2:1-21",
+   "explanation": "Rahab hid the spies in Jericho and was saved when the walls fell.",
+   "clues": [
+    "I lived in a house built into the city wall of Jericho.",
+    "I hid two spies on my roof.",
+    "I and my family were spared when Jericho fell."
+   ],
+   "hint": "I was a woman of faith, named in Hebrews."
+  },
+  {
+   "answer": "Gideon",
+   "aliases": [
+    "Jerubbaal"
+   ],
+   "reference": "Judges 6:11-16; Judges 7:1-22",
+   "explanation": "God reduced Gideon's army so that the victory would clearly be His.",
+   "clues": [
+    "I threshed wheat in a winepress to hide from enemies.",
+    "I asked for a fleece as a sign.",
+    "I defeated Midian with just three hundred men."
+   ],
+   "hint": "I was a judge of Israel."
+  },
+  {
+   "answer": "Deborah",
+   "aliases": [],
+   "reference": "Judges 4:4-14",
+   "explanation": "Deborah judged Israel and encouraged Barak to fight.",
+   "clues": [
+    "I was a prophetess who judged Israel.",
+    "I sat under a palm tree to give judgment.",
+    "I sang a song of victory with Barak."
+   ],
+   "hint": "I was a woman leader in a time of trouble."
+  },
+  {
+   "answer": "Samson",
+   "aliases": [
+    "Samsón"
+   ],
+   "reference": "Judges 16:17-30",
+   "explanation": "Samson's great strength was linked to his Nazirite vow.",
+   "clues": [
+    "My strength was linked to a vow of separation.",
+    "I was betrayed by Delilah.",
+    "I pulled down a temple on the Philistines."
+   ],
+   "hint": "My hair was never cut."
+  },
+  {
+   "answer": "Ruth",
+   "aliases": [],
+   "reference": "Ruth 1:16",
+   "explanation": "Ruth's loyalty to Naomi led her to Bethlehem and into the line of David.",
+   "clues": [
+    "I was a Moabite who stayed with my mother-in-law.",
+    "I gleaned in the fields of Boaz.",
+    "I became the great-grandmother of King David."
+   ],
+   "hint": "A book bears my name."
+  },
+  {
+   "answer": "Naomi",
+   "aliases": [],
+   "reference": "Ruth 1:20-21",
+   "explanation": "Naomi returned to Bethlehem after losing her husband and sons.",
+   "clues": [
+    "I lost my husband and both my sons in Moab.",
+    "I returned to Bethlehem with my daughter-in-law.",
+    "I arranged for Ruth to meet Boaz."
+   ],
+   "hint": "My name means 'pleasant'."
+  },
+  {
+   "answer": "Boaz",
+   "aliases": [],
+   "reference": "Ruth 2:1-12",
+   "explanation": "Boaz, a kinsman, showed kindness to Ruth in his fields.",
+   "clues": [
+    "I was a wealthy relative of Naomi.",
+    "I let Ruth glean in my fields.",
+    "I married Ruth."
+   ],
+   "hint": "I was a redeemer of the family."
+  },
+  {
+   "answer": "Hannah",
+   "aliases": [],
+   "reference": "1 Samuel 1:9-20",
+   "explanation": "Hannah prayed at Shiloh for a son and gave Samuel to the Lord.",
+   "clues": [
+    "I prayed for a child at the tabernacle.",
+    "I dedicated my son to serve the LORD.",
+    "I sang a song of thanks after Samuel was born."
+   ],
+   "hint": "I was the mother of Samuel."
+  },
+  {
+   "answer": "Samuel",
+   "aliases": [],
+   "reference": "1 Samuel 3:1-10",
+   "explanation": "Samuel heard God's voice as a boy and became a prophet.",
+   "clues": [
+    "I heard God call my name in the night.",
+    "I was raised in the house of Eli.",
+    "I anointed the first two kings of Israel."
+   ],
+   "hint": "My mother was Hannah."
+  },
+  {
+   "answer": "Saul",
+   "aliases": [],
+   "reference": "1 Samuel 9:1-2; 1 Samuel 10:1",
+   "explanation": "Saul was chosen as the first king of Israel, but later disobeyed God.",
+   "clues": [
+    "I was taller than anyone in Israel.",
+    "I was anointed as the first king.",
+    "I disobeyed God and lost my kingdom."
+   ],
+   "hint": "Later Paul had a similar name."
+  },
+  {
+   "answer": "Jonathan",
+   "aliases": [],
+   "reference": "1 Samuel 18:1-4; 1 Samuel 20:17",
+   "explanation": "Jonathan loved David as his own soul and made a covenant with him.",
+   "clues": [
+    "I was the son of King Saul.",
+    "I made a covenant of friendship with David.",
+    "I shot arrows to warn David of Saul's plan."
+   ],
+   "hint": "I was the closest friend of David."
+  },
+  {
+   "answer": "Abigail",
+   "aliases": [],
+   "reference": "1 Samuel 25:23-35",
+   "explanation": "Abigail acted wisely to prevent David from taking revenge on her household.",
+   "clues": [
+    "I was wise and beautiful.",
+    "I was married to the foolish Nabal.",
+    "I went out with food to meet David and stopped him from bloodshed."
+   ],
+   "hint": "I later married David."
+  },
+  {
+   "answer": "Nathan",
+   "aliases": [],
+   "reference": "2 Samuel 12:1-13",
+   "explanation": "Nathan the prophet confronted David about his sin with Bathsheba.",
+   "clues": [
+    "I was a prophet in King David's court.",
+    "I told David a story about a poor man's lamb.",
+    "I said to David, 'Thou art the man.'"
+   ],
+   "hint": "I was bold to speak truth to a king."
+  },
+  {
+   "answer": "Bathsheba",
+   "aliases": [],
+   "reference": "2 Samuel 11:2-5; 1 Kings 1:28-31",
+   "explanation": "Bathsheba was the wife of Uriah and later the mother of Solomon.",
+   "clues": [
+    "I was seen bathing by King David.",
+    "I was the wife of Uriah the Hittite.",
+    "I was the mother of King Solomon."
+   ],
+   "hint": "I was married to David after a tragic event."
+  },
+  {
+   "answer": "Absalom",
+   "aliases": [],
+   "reference": "2 Samuel 15:1-14",
+   "explanation": "Absalom plotted to take the throne from his father David.",
+   "clues": [
+    "I was the handsome son of King David.",
+    "I stole the hearts of Israel's men.",
+    "I was killed when my hair caught in a tree."
+   ],
+   "hint": "I was David's third son."
+  },
+  {
+   "answer": "Elijah",
+   "aliases": [
+    "Elias"
+   ],
+   "reference": "1 Kings 18:20-40",
+   "explanation": "Elijah challenged the prophets of Baal on Mount Carmel.",
+   "clues": [
+    "I challenged the prophets of Baal on Mount Carmel.",
+    "Fire fell from heaven when I prayed.",
+    "I was taken to heaven in a whirlwind."
+   ],
+   "hint": "Ravens fed me by the brook Cherith."
+  },
+  {
+   "answer": "Elisha",
+   "aliases": [],
+   "reference": "2 Kings 2:9-15",
+   "explanation": "Elisha received a double portion of the spirit of Elijah.",
+   "clues": [
+    "I received a double portion of the spirit of my master.",
+    "I performed many miracles, including healing Naaman.",
+    "I was the successor of Elijah."
+   ],
+   "hint": "I was ploughing when I was called."
+  },
+  {
+   "answer": "Naaman",
+   "aliases": [],
+   "reference": "2 Kings 5:1-14",
+   "explanation": "Naaman, a Syrian commander, was healed of leprosy after bathing in the Jordan.",
+   "clues": [
+    "I was a commander in the Syrian army.",
+    "I suffered from leprosy.",
+    "I was healed after washing seven times in the Jordan."
+   ],
+   "hint": "A young servant girl told me about the prophet."
+  },
+  {
+   "answer": "Hezekiah",
+   "aliases": [],
+   "reference": "2 Kings 18:1-7; 2 Kings 20:1-6",
+   "explanation": "Hezekiah trusted the LORD and was granted fifteen more years of life.",
+   "clues": [
+    "I was a king of Judah who trusted the LORD.",
+    "I removed the high places and the bronze serpent Nehushtan.",
+    "I prayed when I was sick and God added years to my life."
+   ],
+   "hint": "I was a son of Ahaz."
+  },
+  {
+   "answer": "Josiah",
+   "aliases": [],
+   "reference": "2 Kings 22:1-2; 2 Kings 23:1-3",
+   "explanation": "Josiah led a reform after the book of the law was found in the temple.",
+   "clues": [
+    "I became king of Judah at the age of eight.",
+    "I led a reform after the book of the law was found.",
+    "I renewed the covenant with the LORD."
+   ],
+   "hint": "I was a great reforming king."
+  },
+  {
+   "answer": "Isaiah",
+   "aliases": [],
+   "reference": "Isaiah 6:1-8",
+   "explanation": "Isaiah saw the Lord high and lifted up and answered the call, 'Here am I'.",
+   "clues": [
+    "I saw the Lord high and lifted up in a vision.",
+    "I said, 'Here am I; send me.'",
+    "I prophesied about the coming Servant."
+   ],
+   "hint": "A prophetic book bears my name."
+  },
+  {
+   "answer": "Jeremiah",
+   "aliases": [],
+   "reference": "Jeremiah 1:4-10",
+   "explanation": "Jeremiah was called as a prophet while still young.",
+   "clues": [
+    "I was called to be a prophet while still young.",
+    "I was known as the weeping prophet.",
+    "I was thrown into a cistern by my enemies."
+   ],
+   "hint": "I wrote the Lamentations."
+  },
+  {
+   "answer": "Ezekiel",
+   "aliases": [],
+   "reference": "Ezekiel 1:1-3",
+   "explanation": "Ezekiel received visions by the river Chebar while in exile.",
+   "clues": [
+    "I was a priest who prophesied in exile.",
+    "I saw a vision of wheels within wheels.",
+    "I saw a valley of dry bones come to life."
+   ],
+   "hint": "I was a prophet by the river Chebar."
+  },
+  {
+   "answer": "Daniel",
+   "aliases": [],
+   "reference": "Daniel 1:8; Daniel 6:10",
+   "explanation": "Daniel refused the king's food and prayed three times a day.",
+   "clues": [
+    "I refused the king's rich food and wine.",
+    "I kept praying toward Jerusalem despite a decree.",
+    "I interpreted dreams in Babylon."
+   ],
+   "hint": "I was a young Hebrew exile."
+  },
+  {
+   "answer": "Shadrach",
+   "aliases": [
+    "Hananiah"
+   ],
+   "reference": "Daniel 3:12-30",
+   "explanation": "Shadrach and his friends refused to bow to the golden image and were kept safe in the furnace.",
+   "clues": [
+    "I refused to bow to the golden image.",
+    "I was thrown into a furnace.",
+    "A fourth figure walked with me in the fire."
+   ],
+   "hint": "I was one of three friends with Daniel."
+  },
+  {
+   "answer": "Meshach",
+   "aliases": [
+    "Mishael"
+   ],
+   "reference": "Daniel 3:19-27",
+   "explanation": "Meshach was among the three friends who survived the blazing furnace.",
+   "clues": [
+    "I was thrown into the fiery furnace with two friends.",
+    "The fire did not harm me.",
+    "The king saw a fourth man in the fire."
+   ],
+   "hint": "I was one of Daniel's three companions."
+  },
+  {
+   "answer": "Abednego",
+   "aliases": [
+    "Azariah"
+   ],
+   "reference": "Daniel 3:16-18",
+   "explanation": "Abednego trusted God even if God did not deliver him.",
+   "clues": [
+    "I answered the king that God could deliver us.",
+    "I was thrown into the furnace.",
+    "I walked unharmed in the fire."
+   ],
+   "hint": "I was one of Daniel's three companions."
+  },
+  {
+   "answer": "Nebuchadnezzar",
+   "aliases": [],
+   "reference": "Daniel 4:28-37",
+   "explanation": "Nebuchadnezzar was humbled and acknowledged God as the Most High.",
+   "clues": [
+    "I was the great king of Babylon.",
+    "I built an image of gold on the plain of Dura.",
+    "I was humbled and lived like an animal for a time."
+   ],
+   "hint": "I destroyed Jerusalem."
+  },
+  {
+   "answer": "Job",
+   "aliases": [],
+   "reference": "Job 1:1; Job 42:10-17",
+   "explanation": "Job was blameless and upright, and remained faithful through great suffering.",
+   "clues": [
+    "I was blameless and upright.",
+    "I lost my children, property and health.",
+    "God restored my family and possessions twofold."
+   ],
+   "hint": "I lived in the land of Uz."
+  },
+  {
+   "answer": "Obadiah",
+   "aliases": [],
+   "reference": "1 Kings 18:3-4",
+   "explanation": "Obadiah protected a hundred prophets from Jezebel.",
+   "clues": [
+    "I was the governor of King Ahab's house.",
+    "I hid one hundred prophets in caves.",
+    "I feared the LORD greatly."
+   ],
+   "hint": "I was not the same as the prophet who wrote a short book."
+  },
+  {
+   "answer": "Jonah",
+   "aliases": [
+    "Yona"
+   ],
+   "reference": "Jonah 1:1-3; Jonah 3:1-10",
+   "explanation": "Jonah was sent to Nineveh, but first ran away from God's call.",
+   "clues": [
+    "I tried to flee to Tarshish from God.",
+    "I was swallowed by a great fish.",
+    "I preached to Nineveh, which repented."
+   ],
+   "hint": "I sat under a gourd vine."
+  },
+  {
+   "answer": "Ezra",
+   "aliases": [],
+   "reference": "Ezra 7:10",
+   "explanation": "Ezra was a scribe who set his heart to study and teach the law.",
+   "clues": [
+    "I was a priest and scribe skilled in the law of Moses.",
+    "I brought a group back from Babylon.",
+    "I read the law to the people at Jerusalem."
+   ],
+   "hint": "I set my heart to seek the law."
+  },
+  {
+   "answer": "Nehemiah",
+   "aliases": [],
+   "reference": "Nehemiah 1:4; Nehemiah 2:1-8",
+   "explanation": "Nehemiah prayed, then asked the king to rebuild Jerusalem's walls.",
+   "clues": [
+    "I was the king's cupbearer.",
+    "I prayed and wept over Jerusalem's broken walls.",
+    "I led the rebuilding of the walls."
+   ],
+   "hint": "I was an exile who served Artaxerxes."
+  },
+  {
+   "answer": "Mordecai",
+   "aliases": [],
+   "reference": "Esther 2:5-7; Esther 4:13-14",
+   "explanation": "Mordecai raised Esther and urged her to act for her people.",
+   "clues": [
+    "I raised my cousin Esther after her parents died.",
+    "I sat at the king's gate.",
+    "I urged Esther to speak to the king for her people."
+   ],
+   "hint": "I was the cousin of Esther."
+  },
+  {
+   "answer": "Esther",
+   "aliases": [
+    "Hadassah"
+   ],
+   "reference": "Esther 4:14-16",
+   "explanation": "Esther risked her life to speak to the king for the Jews.",
+   "clues": [
+    "I became queen of Persia.",
+    "I fasted for three days before approaching the king.",
+    "I saved my people from destruction."
+   ],
+   "hint": "I was once known as Hadassah."
+  },
+  {
+   "answer": "Mary",
+   "aliases": [
+    "Maria",
+    "Mariam"
+   ],
+   "reference": "Luke 1:26-38",
+   "explanation": "Mary responded in faith to the angel's announcement of Jesus' birth.",
+   "clues": [
+    "An angel announced that I would bear the Son of the Highest.",
+    "I said, 'Be it unto me according to thy word.'",
+    "I stood at the cross."
+   ],
+   "hint": "I lived in Nazareth."
+  },
+  {
+   "answer": "Elizabeth",
+   "aliases": [],
+   "reference": "Luke 1:5-25",
+   "explanation": "Elizabeth was the mother of John the Baptist and a relative of Mary.",
+   "clues": [
+    "I was the wife of a priest named Zacharias.",
+    "I was barren but bore a child in old age.",
+    "I was the mother of John the Baptist."
+   ],
+   "hint": "I was a cousin of Mary."
+  },
+  {
+   "answer": "Zacharias",
+   "aliases": [
+    "Zechariah"
+   ],
+   "reference": "Luke 1:11-20",
+   "explanation": "Zacharias was made mute until the birth of his son John.",
+   "clues": [
+    "I was a priest serving in the temple.",
+    "An angel told me I would have a son.",
+    "I could not speak until my son was named."
+   ],
+   "hint": "I was the husband of Elizabeth."
+  },
+  {
+   "answer": "John the Baptist",
+   "aliases": [
+    "John"
+   ],
+   "reference": "Matthew 3:1-6",
+   "explanation": "John prepared the way for Jesus by preaching repentance in the wilderness.",
+   "clues": [
+    "I wore clothing of camel's hair.",
+    "I baptised people in the Jordan.",
+    "I prepared the way for the Messiah."
+   ],
+   "hint": "I was the cousin of Jesus."
+  },
+  {
+   "answer": "Simeon",
+   "aliases": [],
+   "reference": "Luke 2:25-35",
+   "explanation": "Simeon waited for the consolation of Israel and saw the infant Jesus.",
+   "clues": [
+    "I was righteous and waited for the consolation of Israel.",
+    "The Holy Spirit revealed I would not die before seeing the Christ.",
+    "I held the infant Jesus in the temple."
+   ],
+   "hint": "I blessed the child in the temple."
+  },
+  {
+   "answer": "Anna",
+   "aliases": [],
+   "reference": "Luke 2:36-38",
+   "explanation": "Anna, a prophetess, spoke of the child to those who waited for redemption.",
+   "clues": [
+    "I was a prophetess of great age.",
+    "I never left the temple, worshipping night and day.",
+    "I spoke of the child to all who looked for redemption."
+   ],
+   "hint": "I was a widow for many years."
+  },
+  {
+   "answer": "Andrew",
+   "aliases": [],
+   "reference": "John 1:40-42",
+   "explanation": "Andrew brought his brother Simon Peter to Jesus.",
+   "clues": [
+    "I was a fisherman from Bethsaida.",
+    "I first followed John the Baptist.",
+    "I brought my brother to Jesus."
+   ],
+   "hint": "My brother was Simon Peter."
+  },
+  {
+   "answer": "Philip",
+   "aliases": [],
+   "reference": "John 1:43-46",
+   "explanation": "Philip invited Nathanael to come and see Jesus.",
+   "clues": [
+    "I came from Bethsaida.",
+    "I told Nathanael to come and see.",
+    "I asked Jesus to show us the Father."
+   ],
+   "hint": "I was one of the twelve apostles."
+  },
+  {
+   "answer": "Nathanael",
+   "aliases": [
+    "Bartholomew"
+   ],
+   "reference": "John 1:45-51",
+   "explanation": "Jesus described Nathanael as an Israelite in whom there is no guile.",
+   "clues": [
+    "Jesus called me an Israelite indeed, without guile.",
+    "I was brought to Jesus by my friend Philip.",
+    "I doubted that anything good could come from Nazareth."
+   ],
+   "hint": "I was sitting under a fig tree."
+  },
+  {
+   "answer": "Thomas",
+   "aliases": [
+    "Didymus"
+   ],
+   "reference": "John 20:24-29",
+   "explanation": "Thomas doubted until he saw the risen Lord, then confessed him.",
+   "clues": [
+    "I was called Didymus, the Twin.",
+    "I doubted until I saw the wounds.",
+    "I cried, 'My Lord and my God.'"
+   ],
+   "hint": "I was one of the twelve."
+  },
+  {
+   "answer": "Matthew",
+   "aliases": [
+    "Levi"
+   ],
+   "reference": "Matthew 9:9",
+   "explanation": "Matthew, a tax collector, left his booth to follow Jesus.",
+   "clues": [
+    "I collected taxes before following Jesus.",
+    "I was called from my tax booth.",
+    "I wrote the first Gospel."
+   ],
+   "hint": "I was also named Levi."
+  },
+  {
+   "answer": "Martha",
+   "aliases": [],
+   "reference": "Luke 10:38-42",
+   "explanation": "Martha welcomed Jesus into her home, but was busy with many things.",
+   "clues": [
+    "I welcomed Jesus into my home in Bethany.",
+    "I was busy serving while my sister sat at Jesus' feet.",
+    "Jesus raised my brother Lazarus."
+   ],
+   "hint": "My sister was Mary."
+  },
+  {
+   "answer": "Lazarus",
+   "aliases": [],
+   "reference": "John 11:1-44",
+   "explanation": "Jesus raised Lazarus from the tomb after four days.",
+   "clues": [
+    "I was the brother of Mary and Martha.",
+    "I was raised from the dead after four days in the tomb.",
+    "Jesus wept at my tomb."
+   ],
+   "hint": "Jesus called me out of the grave."
+  },
+  {
+   "answer": "Mary Magdalene",
+   "aliases": [
+    "Mary Magdalen"
+   ],
+   "reference": "Luke 8:2; John 20:11-18",
+   "explanation": "Mary Magdalene was healed by Jesus and was the first to see the risen Lord.",
+   "clues": [
+    "Jesus had cast seven devils out of me.",
+    "I stood by the cross and went to the tomb.",
+    "I was the first to see the risen Lord."
+   ],
+   "hint": "I came from the town of Magdala."
+  },
+  {
+   "answer": "Nicodemus",
+   "aliases": [],
+   "reference": "John 3:1-10",
+   "explanation": "Nicodemus came to Jesus by night and heard about being born again.",
+   "clues": [
+    "I was a ruler of the Jews who came to Jesus at night.",
+    "I was told I must be born again.",
+    "I helped prepare Jesus' body for burial."
+   ],
+   "hint": "I was a Pharisee."
+  },
+  {
+   "answer": "Stephen",
+   "aliases": [],
+   "reference": "Acts 6:8; Acts 7:54-60",
+   "explanation": "Stephen was the first martyr of the church.",
+   "clues": [
+    "I was full of faith and power and did great wonders.",
+    "I preached before the council and was stoned.",
+    "I prayed for those who stoned me."
+   ],
+   "hint": "I was one of the first deacons."
+  },
+  {
+   "answer": "Barnabas",
+   "aliases": [],
+   "reference": "Acts 4:36-37; Acts 11:22-24",
+   "explanation": "Barnabas encouraged the new believers and supported Paul.",
+   "clues": [
+    "My name means 'son of encouragement'.",
+    "I sold a field and gave the money to the apostles.",
+    "I travelled with Paul on his first journey."
+   ],
+   "hint": "I came from Cyprus."
+  },
+  {
+   "answer": "Silas",
+   "aliases": [
+    "Silvanus"
+   ],
+   "reference": "Acts 16:22-25",
+   "explanation": "Silas sang with Paul in prison and saw the jailer converted.",
+   "clues": [
+    "I was a leader among the Jerusalem believers.",
+    "I was imprisoned with Paul in Philippi.",
+    "I sang praises at midnight with Paul."
+   ],
+   "hint": "I travelled with Paul on his second journey."
+  },
+  {
+   "answer": "Timothy",
+   "aliases": [],
+   "reference": "2 Timothy 1:5; 2 Timothy 3:15",
+   "explanation": "Timothy learned the Scriptures from childhood under his mother and grandmother.",
+   "clues": [
+    "I learned the Holy Scriptures from childhood.",
+    "My mother and grandmother had faith before me.",
+    "Paul wrote two letters to me."
+   ],
+   "hint": "I was a young pastor."
+  },
+  {
+   "answer": "Luke",
+   "aliases": [],
+   "reference": "Colossians 4:14; 2 Timothy 4:11",
+   "explanation": "Luke was a physician and companion of Paul who wrote Luke and Acts.",
+   "clues": [
+    "I was a physician.",
+    "I travelled with Paul.",
+    "I wrote the Gospel and the book of Acts."
+   ],
+   "hint": "I am called the beloved physician."
+  },
+  {
+   "answer": "Cornelius",
+   "aliases": [],
+   "reference": "Acts 10:1-8",
+   "explanation": "Cornelius was a devout centurion whose household received the Holy Spirit.",
+   "clues": [
+    "I was a centurion of the Italian band.",
+    "I was a devout man who feared God and gave alms.",
+    "God sent an angel to tell me to call for Peter."
+   ],
+   "hint": "I lived in Caesarea."
+  },
+  {
+   "answer": "Lydia",
+   "aliases": [],
+   "reference": "Acts 16:14-15",
+   "explanation": "Lydia, a seller of purple, opened her heart to Paul's message and hosted the church.",
+   "clues": [
+    "I was a seller of purple from Thyatira.",
+    "The Lord opened my heart to listen to Paul.",
+    "I invited Paul and his companions into my home."
+   ],
+   "hint": "I was a businesswoman in Philippi."
+  },
+  {
+   "answer": "Priscilla",
+   "aliases": [
+    "Prisca"
+   ],
+   "reference": "Acts 18:2-3; Romans 16:3-4",
+   "explanation": "Priscilla and Aquila were tentmakers who hosted churches and taught Apollos.",
+   "clues": [
+    "I was a tentmaker with my husband.",
+    "I taught Apollos more accurately about the way of God.",
+    "I risked my life for Paul."
+   ],
+   "hint": "My husband is Aquila."
+  },
+  {
+   "answer": "Apollos",
+   "aliases": [],
+   "reference": "Acts 18:24-28",
+   "explanation": "Apollos was an eloquent man mighty in the Scriptures, taught more fully by Priscilla and Aquila.",
+   "clues": [
+    "I was an eloquent man from Alexandria.",
+    "I was mighty in the Scriptures.",
+    "I was taught more perfectly by Priscilla and Aquila."
+   ],
+   "hint": "I later preached in Corinth."
+  },
+  {
+   "answer": "Epaphroditus",
+   "aliases": [],
+   "reference": "Philippians 2:25-30",
+   "explanation": "Epaphroditus risked his life to bring Paul gifts while Paul was in prison.",
+   "clues": [
+    "I was a fellow worker and soldier with Paul.",
+    "I was sick and nearly died for the work of Christ.",
+    "I carried the church's gift to Paul in prison."
+   ],
+   "hint": "I was sent by the church at Philippi."
+  },
+  {
+   "answer": "Onesimus",
+   "aliases": [],
+   "reference": "Philemon 1:10-16",
+   "explanation": "Onesimus became a brother in Christ through Paul's ministry.",
+   "clues": [
+    "I once ran away from my master.",
+    "Paul wrote a letter asking that I be received as a brother.",
+    "I was once unprofitable but became profitable."
+   ],
+   "hint": "The letter to Philemon concerns me."
+  },
+  {
+   "answer": "Dorcas",
+   "aliases": [
+    "Tabitha"
+   ],
+   "reference": "Acts 9:36-41",
+   "explanation": "Dorcas was full of good works and was raised from the dead by Peter.",
+   "clues": [
+    "I was full of good works and alms deeds.",
+    "I made coats and garments for widows.",
+    "Peter raised me from the dead."
+   ],
+   "hint": "My Greek name means 'gazelle'."
+  },
+  {
+   "answer": "Gamaliel",
+   "aliases": [],
+   "reference": "Acts 5:34-39",
+   "explanation": "Gamaliel advised the council not to oppose the apostles, in case they were of God.",
+   "clues": [
+    "I was a respected teacher of the law.",
+    "I advised the council to leave the apostles alone.",
+    "I was the teacher of Paul."
+   ],
+   "hint": "I was a Pharisee."
+  },
+  {
+   "answer": "Herod",
+   "aliases": [
+    "Herod the Great"
+   ],
+   "reference": "Matthew 2:1-16",
+   "explanation": "Herod was a king who feared a rival and ordered the killing of infants in Bethlehem.",
+   "clues": [
+    "I was king when Jesus was born.",
+    "I asked the wise men to report back to me.",
+    "I ordered the children in Bethlehem to be killed."
+   ],
+   "hint": "I was a ruler over Judea."
+  },
+  {
+   "answer": "Pilate",
+   "aliases": [
+    "Pontius Pilate"
+   ],
+   "reference": "John 18:38; John 19:12-16",
+   "explanation": "Pilate, the Roman governor, questioned Jesus and handed him over for crucifixion.",
+   "clues": [
+    "I was the Roman governor of Judea.",
+    "I asked Jesus, 'What is truth?'",
+    "I washed my hands before the crowd."
+   ],
+   "hint": "I was the governor who judged Jesus."
+  },
+  {
+   "answer": "Caiaphas",
+   "aliases": [],
+   "reference": "John 11:49-53; Matthew 26:57",
+   "explanation": "Caiaphas, the high priest, said it was expedient that one man should die.",
+   "clues": [
+    "I was the high priest that year.",
+    "I advised that one man die for the people.",
+    "I questioned Jesus at night before the council."
+   ],
+   "hint": "I was the high priest with Annas."
+  },
+  {
+   "answer": "Judas Iscariot",
+   "aliases": [
+    "Judas"
+   ],
+   "reference": "Matthew 26:14-16; Matthew 27:3-5",
+   "explanation": "Judas, one of the twelve, betrayed Jesus for thirty pieces of silver.",
+   "clues": [
+    "I was one of the twelve.",
+    "I received thirty pieces of silver.",
+    "I betrayed my Master with a kiss."
+   ],
+   "hint": "I was the keeper of the money bag."
+  },
+  {
+   "answer": "Cain",
+   "aliases": [],
+   "reference": "Genesis 4:8-9",
+   "explanation": "Cain killed his brother Abel and was marked by God.",
+   "clues": [
+    "I was the firstborn son of Adam and Eve.",
+    "I was a farmer.",
+    "I killed my brother out of jealousy."
+   ],
+   "hint": "God marked me so I would not be killed."
+  },
+  {
+   "answer": "Methuselah",
+   "aliases": [],
+   "reference": "Genesis 5:27",
+   "explanation": "Methuselah was the oldest man recorded in Scripture.",
+   "clues": [
+    "I was the son of Enoch.",
+    "I lived longer than any other man in the record.",
+    "I lived 969 years."
+   ],
+   "hint": "My name is famously linked to great age."
+  },
+  {
+   "answer": "Lot",
+   "aliases": [],
+   "reference": "Genesis 19:15-26",
+   "explanation": "Lot escaped Sodom, though his wife looked back and became a pillar of salt.",
+   "clues": [
+    "I was the nephew of Abraham.",
+    "I lived in Sodom.",
+    "My wife looked back when we fled the city."
+   ],
+   "hint": "I was rescued from the destruction of two cities."
+  },
+  {
+   "answer": "Balaam",
+   "aliases": [],
+   "reference": "Numbers 22:21-35",
+   "explanation": "Balaam's donkey spoke to him when he was blind to the angel on the road.",
+   "clues": [
+    "I was a prophet hired to curse Israel.",
+    "My donkey spoke to me.",
+    "An angel stood in my path with a drawn sword."
+   ],
+   "hint": "I rode a donkey."
+  },
+  {
+   "answer": "Phinehas",
+   "aliases": [],
+   "reference": "Numbers 25:7-13",
+   "explanation": "Phinehas turned God's wrath from Israel and received a covenant of peace.",
+   "clues": [
+    "I was a grandson of Aaron.",
+    "I stopped a plague by zeal for the LORD.",
+    "I received a covenant of peace."
+   ],
+   "hint": "I was a priest."
+  },
+  {
+   "answer": "Achan",
+   "aliases": [],
+   "reference": "Joshua 7:19-26",
+   "explanation": "Achan took forbidden spoil from Jericho and brought trouble on Israel.",
+   "clues": [
+    "I took a garment, silver and gold from Jericho that was forbidden.",
+    "My sin brought defeat at Ai.",
+    "I was stoned in the valley of Achor."
+   ],
+   "hint": "I was from the tribe of Judah."
+  },
+  {
+   "answer": "Eli",
+   "aliases": [],
+   "reference": "1 Samuel 3:8-18",
+   "explanation": "Eli was a priest who trained Samuel but failed to restrain his sons.",
+   "clues": [
+    "I was the high priest at Shiloh.",
+    "I taught the boy Samuel to answer God.",
+    "I failed to restrain my wicked sons."
+   ],
+   "hint": "I was an old priest."
+  },
+  {
+   "answer": "Goliath",
+   "aliases": [],
+   "reference": "1 Samuel 17:4-10",
+   "explanation": "Goliath was a Philistine champion defeated by David's trust in God.",
+   "clues": [
+    "I was a giant from Gath.",
+    "I defied the armies of Israel for forty days.",
+    "I was struck down by a stone from a sling."
+   ],
+   "hint": "I was a Philistine."
+  },
+  {
+   "answer": "Bezalel",
+   "aliases": [],
+   "reference": "Exodus 31:1-5",
+   "explanation": "Bezalel was filled with the Spirit of God to craft the tabernacle furnishings.",
+   "clues": [
+    "I was filled with the Spirit of God.",
+    "I was skilled in every kind of craftsmanship.",
+    "I built the tabernacle and its furnishings."
+   ],
+   "hint": "I was a craftsman from the tribe of Judah."
+  },
+  {
+   "answer": "Hur",
+   "aliases": [],
+   "reference": "Exodus 17:10-13",
+   "explanation": "Hur helped hold up Moses' hands during the battle against Amalek.",
+   "clues": [
+    "I stood beside Moses during a battle.",
+    "I held up Moses' hands with Aaron.",
+    "I was a leader in Israel."
+   ],
+   "hint": "I was a companion of Aaron."
+  },
+  {
+   "answer": "Keturah",
+   "aliases": [],
+   "reference": "Genesis 25:1",
+   "explanation": "Keturah became Abraham's wife after Sarah died.",
+   "clues": [
+    "I became Abraham's wife after Sarah.",
+    "I bore him several sons.",
+    "I am mentioned in Genesis after Isaac."
+   ],
+   "hint": "I was a wife of Abraham."
+  },
+  {
+   "answer": "Hagar",
+   "aliases": [],
+   "reference": "Genesis 16:1-15",
+   "explanation": "Hagar was an Egyptian servant who met God in the wilderness.",
+   "clues": [
+    "I was an Egyptian servant.",
+    "I fled into the wilderness and God saw me.",
+    "I bore a son named Ishmael."
+   ],
+   "hint": "I named God 'the God who sees me'."
+  },
+  {
+   "answer": "Ishmael",
+   "aliases": [],
+   "reference": "Genesis 21:14-20",
+   "explanation": "God heard Ishmael's cry in the wilderness and made him a great nation.",
+   "clues": [
+    "I was the son of Hagar and Abraham.",
+    "God heard my cry in the wilderness.",
+    "God promised to make a great nation of me."
+   ],
+   "hint": "I was the first son of Abraham."
+  },
+  {
+   "answer": "Laban",
+   "aliases": [],
+   "reference": "Genesis 29:15-30",
+   "explanation": "Laban deceived Jacob by giving him Leah instead of Rachel.",
+   "clues": [
+    "I was the uncle of Jacob.",
+    "I gave Leah to Jacob instead of Rachel.",
+    "I made Jacob work many years for my daughters."
+   ],
+   "hint": "I was the father of Rachel and Leah."
+  },
+  {
+   "answer": "Rachel",
+   "aliases": [],
+   "reference": "Genesis 30:22-24",
+   "explanation": "Rachel was the beloved wife of Jacob, mother of Joseph and Benjamin.",
+   "clues": [
+    "I was the beloved wife of Jacob.",
+    "I was barren for a long time before I bore a son.",
+    "I was the mother of Joseph and Benjamin."
+   ],
+   "hint": "I died giving birth to Benjamin."
+  },
+  {
+   "answer": "Dinah",
+   "aliases": [],
+   "reference": "Genesis 34:1-2",
+   "explanation": "Dinah was the daughter of Jacob and Leah whose story led to conflict.",
+   "clues": [
+    "I was the daughter of Jacob and Leah.",
+    "I was defiled by a man of Shechem.",
+    "My brothers avenged me."
+   ],
+   "hint": "I was the only daughter of Jacob named in Genesis."
+  },
+  {
+   "answer": "Potiphar's wife",
+   "aliases": [],
+   "reference": "Genesis 39:7-20",
+   "explanation": "Potiphar's wife falsely accused Joseph when he refused her advances.",
+   "clues": [
+    "I was the wife of an officer in Pharaoh's household.",
+    "I tried to seduce Joseph.",
+    "I falsely accused Joseph to my husband."
+   ],
+   "hint": "My husband was Potiphar."
+  },
+  {
+   "answer": "Pharaoh's daughter",
+   "aliases": [],
+   "reference": "Exodus 2:5-10",
+   "explanation": "Pharaoh's daughter drew Moses from the river and raised him as her son.",
+   "clues": [
+    "I found a basket in the reeds of the Nile.",
+    "I had compassion on a Hebrew child.",
+    "I raised the child as my son."
+   ],
+   "hint": "I was a princess of Egypt."
+  },
+  {
+   "answer": "Zipporah",
+   "aliases": [],
+   "reference": "Exodus 2:21; Exodus 4:24-26",
+   "explanation": "Zipporah was Moses' wife and circumcised their son in a moment of danger.",
+   "clues": [
+    "I was the daughter of a Midianite priest.",
+    "I married Moses.",
+    "I circumcised my son to save my husband's life."
+   ],
+   "hint": "My father was Jethro."
+  },
+  {
+   "answer": "Jethro",
+   "aliases": [],
+   "reference": "Exodus 18:13-24",
+   "explanation": "Jethro advised Moses to share the work of judging the people.",
+   "clues": [
+    "I was a priest of Midian.",
+    "I was the father-in-law of Moses.",
+    "I advised Moses to appoint judges over the people."
+   ],
+   "hint": "I am also called Reuel."
+  },
+  {
+   "answer": "Korah",
+   "aliases": [],
+   "reference": "Numbers 16:1-3; Numbers 16:31-33",
+   "explanation": "Korah rebelled against Moses and Aaron and was swallowed by the earth.",
+   "clues": [
+    "I led a rebellion against Moses and Aaron.",
+    "I said the whole congregation was holy.",
+    "The earth opened and swallowed me."
+   ],
+   "hint": "I was a Levite."
+  },
+  {
+   "answer": "Og",
+   "aliases": [],
+   "reference": "Deuteronomy 3:1-11",
+   "explanation": "Og, king of Bashan, was defeated by Israel and his iron bed remained as a memorial.",
+   "clues": [
+    "I was the king of Bashan.",
+    "I was a giant whose iron bed remained.",
+    "Israel defeated me in battle."
+   ],
+   "hint": "I was defeated by Moses."
+  },
+  {
+   "answer": "Sihon",
+   "aliases": [],
+   "reference": "Numbers 21:21-24",
+   "explanation": "Sihon, king of the Amorites, refused passage to Israel and was defeated.",
+   "clues": [
+    "I was the king of the Amorites.",
+    "I refused Israel passage through my land.",
+    "Israel defeated me at Jahaz."
+   ],
+   "hint": "I ruled east of the Jordan."
+  },
+  {
+   "answer": "Gehazi",
+   "aliases": [],
+   "reference": "2 Kings 5:20-27",
+   "explanation": "Gehazi, Elisha's servant, lied to gain Naaman's gifts and was struck with leprosy.",
+   "clues": [
+    "I was the servant of Elisha.",
+    "I lied to Naaman to gain his gifts.",
+    "I was struck with leprosy as a result."
+   ],
+   "hint": "I was the servant of a prophet who healed Naaman."
+  },
+  {
+   "answer": "Peter",
+   "aliases": [
+    "Simon Peter",
+    "Simon",
+    "Cephas"
+   ],
+   "reference": "Luke 22:54-62; John 21:15-19",
+   "explanation": "Peter denied Jesus three times, then was restored and led the early church.",
+   "clues": [
+    "I was a fisherman called by Jesus from the lake.",
+    "I denied knowing Jesus three times before the cock crowed.",
+    "I was restored by Jesus and fed his sheep."
+   ],
+   "hint": "My brother was Andrew."
+  },
+  {
+   "answer": "Paul",
+   "aliases": [
+    "Saul of Tarsus",
+    "Paulus"
+   ],
+   "reference": "Acts 9:1-22",
+   "explanation": "Paul's encounter with Jesus on the road to Damascus changed his life.",
+   "clues": [
+    "I once persecuted the church before my conversion.",
+    "I was a tentmaker who travelled to many cities.",
+    "I wrote many letters that are now part of the New Testament."
+   ],
+   "hint": "I was born in Tarsus."
+  },
+  {
+   "answer": "The Samaritan woman",
+   "aliases": [
+    "Woman at the well",
+    "Samaritan woman"
+   ],
+   "reference": "John 4:4-30",
+   "explanation": "John does not give her name; her testimony led others to meet Jesus.",
+   "clues": [
+    "I met Jesus at a well in Samaria.",
+    "I had been married several times.",
+    "I told my town about the man who knew everything I did."
+   ],
+   "hint": "The conversation happened at Jacob's well."
+  }
+ ]
+}
