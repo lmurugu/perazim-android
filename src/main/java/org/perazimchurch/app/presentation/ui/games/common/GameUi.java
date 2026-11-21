@@ -3,6 +3,7 @@ package org.perazimchurch.app.presentation.ui.games.common;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
@@ -199,7 +200,7 @@ public final class GameUi implements GameChrome.Host {
         return view;
     }
 
-    /** Applies the game button look to an existing button. */
+    /** Applies the game button look to an existing button: the orange or purple pill frame, or a plain fill. */
     public void styleButton(Button button, String label, boolean primary) {
         button.setText(label);
         button.setAllCaps(false);
@@ -210,7 +211,24 @@ public final class GameUi implements GameChrome.Host {
         button.setMinWidth(0);
         button.setGravity(Gravity.CENTER);
         button.setPadding(dp(12), dp(12), dp(12), dp(12));
-        button.setBackground(shape(primary ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE_2));
+        // The pill frame is drawn with a height-based corner, so it reads as a rounded button at any width.
+        Drawable pill = GameArt.frame(activity, primary ? GameArt.FRAME_PILL_ORANGE : GameArt.FRAME_PILL_PURPLE,
+                GameArt.FRAME_BORDER, dp(26));
+        button.setBackground(pill != null ? pill : shape(primary ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE_2));
+    }
+
+    /**
+     * A card-style panel on the current page, framed with the purple panel from the UI sheet. Add rows to it
+     * with the returned layout's addView, or pass it to {@link #addText}.
+     */
+    public LinearLayout panel() {
+        LinearLayout panel = new LinearLayout(activity);
+        panel.setOrientation(LinearLayout.VERTICAL);
+        panel.setPadding(dp(16), dp(16), dp(16), dp(16));
+        Drawable frame = GameArt.frame(activity, GameArt.FRAME_PANEL_WIDE, GameArt.FRAME_BORDER, dp(18));
+        panel.setBackground(frame != null ? frame : shape(PerazimTheme.COLOR_SURFACE));
+        page.addView(panel, wrapParams(12));
+        return panel;
     }
 
     /** Vertical space of the given height in dp on the current page. */

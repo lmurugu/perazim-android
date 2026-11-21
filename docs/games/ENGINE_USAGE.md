@@ -102,3 +102,17 @@ If no tone device is available, the game runs silently.
 
 `GameChrome` already uses the results effects. Game screens call `GameFx.correct` and `GameFx.wrong` on each answer.
 
+## Game-feel art (GameArt)
+
+The art sheets live in `src/main/assets/games/ui/` (from 333e174). `GameArt` loads each one once, at half size.
+
+- `ctx.ui().button(...)` draws the orange or purple pill frame. `styleButton` does this for every button.
+- `ctx.ui().panel()` adds a card-style panel to the page, framed with the purple panel from the UI sheet.
+- Particle bursts (`GameFx.starRow` / `popStars`) draw star, sparkle and flare sprites from the particle sheet.
+  Without the sheet they fall back to drawn dots.
+- Level pickers: `GameArt.levelMap(context)` returns the level-map scene. `GameArt.levelNodesFor(width, height)`
+  gives the level node positions in pixels, from the first level to the last, along the path.
+
+The sprite and node coordinates are approximate, read from the sheets by eye. Adjust `GameArt`'s constants if a
+crop or node looks off on a device.
+
