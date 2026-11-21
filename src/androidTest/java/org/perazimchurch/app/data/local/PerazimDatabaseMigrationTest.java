@@ -36,6 +36,9 @@ import java.util.UUID;
  */
 @RunWith(AndroidJUnit4.class)
 public class PerazimDatabaseMigrationTest {
+    /** Must match @Database(version) in PerazimDatabase and schemas/12.json. */
+    private static final int CURRENT_SCHEMA_VERSION = 12;
+
 
     private static final String FIXTURE_USER_ID = "migration-fixture-user";
     private static final String FIXTURE_VERSE_ID = "migration-fixture-verse";
@@ -95,7 +98,7 @@ public class PerazimDatabaseMigrationTest {
     }
 
     @Test
-    public void bundledVersion5AssetMigratesTo6WithoutLosingBibleContent() throws IOException {
+    public void bundledVersion5AssetMigratesToCurrentVersionWithoutLosingBibleContent() throws IOException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         String databaseName = uniqueName("bundled_asset_v5");
         File databaseFile = context.getDatabasePath(databaseName);
@@ -125,11 +128,14 @@ public class PerazimDatabaseMigrationTest {
             rawHelper.close();
 
             upgraded = Room.databaseBuilder(context, PerazimDatabase.class, databaseName)
-                    .addMigrations(PerazimDatabase.MIGRATION_5_6, PerazimDatabase.MIGRATION_6_7)
+                    .addMigrations(PerazimDatabase.MIGRATION_5_6, PerazimDatabase.MIGRATION_6_7,
+                            PerazimDatabase.MIGRATION_7_8, PerazimDatabase.MIGRATION_8_9,
+                            PerazimDatabase.MIGRATION_9_10, PerazimDatabase.MIGRATION_10_11,
+                            PerazimDatabase.MIGRATION_11_12)
                     .build();
             SupportSQLiteDatabase after = upgraded.getOpenHelper().getWritableDatabase();
 
-            assertEquals(7, pragmaInt(after, "user_version"));
+            assertEquals(CURRENT_SCHEMA_VERSION, pragmaInt(after, "user_version"));
             assertEquals(translationCountsBefore, translationCounts(after));
             assertFixtureRowsPreserved(after, verseId, "synthetic migration note");
             assertEquals("", firstString(after,
@@ -178,7 +184,7 @@ public class PerazimDatabaseMigrationTest {
 
             restored = Room.databaseBuilder(context, PerazimDatabase.class, restoredName).build();
             SupportSQLiteDatabase restoredDb = restored.getOpenHelper().getWritableDatabase();
-            assertEquals(7, pragmaInt(restoredDb, "user_version"));
+            assertEquals(CURRENT_SCHEMA_VERSION, pragmaInt(restoredDb, "user_version"));
             assertFixtureRowsPreserved(restoredDb, FIXTURE_VERSE_ID, "synthetic private note");
             assertEquals("Database copy must not replace the separate preferences file", 73,
                     preferences.getInt(xpKey, -1));
