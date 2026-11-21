@@ -858,6 +858,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 bibleViewModel,
                 new HomeUiBinder.HomeUiListener() {
                     @Override
+                    public void onOpenAiGuide() {
+                        if (BuildConfig.OFFLINE_QWEN_ENABLED) showAiBreakthroughGuide();
+                    }
+
+                    @Override
                     public void onStreakUpdated(int streak) {
                         streakCount = streak;
                         GamificationStore.saveStreak(MainActivity.this, resolveGamificationUserId(), streakCount, streakFrozen);

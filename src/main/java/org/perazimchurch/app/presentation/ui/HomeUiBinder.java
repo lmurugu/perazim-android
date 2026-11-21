@@ -106,6 +106,8 @@ public class HomeUiBinder {
         void onPlaySermon(@NonNull Sermon sermon);
         void onOpenScripture(@NonNull String bookId, int chapter);
         default void onNavigateToTab(int tabIndex) {}
+        /** Opens the Perazim Guide (on-phone assistant). Only offered when the build enables it. */
+        default void onOpenAiGuide() {}
     }
 
     private final Context context;
@@ -392,6 +394,13 @@ public class HomeUiBinder {
         btnBeginRoutine = GlassKit.orangeButton(context, "PICK UP WHERE YOU LEFT OFF", 13);
         btnBeginRoutine.setOnClickListener(v -> toggleOrAdvanceRoutine());
         card.addView(btnBeginRoutine, GlassKit.matchHeight(context, 46, 14));
+        if (org.perazimchurch.app.BuildConfig.OFFLINE_QWEN_ENABLED) {
+            TextView btnAskGuide = GlassKit.glassButton(context, "ASK PERAZIM GUIDE", 13);
+            btnAskGuide.setOnClickListener(v -> {
+                if (listener != null) listener.onOpenAiGuide();
+            });
+            card.addView(btnAskGuide, GlassKit.matchHeight(context, 46, 10));
+        }
 
         syncRoutineStateWithGamificationStore();
         updateBeginRoutineButtonText();

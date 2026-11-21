@@ -76,10 +76,10 @@ android {
         buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "false"
         buildConfigField "String", "API_BASE_URL", "\"\""
     }
-    // Validation builds get versionCode 6 so they can be told apart from the 5 builds already on test phones.
+    // Validation builds get versionCode 6 so they install over versionCode 6 builds without a downgrade.
     applicationVariants.all { variant ->
         if (variant.buildType.name == "validation") {
-            variant.outputs.each { output -> output.versionCodeOverride = 6 }
+            variant.outputs.each { output -> output.versionCodeOverride = 7 }
         }
     }
     signingConfigs {
