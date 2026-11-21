@@ -10,10 +10,14 @@ import org.perazimchurch.app.domain.games.catalog.WhoSaidItDefinition;
 import org.perazimchurch.app.domain.games.catalog.WhoSaidItSession;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.domain.games.catalog.HintRules;
+import org.perazimchurch.app.domain.games.catalog.Levels;
+import org.perazimchurch.app.presentation.ui.games.common.GameBanks;
+import org.perazimchurch.app.presentation.ui.games.common.GameUi;
+
 import org.perazimchurch.app.domain.games.catalog.Streak;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
-import org.perazimchurch.app.presentation.ui.games.common.GameUi;
 
 /**
  * Play screen for Who Said It?. Drives {@link WhoSaidItSession} and finishes through
@@ -26,29 +30,38 @@ public final class WhoSaidItScreen {
 
     private final GameContext ctx;
     private final GameDefinition definition = new WhoSaidItDefinition(0);
-    private long seed = System.nanoTime();
+    private int level = 1;
 
     public WhoSaidItScreen(GameContext ctx) {
         this.ctx = ctx;
     }
 
-    /** Starts a fresh run on the current screen. */
+    /** Opens the level picker on the current screen. */
     public void start() {
-        newRun();
+        renderPicker();
     }
 
-    private void newRun() {
-        seed = System.nanoTime();
-        render((WhoSaidItSession) definition.createSession(1, seed), null, false);
+    private void renderPicker() {
+        GameUi ui = ctx.ui();
+        ctx.activity().setContentView(ui.page(TITLE, "Pick a level. A level opens after two stars on the one before.", true));
+        ui.levelPicker(definition.id(), Levels.COUNT, this::startRun);
+    }
+
+    /** Starts a run on one level, drawn from the bundled bank for its band. */
+    private void startRun(int chosen) {
+        level = Levels.clamp(chosen);
+        long seed = Levels.seed(level);
+        render(new WhoSaidItSession(new WhoSaidIt(GameBanks.quotes(ctx.activity(), Levels.band(level)),
+                GameBanks.speakers(ctx.activity()), seed)), null, false);
     }
 
     private void render(WhoSaidItSession game, String feedback, boolean popScore) {
         GameUi ui = ctx.ui();
-        ctx.activity().setContentView(ui.page(TITLE, "Choose who spoke each quotation. Five quotations per run.", true));
+        ctx.activity().setContentView(ui.page(TITLE, "Level " + level + " · " + "Choose who spoke each quotation. Five quotations per run.", true));
         if (game.finished()) {
             String key = ctx.scorePrefix() + "WHO_SAID_IT";
             if (game.score() > ctx.scores().getInt(key, 0)) ctx.scores().edit().putInt(key, game.score()).apply();
-            new GameChrome(ui).finishedRun(definition, TITLE, game, 1, this::newRun);
+            new GameChrome(ui).finishedRun(definition, TITLE, game, level, () -> startRun(level), () -> startRun(level + 1));
             return;
         }
         TextView scoreLine = ui.text("Quotation " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
@@ -60,6 +73,14 @@ public final class WhoSaidItScreen {
         ui.text(game.prompt(), 18, true);
         if (feedback != null) ui.text(feedback, 13, false);
         new GameChrome(ui).pauseButton(() -> render(game, feedback, false));
+        if (game.hintAvailable()) {
+            Button hint = ui.button("Hint (" + (HintRules.HINTS_PER_RUN - game.hintsUsed()) + " left)", false);
+            hint.setOnClickListener(v -> {
+                if (!ui.activeOwner()) return;
+                ui.click(v);
+                render(game, game.hint(), false);
+            });
+        }
         int slot = 0;
         for (String choice : game.choices()) {
             Button option = ui.button(choice, false);

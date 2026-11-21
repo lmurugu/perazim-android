@@ -18,11 +18,17 @@ public final class FillTheGapDefinition implements GameDefinition {
         return "A famous verse has one word missing. Choose the word that completes it.";
     }
     @Override public int iconResource() { return iconResource; }
-    @Override public int levelCount() { return 1; }
+    @Override public int levelCount() { return Levels.COUNT; }
     @Override public String levelName(int level) { return "Level " + level; }
 
     @Override
     public GameSession createSession(int level, long seed) {
         return new FillTheGapSession(new FillTheGap(seed));
+    }
+
+    @Override
+    public org.perazimchurch.app.domain.games.engine.StarRule starRule() {
+        return HintRules.capped(session -> org.perazimchurch.app.domain.games.engine.StarRating.stars(
+                session.score(), session.size(), session.lives()));
     }
 }

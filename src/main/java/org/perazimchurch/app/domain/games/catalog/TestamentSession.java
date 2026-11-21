@@ -41,6 +41,7 @@ public final class TestamentSession extends AdvancingSession {
 
     @Override
     protected String hintText() {
-        return null;
+        if (game.finished()) return null;
+        return "Hint: the name starts with \u201c" + game.current().name.charAt(0) + "\u201d.";
     }
 }

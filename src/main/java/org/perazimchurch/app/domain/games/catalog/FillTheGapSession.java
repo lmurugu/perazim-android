@@ -47,6 +47,7 @@ public final class FillTheGapSession extends AdvancingSession {
 
     @Override
     protected String hintText() {
-        return null;
+        if (game.finished()) return null;
+        return "Hint: the missing word starts with \u201c" + game.current().answer.charAt(0) + "\u201d.";
     }
 }

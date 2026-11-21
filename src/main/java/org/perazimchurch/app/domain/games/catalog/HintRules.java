@@ -16,6 +16,11 @@ public final class HintRules {
 
     private HintRules() { }
 
+    /** The book named in a reference such as "1 Samuel 3:5", without the chapter and verse. */
+    public static String bookOf(String reference) {
+        return reference.replaceAll("\\s+\\d+:\\d+.*$", "");
+    }
+
     /** Wraps a star rule so that a hinted run is capped at {@link #STAR_CAP_WITH_HINT} stars. */
     public static StarRule capped(StarRule base) {
         return session -> session.hintsUsed() > 0

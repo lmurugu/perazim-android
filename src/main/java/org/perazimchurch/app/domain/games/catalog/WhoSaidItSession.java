@@ -44,6 +44,7 @@ public final class WhoSaidItSession extends AdvancingSession {
 
     @Override
     protected String hintText() {
-        return null;
+        if (game.finished()) return null;
+        return "Hint: the words come from " + HintRules.bookOf(game.current().reference) + ".";
     }
 }

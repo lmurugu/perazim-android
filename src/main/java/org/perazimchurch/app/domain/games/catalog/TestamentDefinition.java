@@ -18,11 +18,17 @@ public final class TestamentDefinition implements GameDefinition {
         return "Place each Bible book in the Old or New Testament.";
     }
     @Override public int iconResource() { return iconResource; }
-    @Override public int levelCount() { return 1; }
+    @Override public int levelCount() { return Levels.COUNT; }
     @Override public String levelName(int level) { return "Level " + level; }
 
     @Override
     public GameSession createSession(int level, long seed) {
         return new TestamentSession(new TestamentSort(seed));
+    }
+
+    @Override
+    public org.perazimchurch.app.domain.games.engine.StarRule starRule() {
+        return HintRules.capped(session -> org.perazimchurch.app.domain.games.engine.StarRating.stars(
+                session.score(), session.size(), session.lives()));
     }
 }
