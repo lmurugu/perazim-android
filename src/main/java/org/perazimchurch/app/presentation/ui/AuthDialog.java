@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
@@ -44,7 +46,7 @@ public final class AuthDialog {
     private AuthDialog() {}
 
     public static void show(@NonNull Context context, @Nullable AuthListener listener) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        final AlertDialog.Builder builder = AppDialogs.builder(context);
         final LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(context, 20), dp(context, 20), dp(context, 20), dp(context, 20));
@@ -409,7 +411,7 @@ public final class AuthDialog {
                                     showPrivacyUnavailable(context, dialog, progressBar, btnSubmit);
                                     return;
                                 }
-                                new AlertDialog.Builder(context)
+                                AppDialogs.builder(context)
                                         .setTitle("Privacy Notice v" + version)
                                         .setMessage(content)
                                         .setPositiveButton("Acknowledge and continue", (noticeDialog, which) -> {
