@@ -28,6 +28,7 @@ import android.widget.Toast;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
+import org.perazimchurch.app.domain.games.FillTheGap;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
 import org.perazimchurch.app.domain.games.MemoryMatch;
 import org.perazimchurch.app.domain.games.MiniCrossword;
@@ -243,6 +244,9 @@ public final class GamesHubDialog extends Dialog {
         gameCard(org.perazimchurch.app.R.drawable.game_art_who_said_it, shepherd, PerazimTheme.COLOR_PURPLE_SOFT, "Who Said It?",
                 "Read a Bible quotation and choose the person who spoke it. Five quotations, four names each.",
                 bestLineOf("WHO_SAID_IT", WhoSaidIt.ROUND_SIZE), this::whoSaidIt);
+        gameCard(org.perazimchurch.app.R.drawable.game_art_verse_builder, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Fill the Gap",
+                "A famous verse has one word missing. Choose the word that completes it. Five verses per run.",
+                bestLineOf("FILL_THE_GAP", FillTheGap.ROUND_SIZE), this::fillTheGap);
         text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 12, false);
     }
 
@@ -784,6 +788,52 @@ public final class GamesHubDialog extends Dialog {
                 String line = (right ? "Correct. " : "Not quite. It was " + answered.answer + ". ")
                         + answered.reference + ".";
                 renderWhoSaidIt(game, line);
+            });
+        }
+    }
+
+    // ---- Fill the Gap: choose the missing word of a famous KJV verse ----
+
+    private void fillTheGap() {
+        renderFillTheGap(new FillTheGap(seed), null);
+    }
+
+    private void renderFillTheGap(FillTheGap game, String feedback) {
+        screen("Fill the Gap", "Choose the missing word. Five verses per run.", true);
+        if (game.finished()) {
+            String key = scorePrefix + "FILL_THE_GAP";
+            if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
+            text("Finished: " + game.score() + " of " + game.size() + " correct.", 15, true);
+            text(game.score() == game.size()
+                    ? "Every verse completed. Well done."
+                    : "Read the verses again and try once more.", 13, false);
+            Button again = button("Play again", true);
+            again.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                seed = System.nanoTime();
+                fillTheGap();
+            });
+            return;
+        }
+        FillTheGap.Question question = game.current();
+        text("Verse " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        addText(card, question.before + "_____" + question.after, 18, true);
+        page.addView(card, wrapParams(12));
+        if (feedback != null) text(feedback, 13, false);
+        for (String choice : question.choices) {
+            Button option = button(choice, false);
+            option.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                feedback().click(v);
+                boolean right = game.answer(choice);
+                FillTheGap.Question answered = game.lastQuestion();
+                String line = (right ? "Correct. " : "Not quite. The word was " + answered.answer + ". ")
+                        + answered.reference + ".";
+                renderFillTheGap(game, line);
             });
         }
     }
