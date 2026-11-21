@@ -39,9 +39,13 @@ public class LampSlidePickerScreenshotTest {
         try {
             LampSlideLauncher.open(ctx);
         } catch (Throwable failure) {
-            // Print the full trace: Gradle trims frames inside test failures, and the CI log needs the origin.
-            failure.printStackTrace(System.out);
-            throw failure;
+            // Gradle's console shows only the class and line, so put the top frames in the message.
+            StringBuilder frames = new StringBuilder("picker open failed:");
+            for (StackTraceElement el : failure.getStackTrace()) {
+                if (frames.length() > 1500) break;
+                frames.append(" | ").append(el);
+            }
+            throw new AssertionError(frames.toString(), failure);
         }
         Dialog dialog = ShadowDialog.getLatestDialog();
         if (dialog == null || dialog.getWindow() == null) {
