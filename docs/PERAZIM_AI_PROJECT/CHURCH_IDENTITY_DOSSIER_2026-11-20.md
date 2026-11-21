@@ -282,3 +282,68 @@ This rule matches section 6 of the decision brief and section E of the compariso
 - Live status was judged from call sites in the repository. Reflection and runtime data were not checked.
 - "Approved" means a written record in one of the three repositories. Records held outside the repositories cannot be seen here.
 - No application text, branding or code was changed.
+
+---
+
+## 12. Update 2026-11-21: documents supplied and decisions accepted
+
+Levi supplied the legal documents and the constitution on 2026-11-21. Two earlier items in this dossier are now resolved in part: M1 (constitution) and M3 (legal name). A new conflict is recorded in 12.2.
+
+### 12.1 Legal facts (from the supplied images)
+
+| Fact | Value | Source |
+|---|---|---|
+| Registered name (Societies Act) | **PERAZIM MISSION CHURCH** | Certificate of Registration No. **23319**, Form C (Rule 4), Societies Rules 1968. File **SOC/45143**. "FORMERLY: PERAZIM MISSION CENTRE." Dated Nairobi, 11 September (year printed as 18, i.e. 2018). Signed by the Assistant Registrar of Societies. |
+| KRA PIN | **P051189845M**, taxpayer name **PERAZIM MISSION CHURCH** | KRA PIN Certificate, certificate date 31/03/2021 |
+| Registered address for tax | Embu Meru Road, Embu Town, Embu County. **P.O. Box 831, 60100**. Obligation: Income Tax - Company, effective 31/08/2006 | KRA PIN Certificate |
+| Constitution | "Constitution of Perazim Missions Church International", **adopted September 2017, Embu, Kenya** | `PERAZIM CONTITUTION.pdf` in `/home/murugu/Android/app/docs/PERAZIM_AI_PROJECT/` on Levi's laptop. Read on 2026-11-21 from a copy staged into the session. |
+
+The KRA certificate also shows a contact email. It is not repeated here.
+
+### 12.2 New conflict: the registered name is not "Perazim Missions Church International"
+
+- The Societies registration (the legal record) says **PERAZIM MISSION CHURCH**.
+- The constitution (adopted 2017) uses **Perazim Missions Church International** throughout, and its cover reads "Perazim Missions Church International. Knowing Christ to Make Him Known."
+- The AI-facing name in Document 02 and the privacy drafts uses the same "International" form. The owner confirmed that form for AI use only.
+- So the "International" name appears in the constitution but is not the name on the Societies certificate. Whether it is a trading name, a national or international body, or a different registration is not shown by any document here.
+
+**Interim treatment (accepted by Levi with decision 10):** the privacy drafts name the controller as **PERAZIM MISSION CHURCH**, its registered name, and keep **PMCI** only as a short form. Leadership or counsel should confirm that short form before publication. Contact details and the ODPC registration remain open placeholders.
+
+### 12.3 Constitution: what it says (for the identity decisions)
+
+- **Name:** "Perazim Missions Church International" (title and throughout).
+- **Objectives and vision (Section 1.01):** a nine-point list under the subtitle "Reaching the unreached and making disciples of those Reached". No single "vision" sentence is given. The text includes the Great Commission, evangelism, church planting, leader training and social welfare. This is the nearest official vision text in any document.
+- **Statement of faith (Section 2.01):** three articles, FAITH, FELLOWSHIP and FUTURE. The Future article matches the public website's "Article of the Future" text. The Faith and Fellowship articles match the website's wording in substance.
+- **Membership (Section 3.01):** a person who wishes to join may do so through a local church. Registered membership requires criteria (for example, "Be an active soul winner" and participation in church activities). Only registered members may be appointed deacons, elders or ministers.
+- **Not in the constitution:** a motto, a slogan, a mission statement, or core values (no hits for "motto", "slogan", "values", "Place of Great Breakthrough" or "everybody is somebody" in the text).
+- **Trustees (Section 4.F):** the constitution provides for trustees of Perazim Missions Church International.
+
+Impact on the earlier decisions:
+- **Decision 4 (vision):** the constitution's Section 1.01 is the approved objectives text. Leadership should decide whether it is the vision.
+- **Decision 3 (values and slogan):** still open. The constitution has no values or slogan.
+- **Decision 2 (mission):** still open. The constitution's objectives are not a mission sentence.
+- **Decision 8 (constitution and statement of faith):** resolved. The statement of faith is in the constitution, adopted 2017. The website's Article text should be checked line by line against it before the website is marked as approved.
+
+### 12.4 Decisions accepted by Levi (2026-11-21)
+
+Levi wrote "yes" to the recommendations and said the rest will be confirmed later as finishing touches. The recorded answers are:
+
+| # | Decision | Recorded answer | Note |
+|---|---|---|---|
+| 1 | Official motto | Confirm "The Place of Great Breakthrough" in writing, with a dated leadership record | Not yet in any document. Leadership to write the record. |
+| 2 | Official mission | Leadership writes one text for both app and website | Constitution objectives are not a mission sentence. |
+| 3 | Values and slogan | Leadership writes one set of values; one slogan spelling | Constitution has neither. |
+| 4 | Vision | Confirm in writing; the constitution's Section 1.01 is the candidate | |
+| 5 | Member-facing name | Keep "Perazim Mission Church" for member text; use PMCI for AI and policy short form only | **Adjusted by 12.2:** the legal name is PERAZIM MISSION CHURCH. Leadership to decide whether "Missions Church International" is a trading name. |
+| 6 | Location | "Embu Central Campus, Manyatta", if that is the address members use | Confirm. The KRA address is Embu Meru Road, P.O. Box 831-60100. |
+| 7 | Website statements | Mark "pending approval" on the website until leadership signs off | |
+| 8 | Constitution and statement of faith | **Resolved in part:** constitution found (2017); statement of faith is in it | See 12.3 |
+| 9 | Leadership titles and dates | Confirm in writing | Open |
+| 10 | Legal name and privacy | **Unblocked in part:** registered name and P.O. Box filled into the drafts (commit `fed3b1e`). ODPC number, privacy email and phone still open. | See 12.2 |
+
+### 12.5 What is still open
+
+- The motto, values, slogan and mission remain unapproved until leadership writes them. The interim rule in section 8 still applies.
+- The relationship between PMCI and PERAZIM MISSION CHURCH needs a written answer (12.2).
+- The 2018 registration year is read from the certificate's printed "18". It should be checked against the original.
+- The ODPC registration status and the privacy contact details are not supplied.
