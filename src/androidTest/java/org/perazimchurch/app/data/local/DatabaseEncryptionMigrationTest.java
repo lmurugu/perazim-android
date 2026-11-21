@@ -137,7 +137,12 @@ public class DatabaseEncryptionMigrationTest {
                 .openHelperFactory(new SupportOpenHelperFactory(key))
                 .addMigrations(PerazimDatabase.MIGRATION_4_5,
                         PerazimDatabase.MIGRATION_5_6,
-                        PerazimDatabase.MIGRATION_6_7)
+                        PerazimDatabase.MIGRATION_6_7,
+                        PerazimDatabase.MIGRATION_7_8,
+                        PerazimDatabase.MIGRATION_8_9,
+                        PerazimDatabase.MIGRATION_9_10,
+                        PerazimDatabase.MIGRATION_10_11,
+                        PerazimDatabase.MIGRATION_11_12)
                 .build();
     }
 
