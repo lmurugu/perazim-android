@@ -39,3 +39,27 @@ Branch `feature/offline-qwen-phone`, HEAD at time of writing: `58cded6`. Install
 1. Robolectric interaction tests for the reader: open, navigate chapters, search, select and highlight a verse, add a note.
 2. Device checks on the phone (after your approval) or on a working emulator.
 3. Fix any defect found, with a regression test.
+
+## On-device results (Levi's phone, version 8, 2026-11-21 ~10:00 EAT)
+Method: UI taps on the phone through adb; read-only where possible. No highlights, notes or topics were saved.
+
+| Component | Result |
+|---|---|
+| Opening the Bible reader | PASS: opened at 2 Samuel 5 (last position) |
+| Translation selector | PASS: lists ASV, BSB, ESV, GRK, HEB, KJV, NIV, NKJV, SUV, WEB; closes. NASB not listed |
+| Chapter navigation (Next, Previous) | PASS: 2 Samuel 5 → 6 → 5 |
+| Text size (A+, A−) | PASS: changes and returns to the original size |
+| Book and chapter selector | PASS: Old/New Testament lists; Ruth → chapter grid → chapter 2 |
+| Verse picker | PASS: choosing verse 5 scrolls to it and closes |
+| Highlight tools and select-verses mode | PASS: Select verses opens; select card shows Copy, Highlight colours, Save and notes; Done exits. No colour applied |
+| Bible search | PASS: "Boaz" returns "Found 22 verses" with Ruth 2 hits |
+| Search close | PASS: returns to reader |
+| Whole-verse highlight apply/undo | NOT TESTED (would write data) |
+| Word-range highlight | NOT TESTED (would write data) |
+| Interlinear and Strong's dialogs | NOT TESTED (entry point not found yet) |
+| Study notes editor and topics | NOT TESTED (write paths) |
+| Verse size and weight persistence | NOT TESTED beyond the A+/A− round trip |
+
+Reading position is now Ruth 2 instead of 2 Samuel 5. This is a saved position, not data loss. Levi can return to 2 Samuel 5 from the book selector.
+No crashes (FATAL count 0 at each check). The app process stayed running.
+Also noticed: the translation list includes NIV, NKJV and ESV in the reader. Licences for NIV and NKJV are still pending (remediation decision D4), and ESV stays in the reader only per Levi's decision.
