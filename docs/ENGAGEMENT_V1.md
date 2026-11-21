@@ -27,13 +27,14 @@ Approved for build by the coordinator on 2026-11-21. Technical decisions are the
 | 1 | Merge `feature/games-leaderboard` onto the games engine | Done | Merge commit `ad54f99`. Migration kept at `0022` (see note). |
 | 2 | Adults-only gate for the leaderboard (server and app) | Done | `server/test/games_leaderboard.test.js` passes against a disposable PostgreSQL database. App shows the closed message when `eligible` is false. Not compiled in Gradle here. |
 | 3 | Review scheduler (question choice from the player's own results) | Domain done | `ReviewScheduler.java`, 7 unit tests pass (JUnit 4 run with `javac`). Not yet wired into the games. |
-| 4 | "Practise this verse" link after a lost round | Not started | |
+| 4 | "Practise this verse" link after a lost Ladder run | Done | `BookReference.java` with 9 unit tests. Button in `GamesHubDialog` opens the reader at the verse last missed. Verified by CI on `81c3017`: unit tests and debug build and Robolectric screenshots pass. |
 | 5 | Routine Read step counts chapter reading (Q1) | Not started | |
-| 6 | Star cap and remote game settings with offline defaults (Q2) | Cap logic done | `StarCap.java` with unit tests. Not yet wired into star uploads. Remote settings not started. |
-| 7 | Aggregated measurement (Q4) | Not started | |
+| 6 | Star cap and remote game settings with offline defaults (Q2) | Done | `GameSettings.java` (5 unit tests), public `GET /api/games/settings` (server test), `GameSettingsStore` cache, cap read from cache. Verified by CI on `81c3017` as above. Question shares are cached but not yet read by `ReviewScheduler`. |
+| 7 | Aggregated measurement (Q4) | On hold | Needs a new table, so a migration. Held until 0023 to 0027 merge, as the coordinator directed on 2026-11-21. Nothing built. |
 
 ## Notes
 
 - **Migration number.** The coordinator asked for `0028`. The migration runner requires a gap-free sequence from `0001`, and this base ends at `0021`. Renaming to `0028` made the server test fail at boot. The migration therefore stays `0022` until the other branches that claim 0022 to 0027 are merged. Their numbers must then be settled in one place.
 - **Not verified.** Android code has not been built with Gradle in this session. The domain classes compile and pass their tests with `javac`. The server leaderboard test passes.
-- **Remaining work** is steps 4, 5, 6 (wiring) and 7.
+- **Emulator jobs.** "SQLCipher and Room migration suites" fails on `81c3017` and earlier commits. "Background sync WorkManager tests" failed on `aa7ee51`. Both are advisory per the coordinator, and left alone.
+- **Remaining work** is step 7 (on hold) and wiring the question shares into `ReviewScheduler`.
