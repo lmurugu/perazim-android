@@ -69,6 +69,13 @@ public final class AiRelayClient {
                     callback.onError("The church service returned no answer.");
                     return;
                 }
+                // Fail closed: the phone cannot verify provenance or app operations for a server answer, so an answer
+                // that claims either is withheld rather than shown as fact.
+                if (PerazimAiEngine.claimsAppActionOrHumanAuthority((String) answer)
+                        || PerazimAiEngine.claimsOfficialStatus((String) answer)) {
+                    callback.onError("The church service answer could not be verified in the app. Try again or contact the church office.");
+                    return;
+                }
                 StringBuilder text = new StringBuilder((String) answer);
                 appendCitations(text, json.optJSONArray("sourceReferences"), 6, "title", "version", "location");
                 appendCitations(text, json.optJSONArray("scriptureReferences"), 3, "reference", "translationId", "corpusVersion");

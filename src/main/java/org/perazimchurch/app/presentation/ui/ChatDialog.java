@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -58,6 +60,12 @@ import java.util.UUID;
  */
 public class ChatDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     private final MessageRepository messageRepository;
     private final ConnectionRepository connectionRepository;
     private final SyncQueueManager syncQueueManager;
@@ -110,7 +118,7 @@ public class ChatDialog extends Dialog {
                       @NonNull String peerId,
                       @NonNull String peerName,
                       @Nullable String peerStatus) {
-        super(context, android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.fullscreenTheme());
         this.messageRepository = messageRepository;
         this.connectionRepository = connectionRepository;
         this.syncQueueManager = syncQueueManager;
@@ -334,7 +342,7 @@ public class ChatDialog extends Dialog {
     }
 
     private void showOptionsMenu() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
         builder.setTitle(peerName);
 
         String[] options = new String[]{"🚫 Block Member", "📋 Copy Member Name"};
@@ -350,7 +358,7 @@ public class ChatDialog extends Dialog {
     }
 
     private void confirmBlockMember() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        AlertDialog.Builder builder = AppDialogs.builder(getContext());
         builder.setTitle("Block Member");
         builder.setMessage("Are you sure you want to block " + peerName + "? You will no longer receive fellowship messages from them.");
         builder.setPositiveButton("Block", (dialog, which) -> {
