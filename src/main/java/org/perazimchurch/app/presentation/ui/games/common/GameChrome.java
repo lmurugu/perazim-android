@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.perazimchurch.app.domain.games.engine.GameSession;
+
 /**
  * The shared results screen and pause overlay for every game. A game screen supplies its drawing
  * and state through {@link Host}; this class decides what the results and pause screens show.
@@ -37,9 +39,28 @@ public final class GameChrome {
         this.host = host;
     }
 
-    /** Results screen for a finished run: stars, score, today's verse, Replay and Back to Games. */
+    /** Results for a run that is scored by score and size only (the older games). */
     public void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
         int stars = GameResults.recordRun(host.scores(), host.scorePrefix() + gameId, score, size);
+        showResults(title, stars, score, size, replay);
+    }
+
+    /**
+     * Results for an engine run. Saves the stars once through GameResults.finishRun, which also
+     * takes lives into account, then shows them.
+     */
+    public void finishedRun(String gameId, String title, GameSession session, Runnable replay) {
+        finishedRun(gameId, title, session, 1, 1, replay);
+    }
+
+    /** Results for an engine run on a given level. Stars are saved for that level only. */
+    public void finishedRun(String gameId, String title, GameSession session, int level, int levelCount, Runnable replay) {
+        int stars = GameResults.finishRun(host.scores(), host.scorePrefix() + gameId, level, levelCount, session);
+        showResults(title, stars, session.score(), session.size(), replay);
+    }
+
+    /** Results screen: stars, score, today's verse, Replay and Back to Games. */
+    private void showResults(String title, int stars, int score, int size, Runnable replay) {
         host.screen(title, "Run complete");
         host.text(GameResults.starLine(stars), 28, true);
         host.text("Score: " + score + " of " + size, 16, true);

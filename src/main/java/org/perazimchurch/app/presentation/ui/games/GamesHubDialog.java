@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.domain.games.BibleGames;
+import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
 import org.perazimchurch.app.domain.games.FillTheGap;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
@@ -761,6 +762,11 @@ public final class GamesHubDialog extends Dialog {
     /** Results screen for a finished run. The shared logic lives in GameChrome. */
     private void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
         chrome().finishedRun(gameId, title, score, size, replay);
+    }
+
+    /** Results for an engine GameSession. Stars are saved once, through GameResults.finishRun. */
+    private void finishedRun(String gameId, String title, GameSession session, int level, int levelCount, Runnable replay) {
+        chrome().finishedRun(gameId, title, session, level, levelCount, replay);
     }
 
     /** Pause button for an active run. The shared logic lives in GameChrome. */
