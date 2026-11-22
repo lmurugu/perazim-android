@@ -33,7 +33,7 @@ public final class LocalScriptureRetriever {
     private static final int MAX_PASSAGES = 3;
     private static final int MAX_TOTAL_CHARS = 900;
     private static final Pattern REFERENCE_SHAPE = Pattern.compile(
-            "(?<![\\p{L}\\p{N}])(?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,3}\\s+[1-9]\\d{0,2}:[1-9]\\d{0,2}(?:\\s*[-–]\\s*[1-9]\\d{0,2})?(?!\\d)",
+            "(?<![\\p{L}\\p{N}])(?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,3}\\s+[1-9]\\d{0,2}(?::|\\s+)[1-9]\\d{0,2}(?:\\s*[-–]\\s*[1-9]\\d{0,2})?(?!\\d)",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Set<String> SCRIPTURE_TERMS = new HashSet<>(Arrays.asList(
             "bible", "scripture", "verse", "verses", "chapter", "kjv", "god", "jesus", "christ",
@@ -163,7 +163,7 @@ public final class LocalScriptureRetriever {
                 namePattern.append(Pattern.quote(words[i]));
             }
             Pattern exact = Pattern.compile("(?<![\\p{L}\\p{N}])" + namePattern
-                    + "\\s+([1-9]\\d{0,2}):([1-9]\\d{0,2})(?:\\s*[-–]\\s*([1-9]\\d{0,2}))?(?!\\d)",
+                    + "\\s+([1-9]\\d{0,2})(?::|\\s+)([1-9]\\d{0,2})(?:\\s*[-–]\\s*([1-9]\\d{0,2}))?(?!\\d)",
                     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
             Matcher matcher = exact.matcher(question);
             if (matcher.find()) {
