@@ -2,14 +2,20 @@ package org.perazimchurch.app.screenshots;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.room.Room;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.work.testing.WorkManagerTestInitHelper;
+
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.presentation.ui.games.GamesHubDialog;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 import org.robolectric.Robolectric;
@@ -19,6 +25,7 @@ import org.robolectric.annotation.GraphicsMode;
 import org.robolectric.shadows.ShadowDialog;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 /**
  * Design-review render of the Bible Games hub, light and dark. The Home game row is captured by the
@@ -41,7 +48,24 @@ public class GameCardScreenshotTest {
         capture(false);
     }
 
+    /**
+     * The hub reads the signed-in user through the app database, which loads SQLCipher's native library. That
+     * library is not available under Robolectric, so the test swaps in an in-memory database, as the all-tabs
+     * screenshot does.
+     */
+    private static void installInMemoryDatabase() throws Exception {
+        Context ctx = ApplicationProvider.getApplicationContext();
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx);
+        PerazimDatabase db = Room.inMemoryDatabaseBuilder(ctx, PerazimDatabase.class)
+                .allowMainThreadQueries()
+                .build();
+        Field instance = PerazimDatabase.class.getDeclaredField("INSTANCE");
+        instance.setAccessible(true);
+        instance.set(null, db);
+    }
+
     private static void capture(boolean light) throws Exception {
+        installInMemoryDatabase();
         PerazimTheme.applyMode(light);
         Activity activity = Robolectric.buildActivity(Activity.class).create().start().resume().get();
         GamesHubDialog.show(activity);
