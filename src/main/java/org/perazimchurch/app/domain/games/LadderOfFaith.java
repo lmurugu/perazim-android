@@ -4,7 +4,9 @@ import org.perazimchurch.app.domain.games.BibleGames.Card;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -65,6 +67,22 @@ public final class LadderOfFaith {
         rungs = Collections.unmodifiableList(draw);
     }
 
+    /**
+     * Same tiers as {@link #LadderOfFaith(long)}, but each rung is chosen by {@link ReviewScheduler} from the
+     * player's own history on this phone: unseen questions, recently missed ones, and known ones for review.
+     * {@code history} is keyed by question prompt; a missing entry counts as unseen. Null history means none.
+     */
+    public LadderOfFaith(long seed, Map<String, ReviewScheduler.Record> history, int unseenPercent, int missedPercent) {
+        Random random = new Random(seed);
+        Map<String, ReviewScheduler.Record> record = history == null ? Collections.emptyMap() : history;
+        List<Card> draw = new ArrayList<>();
+        draw.addAll(pickScheduled(LadderBank.EASY, EASY_RUNGS, random, record, unseenPercent, missedPercent));
+        draw.addAll(pickScheduled(LadderBank.MEDIUM, MEDIUM_RUNGS, random, record, unseenPercent, missedPercent));
+        draw.addAll(pickScheduled(LadderBank.HARD, RUNGS - EASY_RUNGS - MEDIUM_RUNGS, random, record,
+                unseenPercent, missedPercent));
+        rungs = Collections.unmodifiableList(draw);
+    }
+
     /** How many rungs of this run come from the given tier (1 easy, 2 medium, 3 hard). */
     public int rungsOfTier(int tier) {
         List<Card> pool = tier == 1 ? LadderBank.EASY : tier == 2 ? LadderBank.MEDIUM : LadderBank.HARD;
@@ -77,6 +95,20 @@ public final class LadderOfFaith {
         List<Card> shuffled = new ArrayList<>(tier);
         Collections.shuffle(shuffled, random);
         return shuffled.subList(0, count);
+    }
+
+    private static List<Card> pickScheduled(List<Card> tier, int count, Random random,
+                                            Map<String, ReviewScheduler.Record> history,
+                                            int unseenPercent, int missedPercent) {
+        Map<String, Card> left = new LinkedHashMap<>();
+        for (Card card : tier) left.putIfAbsent(card.prompt, card);
+        List<Card> chosen = new ArrayList<>();
+        while (chosen.size() < count && !left.isEmpty()) {
+            String id = ReviewScheduler.pick(new ArrayList<>(left.keySet()), history, random,
+                    unseenPercent, missedPercent);
+            chosen.add(left.remove(id));
+        }
+        return chosen;
     }
 
     /** Difficulty tier of a 1-based rung: 1 easy, 2 medium, 3 hard. */

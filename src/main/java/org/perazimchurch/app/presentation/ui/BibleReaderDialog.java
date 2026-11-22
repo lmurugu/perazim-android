@@ -807,6 +807,7 @@ public class BibleReaderDialog extends Dialog {
     }
 
     public void loadChapterVerses(@NonNull String bookId, int chapter) {
+        org.perazimchurch.app.data.local.preference.ReadingLog.recordChapter(getContext());
         dismissActionBar();
         exitSelectMode();
         freshRender = true;
