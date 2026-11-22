@@ -284,7 +284,7 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         scrollView = scroll;
         scroll.setFillViewport(true);
         GameFx.enter(scroll);
-        scroll.setBackground(PerazimTheme.createBackgroundGradient());
+        scroll.setBackground(org.perazimchurch.app.presentation.ui.games.common.GameScene.background(activity, "vine_scene"));
         page = new LinearLayout(activity);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setPadding(dp(16), dp(16), dp(16), dp(28));
@@ -339,14 +339,11 @@ public final class VineWordsDialog extends Dialog implements GameChrome.Host {
         button.setText(label);
         button.setAllCaps(false);
         button.setTextSize(15);
-        button.setTextColor(primary ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
-        button.setMinHeight(dp(48));
+        button.setTextColor(PerazimTheme.COLOR_WHITE);
+        button.setMinHeight(dp(56));
         button.setGravity(Gravity.CENTER);
         button.setPadding(dp(12), dp(10), dp(12), dp(10));
-        GradientDrawable shape = new GradientDrawable();
-        shape.setColor(primary ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE_2);
-        shape.setCornerRadius(dp(14));
-        button.setBackground(shape);
+        button.setBackground(org.perazimchurch.app.presentation.ui.games.common.GameButtons.drawn(activity, primary));
     }
 
     private LinearLayout.LayoutParams weighted() {
