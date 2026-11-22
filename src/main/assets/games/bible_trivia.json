@@ -1,0 +1,5181 @@
+{
+ "game": "bible_trivia",
+ "version": 1,
+ "items": [
+  {
+   "id": "trivia_who_built_the_ark",
+   "difficulty": "easy",
+   "question": "Who built the ark?",
+   "answer": "Noah",
+   "options": [
+    "Moses",
+    "Noah",
+    "Abraham",
+    "David"
+   ],
+   "reference": "Genesis 6:14",
+   "explanation": "God told Noah to build an ark to save his family and the animals from the flood.",
+   "hint": "He was a righteous man in his generation."
+  },
+  {
+   "id": "trivia_who_was_swallowed_by_a_great_fish",
+   "difficulty": "easy",
+   "question": "Who was swallowed by a great fish?",
+   "answer": "Jonah",
+   "options": [
+    "Daniel",
+    "Jonah",
+    "Elijah",
+    "Peter"
+   ],
+   "reference": "Jonah 1:17",
+   "explanation": "Jonah ran from God's command and was taken into the fish before being sent to Nineveh.",
+   "hint": "He was sent to the city of Nineveh."
+  },
+  {
+   "id": "trivia_who_was_thrown_into_the_lions_den",
+   "difficulty": "easy",
+   "question": "Who was thrown into the lions' den?",
+   "answer": "Daniel",
+   "options": [
+    "Elisha",
+    "Joseph",
+    "Daniel",
+    "Samson"
+   ],
+   "reference": "Daniel 6:16",
+   "explanation": "Daniel kept praying to God, so the king had him cast into the den.",
+   "hint": "He served in the court of Babylon."
+  },
+  {
+   "id": "trivia_which_giant_did_david_defeat_with_a_sling",
+   "difficulty": "easy",
+   "question": "Which giant did David defeat with a sling?",
+   "answer": "Goliath",
+   "options": [
+    "Goliath",
+    "Og",
+    "Sisera",
+    "Nimrod"
+   ],
+   "reference": "1 Samuel 17:49",
+   "explanation": "David's stone struck the Philistine champion on the forehead.",
+   "hint": "He was a champion from Gath."
+  },
+  {
+   "id": "trivia_who_was_sold_into_egypt_by_his_brothers",
+   "difficulty": "easy",
+   "question": "Who was sold into Egypt by his brothers?",
+   "answer": "Joseph",
+   "options": [
+    "Judah",
+    "Benjamin",
+    "Reuben",
+    "Joseph"
+   ],
+   "reference": "Genesis 37:28",
+   "explanation": "His brothers sold him to traders who took him to Egypt.",
+   "hint": "His father gave him a coat of many colours."
+  },
+  {
+   "id": "trivia_who_led_the_israelites_out_of_egypt",
+   "difficulty": "easy",
+   "question": "Who led the Israelites out of Egypt?",
+   "answer": "Moses",
+   "options": [
+    "Joshua",
+    "Moses",
+    "Aaron",
+    "Samuel"
+   ],
+   "reference": "Exodus 3:10",
+   "explanation": "God sent Moses to bring the people out of slavery.",
+   "hint": "He saw a burning bush."
+  },
+  {
+   "id": "trivia_who_was_the_first_man",
+   "difficulty": "easy",
+   "question": "Who was the first man?",
+   "answer": "Adam",
+   "options": [
+    "Seth",
+    "Enoch",
+    "Abel",
+    "Adam"
+   ],
+   "reference": "Genesis 2:7",
+   "explanation": "God formed Adam from the dust of the ground.",
+   "hint": "He lived in the garden of Eden."
+  },
+  {
+   "id": "trivia_who_was_the_first_woman",
+   "difficulty": "easy",
+   "question": "Who was the first woman?",
+   "answer": "Eve",
+   "options": [
+    "Leah",
+    "Eve",
+    "Sarah",
+    "Rebekah"
+   ],
+   "reference": "Genesis 2:22",
+   "explanation": "God made Eve from one of Adam's ribs and brought her to him.",
+   "hint": "She was the mother of all the living."
+  },
+  {
+   "id": "trivia_which_man_was_swallowed_by_a_fish_and_then_preached_in_ninev",
+   "difficulty": "easy",
+   "question": "Which man was swallowed by a fish and then preached in Nineveh?",
+   "answer": "Jonah",
+   "options": [
+    "Hosea",
+    "Jonah",
+    "Amos",
+    "Ezra"
+   ],
+   "reference": "Jonah 3:1–3",
+   "explanation": "After his time in the fish, Jonah obeyed God and preached in the great city.",
+   "hint": "His book is short, with four chapters."
+  },
+  {
+   "id": "trivia_who_was_israel_s_first_king",
+   "difficulty": "easy",
+   "question": "Who was Israel's first king?",
+   "answer": "Saul",
+   "options": [
+    "David",
+    "Samuel",
+    "Solomon",
+    "Saul"
+   ],
+   "reference": "1 Samuel 10:1",
+   "explanation": "Samuel anointed Saul as the first king of Israel.",
+   "hint": "He was taller than the others."
+  },
+  {
+   "id": "trivia_who_was_the_shepherd_boy_who_became_king",
+   "difficulty": "easy",
+   "question": "Who was the shepherd boy who became king?",
+   "answer": "David",
+   "options": [
+    "Jesse",
+    "Eliab",
+    "Saul",
+    "David"
+   ],
+   "reference": "1 Samuel 16:11–13",
+   "explanation": "God chose David, the youngest son of Jesse, to be king.",
+   "hint": "He wrote many psalms."
+  },
+  {
+   "id": "trivia_which_king_was_known_for_great_wisdom",
+   "difficulty": "easy",
+   "question": "Which king was known for great wisdom?",
+   "answer": "Solomon",
+   "options": [
+    "Ahab",
+    "Hezekiah",
+    "Solomon",
+    "Josiah"
+   ],
+   "reference": "1 Kings 3:12",
+   "explanation": "God gave Solomon a wise and understanding heart.",
+   "hint": "He was David's son."
+  },
+  {
+   "id": "trivia_who_was_the_mother_of_samuel",
+   "difficulty": "easy",
+   "question": "Who was the mother of Samuel?",
+   "answer": "Hannah",
+   "options": [
+    "Naomi",
+    "Rachel",
+    "Ruth",
+    "Hannah"
+   ],
+   "reference": "1 Samuel 1:20",
+   "explanation": "Hannah prayed for a child, and God answered her.",
+   "hint": "She dedicated her son to the Lord at Shiloh."
+  },
+  {
+   "id": "trivia_who_was_the_wife_of_abraham",
+   "difficulty": "easy",
+   "question": "Who was the wife of Abraham?",
+   "answer": "Sarah",
+   "options": [
+    "Leah",
+    "Rebekah",
+    "Rachel",
+    "Sarah"
+   ],
+   "reference": "Genesis 17:15",
+   "explanation": "God changed her name and promised she would be the mother of nations.",
+   "hint": "Her name was once Sarai."
+  },
+  {
+   "id": "trivia_whose_wife_looked_back_and_became_a_pillar_of_salt",
+   "difficulty": "easy",
+   "question": "Whose wife looked back and became a pillar of salt?",
+   "answer": "Lot's wife",
+   "options": [
+    "Naomi's daughter",
+    "Hagar",
+    "Rahab",
+    "Lot's wife"
+   ],
+   "reference": "Genesis 19:26",
+   "explanation": "Lot's wife disobeyed God's warning when Sodom was destroyed.",
+   "hint": "She was leaving the city with her family."
+  },
+  {
+   "id": "trivia_which_wall_fell_after_the_people_marched_around_it",
+   "difficulty": "easy",
+   "question": "Which wall fell after the people marched around it?",
+   "answer": "Jericho",
+   "options": [
+    "Gibeon",
+    "Hebron",
+    "Jericho",
+    "Ai"
+   ],
+   "reference": "Joshua 6:20",
+   "explanation": "The walls fell down flat when the people shouted at God's command.",
+   "hint": "Joshua led the army to this city."
+  },
+  {
+   "id": "trivia_who_was_the_first_murderer_in_the_bible",
+   "difficulty": "easy",
+   "question": "Who was the first murderer in the Bible?",
+   "answer": "Cain",
+   "options": [
+    "Esau",
+    "Ham",
+    "Cain",
+    "Ishmael"
+   ],
+   "reference": "Genesis 4:8",
+   "explanation": "Cain killed his brother Abel out of jealousy.",
+   "hint": "He was a farmer."
+  },
+  {
+   "id": "trivia_who_was_the_strongest_man_in_the_old_testament",
+   "difficulty": "easy",
+   "question": "Who was the strongest man in the Old Testament?",
+   "answer": "Samson",
+   "options": [
+    "Gideon",
+    "Ehud",
+    "Samson",
+    "Jephthah"
+   ],
+   "reference": "Judges 16:28–30",
+   "explanation": "God gave Samson great strength, which he used for Israel's deliverance.",
+   "hint": "His hair was never cut."
+  },
+  {
+   "id": "trivia_who_wrestled_with_an_angel_by_the_river_jabbok",
+   "difficulty": "easy",
+   "question": "Who wrestled with an angel by the river Jabbok?",
+   "answer": "Jacob",
+   "options": [
+    "Jacob",
+    "Esau",
+    "Isaac",
+    "Joseph"
+   ],
+   "reference": "Genesis 32:24",
+   "explanation": "Jacob held on until he received a blessing, and his name was changed to Israel.",
+   "hint": "He was the son of Isaac."
+  },
+  {
+   "id": "trivia_which_book_is_named_after_a_woman_from_moab_who_was_loyal_to",
+   "difficulty": "easy",
+   "question": "Which book is named after a woman from Moab who was loyal to Naomi?",
+   "answer": "Ruth",
+   "options": [
+    "Ruth",
+    "Hannah",
+    "Abigail",
+    "Esther"
+   ],
+   "reference": "Ruth 1:16",
+   "explanation": "Ruth stayed with Naomi and worshipped the Lord.",
+   "hint": "She gleaned in the fields of Boaz."
+  },
+  {
+   "id": "trivia_who_was_the_queen_who_saved_the_jews_in_persia",
+   "difficulty": "easy",
+   "question": "Who was the queen who saved the Jews in Persia?",
+   "answer": "Esther",
+   "options": [
+    "Esther",
+    "Vashti",
+    "Michal",
+    "Jezebel"
+   ],
+   "reference": "Esther 4:14",
+   "explanation": "Esther risked her life to speak to the king for her people.",
+   "hint": "Her cousin was Mordecai."
+  },
+  {
+   "id": "trivia_how_many_days_did_it_rain_during_the_flood",
+   "difficulty": "easy",
+   "question": "How many days did it rain during the flood?",
+   "answer": "Forty days",
+   "options": [
+    "Forty days",
+    "Twelve days",
+    "One hundred days",
+    "Seven days"
+   ],
+   "reference": "Genesis 7:12",
+   "explanation": "The rain fell for forty days and forty nights.",
+   "hint": "The number forty appears often in the Bible."
+  },
+  {
+   "id": "trivia_what_did_god_set_in_the_sky_as_a_sign_of_his_promise_after_t",
+   "difficulty": "easy",
+   "question": "What did God set in the sky as a sign of his promise after the flood?",
+   "answer": "A rainbow",
+   "options": [
+    "A rainbow",
+    "A star",
+    "A cloud of smoke",
+    "A bright sun"
+   ],
+   "reference": "Genesis 9:13",
+   "explanation": "The rainbow is a sign of the covenant with Noah.",
+   "hint": "It appears after rain."
+  },
+  {
+   "id": "trivia_which_mountain_did_noah_s_ark_rest_on",
+   "difficulty": "easy",
+   "question": "Which mountain did Noah's ark rest on?",
+   "answer": "Ararat",
+   "options": [
+    "Carmel",
+    "Ararat",
+    "Zion",
+    "Sinai"
+   ],
+   "reference": "Genesis 8:4",
+   "explanation": "The ark came to rest on the mountains of Ararat.",
+   "hint": "It is in the region of modern Turkey."
+  },
+  {
+   "id": "trivia_which_tree_did_adam_and_eve_eat_from_against_god_s_command",
+   "difficulty": "easy",
+   "question": "Which tree did Adam and Eve eat from against God's command?",
+   "answer": "The tree of the knowledge of good and evil",
+   "options": [
+    "The olive tree",
+    "The tree of the knowledge of good and evil",
+    "The tree of life",
+    "The fig tree"
+   ],
+   "reference": "Genesis 2:17",
+   "explanation": "God forbade them to eat from it.",
+   "hint": "It was in the middle of the garden."
+  },
+  {
+   "id": "trivia_who_was_the_father_of_the_twelve_tribes_of_israel",
+   "difficulty": "easy",
+   "question": "Who was the father of the twelve tribes of Israel?",
+   "answer": "Jacob",
+   "options": [
+    "Abraham",
+    "Isaac",
+    "Esau",
+    "Jacob"
+   ],
+   "reference": "Genesis 35:22–26",
+   "explanation": "Jacob's twelve sons became the heads of the tribes.",
+   "hint": "God renamed him Israel."
+  },
+  {
+   "id": "trivia_who_was_the_brother_of_moses_who_spoke_for_him",
+   "difficulty": "easy",
+   "question": "Who was the brother of Moses who spoke for him?",
+   "answer": "Aaron",
+   "options": [
+    "Caleb",
+    "Joshua",
+    "Miriam",
+    "Aaron"
+   ],
+   "reference": "Exodus 4:14–16",
+   "explanation": "Aaron spoke to Pharaoh on behalf of Moses.",
+   "hint": "He became the first high priest."
+  },
+  {
+   "id": "trivia_which_sea_did_god_divide_to_let_israel_escape_egypt",
+   "difficulty": "easy",
+   "question": "Which sea did God divide to let Israel escape Egypt?",
+   "answer": "The Red Sea",
+   "options": [
+    "The Mediterranean Sea",
+    "The Sea of Galilee",
+    "The Red Sea",
+    "The Dead Sea"
+   ],
+   "reference": "Exodus 14:21",
+   "explanation": "The waters stood as a wall on each side of the people.",
+   "hint": "Egyptian chariots followed them."
+  },
+  {
+   "id": "trivia_what_food_did_god_send_from_heaven_in_the_wilderness",
+   "difficulty": "easy",
+   "question": "What food did God send from heaven in the wilderness?",
+   "answer": "Manna",
+   "options": [
+    "Quail only",
+    "Barley cakes",
+    "Manna",
+    "Figs"
+   ],
+   "reference": "Exodus 16:14–15",
+   "explanation": "Each morning the people gathered manna to eat.",
+   "hint": "The name means 'What is it?'."
+  },
+  {
+   "id": "trivia_what_did_god_give_moses_on_mount_sinai",
+   "difficulty": "easy",
+   "question": "What did God give Moses on Mount Sinai?",
+   "answer": "The Ten Commandments",
+   "options": [
+    "A sword",
+    "The Ten Commandments",
+    "A golden crown",
+    "A new covenant of silver"
+   ],
+   "reference": "Exodus 20:1–17",
+   "explanation": "God spoke the commandments and wrote them on stone tablets.",
+   "hint": "They begin with 'I am the LORD thy God'."
+  },
+  {
+   "id": "trivia_who_was_rahab_s_city",
+   "difficulty": "easy",
+   "question": "Who was Rahab's city?",
+   "answer": "Jericho",
+   "options": [
+    "Lachish",
+    "Shechem",
+    "Jericho",
+    "Bethlehem"
+   ],
+   "reference": "Joshua 2:1",
+   "explanation": "Rahab hid the two spies in her house on the city wall.",
+   "hint": "Her house was built into the wall."
+  },
+  {
+   "id": "trivia_who_hid_two_spies_on_the_roof_under_stalks_of_flax",
+   "difficulty": "easy",
+   "question": "Who hid two spies on the roof under stalks of flax?",
+   "answer": "Rahab",
+   "options": [
+    "Deborah",
+    "Rahab",
+    "Ruth",
+    "Jael"
+   ],
+   "reference": "Joshua 2:6",
+   "explanation": "Rahab hid the spies and helped them escape.",
+   "hint": "She lived in Jericho."
+  },
+  {
+   "id": "trivia_which_judge_led_an_army_of_three_hundred_men",
+   "difficulty": "easy",
+   "question": "Which judge led an army of three hundred men?",
+   "answer": "Gideon",
+   "options": [
+    "Othniel",
+    "Gideon",
+    "Barak",
+    "Ehud"
+   ],
+   "reference": "Judges 7:7",
+   "explanation": "God reduced the army so that Israel would know the victory came from him.",
+   "hint": "He once asked God for a sign with a fleece."
+  },
+  {
+   "id": "trivia_who_was_the_woman_who_judged_israel_under_a_palm_tree",
+   "difficulty": "easy",
+   "question": "Who was the woman who judged Israel under a palm tree?",
+   "answer": "Deborah",
+   "options": [
+    "Deborah",
+    "Hannah",
+    "Jael",
+    "Miriam"
+   ],
+   "reference": "Judges 4:4–5",
+   "explanation": "Deborah judged Israel and encouraged Barak to fight.",
+   "hint": "She was also a prophetess."
+  },
+  {
+   "id": "trivia_who_was_the_prophet_who_anointed_saul",
+   "difficulty": "easy",
+   "question": "Who was the prophet who anointed Saul?",
+   "answer": "Samuel",
+   "options": [
+    "Elijah",
+    "Gad",
+    "Samuel",
+    "Nathan"
+   ],
+   "reference": "1 Samuel 10:1",
+   "explanation": "Samuel poured oil on Saul's head to show that God had chosen him.",
+   "hint": "He was raised by Eli at Shiloh."
+  },
+  {
+   "id": "trivia_who_was_the_prophet_who_called_fire_down_on_mount_carmel",
+   "difficulty": "easy",
+   "question": "Who was the prophet who called fire down on Mount Carmel?",
+   "answer": "Elijah",
+   "options": [
+    "Jeremiah",
+    "Elijah",
+    "Isaiah",
+    "Elisha"
+   ],
+   "reference": "1 Kings 18:38",
+   "explanation": "God answered Elijah's prayer and the fire consumed the sacrifice.",
+   "hint": "He opposed the prophets of Baal."
+  },
+  {
+   "id": "trivia_who_was_elijah_s_successor_as_prophet",
+   "difficulty": "easy",
+   "question": "Who was Elijah's successor as prophet?",
+   "answer": "Elisha",
+   "options": [
+    "Gehazi",
+    "Elisha",
+    "Obadiah",
+    "Micaiah"
+   ],
+   "reference": "2 Kings 2:9–15",
+   "explanation": "Elisha received a double portion of Elijah's spirit.",
+   "hint": "He saw Elijah taken up in a whirlwind."
+  },
+  {
+   "id": "trivia_which_prophet_was_taken_to_heaven_in_a_whirlwind",
+   "difficulty": "easy",
+   "question": "Which prophet was taken to heaven in a whirlwind?",
+   "answer": "Elijah",
+   "options": [
+    "Moses",
+    "Elijah",
+    "Elisha",
+    "Enoch"
+   ],
+   "reference": "2 Kings 2:11",
+   "explanation": "A chariot of fire separated Elijah from Elisha and he went up in the whirlwind.",
+   "hint": "He was the prophet of Mount Carmel."
+  },
+  {
+   "id": "trivia_which_king_of_babylon_saw_a_statue_with_feet_of_iron_and_cla",
+   "difficulty": "easy",
+   "question": "Which king of Babylon saw a statue with feet of iron and clay?",
+   "answer": "Nebuchadnezzar",
+   "options": [
+    "Cyrus",
+    "Darius",
+    "Nebuchadnezzar",
+    "Belshazzar"
+   ],
+   "reference": "Daniel 2:31–33",
+   "explanation": "Daniel explained the dream of the great statue.",
+   "hint": "He ruled Babylon."
+  },
+  {
+   "id": "trivia_who_wrote_most_of_the_psalms",
+   "difficulty": "easy",
+   "question": "Who wrote most of the Psalms?",
+   "answer": "David",
+   "options": [
+    "Asaph",
+    "David",
+    "Solomon",
+    "Moses"
+   ],
+   "reference": "Psalms 23:1",
+   "explanation": "Many psalms are attributed to David, the shepherd king.",
+   "hint": "He is called the sweet psalmist of Israel."
+  },
+  {
+   "id": "trivia_which_old_testament_book_is_a_collection_of_wise_sayings",
+   "difficulty": "easy",
+   "question": "Which Old Testament book is a collection of wise sayings?",
+   "answer": "Proverbs",
+   "options": [
+    "Nahum",
+    "Proverbs",
+    "Joel",
+    "Lamentations"
+   ],
+   "reference": "Proverbs 1:1–7",
+   "explanation": "Proverbs teaches wisdom for daily life.",
+   "hint": "Solomon is named as its author."
+  },
+  {
+   "id": "trivia_which_book_has_the_sentence_vanity_of_vanities_all_is_vanity",
+   "difficulty": "easy",
+   "question": "Which book has the sentence 'Vanity of vanities; all is vanity'?",
+   "answer": "Ecclesiastes",
+   "options": [
+    "Jeremiah",
+    "Job",
+    "Proverbs",
+    "Ecclesiastes"
+   ],
+   "reference": "Ecclesiastes 1:2",
+   "explanation": "The Preacher reflects on the meaning of life 'under the sun'.",
+   "hint": "It is a short book in the wisdom books."
+  },
+  {
+   "id": "trivia_who_was_the_man_of_great_patience_who_lost_his_children_and_",
+   "difficulty": "easy",
+   "question": "Who was the man of great patience who lost his children and wealth?",
+   "answer": "Job",
+   "options": [
+    "Job",
+    "Eliphaz",
+    "Zophar",
+    "Bildad"
+   ],
+   "reference": "Job 1:20–22",
+   "explanation": "Job kept faith in God through severe trials.",
+   "hint": "He lived in the land of Uz."
+  },
+  {
+   "id": "trivia_which_prophet_was_called_in_his_youth_ah_lord_god_behold_i_c",
+   "difficulty": "easy",
+   "question": "Which prophet was called in his youth: 'Ah, Lord GOD! behold, I cannot speak: for I am a child'?",
+   "answer": "Jeremiah",
+   "options": [
+    "Ezekiel",
+    "Hosea",
+    "Jeremiah",
+    "Isaiah"
+   ],
+   "reference": "Jeremiah 1:6",
+   "explanation": "God called Jeremiah as a prophet to the nations.",
+   "hint": "He is called the weeping prophet."
+  },
+  {
+   "id": "trivia_who_was_the_king_who_received_a_long_life_extension_of_fifte",
+   "difficulty": "easy",
+   "question": "Who was the king who received a long life extension of fifteen years?",
+   "answer": "Hezekiah",
+   "options": [
+    "Hezekiah",
+    "Josiah",
+    "Uzziah",
+    "Asa"
+   ],
+   "reference": "Isaiah 38:5",
+   "explanation": "God answered Hezekiah's prayer after he was sick.",
+   "hint": "The sun went backward as a sign."
+  },
+  {
+   "id": "trivia_which_king_repaired_the_temple_and_found_the_book_of_the_law",
+   "difficulty": "easy",
+   "question": "Which king repaired the temple and found the book of the law?",
+   "answer": "Josiah",
+   "options": [
+    "Josiah",
+    "Jehoiakim",
+    "Hezekiah",
+    "Manasseh"
+   ],
+   "reference": "2 Kings 22:8",
+   "explanation": "Hilkiah found the book in the temple and it was read to the king.",
+   "hint": "He was a boy king."
+  },
+  {
+   "id": "trivia_who_received_the_words_be_fruitful_and_multiply_in_the_garde",
+   "difficulty": "easy",
+   "question": "Who received the words 'Be fruitful, and multiply' in the garden?",
+   "answer": "Adam and Eve",
+   "options": [
+    "Abraham and Sarah",
+    "Noah and his sons",
+    "Adam and Eve",
+    "Isaac and Rebekah"
+   ],
+   "reference": "Genesis 1:28",
+   "explanation": "God blessed the first humans and gave them this command.",
+   "hint": "It happened on the sixth day of creation."
+  },
+  {
+   "id": "trivia_how_many_days_did_god_take_to_create_the_world",
+   "difficulty": "easy",
+   "question": "How many days did God take to create the world?",
+   "answer": "Six",
+   "options": [
+    "Ten",
+    "Three",
+    "Six",
+    "Seven"
+   ],
+   "reference": "Genesis 1:31",
+   "explanation": "God created the world in six days and rested on the seventh.",
+   "hint": "Look at the account at the start of Genesis."
+  },
+  {
+   "id": "trivia_on_which_day_did_god_rest",
+   "difficulty": "easy",
+   "question": "On which day did God rest?",
+   "answer": "The seventh day",
+   "options": [
+    "The third day",
+    "The sixth day",
+    "The seventh day",
+    "The first day"
+   ],
+   "reference": "Genesis 2:2",
+   "explanation": "God finished his work and rested from it.",
+   "hint": "It is the sabbath."
+  },
+  {
+   "id": "trivia_what_did_god_create_on_the_first_day",
+   "difficulty": "easy",
+   "question": "What did God create on the first day?",
+   "answer": "Light",
+   "options": [
+    "The sea",
+    "The sun",
+    "Animals",
+    "Light"
+   ],
+   "reference": "Genesis 1:3–5",
+   "explanation": "God said, 'Let there be light', and there was light.",
+   "hint": "The sun was made on the fourth day."
+  },
+  {
+   "id": "trivia_which_brother_was_murdered_by_cain",
+   "difficulty": "easy",
+   "question": "Which brother was murdered by Cain?",
+   "answer": "Abel",
+   "options": [
+    "Abel",
+    "Seth",
+    "Lamech",
+    "Enoch"
+   ],
+   "reference": "Genesis 4:8",
+   "explanation": "Abel offered a sacrifice that God accepted, and Cain killed him in anger.",
+   "hint": "He was a shepherd."
+  },
+  {
+   "id": "trivia_who_was_the_father_of_isaac",
+   "difficulty": "easy",
+   "question": "Who was the father of Isaac?",
+   "answer": "Abraham",
+   "options": [
+    "Jacob",
+    "Abraham",
+    "Lot",
+    "Terah"
+   ],
+   "reference": "Genesis 21:2–3",
+   "explanation": "God gave Abraham and Sarah a son in their old age.",
+   "hint": "He left Ur at God's call."
+  },
+  {
+   "id": "trivia_who_did_abraham_almost_sacrifice_on_mount_moriah",
+   "difficulty": "easy",
+   "question": "Who did Abraham almost sacrifice on Mount Moriah?",
+   "answer": "Isaac",
+   "options": [
+    "Esau",
+    "Jacob",
+    "Ishmael",
+    "Isaac"
+   ],
+   "reference": "Genesis 22:2",
+   "explanation": "God tested Abraham's faith and provided a ram instead.",
+   "hint": "He was the son of the promise."
+  },
+  {
+   "id": "trivia_which_son_of_isaac_sold_his_birthright_for_a_bowl_of_stew",
+   "difficulty": "easy",
+   "question": "Which son of Isaac sold his birthright for a bowl of stew?",
+   "answer": "Esau",
+   "options": [
+    "Reuben",
+    "Esau",
+    "Simeon",
+    "Jacob"
+   ],
+   "reference": "Genesis 25:29–34",
+   "explanation": "Esau gave up his birthright to his brother for food.",
+   "hint": "He was a skilful hunter."
+  },
+  {
+   "id": "trivia_who_was_the_mother_of_joseph",
+   "difficulty": "easy",
+   "question": "Who was the mother of Joseph?",
+   "answer": "Rachel",
+   "options": [
+    "Bilhah",
+    "Rachel",
+    "Zilpah",
+    "Leah"
+   ],
+   "reference": "Genesis 30:22–24",
+   "explanation": "God remembered Rachel and she bore Joseph.",
+   "hint": "She died giving birth to Benjamin."
+  },
+  {
+   "id": "trivia_who_was_the_father_of_jesse",
+   "difficulty": "easy",
+   "question": "Who was the father of Jesse?",
+   "answer": "Obed",
+   "options": [
+    "Salmon",
+    "Nahshon",
+    "Obed",
+    "Boaz"
+   ],
+   "reference": "Ruth 4:17",
+   "explanation": "Obed was the son of Ruth and Boaz and the grandfather of David.",
+   "hint": "Ruth was his mother."
+  },
+  {
+   "id": "trivia_who_was_the_wife_of_boaz",
+   "difficulty": "easy",
+   "question": "Who was the wife of Boaz?",
+   "answer": "Ruth",
+   "options": [
+    "Naomi",
+    "Abigail",
+    "Ruth",
+    "Orpah"
+   ],
+   "reference": "Ruth 4:13",
+   "explanation": "Ruth became the wife of Boaz and the great-grandmother of David.",
+   "hint": "She was a Moabite."
+  },
+  {
+   "id": "trivia_which_mountain_did_god_speak_to_moses_from",
+   "difficulty": "easy",
+   "question": "Which mountain did God speak to Moses from?",
+   "answer": "Sinai",
+   "options": [
+    "Horeb only",
+    "Sinai",
+    "Nebo",
+    "Carmel"
+   ],
+   "reference": "Exodus 19:20",
+   "explanation": "God came down on Mount Sinai and gave the law.",
+   "hint": "It is also called Horeb in some places."
+  },
+  {
+   "id": "trivia_which_tabernacle_furniture_held_the_ten_commandments",
+   "difficulty": "easy",
+   "question": "Which tabernacle furniture held the Ten Commandments?",
+   "answer": "The ark of the covenant",
+   "options": [
+    "The table of showbread",
+    "The ark of the covenant",
+    "The altar of incense",
+    "The lampstand"
+   ],
+   "reference": "Exodus 25:16",
+   "explanation": "The tablets of stone were placed inside the ark.",
+   "hint": "It was covered with a mercy seat."
+  },
+  {
+   "id": "trivia_what_did_moses_use_to_strike_the_rock_for_water",
+   "difficulty": "easy",
+   "question": "What did Moses use to strike the rock for water?",
+   "answer": "His rod",
+   "options": [
+    "A stone",
+    "His rod",
+    "A harp",
+    "A sword"
+   ],
+   "reference": "Exodus 17:6",
+   "explanation": "God told Moses to strike the rock at Horeb so water would come out.",
+   "hint": "The rod was used before in signs in Egypt."
+  },
+  {
+   "id": "trivia_which_animal_spoke_to_balaam",
+   "difficulty": "easy",
+   "question": "Which animal spoke to Balaam?",
+   "answer": "A donkey",
+   "options": [
+    "A lion",
+    "A donkey",
+    "A serpent",
+    "A horse"
+   ],
+   "reference": "Numbers 22:28",
+   "explanation": "God opened the mouth of the donkey to rebuke Balaam.",
+   "hint": "Balaam was riding it."
+  },
+  {
+   "id": "trivia_who_was_the_high_priest_in_eli_s_time",
+   "difficulty": "easy",
+   "question": "Who was the high priest in Eli's time?",
+   "answer": "Eli",
+   "options": [
+    "Ahimelech",
+    "Abiathar",
+    "Eli",
+    "Zadok"
+   ],
+   "reference": "1 Samuel 1:9",
+   "explanation": "Eli sat by the doorpost of the temple at Shiloh.",
+   "hint": "He trained the boy Samuel."
+  },
+  {
+   "id": "trivia_who_killed_the_giant_goliath",
+   "difficulty": "easy",
+   "question": "Who killed the giant Goliath?",
+   "answer": "David",
+   "options": [
+    "Elhanan",
+    "David",
+    "Jonathan",
+    "Saul"
+   ],
+   "reference": "1 Samuel 17:50",
+   "explanation": "With a stone from his sling, David defeated the Philistine.",
+   "hint": "He was a young shepherd."
+  },
+  {
+   "id": "trivia_who_was_david_s_best_friend",
+   "difficulty": "easy",
+   "question": "Who was David's best friend?",
+   "answer": "Jonathan",
+   "options": [
+    "Joab",
+    "Abner",
+    "Jonathan",
+    "Amnon"
+   ],
+   "reference": "1 Samuel 18:1",
+   "explanation": "Jonathan loved David as his own soul and made a covenant with him.",
+   "hint": "He was the son of Saul."
+  },
+  {
+   "id": "trivia_who_was_the_son_of_david_who_was_known_for_his_beautiful_hai",
+   "difficulty": "easy",
+   "question": "Who was the son of David who was known for his beautiful hair?",
+   "answer": "Absalom",
+   "options": [
+    "Absalom",
+    "Amnon",
+    "Solomon",
+    "Adonijah"
+   ],
+   "reference": "2 Samuel 14:25",
+   "explanation": "Absalom rebelled against his father and was killed.",
+   "hint": "His hair was heavy when he cut it."
+  },
+  {
+   "id": "trivia_who_was_the_prophet_who_told_david_thou_art_the_man",
+   "difficulty": "easy",
+   "question": "Who was the prophet who told David 'Thou art the man'?",
+   "answer": "Nathan",
+   "options": [
+    "Samuel",
+    "Nathan",
+    "Elijah",
+    "Gad"
+   ],
+   "reference": "2 Samuel 12:7",
+   "explanation": "Nathan confronted David with his sin involving Bathsheba.",
+   "hint": "He also helped Solomon become king."
+  },
+  {
+   "id": "trivia_who_built_the_temple_in_jerusalem",
+   "difficulty": "easy",
+   "question": "Who built the temple in Jerusalem?",
+   "answer": "Solomon",
+   "options": [
+    "Solomon",
+    "David",
+    "Hezekiah",
+    "Zerubbabel"
+   ],
+   "reference": "1 Kings 6:1",
+   "explanation": "Solomon completed the temple in the fourth year of his reign.",
+   "hint": "His father had wanted to build it."
+  },
+  {
+   "id": "trivia_who_was_solomon_s_mother",
+   "difficulty": "easy",
+   "question": "Who was Solomon's mother?",
+   "answer": "Bathsheba",
+   "options": [
+    "Abigail",
+    "Michal",
+    "Maacah",
+    "Bathsheba"
+   ],
+   "reference": "2 Samuel 12:24",
+   "explanation": "Bathsheba was the wife of Uriah and then of David.",
+   "hint": "She had a son named Solomon."
+  },
+  {
+   "id": "trivia_who_was_solomon_s_father",
+   "difficulty": "easy",
+   "question": "Who was Solomon's father?",
+   "answer": "David",
+   "options": [
+    "David",
+    "Ahab",
+    "Jesse",
+    "Saul"
+   ],
+   "reference": "1 Kings 1:30",
+   "explanation": "David declared that Solomon would reign after him.",
+   "hint": "He was the king of Judah and Israel."
+  },
+  {
+   "id": "trivia_which_queen_visited_solomon_to_test_his_wisdom",
+   "difficulty": "easy",
+   "question": "Which queen visited Solomon to test his wisdom?",
+   "answer": "The queen of Sheba",
+   "options": [
+    "The queen of Egypt",
+    "The queen of Moab",
+    "The queen of Babylon",
+    "The queen of Sheba"
+   ],
+   "reference": "1 Kings 10:1",
+   "explanation": "She came with riddles and was amazed at his wisdom.",
+   "hint": "She travelled a long way from the south."
+  },
+  {
+   "id": "trivia_which_prophet_confronted_king_ahab_and_jezebel_about_naboth_",
+   "difficulty": "easy",
+   "question": "Which prophet confronted King Ahab and Jezebel about Naboth's vineyard?",
+   "answer": "Elijah",
+   "options": [
+    "Elijah",
+    "Amos",
+    "Micah",
+    "Isaiah"
+   ],
+   "reference": "1 Kings 21:17–19",
+   "explanation": "Elijah announced judgement for the murder of Naboth.",
+   "hint": "He was a prophet from Tishbe."
+  },
+  {
+   "id": "trivia_who_was_the_wicked_queen_who_had_many_prophets_of_the_lord_k",
+   "difficulty": "easy",
+   "question": "Who was the wicked queen who had many prophets of the Lord killed?",
+   "answer": "Jezebel",
+   "options": [
+    "Athaliah",
+    "Herodias",
+    "Jezebel",
+    "Delilah"
+   ],
+   "reference": "1 Kings 18:4",
+   "explanation": "Jezebel promoted the worship of Baal and opposed God's prophets.",
+   "hint": "She was married to Ahab."
+  },
+  {
+   "id": "trivia_who_was_the_woman_in_shunem_who_gave_a_room_to_elisha",
+   "difficulty": "easy",
+   "question": "Who was the woman in Shunem who gave a room to Elisha?",
+   "answer": "The Shunammite woman",
+   "options": [
+    "Dorcas",
+    "Priscilla",
+    "The Shunammite woman",
+    "Lydia"
+   ],
+   "reference": "2 Kings 4:8–10",
+   "explanation": "She provided a room for the prophet and God gave her a son.",
+   "hint": "Her husband was old."
+  },
+  {
+   "id": "trivia_who_cured_naaman_s_leprosy_by_washing_in_the_jordan_river",
+   "difficulty": "easy",
+   "question": "Who cured Naaman's leprosy by washing in the Jordan River?",
+   "answer": "Elisha",
+   "options": [
+    "Elisha",
+    "Samuel",
+    "Elijah",
+    "Isaiah"
+   ],
+   "reference": "2 Kings 5:10",
+   "explanation": "Elisha told Naaman to wash seven times in the Jordan.",
+   "hint": "Naaman was a commander of the Syrian army."
+  },
+  {
+   "id": "trivia_who_was_the_servant_of_elisha_who_took_money_from_naaman",
+   "difficulty": "easy",
+   "question": "Who was the servant of Elisha who took money from Naaman?",
+   "answer": "Gehazi",
+   "options": [
+    "Micaiah",
+    "Shemaiah",
+    "Gehazi",
+    "Obadiah"
+   ],
+   "reference": "2 Kings 5:20–27",
+   "explanation": "Gehazi lied to Naaman and was struck with leprosy.",
+   "hint": "He was Elisha's servant."
+  },
+  {
+   "id": "trivia_which_king_of_judah_was_struck_with_leprosy_for_offering_inc",
+   "difficulty": "easy",
+   "question": "Which king of Judah was struck with leprosy for offering incense in the temple?",
+   "answer": "Uzziah",
+   "options": [
+    "Ahaz",
+    "Uzziah",
+    "Amaziah",
+    "Jotham"
+   ],
+   "reference": "2 Chronicles 26:16–21",
+   "explanation": "Uzziah became proud and entered the temple to burn incense.",
+   "hint": "He is also called Azariah."
+  },
+  {
+   "id": "trivia_who_led_the_people_back_from_babylon_to_rebuild_the_temple",
+   "difficulty": "easy",
+   "question": "Who led the people back from Babylon to rebuild the temple?",
+   "answer": "Zerubbabel",
+   "options": [
+    "Ezra",
+    "Nehemiah",
+    "Zerubbabel",
+    "Joshua"
+   ],
+   "reference": "Ezra 3:8",
+   "explanation": "Zerubbabel led the return and the building of the second temple.",
+   "hint": "He was a governor of Judah."
+  },
+  {
+   "id": "trivia_who_read_the_law_to_the_people_after_the_return_from_exile",
+   "difficulty": "easy",
+   "question": "Who read the law to the people after the return from exile?",
+   "answer": "Ezra",
+   "options": [
+    "Haggai",
+    "Ezra",
+    "Malachi",
+    "Nehemiah"
+   ],
+   "reference": "Nehemiah 8:1–3",
+   "explanation": "Ezra read the book of the law from morning until midday.",
+   "hint": "He was a priest and scribe."
+  },
+  {
+   "id": "trivia_who_rebuilt_the_walls_of_jerusalem",
+   "difficulty": "easy",
+   "question": "Who rebuilt the walls of Jerusalem?",
+   "answer": "Nehemiah",
+   "options": [
+    "Haggai",
+    "Nehemiah",
+    "Ezra",
+    "Zerubbabel"
+   ],
+   "reference": "Nehemiah 2:17–18",
+   "explanation": "Nehemiah organised the people to rebuild the walls in fifty-two days.",
+   "hint": "He was cupbearer to the king of Persia."
+  },
+  {
+   "id": "trivia_who_was_the_high_priest_who_saw_samuel_s_call",
+   "difficulty": "easy",
+   "question": "Who was the high priest who saw Samuel's call?",
+   "answer": "Eli",
+   "options": [
+    "Eleazar",
+    "Abiathar",
+    "Zadok",
+    "Eli"
+   ],
+   "reference": "1 Samuel 3:3–9",
+   "explanation": "Eli helped Samuel understand that God was calling him.",
+   "hint": "He was a priest at Shiloh."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_moses_mother",
+   "difficulty": "easy",
+   "question": "What was the name of Moses' mother?",
+   "answer": "Jochebed",
+   "options": [
+    "Rachel",
+    "Zipporah",
+    "Miriam",
+    "Jochebed"
+   ],
+   "reference": "Exodus 6:20",
+   "explanation": "She was the mother of Aaron and Moses.",
+   "hint": "Her name is listed in the genealogy of Levi."
+  },
+  {
+   "id": "trivia_who_was_the_sister_of_moses_who_watched_over_him_in_the_rive",
+   "difficulty": "easy",
+   "question": "Who was the sister of Moses who watched over him in the river?",
+   "answer": "Miriam",
+   "options": [
+    "Deborah",
+    "Miriam",
+    "Zipporah",
+    "Hannah"
+   ],
+   "reference": "Exodus 2:4",
+   "explanation": "Miriam watched the basket among the reeds.",
+   "hint": "She later sang after the Red Sea crossing."
+  },
+  {
+   "id": "trivia_which_judge_was_a_woman_who_killed_sisera_with_a_tent_peg",
+   "difficulty": "easy",
+   "question": "Which judge was a woman who killed Sisera with a tent peg?",
+   "answer": "Jael",
+   "options": [
+    "Deborah",
+    "Abigail",
+    "Jael",
+    "Rahab"
+   ],
+   "reference": "Judges 4:21",
+   "explanation": "Jael drove a tent peg through Sisera's head.",
+   "hint": "She was the wife of Heber."
+  },
+  {
+   "id": "trivia_which_man_asked_god_for_a_fleece_to_test_his_call",
+   "difficulty": "easy",
+   "question": "Which man asked God for a fleece to test his call?",
+   "answer": "Gideon",
+   "options": [
+    "Barak",
+    "Jephthah",
+    "Samson",
+    "Gideon"
+   ],
+   "reference": "Judges 6:36–40",
+   "explanation": "Gideon placed wool on the threshing floor to test God's promise.",
+   "hint": "He was threshing wheat in a winepress."
+  },
+  {
+   "id": "trivia_who_was_the_father_of_samson",
+   "difficulty": "easy",
+   "question": "Who was the father of Samson?",
+   "answer": "Manoah",
+   "options": [
+    "Elkanah",
+    "Abraham",
+    "Eli",
+    "Manoah"
+   ],
+   "reference": "Judges 13:2",
+   "explanation": "An angel announced Samson's birth to Manoah's wife.",
+   "hint": "He prayed that the angel would return."
+  },
+  {
+   "id": "trivia_who_did_samson_love_and_who_betrayed_him",
+   "difficulty": "easy",
+   "question": "Who did Samson love and who betrayed him?",
+   "answer": "Delilah",
+   "options": [
+    "Delilah",
+    "Hagar",
+    "Michal",
+    "Ruth"
+   ],
+   "reference": "Judges 16:4–20",
+   "explanation": "Delilah learned the secret of Samson's strength and told the Philistines.",
+   "hint": "She lived in the valley of Sorek."
+  },
+  {
+   "id": "trivia_which_prophet_said_here_am_i_send_me",
+   "difficulty": "medium",
+   "question": "Which prophet said 'Here am I; send me'?",
+   "answer": "Isaiah",
+   "options": [
+    "Isaiah",
+    "Ezekiel",
+    "Jeremiah",
+    "Amos"
+   ],
+   "reference": "Isaiah 6:8",
+   "explanation": "After seeing the Lord high and lifted up, Isaiah responded to God's call.",
+   "hint": "His vision took place in the temple."
+  },
+  {
+   "id": "trivia_which_prophet_saw_a_vision_of_a_valley_of_dry_bones",
+   "difficulty": "medium",
+   "question": "Which prophet saw a vision of a valley of dry bones?",
+   "answer": "Ezekiel",
+   "options": [
+    "Micah",
+    "Hosea",
+    "Ezekiel",
+    "Daniel"
+   ],
+   "reference": "Ezekiel 37:1–10",
+   "explanation": "God asked Ezekiel whether the bones could live and then breathed life into them.",
+   "hint": "He was a priest taken to Babylon."
+  },
+  {
+   "id": "trivia_who_was_the_prophet_whose_marriage_pictured_israel_s_unfaith",
+   "difficulty": "medium",
+   "question": "Who was the prophet whose marriage pictured Israel's unfaithfulness?",
+   "answer": "Hosea",
+   "options": [
+    "Amos",
+    "Hosea",
+    "Obadiah",
+    "Joel"
+   ],
+   "reference": "Hosea 1:2",
+   "explanation": "God told Hosea to marry Gomer, pictured as Israel's faithlessness.",
+   "hint": "His name means 'salvation'."
+  },
+  {
+   "id": "trivia_which_prophet_was_a_shepherd_from_tekoa",
+   "difficulty": "medium",
+   "question": "Which prophet was a shepherd from Tekoa?",
+   "answer": "Amos",
+   "options": [
+    "Nahum",
+    "Amos",
+    "Micah",
+    "Joel"
+   ],
+   "reference": "Amos 1:1",
+   "explanation": "Amos was a herdsman and a dresser of sycamore figs who prophesied to Israel.",
+   "hint": "He lived in the time of Uzziah and Jeroboam."
+  },
+  {
+   "id": "trivia_which_prophet_was_from_moresheth_and_spoke_about_bethlehem_s",
+   "difficulty": "medium",
+   "question": "Which prophet was from Moresheth and spoke about Bethlehem's ruler?",
+   "answer": "Micah",
+   "options": [
+    "Amos",
+    "Micah",
+    "Hosea",
+    "Jonah"
+   ],
+   "reference": "Micah 5:2",
+   "explanation": "Micah prophesied that a ruler would come from Bethlehem.",
+   "hint": "He is one of the minor prophets."
+  },
+  {
+   "id": "trivia_which_prophet_describes_the_day_of_the_lord_as_darkness",
+   "difficulty": "medium",
+   "question": "Which prophet describes the 'day of the LORD' as darkness?",
+   "answer": "Joel",
+   "options": [
+    "Obadiah",
+    "Haggai",
+    "Joel",
+    "Zephaniah"
+   ],
+   "reference": "Joel 2:1–2",
+   "explanation": "Joel warned that the day of the Lord is a day of darkness and gloominess.",
+   "hint": "A plague of locusts is central to his book."
+  },
+  {
+   "id": "trivia_which_prophet_was_sent_to_nineveh_and_ran_away_to_tarshish",
+   "difficulty": "medium",
+   "question": "Which prophet was sent to Nineveh and ran away to Tarshish?",
+   "answer": "Jonah",
+   "options": [
+    "Elisha",
+    "Jonah",
+    "Obadiah",
+    "Nahum"
+   ],
+   "reference": "Jonah 1:3",
+   "explanation": "Jonah boarded a ship to flee from the presence of the Lord.",
+   "hint": "He prayed inside the fish."
+  },
+  {
+   "id": "trivia_which_prophet_wrote_about_the_city_of_nineveh_falling",
+   "difficulty": "medium",
+   "question": "Which prophet wrote about the city of Nineveh falling?",
+   "answer": "Nahum",
+   "options": [
+    "Haggai",
+    "Nahum",
+    "Habakkuk",
+    "Zephaniah"
+   ],
+   "reference": "Nahum 3:7",
+   "explanation": "Nahum announced the destruction of Nineveh.",
+   "hint": "His prophecy is short and fierce."
+  },
+  {
+   "id": "trivia_which_prophet_asked_how_long_shall_i_cry_and_thou_wilt_not_h",
+   "difficulty": "medium",
+   "question": "Which prophet asked 'How long shall I cry, and thou wilt not hear?'",
+   "answer": "Habakkuk",
+   "options": [
+    "Joel",
+    "Habakkuk",
+    "Jeremiah",
+    "Micah"
+   ],
+   "reference": "Habakkuk 1:2",
+   "explanation": "Habakkuk questioned God about injustice in Judah.",
+   "hint": "He wrote a prayer that ends with joy in the Lord."
+  },
+  {
+   "id": "trivia_which_prophet_says_the_just_shall_live_by_his_faith",
+   "difficulty": "medium",
+   "question": "Which prophet says 'The just shall live by his faith'?",
+   "answer": "Habakkuk",
+   "options": [
+    "Habakkuk",
+    "Zechariah",
+    "Haggai",
+    "Malachi"
+   ],
+   "reference": "Habakkuk 2:4",
+   "explanation": "This verse is quoted by Paul in the New Testament.",
+   "hint": "It appears near the end of his second chapter."
+  },
+  {
+   "id": "trivia_which_prophet_told_the_people_to_build_the_house_of_god",
+   "difficulty": "medium",
+   "question": "Which prophet told the people to build the house of God?",
+   "answer": "Haggai",
+   "options": [
+    "Zechariah",
+    "Haggai",
+    "Malachi",
+    "Joel"
+   ],
+   "reference": "Haggai 1:8",
+   "explanation": "Haggai urged the people to rebuild the temple.",
+   "hint": "His prophecy is very short."
+  },
+  {
+   "id": "trivia_which_prophet_saw_a_vision_of_a_man_riding_a_red_horse_among",
+   "difficulty": "medium",
+   "question": "Which prophet saw a vision of a man riding a red horse among myrtle trees?",
+   "answer": "Zechariah",
+   "options": [
+    "Daniel",
+    "Ezekiel",
+    "Zechariah",
+    "Haggai"
+   ],
+   "reference": "Zechariah 1:8",
+   "explanation": "The vision shows God's concern for Jerusalem.",
+   "hint": "He prophesied with Haggai."
+  },
+  {
+   "id": "trivia_which_prophet_calls_god_s_people_to_return_and_asks_will_a_m",
+   "difficulty": "medium",
+   "question": "Which prophet calls God's people to return and asks, 'Will a man rob God?'",
+   "answer": "Malachi",
+   "options": [
+    "Zephaniah",
+    "Malachi",
+    "Micah",
+    "Joel"
+   ],
+   "reference": "Malachi 3:8",
+   "explanation": "Malachi rebukes the people for withholding tithes.",
+   "hint": "He is the last book of the Old Testament."
+  },
+  {
+   "id": "trivia_which_prophet_said_behold_i_send_my_messenger_before_my_face",
+   "difficulty": "medium",
+   "question": "Which prophet said, 'Behold, I send my messenger before my face'?",
+   "answer": "Malachi",
+   "options": [
+    "Zechariah",
+    "Isaiah",
+    "Malachi",
+    "Haggai"
+   ],
+   "reference": "Malachi 3:1",
+   "explanation": "This verse points forward to the coming of the Lord and his messenger.",
+   "hint": "It is in the final chapters of the Old Testament."
+  },
+  {
+   "id": "trivia_which_prophet_was_a_young_man_called_to_prophesy_against_the",
+   "difficulty": "medium",
+   "question": "Which prophet was a young man called to prophesy against the people of Anathoth?",
+   "answer": "Jeremiah",
+   "options": [
+    "Ezekiel",
+    "Hosea",
+    "Jeremiah",
+    "Obadiah"
+   ],
+   "reference": "Jeremiah 1:1",
+   "explanation": "Jeremiah was from the priests of Anathoth.",
+   "hint": "He was called during the time of Josiah."
+  },
+  {
+   "id": "trivia_which_prophet_declared_that_the_new_covenant_would_be_writte",
+   "difficulty": "medium",
+   "question": "Which prophet declared that the new covenant would be written on hearts?",
+   "answer": "Jeremiah",
+   "options": [
+    "Isaiah",
+    "Jeremiah",
+    "Ezekiel",
+    "Joel"
+   ],
+   "reference": "Jeremiah 31:33",
+   "explanation": "God promised to write his law on the hearts of his people.",
+   "hint": "He lived before the fall of Jerusalem."
+  },
+  {
+   "id": "trivia_who_prophesied_the_destruction_of_jerusalem_and_wept_over_it",
+   "difficulty": "medium",
+   "question": "Who prophesied the destruction of Jerusalem and wept over it?",
+   "answer": "Jeremiah",
+   "options": [
+    "Jeremiah",
+    "Ezekiel",
+    "Amos",
+    "Jonah"
+   ],
+   "reference": "Jeremiah 9:1",
+   "explanation": "Jeremiah lamented the state of Judah.",
+   "hint": "He is called the weeping prophet."
+  },
+  {
+   "id": "trivia_which_book_contains_the_lament_how_doth_the_city_sit_solitar",
+   "difficulty": "medium",
+   "question": "Which book contains the lament: 'How doth the city sit solitary'?",
+   "answer": "Lamentations",
+   "options": [
+    "Psalms",
+    "Lamentations",
+    "Ecclesiastes",
+    "Song of Solomon"
+   ],
+   "reference": "Lamentations 1:1",
+   "explanation": "This book mourns the fall of Jerusalem.",
+   "hint": "It is placed after Jeremiah."
+  },
+  {
+   "id": "trivia_which_book_is_a_love_poem_between_a_bride_and_bridegroom",
+   "difficulty": "medium",
+   "question": "Which book is a love poem between a bride and bridegroom?",
+   "answer": "Song of Solomon",
+   "options": [
+    "Ruth",
+    "Esther",
+    "Song of Solomon",
+    "Job"
+   ],
+   "reference": "Song of Solomon 2:4",
+   "explanation": "This book celebrates love in marriage.",
+   "hint": "It is attributed to Solomon."
+  },
+  {
+   "id": "trivia_which_prophet_was_told_to_eat_a_scroll_that_tasted_sweet",
+   "difficulty": "medium",
+   "question": "Which prophet was told to eat a scroll that tasted sweet?",
+   "answer": "Ezekiel",
+   "options": [
+    "Isaiah",
+    "Daniel",
+    "Ezekiel",
+    "Jeremiah"
+   ],
+   "reference": "Ezekiel 3:3",
+   "explanation": "God gave Ezekiel the word to speak to Israel.",
+   "hint": "The scroll was as sweet as honey."
+  },
+  {
+   "id": "trivia_which_king_of_israel_built_a_high_place_for_asherah_and_was_",
+   "difficulty": "medium",
+   "question": "Which king of Israel built a high place for Asherah and was rebuked by Elijah?",
+   "answer": "Ahab",
+   "options": [
+    "Joash",
+    "Jehoram",
+    "Ahab",
+    "Ahaziah"
+   ],
+   "reference": "1 Kings 16:33",
+   "explanation": "Ahab did evil in the sight of the Lord and worshipped Baal.",
+   "hint": "He married Jezebel."
+  },
+  {
+   "id": "trivia_which_king_of_judah_was_known_for_reforming_the_worship_in_t",
+   "difficulty": "medium",
+   "question": "Which king of Judah was known for reforming the worship in the temple?",
+   "answer": "Hezekiah",
+   "options": [
+    "Hezekiah",
+    "Manasseh",
+    "Ahaz",
+    "Amon"
+   ],
+   "reference": "2 Chronicles 29:3",
+   "explanation": "Hezekiah opened the doors of the temple and cleansed it.",
+   "hint": "He is also known for the Siloam tunnel."
+  },
+  {
+   "id": "trivia_which_king_prayed_that_god_would_heal_him_and_was_given_fift",
+   "difficulty": "medium",
+   "question": "Which king prayed that God would heal him, and was given fifteen more years?",
+   "answer": "Hezekiah",
+   "options": [
+    "Asa",
+    "Jehoash",
+    "Josiah",
+    "Hezekiah"
+   ],
+   "reference": "2 Kings 20:1–6",
+   "explanation": "God heard the king's prayer and added fifteen years to his life.",
+   "hint": "Isaiah brought the message."
+  },
+  {
+   "id": "trivia_which_king_sent_a_letter_to_hezekiah_mocking_the_god_of_isra",
+   "difficulty": "medium",
+   "question": "Which king sent a letter to Hezekiah mocking the God of Israel?",
+   "answer": "Sennacherib",
+   "options": [
+    "Sennacherib",
+    "Shalmaneser",
+    "Esarhaddon",
+    "Nebuchadnezzar"
+   ],
+   "reference": "2 Kings 19:9–14",
+   "explanation": "The king of Assyria sent a letter threatening Jerusalem.",
+   "hint": "The Assyrians besieged the city."
+  },
+  {
+   "id": "trivia_who_was_the_prophet_who_advised_hezekiah_about_the_assyrian_",
+   "difficulty": "medium",
+   "question": "Who was the prophet who advised Hezekiah about the Assyrian threat?",
+   "answer": "Isaiah",
+   "options": [
+    "Micah",
+    "Isaiah",
+    "Nahum",
+    "Hosea"
+   ],
+   "reference": "2 Kings 19:20",
+   "explanation": "Isaiah sent a message from God that Jerusalem would be delivered.",
+   "hint": "He was a prophet in Jerusalem."
+  },
+  {
+   "id": "trivia_how_many_men_died_in_one_night_when_the_angel_of_the_lord_st",
+   "difficulty": "medium",
+   "question": "How many men died in one night when the angel of the Lord struck the Assyrian camp?",
+   "answer": "One hundred and eighty-five thousand",
+   "options": [
+    "One hundred and eighty-five thousand",
+    "Forty thousand",
+    "Seventy thousand",
+    "Ten thousand"
+   ],
+   "reference": "2 Kings 19:35",
+   "explanation": "The angel of the Lord struck down the Assyrian army in one night.",
+   "hint": "The number is given in the account of Hezekiah."
+  },
+  {
+   "id": "trivia_who_led_the_army_against_jericho_after_moses_died",
+   "difficulty": "medium",
+   "question": "Who led the army against Jericho after Moses died?",
+   "answer": "Joshua",
+   "options": [
+    "Eleazar",
+    "Caleb",
+    "Phinehas",
+    "Joshua"
+   ],
+   "reference": "Joshua 1:1–2",
+   "explanation": "God commanded Joshua to lead the people across the Jordan.",
+   "hint": "He was Moses' assistant."
+  },
+  {
+   "id": "trivia_which_spies_brought_back_a_good_report_of_the_land_along_wit",
+   "difficulty": "medium",
+   "question": "Which spies brought back a good report of the land along with Joshua?",
+   "answer": "Caleb",
+   "options": [
+    "Igal",
+    "Caleb",
+    "Phinehas",
+    "Shammua"
+   ],
+   "reference": "Numbers 13:30",
+   "explanation": "Caleb said the people should go up and possess the land.",
+   "hint": "He later received Hebron as an inheritance."
+  },
+  {
+   "id": "trivia_which_bird_did_god_send_to_feed_elijah_beside_the_brook_cher",
+   "difficulty": "medium",
+   "question": "Which bird did God send to feed Elijah beside the brook Cherith?",
+   "answer": "Ravens",
+   "options": [
+    "Doves",
+    "Eagles",
+    "Ravens",
+    "Sparrows"
+   ],
+   "reference": "1 Kings 17:4–6",
+   "explanation": "God commanded ravens to bring bread and meat to Elijah.",
+   "hint": "The brook is east of the Jordan."
+  },
+  {
+   "id": "trivia_who_was_the_widow_of_zarephath_who_fed_elijah",
+   "difficulty": "medium",
+   "question": "Who was the widow of Zarephath who fed Elijah?",
+   "answer": "A widow",
+   "options": [
+    "A servant girl",
+    "A princess",
+    "A widow",
+    "A queen"
+   ],
+   "reference": "1 Kings 17:9–16",
+   "explanation": "The widow shared her last meal with the prophet and God kept her jar of meal full.",
+   "hint": "She lived in Sidon."
+  },
+  {
+   "id": "trivia_which_prophet_was_taken_up_by_a_whirlwind_into_heaven",
+   "difficulty": "medium",
+   "question": "Which prophet was taken up by a whirlwind into heaven?",
+   "answer": "Elijah",
+   "options": [
+    "Enoch",
+    "Elijah",
+    "Moses",
+    "Elisha"
+   ],
+   "reference": "2 Kings 2:11",
+   "explanation": "Elijah was taken up while Elisha watched.",
+   "hint": "A chariot of fire appeared."
+  },
+  {
+   "id": "trivia_which_king_of_israel_was_known_for_turning_to_the_lord_with_",
+   "difficulty": "medium",
+   "question": "Which king of Israel was known for turning to the Lord with all his heart after Moses' law?",
+   "answer": "Josiah",
+   "options": [
+    "Asa",
+    "Joash",
+    "Jehoash",
+    "Josiah"
+   ],
+   "reference": "2 Kings 23:25",
+   "explanation": "No king before or after him turned to the Lord as he did.",
+   "hint": "He reformed worship in the land."
+  },
+  {
+   "id": "trivia_which_king_of_israel_was_rebuked_by_the_prophet_ahijah_for_s",
+   "difficulty": "medium",
+   "question": "Which king of Israel was rebuked by the prophet Ahijah for splitting the nation?",
+   "answer": "Jeroboam",
+   "options": [
+    "Jeroboam",
+    "Nadab",
+    "Rehoboam",
+    "Abijah"
+   ],
+   "reference": "1 Kings 11:29–39",
+   "explanation": "Ahijah tore his garment and told Jeroboam he would rule ten tribes.",
+   "hint": "He set up golden calves at Bethel and Dan."
+  },
+  {
+   "id": "trivia_who_was_the_son_of_solomon_who_lost_the_ten_tribes",
+   "difficulty": "medium",
+   "question": "Who was the son of Solomon who lost the ten tribes?",
+   "answer": "Rehoboam",
+   "options": [
+    "Abijah",
+    "Asa",
+    "Jehoram",
+    "Rehoboam"
+   ],
+   "reference": "1 Kings 12:16–20",
+   "explanation": "Rehoboam refused the request of the people and most of the tribes rebelled.",
+   "hint": "He listened to his young advisers."
+  },
+  {
+   "id": "trivia_what_were_the_names_of_the_two_golden_calves_set_up_by_jerob",
+   "difficulty": "medium",
+   "question": "What were the names of the two golden calves set up by Jeroboam?",
+   "answer": "Bethel and Dan",
+   "options": [
+    "Jericho and Ai",
+    "Shiloh and Gilgal",
+    "Bethel and Dan",
+    "Hebron and Beersheba"
+   ],
+   "reference": "1 Kings 12:28–29",
+   "explanation": "Jeroboam set up calves at Bethel and Dan to keep the people from Jerusalem.",
+   "hint": "Both towns are in the north."
+  },
+  {
+   "id": "trivia_which_man_saw_the_lord_sitting_on_a_throne_high_and_lifted_u",
+   "difficulty": "medium",
+   "question": "Which man saw the Lord sitting on a throne high and lifted up in the temple?",
+   "answer": "Isaiah",
+   "options": [
+    "Ezekiel",
+    "Daniel",
+    "Micah",
+    "Isaiah"
+   ],
+   "reference": "Isaiah 6:1",
+   "explanation": "Isaiah saw the glory of the Lord in a vision.",
+   "hint": "The seraphim cried 'Holy, holy, holy'."
+  },
+  {
+   "id": "trivia_what_were_the_hebrew_names_of_shadrach_meshach_and_abednego",
+   "difficulty": "medium",
+   "question": "What were the Hebrew names of Shadrach, Meshach and Abednego?",
+   "answer": "Hananiah, Mishael and Azariah",
+   "options": [
+    "Micah, Jonathan and Hosea",
+    "Elnathan, Abihu and Mattaniah",
+    "Hananiah, Mishael and Azariah",
+    "Eliab, Gershom and Amram"
+   ],
+   "reference": "Daniel 1:6–7",
+   "explanation": "Their Babylonian names were given by the king's officer.",
+   "hint": "Daniel's Hebrew name was Daniel too."
+  },
+  {
+   "id": "trivia_who_was_thrown_into_a_fiery_furnace_and_not_harmed",
+   "difficulty": "medium",
+   "question": "Who was thrown into a fiery furnace and not harmed?",
+   "answer": "Shadrach, Meshach and Abednego",
+   "options": [
+    "Shadrach, Meshach and Abednego",
+    "Moses and Aaron",
+    "Ezekiel and Jeremiah",
+    "Daniel and Hananiah"
+   ],
+   "reference": "Daniel 3:19–27",
+   "explanation": "God protected the three friends in the furnace.",
+   "hint": "A fourth figure was seen with them."
+  },
+  {
+   "id": "trivia_which_babylonian_king_saw_the_writing_on_the_wall",
+   "difficulty": "medium",
+   "question": "Which Babylonian king saw the writing on the wall?",
+   "answer": "Belshazzar",
+   "options": [
+    "Nebuchadnezzar",
+    "Darius",
+    "Belshazzar",
+    "Cyrus"
+   ],
+   "reference": "Daniel 5:5",
+   "explanation": "A hand wrote on the plaster of the palace wall at a feast.",
+   "hint": "Daniel interpreted the writing."
+  },
+  {
+   "id": "trivia_which_words_did_daniel_read_on_the_wall_mene_mene_tekel_upha",
+   "difficulty": "medium",
+   "question": "Which words did Daniel read on the wall: 'MENE, MENE, TEKEL, UPHARSIN'?",
+   "answer": "Weighed, numbered, divided",
+   "options": [
+    "Blessed, holy, lifted",
+    "Fire, flood, famine",
+    "Peace, joy, honour",
+    "Weighed, numbered, divided"
+   ],
+   "reference": "Daniel 5:25–28",
+   "explanation": "Daniel explained that the kingdom had been weighed and found wanting.",
+   "hint": "The words describe the kingdom's end."
+  },
+  {
+   "id": "trivia_which_king_of_persia_allowed_the_jews_to_return_to_jerusalem",
+   "difficulty": "medium",
+   "question": "Which king of Persia allowed the Jews to return to Jerusalem?",
+   "answer": "Cyrus",
+   "options": [
+    "Darius",
+    "Xerxes",
+    "Cyrus",
+    "Artaxerxes"
+   ],
+   "reference": "Ezra 1:1–3",
+   "explanation": "Cyrus made a decree that the temple should be rebuilt.",
+   "hint": "He is called God's anointed in Isaiah."
+  },
+  {
+   "id": "trivia_which_persian_king_made_esther_his_queen",
+   "difficulty": "medium",
+   "question": "Which Persian king made Esther his queen?",
+   "answer": "Xerxes",
+   "options": [
+    "Artaxerxes",
+    "Xerxes",
+    "Darius",
+    "Cyrus"
+   ],
+   "reference": "Esther 2:17",
+   "explanation": "Xerxes, also called Ahasuerus, chose Esther after Vashti was removed.",
+   "hint": "Vashti refused to come when called."
+  },
+  {
+   "id": "trivia_who_was_mordecai_s_cousin_who_was_raised_by_him",
+   "difficulty": "medium",
+   "question": "Who was Mordecai's cousin who was raised by him?",
+   "answer": "Esther",
+   "options": [
+    "Esther",
+    "Ruth",
+    "Miriam",
+    "Vashti"
+   ],
+   "reference": "Esther 2:7",
+   "explanation": "Esther was an orphan and Mordecai raised her as his own daughter.",
+   "hint": "She was of the tribe of Benjamin."
+  },
+  {
+   "id": "trivia_what_feast_was_established_to_remember_the_deliverance_of_th",
+   "difficulty": "medium",
+   "question": "What feast was established to remember the deliverance of the Jews in Esther's time?",
+   "answer": "Purim",
+   "options": [
+    "Purim",
+    "Pentecost",
+    "Tabernacles",
+    "Passover"
+   ],
+   "reference": "Esther 9:26–28",
+   "explanation": "The feast of Purim was celebrated as a memorial of the deliverance.",
+   "hint": "Lots were cast before Haman."
+  },
+  {
+   "id": "trivia_which_wicked_official_plotted_to_destroy_the_jews_in_persia",
+   "difficulty": "medium",
+   "question": "Which wicked official plotted to destroy the Jews in Persia?",
+   "answer": "Haman",
+   "options": [
+    "Nehemiah",
+    "Mordecai",
+    "Haman",
+    "Sanballat"
+   ],
+   "reference": "Esther 3:6",
+   "explanation": "Haman was angry that Mordecai would not bow down to him.",
+   "hint": "He was hanged on the gallows he had built."
+  },
+  {
+   "id": "trivia_which_prophet_was_sent_to_speak_to_eli_s_family_about_their_",
+   "difficulty": "medium",
+   "question": "Which prophet was sent to speak to Eli's family about their disobedience?",
+   "answer": "A man of God",
+   "options": [
+    "Gad",
+    "Nathan",
+    "Elkanah",
+    "A man of God"
+   ],
+   "reference": "1 Samuel 2:27",
+   "explanation": "An unnamed man of God pronounced judgement on Eli's house.",
+   "hint": "The Bible does not give his name here."
+  },
+  {
+   "id": "trivia_which_priest_s_sons_hophni_and_phinehas_were_wicked",
+   "difficulty": "medium",
+   "question": "Which priest's sons, Hophni and Phinehas, were wicked?",
+   "answer": "Eli",
+   "options": [
+    "Zadok",
+    "Eli",
+    "Abiathar",
+    "Samuel"
+   ],
+   "reference": "1 Samuel 2:12",
+   "explanation": "Eli's sons did not know the Lord and abused the offerings.",
+   "hint": "They died in battle."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_the_ark_s_temporary_home_in_the_philist",
+   "difficulty": "medium",
+   "question": "What was the name of the ark's temporary home in the Philistine city of Ashdod?",
+   "answer": "The temple of Dagon",
+   "options": [
+    "The house of Obed-edom",
+    "The temple of Dagon",
+    "The temple of Baal",
+    "The house of Abinadab"
+   ],
+   "reference": "1 Samuel 5:2",
+   "explanation": "The Philistines placed the ark beside their god Dagon, which fell down.",
+   "hint": "Dagon was a Philistine god."
+  },
+  {
+   "id": "trivia_who_was_the_first_king_of_the_northern_kingdom_after_the_div",
+   "difficulty": "medium",
+   "question": "Who was the first king of the northern kingdom after the division?",
+   "answer": "Jeroboam",
+   "options": [
+    "Omri",
+    "Jehu",
+    "Jeroboam",
+    "Rehoboam"
+   ],
+   "reference": "1 Kings 12:20",
+   "explanation": "Jeroboam was made king over Israel after the ten tribes rebelled.",
+   "hint": "He set up golden calves."
+  },
+  {
+   "id": "trivia_which_judge_sacrificed_his_daughter_because_of_a_vow",
+   "difficulty": "medium",
+   "question": "Which judge sacrificed his daughter because of a vow?",
+   "answer": "Jephthah",
+   "options": [
+    "Jephthah",
+    "Gideon",
+    "Abdon",
+    "Ehud"
+   ],
+   "reference": "Judges 11:30–31",
+   "explanation": "Jephthah made a vow before battle and his daughter came out to meet him.",
+   "hint": "He was a Gileadite."
+  },
+  {
+   "id": "trivia_who_was_the_edomite_king_who_was_not_an_israelite_but_ruled_",
+   "difficulty": "medium",
+   "question": "Who was the Edomite king who was not an Israelite but ruled before Israel had a king?",
+   "answer": "Bela",
+   "options": [
+    "Bela",
+    "Saul",
+    "Eglon",
+    "Ehud"
+   ],
+   "reference": "Genesis 36:31–32",
+   "explanation": "Genesis lists the kings of Edom before Israel had a king.",
+   "hint": "He was the son of Beor."
+  },
+  {
+   "id": "trivia_which_king_of_moab_was_defeated_by_ehud",
+   "difficulty": "medium",
+   "question": "Which king of Moab was defeated by Ehud?",
+   "answer": "Eglon",
+   "options": [
+    "Og",
+    "Sihon",
+    "Eglon",
+    "Balak"
+   ],
+   "reference": "Judges 3:20–21",
+   "explanation": "Ehud killed Eglon with a dagger in his private chamber.",
+   "hint": "He was left-handed."
+  },
+  {
+   "id": "trivia_which_king_of_bashan_had_a_bed_of_iron",
+   "difficulty": "medium",
+   "question": "Which king of Bashan had a bed of iron?",
+   "answer": "Og",
+   "options": [
+    "Eglon",
+    "Balak",
+    "Og",
+    "Sihon"
+   ],
+   "reference": "Deuteronomy 3:11",
+   "explanation": "Og was a giant king of Bashan who was defeated by Israel.",
+   "hint": "His bed was nine cubits long."
+  },
+  {
+   "id": "trivia_which_king_of_the_amorites_refused_israel_passage_through_hi",
+   "difficulty": "medium",
+   "question": "Which king of the Amorites refused Israel passage through his land?",
+   "answer": "Sihon",
+   "options": [
+    "Sihon",
+    "Eglon",
+    "Og",
+    "Balak"
+   ],
+   "reference": "Numbers 21:23",
+   "explanation": "Sihon gathered his army and fought against Israel.",
+   "hint": "Israel took his land east of the Jordan."
+  },
+  {
+   "id": "trivia_who_was_the_moabite_king_who_hired_balaam_to_curse_israel",
+   "difficulty": "medium",
+   "question": "Who was the Moabite king who hired Balaam to curse Israel?",
+   "answer": "Balak",
+   "options": [
+    "Eglon",
+    "Og",
+    "Balak",
+    "Sihon"
+   ],
+   "reference": "Numbers 22:2–6",
+   "explanation": "Balak sent messengers to Balaam to curse the people.",
+   "hint": "He was afraid of Israel's numbers."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_the_man_from_midian_who_married_a_moabi",
+   "difficulty": "medium",
+   "question": "What was the name of the man from Midian who married a Moabite woman and was killed by Phinehas?",
+   "answer": "Zimri",
+   "options": [
+    "Abiram",
+    "Korah",
+    "Dathan",
+    "Zimri"
+   ],
+   "reference": "Numbers 25:14",
+   "explanation": "Zimri brought a Midianite woman into the camp in public.",
+   "hint": "Phinehas stopped the plague by his zeal."
+  },
+  {
+   "id": "trivia_which_man_was_moses_father_in_law_who_advised_him_to_appoint",
+   "difficulty": "medium",
+   "question": "Which man was Moses' father-in-law who advised him to appoint judges?",
+   "answer": "Jethro",
+   "options": [
+    "Jethro",
+    "Hobab",
+    "Reuel",
+    "Laban"
+   ],
+   "reference": "Exodus 18:17–21",
+   "explanation": "Jethro suggested sharing the burden of judging the people.",
+   "hint": "He was a priest of Midian."
+  },
+  {
+   "id": "trivia_who_was_moses_wife_who_was_a_midianite",
+   "difficulty": "medium",
+   "question": "Who was Moses' wife who was a Midianite?",
+   "answer": "Zipporah",
+   "options": [
+    "Hagar",
+    "Zipporah",
+    "Rahab",
+    "Miriam"
+   ],
+   "reference": "Exodus 2:21",
+   "explanation": "Zipporah was the daughter of Reuel, a priest of Midian.",
+   "hint": "She circumcised their son."
+  },
+  {
+   "id": "trivia_which_prophet_raised_the_son_of_the_shunammite_woman_from_th",
+   "difficulty": "medium",
+   "question": "Which prophet raised the son of the Shunammite woman from the dead?",
+   "answer": "Elisha",
+   "options": [
+    "Elisha",
+    "Samuel",
+    "Elijah",
+    "Ezekiel"
+   ],
+   "reference": "2 Kings 4:34–35",
+   "explanation": "Elisha lay on the child and his flesh became warm.",
+   "hint": "He was the servant of Elijah."
+  },
+  {
+   "id": "trivia_which_prophet_was_known_as_the_man_of_god_who_prophesied_to_",
+   "difficulty": "medium",
+   "question": "Which prophet was known as the 'man of God' who prophesied to Jeroboam at Bethel?",
+   "answer": "A man of God from Judah",
+   "options": [
+    "A man of God from Judah",
+    "Shemaiah",
+    "Azariah",
+    "Iddo"
+   ],
+   "reference": "1 Kings 13:1–2",
+   "explanation": "The prophet from Judah spoke against the altar at Bethel.",
+   "hint": "The Bible describes him as coming from Judah."
+  },
+  {
+   "id": "trivia_which_king_had_a_wife_named_athaliah_who_killed_the_royal_fa",
+   "difficulty": "medium",
+   "question": "Which king had a wife named Athaliah who killed the royal family?",
+   "answer": "Ahaziah",
+   "options": [
+    "Ahab",
+    "Jehoash",
+    "Joram",
+    "Ahaziah"
+   ],
+   "reference": "2 Kings 11:1",
+   "explanation": "Athaliah destroyed the royal family, but Joash was hidden in the temple.",
+   "hint": "She was the daughter of Ahab."
+  },
+  {
+   "id": "trivia_which_priest_hid_the_young_king_joash_in_the_temple",
+   "difficulty": "medium",
+   "question": "Which priest hid the young king Joash in the temple?",
+   "answer": "Jehoiada",
+   "options": [
+    "Jehoiada",
+    "Eli",
+    "Zadok",
+    "Hilkiah"
+   ],
+   "reference": "2 Kings 11:2–3",
+   "explanation": "Jehoiada rescued Joash and later helped him become king.",
+   "hint": "He was the high priest."
+  },
+  {
+   "id": "trivia_which_prophet_told_king_asa_he_would_be_strong_if_he_trusted",
+   "difficulty": "medium",
+   "question": "Which prophet told King Asa he would be strong if he trusted God?",
+   "answer": "Azariah",
+   "options": [
+    "Hanani",
+    "Iddo",
+    "Obed",
+    "Azariah"
+   ],
+   "reference": "2 Chronicles 15:1–2",
+   "explanation": "Azariah reminded Asa that the Lord is with those who are with him.",
+   "hint": "Asa had won against a great army."
+  },
+  {
+   "id": "trivia_who_was_the_moabite_woman_who_said_whither_thou_goest_i_will",
+   "difficulty": "medium",
+   "question": "Who was the Moabite woman who said 'Whither thou goest, I will go'?",
+   "answer": "Ruth",
+   "options": [
+    "Rahab",
+    "Ruth",
+    "Orpah",
+    "Naomi"
+   ],
+   "reference": "Ruth 1:16",
+   "explanation": "Ruth committed herself to Naomi and her people.",
+   "hint": "Orpah returned to her family."
+  },
+  {
+   "id": "trivia_which_man_sat_under_a_tree_while_god_revealed_he_would_be_th",
+   "difficulty": "medium",
+   "question": "Which man sat under a tree while God revealed he would be the deliverer of Israel?",
+   "answer": "Gideon",
+   "options": [
+    "Samson",
+    "Gideon",
+    "Ehud",
+    "Barak"
+   ],
+   "reference": "Judges 6:11",
+   "explanation": "The angel of the Lord sat under an oak tree in Ophrah.",
+   "hint": "He was threshing wheat in a winepress."
+  },
+  {
+   "id": "trivia_which_warrior_judge_was_helped_by_deborah",
+   "difficulty": "medium",
+   "question": "Which warrior judge was helped by Deborah?",
+   "answer": "Barak",
+   "options": [
+    "Othniel",
+    "Gideon",
+    "Jephthah",
+    "Barak"
+   ],
+   "reference": "Judges 4:6–8",
+   "explanation": "Barak agreed to fight only if Deborah went with him.",
+   "hint": "He was from Naphtali."
+  },
+  {
+   "id": "trivia_which_woman_was_given_a_son_after_her_prayers_and_then_sang_",
+   "difficulty": "medium",
+   "question": "Which woman was given a son after her prayers, and then sang a song of thanksgiving?",
+   "answer": "Hannah",
+   "options": [
+    "Miriam",
+    "Hannah",
+    "Rebekah",
+    "Deborah"
+   ],
+   "reference": "1 Samuel 2:1",
+   "explanation": "Hannah praised God for his salvation and for lifting up the poor.",
+   "hint": "Her son was Samuel."
+  },
+  {
+   "id": "trivia_who_said_speak_lord_for_thy_servant_heareth",
+   "difficulty": "medium",
+   "question": "Who said 'Speak, LORD; for thy servant heareth'?",
+   "answer": "Samuel",
+   "options": [
+    "Gad",
+    "Nathan",
+    "Eli",
+    "Samuel"
+   ],
+   "reference": "1 Samuel 3:9–10",
+   "explanation": "The boy Samuel answered God's call in the temple.",
+   "hint": "He grew up in the house of Eli."
+  },
+  {
+   "id": "trivia_who_was_the_commander_of_david_s_army_who_killed_uriah",
+   "difficulty": "medium",
+   "question": "Who was the commander of David's army who killed Uriah?",
+   "answer": "Joab",
+   "options": [
+    "Abner",
+    "Benaiah",
+    "Amasa",
+    "Joab"
+   ],
+   "reference": "2 Samuel 11:14–17",
+   "explanation": "Joab arranged for Uriah to be placed in danger in battle.",
+   "hint": "He was David's nephew."
+  },
+  {
+   "id": "trivia_which_man_was_david_s_son_who_killed_amnon",
+   "difficulty": "medium",
+   "question": "Which man was David's son who killed Amnon?",
+   "answer": "Absalom",
+   "options": [
+    "Shammah",
+    "Adonijah",
+    "Chileab",
+    "Absalom"
+   ],
+   "reference": "2 Samuel 13:28–29",
+   "explanation": "Absalom had Amnon killed after the attack on Tamar.",
+   "hint": "He later rebelled against David."
+  },
+  {
+   "id": "trivia_which_king_had_a_counsellor_named_ahithophel_who_joined_absa",
+   "difficulty": "medium",
+   "question": "Which king had a counsellor named Ahithophel who joined Absalom's rebellion?",
+   "answer": "David",
+   "options": [
+    "David",
+    "Solomon",
+    "Hezekiah",
+    "Saul"
+   ],
+   "reference": "2 Samuel 15:12",
+   "explanation": "Ahithophel supported Absalom against his former king.",
+   "hint": "The king fled Jerusalem."
+  },
+  {
+   "id": "trivia_who_cursed_david_as_he_fled_from_absalom",
+   "difficulty": "medium",
+   "question": "Who cursed David as he fled from Absalom?",
+   "answer": "Shimei",
+   "options": [
+    "Ittai",
+    "Joab",
+    "Shimei",
+    "Abishai"
+   ],
+   "reference": "2 Samuel 16:5–6",
+   "explanation": "Shimei threw stones and cursed the king on the road.",
+   "hint": "He was from the family of Saul."
+  },
+  {
+   "id": "trivia_which_captain_of_david_s_army_was_absalom_s_cousin_and_fough",
+   "difficulty": "medium",
+   "question": "Which captain of David's army was Absalom's cousin and fought against him?",
+   "answer": "Joab",
+   "options": [
+    "Ittai",
+    "Benaiah",
+    "Joab",
+    "Abishai"
+   ],
+   "reference": "2 Samuel 18:14",
+   "explanation": "Joab killed Absalom when his hair caught in an oak tree.",
+   "hint": "He was the commander of the army."
+  },
+  {
+   "id": "trivia_who_was_the_mother_of_jesus",
+   "difficulty": "easy",
+   "question": "Who was the mother of Jesus?",
+   "answer": "Mary",
+   "options": [
+    "Anna",
+    "Martha",
+    "Mary",
+    "Elizabeth"
+   ],
+   "reference": "Luke 1:30–31",
+   "explanation": "The angel Gabriel told Mary she would conceive and bear a son.",
+   "hint": "She lived in Nazareth."
+  },
+  {
+   "id": "trivia_who_was_the_cousin_of_jesus_who_baptised_him",
+   "difficulty": "easy",
+   "question": "Who was the cousin of Jesus who baptised him?",
+   "answer": "John the Baptist",
+   "options": [
+    "John the Baptist",
+    "Peter",
+    "Thomas",
+    "James"
+   ],
+   "reference": "Matthew 3:13–15",
+   "explanation": "John baptised Jesus in the Jordan River.",
+   "hint": "He wore clothing of camel's hair."
+  },
+  {
+   "id": "trivia_in_which_town_was_jesus_born",
+   "difficulty": "easy",
+   "question": "In which town was Jesus born?",
+   "answer": "Bethlehem",
+   "options": [
+    "Bethlehem",
+    "Capernaum",
+    "Nazareth",
+    "Jerusalem"
+   ],
+   "reference": "Luke 2:4–7",
+   "explanation": "Joseph and Mary travelled to Bethlehem, where Jesus was born.",
+   "hint": "It is also called the city of David."
+  },
+  {
+   "id": "trivia_where_did_jesus_grow_up",
+   "difficulty": "easy",
+   "question": "Where did Jesus grow up?",
+   "answer": "Nazareth",
+   "options": [
+    "Bethlehem",
+    "Samaria",
+    "Bethany",
+    "Nazareth"
+   ],
+   "reference": "Luke 2:39",
+   "explanation": "After the visit to Jerusalem, the family returned to their own city.",
+   "hint": "It is in Galilee."
+  },
+  {
+   "id": "trivia_which_disciple_was_a_tax_collector",
+   "difficulty": "easy",
+   "question": "Which disciple was a tax collector?",
+   "answer": "Matthew",
+   "options": [
+    "Thaddaeus",
+    "Matthew",
+    "Bartholomew",
+    "Simon"
+   ],
+   "reference": "Matthew 9:9",
+   "explanation": "Jesus called Matthew from his tax booth to follow him.",
+   "hint": "He also wrote the first Gospel."
+  },
+  {
+   "id": "trivia_which_disciple_was_also_called_didymus",
+   "difficulty": "easy",
+   "question": "Which disciple was also called Didymus?",
+   "answer": "Thomas",
+   "options": [
+    "Philip",
+    "Nathanael",
+    "Thomas",
+    "Andrew"
+   ],
+   "reference": "John 11:16",
+   "explanation": "Didymus means 'twin' in Greek.",
+   "hint": "He wanted to see the nail marks."
+  },
+  {
+   "id": "trivia_who_was_the_brother_of_peter",
+   "difficulty": "easy",
+   "question": "Who was the brother of Peter?",
+   "answer": "Andrew",
+   "options": [
+    "Philip",
+    "John",
+    "James",
+    "Andrew"
+   ],
+   "reference": "John 1:40–42",
+   "explanation": "Andrew brought Peter to Jesus.",
+   "hint": "He was a fisherman with his brother."
+  },
+  {
+   "id": "trivia_which_two_brothers_were_called_sons_of_thunder",
+   "difficulty": "easy",
+   "question": "Which two brothers were called 'Sons of Thunder'?",
+   "answer": "James and John",
+   "options": [
+    "Matthew and Thomas",
+    "Peter and Andrew",
+    "Simon and Jude",
+    "James and John"
+   ],
+   "reference": "Mark 3:17",
+   "explanation": "Jesus gave them this name, perhaps for their temper.",
+   "hint": "They were fishermen by the Sea of Galilee."
+  },
+  {
+   "id": "trivia_how_many_disciples_did_jesus_choose_as_apostles",
+   "difficulty": "easy",
+   "question": "How many disciples did Jesus choose as apostles?",
+   "answer": "Twelve",
+   "options": [
+    "Seven",
+    "Forty",
+    "Twelve",
+    "Ten"
+   ],
+   "reference": "Luke 6:13",
+   "explanation": "Jesus chose twelve from among his disciples to be apostles.",
+   "hint": "The number matches the tribes of Israel."
+  },
+  {
+   "id": "trivia_who_betrayed_jesus_for_thirty_pieces_of_silver",
+   "difficulty": "easy",
+   "question": "Who betrayed Jesus for thirty pieces of silver?",
+   "answer": "Judas Iscariot",
+   "options": [
+    "Simon Peter",
+    "Thomas",
+    "Judas Iscariot",
+    "Matthias"
+   ],
+   "reference": "Matthew 26:14–16",
+   "explanation": "Judas agreed to hand Jesus over to the chief priests.",
+   "hint": "He carried the money bag."
+  },
+  {
+   "id": "trivia_who_denied_jesus_three_times_before_the_cock_crew",
+   "difficulty": "easy",
+   "question": "Who denied Jesus three times before the cock crew?",
+   "answer": "Peter",
+   "options": [
+    "Peter",
+    "Philip",
+    "John",
+    "Thomas"
+   ],
+   "reference": "Matthew 26:69–75",
+   "explanation": "Peter denied knowing Jesus, as Jesus had foretold.",
+   "hint": "He wept bitterly afterwards."
+  },
+  {
+   "id": "trivia_which_garden_did_jesus_pray_in_before_his_arrest",
+   "difficulty": "easy",
+   "question": "Which garden did Jesus pray in before his arrest?",
+   "answer": "Gethsemane",
+   "options": [
+    "Siloam",
+    "Olivet",
+    "Gethsemane",
+    "Eden"
+   ],
+   "reference": "Matthew 26:36",
+   "explanation": "Jesus prayed there while the disciples slept.",
+   "hint": "It is at the foot of the Mount of Olives."
+  },
+  {
+   "id": "trivia_what_did_jesus_turn_water_into_at_the_wedding_in_cana",
+   "difficulty": "easy",
+   "question": "What did Jesus turn water into at the wedding in Cana?",
+   "answer": "Wine",
+   "options": [
+    "Milk",
+    "Oil",
+    "Honey",
+    "Wine"
+   ],
+   "reference": "John 2:1–11",
+   "explanation": "This was Jesus' first sign, which showed his glory.",
+   "hint": "The steward tasted it and was surprised."
+  },
+  {
+   "id": "trivia_how_many_loaves_and_fish_did_jesus_use_to_feed_the_five_thou",
+   "difficulty": "easy",
+   "question": "How many loaves and fish did Jesus use to feed the five thousand?",
+   "answer": "Five loaves and two fish",
+   "options": [
+    "Seven loaves and a few fish",
+    "Five loaves and two fish",
+    "Two loaves and five fish",
+    "Ten loaves"
+   ],
+   "reference": "Matthew 14:17",
+   "explanation": "A boy's meal was blessed and shared by Jesus.",
+   "hint": "Twelve baskets of pieces were left over."
+  },
+  {
+   "id": "trivia_on_which_sea_did_jesus_walk_on_the_water",
+   "difficulty": "easy",
+   "question": "On which sea did Jesus walk on the water?",
+   "answer": "The Sea of Galilee",
+   "options": [
+    "The Sea of Galilee",
+    "The Dead Sea",
+    "The Mediterranean Sea",
+    "The Red Sea"
+   ],
+   "reference": "Matthew 14:25–26",
+   "explanation": "The disciples were frightened when they saw him walking towards them.",
+   "hint": "It is also called Lake Gennesaret."
+  },
+  {
+   "id": "trivia_who_was_the_disciple_who_walked_on_water_toward_jesus_until_",
+   "difficulty": "easy",
+   "question": "Who was the disciple who walked on water toward Jesus until he doubted?",
+   "answer": "Peter",
+   "options": [
+    "James",
+    "Andrew",
+    "Peter",
+    "John"
+   ],
+   "reference": "Matthew 14:29–30",
+   "explanation": "Peter began to sink when he looked at the wind.",
+   "hint": "Jesus caught him and lifted him up."
+  },
+  {
+   "id": "trivia_which_parable_tells_of_a_man_robbed_on_the_road_to_jericho",
+   "difficulty": "easy",
+   "question": "Which parable tells of a man robbed on the road to Jericho?",
+   "answer": "The Good Samaritan",
+   "options": [
+    "The Prodigal Son",
+    "The Talents",
+    "The Sower",
+    "The Good Samaritan"
+   ],
+   "reference": "Luke 10:30–37",
+   "explanation": "The Samaritan showed mercy when others passed by.",
+   "hint": "Jesus told it in answer to 'Who is my neighbour?'"
+  },
+  {
+   "id": "trivia_which_parable_tells_of_a_son_who_left_home_and_came_back",
+   "difficulty": "easy",
+   "question": "Which parable tells of a son who left home and came back?",
+   "answer": "The Prodigal Son",
+   "options": [
+    "The Wicked Servant",
+    "The Prodigal Son",
+    "The Lost Sheep",
+    "The Mustard Seed"
+   ],
+   "reference": "Luke 15:11–32",
+   "explanation": "The father welcomed his son home with joy.",
+   "hint": "It is in the chapter about lost things."
+  },
+  {
+   "id": "trivia_which_parable_compares_the_kingdom_to_a_tiny_seed_that_grows",
+   "difficulty": "easy",
+   "question": "Which parable compares the kingdom to a tiny seed that grows large?",
+   "answer": "The Mustard Seed",
+   "options": [
+    "The Pearl",
+    "The Mustard Seed",
+    "The Leaven",
+    "The Net"
+   ],
+   "reference": "Matthew 13:31–32",
+   "explanation": "The small seed becomes a tree where birds can rest.",
+   "hint": "It is one of the parables of the kingdom."
+  },
+  {
+   "id": "trivia_who_did_jesus_say_was_the_good_shepherd",
+   "difficulty": "easy",
+   "question": "Who did Jesus say was 'the good shepherd'?",
+   "answer": "Jesus",
+   "options": [
+    "Peter",
+    "Moses",
+    "David",
+    "Jesus"
+   ],
+   "reference": "John 10:11",
+   "explanation": "Jesus said he was the good shepherd who gives his life for the sheep.",
+   "hint": "The sheep know his voice."
+  },
+  {
+   "id": "trivia_what_is_the_shortest_verse_in_the_bible",
+   "difficulty": "easy",
+   "question": "What is the shortest verse in the Bible?",
+   "answer": "Jesus wept",
+   "options": [
+    "Jesus wept",
+    "Pray without ceasing",
+    "God is love",
+    "Rejoice evermore"
+   ],
+   "reference": "John 11:35",
+   "explanation": "Jesus wept at the grave of Lazarus.",
+   "hint": "It is in the Gospel of John."
+  },
+  {
+   "id": "trivia_what_did_jesus_raise_from_the_dead_in_bethany",
+   "difficulty": "easy",
+   "question": "What did Jesus raise from the dead in Bethany?",
+   "answer": "Lazarus",
+   "options": [
+    "Lazarus",
+    "The widow's son",
+    "Tabitha",
+    "Jairus' daughter"
+   ],
+   "reference": "John 11:43–44",
+   "explanation": "Jesus called Lazarus out of the tomb after four days.",
+   "hint": "Lazarus was a friend of Jesus."
+  },
+  {
+   "id": "trivia_which_sisters_lived_in_bethany_with_lazarus",
+   "difficulty": "easy",
+   "question": "Which sisters lived in Bethany with Lazarus?",
+   "answer": "Mary and Martha",
+   "options": [
+    "Mary and Elizabeth",
+    "Dorcas and Lydia",
+    "Anna and Salome",
+    "Mary and Martha"
+   ],
+   "reference": "John 11:1",
+   "explanation": "Jesus loved this family.",
+   "hint": "One sister was busy serving while the other sat at Jesus' feet."
+  },
+  {
+   "id": "trivia_who_was_the_tax_collector_who_climbed_a_tree_to_see_jesus",
+   "difficulty": "easy",
+   "question": "Who was the tax collector who climbed a tree to see Jesus?",
+   "answer": "Zacchaeus",
+   "options": [
+    "Matthew",
+    "Zacchaeus",
+    "Bartimaeus",
+    "Levi"
+   ],
+   "reference": "Luke 19:2–4",
+   "explanation": "He was short and climbed a sycamore tree.",
+   "hint": "Jesus invited himself to his house."
+  },
+  {
+   "id": "trivia_who_was_the_blind_man_healed_outside_jericho_who_called_out_",
+   "difficulty": "easy",
+   "question": "Who was the blind man healed outside Jericho who called out to Jesus?",
+   "answer": "Bartimaeus",
+   "options": [
+    "Zacchaeus",
+    "Bartimaeus",
+    "Simon",
+    "Lazarus"
+   ],
+   "reference": "Mark 10:46–52",
+   "explanation": "The blind beggar cried out to the son of David and received his sight.",
+   "hint": "His name means 'son of Timaeus'."
+  },
+  {
+   "id": "trivia_who_was_the_man_healed_at_the_pool_of_bethesda",
+   "difficulty": "easy",
+   "question": "Who was the man healed at the pool of Bethesda?",
+   "answer": "A man who had been sick for thirty-eight years",
+   "options": [
+    "A man who had been sick for thirty-eight years",
+    "A blind beggar",
+    "A man with a withered hand",
+    "A leper"
+   ],
+   "reference": "John 5:5–9",
+   "explanation": "Jesus told him to take up his bed and walk.",
+   "hint": "The pool had five porches."
+  },
+  {
+   "id": "trivia_what_did_jesus_say_to_the_paralysed_man_his_friends_lowered_",
+   "difficulty": "easy",
+   "question": "What did Jesus say to the paralysed man his friends lowered through a roof?",
+   "answer": "Thy sins be forgiven thee",
+   "options": [
+    "Thy sins be forgiven thee",
+    "Your faith has saved you",
+    "Rise and walk",
+    "Be clean"
+   ],
+   "reference": "Mark 2:5",
+   "explanation": "Jesus forgave the man's sins and then healed him.",
+   "hint": "The roof was opened to let him in."
+  },
+  {
+   "id": "trivia_who_was_the_woman_who_touched_jesus_garment_and_was_healed",
+   "difficulty": "easy",
+   "question": "Who was the woman who touched Jesus' garment and was healed?",
+   "answer": "A woman with an issue of blood",
+   "options": [
+    "Mary of Magdala",
+    "The Syrophoenician woman",
+    "A widow of Nain",
+    "A woman with an issue of blood"
+   ],
+   "reference": "Mark 5:25–34",
+   "explanation": "She had suffered for twelve years and was made whole by her faith.",
+   "hint": "Jesus felt power go out of him."
+  },
+  {
+   "id": "trivia_which_jewish_ruler_came_to_jesus_at_night",
+   "difficulty": "easy",
+   "question": "Which Jewish ruler came to Jesus at night?",
+   "answer": "Nicodemus",
+   "options": [
+    "Caiaphas",
+    "Joseph of Arimathea",
+    "Gamaliel",
+    "Nicodemus"
+   ],
+   "reference": "John 3:1–2",
+   "explanation": "He came to Jesus and learned about being born again.",
+   "hint": "He later helped bury Jesus."
+  },
+  {
+   "id": "trivia_who_said_behold_the_lamb_of_god",
+   "difficulty": "easy",
+   "question": "Who said 'Behold the Lamb of God'?",
+   "answer": "John the Baptist",
+   "options": [
+    "Peter",
+    "Paul",
+    "Andrew",
+    "John the Baptist"
+   ],
+   "reference": "John 1:29",
+   "explanation": "John pointed to Jesus as the one who takes away the sin of the world.",
+   "hint": "He was in the wilderness of Judea."
+  },
+  {
+   "id": "trivia_what_was_jesus_first_miracle_recorded_in_john",
+   "difficulty": "easy",
+   "question": "What was Jesus' first miracle recorded in John?",
+   "answer": "Turning water into wine",
+   "options": [
+    "Turning water into wine",
+    "Healing a nobleman's son",
+    "Feeding the crowd",
+    "Calming the storm"
+   ],
+   "reference": "John 2:11",
+   "explanation": "This sign at Cana showed his glory.",
+   "hint": "The guests were at a wedding."
+  },
+  {
+   "id": "trivia_who_was_the_pharisee_who_asked_jesus_about_the_greatest_comm",
+   "difficulty": "easy",
+   "question": "Who was the Pharisee who asked Jesus about the greatest commandment?",
+   "answer": "A lawyer",
+   "options": [
+    "A tax collector",
+    "A lawyer",
+    "A Sadducee",
+    "A centurion"
+   ],
+   "reference": "Matthew 22:35–36",
+   "explanation": "The lawyer tested Jesus by asking about the law.",
+   "hint": "Jesus answered by quoting Deuteronomy."
+  },
+  {
+   "id": "trivia_what_is_the_greatest_commandment_according_to_jesus",
+   "difficulty": "easy",
+   "question": "What is the greatest commandment according to Jesus?",
+   "answer": "Love the Lord thy God with all thy heart",
+   "options": [
+    "Keep the sabbath holy",
+    "Honour your parents",
+    "Do not steal",
+    "Love the Lord thy God with all thy heart"
+   ],
+   "reference": "Matthew 22:37",
+   "explanation": "Jesus said the first commandment is to love God wholly.",
+   "hint": "The second is like it: love your neighbour."
+  },
+  {
+   "id": "trivia_who_was_the_centurion_whose_servant_jesus_healed_without_goi",
+   "difficulty": "easy",
+   "question": "Who was the centurion whose servant Jesus healed without going to his house?",
+   "answer": "A centurion",
+   "options": [
+    "A Pharisee",
+    "A Roman governor",
+    "A centurion",
+    "A Samaritan leper"
+   ],
+   "reference": "Matthew 8:5–13",
+   "explanation": "The centurion believed that Jesus could heal by a word.",
+   "hint": "Jesus marvelled at his faith."
+  },
+  {
+   "id": "trivia_who_asked_jesus_who_is_my_neighbour",
+   "difficulty": "easy",
+   "question": "Who asked Jesus, 'Who is my neighbour?'",
+   "answer": "A lawyer",
+   "options": [
+    "A Pharisee's servant",
+    "Peter",
+    "A widow",
+    "A lawyer"
+   ],
+   "reference": "Luke 10:29",
+   "explanation": "This question led to the parable of the Good Samaritan.",
+   "hint": "He wanted to justify himself."
+  },
+  {
+   "id": "trivia_who_was_the_widow_of_nain_whose_son_jesus_raised",
+   "difficulty": "easy",
+   "question": "Who was the widow of Nain whose son Jesus raised?",
+   "answer": "Her only son",
+   "options": [
+    "Her daughter",
+    "Her husband",
+    "Her brother",
+    "Her only son"
+   ],
+   "reference": "Luke 7:12–15",
+   "explanation": "Jesus had compassion on the widow and raised her son.",
+   "hint": "The town is in Galilee."
+  },
+  {
+   "id": "trivia_what_did_the_prodigal_son_eat_with_the_pigs",
+   "difficulty": "easy",
+   "question": "What did the prodigal son eat with the pigs?",
+   "answer": "Husks",
+   "options": [
+    "Beans",
+    "Figs",
+    "Husks",
+    "Bread"
+   ],
+   "reference": "Luke 15:16",
+   "explanation": "He was hungry in a far country and wished to eat the husks.",
+   "hint": "He came to himself and returned home."
+  },
+  {
+   "id": "trivia_what_is_the_name_of_the_place_where_jesus_was_crucified",
+   "difficulty": "easy",
+   "question": "What is the name of the place where Jesus was crucified?",
+   "answer": "Golgotha",
+   "options": [
+    "Gethsemane",
+    "Emmaus",
+    "Golgotha",
+    "Bethany"
+   ],
+   "reference": "Matthew 27:33",
+   "explanation": "The name means 'place of a skull'.",
+   "hint": "It was outside Jerusalem."
+  },
+  {
+   "id": "trivia_who_carried_the_cross_for_jesus",
+   "difficulty": "easy",
+   "question": "Who carried the cross for Jesus?",
+   "answer": "Simon of Cyrene",
+   "options": [
+    "Barabbas",
+    "Simon of Cyrene",
+    "Joseph of Arimathea",
+    "Nicodemus"
+   ],
+   "reference": "Matthew 27:32",
+   "explanation": "A passer-by was made to carry the cross.",
+   "hint": "He came from North Africa."
+  },
+  {
+   "id": "trivia_what_was_written_above_jesus_head_on_the_cross",
+   "difficulty": "easy",
+   "question": "What was written above Jesus' head on the cross?",
+   "answer": "The King of the Jews",
+   "options": [
+    "The King of the Jews",
+    "The Son of God",
+    "The Shepherd",
+    "The Christ of Galilee"
+   ],
+   "reference": "John 19:19",
+   "explanation": "Pilate had the words written in three languages.",
+   "hint": "It was written in Hebrew, Greek and Latin."
+  },
+  {
+   "id": "trivia_who_buried_jesus_in_his_own_new_tomb",
+   "difficulty": "easy",
+   "question": "Who buried Jesus in his own new tomb?",
+   "answer": "Joseph of Arimathea",
+   "options": [
+    "Joseph of Arimathea",
+    "Lazarus",
+    "Nicodemus",
+    "Simon"
+   ],
+   "reference": "Matthew 27:57–60",
+   "explanation": "Joseph asked Pilate for the body and laid it in his tomb.",
+   "hint": "He was a rich man and a disciple."
+  },
+  {
+   "id": "trivia_who_were_the_first_to_see_the_empty_tomb",
+   "difficulty": "easy",
+   "question": "Who were the first to see the empty tomb?",
+   "answer": "Mary Magdalene and other women",
+   "options": [
+    "The disciples at Emmaus",
+    "Peter and John",
+    "The soldiers",
+    "Mary Magdalene and other women"
+   ],
+   "reference": "Matthew 28:1",
+   "explanation": "The women came at dawn and found the stone rolled away.",
+   "hint": "An angel spoke to them."
+  },
+  {
+   "id": "trivia_which_two_disciples_walked_to_emmaus_and_met_the_risen_jesus",
+   "difficulty": "easy",
+   "question": "Which two disciples walked to Emmaus and met the risen Jesus?",
+   "answer": "Cleopas and another disciple",
+   "options": [
+    "Peter and Andrew",
+    "Cleopas and another disciple",
+    "Thomas and Philip",
+    "James and John"
+   ],
+   "reference": "Luke 24:13–18",
+   "explanation": "They did not recognise Jesus until he broke bread with them.",
+   "hint": "They were going to a village near Jerusalem."
+  },
+  {
+   "id": "trivia_what_did_jesus_ask_peter_three_times",
+   "difficulty": "easy",
+   "question": "What did Jesus ask Peter three times?",
+   "answer": "Lovest thou me?",
+   "options": [
+    "Who do you say I am?",
+    "Will you follow me?",
+    "Lovest thou me?",
+    "Do you believe this?"
+   ],
+   "reference": "John 21:15–17",
+   "explanation": "Jesus restored Peter after his three denials.",
+   "hint": "He told Peter to feed his sheep."
+  },
+  {
+   "id": "trivia_on_which_feast_day_did_the_holy_spirit_come_upon_the_discipl",
+   "difficulty": "easy",
+   "question": "On which feast day did the Holy Spirit come upon the disciples?",
+   "answer": "Pentecost",
+   "options": [
+    "Passover",
+    "Purim",
+    "Tabernacles",
+    "Pentecost"
+   ],
+   "reference": "Acts 2:1–4",
+   "explanation": "The disciples were gathered together when the Spirit came like a mighty wind.",
+   "hint": "It is fifty days after Passover."
+  },
+  {
+   "id": "trivia_who_was_the_first_martyr_of_the_christian_church",
+   "difficulty": "easy",
+   "question": "Who was the first martyr of the Christian church?",
+   "answer": "Stephen",
+   "options": [
+    "Peter",
+    "Philip",
+    "Stephen",
+    "Barnabas"
+   ],
+   "reference": "Acts 7:58–60",
+   "explanation": "Stephen was stoned for preaching Jesus, and he prayed for his killers.",
+   "hint": "He was one of the seven deacons."
+  },
+  {
+   "id": "trivia_who_was_struck_blind_on_the_road_to_damascus",
+   "difficulty": "easy",
+   "question": "Who was struck blind on the road to Damascus?",
+   "answer": "Saul",
+   "options": [
+    "Silas",
+    "Barnabas",
+    "Saul",
+    "Ananias"
+   ],
+   "reference": "Acts 9:3–8",
+   "explanation": "Saul saw a light from heaven and heard the voice of Jesus.",
+   "hint": "He was later known as Paul."
+  },
+  {
+   "id": "trivia_who_was_the_man_in_damascus_who_laid_hands_on_saul",
+   "difficulty": "easy",
+   "question": "Who was the man in Damascus who laid hands on Saul?",
+   "answer": "Ananias",
+   "options": [
+    "Silas",
+    "Barnabas",
+    "Timothy",
+    "Ananias"
+   ],
+   "reference": "Acts 9:10–17",
+   "explanation": "Ananias obeyed God and restored Saul's sight.",
+   "hint": "He was a disciple living in Damascus."
+  },
+  {
+   "id": "trivia_who_was_the_ethiopian_official_baptised_by_philip",
+   "difficulty": "easy",
+   "question": "Who was the Ethiopian official baptised by Philip?",
+   "answer": "The eunuch of the Ethiopian queen",
+   "options": [
+    "The eunuch of the Ethiopian queen",
+    "A sailor",
+    "A Pharisee",
+    "A Roman soldier"
+   ],
+   "reference": "Acts 8:27–38",
+   "explanation": "Philip explained Isaiah 53 and baptised him on the road to Gaza.",
+   "hint": "He was reading the book of Isaiah in his chariot."
+  },
+  {
+   "id": "trivia_who_was_the_woman_in_joppa_raised_from_the_dead_by_peter",
+   "difficulty": "easy",
+   "question": "Who was the woman in Joppa raised from the dead by Peter?",
+   "answer": "Tabitha, also called Dorcas",
+   "options": [
+    "Lydia",
+    "Phoebe",
+    "Priscilla",
+    "Tabitha, also called Dorcas"
+   ],
+   "reference": "Acts 9:36–41",
+   "explanation": "Peter prayed and told her to arise.",
+   "hint": "She made clothes for the poor."
+  },
+  {
+   "id": "trivia_which_seller_of_purple_cloth_became_a_believer_in_philippi",
+   "difficulty": "easy",
+   "question": "Which seller of purple cloth became a believer in Philippi?",
+   "answer": "Lydia",
+   "options": [
+    "Damaris",
+    "Phoebe",
+    "Priscilla",
+    "Lydia"
+   ],
+   "reference": "Acts 16:14",
+   "explanation": "The Lord opened her heart to heed Paul's words.",
+   "hint": "She was from Thyatira."
+  },
+  {
+   "id": "trivia_who_were_the_tentmakers_paul_worked_with_in_corinth",
+   "difficulty": "easy",
+   "question": "Who were the tentmakers Paul worked with in Corinth?",
+   "answer": "Aquila and Priscilla",
+   "options": [
+    "Luke and Titus",
+    "Aquila and Priscilla",
+    "Barnabas and Mark",
+    "Silas and Timothy"
+   ],
+   "reference": "Acts 18:2–3",
+   "explanation": "They were Jews expelled from Rome who welcomed Paul.",
+   "hint": "Paul worked with them as a tentmaker."
+  },
+  {
+   "id": "trivia_who_was_paul_s_companion_on_his_first_missionary_journey",
+   "difficulty": "easy",
+   "question": "Who was Paul's companion on his first missionary journey?",
+   "answer": "Barnabas",
+   "options": [
+    "Timothy",
+    "Silas",
+    "Titus",
+    "Barnabas"
+   ],
+   "reference": "Acts 13:2",
+   "explanation": "The Holy Spirit called Barnabas and Saul to the work.",
+   "hint": "He was from Cyprus."
+  },
+  {
+   "id": "trivia_who_was_the_young_man_who_fell_asleep_during_paul_s_sermon_a",
+   "difficulty": "easy",
+   "question": "Who was the young man who fell asleep during Paul's sermon and fell from a window?",
+   "answer": "Eutychus",
+   "options": [
+    "Eutychus",
+    "Mark",
+    "Onesimus",
+    "Timothy"
+   ],
+   "reference": "Acts 20:9",
+   "explanation": "Paul raised him back to life.",
+   "hint": "The meeting was in Troas."
+  },
+  {
+   "id": "trivia_which_apostle_was_shipwrecked_on_the_island_of_malta",
+   "difficulty": "easy",
+   "question": "Which apostle was shipwrecked on the island of Malta?",
+   "answer": "Paul",
+   "options": [
+    "Peter",
+    "Barnabas",
+    "John",
+    "Paul"
+   ],
+   "reference": "Acts 28:1",
+   "explanation": "Paul was bitten by a viper and was not harmed.",
+   "hint": "He was on his way to Rome as a prisoner."
+  },
+  {
+   "id": "trivia_which_letter_did_paul_write_to_the_christians_in_rome",
+   "difficulty": "easy",
+   "question": "Which letter did Paul write to the Christians in Rome?",
+   "answer": "Romans",
+   "options": [
+    "Colossians",
+    "Galatians",
+    "Romans",
+    "Ephesians"
+   ],
+   "reference": "Romans 1:7",
+   "explanation": "Paul writes about justification by faith.",
+   "hint": "It is the first long letter after Acts."
+  },
+  {
+   "id": "trivia_which_book_describes_the_seven_churches_of_asia",
+   "difficulty": "easy",
+   "question": "Which book describes the seven churches of Asia?",
+   "answer": "Revelation",
+   "options": [
+    "Revelation",
+    "Acts",
+    "Jude",
+    "Hebrews"
+   ],
+   "reference": "Revelation 1:4",
+   "explanation": "John writes letters to the seven churches.",
+   "hint": "It ends the Bible."
+  },
+  {
+   "id": "trivia_which_apostle_wrote_the_most_letters_in_the_new_testament",
+   "difficulty": "easy",
+   "question": "Which apostle wrote the most letters in the New Testament?",
+   "answer": "Paul",
+   "options": [
+    "Paul",
+    "Peter",
+    "James",
+    "John"
+   ],
+   "reference": "Romans 1:1",
+   "explanation": "Paul's letters make up a large part of the New Testament.",
+   "hint": "He was once a persecutor of the church."
+  },
+  {
+   "id": "trivia_who_is_called_the_beloved_physician_in_the_bible",
+   "difficulty": "easy",
+   "question": "Who is called the beloved physician in the Bible?",
+   "answer": "Luke",
+   "options": [
+    "Luke",
+    "Titus",
+    "Mark",
+    "Timothy"
+   ],
+   "reference": "Colossians 4:14",
+   "explanation": "Paul mentions Luke as the beloved physician.",
+   "hint": "He wrote the Gospel and the book of Acts."
+  },
+  {
+   "id": "trivia_which_faithful_disciple_was_paul_s_young_son_in_the_faith",
+   "difficulty": "easy",
+   "question": "Which faithful disciple was Paul's young son in the faith?",
+   "answer": "Timothy",
+   "options": [
+    "Titus",
+    "Silas",
+    "Timothy",
+    "Onesimus"
+   ],
+   "reference": "1 Timothy 1:2",
+   "explanation": "Paul called Timothy his true son in the faith.",
+   "hint": "His mother and grandmother were believers."
+  },
+  {
+   "id": "trivia_to_whom_did_paul_write_a_letter_about_a_runaway_slave_named_",
+   "difficulty": "easy",
+   "question": "To whom did Paul write a letter about a runaway slave named Onesimus?",
+   "answer": "Philemon",
+   "options": [
+    "Philemon",
+    "Epaphras",
+    "Titus",
+    "Timothy"
+   ],
+   "reference": "Philemon 1:10",
+   "explanation": "Paul asked Philemon to receive Onesimus as a brother.",
+   "hint": "It is the shortest letter by Paul."
+  },
+  {
+   "id": "trivia_which_book_is_the_last_in_the_bible",
+   "difficulty": "easy",
+   "question": "Which book is the last in the Bible?",
+   "answer": "Revelation",
+   "options": [
+    "3 John",
+    "Hebrews",
+    "Jude",
+    "Revelation"
+   ],
+   "reference": "Revelation 22:21",
+   "explanation": "The book ends with a blessing on the saints.",
+   "hint": "It is a book of visions."
+  },
+  {
+   "id": "trivia_which_letter_of_john_begins_that_which_was_from_the_beginnin",
+   "difficulty": "easy",
+   "question": "Which letter of John begins 'That which was from the beginning'?",
+   "answer": "1 John",
+   "options": [
+    "3 John",
+    "2 John",
+    "Jude",
+    "1 John"
+   ],
+   "reference": "1 John 1:1",
+   "explanation": "John writes about the word of life.",
+   "hint": "It is the first of three letters."
+  },
+  {
+   "id": "trivia_which_apostle_wrote_about_the_armour_of_god",
+   "difficulty": "easy",
+   "question": "Which apostle wrote about the armour of God?",
+   "answer": "Paul",
+   "options": [
+    "Peter",
+    "James",
+    "Jude",
+    "Paul"
+   ],
+   "reference": "Ephesians 6:11",
+   "explanation": "Paul describes the whole armour of God for spiritual battle.",
+   "hint": "He wrote from prison."
+  },
+  {
+   "id": "trivia_what_did_jesus_say_about_the_greatest_among_his_followers",
+   "difficulty": "easy",
+   "question": "What did Jesus say about the greatest among his followers?",
+   "answer": "Whosoever shall be chief shall be servant of all",
+   "options": [
+    "The first shall be first",
+    "Whosoever shall be chief shall be servant of all",
+    "Blessed are the meek",
+    "Be ye perfect"
+   ],
+   "reference": "Mark 10:44",
+   "explanation": "True greatness is found in serving others.",
+   "hint": "It was said to the disciples who argued about status."
+  },
+  {
+   "id": "trivia_which_fruit_is_listed_first_in_the_fruit_of_the_spirit",
+   "difficulty": "easy",
+   "question": "Which fruit is listed first in the fruit of the Spirit?",
+   "answer": "Love",
+   "options": [
+    "Joy",
+    "Patience",
+    "Peace",
+    "Love"
+   ],
+   "reference": "Galatians 5:22",
+   "explanation": "Love is named first in Paul's list.",
+   "hint": "The list also includes joy and peace."
+  },
+  {
+   "id": "trivia_which_christian_virtue_does_paul_say_is_greater_than_faith_a",
+   "difficulty": "easy",
+   "question": "Which Christian virtue does Paul say is greater than faith and hope?",
+   "answer": "Charity, or love",
+   "options": [
+    "Charity, or love",
+    "Kindness",
+    "Wisdom",
+    "Patience"
+   ],
+   "reference": "1 Corinthians 13:13",
+   "explanation": "Paul says that love is the greatest of these three.",
+   "hint": "The passage is often read at weddings."
+  },
+  {
+   "id": "trivia_who_was_the_apostle_that_the_church_replaced_judas_with",
+   "difficulty": "easy",
+   "question": "Who was the apostle that the church replaced Judas with?",
+   "answer": "Matthias",
+   "options": [
+    "Barnabas",
+    "Silas",
+    "Joseph",
+    "Matthias"
+   ],
+   "reference": "Acts 1:26",
+   "explanation": "The apostles cast lots, and Matthias was chosen.",
+   "hint": "He was with the disciples from the baptism of John."
+  },
+  {
+   "id": "trivia_which_apostle_preached_on_the_day_of_pentecost_and_quoted_th",
+   "difficulty": "easy",
+   "question": "Which apostle preached on the day of Pentecost and quoted the prophet Joel?",
+   "answer": "Peter",
+   "options": [
+    "John",
+    "James",
+    "Peter",
+    "Andrew"
+   ],
+   "reference": "Acts 2:14–17",
+   "explanation": "Peter explained that the Spirit had been poured out as Joel foretold.",
+   "hint": "He stood up with the eleven."
+  },
+  {
+   "id": "trivia_which_early_church_leader_was_called_the_son_of_consolation",
+   "difficulty": "easy",
+   "question": "Which early church leader was called 'the son of consolation'?",
+   "answer": "Barnabas",
+   "options": [
+    "Barnabas",
+    "Timothy",
+    "Silas",
+    "Titus"
+   ],
+   "reference": "Acts 4:36",
+   "explanation": "Barnabas sold a field and gave the money to the apostles.",
+   "hint": "His name means son of encouragement."
+  },
+  {
+   "id": "trivia_which_apostle_is_nicknamed_doubting",
+   "difficulty": "medium",
+   "question": "Which apostle is nicknamed Doubting?",
+   "answer": "Thomas",
+   "options": [
+    "Simon the Zealot",
+    "Nathanael",
+    "Thomas",
+    "Philip"
+   ],
+   "reference": "John 20:24–29",
+   "explanation": "Thomas did not believe until he saw Jesus' wounds.",
+   "hint": "He is also called Didymus."
+  },
+  {
+   "id": "trivia_which_disciple_asked_to_see_the_father",
+   "difficulty": "medium",
+   "question": "Which disciple asked to see the Father?",
+   "answer": "Philip",
+   "options": [
+    "Andrew",
+    "Philip",
+    "Thomas",
+    "James"
+   ],
+   "reference": "John 14:8",
+   "explanation": "Jesus answered that seeing him was seeing the Father.",
+   "hint": "He was from Bethsaida."
+  },
+  {
+   "id": "trivia_who_was_the_disciple_with_no_guile_in_whom_jesus_found_hones",
+   "difficulty": "medium",
+   "question": "Who was the disciple with no guile in whom Jesus found honesty?",
+   "answer": "Nathanael",
+   "options": [
+    "Nathanael",
+    "Andrew",
+    "Thomas",
+    "Matthias"
+   ],
+   "reference": "John 1:47",
+   "explanation": "Jesus praised him before he came to Jesus.",
+   "hint": "He was from Cana."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_the_roman_governor_who_condemned_jesus",
+   "difficulty": "medium",
+   "question": "What was the name of the Roman governor who condemned Jesus?",
+   "answer": "Pontius Pilate",
+   "options": [
+    "Pontius Pilate",
+    "Felix",
+    "Herod Antipas",
+    "Festus"
+   ],
+   "reference": "Matthew 27:24–26",
+   "explanation": "Pilate gave the order for Jesus to be crucified.",
+   "hint": "He washed his hands."
+  },
+  {
+   "id": "trivia_which_king_ruled_galilee_when_john_the_baptist_was_beheaded",
+   "difficulty": "medium",
+   "question": "Which king ruled Galilee when John the Baptist was beheaded?",
+   "answer": "Herod Antipas",
+   "options": [
+    "Herod Antipas",
+    "Agrippa",
+    "Archelaus",
+    "Herod the Great"
+   ],
+   "reference": "Mark 6:14–29",
+   "explanation": "Herod had John beheaded at the request of Herodias' daughter.",
+   "hint": "He was son of Herod the Great."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_the_high_priest_who_sent_jesus_to_pilat",
+   "difficulty": "medium",
+   "question": "What was the name of the high priest who sent Jesus to Pilate?",
+   "answer": "Caiaphas",
+   "options": [
+    "Annas",
+    "Caiaphas",
+    "Gamaliel",
+    "Ananias"
+   ],
+   "reference": "John 18:24–28",
+   "explanation": "Caiaphas had earlier said it was better for one man to die.",
+   "hint": "He was high priest that year."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_the_pharisee_who_taught_paul_at_jerusal",
+   "difficulty": "medium",
+   "question": "What was the name of the Pharisee who taught Paul at Jerusalem?",
+   "answer": "Gamaliel",
+   "options": [
+    "Caiaphas",
+    "Gamaliel",
+    "Annas",
+    "Nicodemus"
+   ],
+   "reference": "Acts 22:3",
+   "explanation": "Paul studied under Gamaliel.",
+   "hint": "He advised caution about the apostles."
+  },
+  {
+   "id": "trivia_who_was_the_ephesian_silversmith_who_stirred_up_a_riot_again",
+   "difficulty": "medium",
+   "question": "Who was the Ephesian silversmith who stirred up a riot against Paul?",
+   "answer": "Demetrius",
+   "options": [
+    "Demetrius",
+    "Jason",
+    "Aquila",
+    "Alexander"
+   ],
+   "reference": "Acts 19:24–25",
+   "explanation": "Demetrius made silver shrines of Artemis and feared losing business.",
+   "hint": "The city was Ephesus."
+  },
+  {
+   "id": "trivia_which_greek_city_did_paul_visit_where_the_people_worshipped_",
+   "difficulty": "medium",
+   "question": "Which Greek city did Paul visit where the people worshipped him as a god?",
+   "answer": "Lystra",
+   "options": [
+    "Corinth",
+    "Lystra",
+    "Athens",
+    "Antioch"
+   ],
+   "reference": "Acts 14:11–12",
+   "explanation": "Paul healed a lame man, and the people called Paul and Barnabas gods.",
+   "hint": "Barnabas was called Jupiter."
+  },
+  {
+   "id": "trivia_which_athenian_council_member_believed_after_paul_preached_a",
+   "difficulty": "medium",
+   "question": "Which Athenian council member believed after Paul preached at the Areopagus?",
+   "answer": "Dionysius",
+   "options": [
+    "Gamaliel",
+    "Lucius",
+    "Silas",
+    "Dionysius"
+   ],
+   "reference": "Acts 17:34",
+   "explanation": "Dionysius the Areopagite became a believer.",
+   "hint": "Paul spoke about the unknown God."
+  },
+  {
+   "id": "trivia_which_city_did_paul_say_he_had_fought_with_beasts_at_ephesus",
+   "difficulty": "medium",
+   "question": "Which city did Paul say he had fought with beasts at Ephesus?",
+   "answer": "Ephesus",
+   "options": [
+    "Philippi",
+    "Ephesus",
+    "Thessalonica",
+    "Corinth"
+   ],
+   "reference": "1 Corinthians 15:32",
+   "explanation": "Paul speaks of fighting with beasts at Ephesus, perhaps figuratively.",
+   "hint": "It was a great city in Asia."
+  },
+  {
+   "id": "trivia_who_was_the_rich_man_who_asked_jesus_what_he_must_do_to_inhe",
+   "difficulty": "medium",
+   "question": "Who was the rich man who asked Jesus what he must do to inherit eternal life?",
+   "answer": "The rich young ruler",
+   "options": [
+    "Nicodemus",
+    "Zacchaeus",
+    "Joseph of Arimathea",
+    "The rich young ruler"
+   ],
+   "reference": "Mark 10:17–22",
+   "explanation": "He went away sad because he had great possessions.",
+   "hint": "Jesus loved him."
+  },
+  {
+   "id": "trivia_which_gospel_records_the_story_of_the_rich_young_ruler",
+   "difficulty": "medium",
+   "question": "Which Gospel records the story of the rich young ruler?",
+   "answer": "Mark",
+   "options": [
+    "Luke",
+    "Mark",
+    "Matthew",
+    "John"
+   ],
+   "reference": "Mark 10:17",
+   "explanation": "Mark records the encounter with the young man who had many possessions.",
+   "hint": "This Gospel is the shortest."
+  },
+  {
+   "id": "trivia_who_was_the_high_priest_whose_servant_s_ear_peter_cut_off",
+   "difficulty": "medium",
+   "question": "Who was the high priest whose servant's ear Peter cut off?",
+   "answer": "Caiaphas",
+   "options": [
+    "Herod",
+    "Pilate",
+    "Annas",
+    "Caiaphas"
+   ],
+   "reference": "John 18:10",
+   "explanation": "Peter used a sword in the garden when Jesus was arrested.",
+   "hint": "The servant was named Malchus."
+  },
+  {
+   "id": "trivia_which_gospel_tells_of_the_angel_who_strengthened_jesus_in_ge",
+   "difficulty": "medium",
+   "question": "Which Gospel tells of the angel who strengthened Jesus in Gethsemane?",
+   "answer": "Luke",
+   "options": [
+    "John",
+    "Matthew",
+    "Mark",
+    "Luke"
+   ],
+   "reference": "Luke 22:43",
+   "explanation": "An angel appeared from heaven to strengthen him.",
+   "hint": "This Gospel is written to Theophilus."
+  },
+  {
+   "id": "trivia_what_did_jesus_say_about_children_coming_to_him",
+   "difficulty": "medium",
+   "question": "What did Jesus say about children coming to him?",
+   "answer": "Suffer the little children to come unto me",
+   "options": [
+    "Bring the children to the temple",
+    "Let the children go home",
+    "Suffer the little children to come unto me",
+    "Teach the children the law"
+   ],
+   "reference": "Mark 10:14",
+   "explanation": "Jesus welcomed the children and blessed them.",
+   "hint": "The disciples had tried to stop the parents."
+  },
+  {
+   "id": "trivia_what_did_jesus_tell_the_disciples_to_do_when_they_prayed",
+   "difficulty": "medium",
+   "question": "What did Jesus tell the disciples to do when they prayed?",
+   "answer": "Say Our Father",
+   "options": [
+    "Light a lamp",
+    "Say Our Father",
+    "Fast for forty days",
+    "Read the law"
+   ],
+   "reference": "Matthew 6:9",
+   "explanation": "Jesus taught them to pray with the words of the Lord's prayer.",
+   "hint": "It begins 'Our Father which art in heaven'."
+  },
+  {
+   "id": "trivia_what_did_the_samaritan_woman_ask_jesus_to_give_her",
+   "difficulty": "medium",
+   "question": "What did the Samaritan woman ask Jesus to give her?",
+   "answer": "Living water",
+   "options": [
+    "Oil",
+    "Living water",
+    "Wine",
+    "Bread"
+   ],
+   "reference": "John 4:10",
+   "explanation": "Jesus offered living water to the woman at the well.",
+   "hint": "The conversation took place at Jacob's well."
+  },
+  {
+   "id": "trivia_which_disciple_was_known_as_the_one_whom_jesus_loved",
+   "difficulty": "medium",
+   "question": "Which disciple was known as the one whom Jesus loved?",
+   "answer": "John",
+   "options": [
+    "Andrew",
+    "John",
+    "James",
+    "Peter"
+   ],
+   "reference": "John 13:23",
+   "explanation": "This disciple leaned on Jesus' breast at the supper.",
+   "hint": "He wrote the fourth Gospel."
+  },
+  {
+   "id": "trivia_who_was_the_disciple_who_went_with_peter_to_the_high_priest_",
+   "difficulty": "medium",
+   "question": "Who was the disciple who went with Peter to the high priest's courtyard?",
+   "answer": "John",
+   "options": [
+    "Andrew",
+    "John",
+    "Philip",
+    "James"
+   ],
+   "reference": "John 18:15–16",
+   "explanation": "This disciple was known to the high priest and got Peter in.",
+   "hint": "He is the author of the fourth Gospel."
+  },
+  {
+   "id": "trivia_which_jewish_sect_did_not_believe_in_the_resurrection",
+   "difficulty": "medium",
+   "question": "Which Jewish sect did not believe in the resurrection?",
+   "answer": "The Sadducees",
+   "options": [
+    "The Zealots",
+    "The Essenes",
+    "The Pharisees",
+    "The Sadducees"
+   ],
+   "reference": "Matthew 22:23",
+   "explanation": "The Sadducees asked Jesus a question about the resurrection.",
+   "hint": "They were associated with the temple."
+  },
+  {
+   "id": "trivia_which_feast_did_jesus_celebrate_with_his_disciples_when_he_i",
+   "difficulty": "medium",
+   "question": "Which feast did Jesus celebrate with his disciples when he instituted the Lord's Supper?",
+   "answer": "Passover",
+   "options": [
+    "Purim",
+    "Tabernacles",
+    "Passover",
+    "Pentecost"
+   ],
+   "reference": "Luke 22:15",
+   "explanation": "Jesus ate the Passover with his disciples before his death.",
+   "hint": "It was the night he was betrayed."
+  },
+  {
+   "id": "trivia_which_gospel_records_jesus_words_i_am_the_bread_of_life",
+   "difficulty": "medium",
+   "question": "Which Gospel records Jesus' words, 'I am the bread of life'?",
+   "answer": "John",
+   "options": [
+    "Matthew",
+    "Luke",
+    "Mark",
+    "John"
+   ],
+   "reference": "John 6:35",
+   "explanation": "Jesus described himself as the bread that comes down from heaven.",
+   "hint": "This statement comes in the sixth chapter."
+  },
+  {
+   "id": "trivia_who_was_the_father_of_james_and_john_the_sons_of_zebedee",
+   "difficulty": "medium",
+   "question": "Who was the father of James and John, the sons of Zebedee?",
+   "answer": "Zebedee",
+   "options": [
+    "Jonas",
+    "Cleophas",
+    "Alphaeus",
+    "Zebedee"
+   ],
+   "reference": "Matthew 4:21",
+   "explanation": "The brothers were mending their nets with their father.",
+   "hint": "The family were fishermen."
+  },
+  {
+   "id": "trivia_who_was_the_herodian_king_who_killed_james_the_brother_of_jo",
+   "difficulty": "medium",
+   "question": "Who was the Herodian king who killed James the brother of John?",
+   "answer": "Herod Agrippa I",
+   "options": [
+    "Herod Antipas",
+    "Herod Agrippa I",
+    "Herod Philip",
+    "Herod the Great"
+   ],
+   "reference": "Acts 12:1–2",
+   "explanation": "Herod put James to death with the sword.",
+   "hint": "He was the grandson of Herod the Great."
+  },
+  {
+   "id": "trivia_who_was_the_apostle_who_was_sent_to_preach_to_the_gentiles_a",
+   "difficulty": "medium",
+   "question": "Who was the apostle who was sent to preach to the Gentiles along with Paul?",
+   "answer": "Barnabas",
+   "options": [
+    "Timothy",
+    "Silas",
+    "Titus",
+    "Barnabas"
+   ],
+   "reference": "Acts 13:46",
+   "explanation": "Paul and Barnabas declared that they would turn to the Gentiles.",
+   "hint": "They were sent from Antioch."
+  },
+  {
+   "id": "trivia_which_apostle_is_said_to_have_been_crucified_upside_down_acc",
+   "difficulty": "medium",
+   "question": "Which apostle is said to have been crucified upside down according to tradition?",
+   "answer": "Peter",
+   "options": [
+    "James",
+    "Bartholomew",
+    "Andrew",
+    "Peter"
+   ],
+   "reference": "John 21:18",
+   "explanation": "Jesus foretold that Peter would be led where he did not want to go.",
+   "hint": "Tradition says he was crucified in Rome."
+  },
+  {
+   "id": "trivia_in_what_city_were_believers_first_called_christians",
+   "difficulty": "medium",
+   "question": "In what city were believers first called Christians?",
+   "answer": "Antioch",
+   "options": [
+    "Rome",
+    "Jerusalem",
+    "Antioch",
+    "Corinth"
+   ],
+   "reference": "Acts 11:26",
+   "explanation": "The disciples were first called Christians in this city.",
+   "hint": "It is in Syria."
+  },
+  {
+   "id": "trivia_who_wrote_the_letter_that_says_faith_without_works_is_dead",
+   "difficulty": "medium",
+   "question": "Who wrote the letter that says 'faith without works is dead'?",
+   "answer": "James",
+   "options": [
+    "John",
+    "James",
+    "Jude",
+    "Peter"
+   ],
+   "reference": "James 2:26",
+   "explanation": "James teaches that faith must show itself in action.",
+   "hint": "He was the brother of Jesus."
+  },
+  {
+   "id": "trivia_who_was_the_apostle_who_wrote_blessed_be_the_god_and_father_",
+   "difficulty": "medium",
+   "question": "Who was the apostle who wrote 'Blessed be the God and Father of our Lord Jesus Christ' in his first letter?",
+   "answer": "Peter",
+   "options": [
+    "James",
+    "Jude",
+    "Peter",
+    "John"
+   ],
+   "reference": "1 Peter 1:3",
+   "explanation": "Peter opens his letter with praise for the living hope in Jesus.",
+   "hint": "He was once a fisherman."
+  },
+  {
+   "id": "trivia_which_book_in_the_new_testament_is_a_letter_written_to_hebre",
+   "difficulty": "medium",
+   "question": "Which book in the New Testament is a letter written to Hebrews?",
+   "answer": "Hebrews",
+   "options": [
+    "Jude",
+    "Titus",
+    "James",
+    "Hebrews"
+   ],
+   "reference": "Hebrews 1:1",
+   "explanation": "The author argues that Jesus is better than the old covenant.",
+   "hint": "The author is not named."
+  },
+  {
+   "id": "trivia_which_letter_speaks_about_the_armour_of_faith_hope_and_love",
+   "difficulty": "medium",
+   "question": "Which letter speaks about the armour of faith, hope and love?",
+   "answer": "1 Thessalonians",
+   "options": [
+    "2 Corinthians",
+    "Galatians",
+    "Colossians",
+    "1 Thessalonians"
+   ],
+   "reference": "1 Thessalonians 5:8",
+   "explanation": "Paul writes about putting on the breastplate of faith and love.",
+   "hint": "It is one of Paul's earliest letters."
+  },
+  {
+   "id": "trivia_who_was_the_apostle_that_wrote_the_letter_from_prison_to_phi",
+   "difficulty": "medium",
+   "question": "Who was the apostle that wrote the letter from prison to Philippi?",
+   "answer": "Paul",
+   "options": [
+    "Peter",
+    "Paul",
+    "Silas",
+    "John"
+   ],
+   "reference": "Philippians 1:7",
+   "explanation": "Paul writes joyfully while in prison.",
+   "hint": "Epaphroditus carried the gift."
+  },
+  {
+   "id": "trivia_which_letter_is_known_for_the_words_the_fruit_of_the_spirit",
+   "difficulty": "medium",
+   "question": "Which letter is known for the words 'the fruit of the Spirit'?",
+   "answer": "Galatians",
+   "options": [
+    "Colossians",
+    "Romans",
+    "Ephesians",
+    "Galatians"
+   ],
+   "reference": "Galatians 5:22",
+   "explanation": "Paul lists love, joy, peace and other virtues.",
+   "hint": "It warns against returning to the law."
+  },
+  {
+   "id": "trivia_which_gospel_begins_with_a_genealogy_from_abraham_to_jesus",
+   "difficulty": "medium",
+   "question": "Which Gospel begins with a genealogy from Abraham to Jesus?",
+   "answer": "Matthew",
+   "options": [
+    "Matthew",
+    "Mark",
+    "Luke",
+    "John"
+   ],
+   "reference": "Matthew 1:1–2",
+   "explanation": "Matthew traces Jesus' ancestry from Abraham.",
+   "hint": "It is the first book of the New Testament."
+  },
+  {
+   "id": "trivia_which_gospel_begins_with_a_genealogy_from_adam_to_jesus",
+   "difficulty": "medium",
+   "question": "Which Gospel begins with a genealogy from Adam to Jesus?",
+   "answer": "Luke",
+   "options": [
+    "John",
+    "Luke",
+    "Matthew",
+    "Mark"
+   ],
+   "reference": "Luke 3:38",
+   "explanation": "Luke traces Jesus' ancestry back to Adam and God.",
+   "hint": "It is the longest Gospel."
+  },
+  {
+   "id": "trivia_who_was_the_first_deacon_chosen_by_the_twelve_apostles",
+   "difficulty": "medium",
+   "question": "Who was the first deacon chosen by the twelve apostles?",
+   "answer": "Stephen",
+   "options": [
+    "Stephen",
+    "Prochorus",
+    "Philip",
+    "Nicolas"
+   ],
+   "reference": "Acts 6:5",
+   "explanation": "Stephen was full of faith and the Holy Ghost.",
+   "hint": "He was stoned to death."
+  },
+  {
+   "id": "trivia_which_person_did_peter_ask_to_cast_a_net_on_the_other_side_o",
+   "difficulty": "medium",
+   "question": "Which person did Peter ask to cast a net on the other side of the boat?",
+   "answer": "Jesus",
+   "options": [
+    "John",
+    "Thomas",
+    "Jesus",
+    "Andrew"
+   ],
+   "reference": "John 21:6",
+   "explanation": "The disciples caught a great catch of fish at Jesus' word.",
+   "hint": "This happened after the resurrection."
+  },
+  {
+   "id": "trivia_what_did_the_disciples_catch_when_jesus_told_them_to_cast_th",
+   "difficulty": "medium",
+   "question": "What did the disciples catch when Jesus told them to cast the net on the right side?",
+   "answer": "153 fishes",
+   "options": [
+    "A great many loaves",
+    "Seven fishes",
+    "Twelve fishes",
+    "153 fishes"
+   ],
+   "reference": "John 21:6–11",
+   "explanation": "The net was full of great fishes.",
+   "hint": "The number is recorded in the Gospel."
+  },
+  {
+   "id": "trivia_how_many_fish_were_in_the_net_that_the_disciples_caught_in_j",
+   "difficulty": "hard",
+   "question": "How many fish were in the net that the disciples caught in John 21?",
+   "answer": "One hundred and fifty-three",
+   "options": [
+    "One hundred and fifty-three",
+    "One hundred",
+    "Seventy",
+    "Two hundred"
+   ],
+   "reference": "John 21:11",
+   "explanation": "John records the exact number.",
+   "hint": "The net did not break."
+  },
+  {
+   "id": "trivia_which_greek_word_for_love_describes_god_s_unconditional_love",
+   "difficulty": "hard",
+   "question": "Which Greek word for 'love' describes God's unconditional love in John 3:16?",
+   "answer": "Agape",
+   "options": [
+    "Eros",
+    "Philia",
+    "Agape",
+    "Storge"
+   ],
+   "reference": "John 3:16",
+   "explanation": "John uses the word agape for God's love for the world.",
+   "hint": "It is the most common word for love in the New Testament."
+  },
+  {
+   "id": "trivia_which_greek_word_did_jesus_use_for_it_is_finished_on_the_cro",
+   "difficulty": "hard",
+   "question": "Which Greek word did Jesus use for 'It is finished' on the cross?",
+   "answer": "Tetelestai",
+   "options": [
+    "Pisteuo",
+    "Sozo",
+    "Tetelestai",
+    "Agapao"
+   ],
+   "reference": "John 19:30",
+   "explanation": "The word means 'it is completed'.",
+   "hint": "It is a word used for paying a debt."
+  },
+  {
+   "id": "trivia_which_church_in_revelation_was_told_it_had_a_name_that_it_li",
+   "difficulty": "hard",
+   "question": "Which church in Revelation was told it had a name that it lived but was dead?",
+   "answer": "Sardis",
+   "options": [
+    "Ephesus",
+    "Sardis",
+    "Smyrna",
+    "Laodicea"
+   ],
+   "reference": "Revelation 3:1",
+   "explanation": "Jesus said the church at Sardis had a reputation for life but was dead.",
+   "hint": "It is one of the seven churches."
+  },
+  {
+   "id": "trivia_which_church_in_revelation_was_described_as_lukewarm",
+   "difficulty": "hard",
+   "question": "Which church in Revelation was described as lukewarm?",
+   "answer": "Laodicea",
+   "options": [
+    "Laodicea",
+    "Thyatira",
+    "Philadelphia",
+    "Pergamos"
+   ],
+   "reference": "Revelation 3:16",
+   "explanation": "Jesus said he would spue the lukewarm church out of his mouth.",
+   "hint": "Its people were rich but needed true riches."
+  },
+  {
+   "id": "trivia_what_is_the_name_of_the_island_where_john_received_the_revel",
+   "difficulty": "hard",
+   "question": "What is the name of the island where John received the revelation?",
+   "answer": "Patmos",
+   "options": [
+    "Cyprus",
+    "Patmos",
+    "Crete",
+    "Malta"
+   ],
+   "reference": "Revelation 1:9",
+   "explanation": "John was on the island because of the word of God.",
+   "hint": "It is in the Aegean Sea."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_the_roman_centurion_whose_vision_led_to",
+   "difficulty": "hard",
+   "question": "What was the name of the Roman centurion whose vision led to the Gentile mission in Acts 10?",
+   "answer": "Cornelius",
+   "options": [
+    "Claudius",
+    "Cornelius",
+    "Julius",
+    "Lucius"
+   ],
+   "reference": "Acts 10:1–3",
+   "explanation": "Cornelius saw a vision and sent for Peter.",
+   "hint": "He was stationed at Caesarea."
+  },
+  {
+   "id": "trivia_what_was_the_name_of_the_town_where_paul_was_born",
+   "difficulty": "hard",
+   "question": "What was the name of the town where Paul was born?",
+   "answer": "Tarsus",
+   "options": [
+    "Tarsus",
+    "Antioch",
+    "Derbe",
+    "Iconium"
+   ],
+   "reference": "Acts 9:11",
+   "explanation": "Paul was from Tarsus in Cilicia.",
+   "hint": "It was a university city."
+  },
+  {
+   "id": "trivia_which_city_did_jonah_first_refuse_to_go_to",
+   "difficulty": "easy",
+   "question": "Which city did Jonah first refuse to go to?",
+   "answer": "Nineveh",
+   "options": [
+    "Nineveh",
+    "Damascus",
+    "Tyre",
+    "Babylon"
+   ],
+   "reference": "Jonah 1:2",
+   "explanation": "God sent Jonah to preach against the great city of Nineveh.",
+   "hint": "It was the capital of Assyria."
+  },
+  {
+   "id": "trivia_who_was_the_king_of_tyre_who_sent_cedar_for_solomon_s_temple",
+   "difficulty": "easy",
+   "question": "Who was the king of Tyre who sent cedar for Solomon's temple?",
+   "answer": "Hiram",
+   "options": [
+    "Ahab",
+    "Shimei",
+    "Hiram",
+    "Ittai"
+   ],
+   "reference": "1 Kings 5:1",
+   "explanation": "Hiram sent his servants to Solomon to help build the house of God.",
+   "hint": "Hiram was a friend of David."
+  },
+  {
+   "id": "trivia_in_which_valley_did_david_fight_goliath",
+   "difficulty": "easy",
+   "question": "In which valley did David fight Goliath?",
+   "answer": "The valley of Elah",
+   "options": [
+    "The valley of Hinnom",
+    "The valley of Jezreel",
+    "The valley of Sorek",
+    "The valley of Elah"
+   ],
+   "reference": "1 Samuel 17:2",
+   "explanation": "The Philistines and Israelites camped on opposite hills of this valley.",
+   "hint": "Its name appears in the first verses of the chapter."
+  },
+  {
+   "id": "trivia_how_tall_was_goliath_according_to_1_samuel",
+   "difficulty": "hard",
+   "question": "How tall was Goliath, according to 1 Samuel?",
+   "answer": "Six cubits and a span",
+   "options": [
+    "Ten cubits",
+    "Eight cubits",
+    "Four cubits",
+    "Six cubits and a span"
+   ],
+   "reference": "1 Samuel 17:4",
+   "explanation": "The text gives his height as six cubits and a span.",
+   "hint": "The measure is an ancient cubit."
+  },
+  {
+   "id": "trivia_how_much_did_the_head_of_goliath_s_spear_weigh",
+   "difficulty": "hard",
+   "question": "How much did the head of Goliath's spear weigh?",
+   "answer": "Six hundred shekels of iron",
+   "options": [
+    "Six hundred shekels of iron",
+    "Fifty shekels",
+    "Two hundred shekels",
+    "A talent of gold"
+   ],
+   "reference": "1 Samuel 17:7",
+   "explanation": "His spear's head weighed six hundred shekels of iron.",
+   "hint": "A shekel is a unit of weight."
+  },
+  {
+   "id": "trivia_which_tribe_had_no_territory_of_its_own_but_received_cities_",
+   "difficulty": "hard",
+   "question": "Which tribe had no territory of its own, but received cities scattered among the others?",
+   "answer": "Levi",
+   "options": [
+    "Dan",
+    "Reuben",
+    "Simeon",
+    "Levi"
+   ],
+   "reference": "Joshua 21:1–3",
+   "explanation": "The Levites were given forty-eight cities among the tribes.",
+   "hint": "They served as priests and ministers."
+  },
+  {
+   "id": "trivia_how_many_years_did_israel_serve_eglon_the_king_of_moab",
+   "difficulty": "hard",
+   "question": "How many years did Israel serve Eglon, the king of Moab?",
+   "answer": "Eighteen years",
+   "options": [
+    "Forty years",
+    "Seven years",
+    "Twenty years",
+    "Eighteen years"
+   ],
+   "reference": "Judges 3:14",
+   "explanation": "The Israelites served Eglon for eighteen years before God raised up a deliverer.",
+   "hint": "Ehud was the deliverer."
+  },
+  {
+   "id": "trivia_how_many_years_did_jacob_serve_laban_for_rachel_and_leah",
+   "difficulty": "hard",
+   "question": "How many years did Jacob serve Laban for Rachel and Leah?",
+   "answer": "Fourteen years",
+   "options": [
+    "Twelve years",
+    "Fourteen years",
+    "Seven years",
+    "Twenty years"
+   ],
+   "reference": "Genesis 31:41",
+   "explanation": "Jacob served fourteen years for his two wives and six years for the cattle.",
+   "hint": "It was seven years for each daughter."
+  },
+  {
+   "id": "trivia_which_king_of_judah_reigned_for_fifty_five_years",
+   "difficulty": "hard",
+   "question": "Which king of Judah reigned for fifty-five years?",
+   "answer": "Manasseh",
+   "options": [
+    "Josiah",
+    "Manasseh",
+    "Uzziah",
+    "Joash"
+   ],
+   "reference": "2 Kings 21:1",
+   "explanation": "Manasseh's reign was the longest of any king of Judah.",
+   "hint": "He was the son of Hezekiah."
+  },
+  {
+   "id": "trivia_what_was_abraham_s_name_before_god_changed_it",
+   "difficulty": "hard",
+   "question": "What was Abraham's name before God changed it?",
+   "answer": "Abram",
+   "options": [
+    "Abram",
+    "Abner",
+    "Abishai",
+    "Abel"
+   ],
+   "reference": "Genesis 17:5",
+   "explanation": "God renamed him Abraham, the father of many nations.",
+   "hint": "The new name means father of a multitude."
+  },
+  {
+   "id": "trivia_what_was_sarah_s_name_before_god_changed_it",
+   "difficulty": "hard",
+   "question": "What was Sarah's name before God changed it?",
+   "answer": "Sarai",
+   "options": [
+    "Sarah",
+    "Hagar",
+    "Milcah",
+    "Sarai"
+   ],
+   "reference": "Genesis 17:15",
+   "explanation": "God changed her name to Sarah.",
+   "hint": "Her name began with the same letters."
+  },
+  {
+   "id": "trivia_what_was_jacob_s_new_name_after_wrestling_with_god",
+   "difficulty": "hard",
+   "question": "What was Jacob's new name after wrestling with God?",
+   "answer": "Israel",
+   "options": [
+    "Benjamin",
+    "Joseph",
+    "Israel",
+    "Levi"
+   ],
+   "reference": "Genesis 32:28",
+   "explanation": "God told Jacob that he had striven with God and men and would be called Israel.",
+   "hint": "It is the name of his nation."
+  },
+  {
+   "id": "trivia_who_were_the_two_sons_born_to_joseph_in_egypt",
+   "difficulty": "hard",
+   "question": "Who were the two sons born to Joseph in Egypt?",
+   "answer": "Manasseh and Ephraim",
+   "options": [
+    "Manasseh and Ephraim",
+    "Perez and Zerah",
+    "Gershom and Eliezer",
+    "Reuben and Simeon"
+   ],
+   "reference": "Genesis 41:50–52",
+   "explanation": "Joseph named his first son Manasseh and his second son Ephraim.",
+   "hint": "Jacob later blessed both boys."
+  },
+  {
+   "id": "trivia_who_were_the_two_hebrew_midwives_who_feared_god",
+   "difficulty": "hard",
+   "question": "Who were the two Hebrew midwives who feared God?",
+   "answer": "Shiphrah and Puah",
+   "options": [
+    "Miriam and Jochebed",
+    "Rahab and Ruth",
+    "Deborah and Jael",
+    "Shiphrah and Puah"
+   ],
+   "reference": "Exodus 1:15–17",
+   "explanation": "They refused the king's command to kill the baby boys.",
+   "hint": "Their names are recorded in Exodus."
+  },
+  {
+   "id": "trivia_on_which_mountain_did_moses_die_looking_at_the_promised_land",
+   "difficulty": "hard",
+   "question": "On which mountain did Moses die, looking at the promised land?",
+   "answer": "Nebo",
+   "options": [
+    "Sinai",
+    "Hor",
+    "Horeb",
+    "Nebo"
+   ],
+   "reference": "Deuteronomy 34:1",
+   "explanation": "God showed Moses the land from the top of Pisgah on Nebo.",
+   "hint": "It is in Moab."
+  },
+  {
+   "id": "trivia_which_city_s_mountain_saw_the_sun_and_moon_stand_still_at_jo",
+   "difficulty": "hard",
+   "question": "Which city's mountain saw the sun and moon stand still at Joshua's command?",
+   "answer": "Gibeon",
+   "options": [
+    "Ai",
+    "Jericho",
+    "Hebron",
+    "Gibeon"
+   ],
+   "reference": "Joshua 10:12",
+   "explanation": "Joshua asked the sun to stand still upon Gibeon.",
+   "hint": "The battle was against the Amorites."
+  },
+  {
+   "id": "trivia_who_was_the_father_of_barak",
+   "difficulty": "hard",
+   "question": "Who was the father of Barak?",
+   "answer": "Abinoam",
+   "options": [
+    "Shaphat",
+    "Jesse",
+    "Abinoam",
+    "Lapidoth"
+   ],
+   "reference": "Judges 4:6",
+   "explanation": "Barak the son of Abinoam was called by Deborah to lead the army.",
+   "hint": "Deborah was a prophetess."
+  },
+  {
+   "id": "trivia_how_many_years_did_david_reign_in_hebron_over_judah",
+   "difficulty": "hard",
+   "question": "How many years did David reign in Hebron over Judah?",
+   "answer": "Seven years and six months",
+   "options": [
+    "Twenty years",
+    "Three years",
+    "Seven years and six months",
+    "Forty years"
+   ],
+   "reference": "2 Samuel 5:5",
+   "explanation": "David reigned in Hebron for seven and a half years before ruling all Israel.",
+   "hint": "His reign in Jerusalem was longer."
+  },
+  {
+   "id": "trivia_how_many_years_did_david_reign_in_jerusalem_over_all_israel_",
+   "difficulty": "hard",
+   "question": "How many years did David reign in Jerusalem over all Israel and Judah?",
+   "answer": "Thirty and three years",
+   "options": [
+    "Twenty and five years",
+    "Thirty years",
+    "Thirty and three years",
+    "Forty years"
+   ],
+   "reference": "2 Samuel 5:5",
+   "explanation": "The total of David's reign was forty years, including seven and a half years in Hebron.",
+   "hint": "The Bible gives the total in this verse."
+  },
+  {
+   "id": "trivia_how_many_sons_did_gideon_have",
+   "difficulty": "hard",
+   "question": "How many sons did Gideon have?",
+   "answer": "Seventy",
+   "options": [
+    "Seventy",
+    "Forty",
+    "Eight",
+    "Twelve"
+   ],
+   "reference": "Judges 8:30",
+   "explanation": "Gideon had many wives and seventy sons.",
+   "hint": "One son was named Abimelech."
+  },
+  {
+   "id": "trivia_which_city_was_the_setting_of_paul_s_sermon_on_the_areopagus",
+   "difficulty": "hard",
+   "question": "Which city was the setting of Paul's sermon on the Areopagus?",
+   "answer": "Athens",
+   "options": [
+    "Ephesus",
+    "Corinth",
+    "Athens",
+    "Thessalonica"
+   ],
+   "reference": "Acts 17:22",
+   "explanation": "Paul spoke to the people of Athens about the unknown God.",
+   "hint": "It was the centre of Greek learning."
+  },
+  {
+   "id": "trivia_what_gifts_did_the_wise_men_bring_to_jesus",
+   "difficulty": "hard",
+   "question": "What gifts did the wise men bring to Jesus?",
+   "answer": "Gold, frankincense and myrrh",
+   "options": [
+    "Gold, silver and wine",
+    "Oil, bread and fish",
+    "Spices, cloth and wood",
+    "Gold, frankincense and myrrh"
+   ],
+   "reference": "Matthew 2:11",
+   "explanation": "The wise men offered their treasures and worshipped the child.",
+   "hint": "Two of the gifts are fragrant."
+  },
+  {
+   "id": "trivia_where_did_the_wise_men_first_see_the_star",
+   "difficulty": "hard",
+   "question": "Where did the wise men first see the star?",
+   "answer": "In the east",
+   "options": [
+    "In the east",
+    "Over Jerusalem",
+    "In the south",
+    "Over Bethlehem"
+   ],
+   "reference": "Matthew 2:2",
+   "explanation": "They said, 'We have seen his star in the east'.",
+   "hint": "They came from the east."
+  },
+  {
+   "id": "trivia_how_many_days_after_the_resurrection_did_jesus_appear_to_his",
+   "difficulty": "hard",
+   "question": "How many days after the resurrection did Jesus appear to his disciples before his ascension?",
+   "answer": "Forty days",
+   "options": [
+    "Three days",
+    "Seven days",
+    "Forty days",
+    "Ten days"
+   ],
+   "reference": "Acts 1:3",
+   "explanation": "He showed himself alive by many infallible proofs during forty days.",
+   "hint": "The number forty appears often in the Bible."
+  },
+  {
+   "id": "trivia_what_was_the_tribe_of_paul",
+   "difficulty": "hard",
+   "question": "What was the tribe of Paul?",
+   "answer": "Benjamin",
+   "options": [
+    "Levi",
+    "Benjamin",
+    "Ephraim",
+    "Judah"
+   ],
+   "reference": "Philippians 3:5",
+   "explanation": "Paul describes himself as circumcised the eighth day, of the tribe of Benjamin.",
+   "hint": "Saul, the first king, came from this tribe."
+  },
+  {
+   "id": "trivia_what_was_paul_s_occupation",
+   "difficulty": "hard",
+   "question": "What was Paul's occupation?",
+   "answer": "Tentmaker",
+   "options": [
+    "Fisherman",
+    "Shepherd",
+    "Physician",
+    "Tentmaker"
+   ],
+   "reference": "Acts 18:3",
+   "explanation": "Paul worked with Aquila and Priscilla making tents.",
+   "hint": "Tents were made from goat hair."
+  },
+  {
+   "id": "trivia_from_which_city_was_lydia_the_seller_of_purple",
+   "difficulty": "hard",
+   "question": "From which city was Lydia, the seller of purple?",
+   "answer": "Thyatira",
+   "options": [
+    "Derbe",
+    "Colosse",
+    "Thyatira",
+    "Philippi"
+   ],
+   "reference": "Acts 16:14",
+   "explanation": "She was a seller of purple from the city of Thyatira.",
+   "hint": "The city was known for dyeing."
+  },
+  {
+   "id": "trivia_which_island_was_titus_left_on_to_organise_the_churches",
+   "difficulty": "hard",
+   "question": "Which island was Titus left on to organise the churches?",
+   "answer": "Crete",
+   "options": [
+    "Malta",
+    "Patmos",
+    "Crete",
+    "Cyprus"
+   ],
+   "reference": "Titus 1:5",
+   "explanation": "Paul left Titus in Crete to set things in order.",
+   "hint": "It is a large island south of Greece."
+  },
+  {
+   "id": "trivia_in_which_city_was_timothy_from",
+   "difficulty": "hard",
+   "question": "In which city was Timothy from?",
+   "answer": "Lystra",
+   "options": [
+    "Antioch",
+    "Iconium",
+    "Lystra",
+    "Derbe"
+   ],
+   "reference": "Acts 16:1",
+   "explanation": "Timothy lived at Lystra and was well reported of by the brethren.",
+   "hint": "Paul visited this city on his travels."
+  },
+  {
+   "id": "trivia_which_roman_emperor_was_reigning_when_jesus_was_born",
+   "difficulty": "hard",
+   "question": "Which Roman emperor was reigning when Jesus was born?",
+   "answer": "Caesar Augustus",
+   "options": [
+    "Nero",
+    "Tiberius",
+    "Caesar Augustus",
+    "Claudius"
+   ],
+   "reference": "Luke 2:1",
+   "explanation": "A decree went out from Caesar Augustus that all the world should be taxed.",
+   "hint": "He was the first Roman emperor."
+  },
+  {
+   "id": "trivia_who_was_the_governor_of_syria_when_jesus_was_born",
+   "difficulty": "hard",
+   "question": "Who was the governor of Syria when Jesus was born?",
+   "answer": "Cyrenius",
+   "options": [
+    "Felix",
+    "Festus",
+    "Pilate",
+    "Cyrenius"
+   ],
+   "reference": "Luke 2:2",
+   "explanation": "The taxing was made when Cyrenius was governor of Syria.",
+   "hint": "The name is Quirinius in other sources."
+  },
+  {
+   "id": "trivia_who_was_the_high_priest_along_with_caiaphas_during_the_time_",
+   "difficulty": "hard",
+   "question": "Who was the high priest along with Caiaphas during the time of John the Baptist?",
+   "answer": "Annas",
+   "options": [
+    "Zadok",
+    "Annas",
+    "Ananias",
+    "Gamaliel"
+   ],
+   "reference": "Luke 3:2",
+   "explanation": "Luke names Annas and Caiaphas as high priests.",
+   "hint": "He was Caiaphas's father-in-law."
+  },
+  {
+   "id": "trivia_how_many_baskets_of_broken_pieces_were_left_after_feeding_th",
+   "difficulty": "hard",
+   "question": "How many baskets of broken pieces were left after feeding the five thousand?",
+   "answer": "Twelve",
+   "options": [
+    "Twelve",
+    "Five",
+    "Seven",
+    "Ten"
+   ],
+   "reference": "Matthew 14:20",
+   "explanation": "The disciples gathered twelve baskets full of the leftover pieces.",
+   "hint": "The number twelve is important in the Gospels."
+  },
+  {
+   "id": "trivia_where_did_jesus_go_to_be_baptised_by_john",
+   "difficulty": "hard",
+   "question": "Where did Jesus go to be baptised by John?",
+   "answer": "The Jordan",
+   "options": [
+    "The Jordan",
+    "The river Abana",
+    "The Sea of Galilee",
+    "The pool of Siloam"
+   ],
+   "reference": "Matthew 3:13",
+   "explanation": "Jesus came from Galilee to the Jordan to be baptised.",
+   "hint": "The river is in the south of Israel."
+  },
+  {
+   "id": "trivia_which_disciple_outran_peter_to_the_empty_tomb",
+   "difficulty": "hard",
+   "question": "Which disciple outran Peter to the empty tomb?",
+   "answer": "John",
+   "options": [
+    "Andrew",
+    "Thomas",
+    "John",
+    "James"
+   ],
+   "reference": "John 20:4",
+   "explanation": "The other disciple outran Peter and came to the sepulchre first.",
+   "hint": "He was the disciple whom Jesus loved."
+  },
+  {
+   "id": "trivia_how_many_lepers_were_cleansed_when_jesus_healed_ten",
+   "difficulty": "hard",
+   "question": "How many lepers were cleansed when Jesus healed ten?",
+   "answer": "Ten",
+   "options": [
+    "Seven",
+    "Three",
+    "Ten",
+    "Five"
+   ],
+   "reference": "Luke 17:17",
+   "explanation": "Jesus asked, 'Were there not ten cleansed?' Only one returned to thank him.",
+   "hint": "Only a Samaritan returned."
+  },
+  {
+   "id": "trivia_how_many_days_and_nights_did_jesus_fast_in_the_wilderness",
+   "difficulty": "hard",
+   "question": "How many days and nights did Jesus fast in the wilderness?",
+   "answer": "Forty days and forty nights",
+   "options": [
+    "Three days and three nights",
+    "Forty days and forty nights",
+    "Seven days and seven nights",
+    "Twelve days"
+   ],
+   "reference": "Matthew 4:2",
+   "explanation": "After fasting, Jesus was tempted by the devil.",
+   "hint": "The number matches Moses on Sinai."
+  },
+  {
+   "id": "trivia_what_did_the_devil_tell_jesus_to_turn_into_bread",
+   "difficulty": "hard",
+   "question": "What did the devil tell Jesus to turn into bread?",
+   "answer": "Stones",
+   "options": [
+    "Water",
+    "Sand",
+    "Dust",
+    "Stones"
+   ],
+   "reference": "Matthew 4:3",
+   "explanation": "Jesus answered that man shall not live by bread alone.",
+   "hint": "It happened in the wilderness."
+  },
+  {
+   "id": "trivia_who_said_be_it_unto_me_according_to_thy_word",
+   "difficulty": "hard",
+   "question": "Who said, 'Be it unto me according to thy word'?",
+   "answer": "Mary",
+   "options": [
+    "Mary",
+    "Anna",
+    "Elizabeth",
+    "Martha"
+   ],
+   "reference": "Luke 1:38",
+   "explanation": "Mary accepted God's word through the angel Gabriel.",
+   "hint": "She was the mother of Jesus."
+  },
+  {
+   "id": "trivia_who_was_the_father_of_john_the_baptist",
+   "difficulty": "hard",
+   "question": "Who was the father of John the Baptist?",
+   "answer": "Zacharias",
+   "options": [
+    "Joachim",
+    "Zacharias",
+    "Elkanah",
+    "Zebedee"
+   ],
+   "reference": "Luke 1:13",
+   "explanation": "An angel told Zacharias that his wife Elisabeth would bear a son.",
+   "hint": "He was a priest of the course of Abia."
+  },
+  {
+   "id": "trivia_what_is_the_name_of_the_angel_who_announced_john_the_baptist",
+   "difficulty": "hard",
+   "question": "What is the name of the angel who announced John the Baptist's birth?",
+   "answer": "Gabriel",
+   "options": [
+    "Uriel",
+    "Raphael",
+    "Michael",
+    "Gabriel"
+   ],
+   "reference": "Luke 1:19",
+   "explanation": "Gabriel stood in the presence of God and brought the good news.",
+   "hint": "He also announced the birth of Jesus."
+  },
+  {
+   "id": "trivia_what_did_the_people_of_babel_try_to_build",
+   "difficulty": "medium",
+   "question": "What did the people of Babel try to build?",
+   "answer": "A tower reaching to heaven",
+   "options": [
+    "A wall around the city",
+    "A tower reaching to heaven",
+    "A bridge across the river",
+    "A temple of gold"
+   ],
+   "reference": "Genesis 11:4",
+   "explanation": "They wanted to make a name for themselves, and God confused their language.",
+   "hint": "The city was built on the plain of Shinar."
+  },
+  {
+   "id": "trivia_which_city_was_destroyed_by_fire_together_with_sodom",
+   "difficulty": "medium",
+   "question": "Which city was destroyed by fire together with Sodom?",
+   "answer": "Gomorrah",
+   "options": [
+    "Zeboim",
+    "Admah",
+    "Gomorrah",
+    "Zoar"
+   ],
+   "reference": "Genesis 19:24",
+   "explanation": "The Lord rained brimstone and fire from heaven on Sodom and Gomorrah.",
+   "hint": "Zoar was spared at Lot's request."
+  },
+  {
+   "id": "trivia_which_plague_struck_the_firstborn_of_egypt",
+   "difficulty": "medium",
+   "question": "Which plague struck the firstborn of Egypt?",
+   "answer": "The death of the firstborn",
+   "options": [
+    "The death of the firstborn",
+    "Darkness",
+    "Locusts",
+    "Hail"
+   ],
+   "reference": "Exodus 12:29",
+   "explanation": "At midnight the Lord struck every firstborn in the land of Egypt.",
+   "hint": "The Israelites were spared because of the lamb's blood."
+  },
+  {
+   "id": "trivia_what_did_the_israelites_put_on_their_doorposts_at_the_passov",
+   "difficulty": "medium",
+   "question": "What did the Israelites put on their doorposts at the Passover?",
+   "answer": "The blood of a lamb",
+   "options": [
+    "Ashes",
+    "The blood of a lamb",
+    "Oil",
+    "Wine"
+   ],
+   "reference": "Exodus 12:7",
+   "explanation": "The blood on the doorposts marked the houses where the Israelites lived.",
+   "hint": "It was an animal sacrifice."
+  },
+  {
+   "id": "trivia_which_feast_celebrates_the_deliverance_from_egypt",
+   "difficulty": "medium",
+   "question": "Which feast celebrates the deliverance from Egypt?",
+   "answer": "Passover",
+   "options": [
+    "Tabernacles",
+    "Passover",
+    "Trumpets",
+    "Pentecost"
+   ],
+   "reference": "Exodus 12:11",
+   "explanation": "The Israelites ate the lamb in haste, for it is the Lord's passover.",
+   "hint": "It is still kept by Jews today."
+  },
+  {
+   "id": "trivia_what_food_came_in_the_evening_in_the_wilderness_of_sin",
+   "difficulty": "medium",
+   "question": "What food came in the evening in the wilderness of Sin?",
+   "answer": "Quails",
+   "options": [
+    "Quails",
+    "Fish",
+    "Locusts",
+    "Honey"
+   ],
+   "reference": "Exodus 16:13",
+   "explanation": "Quails came up and covered the camp in the evening.",
+   "hint": "Manna came in the morning."
+  },
+  {
+   "id": "trivia_what_did_the_people_make_while_moses_was_on_the_mountain",
+   "difficulty": "medium",
+   "question": "What did the people make while Moses was on the mountain?",
+   "answer": "A golden calf",
+   "options": [
+    "A golden calf",
+    "A stone idol of Baal",
+    "A silver lampstand",
+    "A bronze altar"
+   ],
+   "reference": "Exodus 32:4",
+   "explanation": "Aaron made a molten calf from their gold jewellery.",
+   "hint": "Moses broke the tablets when he saw it."
+  },
+  {
+   "id": "trivia_how_many_days_did_moses_fast_on_mount_sinai_when_he_received",
+   "difficulty": "medium",
+   "question": "How many days did Moses fast on Mount Sinai when he received the law?",
+   "answer": "Forty days",
+   "options": [
+    "Forty days",
+    "Seven days",
+    "Three days",
+    "Twelve days"
+   ],
+   "reference": "Exodus 34:28",
+   "explanation": "Moses was on the mountain forty days and forty nights without bread or water.",
+   "hint": "The number forty recurs in the story."
+  },
+  {
+   "id": "trivia_what_did_moses_name_the_altar_after_israel_s_victory_over_am",
+   "difficulty": "medium",
+   "question": "What did Moses name the altar after Israel's victory over Amalek?",
+   "answer": "Jehovah-nissi",
+   "options": [
+    "Jehovah-jireh",
+    "Jehovah-nissi",
+    "Jehovah-shalom",
+    "Jehovah-rophi"
+   ],
+   "reference": "Exodus 17:15",
+   "explanation": "Moses said, 'The LORD will have war with Amalek'.",
+   "hint": "The name means 'the Lord is my banner'."
+  },
+  {
+   "id": "trivia_on_which_mountain_did_aaron_die",
+   "difficulty": "medium",
+   "question": "On which mountain did Aaron die?",
+   "answer": "Mount Hor",
+   "options": [
+    "Mount Carmel",
+    "Mount Gerizim",
+    "Mount Nebo",
+    "Mount Hor"
+   ],
+   "reference": "Numbers 20:28",
+   "explanation": "Aaron died on Mount Hor, and Eleazar his son took his garments.",
+   "hint": "The mountain is on the border of Edom."
+  },
+  {
+   "id": "trivia_what_did_god_give_the_israelites_to_cure_snakebites_in_the_w",
+   "difficulty": "medium",
+   "question": "What did God give the Israelites to cure snakebites in the wilderness?",
+   "answer": "A brazen serpent",
+   "options": [
+    "A brazen serpent",
+    "A rod of iron",
+    "A golden calf",
+    "A bronze altar"
+   ],
+   "reference": "Numbers 21:8",
+   "explanation": "Moses made a serpent of brass and whoever looked on it lived.",
+   "hint": "Jesus later compared himself to it."
+  },
+  {
+   "id": "trivia_who_anointed_solomon_as_king",
+   "difficulty": "medium",
+   "question": "Who anointed Solomon as king?",
+   "answer": "Zadok the priest",
+   "options": [
+    "Eli",
+    "Nathan the prophet",
+    "Abiathar",
+    "Zadok the priest"
+   ],
+   "reference": "1 Kings 1:39",
+   "explanation": "Zadok took a horn of oil and anointed Solomon.",
+   "hint": "Nathan and Benaiah were also involved."
+  },
+  {
+   "id": "trivia_beside_which_brook_did_god_hide_elijah",
+   "difficulty": "medium",
+   "question": "Beside which brook did God hide Elijah?",
+   "answer": "Cherith",
+   "options": [
+    "Kishon",
+    "Jabbok",
+    "Kidron",
+    "Cherith"
+   ],
+   "reference": "1 Kings 17:3",
+   "explanation": "God told Elijah to hide by the brook Cherith before Jordan.",
+   "hint": "Ravens fed him there."
+  },
+  {
+   "id": "trivia_what_did_the_angels_sing_to_the_shepherds_on_the_night_of_je",
+   "difficulty": "easy",
+   "question": "What did the angels sing to the shepherds on the night of Jesus' birth?",
+   "answer": "Glory to God in the highest",
+   "options": [
+    "Blessed is the King",
+    "Holy, holy, holy",
+    "Hallelujah",
+    "Glory to God in the highest"
+   ],
+   "reference": "Luke 2:14",
+   "explanation": "The heavenly host praised God for peace and goodwill.",
+   "hint": "It was announced to shepherds in the fields."
+  },
+  {
+   "id": "trivia_where_did_the_shepherds_find_the_baby_jesus",
+   "difficulty": "easy",
+   "question": "Where did the shepherds find the baby Jesus?",
+   "answer": "In a manger",
+   "options": [
+    "In a palace",
+    "In a boat",
+    "In a manger",
+    "In a tent of cedar"
+   ],
+   "reference": "Luke 2:16",
+   "explanation": "The shepherds found the babe lying in a manger.",
+   "hint": "There was no room in the inn."
+  },
+  {
+   "id": "trivia_what_did_jesus_do_when_he_was_twelve_years_old_in_the_temple",
+   "difficulty": "easy",
+   "question": "What did Jesus do when he was twelve years old in the temple?",
+   "answer": "He sat among the doctors",
+   "options": [
+    "He sat among the doctors",
+    "He healed a lame man",
+    "He cleansed the temple",
+    "He preached to the crowd"
+   ],
+   "reference": "Luke 2:46",
+   "explanation": "Jesus listened to the teachers and asked them questions.",
+   "hint": "His parents searched for him three days."
+  },
+  {
+   "id": "trivia_which_town_did_jesus_say_a_prophet_is_not_accepted_in_his_ow",
+   "difficulty": "easy",
+   "question": "Which town did Jesus say a prophet is not accepted in his own country?",
+   "answer": "Nazareth",
+   "options": [
+    "Nazareth",
+    "Bethsaida",
+    "Cana",
+    "Capernaum"
+   ],
+   "reference": "Luke 4:24",
+   "explanation": "Jesus said that no prophet is accepted in his own country.",
+   "hint": "He had been raised in this town."
+  },
+  {
+   "id": "trivia_who_was_the_first_person_jesus_healed_on_a_sabbath_in_capern",
+   "difficulty": "easy",
+   "question": "Who was the first person Jesus healed on a Sabbath in Capernaum?",
+   "answer": "A man with an unclean spirit",
+   "options": [
+    "A woman with a fever",
+    "A lame man",
+    "A blind beggar",
+    "A man with an unclean spirit"
+   ],
+   "reference": "Mark 1:23–26",
+   "explanation": "Jesus cast out an unclean spirit in the synagogue.",
+   "hint": "The people were amazed by his authority."
+  },
+  {
+   "id": "trivia_which_house_of_simon_did_jesus_heal_the_mother_in_law_of",
+   "difficulty": "easy",
+   "question": "Which house of Simon did Jesus heal the mother-in-law of?",
+   "answer": "Simon Peter's",
+   "options": [
+    "James's",
+    "Zacchaeus's",
+    "Simon Peter's",
+    "Lazarus's"
+   ],
+   "reference": "Mark 1:29–31",
+   "explanation": "Jesus took her by the hand and the fever left her.",
+   "hint": "It was in Capernaum."
+  },
+  {
+   "id": "trivia_what_did_jesus_do_with_the_little_children_who_were_brought_",
+   "difficulty": "easy",
+   "question": "What did Jesus do with the little children who were brought to him?",
+   "answer": "He blessed them",
+   "options": [
+    "He taught them to fish",
+    "He fed them",
+    "He blessed them",
+    "He sent them away"
+   ],
+   "reference": "Mark 10:16",
+   "explanation": "Jesus took the children in his arms and blessed them.",
+   "hint": "The disciples had tried to stop them."
+  },
+  {
+   "id": "trivia_which_garden_was_the_place_where_jesus_was_arrested",
+   "difficulty": "easy",
+   "question": "Which garden was the place where Jesus was arrested?",
+   "answer": "The garden of Gethsemane",
+   "options": [
+    "The garden of Gethsemane",
+    "The garden of Eden",
+    "The garden of Siloam",
+    "The garden of Olives"
+   ],
+   "reference": "Matthew 26:36",
+   "explanation": "Jesus took his disciples to pray before his arrest.",
+   "hint": "It was across the Kidron valley."
+  },
+  {
+   "id": "trivia_which_gospel_tells_the_story_of_the_samaritan_woman_at_the_w",
+   "difficulty": "easy",
+   "question": "Which Gospel tells the story of the Samaritan woman at the well?",
+   "answer": "John",
+   "options": [
+    "Mark",
+    "John",
+    "Luke",
+    "Matthew"
+   ],
+   "reference": "John 4:7",
+   "explanation": "Jesus asked the woman for a drink at Jacob's well.",
+   "hint": "It is the fourth Gospel."
+  },
+  {
+   "id": "trivia_what_did_jesus_say_to_the_thief_on_the_cross",
+   "difficulty": "easy",
+   "question": "What did Jesus say to the thief on the cross?",
+   "answer": "Today shalt thou be with me in paradise",
+   "options": [
+    "Rise and walk",
+    "Today shalt thou be with me in paradise",
+    "Follow me",
+    "Go in peace"
+   ],
+   "reference": "Luke 23:43",
+   "explanation": "Jesus promised the penitent thief that he would be with him in paradise.",
+   "hint": "The other thief mocked Jesus."
+  },
+  {
+   "id": "trivia_which_man_helped_jesus_carry_his_cross",
+   "difficulty": "easy",
+   "question": "Which man helped Jesus carry his cross?",
+   "answer": "Simon of Cyrene",
+   "options": [
+    "Joseph of Arimathea",
+    "Zacchaeus",
+    "Barabbas",
+    "Simon of Cyrene"
+   ],
+   "reference": "Mark 15:21",
+   "explanation": "Simon was compelled to carry the cross.",
+   "hint": "He was the father of Alexander and Rufus."
+  },
+  {
+   "id": "trivia_which_man_was_released_instead_of_jesus_at_the_feast",
+   "difficulty": "easy",
+   "question": "Which man was released instead of Jesus at the feast?",
+   "answer": "Barabbas",
+   "options": [
+    "Stephen",
+    "Judas",
+    "Lazarus",
+    "Barabbas"
+   ],
+   "reference": "Matthew 27:21",
+   "explanation": "The crowd asked Pilate to release Barabbas.",
+   "hint": "He was a robber and murderer."
+  },
+  {
+   "id": "trivia_which_of_the_apostles_is_said_to_have_led_the_church_at_anti",
+   "difficulty": "medium",
+   "question": "Which of the apostles is said to have led the church at Antioch with Barnabas?",
+   "answer": "Paul",
+   "options": [
+    "Timothy",
+    "Peter",
+    "Paul",
+    "Silas"
+   ],
+   "reference": "Acts 13:1",
+   "explanation": "Prophets and teachers at Antioch included Barnabas, Simeon, Lucius and Manaen.",
+   "hint": "It was the church that sent out Paul."
+  },
+  {
+   "id": "trivia_who_was_the_first_christian_martyr_to_be_killed_by_the_jewis",
+   "difficulty": "medium",
+   "question": "Who was the first Christian martyr to be killed by the Jewish council?",
+   "answer": "Stephen",
+   "options": [
+    "Barnabas",
+    "Stephen",
+    "James",
+    "Peter"
+   ],
+   "reference": "Acts 7:59",
+   "explanation": "Stephen was stoned while he prayed for those who stoned him.",
+   "hint": "Saul approved of his death."
+  },
+  {
+   "id": "trivia_on_which_feast_did_the_jews_gather_in_jerusalem_when_the_spi",
+   "difficulty": "medium",
+   "question": "On which feast did the Jews gather in Jerusalem when the Spirit fell on the disciples?",
+   "answer": "Pentecost",
+   "options": [
+    "Trumpets",
+    "Dedication",
+    "Tabernacles",
+    "Pentecost"
+   ],
+   "reference": "Acts 2:1",
+   "explanation": "The day of Pentecost was fully come when they were all with one accord in one place.",
+   "hint": "It was fifty days after the Passover."
+  }
+ ]
+}

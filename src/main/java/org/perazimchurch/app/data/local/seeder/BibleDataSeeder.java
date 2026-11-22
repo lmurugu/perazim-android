@@ -45,7 +45,23 @@ public final class BibleDataSeeder {
     public static final String SWAHILI_TRANSLATION_ID = "SUV";
 
     // Canonical 66 Books Metadata [ID, Name, Testament, ChapterCount]
-    private static final Object[][] CANONICAL_BOOKS = {
+    /** Canonical book id such as "JHN" for a book number, or an empty string when out of range. */
+    public static String canonicalBookId(int bookNumber) {
+        if (bookNumber < 1 || bookNumber > CANONICAL_BOOKS.length) {
+            return "";
+        }
+        return (String) CANONICAL_BOOKS[bookNumber - 1][0];
+    }
+
+    /** Display name of a canonical book (1-66), or an empty string when out of range. */
+    public static String canonicalBookName(int bookNumber) {
+        if (bookNumber < 1 || bookNumber > CANONICAL_BOOKS.length) {
+            return "";
+        }
+        return (String) CANONICAL_BOOKS[bookNumber - 1][1];
+    }
+
+    static final Object[][] CANONICAL_BOOKS = {
             {"GEN", "Genesis", "OLD", 50},
             {"EXO", "Exodus", "OLD", 40},
             {"LEV", "Leviticus", "OLD", 27},
@@ -160,8 +176,12 @@ public final class BibleDataSeeder {
             // Check if 66 books and key breakthrough verse exist
             List<BibleBookEntity> existingBooks = bibleDao.getBooksByTranslation(DEFAULT_TRANSLATION_ID);
             BibleVerseEntity sampleVerse = bibleDao.getVerse(10, 5, 20); // 2 Samuel 5:20
-            if (existingBooks != null && existingBooks.size() >= 66 && sampleVerse != null
-                    && (context == null || bibleDao.getVerse("KJV", 66, 21, 27) != null)) {
+            // Once the KJV text lives in the separate text database, the starter rows are no longer needed here.
+            boolean kjvInTextDb = context != null
+                    && org.perazimchurch.app.data.local.text.BibleVerseReader.isReady(context, DEFAULT_TRANSLATION_ID);
+            if (existingBooks != null && existingBooks.size() >= 66
+                    && (kjvInTextDb || (sampleVerse != null
+                    && (context == null || bibleDao.getVerse("KJV", 66, 21, 27) != null)))) {
                 Log.d(TAG, "Bible already fully seeded with KJV default, 66 canonical books, and verses.");
                 return;
             }

@@ -1,0 +1,24 @@
+# Issues found while capturing (Nov 19, 2026)
+- Home: tapping the scripture quote leaves Perazim and opens the phone's Bible app.
+- Sermons: a filter chip tap sent the crawl into MetaTrader 5 (trading app). Cause not yet traced.
+- Worship: the crawl tapped "Favorite" / "Add to favorites" on hymns (about 9 taps). This changed favourites, which should not have been touched. Needs a manual check and restore; the crawl now skips these.
+- Worship: "Search hymns" field and filter chips (All, Favorites, Worship, Faith, Grace, Praise) captured fine.
+- Games: Ladder of Faith button not reachable by the crawler; not captured.
+- Sermons: root cause of the MetaTrader 5 opening. Back from the Sermons root tab leaves Perazim for the launcher, and taps then hit launcher icons. Fixed in the crawler by checking focus before every tap.
+- All tab roots (Home, Sermons, Worship, Community, Profile): Back exits Perazim to the launcher. Expected Android behaviour, but worth knowing for testing.
+- Home: the scripture quote opened the Bible reader in the latest run. Earlier it left Perazim for the phone's Bible app. Check which one happens for users.
+- Home: the Sanctuary doors (Bible, Worship, Bible games row) were not found by the crawler after returning to Home. Not captured in this pass.
+- Phone: airplane mode was on at 11:52 (settings value 1), which I didn't set. Wi-Fi still showed connected. Check whether it was switched on by the phone or the app.
+- Profile: the Appearance row sits below the visible rows and was not reached. Not captured in this pass.
+- Profile: "Tithe and Stewardship", "Refresh Content" and "Church Membership" were skipped or not reached. Not captured.
+- Sermons: "Recent messages" (Home door) was skipped by the crawler's word filter, not by a real check.
+- Not captured in this pass: dialogs, the video player screen, most sub-screens behind a second tap, and the Bible reader.
+- Games: Ladder of Faith's Play button sits off-screen until the hub is scrolled, so the crawler missed it. Captured by hand (games-play-ladder-of-faith.png).
+- Bible reader (from the Home Bible door): the Android Back key doesn't close it. The reader's own Back button does. The earlier tap on Home then hit the reader's "Previous" button. Simple fix candidate.
+- Tithe and Stewardship page: has payment shortcuts ("OPEN M-PESA", "DIAL *334#", "COPY PAYBILL"). Not tapped. Check that these are intended.
+- Prayer wall (Community): shows members' personal prayer requests in plain text, including health and job details. Flagged, not committed. Check the privacy design.
+- Profile: "GIVE WITH M-PESA" button, not tapped. Opening it may start a payment, so it was skipped on purpose.
+- Church Membership: a form opened (not submitted). Not filled in.
+- Appearance picker opened and closed with Back. The theme stayed on "System (follows your phone)".
+- Safety checks: mCurrentFocus was stale and reported Perazim while TikTok was in front. The guard now uses the resumed activity. The earlier 'INAPP' results from the crawl may be wrong, so the clean screens were scanned again for other apps' content (none found except one TikTok shot in diagnostics).
+- Bible reader Back test (diagnostic): not reproduced. The screen was blank, then TikTok was resumed, so two taps landed in TikTok (or the launcher). Perazim was restored with an activity start, not a tap.

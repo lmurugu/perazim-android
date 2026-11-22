@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original Perazim game icon (generated). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M12,30 H52 Q56,30 56,34 V52 Q56,56 52,56 H12 Q8,56 8,52 V34 Q8,30 12,30 Z"
+        android:strokeColor="#3E1E06"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#C8813A" android:endColor="#7A4316"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M8,32 C8,18 18,12 32,12 C46,12 56,18 56,32 Z"
+        android:strokeColor="#3E1E06"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#D99450" android:endColor="#8A4C1A"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M27,12 H37 V56 H27 Z"
+        android:strokeColor="#7A4A00"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#FFE88A" android:endColor="#F5A100"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M30,30 H34 Q36,30 36,32 V38 Q36,40 34,40 H30 Q28,40 28,38 V32 Q28,30 30,30 Z"
+        android:fillColor="#5A3A00"/>
+    <path android:pathData="M12,20 a6,3 0 1,0 12,0 a6,3 0 1,0 -12,0 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.45"/>
+</vector>
