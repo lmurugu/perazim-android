@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.ai.AiResponse;
+import org.perazimchurch.app.ai.local.ModelDownloadService;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.AiPreferences;
 import org.perazimchurch.app.ai.remote.AiRelayClient;
@@ -512,16 +513,42 @@ public class AiBreakthroughGuideDialog extends Dialog {
         AppDialogs.builder(activity).setTitle("Download on-phone AI")
                 .setMessage(modelMessage)
                 .setNegativeButton("Not now", null)
-                .setPositiveButton("Check / download", (dialog, which) -> {
-                    AlertDialog progress = AppDialogs.builder(activity).setTitle("Downloading on-phone model")
-                            .setMessage("Starting…").setCancelable(false).setNegativeButton("Pause", (d,w) -> OnDeviceAi.cancel()).create();
-                    progress.show();
-                    OnDeviceAi.download(activity, new OnDeviceAi.DownloadCallback() {
-                        public void onProgress(int percent) { if (progress.isShowing()) progress.setMessage(percent + "% · The download can be paused and resumed."); }
-                        public void onComplete() { progress.dismiss(); setGuideMode("local"); if (isShowing()) displayAiMessage(AiResponse.plainText("The model is ready. You can turn off Wi-Fi and mobile data and ask your question.", null), "On-phone AI ready"); }
-                        public void onError(String error) { progress.dismiss(); if (isShowing()) AppDialogs.builder(activity).setMessage(error).setPositiveButton("OK", null).show(); }
-                    });
-                }).show();
+                .setPositiveButton("Check / download", (dialog, which) -> showDownloadProgress(false))
+                .show();
+    }
+
+    /**
+     * Shows download progress without blocking the app. Back or X dismisses the card and the download keeps
+     * running in the foreground service; "Cancel download" stops it. Reopening the guide shows progress again.
+     */
+    private void showDownloadProgress(boolean reattach) {
+        if (activity == null || activity.isFinishing()) return;
+        if (!reattach) ModelDownloadService.start(activity);
+        final AlertDialog progress = AppDialogs.builder(activity).setTitle("Downloading on-phone model")
+                .setMessage(ModelDownloadService.isRunning()
+                        ? ModelDownloadService.percent() + "% · You can leave the app; the download continues."
+                        : "Starting…")
+                .setCancelable(true)
+                .setPositiveButton("Run in background", null)
+                .setNegativeButton("Cancel download", (d, w) -> ModelDownloadService.cancel(activity))
+                .create();
+        progress.show();
+        ModelDownloadService.setListener(new ModelDownloadService.Listener() {
+            public void onProgress(int percent) {
+                if (progress.isShowing()) progress.setMessage(percent + "% · You can leave the app; the download continues.");
+            }
+            public void onFinished(String error) {
+                ModelDownloadService.setListener(null);
+                if (progress.isShowing()) progress.dismiss();
+                if (!isShowing()) return;
+                if (error == null) {
+                    setGuideMode("local");
+                    displayAiMessage(AiResponse.plainText("The model is ready. Ask your question again, or choose On-phone AI.", null), "Perazim Guide · on-phone");
+                } else {
+                    AppDialogs.builder(activity).setMessage(error).setPositiveButton("OK", null).show();
+                }
+            }
+        });
     }
 
     @Override public void dismiss() {
