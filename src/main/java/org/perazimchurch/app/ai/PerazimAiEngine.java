@@ -313,6 +313,74 @@ public class PerazimAiEngine {
                 Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
+    /** Lower-cased text with emoji, punctuation and extra spaces removed, so chips and typed text match. */
+    static String normalisedForIntent(@Nullable String query) {
+        if (query == null) return "";
+        String t = query.toLowerCase(java.util.Locale.ROOT).replaceAll("[^\\p{L}\\p{N}' ]", " ").replaceAll("\\s+", " ").trim();
+        return t;
+    }
+
+    private static final Pattern CAPABILITY_QUESTION = Pattern.compile(
+            "^(hi|hello|hey|hi there|hello there|good (morning|afternoon|evening)|greetings|habari|jambo|mambo|"
+            + "what can you do|what do you do|how can you help|how can you help me|who are you|what are you|"
+            + "what is this|help|help me|capabilities|what can i ask|how do i use you|how do you work)$");
+    private static final Pattern BIBLE_DEFINITION = Pattern.compile(
+            "^(what is the bible|what is scripture|what are the scriptures|what is the word of god|what is the holy bible)$");
+    private static final java.util.Set<String> SHORTCUT_CHIPS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "read scripture", "church information", "prayer and fellowship", "give tithe", "watch livestream",
+            "open the bible", "find my groups", "start a reflection", "open prayer support", "pick up where you left off"));
+
+    /** Greetings, capability questions, the Bible definition and shortcut chips get built-in answers. */
+    @Nullable
+    public static AiResponse builtInAppAnswer(@Nullable String query) {
+        String t = normalisedForIntent(query);
+        if (t.isEmpty()) return null;
+        if (CAPABILITY_QUESTION.matcher(t).find()) return capabilityResponse();
+        if (BIBLE_DEFINITION.matcher(t).find()) return bibleDefinitionResponse();
+        for (String chip : SHORTCUT_CHIPS) {
+            if (t.equals(chip) || t.startsWith(chip + " ")) return shortcutResponse(chip);
+        }
+        return null;
+    }
+
+    @NonNull
+    public static AiResponse capabilityResponse() {
+        return AiResponse.plainText(
+                "I'm Perazim Guide. I can help you find Bible passages in the King James Version, explain approved church information and prayer resources, and show you how to use the app. For general questions outside the church and the app, I'll let you know I can't help with those. For medical, legal or financial matters, please speak to a qualified professional.",
+                java.util.Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
+    }
+
+    @NonNull
+    public static AiResponse bibleDefinitionResponse() {
+        return AiResponse.plainText(
+                "The Bible is the Christian scripture: sixty-six books, the Old and New Testaments, which Christians hold as the word of God. Paul wrote that \"All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness\" (2 Timothy 3:16, KJV). You can read it in the app under Read Scripture.",
+                java.util.Arrays.asList("📖 Read Scripture", "🙏 Prayer and fellowship"));
+    }
+
+    @NonNull
+    private static AiResponse shortcutResponse(String chip) {
+        switch (chip) {
+            case "read scripture": case "open the bible":
+                return AiResponse.plainText("Open the Bible reader from the Home screen or the Bible tab. Choose a book and chapter, tap a verse to highlight or save it, and use search to find a word.",
+                        java.util.Arrays.asList("📖 Read Scripture", "🙏 Prayer and fellowship"));
+            case "church information":
+                return AiResponse.plainText("You'll find approved church information on the Home and Profile screens. For anything not shown there, please ask the church office or a leader.",
+                        java.util.Arrays.asList("🙏 Prayer and fellowship", "📖 Read Scripture"));
+            case "prayer and fellowship":
+                return AiResponse.plainText("Open Prayer from the Home screen to share a prayer request or pray for others. Your prayer request is only shared when you submit it in the app.",
+                        java.util.Arrays.asList("🙏 Prayer and fellowship", "📖 Read Scripture"));
+            case "give tithe":
+                return AiResponse.plainText("To give, open Giving in the app and follow the M-Pesa paybill steps shown there. The app does not send money for you.",
+                        java.util.Arrays.asList("📖 Read Scripture", "🙏 Prayer and fellowship"));
+            case "watch livestream":
+                return AiResponse.plainText("Open Sermons in the app to watch the livestream or recent messages.",
+                        java.util.Arrays.asList("📖 Read Scripture", "🙏 Prayer and fellowship"));
+            default:
+                return AiResponse.plainText("Use the buttons on the Home screen to open Scripture, Sermons, Worship, Prayer or Community.",
+                        java.util.Arrays.asList("📖 Read Scripture", "🙏 Prayer and fellowship"));
+        }
+    }
+
     /**
      * Deterministic refusal or referral that must run before any model check, so it holds whether or not the
      * on-phone model is installed. Returns null when the question may go to the model.
