@@ -1,6 +1,8 @@
-# Phone test checklist: validation build versionCode 11 (2026-11-22)
+# Phone test checklist: combined validation build (versionCode 12 or later, 2026-11-22)
 
-**Rule:** on the phone, install and test only. No building and no code changes during phone time.
+**The phone gets the combined APK** from the final combined build, which merges `fix/ai-scope-before-install` into it. Do not install a separate v11. Use the combined APK's path and check its versionCode in the install step.
+
+**Rule:** on the phone, install and test only. No building and no code changes during phone time. Only one session drives the phone.
 
 ## Before you start
 - Phone connected over USB, and Wi-Fi on (not metered).
@@ -11,7 +13,9 @@
 adb -s 0667737142100269 install -r /home/murugu/Android/worktrees/offline-qwen-phone/build/outputs/apk/validation/app-validation.apk
 ```
 
-Then confirm: `adb -s 0667737142100269 shell dumpsys package org.perazimchurch.app | grep versionCode` shows `versionCode=11`.
+Replace the path above with the combined build's validation APK path, and check the installed versionCode against the combined build's versionCode (12 or later).
+
+Then confirm: `adb -s 0667737142100269 shell dumpsys package org.perazimchurch.app | grep versionCode` shows the combined build's versionCode.
 
 ## Checks (pass / fail for each, with screenshots)
 1. **Launch:** app opens, no crash (`logcat` has no FATAL EXCEPTION).
