@@ -31,6 +31,8 @@ import org.perazimchurch.app.domain.games.BibleGames;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
+import org.perazimchurch.app.presentation.ui.games.common.GameAudio;
+import org.perazimchurch.app.presentation.ui.games.common.GameAudioSettings;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
 import org.perazimchurch.app.domain.games.FillTheGap;
 import org.perazimchurch.app.domain.games.LadderOfFaith;
@@ -139,6 +141,9 @@ public final class GamesHubDialog extends Dialog {
         Window window = getWindow();
         if (window != null) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         if (pendingGame != null && launchGame(pendingGame)) return;
+        GameAudio audio = GameAudio.get(activity);
+        audio.bindAccount(scores, scorePrefix);
+        audio.enterGame(null);
         hub();
     }
 
@@ -257,6 +262,7 @@ public final class GamesHubDialog extends Dialog {
         openRow = null;
         screen("Bible Games", "Learn, remember and enjoy. Every game works without internet.", false);
         statsBar();
+        button("Game sound", false).setOnClickListener(v -> GameAudioSettings.show(activity, scores, scorePrefix));
         int shepherd = org.perazimchurch.app.R.drawable.game_char_shepherd;
         int dove = org.perazimchurch.app.R.drawable.game_char_dove;
         int explorer = org.perazimchurch.app.R.drawable.game_char_explorer;

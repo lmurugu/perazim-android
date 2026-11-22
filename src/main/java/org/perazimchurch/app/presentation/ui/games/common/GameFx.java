@@ -68,17 +68,24 @@ public final class GameFx {
 
     /** Press bounce: the button scales to 0.94 while pressed and springs back on release. Clicks still fire. */
     public static void attachPress(View button) {
-        if (!motionEnabled(button.getContext())) return;
         button.setOnTouchListener((v, event) -> {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
-                    v.animate().cancel();
-                    v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(90).start();
+                    if (motionEnabled(v.getContext())) {
+                        v.animate().cancel();
+                        v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(90).start();
+                    }
                     break;
                 case MotionEvent.ACTION_UP:
+                    if (v instanceof android.widget.Button && "Hint".equalsIgnoreCase(((android.widget.Button) v).getText().toString())) {
+                        GameAudio.get(v.getContext()).play(GameAudio.Sfx.HINT);
+                    }
+                    // fall through
                 case MotionEvent.ACTION_CANCEL:
-                    v.animate().scaleX(1f).scaleY(1f).setDuration(220)
-                            .setInterpolator(new android.view.animation.OvershootInterpolator(2f)).start();
+                    if (motionEnabled(v.getContext())) {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(220)
+                                .setInterpolator(new android.view.animation.OvershootInterpolator(2f)).start();
+                    }
                     break;
                 default:
                     break;
@@ -128,14 +135,14 @@ public final class GameFx {
     public static void correct(View view) {
         pulse(view, Color.argb(160, 255, 170, 60));
         haptic(view, true);
-        tone(ToneGenerator.TONE_PROP_ACK);
+        if (!GameAudio.get(view.getContext()).play(GameAudio.Sfx.CORRECT)) tone(ToneGenerator.TONE_PROP_ACK);
     }
 
     /** Wrong answer: a shake, a soft buzz and a short haptic. */
     public static void wrong(View view) {
         shake(view);
         haptic(view, false);
-        tone(ToneGenerator.TONE_PROP_NACK);
+        if (!GameAudio.get(view.getContext()).play(GameAudio.Sfx.WRONG)) tone(ToneGenerator.TONE_PROP_NACK);
     }
 
     /** Scale pulse with a glow in {@code glow}. */
@@ -190,19 +197,23 @@ public final class GameFx {
         LinearLayout row = (LinearLayout) frame.getChildAt(0);
         ParticleView particles = frame.getChildCount() > 1 ? (ParticleView) frame.getChildAt(1) : null;
         boolean motion = motionEnabled(frame.getContext());
+        GameAudio audio = GameAudio.get(frame.getContext());
         for (int i = 0; i < row.getChildCount(); i++) {
             View star = row.getChildAt(i);
             if (!motion) continue;
             star.setScaleX(0f);
             star.setScaleY(0f);
             final boolean lit = i < stars;
+            final int step = i;
             star.animate().scaleX(1f).scaleY(1f).setStartDelay(160L * i).setDuration(320)
                     .setInterpolator(new android.view.animation.OvershootInterpolator(2.2f))
                     .withStartAction(() -> {
                         if (lit && particles != null) particles.burst(star.getX() + star.getWidth() / 2f, star.getY() + star.getHeight() / 2f);
                         if (lit) haptic(star, true);
+                        if (lit) audio.playPitched(GameAudio.Sfx.STAR, 1f + 0.12f * (step + 1));
                     }).start();
         }
+        if (stars >= 3) audio.playPitched(GameAudio.Sfx.COMPLETE, 1f);
     }
 
     /** Counts a score up from 0 to {@code target}, showing "prefix N suffix". */

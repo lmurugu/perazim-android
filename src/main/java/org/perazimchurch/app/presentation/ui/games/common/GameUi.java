@@ -158,7 +158,14 @@ public final class GameUi implements GameChrome.Host {
 
     @Override public void hub() { runHub(); }
 
-    @Override public void click(View v) { feedback().click(v); }
+    @Override public void click(View v) {
+        // Game taps use the shared tap sound; the app's tone is the fallback when audio is unavailable.
+        if (GameAudio.get(activity).play(GameAudio.Sfx.TAP)) {
+            if (v != null && feedback().isHapticsEnabled()) v.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY);
+        } else {
+            feedback().click(v);
+        }
+    }
 
     // ---- Drawing helpers ----
 
