@@ -29,8 +29,8 @@
 
 | Ref | Document | Approval authority (pending) |
 |---|---|---|
-| G01 | Theological Constitution | Bishop Dr. David Mutweri, theological approver, subject to governance confirmation |
-| G02 | Doctrinal Position Papers: index and status model | Bishop Dr. David Mutweri, theological approver |
+| G01 | Theological Constitution | Rev. Levi Murugu, sole final approver for the app, subject to governance confirmation |
+| G02 | Doctrinal Position Papers: index and status model | Rev. Levi Murugu, sole final approver for the app |
 | G03 | Pastoral Care and Safeguarding | Church leadership (authority to be confirmed) |
 | G04 | Roles and Permissions | Church leadership and product owner |
 | G05 | Privacy and Data Protection | Church data controller and an appropriate Kenyan privacy/legal reviewer |
@@ -39,7 +39,7 @@
 | G08 | Safety and Security | Technical reviewer, safeguarding reviewer and independent security/privacy reviewer |
 | G09 | Evaluation and Regression Suite | All designated reviewers |
 | G10 | Release and Change Management | Church leadership and product owner |
-| P1 to P5 | Position papers (divorce and remarriage, tithing, alcohol, healing in the atonement, women in ministry) | Bishop Dr. David Mutweri, theological approver |
+| P1 to P5 | Position papers (divorce and remarriage, tithing, alcohol, healing in the atonement, women in ministry) | Rev. Levi Murugu, sole final approver for the app |
 | CD | Crisis directory (data file and summary) | Church leadership, after independent verification |
 | CHK | Church action checklist | Levi, for routing to the church |
 

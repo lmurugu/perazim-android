@@ -1,7 +1,7 @@
 # G02 Doctrinal Position Papers: Index and Status Model
 
 **Version:** 0.1 (draft)
-**Status:** DRAFT, pending approval by Bishop Dr. David Mutweri (theological approver, subject to governance confirmation)
+**Status:** DRAFT, pending approval by Rev. Levi Murugu (administrator and sole final approver for the app, owner decision 23 Nov 2026)
 **Approved by:** not yet approved
 **Approval date:** pending
 **Effective date:** pending

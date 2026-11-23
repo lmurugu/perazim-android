@@ -46,7 +46,7 @@ Members can report an inaccurate interpretation, a dangerous recommendation, an 
 
 | Change type | Route |
 |---|---|
-| Change to doctrine, doctrinal status, or position papers | Theological approver (G01, G02) |
+| Change to doctrine, doctrinal status, or position papers | Final approver (G01, G02) |
 | Change to pastoral, safeguarding or crisis behaviour | Church leadership and safeguarding reviewer |
 | Change to privacy or data handling | Data controller and privacy reviewer (G05) |
 | Change to permissions or roles | Church leadership and product owner (G04) |

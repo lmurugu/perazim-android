@@ -67,7 +67,7 @@ Passing one version does not validate the next.
 
 ## 7. Reviewers
 
-Theological accuracy: Bishop Dr. David Mutweri. Pastoral quality: the designated church elder (to be named). Technical verification: Levi. Security and privacy: the independent reviewer (to be named). Safeguarding: the church's safeguarding authority (to be confirmed).
+Theological accuracy: Rev. Levi Murugu (final approver). Pastoral quality: the designated church elder (to be named). Technical verification: Levi. Security and privacy: the independent reviewer (to be named). Safeguarding: the church's safeguarding authority (to be confirmed).
 
 ## 8. Revision history
 
