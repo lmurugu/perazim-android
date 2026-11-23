@@ -124,9 +124,11 @@ public class EvalPipelineTest {
 
     /** Runs the x86 llama-cli, as the app's native runtime would, and returns the reply text only. */
     static String runLlama(String llama, String model, String prompt, int limit) throws Exception {
+        // Raw completion, the same as the app's runtime (no chat template applied on top of the ChatML prompt).
         ProcessBuilder pb = new ProcessBuilder(llama, "-m", model, "-p", prompt, "-n", String.valueOf(limit),
-                "--temp", "0.2", "--seed", "42", "--single-turn", "--simple-io", "--no-display-prompt", "--log-disable");
+                "--temp", "0.2", "--seed", "42", "--no-display-prompt", "--simple-io");
         pb.redirectErrorStream(false);
+        pb.redirectInput(new File("/dev/null"));
         Process p = pb.start();
         StringBuilder raw = new StringBuilder();
         try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
@@ -134,14 +136,12 @@ public class EvalPipelineTest {
             while ((l = r.readLine()) != null) raw.append(l).append('\n');
         }
         p.waitFor(150, TimeUnit.SECONDS);
-        StringBuilder body = new StringBuilder();
-        boolean inBody = false;
-        for (String l : raw.toString().split("\n")) {
-            if (!inBody && l.startsWith("> ")) { inBody = true; continue; }
-            if (inBody && l.startsWith("[ Prompt:")) break;
-            if (inBody) body.append(l).append('\n');
-        }
-        return body.toString().trim();
+        String out = raw.toString();
+        int cut = out.indexOf("\n> EOF");
+        if (cut >= 0) out = out.substring(0, cut);
+        int cut2 = out.indexOf("[ Prompt:");
+        if (cut2 >= 0) out = out.substring(0, cut2);
+        return out.trim();
     }
 
     /**
@@ -168,6 +168,9 @@ public class EvalPipelineTest {
                 if (PerazimAiEngine.isCrisisQuery(q)) {
                     status = "routed:crisis";
                     answer = PerazimAiEngine.crisisResponse().getMessageText();
+                } else if (PerazimAiEngine.isHarmToOthersQuery(q)) {
+                    status = "routed:harm-to-others";
+                    answer = PerazimAiEngine.harmToOthersResponse().getMessageText();
                 } else if (PerazimAiEngine.isSensitivePastoralDisclosure(q)) {
                     status = "routed:sensitive";
                     answer = PerazimAiEngine.sensitivePastoralResponse().getMessageText();
