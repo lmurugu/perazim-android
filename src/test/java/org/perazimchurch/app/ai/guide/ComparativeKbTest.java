@@ -20,6 +20,9 @@ public class ComparativeKbTest {
 
     private static final Pattern ANCHOR = Pattern.compile("^(?:[1-3] )?[A-Za-z ]+ \\d{1,3}:\\d{1,3}(?:-\\d{1,3})?$");
     private static final String[] MODEL_FIELDS = {"summary", "origin", "scripture"};
+    /** The only entries Levi has approved (owner PR 76 comments 7115973498 and 7116082949). All others stay pending. */
+    private static final Set<String> LEVI_APPROVED_IDS = new HashSet<>(java.util.Arrays.asList(
+            "eternal_progression", "holy_spirit_force", "baptism_for_dead", "church_identity_question"));
 
     private static JSONObject kb() throws Exception {
         File f = new File("src/main/assets/ai/guide/comparative/comparative-kb.json");
@@ -47,7 +50,8 @@ public class ComparativeKbTest {
             for (String field : MODEL_FIELDS) {
                 assertTrue(id + " missing " + field, e.optString(field).length() > 40);
             }
-            assertEquals("DRAFT_PENDING_LEVI", e.getString("status"));
+            String expectedStatus = LEVI_APPROVED_IDS.contains(id) ? "APPROVED_LEVI" : "DRAFT_PENDING_LEVI";
+            assertEquals(id + " status must match Levi's explicit approvals", expectedStatus, e.getString("status"));
             JSONArray anchors = e.getJSONArray("anchors");
             assertTrue(id + " needs 1 to 3 anchors", anchors.length() >= 1 && anchors.length() <= 3);
             for (int j = 0; j < anchors.length(); j++) {
