@@ -40,6 +40,10 @@ public final class OnDeviceAi {
     private static long verifiedModelModified = -1L;
     private static boolean verifiedModelStatus;
     private OnDeviceAi() {}
+    /** Test seam for the model call. Production code never sets this. */
+    public interface ModelRunner { String generate(String prompt, String grammar, int limit) throws IOException; }
+    static volatile ModelRunner testRunner;
+
     public interface Callback { void onSuccess(String answer); void onError(String error); }
     public interface DownloadCallback { void onProgress(int percent); void onComplete(); void onError(String error); }
     public interface ModelStatusCallback { void onComplete(boolean verified); }
@@ -194,41 +198,48 @@ public final class OnDeviceAi {
                 if (cancelled) throw new IOException("Generation cancelled.");
                 String dir = c.getApplicationInfo().nativeLibraryDir;
                 int answerLimit = LocalPrompt.requiresStructuredBiblicalAnswer(question) ? 280 : 120;
-                ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
-                        "-m", modelFile(c).getAbsolutePath(), "-p", built.prompt,
-                        "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
-                        "--grammar", CitationGrammar.build(shown, answerLimit),
-                        "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
-                builder.environment().put("LD_LIBRARY_PATH", dir);
-                process = builder.start(); active = process;
-                if (cancelled) throw new IOException("Generation cancelled.");
-                final Process running = process;
-                Thread stderrDrain = new Thread(() -> {
-                    try (InputStream errors = running.getErrorStream()) {
-                        byte[] discard = new byte[4096];
-                        while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
-                    } catch (IOException ignored) { }
-                }, "perazim-ai-stderr");
-                stderrDrain.setDaemon(true);
-                stderrDrain.start();
-                ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-                java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
-                ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
-                StringBuilder answer = new StringBuilder();
-                try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
-                    char[] buffer = new char[512]; int count;
-                    while ((count = reader.read(buffer)) != -1) {
-                        int available = 16000 - answer.length();
-                        if (available > 0) answer.append(buffer, 0, Math.min(available, count));
-                    }
-                    process.waitFor();
-                } finally { deadline.cancel(false); timer.shutdownNow(); }
-                int exit = process.exitValue();
-                if (cancelled) throw new IOException("Generation cancelled.");
-                if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
-                if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
+                String rawAnswer;
+                if (testRunner != null) {
+                    // Test-only seam: production never sets testRunner, so this branch is unreachable in the app.
+                    rawAnswer = testRunner.generate(built.prompt, CitationGrammar.build(shown, answerLimit), answerLimit);
+                } else {
+                    ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
+                            "-m", modelFile(c).getAbsolutePath(), "-p", built.prompt,
+                            "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
+                            "--grammar", CitationGrammar.build(shown, answerLimit),
+                            "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
+                    builder.environment().put("LD_LIBRARY_PATH", dir);
+                    process = builder.start(); active = process;
+                    if (cancelled) throw new IOException("Generation cancelled.");
+                    final Process running = process;
+                    Thread stderrDrain = new Thread(() -> {
+                        try (InputStream errors = running.getErrorStream()) {
+                            byte[] discard = new byte[4096];
+                            while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
+                        } catch (IOException ignored) { }
+                    }, "perazim-ai-stderr");
+                    stderrDrain.setDaemon(true);
+                    stderrDrain.start();
+                    ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+                    java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
+                    ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
+                    StringBuilder answer = new StringBuilder();
+                    try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
+                        char[] buffer = new char[512]; int count;
+                        while ((count = reader.read(buffer)) != -1) {
+                            int available = 16000 - answer.length();
+                            if (available > 0) answer.append(buffer, 0, Math.min(available, count));
+                        }
+                        process.waitFor();
+                    } finally { deadline.cancel(false); timer.shutdownNow(); }
+                    int exit = process.exitValue();
+                    if (cancelled) throw new IOException("Generation cancelled.");
+                    if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
+                    if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
+                    rawAnswer = answer.toString();
+                }
                 String result = LocalPrompt.stripStockPhrases(
-                        answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim());
+                        rawAnswer.replace("<|im_end|>", "").replace("<|endoftext|>", "").trim());
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
                 if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
                         || (PerazimAiEngine.claimsOfficialStatus(result)
