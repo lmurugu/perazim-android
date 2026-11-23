@@ -1,6 +1,6 @@
 {
   "_comment": "Comparative knowledge for the Perazim Guide's drift detection. All 27 entries have been individually reviewed and approved under the owner's explicit delegation to approve claims that are sufficiently supported and consistent with Perazim's theological framework. Only an entry with exact status APPROVED_LEVI can pass the release gate. Only text in summary, origin and scripture is model-facing; internal_note and source records are not sent to the model. Scripture anchors are KJV references retrieved from the bundled KJV database; licensed NASB use follows the app's file-loading rule. Entries are contextual descriptions, not authorities: the model evaluates competing claims under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny. The exact nature and duration of final punishment remain an unapproved Perazim doctrinal position and are not settled by the conditional-immortality entry.",
-  "version": "1.5.20",
+  "version": "1.5.21",
   "status": "APPROVED_LEVI",
   "entries": [
     {
@@ -1134,14 +1134,6 @@
           "licence": "public domain (KJV)",
           "use": "verse wording checked against an online KJV text",
           "verification": "verified (KJV wording checked)"
-        },
-        {
-          "title": "Barbara Ann Brennan, Hands of Light: A Guide to Healing Through the Human Energy Field (Bantam New Age Books, 1988), publisher catalogue",
-          "url": "https://www.penguinrandomhouse.com/books/17931/hands-of-light-by-barbara-ann-brennan/",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotations or paraphrase only",
-          "use": "Publisher's bibliographic record identifies Hands of Light in the Bantam New Age Books line and describes Brennan's human energy-field/aura claim about health, illness and healing",
-          "verification": "Official publisher catalogue page read; it identifies the book as part of Bantam New Age Books and describes the author's energy-field teaching"
         },
         {
           "title": "Barbara Ann Brennan School of Healing, “About Barbara Brennan”",
