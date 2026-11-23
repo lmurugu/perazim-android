@@ -1,0 +1,4 @@
+{
+  "_comment": "Reference sources Levi has approved for the on-phone guide. Empty means nothing is used. Each id must match a sources row in scripts/reference/sources.json. Changes go through a reviewed pull request.",
+  "approvedSourceIds": []
+}

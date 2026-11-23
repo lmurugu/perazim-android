@@ -20,3 +20,17 @@ The vineyard, lamp-lit room and story road scenes (`vine_scene`, `lamp_scene`, `
 Images were checked against the Openverse tags for people; a human check of each scene is still recommended before release.
 
 The art is kept swappable: replace any file under `scenes/` with the same name to change a game's scene.
+
+## Reference sources for the on-phone guide (pending Levi's approval)
+
+Full register with licences, sizes and status: `docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md`.
+Nothing below is used by the guide until it is listed in `src/main/assets/reference/approvals.json`.
+
+| Source | Licence | Attribution |
+|---|---|---|
+| OpenBible.info cross-references | CC BY 4.0 | Cross-reference data: OpenBible.info (CC BY 4.0), built from the public-domain Treasury of Scripture Knowledge. |
+| OpenBible.info Bible places | CC BY 4.0 (some coordinates from OpenStreetMap, ODbL 1.0) | Places data: OpenBible.info (CC BY 4.0). Coordinates from OpenStreetMap contributors (ODbL 1.0). |
+| Smith's Bible Dictionary (1884) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+| Easton's Bible Dictionary (1897) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+| Hitchcock's Bible Names Dictionary (1858) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+| Nave's Topical Bible (1921) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |

@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.local;
 
+import org.perazimchurch.app.ai.reference.ReferenceGuide;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -155,6 +156,8 @@ public final class OnDeviceAi {
                 String evidenceQuery = evidenceQuery(question, history);
                 JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,
                         System.currentTimeMillis(), evidenceQuery);
+                // Approved reference items (dictionary and cross-references). A no-op until Levi approves a source.
+                evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
                 // Locked rules, one playbook, style and learned notes (guide memory is optional and bounded).
