@@ -75,12 +75,14 @@ The commentary database is built with `--tier optional` and bundled as `src/main
 Retrieval labels each excerpt with its author and tradition (`ReferenceEvidence.commentaryText`) and adds commentary last, after the governed position and the factual references (`ReferenceGuide.augment`). Host tests cover the labels and chapter headwords; the Android path compiles against stubs only, and the laptop thread tests it on the device.
 Commentaries carry their authors' theology and conflict with each other (Henry is Reformed, Wesley Arminian). Levi's answer A: use both, labelled, Perazim's view first.
 
-Creeds and confessions (CCEL Schaff, *Creeds of Christendom*): **not extracted yet.** The CCEL volumes are
-bilingual or carry critical apparatus. In volume III the Westminster Confession and the Thirty-Nine Articles
-interleave Latin and English on the same lines, and in volume I the Apostles' and Athanasian creeds sit inside
-variant tables. A clean English transcription needs a per-document extraction checked against the source. The
-Nicene text of 381 is readable in volume I but its interleaved columns also need care. Nothing has been written
-from memory. Until a checked transcription exists, creeds are not in the database.
+Creeds and confessions (CCEL Schaff, *Creeds of Christendom*):
+
+- **Extracted and checked: the Nicene-Constantinopolitan Creed of 381** (`scripts/reference/creeds/nicene-constantinopolitan-381.txt`, 218 words). It is the clean English block in CCEL volume I (creeds1.txt). The text matches the source word for word, except the editor's gloss "(æons)", which is omitted. It is **pending Levi's approval** and is not in `approvals.json` or any database.
+- **Not extracted: the Apostles' Creed.** The English received text sits in a table of variant readings with bracketed additions. Extracting it needs a choice between the Roman and received forms, which is a doctrinal decision for Levi.
+- **Not extracted: the Athanasian Creed.** The CCEL volumes carry the Latin and the commentary, but no clean English text was found.
+- **Not extracted: the Westminster Confession, Thirty-Nine Articles and Canons of Dort.** Volume III interleaves Latin, 1562 English and 1801 English on the same lines, so extraction needs a manual split that I have not done.
+
+Nothing has been written from memory. Each remaining creed needs a clean source before it can be checked.
 
 ## F. What needs Levi
 
