@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
@@ -51,7 +52,7 @@ public class AiEvalCasesTest {
         assertEquals(true, categories.contains("general_intelligence_scope"));
     }
 
-    private static boolean containsString(JSONArray array, String value) {
+    private static boolean containsString(JSONArray array, String value) throws JSONException {
         for (int i = 0; i < array.length(); i++) if (value.equals(array.getString(i))) return true;
         return false;
     }
