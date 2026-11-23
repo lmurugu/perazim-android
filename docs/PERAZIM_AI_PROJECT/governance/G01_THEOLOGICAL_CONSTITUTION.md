@@ -1,7 +1,7 @@
 # G01 Perazim AI Theological Constitution
 
 **Version:** 0.1 (draft)
-**Status:** DRAFT, pending approval by Bishop Dr. David Mutweri (theological approver, subject to governance confirmation)
+**Status:** DRAFT, pending approval by Rev. Levi Murugu (administrator and sole final approver for the app, owner decision 23 Nov 2026)
 **Approved by:** not yet approved
 **Approval date:** pending
 **Effective date:** pending
@@ -61,7 +61,7 @@ Each doctrinal document carries a version, approval authority, approval date, ef
 
 ## 6. Working positions (author's convictions, not yet adopted)
 
-These record the author's current convictions for the theological approver to review. They have status **Under review** and must not be presented as Perazim doctrine until approved.
+These record the author's current convictions for the final approver to review. They have status **Under review** and must not be presented as Perazim doctrine until approved.
 
 | Topic | Working conviction | Status | AI behaviour now |
 |---|---|---|---|
@@ -111,7 +111,7 @@ Women in ministry and the four other topics in G02 are **Unresolved** or **Under
 
 ## 12. Change control
 
-- Changes to this constitution or to a doctrinal status require approval by the theological approver.
+- Changes to this constitution or to a doctrinal status require approval by the final approver (Rev. Levi Murugu).
 - Technical changes that do not alter doctrinal behaviour follow G10.
 - The Guide must never silently adopt an unapproved theological update because a new document was uploaded.
 

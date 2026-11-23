@@ -25,7 +25,7 @@
 | Pastoral care personnel | Named by church leadership | Pastoral referral and support functions. **No automatic access** to private AI conversations |
 | Church administrator | Named by church leadership | Approved administrative functions and operational information within assigned scope |
 | System administrator | Technical staff | Infrastructure management. No theological authority, no unrestricted pastoral-data access |
-| Theological approver | Designated by the church | Review, approve and supersede doctrinal material through the approval workflow |
+| Final approver for the app | Rev. Levi Murugu (administrator) | Review, approve and supersede doctrinal material through the approval workflow |
 
 ## 3. Permission matrix
 

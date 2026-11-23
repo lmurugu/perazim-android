@@ -3,7 +3,7 @@
 **Version:** 0.1 (draft)
 **Status:** DRAFT. Status: **Unresolved**. Perazim's position is **PENDING APPROVAL**. The church may adopt a position or formally keep the matter unresolved.
 **Approved by:** not yet approved
-**Approval authority:** Bishop Dr. David Mutweri, theological approver (subject to governance confirmation)
+**Approval authority:** Rev. Levi Murugu, sole final approver for the app (owner decision 23 Nov 2026)
 **Approval date:** pending · **Effective date:** pending
 
 ---
@@ -73,4 +73,4 @@ The distinctions must be kept clear: preaching, teaching, pastoral oversight, el
 
 ## 9. Authorising approval and version
 
-Approval authority: Bishop Dr. David Mutweri (subject to governance confirmation). Version 0.1, draft. Approval date: pending. Decision to adopt or keep unresolved: church leadership with the theological approver.
+Approval authority: Rev. Levi Murugu (sole final approver for the app). Version 0.1, draft. Approval date: pending. Decision to adopt or keep unresolved: church leadership with the theological approver.

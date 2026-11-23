@@ -3,7 +3,7 @@
 **Version:** 0.1 (draft)
 **Status:** DRAFT. Perazim's position is **PENDING APPROVAL**. Status: Under review.
 **Approved by:** not yet approved
-**Approval authority:** Bishop Dr. David Mutweri, theological approver (subject to governance confirmation)
+**Approval authority:** Rev. Levi Murugu, sole final approver for the app (owner decision 23 Nov 2026)
 **Approval date:** pending · **Effective date:** pending
 
 ---
@@ -68,4 +68,4 @@ Early and medieval writers differed on the exception clauses and on remarriage. 
 
 ## 9. Authorising approval and version
 
-Approval authority: Bishop Dr. David Mutweri (subject to governance confirmation). Version 0.1, draft. Approval date: pending.
+Approval authority: Rev. Levi Murugu (sole final approver for the app). Version 0.1, draft. Approval date: pending.
