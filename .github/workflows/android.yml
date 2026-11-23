@@ -22,7 +22,18 @@ jobs:
           java-version: "17"
           cache: gradle
       - name: Unit tests and debug build
-        run: ./gradlew testDebugUnitTest assembleDebug --no-daemon
+        # Robolectric downloads android-all jars at test time. On run 45282713256 (head b08140b) 21 unit
+        # tests failed with MavenArtifactFetcher IOException on the same code that passed on b8ea2c5.
+        # Retry the step up to three times, 30 s apart.
+        run: |
+          for attempt in 1 2 3; do
+            if ./gradlew testDebugUnitTest assembleDebug --no-daemon; then
+              exit 0
+            fi
+            echo "Unit test attempt ${attempt} failed; retrying in 30 s"
+            sleep 30
+          done
+          exit 1
       - name: Upload debug APK
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
