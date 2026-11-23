@@ -153,6 +153,18 @@ public final class OnDeviceAi {
                 String evidenceQuery = evidenceQuery(question, history);
                 JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,
                         System.currentTimeMillis(), evidenceQuery);
+                // Word study by Strong's number (G26, H7225): answer from the bundled entry, never generate it.
+                java.util.regex.Matcher strongsMatch = java.util.regex.Pattern.compile("\\b([GH]\\d{1,4})\\b").matcher(question);
+                if (strongsMatch.find()) {
+                    org.perazimchurch.app.domain.model.StrongsEntry entry =
+                            org.perazimchurch.app.data.interlinear.StrongsStore.getEntry(c, strongsMatch.group(1));
+                    if (entry != null) {
+                        String wordAnswer = entry.getCode() + " (" + entry.getOriginal() + ", "
+                                + entry.getTransliteration() + "): " + entry.getDefinition();
+                        MAIN.post(() -> callback.onSuccess(wordAnswer));
+                        return;
+                    }
+                }
                 // Exact verse reference with one KJV passage: quote the Bible text directly, never generate it.
                 if (evidence.length() == 1 && LocalScriptureRetriever.hasExplicitReference(question)
                         && "Bible".equals(evidence.optJSONObject(0) == null ? "" : evidence.optJSONObject(0).optString("sourceId"))) {
