@@ -410,7 +410,7 @@ public class PerazimAiEngine {
             "discussion questions|bible study|blessing|thanksgiving)\\b", Pattern.CASE_INSENSITIVE);
     /** Instruction-override and role-play attempts. These are refused even when they mention church topics. */
     private static final Pattern MODEL_OVERRIDE = Pattern.compile(
-            "\\b(?:ignore|forget|disregard|bypass)\\s+(?:all\\s+|the\\s+|your\\s+|previous\\s+|church\\s+|these\\s+)*(?:rules|instructions|guidelines|restrictions|prompt)\\b|" +
+            "\\b(?:ignore|forget|disregard|bypass)\\s+(?:(?:all|the|your|previous|church|these)\\s+)*(?:rules|instructions|guidelines|restrictions|prompt)\\b|" +
             "\\bpretend\\s+(?:you\\s+are|to\\s+be|that)\\b|\\broleplay\\b|\\brole-play\\b|\\byou\\s+are\\s+now\\b|\\bfrom\\s+now\\s+on\\s+you\\b|" +
             "\\bspeak\\s+as\\b|\\bact\\s+as\\s+(?:my|an?)\\s+(?!christian|church|pastor|believer|leader)|\\bsong\\s+lyrics\\b|" +
             "\\banswer\\s+any\\s+question\\b|\\bdeclare\\b.{0,40}\\b(?:doctrine|official|policy|position)\\b|\\byou\\s+are\\s+the\\s+(?:bishop|pastor|leader)\\b|\\bignore\\b.{0,30}\\b(?:previous|prior|above)\\s+instructions\\b|\\b(?:riddles?|trivia|jokes?|poems?|poetry)\\b", Pattern.CASE_INSENSITIVE);
