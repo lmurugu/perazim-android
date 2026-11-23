@@ -6,14 +6,14 @@
 **Original bank:** `ADVANCED_APOLOGETICS_BANK_ORIGINAL_2026-11-23.md` in this folder, unchanged.
 **Governing documents checked:** `governance/G01_THEOLOGICAL_CONSTITUTION.md` and `governance/G02_POSITION_PAPERS_INDEX.md` (docs/ai-governance, PR 67, both still DRAFT); AI docs 02–06 and 10 (docs/ai-governance); the 532-case set `ai-eval/perazim-guide/cases.jsonl` (claude/project-thread-3dtcnd, PR 69).
 
-**Reading rule used throughout.** Verse wording is not reproduced in this review. Revised answers cite references only. Where a quotation is needed, the text must come from the approved corpus under the translation policy, which is not yet confirmed (see Levi's PR #71 comment and the Translation note in Part 1B). Until that policy is confirmed, quotations stay as references.
+**Reading rule used throughout.** Verse wording is not reproduced in this review. Revised answers cite references only. Where exact wording is needed, it is retrieved from the authorised KJV or NASB corpus, never reconstructed from model memory. KJV and NASB are the app's authorised translations (owner's second PR comment, 23 November).
 
 **Status tags used in revised answers**
 
 - **[CREEDAL]**: historic doctrine of the ecumenical creeds. The AI may state it firmly, and it is not a Perazim-specific claim.
 - **[FRAMEWORK, UNDER REVIEW]**: the pastor's developing convictions as set out in Section A3 and G01 section 6. G01 marks these "Under review", so the AI may explain them as the pastor's developing view but must not present them as adopted Perazim doctrine.
 - **[OPEN]**: a question where the AI explains the views fairly and states that Perazim has no position.
-- **[PENDING]**: an item on the Section A4 list. It needs approval from Bishop Dr. David Mutweri before any Perazim position is stated.
+- **[PENDING]**: an item on the Section A4 list. It needs approval from the app's final approver, Rev. Levi Murugu, before any Perazim position is stated (see the approver note in Part 1B).
 
 ---
 
@@ -32,7 +32,7 @@ Largely yes, and the pastoral instincts are good. Most answers:
 Where it falls short of the framework is in four places:
 
 1. **Status and voice.** The bank calls Levi's convictions "established". G01 section 6 marks every one of them "Under review". Many answers also speak in the first person as Levi ("my framework", "my developing position", "I would first recognise"). The AI is not Levi, and G01 forbids presenting unapproved positions as doctrine. This is the most consequential problem in the bank.
-2. **Translation.** Section A3 names the ESV as the primary translation. Levi's PR #71 comment says the translation policy is not yet confirmed and that he will confirm it separately. This review therefore does not treat a KJV/NASB decision as made. Governance drafts and the bank's quotations are flagged as affected, and nothing in the governance documents has been changed on assumption.
+2. **Translation.** Section A3 names the ESV as the primary translation. The owner has now authorised KJV and NASB for the app because of licensing constraints, so Section A3 is superseded for the app. The governance drafts that still name the ESV (docs/ai-governance 02–06 and 10) are flagged for the separate correction thread; this review does not edit them.
 3. **Exegetical depth.** In roughly 20 answers the bank does not engage the texts that the strongest objectors actually use. Examples are Exodus 20:5 (Q22), 1 John 2:19 (Q28), 1 John 3:6–9 (Q29), 1 Corinthians 12:29–30 (Q30, and the framework's own tongues position), 1 Peter 2:24 (Q31), Malachi 3:8–10 (Q45), Luke 17:3–4 (Q53) and James 5:14–16 (Q55). The full list is in Part 2.
 4. **Islam section.** Section C is strong on argument but almost never engages the Qur'an directly. It omits Surah 4:171, 5:116, 6:101, 112:3, 61:6, and the classical Muslim *tahrif* (corruption) debate. These are the texts a Muslim interlocutor will raise first.
 
@@ -88,7 +88,7 @@ The existing set (claude/project-thread-3dtcnd, `cases.jsonl`) has 34 cases ment
 
 Each decision is a multiple choice with a recommended option and an "Other" option. Decisions are listed first because the review cannot finish without them. Each recommendation follows the governance documents, so it is safe to accept if you agree.
 
-**Decision 1: Status of your convictions in AI answers.** G01 marks them "Under review" until Bishop Mutweri approves.
+**Decision 1: Status of your convictions in AI answers.** G01 marks them "Under review" until the app's final approver (Rev. Levi Murugu) approves; see the approver note in Part 1B.
 - (A) The AI describes them as the pastor's developing view, labelled "under review", until approval. **Recommended.**
 - (B) The AI describes them as Perazim's adopted view now. Needs approval first.
 - (C) Other.
@@ -149,7 +149,7 @@ Each decision is a multiple choice with a recommended option and an "Other" opti
 - (C) Other.
 
 **Decision 13: Pending Section A4 topics.** Women in ministry, divorce and remarriage, tithing, alcohol, healing in the atonement, evolution and age of the earth, and sexuality.
-- (A) All remain "explain the views, no church position" until Bishop Mutweri approves the position papers. **Recommended.**
+- (A) All remain "explain the views, no church position" until the app's final approver approves the position papers. **Recommended.**
 - (B) Other.
 
 **Decision 14: Sexuality framing (Q43).** The bank calls one reading the "historic evangelical interpretation".
@@ -183,7 +183,7 @@ Each decision is a multiple choice with a recommended option and an "Other" opti
 
 Levi accepted all 17 recommendations, with the clarifications below. These decisions set the review direction. They do **not** approve the PR for merge, approve every revised answer, or authorise any transfer to Qwen or a local AI.
 
-1. **Accept.** Levi's convictions may be represented as his developing or working views, marked under review, until the authorised Bishop approves them.
+1. **Accept.** Levi's convictions may be represented as his developing or working views, marked under review, until the app's final approver (Rev. Levi Murugu) approves them.
 2. **Accept.** The AI never impersonates the pastor or speaks in his first person. "Perazim's approved position" is used only for formally approved doctrine. Otherwise the AI says "the pastor's developing view" or that Perazim has no approved position.
 3. **Accept with clarification.** The developing view is that a person who has genuinely participated in the Christian life may deliberately and finally abandon Christ. Warnings are real and are not explained away. Strong assurance is given to believers struggling against sin. No verdict on any individual.
 4. **Accept.** Unconditional election is the working view, under review. Other evangelical positions are explained fairly. The position is not forced into a complete Calvinist or Arminian system.
@@ -195,15 +195,21 @@ Levi accepted all 17 recommendations, with the clarifications below. These decis
 10. **Accept.** Scripture's supreme authority is established in the framework. No specific technical formulation of inerrancy is attributed to Perazim until approved. Main views are explained.
 11. **Accept with historical correction.** Principal atonement models are explained. Penal substitution is described as a major and influential Reformation formulation, not the sole historic or Reformation account. The framework's affirmation of Christ's substitutionary saving work is preserved. No complete official atonement statement is invented.
 12. **Accept with refinement.** The 66-book Protestant canon is the default corpus for this project. Catholic and Orthodox deuterocanonical collections are explained. Foundational doctrines are stated firmly, without implying that other doctrines are trivial. Gospel essentials are distinguished from secondary but significant doctrines.
-13. **Accept.** All listed disputed practical topics remain "explain the views; no approved Perazim position" until the Bishop approves the position papers.
+13. **Accept.** All listed disputed practical topics remain "explain the views; no approved Perazim position" until the app's final approver approves the position papers.
 14. **Accept with refinement.** The traditional evangelical reading and the significant alternatives are explained. Perazim's formal position is marked pending. Dignity is upheld. Violence, harassment, coercion and dehumanisation are rejected. Attraction, temptation, conduct and identity are not conflated.
 15. **Accept.** Only contacts marked verified in the approved crisis directory are used. The Pastoral Care Contact is not yet designated and is left explicitly pending. No name, number or email is invented. Unverified numbers are not presented as launch-ready.
 16. **Accept.** Kenyan examples, including the 2007–08 post-election violence and Shakahola, are used only after source verification and Levi's contextual review. They are presented neutrally and accurately, with no collective guilt and no smearing of any religion or community.
 17. **Accept.** Split 28 development and 28 held-out questions, stratified by subject and difficulty. The baseline runs before approved guidance is added. The held-out set and unseen variants stay outside Qwen's prompts, retrieval index and training data until the blind evaluation has run.
 
-**Translation.** Levi has not confirmed a change to KJV/NASB. The ESV remains the stated primary translation in Section A3 until he confirms the policy separately. Until then, references are used rather than reproduced verse wording. Affected items are flagged in Part 2 and Part 4.
+**Second owner comment (PR #71, 23 November, 14:04 UTC): approver and translation.** The owner states that for the Perazim app he, Rev. Levi Murugu, is the administrator, the church's representative for this area and the final reviewer and approver. He asks that Bishop Dr. David Mutweri and other external authorities be removed as required approvers in the app workflow, and that approval records name him as final approver. He also says this does not reach unrelated church governance.
 
-**Form of address.** The AI does not speak as Levi. Member-facing responses do not invoke the pastor's name as an authority substitute. Internal records may identify him as Rev. Levi.
+*Status of this instruction.* Governance drafts G01 and G02 still name Bishop Mutweri as theological approver, and the coordinator's earlier instructions and decision 13 referred to him. This review applies the owner's direction to the app-level references above and flags the G01/G02 conflict for owner confirmation. No governance document has been changed.
+
+**Translation.** Resolved for the app by the owner: KJV and NASB are the authorised quotation translations, because of licensing constraints. ESV quotations are not used in the knowledge package or user-facing quoted Scripture. Exact wording is retrieved from the authorised KJV/NASB corpus, not reconstructed from model memory.
+
+**Form of address and AI identity.** The AI is not Rev. Levi Murugu and never claims to be him, impersonates him or attributes first-person statements to him. Internal governance records identify him by full name and role (app administrator, church representative for this area, final approver). Member-facing responses use the approved institutional voice and do not invoke his name as a substitute for biblical reasoning.
+
+
 
 **Revision status.** Revised answers in Part 2 are updated for decisions 2, 3, 5, 8, 9, 10, 11, 12, 14, 15 and 16 where they bear on wording. Each still requires human approval before any use. Decision 13 governs all A4 topics.
 
@@ -371,9 +377,9 @@ Each entry gives the rating, the strengths, the weaknesses and missing passages,
 **Weaknesses and missing passages:**
 - The Synoptic material is missing: Mark 2:5–7 (forgiving sins, which the scribes call blasphemy), Mark 14:61–64 (the high priest's question about the Son of Man, drawing on Daniel 7:13), and Matthew 28:18–20 (authority in heaven and on earth).
 - It does not state the strongest objection: that the high Christology of John is late and that the historical Jesus did not claim divinity. The answer must engage this, and the Synoptic material is the best reply.
-- The bank quotes John 8:58 and Thomas's confession in short phrases. Those phrases match the KJV wording, but the quotations must still be taken from the approved corpus and labelled with the translation used. Translation policy is not yet confirmed (see Part 1B), so until Levi confirms it, quote by reference only.
+- The bank quotes John 8:58 and Thomas's confession in short phrases. Those phrases match the KJV wording, but the quotations must still be taken from the approved corpus and labelled with the translation used. Translation: KJV and NASB are authorised for the app (Part 1B). Quotations are retrieved from that corpus, not typed from memory.
 **Revised answer:**
-> The question is historical as well as theological. The Synoptic Gospels record Jesus forgiving sins (Mark 2:5–7), claiming authority that the scribes called blasphemy, and answering the high priest with a claim drawn from Daniel 7:13 (Mark 14:61–64). John's Gospel is more explicit: in John 8:58 Jesus claims the divine name, and his opponents understood the claim and tried to stone Him (John 10:30–33). Thomas confesses Him as "my Lord and my God" and Jesus does not rebuke him (John 20:28–29). Critics argue that John's presentation is later. Many scholars accept that the Synoptics already present high claims, so the case does not depend on one Gospel. The AI should set out this argument and quote the verses only from the approved corpus under the confirmed translation policy. Until then, cite references only. [CREEDAL: Jesus is God incarnate (John 1:14).]
+> The question is historical as well as theological. The Synoptic Gospels record Jesus forgiving sins (Mark 2:5–7), claiming authority that the scribes called blasphemy, and answering the high priest with a claim drawn from Daniel 7:13 (Mark 14:61–64). John's Gospel is more explicit: in John 8:58 Jesus claims the divine name, and his opponents understood the claim and tried to stone Him (John 10:30–33). Thomas confesses Him as "my Lord and my God" and Jesus does not rebuke him (John 20:28–29). Critics argue that John's presentation is later. Many scholars accept that the Synoptics already present high claims, so the case does not depend on one Gospel. The AI should set out this argument and quote the verses only from the authorised KJV or NASB corpus. [CREEDAL: Jesus is God incarnate (John 1:14).]
 
 ### Q16. Is the Comforter a prophecy about Muhammad? — APPROVE WITH REVISIONS
 
@@ -540,7 +546,7 @@ Each entry gives the rating, the strengths, the weaknesses and missing passages,
 - It cites Matthew 8:16–17 without stating the debate over whether Matthew applies Isaiah 53:4 to physical healing or to bearing sickness spiritually.
 - It omits the texts that show Christians not always healed: 2 Corinthians 12:7–10, Philippians 2:25–27 (Epaphroditus), 2 Timothy 4:20 (Trophimus), and 1 Timothy 5:23.
 **Revised answer:**
-> Christ's saving work is the foundation of the Christian hope of complete restoration. Passages in Isaiah 53:4–5, Matthew 8:16–17 and 1 Peter 2:24 are read in different ways. Some Christians hold that physical healing is provided in the atonement and may be claimed now. Others hold that the atonement's healing is ultimately fulfilled in the resurrection, and that present healing is granted in God's wisdom. James 5:14–16 supports prayer and anointing for the sick. Scripture also records faithful believers who were not healed (2 Corinthians 12:7–10; Philippians 2:25–27; 2 Timothy 4:20). Christians should pray for healing, should seek medical care, and must never tell a sick person that their illness proves weak faith. Whether physical healing is guaranteed in the present age is a matter for the position paper, PENDING approval by Bishop Mutweri (Decision 13). [PENDING.]
+> Christ's saving work is the foundation of the Christian hope of complete restoration. Passages in Isaiah 53:4–5, Matthew 8:16–17 and 1 Peter 2:24 are read in different ways. Some Christians hold that physical healing is provided in the atonement and may be claimed now. Others hold that the atonement's healing is ultimately fulfilled in the resurrection, and that present healing is granted in God's wisdom. James 5:14–16 supports prayer and anointing for the sick. Scripture also records faithful believers who were not healed (2 Corinthians 12:7–10; Philippians 2:25–27; 2 Timothy 4:20). Christians should pray for healing, should seek medical care, and must never tell a sick person that their illness proves weak faith. Whether physical healing is guaranteed in the present age is a matter for the position paper, PENDING approval by the app's final approver (Decision 13). [PENDING.]
 
 ### Q32. Has the Church replaced Israel? — HOLD FOR OWNER DECISION (Decision 6)
 
@@ -655,7 +661,7 @@ Each entry gives the rating, the strengths, the weaknesses and missing passages,
 
 ### Section G: Disputed issues requiring a formal Perazim position
 
-The five A4 topics in this section (divorce and remarriage, sexuality, tithing, alcohol, and the other pending items) must remain "explain the views, no church position" until Bishop Dr. David Mutweri approves the relevant position papers (Decision 13).
+The five A4 topics in this section (divorce and remarriage, sexuality, tithing, alcohol, and the other pending items) must remain "explain the views, no church position" until the app's final approver approves the relevant position papers (Decision 13).
 
 ### Q42. My spouse has cheated. Must I stay in the marriage? — HOLD FOR OWNER DECISION (A4, divorce and remarriage)
 
@@ -967,19 +973,19 @@ Section K.3 requires the review to identify missing objections. Each new questio
 
 These recommendations are for the owner's approval. They are not implemented.
 
-- **Record per question or subject.** Fields: `id`; `subject`; `variants`; `status` (approved, working or under review, pending, or open); `approving_authority` and `approval_date`; `primary_passages` (references only; verse text resolved from the approved corpus under the confirmed translation policy, never typed from memory); `historical_context`; `principal_argument`; `perazim_position` (empty unless approved); `alternative_views`; `objections`; `model_outline`; `reasoning_failures_to_avoid`; `pastoral_boundaries`; `referral_targets`; `adversarial_followups`; `version`; `review_history`.
+- **Record per question or subject.** Fields: `id`; `subject`; `variants`; `status` (approved, working or under review, pending, or open); `approving_authority` and `approval_date`; `primary_passages` (references only; verse text resolved from the authorised KJV or NASB corpus, never typed from memory); `historical_context`; `principal_argument`; `perazim_position` (empty unless approved); `alternative_views`; `objections`; `model_outline`; `reasoning_failures_to_avoid`; `pastoral_boundaries`; `referral_targets`; `adversarial_followups`; `version`; `review_history`.
 - **Status gating.** Retrieval may use `approved` records as Perazim doctrine. `working or under review` records may be used only in "explain the view" mode, labelled as such. `pending` and `open` records may be used only to explain the views. No record may be retrieved as Perazim doctrine without the approved status (G01 section 6).
 - **Separation of reference answers from reasoning guidance.** The revised answers in this review are examples of reasoning. They are not to be stored as a lookup table of answers, because Section J forbids memorisation. Reasoning guidance (argument structure, sources, objections, boundaries) goes into the knowledge package only after approval. Reference answers stay in a separate evaluation store.
 - **Blind evaluation.** The held-out questions (Decision 17) and the unseen variations are stored outside the model's retrieval index, and are never shown to Qwen before its baseline run.
 - **Versioning.** Each approved record carries a version, the approving authority, the effective date and a revision history. A changed doctrinal status creates a new version. The model never adopts an uploaded document as doctrine without the approval step.
-- **Verification step.** Before any reference answer is approved, every verse reference is checked against the approved corpus under the confirmed translation policy, and every factual claim (dates, manuscripts, legal references, crisis numbers) against a named source.
+- **Verification step.** Before any reference answer is approved, every verse reference is checked against the authorised KJV or NASB corpus, and every factual claim (dates, manuscripts, legal references, crisis numbers) against a named source.
 
 ### 4.2 Handoff status (Section 7)
 
 **What has been reviewed.** All 56 questions and their answers; Sections A to K; the governance drafts G01 and G02 for consistency; and the existing 532-case test set for gaps.
 
 **What has been corrected in this review (as proposals, not decisions).**
-- The Bible-translation instruction is flagged as unresolved, not changed. Levi will confirm the policy separately (PR #71 comment).
+- The app's translation policy is KJV and NASB, per the owner's second PR comment. ESV references in the governance drafts are flagged for the separate correction thread.
 - Status and voice: first-person attributions are changed to third-person language. Unapproved views are labelled "the pastor's developing view", under review, as G01 requires.
 - Missing proof texts are added to about twenty answers (Part 2).
 - Islamic answers are given Qur'an-specific engagement (Q11, Q13–Q17).
@@ -987,7 +993,7 @@ These recommendations are for the owner's approval. They are not implemented.
 - Crisis and safeguarding guidance is limited to verified numbers and the pending Pastoral Care Contact.
 - Twelve new questions are proposed (Part 3).
 
-**What needs Levi's approval.** Levi has answered all 17 decisions (see the owner decisions section in Part 1B). The revised review is returned to him for confirmation. Nothing is approved for merge, for the revised answers, or for any transfer to Qwen or the knowledge package. The seven HOLD items remain HOLD until the relevant decisions and Bishop Dr. David Mutweri's approval of the position papers are recorded. The canon default is the 66-book Protestant canon, with Catholic and Orthodox collections explained (Decision 12, as accepted with refinement).
+**What needs Levi's approval.** Levi has answered all 17 decisions (see the owner decisions section in Part 1B). The revised review is returned to him for confirmation. Nothing is approved for merge, for the revised answers, or for any transfer to Qwen or the knowledge package. The seven HOLD items remain HOLD until the relevant decisions and the app's final approver's approval of the position papers is recorded. The canon default is the 66-book Protestant canon, with Catholic and Orthodox collections explained (Decision 12, as accepted with refinement).
 
 **What is suitable for later inclusion in the knowledge package, after approval.** The reasoning structure of each answer; the sources and the objections; the referral boundaries; the answers to Q2, Q3, Q4, Q6, Q7, Q8, Q10, Q18, Q19, Q21 and Q22 once the revisions are accepted and approved. None of these is approved yet.
 
@@ -995,7 +1001,7 @@ These recommendations are for the owner's approval. They are not implemented.
 - All 56 reference answers and all revised answers in this review, as prompts, training examples, retrieval documents or system instructions for Qwen or any local model.
 - Any position on the A4 topics, and the HOLD items.
 - Any position on the atonement model, the nature of hell, the inerrancy question, or the canon default, pending Decisions 9 to 12.
-- Any quotation of Scripture not taken from the approved corpus under the confirmed translation policy.
+- Any quotation of Scripture not taken from the authorised KJV or NASB corpus, and any ESV quotation in the knowledge package or user-facing answers.
 - Crisis or Pastoral Care Contact details not in the verified directory.
 - The new questions N1 to N12, until they are approved.
 
