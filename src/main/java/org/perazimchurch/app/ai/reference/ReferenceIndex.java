@@ -55,8 +55,8 @@ public final class ReferenceIndex {
         File target = new File(dir, UNPACKED_NAME);
         if (target.isFile() && target.length() > 0) return target;
         if (!dir.isDirectory() && !dir.mkdirs()) return null;
-        try (InputStream raw = context.getAssets().open(ASSET)) {
-            InputStream in = new GZIPInputStream(new BufferedInputStream(raw));
+        try (InputStream raw = context.getAssets().open(ASSET);
+             InputStream in = new GZIPInputStream(new BufferedInputStream(raw))) {
             File temp = new File(dir, UNPACKED_NAME + ".tmp");
             try (OutputStream out = new FileOutputStream(temp)) {
                 byte[] buffer = new byte[64 * 1024];
