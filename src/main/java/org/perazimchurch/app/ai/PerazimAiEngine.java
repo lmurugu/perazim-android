@@ -414,6 +414,7 @@ public class PerazimAiEngine {
             "prayer|prayers|pray|praying|maombi|sala|devotional|devotion|faith|imani|grace|neema|mercy|forgiveness|parable|sabbath|" +
             "commission|baptism|tithe|tithing|offering|offerings|sadaka|paybill|church|kanisa|perazim|bishop|ministry|" +
             "cell group|fellowship|testimony|worship|hymn|hymns|hymnal|nyimbo|wimbo|sermon|sermons|livestream|sunday|" +
+            "anger|angry|resent|resentment|sin|sins|sinning|temptation|tempted|hopeless|lonely|loneliness|afraid|fear|anxious|anxiety|depressed|depression|grief|grieving|marriage|husband|wife|brother|sister|family|forgive|forgiveness|guilt|shame|doubt|doubts|salvation|saved|heaven|hell|eternal|struggle|struggling|suffering|hurt|healing|wisdom|purpose|meaning|peace|hope|joy|love|patience|humility|comfort|encouragement|pastor|pastors|elder|elders|counsel|counselling|counseling|worried|worry|stressed|stress|sad|sadness|life|dying|death|" +
             "the app|this app|perazim app|app theme|app account|profile|reader|highlight|highlights|streak|xp|level up|community wall|youtube|reminder|" +
             "discussion questions|bible study|blessing|thanksgiving)\\b", Pattern.CASE_INSENSITIVE);
     /** Instruction-override and role-play attempts. These are refused even when they mention church topics. */
