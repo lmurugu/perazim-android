@@ -64,6 +64,10 @@ fi
 echo 'Package state after the simulated process death (stopped flag and JobScheduler entry):' >&2
 adb shell dumpsys package org.perazimchurch.app | grep -i 'stopped' | head -n 4 >&2 || echo 'stopped flag: not reported by dumpsys package' >&2
 adb shell dumpsys jobscheduler | grep -i -B2 -A6 'org.perazimchurch' | head -n 30 >&2 || echo 'JobScheduler: no job for org.perazimchurch before network restore' >&2
+# Was the app still installed after the Gradle run ended? A missing package would explain the lost job.
+echo "Installed path after the kill: $(adb shell pm path org.perazimchurch.app 2>/dev/null | tr -d '\r' || true)" >&2
+echo 'Package record after the kill (first lines):' >&2
+adb shell dumpsys package org.perazimchurch.app 2>/dev/null | head -n 6 | tr -d '\r' >&2 || true
 
 adb shell svc wifi enable
 adb shell svc data enable || true
