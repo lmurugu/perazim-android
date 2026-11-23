@@ -138,7 +138,7 @@ The following decisions have been explicitly approved or established during proj
 | ID | Decision | Status |
 |---|---|---|
 | A-044 | Scripture is the supreme authority for Christian doctrine. | APPROVED |
-| A-045 | The ESV is the preferred Bible translation for the project, subject to licensing and distribution rights. | APPROVED |
+| A-045 | The ESV is the preferred Bible translation for the project, subject to licensing and distribution rights. | SUPERSEDED for AI quotations by A-105 (23 November 2026). Kept as historical record. |
 | A-046 | Official approved Perazim positions must be represented faithfully and consistently. | APPROVED |
 | A-047 | The AI must not dilute, relativise, or invent compromises concerning a clear official Perazim position. | APPROVED |
 | A-048 | Alternative theological positions may be described fairly but must be distinguished from the official Perazim position. | APPROVED |
@@ -224,6 +224,12 @@ The following decisions have been explicitly approved or established during proj
 | A-103 | Regression testing is mandatory before release. | APPROVED |
 | A-104 | No production deployment, external infrastructure change, or destructive operation is authorised merely by the existence of these specifications. | APPROVED |
 
+## 2.12 Scripture translation for AI quotations
+
+| ID | Decision | Status |
+|---|---|---|
+| A-105 | For AI Scripture quotations, the AI quotes only the KJV and the NASB, with translation attribution. The ESV is excluded from AI quotations, references and explanations. This supersedes A-045 for AI use only. The Android Bible reader's translations (ESV, NIV, NKJV and SUV) are not changed by this decision. Decided by the project owner, Levi, on 23 November 2026 and reconfirmed the same day. | APPROVED |
+
 ---
 
 # 3. TECHNICAL DEFAULTS
@@ -302,7 +308,7 @@ Codex must identify them in its implementation plan and must not silently invent
 | U-014 | Whether the current Bible database is complete and accurate. | Validate against authorised source editions. |
 | U-015 | Exact translation fallback if ESV distribution is not authorised. | Establish an approved fallback without misrepresenting the translation. |
 
-The ESV preference is approved. Its technical distribution mechanism remains dependent on licensing verification.
+The ESV preference (A-045) is superseded for AI use by A-105. ESV distribution rights still matter for the Bible reader, which keeps ESV, and remain dependent on licensing verification.
 
 ## 4.3 Offline access and security
 
