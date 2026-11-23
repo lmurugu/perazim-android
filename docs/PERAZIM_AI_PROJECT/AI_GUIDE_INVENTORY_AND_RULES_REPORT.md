@@ -13,7 +13,7 @@ This report lists every resource, rule, skill and guardrail the Perazim Guide us
 - **What the guide is:** an offline assistant on the phone. It answers only from approved church and Bible sources, and it never makes things up. It runs a small on-device model (Qwen2.5 0.5B) and wraps it in fixed rules, safety checks and a citation check.
 - **What it knows:** the King James Bible (KJV) for every quotation, plus reference material: cross-references, two dictionaries, Nave's topical index, Strong's Greek and Hebrew word list, the Nicene Creed, and two optional commentaries (Matthew Henry, John Wesley) that are not in the standard install. The approved comparative knowledge for drift detection is new in this work and is still a draft.
 - **What it does not know:** it cannot quote the NASB (no NASB text is bundled and the AI has no NASB route), it cannot quote the ESV, NIV or NKJV at all, and it cannot see private messages or chats.
-- **What changed in this work:** the guide now notices when a question uses another faith's idea (karma, reincarnation, purgatory, saints, soul sleep, and similar), answers from Scripture, and does not name or describe the Catholic or Orthodox churches (your ruling O-2). I also added 150 trick-question stress tests that check whether the guide actually uses its resources.
+- **What changed in this work:** the guide now notices when a question uses another faith's idea (karma, reincarnation, purgatory, saints, soul sleep, and similar), answers from Scripture, and describes the Catholic and Orthodox traditions accurately from their own primary sources and evaluates them from Scripture (your PR 76 correction supersedes O-2). I also added 150 trick-question stress tests that check whether the guide actually uses its resources.
 - **Most important findings:**
   1. The guide block cuts every playbook to **160 characters** before it reaches the model. Most playbooks are longer than that, so their later rules are never seen (section 7.2).
   2. If no approved Scripture or reference item matches the question, the model is **never called**. The user gets an error instead. Pastoral questions that use everyday words are most at risk (section 7.3).
@@ -121,7 +121,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 
 - Quotations: KJV and NASB only (your decision, licensing). The reader keeps ESV, NIV, NKJV and SUV.
 - **O-1 (option D), Qur'an:** the guide paraphrases Qur'an passages. It quotes one only as evidence against Islam's claims, or where the verse affirms the Bible or Jesus, and always accurately and in context. It never encourages curiosity about Islam. Adherents are treated with dignity and no collective guilt.
-- **O-2 (option C), Catholic and Orthodox churches:** the guide does not address or characterise these churches. It explains their teachings only where needed for drift detection, answers from Scripture, and politely declines questions about the churches. The one exception is explaining the contents of the deuterocanonical books.
+- **O-2, superseded by your PR 76 correction:** the guide may name and describe the Roman Catholic and Eastern Orthodox traditions, explaining each from its own official sources before evaluating it from Scripture. It does not rank churches, classify them all as cults, or give a verdict on any person. The Protestant, Evangelical and Pentecostal standard and Scripture's authority are unchanged.
 - Your governing standard: historic Protestant, Evangelical and Pentecostal orthodoxy is the true faith. Other teachings are described accurately from their own sources and then evaluated against Scripture.
 - Undecided matters (women in ministry, divorce and remarriage, tithing, alcohol, healing in the atonement, evolution, sexuality, inerrancy wording, final punishment) must be presented as not official.
 - English first. Adults only. Release gates: 98% or more for doctrine and verse search with zero fabricated Scripture; 90% for other areas; 100% for safety and privacy; zero critical failures.
@@ -319,7 +319,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 | drift | 21 | Karma, reincarnation, purgatory, saints, Mary, icons, soul sleep, all paths, New Age, secular worldview, Islam, Christian Science |
 | proof_text | 18 | Mormon, Jehovah's Witness, Oneness, Sabbath (SDA) and Qur'an paraphrase proof-texts; the Qur'an rule (O-1) |
 | scope | 13 | Out-of-scope refusals and in-scope afterlife questions |
-| catholic_orthodox | 10 | No naming or description of the churches (O-2); the canon exception |
+| catholic_orthodox | 10 | Accurate description from primary sources, then Scripture (PR 76 correction supersedes O-2); no verdicts; the canon exception |
 | cult_group | 8 | Fair description and evaluation of named groups; no verdict on people |
 | pastoral | 7 | Pastoral and crisis questions, including Swahili |
 | trick_premise | 6 | False premises (cleanliness, money, Joshua 10) |
@@ -341,7 +341,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 | Safety and privacy (crisis, safeguarding, privacy): pass rate | 100% | _pending_ |
 | Critical failures | zero | _pending_ |
 | Cases where the model was never called (no evidence) | count and list | _pending_ |
-| Cases that named a Catholic or Orthodox church (O-2) | zero | _pending_ |
+| Catholic or Orthodox answers that misdescribe the tradition or give a verdict on a person | zero | _pending_ |
 | Cases that quoted the Qur'an directly (O-1) | zero | _pending_ |
 | Cases that quoted ESV, NIV or NKJV | zero | _pending_ |
 | Average prompt tokens, with and without the duplicated rules (section 7.4) | measured | _pending_ |
@@ -356,7 +356,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 
 1. Run all 682 cases (532 original and 150 stress) through the phone pipeline.
 2. Record the stress-test results in section 10.
-3. Confirm that no drift answer names the Catholic or Orthodox churches.
+3. Confirm that each Catholic or Orthodox answer describes the tradition from its own sources and gives no verdict on any person.
 4. Confirm that the drift answers quote only KJV and that the comparative notes are never cited.
 5. Measure prompt tokens before and after any change to the duplicated rules.
 

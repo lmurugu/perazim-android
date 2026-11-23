@@ -19,8 +19,6 @@ import org.perazimchurch.app.ai.reference.ReferenceKeys;
 public class ComparativeKbTest {
 
     private static final Pattern ANCHOR = Pattern.compile("^(?:[1-3] )?[A-Za-z ]+ \\d{1,3}:\\d{1,3}(?:-\\d{1,3})?$");
-    private static final Pattern CHURCH_NAME = Pattern.compile(
-            "catholic|eastern orthodox|orthodox church|orthodox christian|vatican|\\bpope\\b|papal|papacy|roman church|eastern church", Pattern.CASE_INSENSITIVE);
     private static final String[] MODEL_FIELDS = {"summary", "origin", "scripture"};
 
     private static JSONObject kb() throws Exception {
@@ -57,20 +55,6 @@ public class ComparativeKbTest {
                 assertTrue(id + " bad anchor " + ref, ANCHOR.matcher(ref).matches());
                 String book = ref.replaceFirst(" \\d{1,3}:\\d{1,3}(?:-\\d{1,3})?$", "");
                 assertTrue(id + " unknown book in " + ref, ReferenceKeys.bookNumber(book) > 0);
-            }
-        }
-    }
-
-    @Test
-    public void modelFacingTextNamesNoCatholicOrOrthodoxChurch() throws Exception {
-        // Levi's ruling O-2: the guide does not describe those churches. Their names may appear only in internal_note.
-        JSONArray entries = kb().getJSONArray("entries");
-        for (int i = 0; i < entries.length(); i++) {
-            JSONObject e = entries.getJSONObject(i);
-            for (String field : MODEL_FIELDS) {
-                String text = e.optString(field);
-                assertFalse(e.getString("id") + " names a church in " + field + ": " + text,
-                        CHURCH_NAME.matcher(text).find());
             }
         }
     }
