@@ -53,3 +53,20 @@ For every metric below, record accuracy %, fabrication rate, clarify rate and la
 ## Honest declines (to be added)
 
 Where a metric cannot reach 95% with the current data or model, the guide should decline or redirect instead of guessing. Candidates: cross-references, translation comparison, word studies until the Strong's lookup is wired, and multi-step doctrinal reasoning without retrieved text.
+
+## All areas the guide handles (added 2026-11-23)
+
+Status key: code = behaviour set by deterministic code; model = depends on the 0.5B model; not measured = no result yet.
+
+| Area | Current behaviour | Status | Limit or risk | Path |
+|---|---|---|---|---|
+| Pastoral support | Model replies in a warm tone, with fixed text for sensitive disclosures | model + code, not measured | Generic advice; Scripture often missing | Better prompts and retrieved passages; measure |
+| Safety and crisis | Fixed crisis text with verified Kenyan contacts, shown before model output | code, text changed (6088ae1), not run on phone | Depends on the crisis detector's trigger words | Keep fixed text; widen triggers; test on phone |
+| App help (navigation, features) | Model answers from the prompt; no structured app index | model, not measured | Can invent screen names | Add an app-screen index and route to it |
+| Tone | Warm-tone instruction and stock-phrase filter (a7da73a) | model + code, not run | Filter only strips listed openers | Tone grader with a 90% gate |
+| Apologetics and history | Model with retrieved text only | model, not measured | Historical claims not checked against a source | Decline or cite approved sources only |
+| Swahili | Not supported; English only (governance 10A) | not built | Swahili questions get English or wrong answers | Decline politely until dedicated testing |
+| Memory and conversation | Last four turns, 650 characters each | code limit | Long conversations lose context | State the limit; no memory from earlier sessions |
+| Privacy | Per-user memory is in another thread's branch, not here | not built here | Cannot verify from this branch | Review that branch before release |
+| Clarifying questions | One short question for an unclear book name (608765a) | code, not run | Only book names are covered, not doctrine | Extend the same rule to doctrinal wording |
+| Verse quoting | Single verse straight from KJV (4d19a57) | code, not run | Ranges and multi-reference still go to model | Quote every verse from KJV; model explains only |

@@ -20,3 +20,13 @@ The vineyard, lamp-lit room and story road scenes (`vine_scene`, `lamp_scene`, `
 Images were checked against the Openverse tags for people; a human check of each scene is still recommended before release.
 
 The art is kept swappable: replace any file under `scenes/` with the same name to change a game's scene.
+
+## Bible study data (added 2026-11-23)
+
+Source notes are also in `src/main/assets/bible/strongs/SOURCES.txt` and `src/main/assets/bible/interlinear/SOURCES.txt`.
+
+| Asset | Licence used | Attribution | Note |
+|---|---|---|---|
+| `bible/strongs/strongs.tsv.gz`, Greek entries | MIT (decision by the project coordinator, 2026-11-23) | Strong's 1890 text, OpenScriptures corrections | The upstream notes quote both GPL 3.0 and MIT. The file itself has no licence text. Owner to confirm before release. |
+| `bible/strongs/strongs.tsv.gz`, Hebrew entries | CC BY 4.0 | Open Scriptures Hebrew Bible Project (openscriptures/HebrewLexicon) | Attribution required in the app's licences screen. |
+| `bible/interlinear/*` | See the interlinear SOURCES.txt | See that file | Not yet reviewed in this document. |
