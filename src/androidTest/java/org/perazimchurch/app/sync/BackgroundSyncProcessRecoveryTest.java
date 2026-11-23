@@ -1,7 +1,10 @@
 package org.perazimchurch.app.sync;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.os.Process;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -51,6 +54,13 @@ public class BackgroundSyncProcessRecoveryTest {
         Bundle args = InstrumentationRegistry.getArguments();
         if ("true".equals(args.getString("simulateProcessDeath"))) {
             awaitPersistedState(context);
+            // Diagnostic: record what JobScheduler holds for this app before the death, so logcat shows it.
+            JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            List<JobInfo> pending = jobScheduler.getAllPendingJobs();
+            Log.i("BackgroundSyncRecovery", "pending JobScheduler jobs before self-kill: " + pending.size());
+            for (JobInfo job : pending) {
+                Log.i("BackgroundSyncRecovery", "job id=" + job.getId() + " service=" + job.getService());
+            }
             Process.killProcess(Process.myPid());
         }
     }

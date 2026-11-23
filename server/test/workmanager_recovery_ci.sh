@@ -81,7 +81,7 @@ if [[ "$received" != true ]]; then
   adb shell dumpsys connectivity | grep -iE 'NetworkAgentInfo|CONNECTED|VALIDATED' | head -n 20 >&2 || true
   adb shell dumpsys package org.perazimchurch.app | grep -i 'stopped' | head -n 4 >&2 || true
   adb shell dumpsys jobscheduler | grep -i -B2 -A8 'org.perazimchurch' | head -n 40 >&2 || true
-  adb logcat -d -s WorkManager:* BackgroundSync:* ApiClient:* JobScheduler:* 2>/dev/null | tail -n 200 >&2 || true
+  adb logcat -d -s WorkManager:* BackgroundSync:* BackgroundSyncRecovery:* ApiClient:* JobScheduler:* 2>/dev/null | tail -n 200 >&2 || true
   echo 'Mock server received:' >&2
   curl -fsS http://127.0.0.1:18080/__received >&2 || true
   echo >&2
