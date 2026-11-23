@@ -32,9 +32,28 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
   -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
   --stacktrace
 
-# Kill the app process, not force-stop it, so JobScheduler may restart persisted work.
+# Simulate process death, not force-stop. force-stop puts the package in the stopped state,
+# which blocks JobScheduler from running its jobs until the app is launched again, so it
+# cannot prove delivery after process death. Send SIGKILL to the app's own process instead.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
-adb shell am kill org.perazimchurch.app
+app_pid="$(adb shell pidof org.perazimchurch.app | tr -d '\r' | awk '{print $1}')"
+if [[ -z "$app_pid" ]]; then
+  echo 'FAIL: app process not found before the simulated process death.' >&2
+  exit 1
+fi
+adb shell kill -9 "$app_pid" || true
+for _ in $(seq 1 10); do
+  if [[ -z "$(adb shell pidof org.perazimchurch.app | tr -d '\r')" ]]; then
+    break
+  fi
+  sleep 1
+done
+if [[ -n "$(adb shell pidof org.perazimchurch.app | tr -d '\r')" ]]; then
+  echo 'FAIL: app process still alive after SIGKILL; the simulated process death did not happen.' >&2
+  exit 1
+fi
+echo 'Package state after process death (stopped flag is expected to be false):' >&2
+adb shell dumpsys package org.perazimchurch.app | grep -iE 'stopped=|installed=' | head -n 4 >&2 || true
 adb shell svc wifi enable
 adb shell svc data enable || true
 
