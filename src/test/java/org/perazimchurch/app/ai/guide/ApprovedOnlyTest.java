@@ -91,7 +91,8 @@ public class ApprovedOnlyTest {
     private static int countApproved(JSONArray entries) {
         int n = 0;
         for (int i = 0; i < entries.length(); i++) {
-            if (ComparativeGate.APPROVED_STATUS.equals(entries.getJSONObject(i).optString("status"))) n++;
+            JSONObject entry = entries.optJSONObject(i);
+            if (entry != null && ComparativeGate.APPROVED_STATUS.equals(entry.optString("status"))) n++;
         }
         return n;
     }
