@@ -1,0 +1,116 @@
+{
+  "directory": "Perazim AI Guide crisis directory (Kenya)",
+  "version": "0.1-draft",
+  "status": "DRAFT, pending approval by church leadership after independent call-connectivity checks",
+  "verified_on": "2026-11-23",
+  "verification_method": "Web search and reading of official and organisational pages on 2026-11-23. No calls were placed. Each entry records what was confirmed and what was not.",
+  "review_policy": "Review monthly and whenever a government or provider announcement indicates a change. A stale directory is a safety defect (G10).",
+  "display_rule": "Show the entry's caveat text with the number. Do not present a service as 24-hour unless its own source confirms it.",
+  "contacts": [
+    {
+      "id": "emergency_medical_922",
+      "name": "National emergency medical number (SHA 922 Lifeline / National Ambulance Dispatch Centre)",
+      "number": "922",
+      "channels": ["call"],
+      "hours": "Stated as an emergency service; no hours limit reported",
+      "use_for": ["immediate suicide attempt", "serious medical emergency"],
+      "verification_status": "partially_verified",
+      "confirmed": ["Number 922 is reported by two news sources, and the launch date (5 August 2026) is consistent across them", "Operated with the Social Health Authority (SHA) National Ambulance Dispatch Centre"],
+      "not_confirmed": ["Free calls on all networks: reported only by allAfrica quoting the President. Not seen on a government page", "No primary government or ministry page was located", "Capital FM original page could not be loaded (client error)"],
+      "required_before_publication": ["Official government or SHA source", "Live call-connectivity test on Safaricom, Airtel and Telkom"],
+      "sources": [
+        {"title": "Citizen Digital: Govt launches 922 emergency response system", "url": "https://citizen.digital/article/govt-launches-922-emergency-response-system-with-free-ambulance-services-n387792", "accessed": "2026-11-23"},
+        {"title": "allAfrica (Capital FM reprint): Ruto launches SHA 922 Lifeline", "url": "https://allafrica.com/stories/202608060070.html", "accessed": "2026-11-23"}
+      ]
+    },
+    {
+      "id": "police_emergency_999_112",
+      "name": "National Police Service emergency hotlines",
+      "number": "999 / 112 / 911",
+      "channels": ["call"],
+      "hours": "24 hours (per AllAfrica report of 15 Dec 2025)",
+      "use_for": ["immediate physical threat or violence", "police emergency"],
+      "verification_status": "verified",
+      "confirmed": ["The National Police Service Service Standards document lists 'Police Hotlines: 999/112/911' as an official emergency contact"],
+      "not_confirmed": ["Communications Authority of Kenya listing was not checked on the page read"],
+      "required_before_publication": [],
+      "sources": [
+        {"title": "National Police Service: Service Standards (PDF, 2025-01)", "url": "https://nationalpolice.go.ke/sites/default/files/2025-01/NPS%20Service%20Standards.pdf", "accessed": "2026-11-23"},
+        {"title": "AllAfrica: Kenya: See Reckless Driving? Call 999, 911 or 112 (15 Dec 2025)", "url": "https://allafrica.com/stories/202512150291.html", "accessed": "2026-11-23"}
+      ]
+    },
+    {
+      "id": "befrienders_kenya",
+      "name": "Befrienders Kenya (suicide prevention and emotional support)",
+      "number": "+254 722 178 177",
+      "channels": ["call", "SMS", "WhatsApp"],
+      "hours": "CONFLICTING: Mon to Fri, 9 AM to 5 PM (findahelpline.com). Mon to Sun, 9:00 to 17:00 and also 'open 24 hours' (befrienders.org). Time zone not stated",
+      "use_for": ["suicidal thoughts without immediate danger"],
+      "verification_status": "conflict",
+      "confirmed": ["Number is listed on befrienders.org (Befrienders Worldwide network) and findahelpline.com lists the phone, SMS and WhatsApp channels"],
+      "not_confirmed": ["Hours: sources disagree. The Guide must not describe the service as 24-hour", "Email befrienderskenya.helpline@gmail.com was in the proposal but was NOT checked and is not included"],
+      "required_before_publication": ["Confirm hours with Befrienders Kenya directly", "Confirm number connects"],
+      "display_caveat": "Support line, not an emergency service. Published hours are limited: confirm before display.",
+      "sources": [
+        {"title": "Befrienders Worldwide: Befrienders Kenya", "url": "https://befrienders.org/find-support-now/befrienders-kenya/?", "accessed": "2026-11-23"},
+        {"title": "Find A Helpline: Befrienders Kenya", "url": "https://findahelpline.com/organizations/befrienders-kenya", "accessed": "2026-11-23"}
+      ]
+    },
+    {
+      "id": "gbv_helpline_1195",
+      "name": "National Gender-Based Violence Toll-Free Helpline (HAK, with the Government)",
+      "number": "1195",
+      "channels": ["call"],
+      "hours": "24/7 (per UN Women article dated October 2024)",
+      "use_for": ["domestic violence", "sexual abuse", "gender-based violence"],
+      "verification_status": "partially_verified",
+      "confirmed": ["UN Women article (Oct 2024) describes 1195 as the national toll-free GBV helpline, staffed 24/7, run with HAK (Healthcare Assistance Kenya)"],
+      "not_confirmed": ["Current status in 2026: the source is from 2024", "Live call not tested"],
+      "required_before_publication": ["Confirm current operation with the operator or the Ministry", "Live call test"],
+      "sources": [
+        {"title": "UN Women Africa: Kenya's national toll-free helpline 1195 (Oct 2024)", "url": "https://africa.unwomen.org/en/stories/news/2024/10/kenyas-national-toll-free-helpline-1195-a-lifeline-for-gender-based-violence-survivors", "accessed": "2026-11-23"}
+      ]
+    },
+    {
+      "id": "childline_116",
+      "name": "Childline Kenya / National Child Helpline 116",
+      "number": "116",
+      "channels": ["call", "WhatsApp"],
+      "whatsapp": "0722 116 116",
+      "hours": "24/7, free",
+      "use_for": ["child abuse or exploitation", "child in danger", "child-safety fallback for minors"],
+      "verification_status": "verified",
+      "confirmed": ["MIGECAH (government) describes it as 'a free 24/7 helpline for children' and lists WhatsApp 0722 116 116", "Childline Kenya / Child Helpline International states it runs 24 hours toll free and gives WhatsApp +254 722 116 116", "Operated as a public-private partnership between the government (State Department for Children Services) and Childline Kenya"],
+      "not_confirmed": [],
+      "required_before_publication": [],
+      "sources": [
+        {"title": "MIGECAH: Child helpline", "url": "https://migecah.go.ke/child-helpline?gvas=lilac", "accessed": "2026-11-23"},
+        {"title": "Child Helpline International: Kenya Childline Kenya", "url": "https://childhelplineinternational.org/kenya-childline-kenya/", "accessed": "2026-11-23"},
+        {"title": "Find A Helpline: National Child Helpline 116", "url": "https://findahelpline.com/organizations/national-child-helpline-116", "accessed": "2026-11-23"}
+      ]
+    },
+    {
+      "id": "nacada_1192",
+      "name": "NACADA toll-free helpline (alcohol and drug dependency)",
+      "number": "1192",
+      "channels": ["call"],
+      "hours": "24 hours, every day, including holidays",
+      "use_for": ["alcohol or drug dependency"],
+      "verification_status": "verified",
+      "confirmed": ["NACADA site: 'Help line is available 24 Hrs Everyday' and calls 1192 a 'Free Helpline No.'", "Find A Helpline lists it as a national toll-free line, 24/7"],
+      "not_confirmed": ["NACADA office line +254 202721997 is NOT the helpline and must not be shown as it"],
+      "required_before_publication": [],
+      "sources": [
+        {"title": "NACADA: How to get assistance", "url": "https://nacada.go.ke/how-get-assistance", "accessed": "2026-11-23"},
+        {"title": "Find A Helpline: NACADA toll-free helpline", "url": "https://findahelpline.com/organizations/nacada-toll-free-helpline-49a8cb80-78a1-49da-9f4d-69bd71e85253", "accessed": "2026-11-23"}
+      ]
+    }
+  ],
+  "open_items": [
+    "922: obtain official source and test call connectivity",
+    "Befrienders Kenya: resolve hours with the organisation",
+    "1195: confirm current operation (source is 2024)",
+    "Email for Befrienders Kenya: unchecked, excluded",
+    "Church sign-off on display wording (CHK item 8)"
+  ]
+}
