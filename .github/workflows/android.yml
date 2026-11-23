@@ -42,7 +42,18 @@ jobs:
           java-version: "17"
           cache: gradle
       - name: Render main tabs in dark and light mode
-        run: ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon
+        # Robolectric downloads android-all jars from Maven during the test run. On PR 76 head b9d8d88
+        # a single failed download (MavenArtifactFetcher, IOException) failed all screenshot tests while
+        # the unit job passed. Retry the whole step up to three times before failing.
+        run: |
+          for attempt in 1 2 3; do
+            if ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon; then
+              exit 0
+            fi
+            echo "Screenshot run attempt ${attempt} failed; retrying in 30 s"
+            sleep 30
+          done
+          exit 1
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
