@@ -17,7 +17,7 @@ This report lists every resource, rule, skill and guardrail the Perazim Guide us
 - **Most important findings:**
   1. The guide block cuts every playbook to **160 characters** before it reaches the model. Most playbooks are longer than that, so their later rules are never seen (section 7.2).
   2. If no approved Scripture or reference item matches the question, the model is **never called**. The user gets an error instead. Pastoral questions that use everyday words are most at risk (section 7.3).
-  3. The **NASB** route now exists in the code. It reads only your licensed file, and only when a question names the NASB. It needs your confirmation (section 7.6).
+  3. The **NASB** route now exists in the code. It reads only your licensed file, and only when a question names the NASB. Your 23 November decision allows the NASB for the app and AI; only the file-loading rule needs confirmation (section 7.6).
   4. The reference database has **no full-text index**, although its build script describes one (section 7.5).
 
 ---
@@ -221,11 +221,11 @@ The system text (about 1,860 characters) and the locked core (677 characters, in
 - Dictionary and topic lookups match a single headword exactly, using the words of four or more letters in the question. A phrase such as "the love of money" finds nothing unless one of its words is a headword.
 - **Recommendation:** rebuild the database with the full-text index, or add a headword and synonym list for common topics (forgiveness, grace, Sabbath, prayer). Check that the build and the shipped file agree.
 
-### 7.6 NASB route (implemented; needs your confirmation)
+### 7.6 NASB route (implemented; file-loading rule to confirm)
 
 Your rule allows the NASB for the app and the AI, loaded only from a user-supplied file kept out of git. The AI now has that route. When a question names the NASB and your licensed file is loaded, `LocalScriptureRetriever` reads the NASB from it. When the file is not loaded, the answer says the licensed NASB is not on the device (`NASB_NOT_LOADED`) and uses the KJV. This matches the stress test `resource_use` case "Quote Romans 8:28 in NASB".
 
-- **Recommendation:** confirm that the AI should read the user-supplied NASB file, as the reader does. If you want KJV only, the route can be removed and the rule updated.
+- **Recommendation:** confirm the file-loading rule, as the reader already applies it. Quotation is already permitted by your 23 November decision (KJV and NASB only).
 
 ### 7.7 Commentaries and cross-references are used only with an explicit verse
 
@@ -283,7 +283,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 | `fae9dd5` | Comparative knowledge base: 27 entries (world religions, heterodox groups, African traditional religion, New Age, secular worldviews, and internal drift notes for the Catholic and Orthodox teachings). **Superseded in part by your PR 76 correction:** Catholic and Orthodox names may now appear in model-facing text. The earlier rule that no church is named is no longer in force, and the test that enforced it is not in the current tree. Internal notes name the traditions for drift only. |
 | `a3fda9e` | Drift detection: `DriftDetector` (27 concepts, pure Java), `DriftEvidence` (KJV anchors plus one note), drift playbook and skill, router priority, scope-gate change (drift questions and afterlife terms now pass), tests. Router test count moved from 10 to 11 skills. |
 | `9c2b766` | 150 trick-question stress cases (`cases-stress-2026-11-23.jsonl`) and the generator script. Each case names the resources to use and the trap tested. The original 532-case file is unchanged. |
-| `e177b53` | The final prompt keeps comparative notes whole. Excerpts are cut only at whole sentences (`LocalPrompt`). `DriftEvidence` reads the knowledge base version from the JSON (1.3.0) instead of a hard-coded 1.0.0. New tests: `ComparativeNotePromptTest` (the full note reaches the model), and source titles shown but source URLs not (`GroupSaintsLeakageTest`). |
+| `e177b53` | The final prompt keeps comparative notes whole. Excerpts are cut only at whole sentences (`LocalPrompt`). `DriftEvidence` reads the knowledge base version from the JSON instead of a hard-coded 1.0.0. New tests: `ComparativeNotePromptTest` (the full note reaches the model), and source titles shown but source URLs not (`GroupSaintsLeakageTest`). |
 | `1ee37f3` | Drift playbook shortened to fit the 160-character cap. `Status.md` updated. |
 | (this commit) | This report. |
 
@@ -300,7 +300,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 3. **Henry and Wesley commentaries.** `approvals.json` says approved (your answer A). The register says pending. Which is current?
 4. **Playbook cap.** Raise the 160-character cap, or shorten each playbook to its key rules? (My recommendation: shorten, and add a test.)
 5. **Pastoral questions without evidence.** Give pastoral questions a fixed Scripture set when nothing else matches, or keep "no evidence, no answer"? (My recommendation: a fixed set, still cited.)
-6. **NASB.** The AI now reads your user-supplied NASB file when a question names it. Confirm that this is right, or restore KJV only?
+6. **NASB file rule.** Your 23 November decision allows NASB quotation. Confirm that the AI reads only the user-supplied file, as the reader does.
 7. **Decision 12 (deuterocanonical books).** I read your ruling O-2 exception as explaining the contents of the extra books (Tobit, Judith, Maccabees, Sirach, Wisdom, Baruch) and nothing about the churches that use them. The stress tests follow that reading. Tell me if you meant it differently.
 8. **Verse-number check.** Add a deterministic verse-number check to `SelfCheck` against the KJV table? (My recommendation: yes.)
 
