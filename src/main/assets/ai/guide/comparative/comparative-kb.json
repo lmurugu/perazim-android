@@ -1,171 +1,218 @@
 {
   "_comment": "Comparative knowledge for the Perazim Guide's drift detection. Status DRAFT_PENDING_LEVI: every entry is a summary written for review, not an approved source. Only the text in 'summary', 'origin' and 'scripture' is shown to the model. 'internal_note' is never shown to the model or to users. Scripture references are KJV and are retrieved verbatim from the bundled KJV database; no other translation is quoted. Entries are context only: the model may explain them but may not cite them. Standard: historic Protestant, Evangelical and Pentecostal orthodoxy, with Scripture as supreme authority. Under Levi's PR 76 correction, O-2 is superseded: the guide may name and accurately describe the Roman Catholic and Eastern Orthodox traditions from their own primary sources, and evaluates them from Scripture.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "status": "DRAFT_PENDING_LEVI",
   "entries": [
     {
       "id": "karma",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Karma is the teaching, held in Hindu, Buddhist and Jain thought, that a person's intentional actions bring results that shape later experience, including a later life.",
-      "origin": "Karma comes from Hindu, Buddhist and Jain teaching. It is tied to reincarnation and to the goal of escaping the cycle of rebirth.",
-      "scripture": "The Bible does not teach karma. It teaches that people die once and then face judgment (Hebrews 9:27). Salvation is a gift of grace through faith, not the balance of good and bad deeds (Ephesians 2:8-9). Galatians 6:7 warns that people reap what they sow, but it speaks of a life lived for the flesh or the Spirit in this life, not of a cycle of rebirth.",
-      "anchors": ["Hebrews 9:27", "Ephesians 2:8-9"],
-      "sources": [{"title": "Bhagavad Gita (Edwin Arnold translation, 1885)", "licence": "public domain", "use": "reference only"}, {"title": "Dhammapada (F. Max Müller translation, 1881)", "licence": "public domain", "use": "reference only"}]
+      "summary": "Karma is the principle, taught in Hindu, Buddhist and Jain traditions, that intentional actions bring results that shape later experience, including future lives. The traditions explain how karma works and what it is for in different ways, and Jain accounts differ from both Hindu and Buddhist ones.",
+      "origin": "Karma developed in Indian religious thought and is understood differently in Hindu, Buddhist and Jain systems. In each, it is tied to rebirth and to the goal of release from the cycle of rebirth.",
+      "scripture": "Scripture does not teach karma as a cosmic law of cause and rebirth. It teaches that it is appointed unto men once to die, and after this the judgment (Hebrews 9:27). Salvation is by grace through faith, not by the balance of deeds (Ephesians 2:8-9). Galatians 6:7 says: 'Be not deceived; God is not mocked: for whatsoever a man soweth, that shall he also reap.' That verse uses farming imagery about the consequences of living for the flesh or for the Spirit in this life. It is not a teaching of karma or of rebirth.",
+      "anchors": ["Hebrews 9:27", "Galatians 6:7", "Ephesians 2:8-9"],
+      "sources": [
+        {"title": "OpenStax, Introduction to Philosophy, 6.2 Self and Identity", "url": "https://openstax.org/books/introduction-philosophy/pages/6-2-self-and-identity", "accessed": "2026-11-23", "licence": "CC BY (verify before quoting)", "use": "context on Hindu and Buddhist views of self", "verification": "partly verified; karma-specific text pending"},
+        {"title": "Karma in Hindu, Buddhist and Jain primary texts and specialist scholarship", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending: Oxford Academic chapter was paywalled and no other source fetched"}
+      ]
     },
     {
       "id": "reincarnation",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Reincarnation, or rebirth, is the teaching that a soul or stream of consciousness passes through many lives in different bodies, shaped by karma, until liberation.",
-      "origin": "Reincarnation is central to Hindu, Buddhist and Jain teaching, and it is also found in some New Age and esoteric writing.",
-      "scripture": "Scripture teaches that each person lives once, dies once, and then faces judgment (Hebrews 9:27). Jesus's words to the thief, 'To day shalt thou be with me in paradise' (Luke 23:43), and Paul's desire 'to depart, and to be with Christ' (Philippians 1:23) describe life after death with Christ, not a return to earth. Reincarnation is therefore not compatible with the biblical view.",
+      "summary": "Reincarnation, or rebirth, is the teaching in several Indian traditions that a person or life-stream is reborn in new lives, with the next life shaped by karma. Hindu and Jain accounts hold that something continues from life to life. Buddhism teaches rebirth without an eternal self, and the continuity it describes is one of causes and conditions.",
+      "origin": "Rebirth is central to Hindu and Jain teaching. Buddhist teaching denies a permanent self (anatta), so what is reborn is a stream of conditions rather than an eternal soul. Some New Age and esoteric writing also teaches reincarnation.",
+      "scripture": "Scripture teaches that it is appointed unto men once to die, and after this the judgment (Hebrews 9:27). Jesus told the thief on the cross, 'To day shalt thou be with me in paradise' (Luke 23:43), and Paul wrote of his desire 'to depart, and to be with Christ' (Philippians 1:23). These passages describe life with Christ after death, not a return to earth. Christians therefore hold that reincarnation is not taught in Scripture.",
       "anchors": ["Hebrews 9:27", "Philippians 1:23"],
-      "sources": [{"title": "Upanishads (Max Müller translation, Sacred Books of the East)", "licence": "public domain", "use": "reference only"}]
+      "sources": [
+        {"title": "Signe Cohen, The Problem of God in Buddhism (Cambridge Element), excerpt", "url": "https://assets.cambridge.org/97810095/78707/excerpt/9781009578707_excerpt.pdf", "accessed": "2026-11-23", "licence": "copyright; excerpt used for reference only", "use": "Buddhist view: consciousness is a temporary formation that may last through several reincarnations; no eternal self", "verification": "verified (excerpt read)"},
+        {"title": "OpenStax, Introduction to Philosophy, 6.2 Self and Identity", "url": "https://openstax.org/books/introduction-philosophy/pages/6-2-self-and-identity", "accessed": "2026-11-23", "licence": "CC BY (verify before quoting)", "use": "Hindu view: atman framed as eternal", "verification": "verified (page read)"}
+      ]
     },
     {
       "id": "nirvana_moksha",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Nirvana (Buddhism) and moksha (Hinduism) are the goal of release from suffering or from the cycle of rebirth, understood differently in each tradition.",
-      "origin": "These are goals of Buddhist and Hindu practice. Buddhism speaks of the end of craving, and Hinduism of liberation of the self.",
-      "scripture": "Scripture does not describe release from rebirth. It offers eternal life as a gift of God through Jesus Christ (John 3:16) and the hope of being with the Lord (2 Corinthians 5:8). Liberation in Scripture comes through the Son, not through self-effort: 'If the Son therefore shall make you free, ye shall be free indeed' (John 8:36).",
+      "summary": "Nirvana in Buddhism and moksha in Hindu traditions are goals of release, but they are defined differently. Buddhist nirvana is the end of craving and suffering, understood without a permanent self. Moksha is liberation from rebirth, and Hindu schools explain it in different ways. Jain teaching has its own account of liberation.",
+      "origin": "Nirvana and moksha are goals of practice in Buddhist and Hindu traditions. Each is explained on its own terms and should not be reduced to a single notion of liberating the self.",
+      "scripture": "Scripture does not describe release from rebirth. It presents eternal life as the gift of God through his Son (John 3:16) and the hope of being with the Lord (2 Corinthians 5:8). Jesus said: 'I am the way, the truth, and the life: no man cometh unto the Father, but by me' (John 14:6). He also said: 'If the Son therefore shall make you free, ye shall be free indeed' (John 8:36).",
       "anchors": ["John 8:36", "John 14:6"],
-      "sources": [{"title": "Pali Canon (Rhys Davids and Oldenberg translations, Sacred Books of the Buddhists)", "licence": "public domain", "use": "reference only"}]
+      "sources": [
+        {"title": "Signe Cohen, The Problem of God in Buddhism, excerpt", "url": "https://assets.cambridge.org/97810095/78707/excerpt/9781009578707_excerpt.pdf", "accessed": "2026-11-23", "licence": "copyright; reference only", "use": "Buddhist background", "verification": "partly verified"},
+        {"title": "Primary Buddhist text on nirvana (Pali Canon, public-domain translation)", "url": "", "accessed": "2026-11-23", "licence": "public domain (translation)", "use": "to be recorded", "verification": "pending"}
+      ]
     },
     {
       "id": "purgatory",
       "group": "christian_tradition_internal",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Purgatory is a teaching of a temporary state of purification after death for those who die in grace but still need cleansing before heaven.",
-      "origin": "Purgatory is a teaching from later church tradition. It is not found in Scripture and is not part of the Protestant or Evangelical understanding of the afterlife.",
-      "scripture": "Scripture teaches that the blood of Christ cleanses from all sin (1 John 1:7) and that believers are justified freely by grace through faith (Romans 3:24). Paul says that to be absent from the body is to be present with the Lord (2 Corinthians 5:8). Nothing in Scripture adds a further cleansing after death. Christians should judge what they believe by the Bible, and the state after death is a matter of God's word alone.",
+      "summary": "Purgatory is a doctrine of Catholic teaching: a state after death in which the faithful who still need purification are cleansed before entering heaven. Eastern Orthodox teaching does not hold purgatory as a defined doctrine, but it prays for the departed. Protestant and Evangelical Christians do not find purgatory taught in Scripture, and they explain why in the entry below.",
+      "origin": "The Catholic doctrine was formulated in the medieval West and affirmed by later Western councils. Its scriptural basis is disputed between its advocates and Protestant readers.",
+      "scripture": "Scripture says that the blood of Jesus Christ cleanses from all sin (1 John 1:7), and that believers are justified freely by his grace through the redemption that is in Christ Jesus (Romans 3:24). Paul says that to be absent from the body is to be present with the Lord (2 Corinthians 5:8). Advocates of purgatory cite 2 Maccabees 12:43-45, a book outside the Protestant canon, and 1 Corinthians 3:13-15, which speaks of works tested by fire. Protestant readers take the 1 Corinthians passage to describe the testing and reward of Christian work at the judgment, not a post-death cleansing, and they find no further cleansing after death beyond the work of Christ.",
       "anchors": ["1 John 1:7", "2 Corinthians 5:8"],
-      "internal_note": "Catholic teaching (Catechism 1030-1032). Use for drift only. Never name the source church.",
-      "sources": [{"title": "Catechism of the Catholic Church, paragraphs 1030-1032 (paragraph reference only; the text is not reproduced)", "licence": "copyright, reference only", "use": "reference only, paragraph number"}]
+      "internal_note": "Catholic teaching: Catechism of the Catholic Church, paragraphs 1030-1032 (paragraph reference; text not reproduced). Eastern Orthodox position on the departed: pending verification against an Orthodox primary source. For comparison only.",
+      "sources": [
+        {"title": "Catechism of the Catholic Church, paragraphs 1030-1032", "url": "", "accessed": "2026-11-23", "licence": "copyright; reference only", "use": "paragraph reference", "verification": "pending: text not fetched"},
+        {"title": "Eastern Orthodox primary source on prayer for the departed", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "saint_prayer",
       "group": "christian_tradition_internal",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "The teaching that the saints and Mary can be asked to pray for the living, and that prayers can be addressed to them, is found in later Christian tradition.",
-      "origin": "Asking the saints or Mary to intercede is a teaching from later church tradition, not from the New Testament.",
-      "scripture": "Scripture teaches one mediator between God and people: 'For there is one God, and one mediator between God and men, the man Christ Jesus' (1 Timothy 2:5). Believers are invited to come to God directly through him (Hebrews 4:16). Prayer is addressed to God the Father, in the name of Jesus (John 14:13). The Bible also forbids the worship of anything made by hand that takes God's place (Exodus 20:4-5).",
+      "summary": "Catholic teaching, and some Eastern Orthodox practice, holds that departed saints and Mary pray for believers on earth, and that the faithful may ask them for intercession. Catholic teaching distinguishes the veneration of saints from the worship due to God alone. Protestant and Evangelical Christians hold that Christ alone is the mediator who gives access to God, and that prayer is addressed to God.",
+      "origin": "The practice of asking saints for intercession developed in Christian tradition after the New Testament period and was defended in later Catholic and Orthodox teaching. Protestant teaching rejects it as going beyond Scripture.",
+      "scripture": "1 Timothy 2:1-7 commands prayer and intercession for all people, and in the same passage says there is one God and one mediator between God and men, the man Christ Jesus (1 Timothy 2:5). The disagreement is whether the intercession of departed saints belongs to that prayer. Hebrews 4:16 invites believers to come boldly to the throne of grace. Scripture does not show departed saints hearing or answering prayer, and Deuteronomy 18:10-12 forbids consulting the dead. Protestant readers hold that Christ's unique mediation does not prevent believers from praying for one another, but that prayer addressed to the departed would set up another mediator.",
       "anchors": ["1 Timothy 2:5", "Hebrews 4:16"],
-      "internal_note": "Catholic and Orthodox practice (Catechism 2683, prayer to saints). Use for drift only. Never name the source church.",
-      "sources": [{"title": "Catechism of the Catholic Church, paragraph 2683 (paragraph reference only)", "licence": "copyright, reference only", "use": "reference only, paragraph number"}]
+      "internal_note": "Catholic catechetical teaching on the invocation of saints: Catechism of the Catholic Church, paragraph 2683 (reference only). Eastern Orthodox practice to be verified against an Orthodox primary source.",
+      "sources": [
+        {"title": "Catechism of the Catholic Church, paragraph 2683", "url": "", "accessed": "2026-11-23", "licence": "copyright; reference only", "use": "paragraph reference", "verification": "pending: text not fetched"}
+      ]
     },
     {
       "id": "mary_mediator",
       "group": "christian_tradition_internal",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Titles such as co-redeemer, mediatrix or queen of heaven, given to Mary, are teachings from later tradition that go beyond what Scripture says about her.",
-      "origin": "Titles for Mary as co-redeemer, mediatrix or queen of heaven developed in later tradition. Scripture calls Mary blessed among women and the mother of Jesus, and she points to her Son (John 2:5).",
-      "scripture": "Scripture names Jesus as the only mediator (1 Timothy 2:5) and the one Saviour who saves by his own work (Acts 4:12). Mary herself says that God is her Saviour (Luke 1:47). Redemption is finished in Christ, and no one shares his office.",
+      "summary": "Catholic teaching honours Mary as Mother of God and, in later devotion and some documents, uses titles such as mediatrix and queen of heaven. Co-redemptrix is a disputed title, and Catholic writers explain it in different ways. Eastern Orthodox teaching honours Mary as Theotokos, Mother of God, and does not teach her as co-redeemer. Protestant and Evangelical Christians hold that Jesus is the only mediator and redeemer, and reject titles that give Mary a role in redemption.",
+      "origin": "These titles developed in later tradition and are not found in the New Testament. Queen of heaven has older devotional roots; mediatrix and co-redemptrix were developed later and are the most disputed.",
+      "scripture": "Scripture calls Mary blessed among women (Luke 1:42) and points people to her Son (John 2:5). Mary herself calls God her Saviour (Luke 1:47). Scripture names Jesus as the one mediator (1 Timothy 2:5) and the only Saviour who saves by his own work (Acts 4:12). Redemption is finished in Christ, and no one shares his office. Protestant readers honour Mary as the mother of the Lord and reject titles that give her a share in redemption or in the mediation of grace.",
       "anchors": ["1 Timothy 2:5", "Acts 4:12"],
-      "internal_note": "Catholic teaching on Mary and the Assumption. Use for drift only. Never name the source church.",
-      "sources": [{"title": "Scripture and public-domain commentary summaries (Easton, Smith dictionaries)", "licence": "public domain", "use": "reference only"}]
+      "internal_note": "Catholic teaching on Mary, including the dogma of the Assumption (defined 1950) and the titles above, should be verified against primary Catholic documents before release. Eastern Orthodox teaching on Theotokos to be verified against an Orthodox primary source.",
+      "sources": [
+        {"title": "Catholic primary documents on Mary and her titles", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"},
+        {"title": "Luke 1:42, 1:47; John 2:5; 1 Timothy 2:5 (KJV, bundled)", "url": "", "accessed": "2026-11-23", "licence": "public domain", "use": "quoted from bundled KJV", "verification": "scripture reference"}
+      ]
     },
     {
       "id": "icons_veneration",
       "group": "christian_tradition_internal",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "The use of icons, statues, rosaries and prayer beads as aids to prayer and devotion, with bowing or kissing them, comes from later tradition.",
-      "origin": "Icons and rosaries developed in later church tradition. Protestant and Evangelical Christians hold that the second commandment forbids making and bowing to images used in worship.",
-      "scripture": "The second commandment says: 'Thou shalt not make unto thee any graven image... thou shalt not bow down thyself to them, nor serve them' (Exodus 20:4-5). Jesus said that true worshippers worship God in spirit and in truth (John 4:23-24), not through images.",
+      "summary": "Catholic and Eastern Orthodox traditions use icons, statues and prayer beads in devotion. Eastern Orthodox teaching defends the veneration of icons and distinguishes it from the worship due to God alone. Catholic teaching allows images and the veneration of the saints through them. Protestant and Evangelical Christians, especially in Reformed traditions, hold that making images for worship and bowing to them is forbidden, while accepting images in teaching and art.",
+      "origin": "The controversy over icons in the eighth and ninth centuries was settled in favour of icon veneration by councils in the Eastern Church. Protestant teaching holds that this went beyond Scripture.",
+      "scripture": "The second commandment forbids making an image in order to bow down to it and serve it (Exodus 20:4-5). Scripture also records God's command to make cherubim for the mercy seat (Exodus 25:18-22), so the question is the use and veneration of images, not every image. Jesus said that the Father seeks true worshippers, who worship him in spirit and in truth (John 4:23-24). The Orthodox defence distinguishes the veneration of icons from the worship due to God. Protestant readers answer that Scripture gives no warrant for bowing to images as aids to worship.",
       "anchors": ["Exodus 20:4-5", "John 4:24"],
-      "internal_note": "Catholic and Orthodox veneration of icons and images. Use for drift only. Never name the source church.",
-      "sources": [{"title": "Exodus 20 (KJV, public domain)", "licence": "public domain", "use": "quoted from bundled KJV"}]
+      "internal_note": "Eastern Orthodox teaching on icons (Seventh Ecumenical Council, Nicaea II, 787) and Catholic teaching on images to be verified against primary sources before release.",
+      "sources": [
+        {"title": "Exodus 20:4-5, 25:18-22; John 4:23-24 (KJV, bundled)", "url": "", "accessed": "2026-11-23", "licence": "public domain", "use": "quoted from bundled KJV", "verification": "scripture reference"},
+        {"title": "Eastern Orthodox and Catholic primary sources on icons", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "soul_sleep",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Soul sleep is the teaching, held by some Adventist and Christadelphian groups, that the dead are unconscious until the resurrection.",
-      "origin": "Soul sleep is taught by some Seventh-day Adventist and Christadelphian writers. Most Christians hold that the believer is with the Lord at death.",
-      "scripture": "Jesus told the thief, 'To day shalt thou be with me in paradise' (Luke 23:43), and Paul said he would rather be absent from the body and present with the Lord (2 Corinthians 5:8). Scripture also speaks of the rich man and Lazarus, both conscious after death (Luke 16:19-31). The resurrection of the body is a future hope, not the start of conscious life.",
-      "anchors": ["Luke 23:43", "2 Corinthians 5:8"],
-      "sources": [{"title": "Seventh-day Adventist Church Fundamental Beliefs (summary only)", "licence": "copyright, reference only", "use": "summary"}, {"title": "Christadelphian statement of faith (summary only)", "licence": "copyright, reference only", "use": "summary"}]
+      "summary": "Soul sleep is the teaching that the dead are unconscious until the resurrection. Christadelphian teaching states that all await resurrection in the sleep of death, where there is no consciousness. Seventh-day Adventist publications also hold that the dead are unconscious; the wording should be checked against its Fundamental Beliefs. Most Christians, including Catholic, Orthodox, Protestant and Evangelical, hold that believers are conscious with the Lord at death.",
+      "origin": "Soul sleep is taught in Christadelphian and some Seventh-day Adventist publications. It is outside historic Christian teaching, which holds that the soul continues conscious after death.",
+      "scripture": "Ecclesiastes 9:5-6, 10 says that the dead know not any thing, and advocates of soul sleep cite it, with Daniel 12:2 for the dead who awake. Those who hold that the dead are conscious cite Luke 16:19-31, the rich man and Lazarus, which is a parable and must be read by its genre; Philippians 1:20-23, which speaks of departing to be with Christ; and 2 Corinthians 5:1-10, which speaks of being absent from the body and present with the Lord. Luke 23:43 is read in more than one way, because the earliest Greek manuscripts have no punctuation, so it is strongest set beside these other passages rather than standing alone. Protestant and Evangelical readers conclude that the dead are not unconscious, and that the resurrection of the body is the future completion of the hope.",
+      "anchors": ["Ecclesiastes 9:5", "Philippians 1:23"],
+      "sources": [
+        {"title": "Christadelphian Faith, Our Faith and Beliefs", "url": "https://christadelphia.org/belief.php", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "states the sleep of death with no consciousness, citing Psalm 146:3-4 and Ecclesiastes 9:10", "verification": "verified (page read)"},
+        {"title": "Seventh-day Adventist Fundamental Beliefs on the dead", "url": "", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "conditional_immortality",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Conditional immortality is the teaching that the soul is not inherently immortal, that only those who receive eternal life live on, and that the wicked are finally destroyed rather than suffer forever.",
-      "origin": "Conditional immortality is taught by some Jehovah's Witness, Seventh-day Adventist and Christadelphian writers.",
-      "scripture": "Scripture says that the wicked will be punished with everlasting punishment (Matthew 25:46) and that the lake of fire is for the devil, the beast and the false prophet, who will be tormented day and night for ever (Revelation 20:10). Eternal life is a gift of God in Christ (Romans 6:23), and the soul that sins is accountable to God (Ezekiel 18:4).",
-      "anchors": ["Matthew 25:46", "Revelation 20:10"],
-      "sources": [{"title": "Jehovah's Witness publications (summary only)", "licence": "copyright, reference only", "use": "summary"}]
+      "summary": "Conditional immortality teaches that immortality is given only to those who receive eternal life in Christ, and is not an inherent property of the soul. It holds that those who reject God are destroyed rather than suffering conscious punishment for ever. The traditional Christian view holds that the lost suffer conscious punishment for ever. Perazim has not approved a position on the nature or duration of final punishment, so the guide sets out both views and does not state one as Perazim's.",
+      "origin": "Conditional immortality is taught in some Jehovah's Witness, Seventh-day Adventist and Christadelphian publications, and has been held by some evangelical scholars. The traditional view is the historic position of the Catholic and Eastern Orthodox churches and of most Protestant and Evangelical churches.",
+      "scripture": "Advocates of conditional immortality cite 1 Timothy 6:16, which says that God alone hath immortality; Romans 6:23, that eternal life is God's gift; and Ezekiel 18:4, that the soul that sinneth shall die. Advocates of the traditional view cite Matthew 25:46, where the same word for eternal describes both the life of the righteous and the punishment of the wicked, and Revelation 20:10, which describes the devil, the beast and the false prophet being tormented day and night for ever. Revelation 20:10 names those three and cannot, by itself, settle the fate of every person. The guide explains both arguments and does not decide between them for Perazim.",
+      "anchors": ["Matthew 25:46", "Romans 6:23"],
+      "sources": [
+        {"title": "Christadelphian Faith, Our Faith and Beliefs", "url": "https://christadelphia.org/belief.php", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "page does not address the eternal fate of the wicked; the Statement of Faith (christadelphia.org/basf.php) has not been read", "verification": "partly verified"},
+        {"title": "Jehovah's Witness and Seventh-day Adventist publications on the fate of the wicked", "url": "", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "all_paths",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "All-paths teaching holds that all religions lead to the same God or the same end, so that the exclusive claims of Jesus are set aside.",
-      "origin": "The all-paths view is common in modern pluralism and in some New Age and Hindu-influenced writing.",
-      "scripture": "Jesus said, 'I am the way, the truth, and the life: no man cometh unto the Father, but by me' (John 14:6). Peter said there is no other name under heaven given among men by which we must be saved (Acts 4:12). The Bible does not present many roads to God. It presents one way, through Christ.",
+      "summary": "Religious pluralism, found in some philosophies, New Age movements and some Hindu-influenced writing, holds that the religions are different ways to the same God or the same goal. Pluralists hold this in different ways. It is not the teaching of Hinduism as a whole, nor of every New Age writer. Christians hold that Jesus Christ is the one way to the Father.",
+      "origin": "This is a modern form of religious pluralism, shaped by the comparative study of religions and by some Hindu and New Age writers. It is not one religion's teaching.",
+      "scripture": "Jesus said: 'I am the way, the truth, and the life: no man cometh unto the Father, but by me' (John 14:6). Peter said that there is no other name under heaven given among men by which we must be saved (Acts 4:12). These claims are exclusive, so the Christian reading does not allow that all religions lead to the same salvation. Scripture also teaches that God is known in part through creation (Romans 1:20). Christians may recognise truth and goodness in other traditions while holding that salvation is in Christ alone.",
       "anchors": ["John 14:6", "Acts 4:12"],
-      "sources": [{"title": "Scripture (KJV, public domain)", "licence": "public domain", "use": "quoted from bundled KJV"}]
+      "sources": [
+        {"title": "OpenStax, Introduction to Philosophy, 6.2 Self and Identity", "url": "https://openstax.org/books/introduction-philosophy/pages/6-2-self-and-identity", "accessed": "2026-11-23", "licence": "CC BY (verify before quoting)", "use": "Hindu variety in views of brahman", "verification": "partly verified"},
+        {"title": "Academic source on religious pluralism", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "divine_self",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "The teaching that the self is identical with God or the ultimate reality, as in Hindu Advaita (atman is Brahman) and some New Age writing, that you are God or divine by nature.",
-      "origin": "Atman is Brahman comes from Upanishadic Hindu thought. The idea that everyone is God is found in some New Age and mystical writing.",
-      "scripture": "Scripture says that God created people in his image (Genesis 1:27) and that the Creator is distinct from creation (Isaiah 40:25; Romans 1:25). Humans are not God. Jesus is the only Son who is God by nature (John 1:1; Colossians 2:9), and believers are adopted as children of God by grace (Galatians 4:5).",
+      "summary": "Advaita Vedanta, a school of Hindu philosophy, teaches that the individual self (atman) is identical with ultimate reality (Brahman), and that release from rebirth comes through realising this. Other Hindu schools, including Dvaita and Vishishtadvaita, describe the relation between self and ultimate reality differently and do not teach that the self is God. Some New Age writing says that people are divine by nature.",
+      "origin": "The identity of atman and Brahman is a central teaching of the Upanishads as interpreted in Advaita Vedanta. Hindu traditions vary in their account of Brahman, and other schools hold different relations between the self and God.",
+      "scripture": "Scripture teaches that God created humans in his image (Genesis 1:27), and that the Creator is distinct from his creation (Isaiah 40:25; Romans 1:25). Humans are not God. Jesus is the eternal Son who is God (John 1:1; Colossians 2:9), and believers are adopted as children of God by grace (Galatians 4:5).",
       "anchors": ["Genesis 1:27", "John 1:1"],
-      "sources": [{"title": "Upanishads (Max Müller translation, public domain)", "licence": "public domain", "use": "reference only"}]
+      "sources": [
+        {"title": "OpenStax, Introduction to Philosophy, 6.2 Self and Identity", "url": "https://openstax.org/books/introduction-philosophy/pages/6-2-self-and-identity", "accessed": "2026-11-23", "licence": "CC BY (verify before quoting)", "use": "atman framed as eternal; atman is brahman; Hindu traditions vary in meaning of brahman", "verification": "verified (page read)"},
+        {"title": "Primary Advaita Vedanta text (Shankara) and Dvaita/Vishishtadvaita scholarship", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "eternal_progression",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Eternal progression is the Latter-day Saint teaching that God was once a man, that people can progress to become gods, and that exaltation is reached through works and temple ordinances.",
-      "origin": "This teaching comes from Latter-day Saint sources, including the Doctrine and Covenants and later sermons of Joseph Smith and his successors.",
-      "scripture": "Scripture teaches that God is not a man (Numbers 23:19) and that there is one God, with none formed before or after him (Isaiah 43:10). Believers are called children of God and heirs with Christ (Romans 8:16-17), not gods in the making. Eternal life is the free gift of God through Jesus Christ (Romans 6:23).",
+      "summary": "Latter-day Saint teaching holds that exaltation is the full inheritance of a child of God, received through the Atonement of Jesus Christ and obedience to the gospel's laws and ordinances. It holds that the faithful may become like God. The Church's essay Becoming Like God quotes the nineteenth-century couplet 'As man now is, God once was: As God now is, man may be', and says that little has been revealed about its first half and that little is taught about it.",
+      "origin": "The teaching comes from Joseph Smith and later Latter-day Saint leaders, including the King Follett discourse. The Church's essay states that early Christian writers' use of similar language is open to interpretation and that these passages can be read in different ways.",
+      "scripture": "Scripture says there is one God, and that none was formed before or after him (Isaiah 43:10). God is not a man, that he should lie (Numbers 23:19). Believers are called children of God and heirs with Christ (Romans 8:16-17), and eternal life is the free gift of God through Jesus Christ our Lord (Romans 6:23). Protestant and Evangelical teaching holds that believers are made like Christ in holiness and glory, and do not become gods. The guide explains the Latter-day Saint teaching in its own terms before evaluating it.",
       "anchors": ["Numbers 23:19", "Romans 6:23"],
-      "sources": [{"title": "Doctrine and Covenants and Book of Mormon (1830 text is public domain; current texts are copyright)", "licence": "mixed, verify before any quotation", "use": "summary; reference only"}]
+      "sources": [
+        {"title": "Becoming Like God, Gospel Topics Essays (Church of Jesus Christ of Latter-day Saints, 2016)", "url": "https://www.churchofjesuschrist.org/study/manual/gospel-topics-essays/becoming-like-god", "accessed": "2026-11-23", "licence": "copyright; summary and short quotes only", "use": "exaltation through the Atonement and obedience; the Snow couplet and the Church's qualifications", "verification": "verified (page read)"}
+      ]
     },
     {
       "id": "works_salvation",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Salvation by works is the teaching that people are saved or kept saved by their deeds, or by grace together with what they do, as in the phrase 'after all we can do' from the Book of Mormon.",
-      "origin": "Salvation by works is a teaching of some Latter-day Saint, Jehovah's Witness and other groups, and of many world religions that weigh deeds.",
-      "scripture": "Scripture says: 'For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast' (Ephesians 2:8-9). Paul says righteousness comes through faith in Christ, not through the law (Romans 3:20-28). Good works are the fruit of salvation, not its price.",
+      "summary": "Groups differ on how salvation works, and each position is described separately. Latter-day Saint teaching holds that salvation is through grace and Christ, and that exaltation requires obedience to the gospel's laws and ordinances. The Book of Mormon says it is 'by grace that we are saved, after all we can do' (2 Nephi 25:23). Jehovah's Witness teaching holds that salvation is God's undeserved kindness, and that works prove living faith but do not earn salvation. Many world religions teach that deeds and merit affect liberation or future lives, each in its own terms.",
+      "origin": "Latter-day Saint, Jehovah's Witness and world-religion teachings on works are distinct. They are not one doctrine, and they should not be grouped together.",
+      "scripture": "Scripture says: 'For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast' (Ephesians 2:8-9). Paul writes that a man is justified by faith without the deeds of the law (Romans 3:28). Good works are the fruit of salvation and the evidence of living faith (Ephesians 2:10; James 2:17-18). Protestant and Evangelical teaching holds that faith alone justifies, and that the faith which justifies produces works. The Christian question for Jehovah's Witness teaching is whether the obedience they require is fruit of grace or a condition the believer must still meet to keep salvation.",
       "anchors": ["Ephesians 2:8-9", "Romans 3:28"],
-      "sources": [{"title": "Book of Mormon, 2 Nephi 25:23 (1830 edition is public domain; verify the wording against the 1830 text before quoting)", "licence": "public domain for 1830 text", "use": "reference only, not yet verified"}]
+      "sources": [
+        {"title": "What Does the Bible Say About Salvation? (jw.org)", "url": "https://www.jw.org/en/bible-teachings/questions/what-is-salvation/", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "salvation as God's gift and undeserved kindness; works prove living faith and do not earn salvation", "verification": "verified (page read)"},
+        {"title": "Becoming Like God, Gospel Topics Essays (LDS)", "url": "https://www.churchofjesuschrist.org/study/manual/gospel-topics-essays/becoming-like-god", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "exaltation through the Atonement and obedience", "verification": "verified (page read)"},
+        {"title": "Book of Mormon, 2 Nephi 25:23 (LDS current edition)", "url": "https://www.churchofjesuschrist.org/study/scriptures/bofm/2-ne/25?lang=eng", "accessed": "2026-11-23", "licence": "public domain for 1830 text; verify current wording", "use": "phrase 'after all we can do'", "verification": "verified (phrase read)"}
+      ]
     },
     {
       "id": "ancestors",
       "group": "african_traditional",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "In many African traditional religions, ancestors are the departed who remain part of the family and community. Some communities honour them, ask them for help, or offer to them, while also recognising a Supreme God above them.",
-      "origin": "Ancestor veneration is a practice in many African traditional religions, including Kikuyu, Luo, Akan and Luganda communities. Practices vary widely between communities and families.",
-      "scripture": "Scripture teaches that people should honour their parents (Exodus 20:12) and remember the faithful dead with thanks, but that the dead cannot be asked for help or made mediators (Deuteronomy 18:10-12). Believers are told that God alone is the one to whom prayer is addressed, and that there is one mediator, Christ (1 Timothy 2:5). Christians can honour family members without seeking their intercession.",
+      "summary": "Many African traditional religions honour the dead as remembered members of the family and community. Practices differ widely between peoples, regions and families. Some honour ancestors, make offerings to them, or consult the departed through diviners or mediums. Others focus on respect for living elders and remembrance of the dead. Many also recognise a supreme God above the ancestors. The guide does not generalise one practice across African peoples.",
+      "origin": "African traditional religions are many systems, not one. Scholars such as John Mbiti have described belief in the living-dead as widespread. Later scholarship stresses regional and community variation, and community-specific accounts should be consulted.",
+      "scripture": "Scripture commands honour for parents (Exodus 20:12) and names Christ as the one mediator (1 Timothy 2:5). It forbids divination, consulting familiar spirits and inquiring of the dead (Deuteronomy 18:10-12), so Christians distinguish honouring and remembering family from seeking guidance or mediation from them. Christian prayer and worship are addressed to the triune God, and Christ is addressed in prayer as well (Acts 7:59; 1 Corinthians 1:2). Christians may honour and remember family members, but they do not seek their intercession, and Deuteronomy 18 is not to be used to condemn every act of cultural respect.",
       "anchors": ["Deuteronomy 18:10-12", "1 Timothy 2:5"],
-      "sources": [{"title": "Mbiti, African Religions and Philosophy (1969), summary only", "licence": "copyright, reference only", "use": "summary"}]
+      "sources": [
+        {"title": "John S. Mbiti, African Religions and Philosophy (1969)", "url": "", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "living-dead concept", "verification": "pending: not fetched"},
+        {"title": "Community-specific academic sources on ancestor practice", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "trinity_denial",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Groups that deny the Trinity hold that God is one person who appears in different modes (Oneness, or modalism), or that the Father, Son and Holy Spirit are separate beings or gods (Jehovah's Witnesses and some Latter-day Saint writing).",
-      "origin": "Oneness Pentecostal, modalist, Jehovah's Witness and some Latter-day Saint teaching deny the Trinity. Historic Christian orthodoxy, including Protestant, Evangelical and Pentecostal churches, affirms one God in three persons.",
-      "scripture": "Scripture says: 'Hear, O Israel: The LORD our God is one LORD' (Deuteronomy 6:4). The Father, Son and Holy Spirit are named together in the baptismal commission (Matthew 28:19). The Son is God (John 1:1; Hebrews 1:8), and the Holy Spirit is a person who teaches, grieves and speaks (John 14:26; Acts 13:2). The Father is not the Son (John 14:28).",
+      "summary": "Three groups reject the Trinity in different ways. Oneness Pentecostal teaching holds that God is one person who reveals himself as Father, Son and Holy Spirit in different manifestations or roles; Trinitarian theologians often call this modalism, though Oneness adherents may reject that label. Jehovah's Witness teaching holds that the Son is a created being and the Holy Spirit is God's impersonal active force. Latter-day Saint teaching holds that the Father, Son and Holy Ghost are three separate beings who make up the Godhead.",
+      "origin": "These are separate positions, each described from its own published teaching. Historic Christian orthodoxy, including Catholic, Eastern Orthodox, Protestant, Evangelical and Pentecostal churches, affirms one God in three persons.",
+      "scripture": "Deuteronomy 6:4 teaches the oneness of God: 'Hear, O Israel: The LORD our God is one LORD.' The Father, Son and Holy Spirit are named together in the baptismal commission (Matthew 28:19). Against Oneness teaching, Scripture shows the Father and the Son as distinct persons who speak to each other (John 17:5) and the Son who is sent by the Father, who sends the Spirit (John 14:16-17, 26), alongside the passages affirming the deity of the Son (John 1:1; Hebrews 1:8). Against Jehovah's Witness teaching, the Son is called God (John 1:1; Hebrews 1:8) and the Spirit is a person who teaches, can be grieved and can be lied to (John 14:26; Ephesians 4:30; Acts 5:3-4). Against Latter-day Saint teaching, historic Christianity holds that God is one in essence and three in persons, not three separate beings.",
       "anchors": ["Deuteronomy 6:4", "Matthew 28:19"],
-      "sources": [{"title": "Scripture (KJV, public domain)", "licence": "public domain", "use": "quoted from bundled KJV"}]
+      "sources": [
+        {"title": "The Holy Spirit, God's Active Force (jw.org brochure, Should You Believe in the Trinity?)", "url": "https://www.jw.org/en/library/brochures/Should-You-Believe-in-the-Trinity/The-Holy-Spirit-Gods-Active-Force/", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "Holy Spirit as God's active force, not a person", "verification": "verified (page read)"},
+        {"title": "The Godhead, Gospel Topics essay (LDS)", "url": "https://www.churchofjesuschrist.org/study/manual/gospel-topics/godhead", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "three separate beings", "verification": "verified (page read)"},
+        {"title": "Oneness Pentecostal statement of faith (United Pentecostal Church International, official)", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending: official UPCI statement not yet fetched"}
+      ]
     },
     {
       "id": "jesus_created",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Jehovah's Witness teaching holds that Jesus is a created being, the archangel Michael, and not God the Son who is eternal.",
-      "origin": "This teaching is specific to Jehovah's Witness publications and differs from Scripture and historic Christian belief.",
-      "scripture": "Scripture says that Jesus is the eternal Word who was God (John 1:1-3), that all things were created by him (Colossians 1:16), and that he is the image of the invisible God (Colossians 1:15). The angels are commanded to worship him (Hebrews 1:6). Michael is an angel who is not the Son of God (Jude 9).",
-      "anchors": ["John 1:1", "Colossians 1:16"],
-      "sources": [{"title": "Jehovah's Witness publications (summary only)", "licence": "copyright, reference only", "use": "summary"}]
+      "summary": "Jehovah's Witness teaching identifies Jesus with the archangel Michael and holds that Jesus is a created being, not God the Son who is eternal. The Jehovah's Witness page on Michael says that Michael is evidently a name given to Jesus before and after his life on earth, and that both names refer to the same person. Historic Nicene Christianity rejects this identification.",
+      "origin": "This teaching is specific to Jehovah's Witness publications. Its interpretation of Michael passages, including Jude 9 and 1 Thessalonians 4:16, is set out in those publications, and it differs from Nicene Christian teaching.",
+      "scripture": "Scripture says that Jesus is the eternal Word who was God (John 1:1-3), that all things were created by him (Colossians 1:16), and that he is the image of the invisible God (Colossians 1:15). Hebrews 1:5-14 presents the Son as superior to the angels, and God commands all the angels to worship him (Hebrews 1:6). Jehovah's Witness readers take Jude 9 and 1 Thessalonians 4:16 to identify Michael as the archangel and as Jesus. Jude 9 does not itself say that Michael is not Jesus, and the New Testament nowhere lists Jesus among the created angels.",
+      "anchors": ["John 1:1", "Colossians 1:16", "Hebrews 1:6"],
+      "sources": [
+        {"title": "The Archangel Michael, Who Is He? (jw.org)", "url": "https://www.jw.org/en/bible-teachings/questions/archangel-michael/", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "Michael as a name for Jesus; scriptures cited (Daniel 10:13; Jude 9; 1 Thessalonians 4:16; Revelation 12:7; others)", "verification": "verified (page read)"}
+      ]
     },
     {
       "id": "holy_spirit_force",
@@ -175,107 +222,136 @@
       "origin": "This is the teaching of Jehovah's Witness publications, and it differs from historic Christian and Pentecostal belief.",
       "scripture": "Scripture names the Holy Spirit as a person who teaches (John 14:26), speaks (Acts 13:2), can be grieved (Ephesians 4:30), and can be lied to (Acts 5:3-4). He is called God (Acts 5:3-4). The Holy Spirit is also one of the three persons named in the baptismal commission (Matthew 28:19).",
       "anchors": ["John 14:26", "Acts 5:3-4"],
-      "sources": [{"title": "Jehovah's Witness publications (summary only)", "licence": "copyright, reference only", "use": "summary"}]
+      "sources": [
+        {"title": "What Is the Holy Spirit? (jw.org)", "url": "https://www.jw.org/en/bible-teachings/questions/what-is-the-holy-spirit/", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "the holy spirit is God's power in action, his active force; not a person", "verification": "verified (page read)"},
+        {"title": "The Holy Spirit, God's Active Force (jw.org brochure)", "url": "https://www.jw.org/en/library/brochures/Should-You-Believe-in-the-Trinity/The-Holy-Spirit-Gods-Active-Force/", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "the holy spirit is not a person and is not part of a Trinity", "verification": "verified (page read)"}
+      ]
     },
     {
       "id": "baptism_for_dead",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Baptism for the dead is a Latter-day Saint practice of being baptised by proxy for people who have died, so they can accept the gospel in the afterlife.",
-      "origin": "Baptism for the dead is a practice of the Church of Jesus Christ of Latter-day Saints.",
-      "scripture": "Scripture teaches that people believe and are baptised in this life, as a response to the gospel (Mark 16:16; Acts 2:38). The passage in 1 Corinthians 15:29 that some use for proxy baptism is a difficult text that Protestant and Evangelical commentators read in many ways. It does not establish a practice of proxy baptism, and the rest of Scripture ties salvation to faith in this life (Hebrews 9:27).",
-      "anchors": ["Mark 16:16", "Hebrews 9:27"],
-      "sources": [{"title": "Doctrine and Covenants (copyright, summary only)", "licence": "copyright, reference only", "use": "summary"}]
+      "summary": "Latter-day Saint teaching includes baptism for the dead, a proxy ordinance in which a living person is baptised on behalf of someone who has died. The Church describes it as an offer that the deceased person may accept or reject, and it does not say that the ordinance guarantees acceptance. The Church's essay says that the validity of a proxy baptism depends on the deceased person accepting it.",
+      "origin": "This is a Latter-day Saint practice performed in temples. The Church cites 1 Corinthians 15:29 as evidence that baptisms for the dead were done in Paul's time.",
+      "scripture": "Scripture teaches that people believe and are baptised in this life in response to the gospel (Mark 16:16; Acts 2:38). 1 Corinthians 15:29 refers to a practice that Paul mentions without commending it. Its meaning is disputed among commentators, and it gives no clear command that the church should baptise for the dead. Mark 16:9-20 is a passage whose authenticity is disputed, so Mark 16:16 should not be the main proof. Hebrews 9:27 says that after death comes the judgment, and Protestant and Evangelical teaching holds that salvation is received by faith in this life.",
+      "anchors": ["Hebrews 9:27", "Acts 2:38"],
+      "sources": [
+        {"title": "Baptisms for the Dead, Gospel Topics (LDS, Topics and Questions 2023)", "url": "https://www.churchofjesuschrist.org/study/manual/gospel-topics/baptisms-for-the-dead", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "proxy baptism offered; validity depends on the deceased person accepting; agency to accept or reject", "verification": "verified (page read)"}
+      ]
     },
     {
       "id": "saturday_sabbath",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Some groups, including Seventh-day Adventists, teach that the Sabbath must be kept on Saturday as a binding command for Christians, and that Sunday observance is a mark of error.",
-      "origin": "Saturday Sabbath keeping is the teaching of Seventh-day Adventist and some other groups. Most Christians worship on the first day of the week, the day of the resurrection.",
-      "scripture": "Scripture says: 'Let no man therefore judge you in meat, or in drink, or in respect of an holyday, or of the new moon, or of the sabbath days' (Colossians 2:16). Believers are free in Christ, and Paul says that each should be fully persuaded in their own mind (Romans 14:5). Christ is Lord of the Sabbath (Mark 2:28), and the first day is when the Lord rose from the dead (Mark 16:2).",
-      "anchors": ["Colossians 2:16", "Romans 14:5"],
-      "sources": [{"title": "Seventh-day Adventist Church Fundamental Beliefs (summary only)", "licence": "copyright, reference only", "use": "summary"}]
+      "summary": "Seventh-day Adventists keep the seventh day, Saturday, as the Sabbath, and teach that keeping it is a sign of loyalty to the Creator. Their publications place Sunday observance within an end-time test over worship, in which Sunday is presented as the mark of allegiance to the beast. The guide does not say that present-day Sunday worshippers are condemned, and it does not say that they bear the mark.",
+      "origin": "This is Seventh-day Adventist teaching on the Sabbath and the end-time test. Most Christians worship on the first day of the week, the day of the resurrection.",
+      "scripture": "Colossians 2:16-17 says: 'Let no man therefore judge you in meat, or in drink, or in respect of an holyday, or of the new moon, or of the sabbath days.' Romans 14:5-6 says that one man esteemeth one day above another, that each should be fully persuaded in his own mind, and that he who observes the day observes it unto the Lord. Adventist readers rely on Revelation 12:17 and 14:12, which speak of keeping the commandments of God, and on the seventh-day Sabbath as the sign of loyalty. Protestant and Evangelical readers hold that the Sabbath is not a binding requirement for Christians, that Christ is Lord of the Sabbath (Mark 2:28), and that the early church gathered on the first day (Acts 20:7; 1 Corinthians 16:2).",
+      "anchors": ["Colossians 2:16-17", "Romans 14:5-6"],
+      "sources": [
+        {"title": "General Conference Executive Committee Newsletter, July-September 2021, including Biblical Research Institute answers on the mark of the beast (Seventh-day Adventist)", "url": "https://executivecommittee.adventist.org/wp-content/uploads/2021/08/ECN-July-September-2021.pdf", "accessed": "2026-11-23", "licence": "copyright; summary and short quotes only", "use": "Sunday as the distinguishing mark in the final test; Sabbath as the final test of loyalty; remnant keeping the commandments. The document does not settle whether Sunday worship marks a person before the future test.", "verification": "verified (pages 1-14 read; pages 15-18 summary only)"},
+        {"title": "Seventh-day Adventist Fundamental Beliefs on the Sabbath", "url": "", "accessed": "2026-11-23", "licence": "copyright; summary only", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "new_age_energy",
       "group": "new_age",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "New Age teaching often speaks of universal energy, the law of attraction, chakras, a higher self, or manifesting reality by focused thought, and treats the self as the source of healing and destiny.",
-      "origin": "These ideas come from New Age, Theosophical and occult writing, mixed with ideas from Hindu and Buddhist thought.",
-      "scripture": "Scripture teaches that God is a personal Spirit who created the world and is not an energy field (John 4:24). Healing and destiny come from God's will and grace, not from manifesting or from inner energy (James 5:14-15). Believers are told to test every spirit (1 John 4:1) and to avoid divination and occult practice (Deuteronomy 18:10-12).",
+      "summary": "New Age teaching is a broad and varied movement, not one doctrine. Some of its writers teach that people shape reality by focused thought, which is the law of attraction or manifestation. Others teach that inner energy or chakras heal, or that each person has a higher self. These strands draw on Theosophy, modern esotericism, and concepts from Hindu and Buddhist traditions. They have different origins and do not mean the same thing.",
+      "origin": "New Age ideas draw on Theosophical, occult and esoteric writing and on Eastern religion. Their origins differ from strand to strand.",
+      "scripture": "Scripture teaches that God is Spirit (John 4:24) and is personal, not an impersonal energy, and that creation is his. Healing is sought from God in prayer (James 5:14-15), and God's purposes are not determined by human thought or manifestation. Believers are told to test every spirit (1 John 4:1). Scripture forbids divination and the seeking of guidance from the occult (Deuteronomy 18:10-12).",
       "anchors": ["John 4:24", "1 John 4:1"],
-      "sources": [{"title": "New Age writing (summary only)", "licence": "varies, reference only", "use": "summary"}]
+      "sources": [
+        {"title": "Primary New Age texts and academic histories of Theosophy and modern esotericism", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "christian_science",
       "group": "heterodox_group",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Christian Science teaches that God is Mind, that matter and sickness are illusions or errors, and that healing comes through understanding this, not through medicine or the physical death and resurrection of Jesus.",
-      "origin": "Christian Science was founded by Mary Baker Eddy, whose book Science and Health with Key to the Scriptures (1875) is its main text.",
-      "scripture": "Scripture describes Jesus as a real man who was born, suffered, died, and rose bodily (Luke 24:39; 1 Corinthians 15:3-4). It also describes real sickness and healing through God's power and through prayer (James 5:14-16). The atonement is by the blood of Christ (Ephesians 1:7), not by a change in understanding alone.",
+      "summary": "Christian Science, founded by Mary Baker Eddy, teaches that God is Mind and that matter is nothing, so that sickness and sin are errors to be corrected by understanding and prayer. It affirms the crucifixion and resurrection of Jesus and the divinity of the Christ, but interprets them through its own understanding of Spirit and matter. Its official FAQ says that it does not equate Jesus with God. Christian Scientists are free to choose their own healthcare, and the FAQ says they may visit doctors.",
+      "origin": "Christian Science was founded by Mary Baker Eddy. Its main text, Science and Health with Key to the Scriptures, was first published in 1875.",
+      "scripture": "Scripture describes Jesus as a real man who was born, suffered, died and rose bodily (Luke 24:39; 1 Corinthians 15:3-4). The Son is God (John 1:1; Colossians 2:9). Christian faith takes the incarnation, the crucifixion and the resurrection as physical and historical events. Christian healing is by God's power through prayer and faith (James 5:14-16), and Scripture does not teach that matter is nothing. The atonement is by the blood of Christ (Ephesians 1:7). The guide describes Christian Science's own interpretation before evaluating it.",
       "anchors": ["Luke 24:39", "1 Corinthians 15:3-4"],
-      "sources": [{"title": "Science and Health with Key to the Scriptures (1875, public domain)", "licence": "public domain", "use": "summary; reference only"}]
+      "sources": [
+        {"title": "Frequently asked questions (Christian Science official site)", "url": "https://www.christianscience.com/what-we-believe/frequently-asked-questions", "accessed": "2026-11-23", "licence": "copyright; summary and short quotes only", "use": "Tenet 5 affirms the crucifixion and resurrection; does not equate Jesus with God; members free to choose healthcare", "verification": "verified (page read)"},
+        {"title": "What a Christian Scientist believes (Christian Science official site)", "url": "https://www.christianscience.com/what-we-believe/what-a-christian-scientist-believes", "accessed": "2026-11-23", "licence": "copyright; summary and short quotes only", "use": "Tenets 4, 5 and 6: atonement, nothingness of matter, Mind in us", "verification": "verified (page read)"},
+        {"title": "Science and Health with Key to the Scriptures (1875)", "url": "", "accessed": "2026-11-23", "licence": "public domain", "use": "primary text; date to be checked", "verification": "pending"}
+      ]
     },
     {
       "id": "secular_worldview",
       "group": "secular",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Secular worldviews hold that there is no God, that science alone gives knowledge, and that morality is only human custom or preference.",
-      "origin": "Secular humanism, scientific naturalism and moral relativism are the main forms of this worldview.",
-      "scripture": "Scripture says that the heavens declare the glory of God (Psalm 19:1) and that the fool has said in his heart, there is no God (Psalm 14:1). Moral law is written on human hearts (Romans 2:14-15), and the Bible speaks of a just judge to whom everyone is accountable (Romans 14:12). Faith and reason are not opposed, and science and Scripture are both gifts that can be studied with care.",
-      "anchors": ["Psalm 19:1", "Romans 14:12"],
-      "sources": [{"title": "Humanist Manifesto I (1933), summary only", "licence": "verify before any quotation", "use": "summary"}]
+      "summary": "Secular and non-religious worldviews differ, and the guide should describe the one a person actually holds. Atheism is the view that God does not exist; agnosticism is the view that neither theism nor atheism is known. Scientific naturalism holds that nature is all there is. Secular humanism bases ethics on human reason and welfare rather than revelation. Atheists and secular thinkers disagree about morality: some hold that moral values are objective, and others that they are constructed.",
+      "origin": "Atheism, agnosticism, naturalism, secular humanism and related views have different histories and should not be treated as one position.",
+      "scripture": "Psalm 19:1 says that the heavens declare the glory of God. Psalm 14:1 says 'The fool hath said in his heart, There is no God,' and in the poem the word describes a moral and spiritual condition, not a philosophical argument. The guide does not use the verse as an insult to any questioner. Romans 1:19-20 says that God's invisible power and nature are clearly seen through creation, and Romans 2:14-15 says that the law is written on human hearts. Faith and reason are not opposed, and Acts 17:11 commends those who searched the Scriptures to test what they heard.",
+      "anchors": ["Psalm 19:1", "Romans 1:20"],
+      "sources": [
+        {"title": "Paul Draper, Atheism and Agnosticism, Stanford Encyclopedia of Philosophy", "url": "https://plato.stanford.edu/entries/atheism-agnosticism/", "accessed": "2026-11-23", "licence": "open access reference", "use": "definitions of atheism and agnosticism; atheism and metaphysical naturalism are not identical", "verification": "verified (first 40,000 characters read); moral-realism point not checked"},
+        {"title": "Humanist Manifesto III", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "islam_no_crucifixion",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Islamic teaching holds that Jesus was not crucified and that someone else was made to appear to be him, while Jesus was taken up by God.",
-      "origin": "This is the teaching of the Qur'an (Surah 4:157) and Islamic tradition. The Qur'an is not quoted here: the guide describes this teaching in its own words.",
-      "scripture": "The Bible reports that Jesus was crucified and died (Matthew 27:50; Acts 2:23), and that he rose from the dead (1 Corinthians 15:3-4). Paul says the gospel is 'Christ crucified' (1 Corinthians 1:23). The death and resurrection of Jesus are central to the Christian faith, and the claim that he was not crucified is not supported by the historical witness of the New Testament.",
+      "summary": "Islamic teaching, based on the Qur'an, holds that Jesus was not killed or crucified, and that God made it appear otherwise. Interpretations differ. A prominent reading holds that someone else was made to resemble Jesus, and other readings differ from this. The guide describes this teaching in its own words and does not quote the Qur'an.",
+      "origin": "This is Islamic teaching, based on the Qur'an (Surah 4:157) and its interpretation in Muslim tradition. The Qur'an is paraphrased here, not quoted.",
+      "scripture": "The New Testament reports that Jesus was crucified and died (Matthew 27:50; Acts 2:23), and that he rose from the dead (1 Corinthians 15:3-4). Paul calls the message Christ crucified (1 Corinthians 1:23). The Roman historian Tacitus also reports the execution of Christ under Pontius Pilate (Annals 15.44). The Christian response engages this historical evidence as well as the theological claim.",
       "anchors": ["1 Corinthians 15:3-4", "1 Corinthians 1:23"],
-      "sources": [{"title": "Qur'an (not quoted; paraphrase only under Levi's ruling O-1)", "licence": "varies by translation; paraphrase only", "use": "paraphrase"}]
+      "sources": [
+        {"title": "Qur'an, Surah 4:157 (paraphrase only under Levi's ruling O-1; authorised translation to be recorded)", "url": "", "accessed": "2026-11-23", "licence": "varies by translation; paraphrase only", "use": "paraphrase", "verification": "pending: authorised translation and classical interpretation not yet checked"},
+        {"title": "Tacitus, Annals 15.44 (public domain translation)", "url": "", "accessed": "2026-11-23", "licence": "public domain", "use": "historical reference", "verification": "reference"}
+      ]
     },
     {
       "id": "islam_son_denial",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Islamic teaching holds that God has no son, that Jesus is a prophet and messenger of God and not divine, and that the Christian teaching of the Trinity is a mistake.",
-      "origin": "This is the teaching of Islam, including the Qur'an. The Qur'an is not quoted here: the guide describes this teaching in its own words.",
-      "scripture": "Scripture says that Jesus is the eternal Son of God (John 1:14; Hebrews 1:2-3), that he is God (John 1:1; Titus 2:13), and that he is the only mediator between God and people (1 Timothy 2:5). The Father sent the Son (John 3:16). Jesus said, 'I and my Father are one' (John 10:30).",
+      "summary": "Islamic teaching holds that God has no son, and that God neither begets nor is begotten. Jesus, called the Messiah, is honoured as a prophet and messenger of God and as born of Mary, but he is not divine. Islam rejects the Christian confession that Jesus is the Son of God and the doctrine of the Trinity. The guide paraphrases these teachings and does not quote the Qur'an.",
+      "origin": "This is the teaching of Islam, based on the Qur'an, including the Surahs on the Trinity and on Jesus. The Qur'an is paraphrased here, not quoted.",
+      "scripture": "Scripture teaches that Jesus is the eternal Son of God (John 1:14; Hebrews 1:2-3), that he is God (John 1:1; Titus 2:13), and that he is the one mediator between God and men (1 Timothy 2:5). Jesus said: 'I and my Father are one' (John 10:30). Christians hold that the Father's begetting of the Son is eternal and not physical, and that the Son's divinity is shown in his works, his resurrection and his own claims. Islam honours Jesus as Messiah and prophet while rejecting the Christian confession of his divine Sonship.",
       "anchors": ["John 1:1", "John 10:30"],
-      "sources": [{"title": "Qur'an (not quoted; paraphrase only under Levi's ruling O-1)", "licence": "varies by translation; paraphrase only", "use": "paraphrase"}]
+      "sources": [
+        {"title": "Qur'an, Surahs 4:171, 5:72-75 and 112:1-4 (paraphrase only under Levi's ruling O-1; authorised translation to be recorded)", "url": "", "accessed": "2026-11-23", "licence": "varies by translation; paraphrase only", "use": "paraphrase", "verification": "pending: authorised translation and classical interpretation not yet checked"}
+      ]
     },
     {
       "id": "canon_books",
       "group": "bible_canon",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "The Protestant and Evangelical Bible contains 66 books: 39 in the Old Testament and 27 in the New Testament. Some Bibles also include extra books, called deuterocanonical or apocryphal, such as Tobit, Judith, 1 and 2 Maccabees, Wisdom of Solomon, Sirach and Baruch, and additions to Esther and Daniel.",
-      "origin": "The 66-book canon is the Bible used by Protestants, Evangelicals and Pentecostals. Some Bibles from other traditions add the extra books listed above.",
-      "scripture": "Protestant and Evangelical Christians hold that the 66 books are the inspired Word of God. The extra books are read for history and edification but are not used to establish doctrine. Scripture warns against adding to or taking away from God's words (Deuteronomy 4:2; Revelation 22:18-19). Jesus and the apostles spoke of the Scriptures as the Law, the Prophets and the Psalms (Luke 24:44).",
-      "anchors": ["Deuteronomy 4:2", "Revelation 22:18-19"],
-      "sources": [{"title": "Scripture (KJV, public domain)", "licence": "public domain", "use": "quoted from bundled KJV"}]
+      "summary": "The Protestant and Evangelical Bible contains 66 books: 39 in the Old Testament and 27 in the New. The Catholic canon includes further Old Testament books, such as Tobit, Judith, Wisdom, Sirach, Baruch and 1 and 2 Maccabees. The Eastern Orthodox canon includes some books that the Catholic canon does not. The Westminster Confession states that the books commonly called Apocrypha are not of divine inspiration and are no part of the canon.",
+      "origin": "The 66-book canon was recognised through the church's reception of apostolic books and of the Old Testament books that Jesus and the apostles cited as Scripture. The Catholic canon was defined at the Council of Trent. The Eastern Orthodox canon was settled in its own councils and tradition, and Protestant Reformers returned to the shorter Hebrew canon. The boundaries of some Old Testament books were debated in Christian history, and lists differ.",
+      "scripture": "Scripture is given by inspiration of God (2 Timothy 3:16), and Peter counts Paul's letters with the other Scriptures (2 Peter 3:15-16). Jesus and the apostles treated the Old Testament writings as Scripture, including the phrase 'the law of Moses, and the prophets, and the psalms' (Luke 24:44). That phrase names the divisions of the Hebrew Scriptures but does not itself list every book. Deuteronomy 4:2 and Revelation 22:18-19 warn against adding to or taking from God's words, but each passage is read in its own context and does not by itself fix the number of books. The Protestant view is that the 66 books are the inspired canon, and the additional books are read for history and edification.",
+      "anchors": ["2 Timothy 3:16", "Luke 24:44"],
+      "sources": [
+        {"title": "Westminster Confession of Faith, chapter 1 (1646)", "url": "https://www.blueletterbible.org/study/ccc/westminster/Of_The_Holy_Scripture.cfm", "accessed": "2026-11-23", "licence": "public domain", "use": "Protestant statement of the canon and inspiration; 1.3 on the Apocrypha", "verification": "verified (read)"},
+        {"title": "Catholic and Eastern Orthodox councils and canon lists (Trent; Orthodox councils)", "url": "", "accessed": "2026-11-23", "licence": "to be recorded", "use": "to be added", "verification": "pending"}
+      ]
     },
     {
       "id": "church_identity_question",
       "group": "policy",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "A question asks whether a church or group is true, saved or a cult. The guide does not describe or judge such churches as institutions, and it does not give a verdict on any person.",
-      "origin": "This is a policy entry, not a teaching. It applies to churches named in questions.",
-      "scripture": "Scripture is the standard for every teaching. The guide answers by saying what Scripture teaches on the subject the user asked about, and it leaves the judgment of any person's heart to God (1 Samuel 16:7; Romans 14:12). The user can read the Bible for themselves (Acts 17:11).",
+      "summary": "A question asks whether a named church or group is true, saved, or a cult. The guide describes that group's publicly documented teaching accurately and evaluates it against Scripture. It does not decide whether a church is a true church, does not give a verdict on the salvation of any individual adherent, and does not use the word cult as an unsupported label. Where the term is discussed, its theological or sociological sense is defined and attributed.",
+      "origin": "Policy entry. It governs how the guide answers questions about named churches and movements. It does not express a doctrine.",
+      "scripture": "Scripture is the standard for every teaching (Isaiah 8:20; Acts 17:11). The guide states what the group teaches, names the passages each side uses, and shows what Scripture teaches. Judgment of any person's heart belongs to God (1 Samuel 16:7; Romans 14:12), so the guide does not assign guilt to members or decide their eternal destiny.",
       "anchors": ["Acts 17:11", "1 Samuel 16:7"],
-      "sources": [{"title": "Perazim Guide rules (Agents.md, rule 5)", "licence": "internal", "use": "policy"}]
+      "sources": [
+        {"title": "Perazim Guide rules (Agents.md, rule 5)", "url": "", "accessed": "2026-11-23", "licence": "internal", "use": "policy", "verification": "internal"}
+      ]
     },
     {
       "id": "group_question",
       "group": "policy",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "A question names a group such as Latter-day Saints, Jehovah's Witnesses, Seventh-day Adventists, Oneness Pentecostals or Christian Science. The guide describes that group's teaching accurately from its own sources and evaluates it against Scripture.",
-      "origin": "These groups are described in the entries on Latter-day Saint, Jehovah's Witness, Seventh-day Adventist, Oneness, Christian Science and Christadelphian teaching.",
-      "scripture": "The guide explains the group's teaching in plain words, names the passages each side relies on, and then shows what Scripture teaches (Acts 17:11). It gives no verdict on any member's salvation and treats every person with dignity.",
+      "summary": "A question names a religious group, such as Latter-day Saints, Jehovah's Witnesses, Seventh-day Adventists, Oneness Pentecostals, Christian Science, Christadelphians, or a Catholic or Eastern Orthodox tradition. The guide describes that group's official teaching from its own published sources, separates official teaching from historical teaching, local practice and individual belief, and evaluates the teaching against Scripture. Historic Nicene traditions, such as Catholic and Eastern Orthodox churches, are described as affirming the Nicene Trinity while differing from Perazim's framework on particular doctrines.",
+      "origin": "Policy entry applying the group-specific entries. Each group's self-description comes from a primary source, with a scholarly source where needed.",
+      "scripture": "The guide explains each group's teaching in plain words, names the passages each side relies on, and shows what Scripture teaches (Acts 17:11). It gives no verdict on any member's salvation and treats every person with dignity. The word 'cult' is not used as an automatic classification.",
       "anchors": ["Acts 17:11", "1 John 4:1"],
-      "sources": [{"title": "Perazim Guide rules (Agents.md, rule 5)", "licence": "internal", "use": "policy"}]
+      "sources": [
+        {"title": "Perazim Guide rules (Agents.md, rule 5)", "url": "", "accessed": "2026-11-23", "licence": "internal", "use": "policy", "verification": "internal"}
+      ]
     }
   ]
 }
