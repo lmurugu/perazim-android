@@ -128,6 +128,14 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
             return;
         }
+        if (PerazimAiEngine.isOverdoseQuery(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.overdoseResponse().getMessageText()));
+            return;
+        }
+        if (PerazimAiEngine.isHarmToOthersQuery(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.harmToOthersResponse().getMessageText()));
+            return;
+        }
         if (PerazimAiEngine.isSensitivePastoralDisclosure(question)) {
             MAIN.post(() -> callback.onError(PerazimAiEngine.sensitivePastoralResponse().getMessageText()));
             return;

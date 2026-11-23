@@ -107,6 +107,12 @@ public class PerazimAiEngine {
         if (isCrisisQuery(q)) {
             return handleCrisisQuery();
         }
+        if (isOverdoseQuery(rawQuery)) {
+            return overdoseResponse();
+        }
+        if (isHarmToOthersQuery(rawQuery)) {
+            return harmToOthersResponse();
+        }
 
         if (isSensitivePastoralDisclosure(rawQuery)) {
             return sensitivePastoralResponse();
@@ -213,10 +219,72 @@ public class PerazimAiEngine {
     }
 
     /** Conservative local safety gate used before guide, Qwen, and online routing. */
+    /** Future-tense self-harm with common typos (for example "hurt myeslf tonight"). Approved safety routing. */
+    private static final Pattern SELF_HARM_TYPO_PATTERN = Pattern.compile(
+            "\\b(?:going to|gonna|plan to|want to|will|about to)\\s+(?:hurt|harm|kill|end|cut)\\s+my\\s?(?:self|seff|sefl|slef|eslf|myeslf|sel|elf)\\b|" +
+            "\\bhurt\\s+my\\s?(?:self|seff|sefl|slef|eslf)\\b|\\bkill\\s+my\\s?(?:self|seff|sefl|slef|eslf)\\b", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern MEANS_PATTERN = Pattern.compile(
+            "\\b(?:gun|guns|pistol|rifle|knife|knives|pills|rope|poison|weapon)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DISTRESS_PATTERN = Pattern.compile(
+            "\\b(?:suicid\\w*|kill myself|hurt myself|end (?:it|my life)|don'?t know what i'?m going to do|can'?t go on|hopeless|drinking|no reason to live)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** Means plus distress is a risk message and must never reach the scope gate. */
+    /** Overdose or poisoning: an emergency now, whatever the symptoms. */
+    private static final Pattern OVERDOSE_PATTERN = Pattern.compile(
+            "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison))\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isOverdoseQuery(@Nullable String query) {
+        return query != null && OVERDOSE_PATTERN.matcher(query).find();
+    }
+
+    /** Fixed overdose response: leads with the medical line and never waits for symptoms or a reply. */
+    public static AiResponse overdoseResponse() {
+        String msg = "This may be an emergency. Call 922 now, or go to the nearest emergency department immediately. "
+                + "Do not wait for symptoms, and do not wait for a reply from this app. If you can, ask someone nearby to stay with you and take you. "
+                + "Bring any medicine or container you took.";
+        return AiResponse.plainText(msg, Arrays.asList("📖 Open the Bible"));
+    }
+
+    public static boolean isMeansAndDistress(@Nullable String query) {
+        if (query == null) return false;
+        return MEANS_PATTERN.matcher(query).find() && DISTRESS_PATTERN.matcher(query).find();
+    }
+
+    /** Intent to harm a named or unnamed other person (typos tolerated). */
+    private static final Pattern HARM_OTHERS_PATTERN = Pattern.compile(
+            "\\b(?:kill|killing|hurt|harm|stab|shoot|beat)\\b.{0,40}\\b(?:s[ou]m[a-z]{0,2}ne|somebody|someon|him|her|them|person|boss|husband|wife|neighbour|neighbor|child)\\b|" +
+            "\\bthoughts of (?:killing|hurting)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isHarmToOthersQuery(@Nullable String query) {
+        if (query == null) return false;
+        return HARM_OTHERS_PATTERN.matcher(query).find();
+    }
+
+    /** Fixed safety response for intent to harm another person. Makes no counselling promise. */
+    public static AiResponse harmToOthersResponse() {
+        String msg = "I'm really concerned about what you just shared. If anyone is in danger right now, call 999 or 112 immediately, or go to the nearest police station or hospital. "
+                + "Move away from the person if you can, and don't stay alone with these thoughts. Tell a trusted adult or a leader near you now. "
+                + "This guide cannot monitor your safety or promise to counsel you through this, so please reach a qualified professional as soon as you can.";
+        return AiResponse.plainText(msg, Arrays.asList("📖 Open the Bible"));
+    }
+
+    /** Requests for other people's private data or conversations are refused before the model runs. */
+    private static final Pattern OTHER_PERSON_DATA_PATTERN = Pattern.compile(
+            "\\b(?:members?|someone|everyone|another|other people'?s?|congregation|pastor'?s|last person|other users?|previous user|another user)\\b.{0,60}" +
+            "\\b(?:private|counsell?ing|conversations?|chats?|password|phone number|address|records?|messages?|donations?|give the most|asked the ai|asked)\\b|" +
+            "\\b(?:show|give|tell|list|reveal)\\b.{0,20}\\b(?:every|all)\\b.{0,30}\\b(?:member|members|conversations?|counsell?ing)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isOtherPersonDataRequest(@Nullable String query) {
+        if (query == null) return false;
+        return OTHER_PERSON_DATA_PATTERN.matcher(query).find();
+    }
+
     public static boolean isCrisisQuery(@Nullable String query) {
         if (query == null) return false;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
-        return CRISIS_PATTERN.matcher(normalized).find() || CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find();
+        return CRISIS_PATTERN.matcher(normalized).find() || CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find()
+                || SELF_HARM_TYPO_PATTERN.matcher(normalized).find() || isMeansAndDistress(normalized);
     }
 
     /** Conservative pre-model route for personal pastoral disclosures; not a risk diagnosis. */
@@ -434,6 +502,8 @@ public class PerazimAiEngine {
      */
     public static boolean isOutOfScopeForModel(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return true;
+        if (isOtherPersonDataRequest(query)) return true;
+        if (isMeansAndDistress(query) || isHarmToOthersQuery(query)) return false;
         if (isClearlyOutOfScopeQuery(query)) return true;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ").trim();
         if (MODEL_OVERRIDE.matcher(normalized).find()) return true;
