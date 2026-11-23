@@ -16,7 +16,7 @@ public class GuideDocsRouterTest {
         assertEquals("1.0.0", docs.version());
         assertTrue(docs.core().startsWith("RULES (locked):"));
         assertFalse("markers must not reach the prompt", docs.core().contains("CORE:"));
-        assertEquals(10, docs.index().size());
+        assertEquals(11, docs.index().size());
         for (GuideDocs.SkillEntry skill : docs.index()) {
             assertFalse("empty playbook " + skill.playbook, docs.playbook(skill.playbook).isEmpty());
         }
