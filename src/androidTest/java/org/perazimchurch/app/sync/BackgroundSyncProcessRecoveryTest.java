@@ -1,6 +1,8 @@
 package org.perazimchurch.app.sync;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Process;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -43,5 +45,29 @@ public class BackgroundSyncProcessRecoveryTest {
                 .getWorkInfosForUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME)
                 .get(10, TimeUnit.SECONDS);
         assertFalse("WorkManager must retain the queued one-time sync", work.isEmpty());
+
+        // Only the CI recovery script sets this argument. It kills this process after WorkManager has
+        // persisted the work, which is a real SIGKILL, not a force-stop. The script expects the crash.
+        Bundle args = InstrumentationRegistry.getArguments();
+        if ("true".equals(args.getString("simulateProcessDeath"))) {
+            awaitPersistedState(context);
+            Process.killProcess(Process.myPid());
+        }
+    }
+
+    private static void awaitPersistedState(Context context) throws Exception {
+        long deadline = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(15);
+        while (System.currentTimeMillis() < deadline) {
+            List<WorkInfo> infos = WorkManager.getInstance(context)
+                    .getWorkInfosForUniqueWork(BackgroundSyncScheduler.UNIQUE_WORK_NAME).get(5, TimeUnit.SECONDS);
+            for (WorkInfo info : infos) {
+                if (info.getState() == WorkInfo.State.ENQUEUED || info.getState() == WorkInfo.State.BLOCKED) {
+                    Thread.sleep(1000L);
+                    return;
+                }
+            }
+            Thread.sleep(250L);
+        }
+        throw new AssertionError("WorkManager did not report the queued sync as ENQUEUED or BLOCKED before process death");
     }
 }
