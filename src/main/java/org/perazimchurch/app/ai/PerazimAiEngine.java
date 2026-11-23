@@ -105,6 +105,9 @@ public class PerazimAiEngine {
         if (isCrisisQuery(q)) {
             return handleCrisisQuery();
         }
+        if (isOverdoseQuery(rawQuery)) {
+            return overdoseResponse();
+        }
         if (isHarmToOthersQuery(rawQuery)) {
             return harmToOthersResponse();
         }
@@ -225,6 +228,22 @@ public class PerazimAiEngine {
             "\\b(?:suicid\\w*|kill myself|hurt myself|end (?:it|my life)|don'?t know what i'?m going to do|can'?t go on|hopeless|drinking|no reason to live)\\b", Pattern.CASE_INSENSITIVE);
 
     /** Means plus distress is a risk message and must never reach the scope gate. */
+    /** Overdose or poisoning: an emergency now, whatever the symptoms. */
+    private static final Pattern OVERDOSE_PATTERN = Pattern.compile(
+            "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison))\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isOverdoseQuery(@Nullable String query) {
+        return query != null && OVERDOSE_PATTERN.matcher(query).find();
+    }
+
+    /** Fixed overdose response: leads with the medical line and never waits for symptoms or a reply. */
+    public static AiResponse overdoseResponse() {
+        String msg = "This may be an emergency. Call 922 now, or go to the nearest emergency department immediately. "
+                + "Do not wait for symptoms, and do not wait for a reply from this app. If you can, ask someone nearby to stay with you and take you. "
+                + "Bring any medicine or container you took.";
+        return AiResponse.plainText(msg, Arrays.asList("📖 Open the Bible"));
+    }
+
     public static boolean isMeansAndDistress(@Nullable String query) {
         if (query == null) return false;
         return MEANS_PATTERN.matcher(query).find() && DISTRESS_PATTERN.matcher(query).find();
