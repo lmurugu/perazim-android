@@ -7,6 +7,9 @@ import android.os.Looper;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
+import org.perazimchurch.app.ai.guide.GuideRuntime;
+import org.perazimchurch.app.ai.guide.GuideSafety;
+import org.perazimchurch.app.ai.guide.SelfCheck;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -154,7 +157,9 @@ public final class OnDeviceAi {
                         System.currentTimeMillis(), evidenceQuery);
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
-                LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence);
+                // Locked rules, one playbook, style and learned notes (guide memory is optional and bounded).
+                String guideText = GuideRuntime.contextFor(c, question).text;
+                LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence, guideText);
                 // Only excerpts the model actually saw may be cited, verified, or titled.
                 JSONArray shown = built.shownEvidence;
                 if (shown.length() == 0) throw new IOException("The question is too long for the on-device model. Ask a shorter question.");
@@ -207,7 +212,12 @@ public final class OnDeviceAi {
                 if (!hasVerifiedCitations(result, shown)) {
                     throw new IOException("The local model did not return a verified source citation.");
                 }
-                String citedResult = appendVerifiedSourceTitles(result, shown);
+                // Self-heal before the answer is shown: fix or refuse unverified quotes, verdicts and references.
+                boolean sensitive = GuideSafety.isSensitive(question);
+                SelfCheck.Result checked = SelfCheck.check(result, GuideRuntime.evidenceTexts(shown), sensitive);
+                GuideRuntime.afterAnswer(c, question, checked.issues, sensitive);
+                if (checked.refused) throw new IOException(checked.answer);
+                String citedResult = appendVerifiedSourceTitles(checked.answer, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();

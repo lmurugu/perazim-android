@@ -401,9 +401,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 choices.add("Restore previous signed knowledge package");
             }
         }
+        int memoryIndex = choices.size();
+        choices.add("What the guide remembers");
         choices.add("Clear this conversation");
         final int selectedUpdateIndex = updateIndex;
         final int selectedRollbackIndex = rollbackIndex;
+        final int selectedMemoryIndex = memoryIndex;
         AppDialogs.builder(activity).setTitle("Choose your guide")
                 .setItems(choices.toArray(new String[0]), (dialog, which) -> {
                     if (which == 0) setGuideMode("local");
@@ -412,6 +415,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     else if (which == 3) setGuideMode("guide");
                     else if (which == selectedUpdateIndex) showKnowledgeUpdate();
                     else if (which == selectedRollbackIndex) showKnowledgeRollback();
+                    else if (which == selectedMemoryIndex) GuideMemoryDialog.show(activity);
                     else {
                         localHistory.clear();
                         messagesContainer.removeAllViews();
@@ -701,6 +705,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     String result = ConversationHistory.withoutRepeatedGreeting(answer, !localHistory.isEmpty());
                     localHistory.addExchange(query, result);
                     displayAiMessage(AiResponse.plainText(result, null), "On-phone AI · Qwen · Offline");
+                    GuideFeedbackRow.attach(activity, messagesContainer, query, result);
                 }
                 public void onError(String error) {
                     removeTypingIndicator(indicator); localRequest = false; finishInFlight(); updateSubtitle();
