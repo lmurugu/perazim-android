@@ -36,9 +36,12 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
 # which blocks JobScheduler from running its jobs until the app is launched again, so it
 # cannot prove delivery after process death. Send SIGKILL to the app's own process instead.
 # Do not open the app again; restore network and wait for the mock API to receive the row.
-app_pid="$(adb shell pidof org.perazimchurch.app | tr -d '\r' | awk '{print $1}')"
+# pidof exits non-zero when no process matches, so read it without letting set -e end the script.
+app_pid="$(adb shell pidof org.perazimchurch.app 2>/dev/null | tr -d '\r' | awk '{print $1}' || true)"
 if [[ -z "$app_pid" ]]; then
-  echo 'FAIL: app process not found before the simulated process death.' >&2
+  echo 'Diagnostics: the app process was not running when the simulated death was due.' >&2
+  adb shell dumpsys package org.perazimchurch.app | grep -iE 'stopped=|enabled=|installed=' | head -n 6 >&2 || true
+  echo 'FAIL: app process not found before the simulated process death; the test run had already ended the process.' >&2
   exit 1
 fi
 adb shell kill -9 "$app_pid" || true
