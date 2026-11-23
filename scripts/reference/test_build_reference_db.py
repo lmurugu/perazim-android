@@ -224,3 +224,44 @@ class CommentaryTest(unittest.TestCase):
             default_rows = sqlite3.connect(default_db).execute("SELECT COUNT(*) FROM entries").fetchone()[0]
         self.assertEqual(pending_rows, 1)
         self.assertEqual(default_rows, 0)
+
+
+class CreedTest(unittest.TestCase):
+    CREED = HERE / "creeds" / "nicene-constantinopolitan-381.txt"
+
+    def test_chunks_stay_within_the_guide_limit_and_keep_every_word(self):
+        text = " ".join(["word%d" % i for i in range(400)])
+        pieces = b.chunk_text(text)
+        self.assertTrue(len(pieces) > 1)
+        self.assertTrue(all(len(piece) <= b.CREED_CHUNK_CHARS for piece in pieces))
+        self.assertEqual(" ".join(pieces).split(), text.split())
+
+    def test_real_creed_text_is_split_without_losing_words(self):
+        source_words = self.CREED.read_text(encoding="utf-8").split()
+        entries = list(b.creed_text_entries(self.CREED, "Nicene"))
+        self.assertTrue(all(headword == "Nicene" for headword, _ in entries))
+        self.assertTrue(all(len(body) <= b.CREED_CHUNK_CHARS for _, body in entries))
+        self.assertTrue(entries[0][1].startswith("We believe in one God, the Father Almighty"))
+        self.assertEqual(" ".join(body for _, body in entries).split(), source_words)
+
+    def test_build_stores_the_creed_under_its_headword(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            (raw / "creed").mkdir(parents=True)
+            (raw / "creed" / "nicene-constantinopolitan-381.txt").write_bytes(self.CREED.read_bytes())
+            registry = Path(tmp) / "sources.json"
+            registry.write_text(json.dumps({"sources": [{
+                "id": "creed-nicene-constantinopolitan-381", "title": "Nicene Creed", "author": "Council of 381",
+                "category": "CREED", "licence": "Public domain", "attribution": "Public domain.",
+                "theologyTag": "ECUMENICAL_CREED", "tier": "default", "parser": "creed_text",
+                "headword": "Nicene", "file": "creed/nicene-constantinopolitan-381.txt",
+            }]}), encoding="utf-8")
+            out = Path(tmp) / "reference.db"
+            with mock.patch.object(b, "SOURCES_JSON", registry):
+                b.build(raw, out, tier="default")
+            conn = sqlite3.connect(out)
+            rows = conn.execute("SELECT headword, body FROM entries WHERE headword = 'Nicene' "
+                                "ORDER BY id").fetchall()
+            conn.close()
+        self.assertTrue(len(rows) >= 2)
+        self.assertTrue(rows[0][1].startswith("We believe in one God"))

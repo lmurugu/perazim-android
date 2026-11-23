@@ -26,7 +26,7 @@ public final class ReferenceIndex {
     private static final String TAG = "ReferenceIndex";
     static final String ASSET = "reference/reference.db.gz";
     /** Bump when the database format or contents change, so the unpacked copy is rebuilt. */
-    static final String UNPACKED_NAME = "reference-v1.db";
+    static final String UNPACKED_NAME = "reference-v2.db";
     static final String CROSS_REFERENCE_SOURCE = "openbible-xrefs";
     /** Commentaries are in their own database so the factual index stays small. */
     static final String COMMENTARY_ASSET = "reference/reference-commentaries.db.gz";

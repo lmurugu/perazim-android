@@ -53,7 +53,11 @@ def main(argv=None):
             if target.exists() and item.get("sha256") and sha256_bytes(target.read_bytes()) == item["sha256"]:
                 print("kept   %s %s" % (source["id"], item["file"]))
                 continue
-            body = fetch(item["url"])
+            if source.get("localFile"):
+                # A reviewed text kept in the repository (scripts/reference/creeds/), not downloaded.
+                body = (HERE / "creeds" / source["localFile"]).read_bytes()
+            else:
+                body = fetch(item["url"])
             digest = sha256_bytes(body)
             if item.get("sha256") and digest != item["sha256"]:
                 sys.exit("sha256 mismatch for %s (%s): expected %s, got %s"

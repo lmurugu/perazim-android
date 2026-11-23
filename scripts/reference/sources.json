@@ -179,6 +179,24 @@
       "theologyTag": "ARMINIAN_WESLEYAN_COMMENTARY",
       "tier": "optional",
       "attribution": "John Wesley's Explanatory Notes upon the New Testament (1755), public domain. Text from Christian Classics Ethereal Library (ccel.org). Reference material, not Perazim's position."
+    },
+    {
+      "id": "creed-nicene-constantinopolitan-381",
+      "title": "Nicene-Constantinopolitan Creed of 381",
+      "author": "First Council of Constantinople (381); English text from Philip Schaff, The Creeds of Christendom (CCEL)",
+      "category": "CREED",
+      "licence": "Public domain",
+      "sourceUrl": "https://ccel.org/ccel/schaff/creeds1",
+      "landingUrl": "https://ccel.org/ccel/schaff/creeds1",
+      "file": "creed/nicene-constantinopolitan-381.txt",
+      "localFile": "nicene-constantinopolitan-381.txt",
+      "parser": "creed_text",
+      "headword": "Nicene",
+      "theologyTag": "ECUMENICAL_CREED",
+      "tier": "default",
+      "attribution": "Nicene-Constantinopolitan Creed of 381, public domain. English text from Philip Schaff, The Creeds of Christendom, vol. 1 (CCEL), checked word for word against the source.",
+      "sizeBytes": 1181,
+      "sha256": "6babb4e2ea8966c34a6f9067b84c448d2f93aa62e28f546aaa5ac0f3fa263886"
     }
   ],
   "candidates": [

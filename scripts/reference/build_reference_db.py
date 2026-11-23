@@ -205,6 +205,37 @@ def _book_heading(line):
     return _BOOK_KEYS.get(key)
 
 
+# Largest body the on-phone guide shows for one hit (ReferenceEvidence.MAX_TEXT_CHARS is 600).
+CREED_CHUNK_CHARS = 560
+
+
+def chunk_text(text, limit=CREED_CHUNK_CHARS):
+    """Split a text into word-bounded pieces of at most `limit` characters, joined with single spaces."""
+    pieces, current = [], ""
+    for word in text.split():
+        candidate = word if not current else current + " " + word
+        if len(candidate) > limit and current:
+            pieces.append(current)
+            current = word
+        else:
+            current = candidate
+    if current:
+        pieces.append(current)
+    return pieces
+
+
+def creed_text_entries(path, headword):
+    """Yield (headword, chunk) for a plain-text creed. Paragraphs are separated by blank lines."""
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    for paragraph in re.split(r"\n\s*\n", text.strip()):
+        flat = " ".join(paragraph.split())
+        if not flat:
+            continue
+        for piece in chunk_text(flat):
+            yield headword, piece
+
+
 def _chunk_paragraphs(paragraphs, limit=1800):
     """Group paragraphs into chunks of at most about `limit` characters, never splitting a paragraph."""
     chunks, current = [], []
@@ -395,6 +426,8 @@ def build(raw_dir, out_path, only=None, tier="default"):
                 items = ccel_headword_entries(path)
             elif parser == "ccel_topical":
                 items = ccel_topical_entries(path)
+            elif parser == "creed_text":
+                items = creed_text_entries(path, source["headword"])
             else:
                 raise SystemExit("Unknown parser %s for %s" % (parser, sid))
             for headword, body in items:
