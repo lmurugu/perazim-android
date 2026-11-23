@@ -23,7 +23,6 @@ public final class DriftEvidence {
     static final String SOURCE_ID = "perazim-comparative-kb";
     static final String KB_VERSION = "1.0.0";
     static final int MAX_ANCHORS = 2;
-    static final int MAX_NOTE_CHARS = 700;
 
     private static JSONObject kb;
     private static final Object LOCK = new Object();
@@ -59,9 +58,7 @@ public final class DriftEvidence {
     /** The model-facing note: origin and the Scripture evaluation. Context only; the model may not cite it. */
     static JSONObject noteItem(JSONObject entry) throws Exception {
         String id = entry.optString("id");
-        String text = "Comparative note, not Perazim's position. Origin: " + entry.optString("origin")
-                + " Scripture: " + entry.optString("scripture");
-        if (text.length() > MAX_NOTE_CHARS) text = text.substring(0, MAX_NOTE_CHARS);
+        String text = ComparativeGate.noteText(entry);
         JSONObject item = new JSONObject();
         item.put("sourceId", SOURCE_ID);
         item.put("version", KB_VERSION);

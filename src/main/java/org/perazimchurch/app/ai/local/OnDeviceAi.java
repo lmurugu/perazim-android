@@ -177,7 +177,8 @@ public final class OnDeviceAi {
                 if (evidence.length() == 1 && LocalScriptureRetriever.hasExplicitReference(question)
                         && "Bible".equals(evidence.optJSONObject(0) == null ? "" : evidence.optJSONObject(0).optString("sourceId"))) {
                     JSONObject verse = evidence.getJSONObject(0);
-                    String verseAnswer = verse.optString("location") + " (" + verse.optString("title") + "): “"
+                    String noticeForQuote = LocalScriptureRetriever.nasbNotice(c, question);
+                    String verseAnswer = (noticeForQuote == null ? "" : noticeForQuote + " ") + verse.optString("location") + " (" + verse.optString("title") + "): “"
                             + verse.optString("text") + "”";
                     MAIN.post(() -> callback.onSuccess(verseAnswer));
                     return;
@@ -263,7 +264,9 @@ public final class OnDeviceAi {
                 SelfCheck.Result checked = SelfCheck.check(result, GuideRuntime.evidenceTexts(shown), sensitive);
                 GuideRuntime.afterAnswer(c, question, checked.issues, sensitive);
                 if (checked.refused) throw new IOException(checked.answer);
-                String citedResult = appendVerifiedSourceTitles(checked.answer, shown);
+                String noticeForAnswer = LocalScriptureRetriever.nasbNotice(c, question);
+                String citedResult = (noticeForAnswer == null ? "" : noticeForAnswer + " ")
+                        + appendVerifiedSourceTitles(checked.answer, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();

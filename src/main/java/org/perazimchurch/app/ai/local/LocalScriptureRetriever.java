@@ -158,6 +158,20 @@ public final class LocalScriptureRetriever {
         return null;
     }
 
+    static final String NASB_NOT_LOADED =
+            "The licensed NASB is not loaded on this device, so this answer uses the King James Version.";
+
+    /** The notice to show when the question names the NASB but the licensed file is not loaded; otherwise null. */
+    public static String nasbNotice(Context context, String question) {
+        try {
+            if (question == null || !NASB_NAME.matcher(question).find()) return null;
+            BibleDao dao = PerazimDatabase.getInstance(context).bibleDao();
+            return KJV.equals(translationFor(dao, question)) ? NASB_NOT_LOADED : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     static String titleFor(String translationId) {
         return NASB.equals(translationId) ? "New American Standard Bible" : "King James Version";
     }
