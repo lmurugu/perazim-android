@@ -38,7 +38,7 @@ Membership lists, profiles, pastoral records, prayer requests, disciplinary reco
 ## Remaining dependencies and limits
 
 1. Provide the actual constitution and any other candidate documents through a controlled channel, with their issuing authority, version and approval evidence. Classify every source before ingesting it.
-2. Provide an authorized Scripture corpus and rights evidence, plus a stable source/version identifier and integrity manifest. ESV remains unavailable until its rights are verified; another translation must not be labelled ESV.
+2. Provide an authorized Scripture corpus and rights evidence, plus a stable source/version identifier and integrity manifest. ESV is not part of the AI corpus under decision A-105. The corpus must cover the KJV and the NASB, and no other translation may be labelled as either.
 3. Add offline document extraction tooling or a reviewed extraction workflow. The current ingestion API accepts extracted text; it does not parse PDF or DOCX files.
 4. Build a permission-checked source administration workflow for approval, withdrawal, supersession and audit. Do not infer church authority from a project administrator role.
 5. Connect an authorized corpus loader to the Scripture contract and connect the response-contract validator to a structured model response before activation. The current source registry is empty, and no model request is made when it is empty.

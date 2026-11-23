@@ -593,13 +593,13 @@ The application must never present KJV text as ESV or imply that one translation
 
 The toolkit must record the licence or permitted-use status of each Bible translation.
 
-ESV is the preferred translation for the project's teaching and quotation requirements, subject to verified licensing rights.
+The KJV and the NASB are the translations for the project's teaching and quotation requirements, subject to verified licensing rights (decision A-105). ESV is excluded from AI quotations.
 
 The toolkit must not package or redistribute ESV content merely because it is available in an existing database.
 
 The same licensing review must be applied to NASB and other translations.
 
-### 11.5 ESV and NASB handling
+### 11.5 KJV and NASB handling
 
 Before offline redistribution or AI processing, the project must verify the applicable permissions for:
 

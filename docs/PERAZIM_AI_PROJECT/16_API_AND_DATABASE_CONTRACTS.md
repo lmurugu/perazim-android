@@ -476,7 +476,7 @@ The endpoint must perform the necessary checks before dispatching content to an 
       "content": "I am studying Romans 8."
     }
   ],
-  "preferred_translation": "ESV",
+  "preferred_translation": "KJV",
   "response_mode": "standard"
 }
 ```
@@ -518,7 +518,7 @@ Example response:
       {
         "type": "scripture",
         "reference": "Romans 8:28",
-        "translation": "ESV"
+        "translation": "KJV"
       }
     ],
     "limitations": []

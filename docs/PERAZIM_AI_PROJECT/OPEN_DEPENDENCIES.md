@@ -355,7 +355,7 @@ The approved prohibition on sending identifiable or sensitive pastoral informati
 **ID:** D-013  
 **Classification:** LEGAL/LICENSING REVIEW
 
-The ESV is the preferred translation, but the project must verify the rights applicable to its intended use.
+The AI does not quote the ESV (decision A-105, 23 November 2026). The AI quotes the KJV and the NASB, so the project must verify the rights applicable to their intended use.
 
 Investigate:
 

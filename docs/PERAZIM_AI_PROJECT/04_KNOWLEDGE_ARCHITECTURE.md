@@ -809,7 +809,7 @@ The existing application contains a local Bible database with multiple translati
 
 The inspected implementation currently defaults to KJV for retrieval.
 
-The preferred product behaviour is ESV-first, subject to licensing.
+The AI's translation behaviour is KJV and NASB only, with translation attribution (decision A-105, 23 November 2026). ESV is excluded from AI quotations.
 
 Before redistributing or packaging Bible translations, Codex must verify:
 
@@ -825,9 +825,9 @@ Before redistributing or packaging Bible translations, Codex must verify:
 
 The existence of a translation in the current database does not establish that the church has permission to redistribute it.
 
-Where ESV cannot legally be packaged, the system must use an appropriately licensed alternative and identify it accurately.
+The AI uses only the KJV and the NASB, within their verified licence permissions, and identifies each translation accurately.
 
-The architecture must remain capable of integrating a licensed ESV source later.
+ESV is not part of the AI's translation set. Adding any translation to the AI requires a new approved decision under the change control rules of the Decisions Register.
 
 # 19. TECHNICAL DATA MODEL REQUIREMENTS
 
@@ -880,7 +880,7 @@ The knowledge architecture is acceptable only when testing demonstrates that:
 18. AI-generated answers do not automatically become approved knowledge.
 19. The pilot administrator's actions are audited.
 20. Technical approval remains distinct from formal doctrinal amendment.
-21. ESV and other Bible translation content is used only within verified licence permissions.
+21. KJV and NASB Bible content is used only within verified licence permissions. The AI does not use ESV content.
 22. Offline and online AI apply the same knowledge authority rules.
 
 ---

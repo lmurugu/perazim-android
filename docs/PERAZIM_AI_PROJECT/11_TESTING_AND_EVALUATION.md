@@ -258,7 +258,7 @@ Test Scripture-related responses for:
 - Avoidance of isolated proof-texting.
 - Appropriate handling of difficult or disputed passages.
 
-The ESV is the preferred translation for biblical quotation and references, subject to verified licensing and technical availability.
+The AI quotes the KJV and the NASB for biblical quotation and references, subject to verified licensing and technical availability (decision A-105). An ESV quotation from the AI does not meet this requirement.
 
 If another translation is used, it must be identified accurately. The system must never claim to have consulted the ESV, Greek, Hebrew, or another source when it did not.
 

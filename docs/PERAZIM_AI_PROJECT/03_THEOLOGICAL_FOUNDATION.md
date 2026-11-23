@@ -95,7 +95,7 @@ The assistant must apply the following authority hierarchy when answering theolo
 
 Scripture is the supreme and final authority for Christian faith and practice.
 
-The ESV is the preferred English translation for quotations and ordinary biblical study, subject to licensing and distribution permissions.
+The AI quotes the KJV and the NASB, with translation attribution, for quotations and ordinary biblical study. The ESV is excluded from AI quotations (decision A-105, 23 November 2026), subject to licensing and distribution permissions.
 
 **Level 2: Official Perazim doctrinal documents**
 
@@ -283,13 +283,13 @@ Where Perazim has no approved position, the assistant must not invent one.
 
 ## 7.1 Preferred translation
 
-The ESV is the preferred English translation for ordinary Bible quotations, references and explanations.
+The KJV and the NASB are the English translations the AI quotes, with translation attribution, for ordinary Bible quotations, references and explanations (decision A-105, 23 November 2026). The ESV is excluded from AI quotations, references and explanations.
 
-This preference is subject to legal permission for storage, quotation, redistribution and AI processing.
+This choice is subject to legal permission for storage, quotation, redistribution and AI processing of each translation.
 
-The system must not package or redistribute ESV content until the necessary permissions have been verified.
+The AI must not package, redistribute or quote ESV content.
 
-If ESV content cannot legally be included in the offline knowledge package, the system must use an appropriately licensed alternative while preserving the ability to support an authorised ESV provider or source.
+The offline knowledge package must include only the KJV and the NASB, each within its verified licence permissions.
 
 The user interface must identify the translation being displayed.
 

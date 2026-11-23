@@ -768,7 +768,7 @@ Codex must verify:
 5. The existing PostgreSQL schema and migration conventions.
 6. The storage and security implications of the local Qwen model.
 7. The exact Bible translation datasets and applicable redistribution licences.
-8. ESV licensing and permitted offline storage, quotation, caching and processing.
+8. NASB licensing and permitted offline storage, quotation, caching and processing. The AI does not use ESV (decision A-105).
 9. The existing production HTTPS and backup arrangements.
 10. The appropriate package-signing and key-rotation design.
 11. The feasibility of reliable offline package expiry and revocation.
