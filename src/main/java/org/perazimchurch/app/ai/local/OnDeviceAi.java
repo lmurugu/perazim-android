@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -152,6 +153,15 @@ public final class OnDeviceAi {
                 String evidenceQuery = evidenceQuery(question, history);
                 JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,
                         System.currentTimeMillis(), evidenceQuery);
+                // Exact verse reference with one KJV passage: quote the Bible text directly, never generate it.
+                if (evidence.length() == 1 && LocalScriptureRetriever.hasExplicitReference(question)
+                        && "Bible".equals(evidence.optJSONObject(0) == null ? "" : evidence.optJSONObject(0).optString("sourceId"))) {
+                    JSONObject verse = evidence.getJSONObject(0);
+                    String verseAnswer = verse.optString("location") + " (King James Version): “"
+                            + verse.optString("text") + "”";
+                    MAIN.post(() -> callback.onSuccess(verseAnswer));
+                    return;
+                }
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
                 LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence);
