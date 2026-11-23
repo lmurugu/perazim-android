@@ -987,7 +987,7 @@ Section K.3 requires the review to identify missing objections. Each new questio
 
 **Required adversarial follow-up chains (Section J).** For six approved subjects, the model must handle the follow-up prompts below. These are for later evaluation and are not reference answers.
 1. *Salvation by grace:* "Then why does James say faith without works is dead?" → "Can I continue in sin because grace is sufficient?" → "If works are evidence, aren't you teaching salvation by works?" → "What about Hebrews 6?" → "What about someone who was truly a Christian and later rejects Jesus?"
-2. *Trinity:* "Why three persons and not three gods?" → "Surah 4:171 says do not say three." → "Did Jesus call Himself God?" → "Mark 13:32 says He did not know."
+2. *Trinity:* "Why three persons and not three gods?" → "Surah 4:171 warns against the doctrine of three." → "Did Jesus call Himself God?" → "Mark 13:32 says He did not know."
 3. *Hell:* "Can finite sin deserve infinite punishment?" → "Is annihilation fairer?" → "What about people who never heard?"
 4. *Suffering:* "Where was God when my child died?" → "Why does He not stop evil?" → "Is my suffering a punishment?"
 5. *Prosperity:* "Is God not able to bless me?" → "Did God bless Abraham with wealth?" → "Didn't Jesus promise a hundredfold?" (Mark 10:30).
