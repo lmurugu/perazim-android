@@ -47,6 +47,11 @@ android {
     buildFeatures {
         buildConfig true
     }
+    // Connected tests run on debug unless a job passes -PperazimTestBuildType=validation.
+    // Only the background-sync harness passes it: the validation build is the only build type whose
+    // policy allows cleartext HTTP to loopback (SecureTransportPolicy), so the mock server is reached
+    // through adb reverse at 127.0.0.1. The security policy itself is unchanged.
+    testBuildType (project.findProperty('perazimTestBuildType') ?: 'debug')
     testOptions {
         unitTests {
             includeAndroidResources = true

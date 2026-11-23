@@ -32,7 +32,7 @@ public class BackgroundSyncProcessRecoveryTest {
     @Test
     public void queuedSyntheticMutationIsPersistedForBackgroundDelivery() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ApiClient.setBaseUrl(context, "http://10.0.2.2:18080");
+        ApiClient.setBaseUrl(context, "http://127.0.0.1:18080");
 
         SessionManager session = SessionManager.getInstance(context);
         session.login(USER_ID, "Synthetic WorkManager Test", null, "campus_central", "MEMBER");

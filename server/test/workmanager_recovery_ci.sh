@@ -26,11 +26,12 @@ if [[ "$mock_ready" != true ]]; then
   exit 1
 fi
 
+adb reverse tcp:18080 tcp:18080
 adb shell svc wifi disable
 adb shell svc data disable || true  # the emulator image may not expose the phone service
 
 # 1. Scheduler test: must pass normally, with no process death.
-./gradlew connectedDebugAndroidTest \
+./gradlew connectedValidationAndroidTest -PperazimTestBuildType=validation \
   -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest \
   --stacktrace
 
@@ -40,7 +41,7 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
 set +e
 # leaveApksInstalledAfterRun: connectedAndroidTest otherwise uninstalls the app when the run ends,
 # which removes the WorkManager job and its database before the delivery check.
-./gradlew connectedDebugAndroidTest \
+./gradlew connectedValidationAndroidTest -PperazimTestBuildType=validation \
   -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true \
   -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
   -Pandroid.testInstrumentationRunnerArguments.simulateProcessDeath=true \
