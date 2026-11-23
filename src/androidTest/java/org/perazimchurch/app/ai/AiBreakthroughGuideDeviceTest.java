@@ -74,6 +74,8 @@ public final class AiBreakthroughGuideDeviceTest {
                             @Override public void onNavigateTab(int tabIndex) { }
                             @Override public void onOpenGiving() { }
                             @Override public void onOpenLiveSermons() { }
+                            @Override public void onOpenGames() { }
+                            @Override public void onOpenProfile() { }
                             @Override public void onOpenBible(String book) { }
                             @Override public void onLaunchRiddles() { }
                             @Override public void onLaunchJokes() { }
