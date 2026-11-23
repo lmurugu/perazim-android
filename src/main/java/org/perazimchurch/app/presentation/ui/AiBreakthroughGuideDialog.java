@@ -32,6 +32,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.ai.AiResponse;
+import org.perazimchurch.app.ai.appcontext.AppContextComposer;
+import org.perazimchurch.app.ai.appcontext.AppContextReader;
+import org.perazimchurch.app.ai.appcontext.AppContextRouter;
 import org.perazimchurch.app.ai.local.ModelDownloadService;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.AiPreferences;
@@ -67,11 +70,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
         void onOpenGiving();
         void onOpenLiveSermons();
         void onOpenBible(@Nullable String book);
+        void onOpenGames();
+        void onOpenProfile();
         void onLaunchRiddles();
         void onLaunchJokes();
         void onStartReflections();
     }
 
+    /** Guide skills whose questions keep their existing safe path and never get an app-context answer. */
+    private static final java.util.Set<String> SAFETY_SKILLS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "crisis", "pastoral", "doctrine", "privacy", "human-decision", "church-info", "refusal"));
     private static final int COLOR_PRIMARY_PURPLE = Color.parseColor("#681A7D");
     private static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     private static final int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
@@ -404,6 +412,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
         int memoryIndex = choices.size();
         choices.add("What the guide remembers");
         choices.add("Clear this conversation");
+        final int appActivityIndex = choices.size();
+        choices.add(AppContextReader.isEnabled(activity)
+                ? "App activity for answers: on (tap to turn off)"
+                : "App activity for answers: off (tap to turn on)");
         final int selectedUpdateIndex = updateIndex;
         final int selectedRollbackIndex = rollbackIndex;
         final int selectedMemoryIndex = memoryIndex;
@@ -416,12 +428,21 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     else if (which == selectedUpdateIndex) showKnowledgeUpdate();
                     else if (which == selectedRollbackIndex) showKnowledgeRollback();
                     else if (which == selectedMemoryIndex) GuideMemoryDialog.show(activity);
+                    else if (which == appActivityIndex) toggleAppActivity();
                     else {
                         localHistory.clear();
                         messagesContainer.removeAllViews();
                         displayAiMessage(AiResponse.plainText("Conversation cleared. What would you like to discuss?", null), "Perazim Guide");
                     }
                 }).setNegativeButton("Close", null).show();
+    }
+
+    private void toggleAppActivity() {
+        boolean enable = !AppContextReader.isEnabled(activity);
+        AppContextReader.setEnabled(activity, enable);
+        android.widget.Toast.makeText(activity, enable
+                ? "The guide can use your app activity to answer. It stays on this phone."
+                : "The guide will not use your app activity.", android.widget.Toast.LENGTH_LONG).show();
     }
 
     private void showKnowledgeRollback() {
@@ -654,6 +675,66 @@ public class AiBreakthroughGuideDialog extends Dialog {
         consentDlg.show();
     }
 
+    /**
+     * Answers from the member's own app activity. Reads run on a worker thread and never send anything off the phone.
+     * The answer is not added to the conversation history, so personal facts stay out of later model prompts.
+     */
+    private void answerFromAppContext(final String query, final AppContextRouter.Route route) {
+        localHistory.clear();
+        if (!AppContextReader.isEnabled(activity)) {
+            displayAiMessage(appContextResponse(AppContextComposer.disabled()), "App activity is off");
+            return;
+        }
+        if (route.has(AppContextRouter.Topic.PRIVATE_BLOCKED)) {
+            displayAiMessage(appContextResponse(AppContextComposer.privateRefusal()), "Perazim Guide · built-in");
+            return;
+        }
+        final View indicator = showTypingIndicator();
+        requestInFlight = true;
+        btnSend.setEnabled(false);
+        final java.util.Set<AppContextRouter.Topic> topics = new java.util.HashSet<>(route.topics);
+        org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
+            final AppContextComposer.Reply reply = AppContextComposer.compose(route,
+                    AppContextReader.read(activity, topics), query);
+            activity.runOnUiThread(() -> {
+                removeTypingIndicator(indicator);
+                finishInFlight();
+                if (!isShowing()) return;
+                displayAiMessage(appContextResponse(reply), "From this phone · your app activity");
+            });
+        });
+    }
+
+    /**
+     * True when a question touches crisis, pastoral, human-decision, professional or out-of-scope matters. Those never get
+     * an app-context answer; they keep their existing safe path.
+     */
+    private boolean needsSafetyPath(String query) {
+        if (PerazimAiEngine.isCrisisQuery(query)
+                || PerazimAiEngine.isSensitivePastoralDisclosure(query)
+                || PerazimAiEngine.isProfessionalMatterQuery(query)
+                || PerazimAiEngine.isHumanDecisionQuery(query)
+                || PerazimAiEngine.isOutOfScopeForModel(query)
+                || org.perazimchurch.app.ai.guide.GuideSafety.isSensitive(query)) {
+            return true;
+        }
+        // The guide's own skill router: any pastoral, doctrine, privacy, human-decision, church or refusal skill keeps
+        // its existing path. Scripture lookups and the app's own help are not blocked.
+        for (org.perazimchurch.app.ai.guide.GuideDocs.SkillEntry skill
+                : org.perazimchurch.app.ai.guide.GuideRouter.route(query,
+                org.perazimchurch.app.ai.guide.GuideRuntime.skillIndex(activity), 3)) {
+            if (SAFETY_SKILLS.contains(skill.id)) return true;
+        }
+        return false;
+    }
+
+    private static AiResponse appContextResponse(AppContextComposer.Reply reply) {
+        if (reply.hasAction()) {
+            return AiResponse.withAction(reply.text, reply.actionIntent, reply.actionLabel, reply.actionPayload, reply.chips);
+        }
+        return AiResponse.plainText(reply.text, reply.chips);
+    }
+
     private void submitQuery(String text) {
         if (requestInFlight || text == null || text.trim().isEmpty()) return;
         final String query = text.trim();
@@ -685,6 +766,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
             return;
         }
 
+        // Questions about the member's own app use (games, notes, sermons, community, routine) are answered from
+        // compact facts on this phone. Crisis and scope checks above have already run.
+        AppContextRouter.Route appRoute = needsSafetyPath(query) ? null : AppContextRouter.route(query);
+        if (appRoute != null) {
+            answerFromAppContext(query, appRoute);
+            return;
+        }
         String mode = guideMode();
         if ("local".equals(mode)) {
             if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
@@ -910,6 +998,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 break;
             case AiResponse.INTENT_REFLECTIONS:
                 actionListener.onStartReflections();
+                break;
+            case AiResponse.INTENT_OPEN_GAMES:
+                actionListener.onOpenGames();
+                break;
+            case AiResponse.INTENT_OPEN_PROFILE:
+                actionListener.onOpenProfile();
                 break;
         }
     }

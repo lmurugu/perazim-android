@@ -1,6 +1,6 @@
 # Skills.md: playbooks, self-learning, self-heal and self-improve (locked)
 
-Version 1.0.0. The loader matches each question against the triggers below. It loads at most one playbook, plus lessons and the user style line, inside the 900-character budget.
+Version 1.1.0. The loader matches each question against the triggers below. It loads at most one playbook, plus lessons and the user style line, inside the 900-character budget.
 
 ## Skill index
 | id | triggers | playbook |
@@ -13,6 +13,7 @@ Version 1.0.0. The loader matches each question against the triggers below. It l
 | human-decision | membership, join, leave church, discipline, approve, ruling, ordain, pay, savings, tithe, money, elder, pastor asked | playbooks/human-decision.md |
 | church-info | campus, service, time, bishop, church office, location, contact, giving, mpesa, paybill | playbooks/church-info.md |
 | app-help | app, button, download, bible tab, sermon, profile, offline, feature | playbooks/app-help.md |
+| app-context | my games, my game scores, my score, my scores, my stars, my bible notes, my notes, my verses, my highlights, my bookmarks, my saved verses, my sermons, my streak, my routine, my progress, my posts, my groups, my activity, where did i, did i miss, do i miss, questions i miss, open my, take me to | playbooks/app-context.md |
 | refusal | (fallback when no other skill matches and the topic is outside faith or the app) | playbooks/refusal.md |
 
 ## Self-learning (SL): capture, distil, guard, store, use
