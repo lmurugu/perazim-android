@@ -103,6 +103,6 @@ public final class StoryTimelineSession implements GameSession {
 
     /** The book name of a reference, for example "1 Samuel" from "1 Samuel 17:50". */
     static String bookOf(String reference) {
-        return reference.replaceAll("\\s+\\d+(?::[\\d\\-]+)?$", "");
+        return reference.replaceAll("\\s++\\d+(?::[\\d\\-]+)?$", "");
     }
 }

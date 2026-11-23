@@ -50,7 +50,7 @@ public final class BookReference {
         BY_NAME.put("canticles", "SNG");
     }
 
-    private static final Pattern CITATION = Pattern.compile("^\\s*((?:[1-3]\\s+)?[A-Za-z][A-Za-z ]*?)\\s+(\\d{1,3})(?::\\d+.*)?\\s*$");
+    private static final Pattern CITATION = Pattern.compile("^\\s*((?:[1-3]\\s+)?[A-Za-z]+(?:\\s+[A-Za-z]+)*)\\s+(\\d{1,3})(?::\\d+[^\\n]*)?$");
 
     private BookReference() { }
 

@@ -30,3 +30,20 @@ Source notes are also in `src/main/assets/bible/strongs/SOURCES.txt` and `src/ma
 | `bible/strongs/strongs.tsv.gz`, Greek entries | MIT (decision by the project coordinator, 2026-11-23) | Strong's 1890 text, OpenScriptures corrections | The upstream notes quote both GPL 3.0 and MIT. The file itself has no licence text. Owner to confirm before release. |
 | `bible/strongs/strongs.tsv.gz`, Hebrew entries | CC BY 4.0 | Open Scriptures Hebrew Bible Project (openscriptures/HebrewLexicon) | Attribution required in the app's licences screen. |
 | `bible/interlinear/*` | See the interlinear SOURCES.txt | See that file | Not yet reviewed in this document. |
+## Reference sources for the on-phone guide
+
+Full register with licences, sizes and status: `docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md`.
+The six factual sources below are listed in `src/main/assets/reference/approvals.json` (approved on the coordinator's decision, Levi to confirm). Commentaries and confessions are not approved and are not listed here; see the register, section E.
+
+| Source | Licence | Attribution |
+|---|---|---|
+| OpenBible.info cross-references | CC BY 4.0 | Cross-reference data: OpenBible.info (CC BY 4.0), built from the public-domain Treasury of Scripture Knowledge. |
+| OpenBible.info Bible places | CC BY 4.0 (some coordinates from OpenStreetMap, ODbL 1.0) | Places data: OpenBible.info (CC BY 4.0). Coordinates from OpenStreetMap contributors (ODbL 1.0). |
+| Smith's Bible Dictionary (1884) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+| Easton's Bible Dictionary (1897) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+| Hitchcock's Bible Names Dictionary (1858) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+| Nave's Topical Bible (1921) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+
+Strong's Greek data (already in the app): used under MIT with attribution, by coordinator decision. The upstream licence line is to be re-checked against the source before release.
+
+Matthew Henry's Commentary on the Whole Bible and Wesley's Explanatory Notes upon the New Testament (both public domain, text from Christian Classics Ethereal Library, ccel.org). Approved by Levi for use, bundled in the app as a separate database. Excerpts are labelled with author and tradition.
