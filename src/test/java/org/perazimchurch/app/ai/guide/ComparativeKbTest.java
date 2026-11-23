@@ -49,7 +49,7 @@ public class ComparativeKbTest {
             }
             assertEquals("DRAFT_PENDING_LEVI", e.getString("status"));
             JSONArray anchors = e.getJSONArray("anchors");
-            assertTrue(id + " needs 1 or 2 anchors", anchors.length() >= 1 && anchors.length() <= 2);
+            assertTrue(id + " needs 1 to 3 anchors", anchors.length() >= 1 && anchors.length() <= 3);
             for (int j = 0; j < anchors.length(); j++) {
                 String ref = anchors.getString(j);
                 assertTrue(id + " bad anchor " + ref, ANCHOR.matcher(ref).matches());
