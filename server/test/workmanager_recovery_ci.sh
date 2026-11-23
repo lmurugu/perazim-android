@@ -65,8 +65,15 @@ if [[ -n "$app_pid" ]]; then
   exit 1
 fi
 echo 'Package state after the simulated process death (stopped flag and JobScheduler entry):' >&2
-adb shell dumpsys package org.perazimchurch.app | grep -i 'stopped' | head -n 4 >&2 || echo 'stopped flag: not reported by dumpsys package' >&2
-adb shell dumpsys jobscheduler | grep -i -B2 -A6 'org.perazimchurch' | head -n 30 >&2 || echo 'JobScheduler: no job for org.perazimchurch before network restore' >&2
+# Capture first, then grep: piping into head under pipefail reported false "not found" results on b08140b.
+pkg_dump="$(adb shell dumpsys package org.perazimchurch.app 2>/dev/null || true)"
+printf '%s\n' "$pkg_dump" | grep -i 'stopped=' | head -n 2 >&2 || true
+js_dump="$(adb shell dumpsys jobscheduler 2>/dev/null || true)"
+if grep -q 'org.perazimchurch' <<<"$js_dump"; then
+  grep -i -B2 -A8 'org.perazimchurch' <<<"$js_dump" | head -n 30 >&2 || true
+else
+  echo 'JobScheduler: no job for org.perazimchurch before network restore' >&2
+fi
 # Was the app still installed after the Gradle run ended? A missing package would explain the lost job.
 echo "Installed path after the kill: $(adb shell pm path org.perazimchurch.app 2>/dev/null | tr -d '\r' || true)" >&2
 echo 'Package record after the kill (first lines):' >&2
@@ -88,7 +95,7 @@ if [[ "$received" != true ]]; then
   adb shell dumpsys connectivity | grep -iE 'NetworkAgentInfo|CONNECTED|VALIDATED' | head -n 20 >&2 || true
   adb shell dumpsys package org.perazimchurch.app | grep -i 'stopped' | head -n 4 >&2 || true
   adb shell dumpsys jobscheduler | grep -i -B2 -A8 'org.perazimchurch' | head -n 40 >&2 || true
-  adb logcat -d -s WorkManager:* BackgroundSync:* BackgroundSyncRecovery:* ApiClient:* JobScheduler:* 2>/dev/null | tail -n 200 >&2 || true
+  adb logcat -d 2>/dev/null | grep -E 'WM-|WorkManager|BackgroundSync|ApiClient|perazimchurch|SystemJobService' | tail -n 200 >&2 || true
   echo 'Mock server received:' >&2
   curl -fsS http://127.0.0.1:18080/__received >&2 || true
   echo >&2
