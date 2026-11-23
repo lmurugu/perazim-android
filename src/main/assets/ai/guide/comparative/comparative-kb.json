@@ -1,45 +1,77 @@
 {
   "_comment": "Comparative knowledge for the Perazim Guide's drift detection. Status DRAFT_PENDING_LEVI: every entry is a summary written for review, not an approved source. Only the text in 'summary', 'origin' and 'scripture' is shown to the model. 'internal_note' is never shown to the model or to users. Scripture references are KJV and are retrieved verbatim from the bundled KJV database; no other translation is quoted. Entries are context only: the model may explain them but may not cite them. Standard: historic Protestant, Evangelical and Pentecostal orthodoxy, with Scripture as supreme authority. Under Levi's PR 76 correction, O-2 is superseded: the guide may name and accurately describe the Roman Catholic and Eastern Orthodox traditions from their own primary sources, and evaluates them from Scripture.",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "status": "DRAFT_PENDING_LEVI",
   "entries": [
     {
       "id": "karma",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Karma, in Hindu, Buddhist and Jain teaching, is the principle that intentional actions bring results that shape later experience, including future lives. The three traditions explain karma differently. Jain teaching treats karma as a subtle matter that binds the soul, while Buddhist teaching describes karmic consequence without an eternal self.",
-      "origin": "Karma developed in Indian religious thought and is tied to rebirth and to the goal of release from it. Each tradition gives its own account of how karma works and what release requires.",
-      "scripture": "Scripture does not teach karma as a cosmic law of cause and rebirth. It teaches that it is appointed unto men once to die, and after this the judgment (Hebrews 9:27). Salvation is by grace through faith, not by the balance of deeds (Ephesians 2:8-9). Galatians 6:7-8 uses farming imagery about the harvest of living for the flesh or for the Spirit in this life. It is not a teaching of karma or of rebirth.",
+      "summary": "Karma is the principle that actions bring results. Hindu, Buddhist and Jain teaching each hold that a person's deeds shape later experience, including future lives, but the three traditions explain this differently. In Hindu teaching, the fruit of action follows after death for those who have not given up attachment to that fruit, and the theory is used to explain differences in a person's status and circumstances. In Buddhist teaching, intention is the core of a deed, and each action has its own consequence for the agent, with no permanent self carrying that consequence from one life to the next. As summarised by scholars, Jain teaching holds that karma is a subtle kind of matter that clings to the soul and obstructs it, and that it is removed through right conduct.",
+      "origin": "In these traditions karma is tied to rebirth and to the goal of release from rebirth. Each tradition gives its own account of how karma works and of what release from it requires.",
+      "scripture": "Scripture does not teach karma as an impersonal law that carries each person's deeds from one life to the next. It teaches that people die once and then face judgment (Hebrews 9:27). Salvation is by grace through faith, not by the balance of a person's deeds (Ephesians 2:8-9). Scripture does teach that actions have consequences: Galatians 6:7-8 says that people reap what they sow, either corruption or everlasting life, depending on whether they sow to the flesh or to the Spirit. That teaching concerns this life and eternal life, and it does not describe rebirth.",
       "anchors": [
         "Hebrews 9:27",
-        "Galatians 6:7",
-        "Ephesians 2:8-9"
+        "Ephesians 2:8-9",
+        "Galatians 6:7-8"
       ],
-      "internal_note": "Hindu primary or specialist source pending. Jain and Buddhist specialist sources partly verified only.",
+      "internal_note": "Secondary-source corroborated, pending a second source (coordinator decision, 1.5.8): the Jain karma-as-matter sentence rests on the SEP (Gorisse) alone; Tattvartha Sutra 8 and a second scholarly source not yet read (A-U03 = U58). Stream A (2026-11-23). Hindu: Bhagavad Gita (Telang, SBE 8, 1882, public domain), 2.47 and 18.12 read in the full text; karma-as-explanation of status from IEP Madhva (Stoker) and IEP Ramanuja (Ranganathan). Buddhist: AN 6.63 (Sujato, SuttaCentral). Jain: Acaranga Book 1 Lecture 1 (Jacobi, SBE 22, 1884) and SEP Jaina (Gorisse) sections 1.3 and 2.4. OPEN: Jain karma-as-matter rests on the SEP entry alone (A-U03). Hindu primary beyond the Gita not read (A-U01). Pali and Gita numbering not checked against originals (A-U05, A-U06). Paraphrase only; no Qur'an or Gita wording quoted in model-facing text.",
       "sources": [
         {
-          "title": "Marie-Helene Gorisse, Jaina Philosophy, Stanford Encyclopedia of Philosophy (2023)",
+          "title": "Bhagavad Gita, translated by K. T. Telang, Sacred Books of the East vol. 8 (1882), edited by Max Muller (Toronto copy on archive.org, id bhagavadgtwithsa00tela)",
+          "url": "https://archive.org/details/bhagavadgtwithsa00tela",
+          "accessed": "2026-11-23",
+          "licence": "public domain (1882)",
+          "use": "Gita 2.47 (action without attachment to its fruit); 18.12 (threefold fruit of action accrues after death to those not possessed of abandonment)",
+          "verification": "verified (full text read; numbering per Telang's layout)"
+        },
+        {
+          "title": "Anguttara Nikaya 6.63 'Penetrative', translated by Bhikkhu Sujato, SuttaCentral (an6.63)",
+          "url": "https://suttacentral.net/an6.63/en/sujato",
+          "accessed": "2026-11-23",
+          "licence": "SuttaCentral translation (CC0 per SuttaCentral; licence not re-checked this pass)",
+          "use": "segments 33.3 (intention called deeds), 36.2-36.3 (threefold result, including rebirth), 40-43 (craving and suffering)",
+          "verification": "verified (read via SuttaCentral bilara data)"
+        },
+        {
+          "title": "Acaranga Sutra, Book 1, Lecture 1, translated by Hermann Jacobi, Sacred Books of the East vol. 22 (1884), Wikisource transcription",
+          "url": "https://en.wikisource.org/wiki/Sacred_Books_of_the_East/Volume_22/%C3%82k%C3%A2r%C3%A2%E1%B9%85ga_S%C3%BBtra/Book_1/Lecture_1",
+          "accessed": "2026-11-23",
+          "licence": "public domain (1884)",
+          "use": "sections 1-4: the teaching of soul, world, reward and action; 'believes in action'",
+          "verification": "verified (read; Jacobi's section numbering)"
+        },
+        {
+          "title": "Marie-Helene Gorisse, Jaina Philosophy, Stanford Encyclopedia of Philosophy (first published 13 Feb 2023)",
           "url": "https://plato.stanford.edu/entries/jaina-philosophy/",
           "accessed": "2026-11-23",
-          "licence": "open access reference",
-          "use": "karma as a subtle matter that binds the self; first half of entry read",
-          "verification": "partly verified"
+          "licence": "open-access reference",
+          "use": "section 2.4: karma as subtle matter that fills cosmic space and sticks to the self through passions; section 1.3: inflow, bondage, stoppage, dissociation, complete removal (mokṣa)",
+          "verification": "verified (full text read); single academic source for karma-as-matter (see A-U03)"
         },
         {
-          "title": "Mark Siderits, Buddha, Stanford Encyclopedia of Philosophy (2011, rev. 2023)",
+          "title": "Mark Siderits, Buddha, Stanford Encyclopedia of Philosophy (substantive revision 6 Mar 2023)",
           "url": "https://plato.stanford.edu/entries/buddha/",
           "accessed": "2026-11-23",
-          "licence": "open access reference",
-          "use": "each action has its own consequence for the agent; no-self account",
-          "verification": "partly verified"
+          "licence": "open-access reference",
+          "use": "section 4: Buddhist karma as a strict causal link, each action with its own consequence for the agent, requiring rebirth",
+          "verification": "verified (full text read)"
         },
         {
-          "title": "Hindu karma: primary text or specialist scholarship",
-          "url": "",
+          "title": "Valerie Stoker, Madhva, Internet Encyclopedia of Philosophy",
+          "url": "https://iep.utm.edu/madhva/",
           "accessed": "2026-11-23",
-          "licence": "to be recorded",
-          "use": "to be added",
-          "verification": "pending"
+          "licence": "open-access reference",
+          "use": "section 3: 'traditional Hindu views of the karma theory' explain differences in social and religious status by past acts",
+          "verification": "verified (full text read); academic encyclopedia"
+        },
+        {
+          "title": "Shyam Ranganathan, Ramanuja, Internet Encyclopedia of Philosophy",
+          "url": "https://iep.utm.edu/ramanuja/",
+          "accessed": "2026-11-23",
+          "licence": "open-access reference",
+          "use": "soteriology section: individual selves covered by nescience in the form of karma, embodied in varieties of bodies, in transmigratory existence",
+          "verification": "verified (full text read); academic encyclopedia; second independent source for Hindu karma"
         }
       ]
     },
@@ -47,37 +79,63 @@
       "id": "reincarnation",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Reincarnation, or rebirth, is the teaching in several Indian traditions that a person or life-stream is reborn in new lives, with the next life shaped by karma. Hindu and Jain teaching hold that a self or soul continues through rebirths. Buddhist teaching denies an eternal self and explains rebirth as the continuation of a causal series of impermanent elements. Schools within each tradition differ on the details. Some New Age and esoteric writers also teach reincarnation.",
-      "origin": "Rebirth is central to Hindu and Jain teaching. Buddhist teaching denies a permanent self (anatta), so rebirth is explained by causal continuity, not by an eternal soul passing from body to body.",
-      "scripture": "Scripture teaches that it is appointed unto men once to die, and after this the judgment (Hebrews 9:27). Jesus told the thief on the cross, 'To day shalt thou be with me in paradise' (Luke 23:43), and Paul wrote of his desire 'to depart, and to be with Christ' (Philippians 1:23). These passages describe life with Christ after death, not a return to earth. The Christian view is that reincarnation is not taught in Scripture.",
+      "summary": "Reincarnation, or rebirth, is the belief that a living being is born again after death. Hindu and Jain teaching hold that a self or soul passes through successive lives, and that karma shapes each life. Buddhist teaching denies a permanent self and explains rebirth as the continuation of a causal process, not as a soul passing from one body to another. Some Buddhists have rejected rebirth itself. The traditions, and the schools within them, differ on the details of rebirth and on what carries over from one life to the next.",
+      "origin": "Rebirth is central to Hindu and Jain teaching. In Buddhist teaching the Buddha taught rebirth as governed by karma, while denying a self that could carry personal identity across lives, so the Buddhist account rests on causal continuity.",
+      "scripture": "Scripture teaches that people die once and then face judgment (Hebrews 9:27), and it does not describe a return to earth in another body. Jesus told the thief on the cross that he would be with him in paradise that day (Luke 23:43), and Paul wrote that to depart and be with Christ is far better (Philippians 1:23). These passages describe life with Christ after death, not rebirth. The Christian view is that Scripture does not teach reincarnation.",
       "anchors": [
         "Hebrews 9:27",
+        "Luke 23:43",
         "Philippians 1:23"
       ],
+      "internal_note": "Stream A (2026-11-23). Removed: 'some New Age and esoteric writers also teach reincarnation' (no source in the register). Removed: OpenStax textbook citation (not needed; Gita 2.20 and 2.22 now used for the Hindu self). Luke 23:43 paraphrased; the bundled KJV DB spelling ('To day' or 'Today') must be checked before any verbatim quotation (A-U11). Hindu: Gita 2.20, 2.22 (Telang). Jain: Acaranga 1.1.1 sections 1-2 (Jacobi); SEP Jaina section 2.3 (transmigration of selves). Buddhist: SN 22.59 (Sujato); SEP Buddha sections 3-4.",
       "sources": [
+        {
+          "title": "Bhagavad Gita, translated by K. T. Telang (1882), SBE 8, archive.org bhagavadgtwithsa00tela",
+          "url": "https://archive.org/details/bhagavadgtwithsa00tela",
+          "accessed": "2026-11-23",
+          "licence": "public domain (1882)",
+          "use": "Gita 2.20 (the self is not born and does not die); 2.22 (the embodied self casts off old bodies and goes to new ones)",
+          "verification": "verified (full text read; numbering per Telang's layout)"
+        },
+        {
+          "title": "Samyutta Nikaya 22.59 'The Characteristic of Not-Self', translated by Bhikkhu Sujato, SuttaCentral",
+          "url": "https://suttacentral.net/sn22.59/en/sujato",
+          "accessed": "2026-11-23",
+          "licence": "SuttaCentral translation (CC0 per SuttaCentral; not re-checked this pass)",
+          "use": "segments 2.1-2.5 (form and other aggregates are not-self); 5.1-5.5 (consciousness not-self); 11.1-11.3",
+          "verification": "verified (read via SuttaCentral bilara data)"
+        },
+        {
+          "title": "Acaranga Sutra, Book 1, Lecture 1, translated by Hermann Jacobi (SBE 22, 1884)",
+          "url": "https://en.wikisource.org/wiki/Sacred_Books_of_the_East/Volume_22/%C3%82k%C3%A2r%C3%A2%E1%B9%85ga_S%C3%BBtra/Book_1/Lecture_1",
+          "accessed": "2026-11-23",
+          "licence": "public domain (1884)",
+          "use": "sections 1-2: 'whether their soul is born again and again'",
+          "verification": "verified (read)"
+        },
         {
           "title": "Mark Siderits, Buddha, Stanford Encyclopedia of Philosophy",
           "url": "https://plato.stanford.edu/entries/buddha/",
           "accessed": "2026-11-23",
-          "licence": "open access reference",
-          "use": "rebirth without transmigration is logically possible; causal series of impermanent elements",
-          "verification": "partly verified"
+          "licence": "open-access reference",
+          "use": "section 3 (non-self; no constituent transmigrates) and section 4 (rebirth and karma; some Buddhists reject rebirth)",
+          "verification": "verified (full text read)"
         },
         {
           "title": "Marie-Helene Gorisse, Jaina Philosophy, Stanford Encyclopedia of Philosophy",
           "url": "https://plato.stanford.edu/entries/jaina-philosophy/",
           "accessed": "2026-11-23",
-          "licence": "open access reference",
-          "use": "jiva described as a permanent self",
-          "verification": "partly verified"
+          "licence": "open-access reference",
+          "use": "section 2.3: a plant's self transmigrates and is re-embodied; selves are eternal (section 2.4)",
+          "verification": "verified (full text read)"
         },
         {
-          "title": "OpenStax, Introduction to Philosophy, 6.2 Self and Identity",
-          "url": "https://openstax.org/books/introduction-philosophy/pages/6-2-self-and-identity",
+          "title": "Shyam Ranganathan, Ramanuja, Internet Encyclopedia of Philosophy",
+          "url": "https://iep.utm.edu/ramanuja/",
           "accessed": "2026-11-23",
-          "licence": "CC BY (verify before quoting)",
-          "use": "Hindu view: atman framed as eternal",
-          "verification": "verified (page read)"
+          "licence": "open-access reference",
+          "use": "soteriology section: 'the river of transmigratory existence' (samsara) for embodied selves",
+          "verification": "verified (full text read)"
         }
       ]
     },
@@ -85,29 +143,79 @@
       "id": "nirvana_moksha",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Nirvana in Buddhism and moksha in Hindu traditions are goals of release, and the traditions define them differently. Buddhist nirvana is release from craving and suffering, understood through the teaching of no permanent self. Moksha is liberation from rebirth, and Hindu schools describe it in different ways. In Jain teaching, liberation is the complete removal of karmic matter from the self.",
-      "origin": "Nirvana and moksha are goals of practice in Buddhist, Hindu and Jain traditions. Each is explained on its own terms and should not be reduced to a single idea of liberating the self.",
-      "scripture": "Scripture does not describe release from rebirth. It presents eternal life as the gift of God through his Son (John 3:16) and the hope of being with the Lord (2 Corinthians 5:8). Jesus said: 'I am the way, the truth, and the life: no man cometh unto the Father, but by me' (John 14:6). He also said: 'If the Son therefore shall make you free, ye shall be free indeed' (John 8:36).",
+      "summary": "Nirvana in Buddhism and moksha in Hindu teaching are goals of release, and the traditions define them differently. For Buddhists, nirvana is the ending of craving and of the suffering that craving causes, and it brings freedom from rebirth; Buddhist teaching holds that there is no permanent self to be freed. In Hindu teaching, moksha is liberation from the cycle of rebirth, and the schools differ on what it is. Advaita Vedanta holds that liberation is the recognition that the self is identical with Brahman. Vishishtadvaita holds that individual selves remain distinct and that liberation comes through devotion and surrender to God. Dvaita holds that the self remains permanently distinct from God and that liberation comes through God's grace. In Jain teaching, liberation is the complete removal of karmic matter from the soul.",
+      "origin": "Nirvana and moksha are goals of practice in Buddhist and Hindu traditions, and Jain teaching has its own goal of liberation. Each is explained on its own terms. The Srivaishnava schools within Vishishtadvaita also differ on whether surrender to God alone is enough for liberation.",
+      "scripture": "Scripture does not describe release from rebirth as the goal of life. It presents eternal life as the gift of God through his Son (John 3:16), and the hope of being with the Lord after death (2 Corinthians 5:8). Jesus said that he is the way to the Father (John 14:6), and that the Son makes people free indeed (John 8:36). The freedom that Scripture describes comes through the Son, not as an escape from a cycle of impersonal rebirth.",
       "anchors": [
-        "John 8:36",
+        "John 3:16",
+        "2 Corinthians 5:8",
         "John 14:6"
       ],
+      "internal_note": "Stream A (2026-11-23). Buddhist nirvana previously had no source; now sourced to Ud 8.3 (Sujato), AN 6.63 (craving and suffering), SN 22.59 and SEP Buddha section 2-3. Hindu schools were previously 'not summarised'; now described from IEP Madhva (sections 1-3) and IEP Ramanuja (individuals are real; bhakti; prapatti debate), and SEP Shankara (mokṣa as recognition). Jain: SEP Jaina section 1.3. Quoted KJV removed and replaced by paraphrase; the retrieval layer should supply verses verbatim. Open: primary Hindu texts for the three schools (A-U07). Ud 8.3 translation licence (A-U05).",
       "sources": [
+        {
+          "title": "Udana 8.3 'About Extinguishment (3rd)', translated by Bhikkhu Sujato, SuttaCentral API (ud8.3)",
+          "url": "https://suttacentral.net/ud8.3/en/sujato",
+          "accessed": "2026-11-23",
+          "licence": "SuttaCentral translation (CC0 per SuttaCentral; not re-checked this pass)",
+          "use": "segments 3.1-3.3 (freedom from rebirth and from what is conditioned)",
+          "verification": "verified (read)"
+        },
+        {
+          "title": "Anguttara Nikaya 6.63 'Penetrative', translated by Bhikkhu Sujato, SuttaCentral",
+          "url": "https://suttacentral.net/an6.63/en/sujato",
+          "accessed": "2026-11-23",
+          "licence": "SuttaCentral translation (CC0 per SuttaCentral; not re-checked this pass)",
+          "use": "segments 40.2 and 43.2 (craving is the source of suffering; when craving ceases, suffering ceases)",
+          "verification": "verified (read)"
+        },
+        {
+          "title": "Samyutta Nikaya 22.59, translated by Bhikkhu Sujato, SuttaCentral",
+          "url": "https://suttacentral.net/sn22.59/en/sujato",
+          "accessed": "2026-11-23",
+          "licence": "SuttaCentral translation (CC0 per SuttaCentral; not re-checked this pass)",
+          "use": "segments 2.1-2.5 and 11.1-11.3 (not-self; freedom)",
+          "verification": "verified (read)"
+        },
+        {
+          "title": "Mark Siderits, Buddha, Stanford Encyclopedia of Philosophy",
+          "url": "https://plato.stanford.edu/entries/buddha/",
+          "accessed": "2026-11-23",
+          "licence": "open-access reference",
+          "use": "section 2 (cycle of rebirth sustained by desire, aversion and ignorance); section 3 (non-self)",
+          "verification": "verified (full text read)"
+        },
+        {
+          "title": "Neil Dalal, Sankara (Śaṅkara), Stanford Encyclopedia of Philosophy (first published 4 Oct 2021)",
+          "url": "https://plato.stanford.edu/entries/shankara/",
+          "accessed": "2026-11-23",
+          "licence": "open-access reference",
+          "use": "introduction: atman is numerically identical with brahman; liberation (moksha) is the recognition of this identity",
+          "verification": "verified (full text read); Shankara's own Brahmasutra commentary not read (A-U07)"
+        },
+        {
+          "title": "Valerie Stoker, Madhva, Internet Encyclopedia of Philosophy",
+          "url": "https://iep.utm.edu/madhva/",
+          "accessed": "2026-11-23",
+          "licence": "open-access reference",
+          "use": "sections 1-3: Madhva's Dvaita; liberation from rebirth; grace of Visnu; permanent difference of atman and brahman",
+          "verification": "verified (full text read)"
+        },
+        {
+          "title": "Shyam Ranganathan, Ramanuja, Internet Encyclopedia of Philosophy",
+          "url": "https://iep.utm.edu/ramanuja/",
+          "accessed": "2026-11-23",
+          "licence": "open-access reference",
+          "use": "soteriology: moksa as highest good; bhakti; prapatti debate in the Srivaishnava schools",
+          "verification": "verified (full text read)"
+        },
         {
           "title": "Marie-Helene Gorisse, Jaina Philosophy, Stanford Encyclopedia of Philosophy",
           "url": "https://plato.stanford.edu/entries/jaina-philosophy/",
           "accessed": "2026-11-23",
-          "licence": "open access reference",
-          "use": "liberation as complete annihilation of karmic matter in the pure sentient substance",
-          "verification": "partly verified"
-        },
-        {
-          "title": "Pali Canon primary text on nirvana (public-domain translation)",
-          "url": "",
-          "accessed": "2026-11-23",
-          "licence": "public domain (translation)",
-          "use": "to be recorded",
-          "verification": "pending"
+          "licence": "open-access reference",
+          "use": "section 1.3: the state of complete annihilation of karmic matter in the pure sentient substance (mokṣa)",
+          "verification": "verified (full text read)"
         }
       ]
     },
@@ -406,22 +514,31 @@
       "id": "all_paths",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Religious pluralism is the view, held in several forms, that the religions are valid ways of approaching a reality no one religion has fully grasped. Philosophical pluralists hold that the religions point imperfectly to one ultimate reality. Radical pluralists hold that the religions are irreducibly diverse. Pluralism is not the teaching of Hinduism as a whole, or of every New Age writer. Christians hold that Jesus Christ is the one way to the Father.",
-      "origin": "Pluralism is a modern philosophical view, shaped by the comparative study of religions and held in different forms.",
-      "scripture": "Jesus said: 'I am the way, the truth, and the life: no man cometh unto the Father, but by me' (John 14:6). Peter said that there is no other name under heaven given among men by which we must be saved (Acts 4:12). These claims are exclusive, so the Christian reading does not allow that all religions lead to the same salvation. Scripture also teaches that God is known in part through creation (Romans 1:20). Christians may recognise truth and goodness in other traditions while holding that salvation is in Christ alone.",
+      "summary": "Religious pluralism is one of three standard responses to religious diversity, alongside exclusivism and inclusivism. Pluralists deny that any one religion has primacy over the others. Philosophical pluralists, of whom John Hick is the best known, hold that the religions are incomplete understandings of one ultimate reality, and that more than one can be equally close to the truth. Hick described each major religious tradition as a valid context of salvation or liberation, but none as the only such context. Radical pluralists hold that the religions are irreducibly diverse, and they reject both a single ultimate reality and a shared ethical framework. Pluralism is not a doctrine that every adherent of any one tradition holds: Hinduism contains significant diversity of teaching, and some Buddhists deny both a personal supernatural creator and personal immortality. Christians hold that salvation is found in Jesus Christ alone.",
+      "origin": "Pluralism is held in several forms by philosophers and theologians. Its best-known philosophical form is associated with John Hick, who is the most influential proponent of unitary salvific pluralism.",
+      "scripture": "Jesus said that he is the way, the truth and the life, and that no one comes to the Father except through him (John 14:6). Peter said that there is no other name under heaven by which people must be saved (Acts 4:12). These claims are exclusive, so the Christian reading does not allow that all religions lead to the same salvation. Scripture also says that God's eternal power and divinity are clearly seen through what he has made (Romans 1:20). Christians may recognise truth, goodness and some knowledge of God in other traditions, while holding that salvation is in Christ alone.",
       "anchors": [
         "John 14:6",
-        "Acts 4:12"
+        "Acts 4:12",
+        "Romans 1:20"
       ],
-      "internal_note": "Pending: verification of the portions of the Basinger entry that support the definitions and the distinction between philosophical and radical pluralism (only the first 40,000 characters were read).",
+      "internal_note": "Stream A (2026-11-23). Full SEP Basinger text now read (the 40,000-character limit of U13 is closed). Changed: 'modern philosophical view' removed (not stated by SEP); the Hinduism and Buddhism sentence now rests on SEP sections 1 and 6 (Burley 2024 cited by SEP, not read, A-U09); 'valid ways of approaching a reality' replaced by SEP's wording on incomplete understandings. Hick's 'valid context' sentence is as SEP reports it (Hick 1984 not read, A-U10). Quoted KJV removed; paraphrase only. Sentence on Christian exclusivity stays the Christian evaluation, not a description of pluralism.",
       "sources": [
         {
-          "title": "David Basinger, Religious Diversity (Pluralism), Stanford Encyclopedia of Philosophy (2004, rev. 2025)",
+          "title": "David Basinger, Religious Diversity (Pluralism), Stanford Encyclopedia of Philosophy (first published 25 May 2004; substantive revision 21 Feb 2025)",
           "url": "https://plato.stanford.edu/entries/religious-pluralism/",
           "accessed": "2026-11-23",
-          "licence": "open access reference",
-          "use": "'Individuals are religious pluralists when they deny the primacy of any one religion'; philosophical and radical forms",
-          "verification": "partly verified (first 40,000 characters read)"
+          "licence": "open-access reference",
+          "use": "section 2: exclusivism, inclusivism and pluralism defined; philosophical and radical pluralism; section 1: intra-Hindu diversity (citing Burley 2024); section 6: Hick (as quoted in SEP) and some Buddhists deny personal creator and immortality",
+          "verification": "verified (full text read); Hick and Burley not read directly"
+        },
+        {
+          "title": "Scripture (KJV), John 14:6; Acts 4:12; Romans 1:20",
+          "url": "https://www.biblegateway.com/passage/?search=John+14%3A6&version=KJV",
+          "accessed": "2026-11-23",
+          "licence": "public domain (KJV)",
+          "use": "verse wording checked against an online KJV text; the bundled DB is the source for model output",
+          "verification": "verified (KJV wording checked)"
         }
       ]
     },
@@ -429,38 +546,39 @@
       "id": "divine_self",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Advaita Vedanta, a school of Hindu philosophy associated with Shankara, teaches that the individual self (atman) is numerically identical with Brahman, the ultimate reality, and that liberation is the recognition of this nonduality. Other Hindu schools describe the relation between self and God differently. Their teaching is not summarised here until their sources are verified.",
-      "origin": "The identity of atman and Brahman is a central teaching of the Upanishads as interpreted in Advaita Vedanta. Hindu traditions vary in their account of Brahman.",
-      "scripture": "Scripture teaches that God created humans in his image (Genesis 1:27), and that the Creator is distinct from his creation (Isaiah 40:25; Romans 1:25). Humans are not God. Jesus is the eternal Son who is God (John 1:1; Colossians 2:9), and believers are adopted as children of God by grace (Galatians 4:5).",
+      "summary": "Hindu schools differ on the relation between the individual self (atman) and ultimate reality (Brahman). Advaita Vedanta, associated with Shankara, teaches that the self is numerically identical with Brahman, and that liberation is the recognition of this nonduality. Vishishtadvaita, associated with Ramanuja, teaches that individual selves are real and distinct, yet dependent on Brahman as its modes, and that Brahman is personal and identified with Vishnu; liberation comes through devotion and surrender to God. Dvaita, associated with Madhva, teaches that the self and Brahman are permanently distinct, that the self depends on God, and that liberation comes through God's grace. These schools therefore do not share one teaching about the self.",
+      "origin": "Advaita Vedanta reads the Upanishads as teaching that atman is brahman. Other Vedanta schools read the same texts differently, and each school gives its own account of how the self and Brahman are related.",
+      "scripture": "Scripture teaches that God created man in his own image (Genesis 1:27), and that God is distinct from his creation and cannot be compared to creatures (Isaiah 40:25; Romans 1:25). Humans are therefore not God. Scripture also teaches that the Word was God (John 1:1), and that the fullness of the Godhead dwells bodily in Christ (Colossians 2:9). Believers receive adoption as children of God (Galatians 4:5). The claim that the individual self is numerically identical with God is therefore not the Christian teaching.",
       "anchors": [
         "Genesis 1:27",
-        "John 1:1"
+        "John 1:1",
+        "Colossians 2:9"
       ],
-      "internal_note": "Pending: Dvaita and Vishishtadvaita primary texts and scholarship. Shankara source only partly read (first 40,000 characters).",
+      "internal_note": "Stream A (2026-11-23). Dvaita and Vishishtadvaita were 'not summarised' (U11); now described from IEP Madhva (sections 1-3) and IEP Ramanuja (individuals are real; Brahman and atman; theism; soteriology). Shankara: SEP Dalal, full text read (U12 closed for this claim). Primary texts NOT read: Shankara's Brahmasutra bhashya, Chandogya 6.8.7 ('that you are'), Madhva's Anuvyakhyana, Ramanuja's Sri Bhashya (A-U07). The Vishishtadvaita 'modes' wording is Ranganathan's; the Dvaita 'permanently distinct' wording is Stoker's. OpenStax citation removed. Scripture paraphrased; KJV wording checked for Genesis 1:27, Isaiah 40:25, Romans 1:25, John 1:1, Colossians 2:9, Galatians 4:5.",
       "sources": [
         {
-          "title": "Neil Dalal, Sankara (Śaṅkara), Stanford Encyclopedia of Philosophy (2021)",
+          "title": "Neil Dalal, Sankara (Sankara), Stanford Encyclopedia of Philosophy (first published 4 Oct 2021)",
           "url": "https://plato.stanford.edu/entries/shankara/",
           "accessed": "2026-11-23",
-          "licence": "open access reference",
-          "use": "'numerically identical with brahman'; liberation as recognition of nonduality",
-          "verification": "partly verified (first 40,000 characters read)"
+          "licence": "open-access reference",
+          "use": "introduction: atman is numerically identical with brahman; liberation as recognition of nondual existence",
+          "verification": "verified (full text read)"
         },
         {
-          "title": "OpenStax, Introduction to Philosophy, 6.2 Self and Identity",
-          "url": "https://openstax.org/books/introduction-philosophy/pages/6-2-self-and-identity",
+          "title": "Shyam Ranganathan, Ramanuja, Internet Encyclopedia of Philosophy",
+          "url": "https://iep.utm.edu/ramanuja/",
           "accessed": "2026-11-23",
-          "licence": "CC BY (verify before quoting)",
-          "use": "Hindu traditions vary in meaning of brahman",
-          "verification": "verified (page read)"
+          "licence": "open-access reference",
+          "use": "substantive theses: individuals are real; Brahman and atman; theism; Brahman as the body of the selves (modes)",
+          "verification": "verified (full text read)"
         },
         {
-          "title": "Dvaita and Vishishtadvaita primary texts and scholarship",
-          "url": "",
+          "title": "Valerie Stoker, Madhva, Internet Encyclopedia of Philosophy",
+          "url": "https://iep.utm.edu/madhva/",
           "accessed": "2026-11-23",
-          "licence": "to be recorded",
-          "use": "to be added",
-          "verification": "pending"
+          "licence": "open-access reference",
+          "use": "section 1: Madhva against Sankara; section 3: Dvaita, five-fold difference (pancabheda), dependence of jiva on Brahman, Visnu's grace",
+          "verification": "verified (full text read)"
         }
       ]
     },
@@ -799,22 +917,31 @@
       "id": "new_age_energy",
       "group": "new_age",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "New Age teaching is a diverse movement, not one doctrine. Britannica describes it as a body of diverse believers united by a few ideas, with strongest roots in modern esotericism and in Helena Blavatsky's Theosophical Society. Its practices include healing and self-transformation, and meditation. Because the movement has no single doctrine, the guide does not attribute to New Age writers as a whole any specific teaching about energy.",
+      "summary": "New Age teaching is a diverse movement and not a single doctrine. Its strongest roots lie in modern esotericism and in the Theosophical movement associated with Helena Blavatsky. Its practices include healing, self-transformation and meditation. The movement has no single teaching about energy, so the guide describes it only in general terms and does not attribute to New Age writers as a whole any specific teaching about energy.",
       "origin": "The movement has roots in modern esotericism and in Theosophy, and its strands differ in origin and emphasis. They should not be presented as one teaching.",
-      "scripture": "Scripture teaches that God is Spirit (John 4:24). Healing is sought from God in prayer (James 5:14-15). Believers are told to test every spirit (1 John 4:1). Scripture forbids divination and the seeking of guidance from the occult (Deuteronomy 18:10-12). Christians may evaluate any practice or teaching by these tests, and the guide explains each New Age claim in its own terms before doing so.",
+      "scripture": "Scripture teaches that God is Spirit, and that he is worshipped in spirit and in truth (John 4:24). Healing is sought from God in prayer, with the elders of the church praying and anointing with oil (James 5:14-15). Believers are told to test the spirits (1 John 4:1). Scripture forbids divination and consulting familiar spirits or the dead (Deuteronomy 18:10-11). Christians evaluate any teaching or practice by these tests, and the guide first explains each claim on its own terms.",
       "anchors": [
         "John 4:24",
-        "1 John 4:1"
+        "James 5:14-15",
+        "Deuteronomy 18:10-11"
       ],
-      "internal_note": "Narrowed to a general overview at the owner's request. Energy claims removed: no primary source for a named strand's energy teaching has been verified. Any future energy-specific entry needs a named strand and a primary source. Round 2 (Levi) decision applied.",
+      "internal_note": "Stream A (2026-11-23). Narrowed in 1.5.3 (U32 closed). Changes in this pass: removed the model-facing attribution 'Britannica describes it as' (sources belong in this note, not in the text); 'Theosophical Society founded by' replaced by 'associated with'. The Britannica page (S18) returned HTTP 403 on re-read in this pass; the claims remain as verified earlier in this session (A-U08). No energy claim added: no named strand with a primary source. KJV wording checked for John 4:24, James 5:14-15, 1 John 4:1, Deuteronomy 18:10-11.",
       "sources": [
         {
           "title": "New Age movement, Encyclopaedia Britannica",
           "url": "https://www.britannica.com/topic/New-Age-movement",
           "accessed": "2026-11-23",
-          "licence": "copyright; summary only",
+          "licence": "copyright; summary only (not quoted)",
           "use": "diverse believers; roots in esotericism and Theosophy; healing, self-transformation, meditation",
-          "verification": "verified (page read)"
+          "verification": "verified earlier in this pass (register S18); re-read blocked (403) today"
+        },
+        {
+          "title": "Scripture (KJV), John 4:24; James 5:14-15; 1 John 4:1; Deuteronomy 18:10-11",
+          "url": "https://www.biblegateway.com/passage/?search=Deuteronomy+18%3A10-11&version=KJV",
+          "accessed": "2026-11-23",
+          "licence": "public domain (KJV)",
+          "use": "verse wording checked against an online KJV text",
+          "verification": "verified (KJV wording checked)"
         }
       ]
     },
