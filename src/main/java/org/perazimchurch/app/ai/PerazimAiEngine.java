@@ -232,7 +232,7 @@ public class PerazimAiEngine {
 
     /** Intent to harm a named or unnamed other person (typos tolerated). */
     private static final Pattern HARM_OTHERS_PATTERN = Pattern.compile(
-            "\\b(?:kill|killing|hurt|harm|stab|shoot|beat)\\b.{0,40}\\b(?:s[ou]m[eo]?one|somebody|somoene|someon|him|her|them|person|boss|husband|wife|neighbour|neighbor|child)\\b|" +
+            "\\b(?:kill|killing|hurt|harm|stab|shoot|beat)\\b.{0,40}\\b(?:s[ou]m[a-z]{0,2}ne|somebody|someon|him|her|them|person|boss|husband|wife|neighbour|neighbor|child)\\b|" +
             "\\bthoughts of (?:killing|hurting)\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isHarmToOthersQuery(@Nullable String query) {
