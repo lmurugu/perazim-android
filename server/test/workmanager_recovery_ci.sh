@@ -38,7 +38,10 @@ adb shell svc data disable || true  # the emulator image may not expose the phon
 #    then kills its own process with SIGKILL. The crash is expected, so Gradle's exit status is ignored
 #    here, but the test case must have started and recorded the crash.
 set +e
+# leaveApksInstalledAfterRun: connectedAndroidTest otherwise uninstalls the app when the run ends,
+# which removes the WorkManager job and its database before the delivery check.
 ./gradlew connectedDebugAndroidTest \
+  -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true \
   -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
   -Pandroid.testInstrumentationRunnerArguments.simulateProcessDeath=true \
   --stacktrace
