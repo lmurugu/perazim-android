@@ -67,6 +67,20 @@ public final class GuideRuntime {
         if (m != null) m.forgetAll();
     }
 
+    /** The bundled skill index (trigger rows and playbook names). Empty when the guide files cannot be read. */
+    public static List<GuideDocs.SkillEntry> skillIndex(Context context) {
+        synchronized (LOCK) {
+            if (docs == null) {
+                try {
+                    docs = GuideDocs.load(new AssetGuideSource(context.getApplicationContext().getAssets()));
+                } catch (Exception e) {
+                    return new ArrayList<>();
+                }
+            }
+            return docs.index();
+        }
+    }
+
     /** Opens the memory once per process. Returns null when the keystore or the bundled files are unavailable. */
     static GuideMemory memory(Context context) {
         synchronized (LOCK) {

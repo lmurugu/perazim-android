@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.ui.games;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameMissLog;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -86,7 +87,9 @@ public final class OldOrNewScreen {
         old.setOnClickListener(v -> {
             if (!ui.activeOwner()) return;
             ui.click(v);
+            String asked = game.prompt();
             GameSession.Outcome outcome = game.answer("OLD");
+            GameMissLog.answered(ctx.activity(), "old_or_new", asked, outcome);
             tapFeedback(v, outcome);
             String line = answerLine(game, outcome);
             v.postDelayed(() -> render(game, line, outcome == GameSession.Outcome.CORRECT), 280);
@@ -96,7 +99,9 @@ public final class OldOrNewScreen {
         neu.setOnClickListener(v -> {
             if (!ui.activeOwner()) return;
             ui.click(v);
+            String asked = game.prompt();
             GameSession.Outcome outcome = game.answer("NEW");
+            GameMissLog.answered(ctx.activity(), "old_or_new", asked, outcome);
             tapFeedback(v, outcome);
             String line = answerLine(game, outcome);
             v.postDelayed(() -> render(game, line, outcome == GameSession.Outcome.CORRECT), 280);

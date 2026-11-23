@@ -1399,6 +1399,33 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         new BibleReaderDialog(this, bibleViewModel).show();
     }
 
+    /**
+     * Opens the Bible reader at "bookId|chapter" from the guide. A missing or unreadable payload opens the reader where it
+     * was last left, as the Bible tab does.
+     */
+    private void openPassageFromGuide(String payload) {
+        int bar = payload == null ? -1 : payload.indexOf('|');
+        if (bar <= 0) {
+            showFullScriptureDialog();
+            return;
+        }
+        String bookId = payload.substring(0, bar);
+        int chapter;
+        try {
+            chapter = Integer.parseInt(payload.substring(bar + 1));
+        } catch (NumberFormatException e) {
+            showFullScriptureDialog();
+            return;
+        }
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        if (bibleViewModel == null) {
+            bibleViewModel = factory.createBibleViewModel();
+        }
+        org.perazimchurch.app.presentation.ui.BibleReaderDialog.showPassage(this, bibleViewModel, bookId, chapter);
+    }
+
     private void showLegacyFullScriptureDialog() {
         AlertDialog.Builder builder = AppDialogs.builder(this);
         ScrollView sv = new ScrollView(this);
@@ -1773,7 +1800,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
             @Override
             public void onOpenBible(String book) {
-                showFullScriptureDialog();
+                openPassageFromGuide(book);
+            }
+
+            @Override
+            public void onOpenGames() {
+                org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(MainActivity.this);
+            }
+
+            @Override
+            public void onOpenProfile() {
+                switchTab(5);
             }
 
             @Override
