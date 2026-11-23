@@ -11,7 +11,7 @@ This report lists every resource, rule, skill and guardrail the Perazim Guide us
 ## 1. Plain summary
 
 - **What the guide is:** an offline assistant on the phone. It answers only from approved church and Bible sources, and it never makes things up. It runs a small on-device model (Qwen2.5 0.5B) and wraps it in fixed rules, safety checks and a citation check.
-- **What it knows:** the King James Bible (KJV) for every quotation, plus reference material: cross-references, two dictionaries, Nave's topical index, Strong's Greek and Hebrew word list, the Nicene Creed, and two optional commentaries (Matthew Henry, John Wesley) that are not in the standard install. The approved comparative knowledge for drift detection is new in this work and is still a draft.
+- **What it knows:** the King James Bible (KJV) for every quotation, plus reference material: cross-references, two dictionaries, Nave's topical index, Strong's Greek and Hebrew word list, the Nicene Creed, and two optional commentaries (Matthew Henry, John Wesley) that are not in the standard install. The comparative knowledge for drift detection contains 27 individually approved entries in KB 1.5.20 under the owner's delegated authority. This approves the content for model-context use, not PR merge, release or production activation.
 - **What it does not know:** no NASB text is bundled. The AI quotes the NASB only when a question names it and your licensed NASB file is loaded on the device; otherwise it says the NASB is not loaded and uses the KJV. It cannot quote the ESV, NIV or NKJV at all, and it cannot see private messages or chats.
 - **What changed in this work:** the guide now notices when a question uses another faith's idea (karma, reincarnation, purgatory, saints, soul sleep, and similar), answers from Scripture, and describes the Catholic and Orthodox traditions accurately from their own primary sources and evaluates them from Scripture (your PR 76 correction supersedes O-2). I also added 150 trick-question stress tests that check whether the guide actually uses its resources.
 - **Most important findings:**
@@ -42,7 +42,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 | R12 | John Wesley's Notes on the NT | John Wesley, via CCEL | Public domain (CCEL rights line) | 3,339 entries, same commentary database | One excerpt per explicit verse, labelled "Arminian, Wesleyan" | Same as R11 |
 | R13 | Strong's Greek and Hebrew word list | `assets/bible/strongs/strongs.tsv.gz` (661 KB). Greek from OpenScriptures Strong's 1890 text. Hebrew from OpenScriptures HebrewLexicon. | Hebrew CC BY 4.0. Greek: **the file header says both GPL 3.0 and MIT**. Owner to confirm. | Greek about 5,549 entries, Hebrew included | A direct answer when the question contains a G or H number (for example G26). The model does not generate it. | **In use. Licence unresolved** (section 9, item 2) |
 | R14 | Approvals list | `src/main/assets/reference/approvals.json` | Internal | 9 source IDs | Decides which reference sources the app may use | In use |
-| R15 | Comparative knowledge base (new) | `src/main/assets/ai/guide/comparative/comparative-kb.json`, 27 entries written for this work | Internal summaries. Cited Scripture is KJV from R1. Primary sources listed per entry (public-domain texts where free; copyright texts as summary or paragraph reference only). | 29 KB | Drift detection: KJV anchors (citable) plus one comparative note (never cited) | **Draft, pending your approval** (section 9, item 1) |
+| R15 | Comparative knowledge base (new) | `src/main/assets/ai/guide/comparative/comparative-kb.json`, 27 entries written for this work | Internal summaries. Cited Scripture is KJV from R1. Primary and scholarly sources listed per entry (public-domain texts where free; copyright texts as summary or paragraph reference only). | Updated in KB 1.5.20 | Drift detection: KJV anchors (citable) plus one comparative note (context only, never cited) | **All 27 entries approved for model-context use under delegated owner authority; release remains off** |
 | R16 | Drift detector rules (new) | `DriftDetector.java`, 27 concepts | Internal | About 30 patterns | Decides which drift concept a question touches | Draft with R15 |
 | R17 | Qwen2.5 0.5B Instruct, Q4_K_M | Qwen team, from Hugging Face. SHA-256 pinned in `OnDeviceAi.java`. | Qwen licence (to confirm; believed Apache 2.0) | 491,400,032 bytes | The only generator. Runs on the phone through the llama.cpp runtime. | Validation builds only. Release off |
 | R18 | llama.cpp runtime | `libperazim_llama.so`, licence in `src/main/assets/licenses/llama.cpp-LICENSE.txt` | MIT | Native library | Runs R17 | In use |
@@ -93,7 +93,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 |---|---|---|
 | Crisis keywords | `CrisisPhrases`, `PerazimAiEngine.isCrisisQuery` | Fixed crisis response; the model is not called. Covers English, Swahili and Sheng (added 2026-11-23). |
 | Sensitive pastoral disclosure | `PerazimAiEngine` | Requests like "keep this secret" get a fixed referral; the model is not called. |
-| Human decisions | `isHumanDecisionQuery` | Boundary reply naming the Bishop or an elder through the church office. |
+| Human decisions | `isHumanDecisionQuery` | Boundary reply defers to a trusted church leader; the AI does not decide membership, discipline, ordination, money or leadership. It does not appoint a Bishop or other approver. |
 | Out of scope (model) | `isOutOfScopeForModel` | Refuses anything without a church, Bible, faith or app term, and refuses role-play and instruction-override attempts. **Changed in this work:** drift concepts and afterlife terms now pass this gate. |
 | Out of scope (general) | `isClearlyOutOfScopeQuery` | Investing, medical, legal, sports, code, recipes, weather, travel, gambling, property, entertainment, job search. |
 | Claimed app action or authority | `AppActionClaims`, `claimsAppActionOrHumanAuthority` | Rejects an answer that claims an app action or human authority. |
@@ -112,7 +112,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 - **SH1 Citation:** every citation must match a supplied source. Otherwise the answer is refused.
 - **SH2 Quote:** any quoted phrase of four or more words must appear in the supplied evidence. Otherwise it is replaced with "(quotation not verified in the approved sources)".
 - **SH3 Verdict:** an answer that judges a named person's salvation is replaced with the no-verdict reply.
-- **SH4 Safety:** a sensitive pastoral answer must mention a trusted person, the Bishop or a professional. If not, a referral line is added.
+- **SH4 Safety:** a sensitive pastoral answer must refer the user to a trusted person, a trusted church leader or a qualified professional, as appropriate. No Bishop-specific fallback or app-approval authority is implied.
 - **SH5 Translation:** an answer that quotes ESV, NIV or NKJV is refused.
 - **SH6 Length:** an answer over 900 characters is cut at a sentence boundary.
 - **SH7 Chapter:** a reference whose chapter is outside the book's range is removed. (Verse numbers are not checked. See section 7.8.)
@@ -141,7 +141,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 | pastoral | afraid, anxious, lonely, grief, doubt, angry, forgive, marriage, pray | `pastoral.md` | Names the feeling, gives one or two passages, God's promises do not depend on feelings, encourages a trusted leader. |
 | doctrine | doctrine, salvation, grace, perseverance, apostasy, tongues, election, rapture, israel, millennium | `doctrine.md` | States the Perazim position only if the approved documents establish it. Gives major Christian views fairly, marks disputes, no verdict. |
 | privacy | remember, confidential, secret, phone number, address, members, records | `privacy.md` | Cannot reveal or act on others' details. Device-level notes only. Refers records to the church office. |
-| human-decision | membership, join, discipline, approve, ordain, pay, tithe, money, elder | `human-decision.md` | Cannot decide membership, discipline, ordination, money or leadership. Names the authorised leader. |
+| human-decision | membership, join, discipline, approve, ordain, pay, tithe, money, elder | `human-decision.md` | Cannot decide membership, discipline, ordination, money or leadership. Refers the user to a trusted church leader. |
 | church-info | campus, service time, bishop, giving, mpesa, paybill | `church-info.md` | Approved church information only. Payment only through published channels. |
 | app-help | app, button, download, bible tab, sermon, profile, offline | `app-help.md` | Points to the right tab. Claims no change was made. |
 | app-context | my games, my scores, my notes, my streak, my routine, did i miss | `app-context.md` | Describes the member's own app use from supplied facts. Never judges. Offers one "Open" action. Private chats refused. |
@@ -295,7 +295,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 
 ## 9. Items that need your decision
 
-1. **Approve the comparative knowledge base (27 entries) before merge.** In validation builds these summaries reach the model as context. They are drafts written for this work, marked `DRAFT_PENDING_LEVI`. Please review the wording against the governing standard.
+1. **Comparative knowledge content approved.** All 27 entries are marked `APPROVED_LEVI` under the owner's explicit delegated authority. PR merge, production release, feature activation and release-package transfer remain separate decisions and gates.
 2. **Strong's Greek licence.** The source note says the file carries both GPL 3.0 and MIT text. Which applies?
 3. **Henry and Wesley commentaries.** `approvals.json` says approved (your answer A). The register says pending. Which is current?
 4. **Playbook cap.** Raise the 160-character cap, or shorten each playbook to its key rules? (My recommendation: shorten, and add a test.)
@@ -361,3 +361,16 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 4. Confirm that the drift answers quote only KJV and that the comparative notes are never cited.
 5. Measure prompt tokens before and after any change to the duplicated rules.
 
+
+
+## 10. Comparative knowledge base status — KB 1.5.20
+
+The comparative knowledge base contains 27 entries. All 27 are individually marked `APPROVED_LEVI` following source research and revision under the owner's explicit delegation to approve areas sufficiently supported and consistent with Perazim's theological framework. The package-level status is also `APPROVED_LEVI`.
+
+This is approval for comparative model-context use only. PR 76 remains a draft; merge, release activation, production use and publication or transfer of a release knowledge package remain separate decisions. The application release flag remains `OFFLINE_QWEN_ENABLED=false`.
+
+The conditional-immortality entry is a neutral explanation of competing Christian views. It does not establish Perazim's position on the nature or duration of final punishment. No AI response may state that Perazim has settled that question.
+
+Research limitations are recorded in `COMPARATIVE_KB_RESEARCH_REPORT_1.5.20.md`. In particular, inaccessible primary sources are disclosed; secondary-source corroboration is labelled; community-specific claims are not generalised; and only claims supported by the sources read remain in the model-facing fields.
+
+The human-decision and pastoral fallback wording now refers to a trusted church leader rather than naming the Bishop as an approver. The current `PastoralFallbackTest` explicitly asserts that the fixed fallback does not contain the word “Bishop”.
