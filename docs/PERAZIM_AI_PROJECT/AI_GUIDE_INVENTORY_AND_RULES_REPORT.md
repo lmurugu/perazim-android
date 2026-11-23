@@ -12,12 +12,12 @@ This report lists every resource, rule, skill and guardrail the Perazim Guide us
 
 - **What the guide is:** an offline assistant on the phone. It answers only from approved church and Bible sources, and it never makes things up. It runs a small on-device model (Qwen2.5 0.5B) and wraps it in fixed rules, safety checks and a citation check.
 - **What it knows:** the King James Bible (KJV) for every quotation, plus reference material: cross-references, two dictionaries, Nave's topical index, Strong's Greek and Hebrew word list, the Nicene Creed, and two optional commentaries (Matthew Henry, John Wesley) that are not in the standard install. The approved comparative knowledge for drift detection is new in this work and is still a draft.
-- **What it does not know:** it cannot quote the NASB (no NASB text is bundled and the AI has no NASB route), it cannot quote the ESV, NIV or NKJV at all, and it cannot see private messages or chats.
+- **What it does not know:** no NASB text is bundled. The AI quotes the NASB only when a question names it and your licensed NASB file is loaded on the device; otherwise it says the NASB is not loaded and uses the KJV. It cannot quote the ESV, NIV or NKJV at all, and it cannot see private messages or chats.
 - **What changed in this work:** the guide now notices when a question uses another faith's idea (karma, reincarnation, purgatory, saints, soul sleep, and similar), answers from Scripture, and describes the Catholic and Orthodox traditions accurately from their own primary sources and evaluates them from Scripture (your PR 76 correction supersedes O-2). I also added 150 trick-question stress tests that check whether the guide actually uses its resources.
 - **Most important findings:**
   1. The guide block cuts every playbook to **160 characters** before it reaches the model. Most playbooks are longer than that, so their later rules are never seen (section 7.2).
   2. If no approved Scripture or reference item matches the question, the model is **never called**. The user gets an error instead. Pastoral questions that use everyday words are most at risk (section 7.3).
-  3. The **NASB** route is missing, although your rule allows the NASB for the app and AI (section 7.6).
+  3. The **NASB** route now exists in the code. It reads only your licensed file, and only when a question names the NASB. It needs your confirmation (section 7.6).
   4. The reference database has **no full-text index**, although its build script describes one (section 7.5).
 
 ---
@@ -30,7 +30,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 |---|---|---|---|---|---|---|
 | R1 | KJV Bible text | Authorised King James Version, in `src/main/assets/database/perazim_database.db` (`bible_verses`, 31,102 KJV verses) | Public domain | Part of a 36.7 MB database that also holds ESV, NIV, NKJV and SUV (for the Bible reader only) | Every Scripture quotation. Exact-reference answers are quoted directly from this table, never generated. | **Approved, in use** |
 | R2 | ESV, NIV, NKJV, SUV text | Same database | ESV Crossway, NIV Biblica, NKJV Thomas Nelson, SUV public domain | Same database | Bible reader only. **The AI never quotes them** (`SelfCheck` refuses ESV, NIV and NKJV; `LocalScriptureRetriever` reads KJV only). | Reader approved (your decision); AI excluded |
-| R3 | NASB text | Not bundled | Licensed | None | Your rule allows the NASB for the app and AI, loaded from a user-supplied file kept out of git. **The AI has no NASB route.** | **Gap** (section 7.6) |
+| R3 | NASB text | Not bundled | Licensed | None | Your rule allows the NASB for the app and AI, loaded from a user-supplied file kept out of git. The AI reads it only when a question names the NASB and the file is loaded (`LocalScriptureRetriever`). | **Implemented, awaiting your confirmation** (section 7.6) |
 | R4 | OpenBible cross-references | OpenBible.info, built from the Treasury of Scripture Knowledge (public domain) | CC BY 4.0 | 344,799 rows in `reference.db.gz` | Cross-references for an explicit verse (2 items at most) | Approved, in use |
 | R5 | OpenBible places | OpenBible.info | CC BY 4.0 (some coordinates ODbL, to verify) | 1,274 rows | Stored; **not used by the AI** | Approved, unused by AI |
 | R6 | Smith's Bible Dictionary | William Smith, 1884, via CCEL | Public domain | 4,560 entries | Dictionary lookup for a word in the question (1 item) | Approved, in use |
@@ -168,7 +168,7 @@ This is the order in `OnDeviceAi.ask` and `PerazimAiEngine`, with the new drift 
 11. **Drift augmentation (new, `DriftEvidence.augment`):** if a drift concept is detected, adds up to two KJV passages named in the knowledge base (citable) and one comparative note (context only). These go first, because the prompt shows only three excerpts.
 12. **Evidence check:** if no evidence is left, the answer is an error: "No verified approved source supports this question." **The model is not called.**
 13. **Guide memory** (`GuideRuntime.contextFor`): the locked core rules, one playbook (capped at 160 characters), the member's style line, and up to two learned style notes. The whole block is capped at 1,000 characters.
-14. **Prompt build** (`LocalPrompt.buildBounded`): system text, guide block, up to three excerpts of 700 characters each, the last four conversation turns of 650 characters each, and the question. The prompt is capped at 5,000 characters. The model's context is 2,048 tokens, with 128 reserved for the answer.
+14. **Prompt build** (`LocalPrompt.buildBounded`): system text, guide block, up to three excerpts, each cut only at a whole sentence or skipped if no whole sentence fits its allowance (700 characters for a passage; 900 for a comparative note, which gets the full note budget), the last four conversation turns of 650 characters each, and the question. The prompt is capped at 5,000 characters. The model's context is 2,048 tokens, with 128 reserved for the answer.
 15. **Model run:** `-c 2048 -n 128 -t 3 --seed 42 --temp 0.2`, with a grammar that allows only citations from the shown excerpts. 150-second timeout.
 16. **Post-processing:** removes stock openers. Checks for claimed app actions, claimed official status without provenance, and missing citations.
 17. **Self-check** (`SelfCheck`, SH1 to SH7): fixes or refuses the answer.
@@ -221,11 +221,11 @@ The system text (about 1,860 characters) and the locked core (677 characters, in
 - Dictionary and topic lookups match a single headword exactly, using the words of four or more letters in the question. A phrase such as "the love of money" finds nothing unless one of its words is a headword.
 - **Recommendation:** rebuild the database with the full-text index, or add a headword and synonym list for common topics (forgiveness, grace, Sabbath, prayer). Check that the build and the shipped file agree.
 
-### 7.6 NASB route missing
+### 7.6 NASB route (implemented; needs your confirmation)
 
-Your rule allows the NASB for the app and the AI, loaded only from a user-supplied file kept out of git. The reader can load it, but the AI reads only the KJV. So a question such as "quote Romans 8:28 in the NASB" gets the KJV or a refusal, and the stress test `resource_use` case "Quote Romans 8:28 in NASB" expects the guide to say the NASB is not on the device and to offer the KJV.
+Your rule allows the NASB for the app and the AI, loaded only from a user-supplied file kept out of git. The AI now has that route. When a question names the NASB and your licensed file is loaded, `LocalScriptureRetriever` reads the NASB from it. When the file is not loaded, the answer says the licensed NASB is not on the device (`NASB_NOT_LOADED`) and uses the KJV. This matches the stress test `resource_use` case "Quote Romans 8:28 in NASB".
 
-- **Recommendation:** decide whether the AI should read the user-supplied NASB file (same route as the reader), or whether the AI stays KJV-only and the rule is updated. This is your decision.
+- **Recommendation:** confirm that the AI should read the user-supplied NASB file, as the reader does. If you want KJV only, the route can be removed and the rule updated.
 
 ### 7.7 Commentaries and cross-references are used only with an explicit verse
 
@@ -280,9 +280,10 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 
 | Commit | Change |
 |---|---|
-| `fae9dd5` | Comparative knowledge base: 27 entries (world religions, heterodox groups, African traditional religion, New Age, secular worldviews, and internal drift notes for the Catholic and Orthodox teachings). **No church is named in any text the model sees** (test `modelFacingTextNamesNoCatholicOrOrthodoxChurch`). Internal notes name the traditions for drift only. |
+| `fae9dd5` | Comparative knowledge base: 27 entries (world religions, heterodox groups, African traditional religion, New Age, secular worldviews, and internal drift notes for the Catholic and Orthodox teachings). **Superseded in part by your PR 76 correction:** Catholic and Orthodox names may now appear in model-facing text. The earlier rule that no church is named is no longer in force, and the test that enforced it is not in the current tree. Internal notes name the traditions for drift only. |
 | `a3fda9e` | Drift detection: `DriftDetector` (27 concepts, pure Java), `DriftEvidence` (KJV anchors plus one note), drift playbook and skill, router priority, scope-gate change (drift questions and afterlife terms now pass), tests. Router test count moved from 10 to 11 skills. |
 | `9c2b766` | 150 trick-question stress cases (`cases-stress-2026-11-23.jsonl`) and the generator script. Each case names the resources to use and the trap tested. The original 532-case file is unchanged. |
+| `e177b53` | The final prompt keeps comparative notes whole. Excerpts are cut only at whole sentences (`LocalPrompt`). `DriftEvidence` reads the knowledge base version from the JSON (1.3.0) instead of a hard-coded 1.0.0. New tests: `ComparativeNotePromptTest` (the full note reaches the model), and source titles shown but source URLs not (`GroupSaintsLeakageTest`). |
 | `1ee37f3` | Drift playbook shortened to fit the 160-character cap. `Status.md` updated. |
 | (this commit) | This report. |
 
@@ -299,7 +300,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 3. **Henry and Wesley commentaries.** `approvals.json` says approved (your answer A). The register says pending. Which is current?
 4. **Playbook cap.** Raise the 160-character cap, or shorten each playbook to its key rules? (My recommendation: shorten, and add a test.)
 5. **Pastoral questions without evidence.** Give pastoral questions a fixed Scripture set when nothing else matches, or keep "no evidence, no answer"? (My recommendation: a fixed set, still cited.)
-6. **NASB.** Should the AI read the user-supplied NASB file, or stay KJV-only and the rule be updated?
+6. **NASB.** The AI now reads your user-supplied NASB file when a question names it. Confirm that this is right, or restore KJV only?
 7. **Decision 12 (deuterocanonical books).** I read your ruling O-2 exception as explaining the contents of the extra books (Tobit, Judith, Maccabees, Sirach, Wisdom, Baruch) and nothing about the churches that use them. The stress tests follow that reading. Tell me if you meant it differently.
 8. **Verse-number check.** Add a deterministic verse-number check to `SelfCheck` against the KJV table? (My recommendation: yes.)
 
