@@ -27,11 +27,7 @@ import java.util.regex.Pattern;
  */
 public class PerazimAiEngine {
 
-    private static final Pattern CRISIS_PATTERN = Pattern.compile(
-            "\\b(suicid(?:e|al)|kill myself|end my life|want to die|better off dead|" +
-            "self[ -]?harm|hurt myself|harm myself|cutting myself|unalive myself|" +
-            "end it all|can't go on|cannot go on|not worth living|sexual assault|" +
-            "domestic violence|physically abused|(?:going to|plan to|want to) (?:kill|shoot|stab) (?:someone|him|her|them)|(?:immediate|imminent) danger)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CRISIS_PATTERN = CrisisPhrases.PATTERN;
     private static final Pattern CRISIS_DISCLOSURE_PATTERN = Pattern.compile(
             "\\b(?:(?:my|our) (?:husband|wife|spouse|partner|boyfriend|girlfriend|parent|father|mother|caregiver) " +
                     "(?:hits?|beats?|beating|struck|choked|attacked|threatened) (?:me|us|my child|our child)|" +
