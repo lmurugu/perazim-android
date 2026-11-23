@@ -1,5 +1,5 @@
 {
-  "_comment": "Comparative knowledge for the Perazim Guide's drift detection. All 27 entries have been individually reviewed and approved under the owner's explicit delegation to approve claims that are sufficiently supported and consistent with Perazim's theological framework. Only an entry with exact status APPROVED_LEVI can pass the release gate. Only text in summary, origin and scripture is model-facing; internal_note and source records are not sent to the model. Scripture anchors are KJV references retrieved from the bundled database; licensed NASB use follows the app's file-loading rule. Entries are contextual descriptions, not authorities: the model evaluates competing claims under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny. The exact nature and duration of final punishment remain an unapproved Perazim doctrinal position and are not settled by the conditional-immortality entry.",
+  "_comment": "Comparative knowledge for the Perazim Guide's drift detection. All 27 entries have been individually reviewed and approved under the owner's explicit delegation to approve claims that are sufficiently supported and consistent with Perazim's theological framework. Only an entry with exact status APPROVED_LEVI can pass the release gate. Only text in summary, origin and scripture is model-facing; internal_note and source records are not sent to the model. Scripture anchors are KJV references retrieved from the bundled KJV database; licensed NASB use follows the app's file-loading rule. Entries are contextual descriptions, not authorities: the model evaluates competing claims under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny. The exact nature and duration of final punishment remain an unapproved Perazim doctrinal position and are not settled by the conditional-immortality entry.",
   "version": "1.5.20",
   "status": "APPROVED_LEVI",
   "entries": [
@@ -784,16 +784,24 @@
       "id": "ancestors",
       "group": "african_traditional",
       "status": "APPROVED_LEVI",
-      "summary": "African traditional religions are diverse, and there is no single African doctrine of ancestors. John Mbiti used the term 'living-dead' for recently departed persons who remain present in the memory and relationships of the living; this is an influential scholarly description reported through secondary sources, not a universal label used by every community. Community-specific sources describe different patterns: Jomo Kenyatta's account of the Kikuyu records communion with ancestral spirits alongside belief in Ngai and other spiritual beings; Shin-ichiro Ishida's study examines collective memory and personhood among the Îgembe; and Anthony Ephirim-Donkor's peer-reviewed study of the Akan describes the ancestors' stool as a central religious symbol used in propitiatory rites. Criteria and practices differ across communities, families and regions. The guide distinguishes cultural remembrance and honour from invoking the departed, seeking their guidance or offering them religious rites, and does not generalise one community's practice to all Africans.",
-      "origin": "African traditional religions comprise many distinct religious systems. Mbiti's term 'living-dead' is reported through academic secondary sources because his primary book could not be accessed. Kikuyu evidence is from Jomo Kenyatta's article abstract; the Îgembe source is Ishida's community-specific study; and the Akan example is from the abstract of Ephirim-Donkor's peer-reviewed monograph. These are not extrapolated to all African communities or to Embu without evidence.",
+      "summary": "African traditional religions are diverse, and there is no single African doctrine of ancestors. John Mbiti used the term 'living-dead' for recently departed persons who remain present in the memory and relationships of the living; this is an influential scholarly description reported through secondary sources, not a universal label used by every community. Community-specific sources describe different patterns: Jomo Kenyatta's account of the Kikuyu records communion with ancestral spirits alongside belief in Ngai and other spiritual beings, while Anthony Ephirim-Donkor's peer-reviewed study of the Akan describes the ancestors' stool as a central religious symbol used in propitiatory rites. Criteria and practices differ across communities, families and regions. The guide distinguishes cultural remembrance and honour from invoking the departed, seeking their guidance or offering them religious rites, and does not generalise one community's practice to all Africans.",
+      "origin": "African traditional religions comprise many distinct religious systems. Mbiti's term 'living-dead' is reported through academic secondary sources because his primary book could not be accessed. The Kikuyu evidence is from Jomo Kenyatta's article abstract; the Akan example is from the abstract of Ephirim-Donkor's peer-reviewed monograph. These are attributed examples, not a pan-African summary and not evidence for an Embu-wide belief.",
       "scripture": "Scripture commands honour for parents (Exodus 20:12) and names Christ as the one mediator between God and men (1 Timothy 2:5). It forbids consulting those with familiar spirits and wizards, and seeking the living's guidance from the dead (Leviticus 19:31; Deuteronomy 18:10-12; Isaiah 8:19-20). Scripture records that Saul died for seeking counsel from a familiar spirit (1 Chronicles 10:13), and teaches that after death comes judgment (Hebrews 9:27). Christians may honour and remember family members without seeking guidance, spiritual mediation or religious power from the departed. Christian prayer is directed to the triune God, and prayer is also addressed to Jesus (Acts 7:59; 1 Corinthians 1:2). Deuteronomy 18 condemns divination, consulting familiar spirits and necromancy; it must not be used to condemn every act of cultural respect.",
       "anchors": [
         "Deuteronomy 18:10-12",
         "1 Timothy 2:5",
         "Hebrews 9:27"
       ],
-      "internal_note": "Mbiti, African Religions and Philosophy (1969; 2nd ed. 1990), primary copy remained lending-restricted; his 'living-dead' concept is attributed as reported in academic secondary sources, not as a direct reading. Kenyatta's Kikuyu article is available as an abstract only. Ishida's study is full text and specific to Îgembe collective memory/personhood. Ephirim-Donkor's peer-reviewed monograph abstract (SUNY Binghamton Research Connect) specifically describes Akan ancestor worship and the ancestors' stool; full book is not read. The model uses the Akan example only as an attributed abstract-level description. No Embu-wide, pan-Kikuyu or pan-African uniform doctrine is asserted. Deuteronomy 18 is limited to divination/consulting the dead, not cultural remembrance.",
+      "internal_note": "Mbiti, African Religions and Philosophy (1969; 2nd ed. 1990), primary copy remained lending-restricted; his 'living-dead' concept is attributed as reported in academic secondary sources, not as a direct reading. Kenyatta's Kikuyu article is available as an abstract only. Ephirim-Donkor's peer-reviewed monograph abstract (SUNY Binghamton Research Connect) specifically describes Akan ancestor worship and the ancestors' stool; full book is not read. The model uses the Akan example only as an attributed abstract-level description. No Embu-wide, pan-Kikuyu or pan-African uniform doctrine is asserted. Deuteronomy 18 is limited to divination/consulting the dead, not cultural remembrance.",
       "sources": [
+        {
+          "title": "Thaddeus Metz and Motsamai Molefe, 'Traditional African Religion as a Neglected Form of Monotheism', The Monist (special issue; forthcoming)",
+          "url": "https://repository.up.ac.za/server/api/core/bitstreams/137f4b44-dedd-44db-8469-e50c869347ce/content",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "living-dead; only a small number count as ancestors; meals, warnings, libation and dreams (as quoted from Mbiti); supreme God argued",
+          "verification": "read in full, pre-publication manuscript; peer-reviewed journal, final version not checked. Mbiti quotations are the authors' citations"
+        },
         {
           "title": "Jomo Kenyatta, “Kikuyu Religion, Ancestor-Worship, and Sacrificial Practices,” Africa (Cambridge Core)",
           "url": "https://www.cambridge.org/core/journals/africa/article/abs/kikuyu-religion-ancestorworship-and-sacrificial-practices/6CFD176DD79B1911B0E3F152DDBA59BF",
@@ -801,14 +809,6 @@
           "licence": "copyright; short quotes or summary only",
           "use": "Community-specific Kikuyu article; abstract says the Kikuyu maintain relations with spiritual entities, commune with ancestral spirits and worship Ngai and other supernatural beings",
           "verification": "Cambridge Core article record and abstract read; full article access restricted; used only for the Kikuyu-specific summary"
-        },
-        {
-          "title": "Shin-ichiro Ishida, 'Name-sharing among the Îgembe: The Kîmîîrû texture of personhood in a village community', ch. 3 in Gĩchere, Mwithimbû and Ishida (eds.), Family Dynamics and Memories in Kenyan Villages (National Museums of Kenya, 2020)",
-          "url": "https://tokyo-metro-u.repo.nii.ac.jp/record/8492/files/11040-001.pdf",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quotes only",
-          "use": "Îgembe (Meru): shallow genealogical depth; collective immortality; Mbiti 1990: 25-26 quoted",
-          "verification": "read in full (PDF text, about p. 75). Community-specific source for the Îgembe only. Older Peatrik remark quoted in the chapter not used"
         },
         {
           "title": "Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan, second edition (Bloomsbury / University Press of America, 2012)",
@@ -819,20 +819,20 @@
           "verification": "SUNY Binghamton Research Connect record and abstract read; catalog classifies book as peer-reviewed; full book not read"
         },
         {
+          "title": "Shin-ichiro Ishida, 'Name-sharing among the Îgembe: The Kîmîîrû texture of personhood in a village community', ch. 3 in Gĩchere, Mwithimbû and Ishida (eds.), Family Dynamics and Memories in Kenyan Villages (National Museums of Kenya, 2020)",
+          "url": "https://tokyo-metro-u.repo.nii.ac.jp/record/8492/files/11040-001.pdf",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "Îgembe (Meru): shallow genealogical depth; collective immortality; Mbiti 1990: 25-26 quoted",
+          "verification": "read in full (PDF text, about p. 75). Community-specific source for the Îgembe only. Older Peatrik remark quoted in the chapter not used"
+        },
+        {
           "title": "John S. Mbiti, African Religions and Philosophy (1969; 2nd ed. 1990)",
           "url": "",
           "accessed": "2026-11-23",
           "licence": "copyright; summary and short quotes only",
           "use": "living-dead; remembrance by name (1990: 25-26); meals and warnings (1990: 82); libation and dreams (1990: 25)",
           "verification": "primary NOT accessed: archive.org copy lending-restricted (HTTP 401). Claims rest on Mbiti as quoted by Metz and Molefe, Ishida and Simut (secondary-source corroborated)"
-        },
-        {
-          "title": "Thaddeus Metz and Motsamai Molefe, 'Traditional African Religion as a Neglected Form of Monotheism', The Monist (special issue; forthcoming)",
-          "url": "https://repository.up.ac.za/server/api/core/bitstreams/137f4b44-dedd-44db-8469-e50c869347ce/content",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quotes only",
-          "use": "living-dead; only a small number count as ancestors; meals, warnings, libation and dreams (as quoted from Mbiti); supreme God argued",
-          "verification": "read in full, pre-publication manuscript; peer-reviewed journal, final version not checked. Mbiti quotations are the authors' citations"
         },
         {
           "title": "Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan (University Press of America, 2012)",
@@ -1077,7 +1077,7 @@
           "accessed": "2026-11-24",
           "licence": "copyright; paraphrase or short summary only",
           "use": "Official BRI article explains the Adventist reading of Revelation 13–14, the future Sunday-enforcement test and the Sabbath as a distinguishing end-time sign",
-          "verification": "Official BRI article page read on 24 November 2026; describes Adventist interpretation of a future Sunday-enforcement final test. Used as a statement of that interpretation, not as a settled fact about present Sunday worshippers."
+          "verification": "Official Adventist Biblical Research Institute article read on 24 November 2026; opening section/question 1 checked for the future Sunday-enforcement test."
         },
         {
           "title": "General Conference Executive Committee Newsletter, July-September 2021, Biblical Research Institute answers on the mark of the beast",
