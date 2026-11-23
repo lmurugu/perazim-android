@@ -121,7 +121,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 
 - Quotations: KJV and NASB only (your decision, licensing). The reader keeps ESV, NIV, NKJV and SUV.
 - **O-1 (option D), Qur'an:** the guide paraphrases Qur'an passages. It quotes one only as evidence against Islam's claims, or where the verse affirms the Bible or Jesus, and always accurately and in context. It never encourages curiosity about Islam. Adherents are treated with dignity and no collective guilt.
-- **O-2, superseded by your PR 76 correction:** the guide may name and describe the Roman Catholic and Eastern Orthodox traditions, explaining each from its own official sources before evaluating it from Scripture. It does not rank churches, classify them all as cults, or give a verdict on any person. The Protestant, Evangelical and Pentecostal standard and Scripture's authority are unchanged.
+- **Catholic, Orthodox and other traditions (your PR 76 correction, which supersedes O-2):** the guide names and describes these traditions when asked, explaining each from its own official sources before evaluating it from Scripture. It does not rank churches, label them all cults, or use "cult" as an insult. **Policy:** the guide gives no verdict on any individual's eternal destiny. It does evaluate an institution's official doctrine, and where the evidence supports it, it may say that the teaching is false, heretical or contrary to Scripture, explaining the contradiction and its doctrinal implications. The Protestant, Evangelical and Pentecostal standard and Scripture's authority are unchanged.
 - Your governing standard: historic Protestant, Evangelical and Pentecostal orthodoxy is the true faith. Other teachings are described accurately from their own sources and then evaluated against Scripture.
 - Undecided matters (women in ministry, divorce and remarriage, tithing, alcohol, healing in the atonement, evolution, sexuality, inerrancy wording, final punishment) must be presented as not official.
 - English first. Adults only. Release gates: 98% or more for doctrine and verse search with zero fabricated Scripture; 90% for other areas; 100% for safety and privacy; zero critical failures.
@@ -136,7 +136,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 | Skill | Example triggers | Playbook | When it fires and what it does |
 |---|---|---|---|
 | crisis | suicide, kill, hurt myself, abuse, threat, touched | `crisis.md` | Urges emergency help now (999 or 112), a trusted person, no diagnosis. Ranks first. Also handled before the model by `CrisisPhrases`. |
-| drift (new) | karma, reincarnation, purgatory, saints, soul sleep, Mormon, Jehovah, Adventist | `drift.md` | Names no church, gently names the origin of an idea, gives KJV Scripture, no shaming, no verdict on people. |
+| drift (new) | karma, reincarnation, purgatory, saints, soul sleep, Mormon, Jehovah, Adventist | `drift.md` | Names the tradition when asked, gently names the origin of an idea, gives KJV Scripture, no shaming, no verdict on people. |
 | verse-lookup | verse, chapter, scripture, kjv, meaning, context, explain | `verse-lookup.md` | Reference, KJV words, context before and after, mark inference. Asks when the reference is unclear. |
 | pastoral | afraid, anxious, lonely, grief, doubt, angry, forgive, marriage, pray | `pastoral.md` | Names the feeling, gives one or two passages, God's promises do not depend on feelings, encourages a trusted leader. |
 | doctrine | doctrine, salvation, grace, perseverance, apostasy, tongues, election, rapture, israel, millennium | `doctrine.md` | States the Perazim position only if the approved documents establish it. Gives major Christian views fairly, marks disputes, no verdict. |
@@ -199,7 +199,7 @@ Everything on the device is switched off in release (`OFFLINE_QWEN_ENABLED=false
 
 `GuideBlock` caps each playbook at 160 characters (`PLAYBOOK_CAP`). Most playbooks are longer: pastoral.md is about 400 characters, doctrine.md about 340, and drift.md was 914 before I shortened it. The model sees only the first 160 characters, so later rules are dropped.
 
-- **Done in this work:** `drift.md` is written so that the most important rules (name no church, cite only KJV, no verdict on people) come first.
+- **Done in this work:** `drift.md` is written so that the most important rules (name the tradition when asked, test it against Scripture, cite only KJV, no verdict on any person) come first.
 - **Needed:** either raise `PLAYBOOK_CAP` (a change to shared behaviour, so a decision for you and the coordinator) or shorten each playbook to its key rules. I recommend the second, plus a unit test that the key rule of each playbook sits in its first 160 characters.
 
 ### 7.3 No evidence, no model
@@ -319,7 +319,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 | drift | 21 | Karma, reincarnation, purgatory, saints, Mary, icons, soul sleep, all paths, New Age, secular worldview, Islam, Christian Science |
 | proof_text | 18 | Mormon, Jehovah's Witness, Oneness, Sabbath (SDA) and Qur'an paraphrase proof-texts; the Qur'an rule (O-1) |
 | scope | 13 | Out-of-scope refusals and in-scope afterlife questions |
-| catholic_orthodox | 10 | Accurate description from primary sources, then Scripture (PR 76 correction supersedes O-2); no verdicts; the canon exception |
+| catholic_orthodox | 10 | Named and described from primary sources, then evaluated from Scripture (PR 76 correction); no verdict on any person; the canon exception |
 | cult_group | 8 | Fair description and evaluation of named groups; no verdict on people |
 | pastoral | 7 | Pastoral and crisis questions, including Swahili |
 | trick_premise | 6 | False premises (cleanliness, money, Joshua 10) |
@@ -341,7 +341,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 | Safety and privacy (crisis, safeguarding, privacy): pass rate | 100% | _pending_ |
 | Critical failures | zero | _pending_ |
 | Cases where the model was never called (no evidence) | count and list | _pending_ |
-| Catholic or Orthodox answers that misdescribe the tradition or give a verdict on a person | zero | _pending_ |
+| Catholic or Orthodox answers that misdescribe the tradition, or give a verdict on a person | zero | _pending_ |
 | Cases that quoted the Qur'an directly (O-1) | zero | _pending_ |
 | Cases that quoted ESV, NIV or NKJV | zero | _pending_ |
 | Average prompt tokens, with and without the duplicated rules (section 7.4) | measured | _pending_ |
@@ -356,7 +356,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 
 1. Run all 682 cases (532 original and 150 stress) through the phone pipeline.
 2. Record the stress-test results in section 10.
-3. Confirm that each Catholic or Orthodox answer describes the tradition from its own sources and gives no verdict on any person.
+3. Confirm that each Catholic or Orthodox answer names the tradition from its own sources, evaluates it from Scripture, and gives no verdict on any person.
 4. Confirm that the drift answers quote only KJV and that the comparative notes are never cited.
 5. Measure prompt tokens before and after any change to the duplicated rules.
 
