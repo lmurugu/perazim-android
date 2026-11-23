@@ -1,6 +1,6 @@
 {
   "_comment": "Comparative knowledge for the Perazim Guide's drift detection. Status DRAFT_PENDING_LEVI: every entry is a summary written for review, not an approved source. Only the text in 'summary', 'origin' and 'scripture' is shown to the model. 'internal_note' is never shown to the model or to users. Scripture references are KJV and are retrieved verbatim from the bundled KJV database; no other translation is quoted. Entries are context only: the model may explain them but may not cite them. Standard: historic Protestant, Evangelical and Pentecostal orthodoxy, with Scripture as supreme authority. Under Levi's PR 76 correction, O-2 is superseded: the guide may name and accurately describe the Roman Catholic and Eastern Orthodox traditions from their own primary sources, and evaluates them from Scripture.",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "status": "DRAFT_PENDING_LEVI",
   "entries": [
     {
@@ -805,38 +805,79 @@
       "id": "islam_no_crucifixion",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Islamic teaching, based on the Qur'an, holds that Jesus was neither killed nor crucified, and that the crucifixion only appeared to happen. Muslim scholars have read the verse in more than one way, and the guide describes the common non-crucifixion reading in general terms. The guide describes this teaching in its own words and does not quote the Qur'an.",
-      "origin": "The teaching rests on Surah 4:157 and its interpretation in Muslim tradition. A 2023 article in the American Journal of Islam and Society reviews the long-standing non-crucifixion reading.",
-      "scripture": "The New Testament reports that Jesus was crucified and died (Matthew 27:50; Acts 2:23), and that he rose from the dead (1 Corinthians 15:3-4). Paul calls the message Christ crucified (1 Corinthians 1:23). The Christian response engages both the historical evidence and the theological claim.",
+      "summary": "Islamic teaching holds that Jesus, son of Mary, was not crucified. Muslim commentators have generally read the Qur'an's passage on the crucifixion as denying that it took place. The best-known classical explanation is that God made another person resemble Jesus, so that this person was crucified in his place while Jesus was taken up to God. Commentators give different accounts of who was crucified and how, so the guide describes the common reading and does not present one account as settled. A small minority of scholars, past and present, have read the passage differently. This entry covers the classical reading only and does not set out later reinterpretations of what happened to Jesus afterwards. The guide describes this teaching in its own words and does not quote the Qur'an.",
+      "origin": "The teaching rests on one passage of the Qur'an (Surah 4, verses 157 and 158) and its interpretation in Muslim commentary. Al-Tabari sets out several accounts of the resemblance and prefers the account in which it was cast over everyone in the house with Jesus. Ibn Kathir gives the account, traced to Ibn Abbas, of a young companion who volunteered to take Jesus's appearance and was crucified in his place. A 2023 article in the American Journal of Islam and Society reviews the long-standing reading and the recent minority challenge to it.",
+      "scripture": "The New Testament records that Jesus was crucified and died. Matthew 27:50 and John 19:33-35 report his death, and John 19:35 gives the testimony of an eyewitness. Paul's summary of the gospel names Christ's death, his burial, his rising on the third day, and the many witnesses who saw him afterwards (1 Corinthians 15:3-8). Peter and Paul preached a crucified and risen Messiah (Acts 2:23; 1 Corinthians 1:23). Scripture is the final authority here, and its eyewitness testimony conflicts with the denial that Jesus was crucified. Christians also weigh the historical evidence together with the meaning of the cross, which they hold is the ground of atonement.",
       "anchors": [
         "1 Corinthians 15:3-4",
+        "John 19:35",
         "1 Corinthians 1:23"
       ],
-      "internal_note": "Pending: classical tafsir on 4:157 (Ibn Kathir, al-Tabari) before any specific interpretation is attributed. The Tacitus reference was removed from model-facing text because its text has not been fetched and checked.",
+      "internal_note": "Session D (2026-11-23). Verified: Qur'an 4:157-158 (Khattab, quran.com); Ibn Kathir Arabic on 4:157 (quran.com resource 14) and English abridgement (resource 169); al-Tabari Arabic on 4:157 (resource 15); Fatoohi 2023 abstract, author and endnotes. Model text uses 'commentators have generally read' because the consensus claim is secondary-sourced (Fatoohi). Not verified: the Tabari edition and page (Fatoohi cites Dar Hajr 2001, vol. 5, pp. 447-453; not checked); Lawson and Reynolds content (bibliography only, not used for any claim); Ahmadi and other modern readings of Jesus's fate after the cross (not researched; model text avoids stating what happened to Jesus afterwards beyond the classical reading). Tacitus remains out of model-facing text. Biblical anchors are KJV; wording in the scripture field is paraphrase.",
       "sources": [
         {
-          "title": "Qur'an 4:157, The Clear Quran translation by Dr Mustafa Khattab (quran.com), checked for meaning only",
+          "title": "Qur'an 4:157-158, The Clear Quran (Dr Mustafa Khattab), as displayed on quran.com",
           "url": "https://quran.com/4:157",
           "accessed": "2026-11-23",
           "licence": "translation copyright; not reproduced in guide",
-          "use": "the verse says they neither killed nor crucified him, but it was made to appear so; paraphrased in guide",
-          "verification": "verified (read); paraphrase only"
+          "use": "Verse read for meaning; model text paraphrases the denial, the appearance-only clause and the ascent",
+          "verification": "verified (page read 2026-11-23); paraphrase only; host is a reproduction, not the publisher"
         },
         {
-          "title": "'The Non-Crucifixion Verse', American Journal of Islam and Society (July 2023), abstract",
-          "url": "https://doaj.org/article/5a3aadc913bb47dcaffc4e66e8224e1f",
+          "title": "Tafsir Ibn Kathir, Arabic, commentary on 4:157 (quran.com API, resource 14)",
+          "url": "https://api.quran.com/api/v4/tafsirs/14/by_ayah/4:157",
           "accessed": "2026-11-23",
-          "licence": "open access abstract",
-          "use": "interpretive source on the long-standing non-crucifixion reading",
-          "verification": "verified (abstract read); author not shown"
+          "licence": "classical text; host terms not checked",
+          "use": "Substitution account: a companion volunteered to take Jesus's appearance and was crucified in his place while Jesus was raised; the Arabic excerpt gives the narrative without an isnad; the chain to Ibn Abbas (via Ibn Abi Hatim) appears only in the English abridgement",
+          "verification": "verified (text read in Arabic, 2932 characters for 4:157); printed edition not identified"
         },
         {
-          "title": "Classical tafsir on 4:157 (Ibn Kathir, al-Tabari)",
-          "url": "",
+          "title": "Ibn Kathir (Abridged), English, commentary on 4:157-158 (quran.com resource 169)",
+          "url": "https://quran.com/4:157/tafsirs/en-tafisr-ibn-kathir",
           "accessed": "2026-11-23",
-          "licence": "to be recorded",
-          "use": "to be added",
-          "verification": "pending"
+          "licence": "translation; translator and publisher not confirmed",
+          "use": "Corroborates the Arabic account; used only as a cross-check",
+          "verification": "verified (read); secondary translation of a classical text"
+        },
+        {
+          "title": "Tafsir al-Tabari (Jami al-bayan), Arabic, commentary on 4:157 (quran.com API, resource 15)",
+          "url": "https://api.quran.com/api/v4/tafsirs/15/by_ayah/4:157",
+          "accessed": "2026-11-23",
+          "licence": "classical text; host terms not checked",
+          "use": "Al-Tabari reports several accounts of the resemblance (Wahb ibn Munabbih transmissions) and prefers the view that it was cast over all who were in the house",
+          "verification": "verified (text read in Arabic); edition not identified on host; page cited as 9:369-375 by page markers in the host text, not confirmed against a printed edition"
+        },
+        {
+          "title": "Louay Fatoohi, 'The Non-Crucifixion Verse: A Historical, Contextual, and Linguistic Analysis', American Journal of Islam and Society 40(1-2) (2023)",
+          "url": "https://mail.ajis.org/index.php/ajiss/article/view/3143",
+          "accessed": "2026-11-23",
+          "licence": "open access",
+          "use": "Secondary source for the 'overwhelmingly accepted' reading and the small minority challenge, including early Ismaili readers; endnotes used to identify further sources",
+          "verification": "verified (abstract, author and endnotes read); full text not read; author Louay Fatoohi (Independent) per the article page; the earlier register entry 'author not shown' is corrected"
+        },
+        {
+          "title": "Ian Mevorach, 'Qur'an, Crucifixion, and Talmud: A New Reading of Q 4:157-58', Journal of Religion and Society 19 (2017)",
+          "url": "https://cdr.creighton.edu/items/74f0a0bd-9304-41cc-8ba5-5cf02252a293",
+          "accessed": "2026-11-23",
+          "licence": "repository record",
+          "use": "Describes the recent minority reading linking 4:157 to a Talmudic counter-narrative; used only for the claim that the minority challenge exists",
+          "verification": "verified (repository abstract read); full PDF not read; peer-review status not verified"
+        },
+        {
+          "title": "Qur'an 112:1-4, 4:171, 5:72-75 and 19:35, The Clear Quran (Dr Mustafa Khattab), quran.com",
+          "url": "https://quran.com/4:171",
+          "accessed": "2026-11-23",
+          "licence": "translation copyright; paraphrase only",
+          "use": "Verses read for meaning; the son-denial entry paraphrases them",
+          "verification": "verified (pages read 2026-11-23, including 5:72 and 5:75 on quran.com, which closes U22); paraphrase only"
+        },
+        {
+          "title": "Tafsir Ibn Kathir (Abridged), English, commentary on 4:171, 5:72, 5:75, 112:3, 19:35 (quran.com resource 169)",
+          "url": "https://quran.com/4:171/tafsirs/en-tafisr-ibn-kathir",
+          "accessed": "2026-11-23",
+          "licence": "translation; translator not confirmed",
+          "use": "Cross-check for the son-denial entry",
+          "verification": "partly verified (opening sections read); see son-denial entry"
         }
       ]
     },
@@ -844,46 +885,63 @@
       "id": "islam_son_denial",
       "group": "world_religion",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "Islamic teaching holds that God has no son. Surah 112 says that God has never had offspring and was not born. Surah 5 says that those who call the Messiah, son of Mary, God have disbelieved, and that the Messiah was only a messenger like those before him. Surah 4:171 tells the People of the Book not to say 'Trinity', describes Jesus, son of Mary, as no more than a messenger of God and the fulfilment of his Word, and says that God is far above having a son. Jesus is honoured as a prophet and messenger, but not as divine. The guide paraphrases these teachings and does not quote the Qur'an.",
-      "origin": "This is the teaching of Islam, based on the Qur'an. The Qur'an is paraphrased here, not quoted. The meaning of the relevant Surahs should be checked against the authorised translation and classical tafsir before release.",
-      "scripture": "Scripture teaches that Jesus is the eternal Son of God (John 1:14; Hebrews 1:2-3), that he is God (John 1:1; Titus 2:13), and that he is the one mediator between God and men (1 Timothy 2:5). Jesus said: 'I and my Father are one' (John 10:30). Christians hold that the Father's begetting of the Son is eternal and not physical, and that the Son's divinity is shown in his works, his resurrection and his own claims. Islam honours Jesus as Messiah and prophet while rejecting the Christian confession of his divine Sonship.",
+      "summary": "Islamic teaching holds that God has no children, and that Jesus, son of Mary, was a messenger and not God. Surah 112 rejects the idea that God has children or was ever born. Other passages say that Jesus is the Messiah and a messenger like those before him, warn Christians against going to extremes about him, and reject the belief that God is one of three. Muslims honour Jesus as the Messiah, a prophet and a servant of God, but reject the Christian confession that he is God the Son. The guide describes this teaching in its own words and does not quote the Qur'an.",
+      "origin": "This is the teaching of Islam, based on the Qur'an. Ibn Kathir reads Surah 112, which describes God as al-Samad, as rejecting the idea that God begets or was begotten. Al-Tabari reads the Surah 4 passage as addressing those who call Jesus God's son and as rejecting that claim, since God does not take a son. Ibn Kathir (abridged) reads the passages on Jesus as a servant of God and not his son in the same way. The guide describes these as the common Muslim reading in general terms, drawn from the commentary openings checked so far; it does not present any one commentator's full treatment of these verses as settled.",
+      "scripture": "Scripture teaches that the Son is eternal and is God. John 1:1-14 presents the Word as God, who became flesh, and Hebrews 1:2-3 presents the Son as the one through whom God made the worlds and the exact image of God's person. Jesus said, \"I and my Father are one\" (John 10:30). Christians hold that the Father's begetting of the Son is eternal and not physical, as the Nicene Creed affirms, and 1 Timothy 2:5 calls Jesus the one mediator between God and men. Islam honours Jesus as Messiah and prophet while rejecting his divine Sonship. Scripture's witness is that he is the eternal Son and God.",
       "anchors": [
         "John 1:1",
-        "John 10:30"
+        "John 10:30",
+        "Hebrews 1:2-3"
       ],
-      "internal_note": "Pending: classical tafsir on the Trinity and Jesus's sonship verses. Surah 112 and 4:171 were checked against the Khattab translation on quran.com. Surah 5:72 and 5:75 were checked against a third-party copy of the Khattab translation (quranpedia.net); quran.com was not verified for those verses. Surah 5:73-74 not checked.",
+      "internal_note": "Session D (2026-11-23). Verified on quran.com (Khattab): 112:1-4; 4:171; 5:72-75 (closes U22 and U23); 19:35. Ibn Kathir (abridged) on 4:171, 5:72, 5:75, 112:3, 19:35 read in part; al-Tabari Arabic on 4:171 read in part (opening) and on 5:72 (opening). Not yet done: full Tabari reading on 4:171 and 5:72-75; Arabic Ibn Kathir on 5:72-75 (closes U24 once read). The existing summary's wording on 112 and 4:171 was close to the translation's wording; revised to paraphrase. Nicene Creed reference in the scripture field is by name only, not quoted. The Trinity point is treated as the Qur'an's rejection of a three-of-God belief; the guide should not use this to define the Christian doctrine beyond the Nicene text.",
       "sources": [
         {
-          "title": "Qur'an 112:1-4 (The Clear Quran, Khattab, quran.com), paraphrase only",
+          "title": "Qur'an 112:1-4, The Clear Quran (Dr Mustafa Khattab), quran.com/112/1",
           "url": "https://quran.com/112/1",
           "accessed": "2026-11-23",
           "licence": "translation copyright; paraphrase only",
-          "use": "112:3: 'He has never had offspring, nor was He born.'",
-          "verification": "verified (page read)"
+          "use": "Surah 112 rejects divine offspring and birth",
+          "verification": "verified (page read 2026-11-23); paraphrase only"
         },
         {
-          "title": "Qur'an 4:171 (The Clear Quran, Khattab, quran.com), paraphrase only",
-          "url": "https://quran.com/4/171",
+          "title": "Qur'an 4:171, The Clear Quran (Dr Mustafa Khattab), quran.com/4/171",
+          "url": "https://quran.com/4:171",
           "accessed": "2026-11-23",
           "licence": "translation copyright; paraphrase only",
-          "use": "'no more than a messenger of Allah and the fulfilment of His Word through Mary'; 'Allah is only One God'; 'far above having a son'",
-          "verification": "verified (page read)"
+          "use": "Warns against extremes; Jesus described as a messenger and the fulfilment of God's word; rejects 'three' and a son",
+          "verification": "verified (page read 2026-11-23); paraphrase only"
         },
         {
-          "title": "Qur'an 5:72 and 5:75 (The Clear Quran, Khattab, third-party copy at quranpedia.net), paraphrase only",
-          "url": "https://quranpedia.net/en/translations/5/13661",
+          "title": "Qur'an 5:72-75, The Clear Quran (Dr Mustafa Khattab), quran.com/5:72 and quran.com/5:75",
+          "url": "https://quran.com/5:72",
           "accessed": "2026-11-23",
           "licence": "translation copyright; paraphrase only",
-          "use": "5:72: those who say Allah is the Messiah son of Mary have disbelieved; 5:75: the Messiah was only a messenger like those before him",
-          "verification": "paraphrase verified via a third-party page; not on quran.com; verbatim not checked"
+          "use": "5:72 calls the claim that God is the Messiah son of Mary disbelief; 5:73 rejects 'one in a Trinity'; 5:75 describes the Messiah as a messenger like those before him",
+          "verification": "verified (pages read on quran.com 2026-11-23); replaces the third-party copy previously used (quranpedia.net); paraphrase only"
         },
         {
-          "title": "Classical tafsir on the Trinity and Jesus's sonship verses",
-          "url": "",
+          "title": "Qur'an 19:35, The Clear Quran (Dr Mustafa Khattab), quran.com/19:35",
+          "url": "https://quran.com/19:35",
           "accessed": "2026-11-23",
-          "licence": "to be recorded",
-          "use": "to be added",
-          "verification": "pending"
+          "licence": "translation copyright; paraphrase only",
+          "use": "Denial that God takes a son, in the Jesus narrative",
+          "verification": "verified (page read 2026-11-23); paraphrase only; not used in model text yet"
+        },
+        {
+          "title": "Tafsir Ibn Kathir (Abridged), English, quran.com resource 169, on 4:171, 5:72, 5:75, 112:3, 19:35",
+          "url": "https://api.quran.com/api/v4/tafsirs/169/by_ayah/112:3",
+          "accessed": "2026-11-23",
+          "licence": "translation; translator not confirmed",
+          "use": "Ibn Kathir's reading of 112 (not begetting or begotten), 4:171 (against exaggeration), 5:72-75 (Christian sects), 19:35 (servant, not son)",
+          "verification": "partly verified (openings read); not the Arabic original"
+        },
+        {
+          "title": "Tafsir al-Tabari (Jami al-bayan), Arabic, on 4:171 (quran.com API, resource 15)",
+          "url": "https://api.quran.com/api/v4/tafsirs/15/by_ayah/4:171",
+          "accessed": "2026-11-23",
+          "licence": "classical text",
+          "use": "Al-Tabari reads the verse as rejecting the claim that Jesus is God's son, as God does not take a son",
+          "verification": "partly verified (opening read in Arabic); edition not identified"
         }
       ]
     },
