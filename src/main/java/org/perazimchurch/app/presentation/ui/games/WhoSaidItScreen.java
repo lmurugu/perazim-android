@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.ui.games;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameMissLog;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -88,7 +89,9 @@ public final class WhoSaidItScreen {
             option.setOnClickListener(v -> {
                 if (!ui.activeOwner()) return;
                 ui.click(v);
+                String asked = game.prompt();
                 GameSession.Outcome outcome = game.answer(choice);
+                GameMissLog.answered(ctx.activity(), "who_said_it", asked, outcome);
                 tapFeedback(v, outcome);
                 String line = answerLine(game, outcome);
                 v.postDelayed(() -> render(game, line, outcome == GameSession.Outcome.CORRECT), 280);

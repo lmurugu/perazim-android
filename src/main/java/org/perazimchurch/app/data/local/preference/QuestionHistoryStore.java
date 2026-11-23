@@ -40,6 +40,34 @@ public final class QuestionHistoryStore {
         return out;
     }
 
+    /**
+     * Read-only view of every game's records, keyed by game then by prompt. Used by the guide to show which questions
+     * the member misses most. Returns an empty map when storage is unavailable.
+     */
+    @NonNull
+    public static Map<String, Map<String, Record>> loadAll(@NonNull Context context) {
+        Map<String, Map<String, Record>> out = new HashMap<>();
+        try {
+            for (Map.Entry<String, ?> entry : prefs(context).getAll().entrySet()) {
+                if (!(entry.getValue() instanceof String)) continue;
+                int split = entry.getKey().indexOf('|');
+                if (split <= 0) continue;
+                Record record = parse((String) entry.getValue());
+                if (record == null) continue;
+                String game = entry.getKey().substring(0, split);
+                Map<String, Record> byPrompt = out.get(game);
+                if (byPrompt == null) {
+                    byPrompt = new HashMap<>();
+                    out.put(game, byPrompt);
+                }
+                byPrompt.put(entry.getKey().substring(split + 1), record);
+            }
+        } catch (RuntimeException ignored) {
+            // Storage unavailable: the guide sees no history, the same as a first run.
+        }
+        return out;
+    }
+
     /** Adds one answer for a question to its record. */
     public static void record(@NonNull Context context, @NonNull String game, @NonNull String prompt, boolean correct) {
         try {
