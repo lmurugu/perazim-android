@@ -46,7 +46,8 @@ public class GroupSaintsLeakageTest {
                 .anyMatch(h -> h.conceptId.equals("jesus_created") || h.conceptId.equals("group_question")));
     }
 
-    // The model note carries origin and Scripture only: never internal notes or sources.
+    // The model note carries the approved fields: official summary, Scripture evaluation, origin and approved source
+    // titles. Internal notes, reviewer material and source URLs never appear.
     @Test
     public void noteTextLeaksNoInternalFields() throws Exception {
         JSONObject entry = new JSONObject()
@@ -56,6 +57,21 @@ public class GroupSaintsLeakageTest {
         assertTrue(note, note.contains("ORIGIN-TEXT") && note.contains("SCRIPTURE-TEXT"));
         assertFalse(note, note.contains("INTERNAL-SECRET"));
         assertFalse(note, note.contains("SOURCE-LINK"));
+    }
+
+    // Source titles are model-visible; source URLs and any other source field are not.
+    @Test
+    public void noteTextShowsSourceTitlesButNeverSourceUrls() throws Exception {
+        JSONObject entry = new JSONObject()
+                .put("id", "x").put("summary", "SUMMARY-TEXT").put("scripture", "SCRIPTURE-TEXT")
+                .put("sources", new JSONArray().put(new JSONObject()
+                        .put("title", "TITLE-OK").put("url", "https://example.invalid/PRIVATE-URL")
+                        .put("licence", "PRIVATE-LICENCE")));
+        String note = ComparativeGate.noteText(entry);
+        assertTrue(note, note.contains("Sources: TITLE-OK"));
+        assertFalse(note, note.contains("PRIVATE-URL"));
+        assertFalse(note, note.contains("https://"));
+        assertFalse(note, note.contains("PRIVATE-LICENCE"));
     }
 
     @Test

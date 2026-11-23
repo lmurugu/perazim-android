@@ -11,8 +11,10 @@ import org.json.JSONObject;
 public final class ComparativeGate {
 
     public static final String APPROVED_STATUS = "APPROVED_LEVI";
+    /** The evidence sourceId that marks a comparative note in the prompt. Notes are context only and never cited. */
+    public static final String NOTE_SOURCE_ID = "perazim-comparative-kb";
     /** Budget for one model-facing note. Fields are kept whole or cut at a whole sentence, never mid-sentence. */
-    static final int MAX_NOTE_CHARS = 900;
+    public static final int MAX_NOTE_CHARS = 900;
     static final String HEADER = "Comparative note, not Perazim's position.";
     static final int MAX_SOURCE_TITLES = 3;
 
@@ -79,8 +81,11 @@ public final class ComparativeGate {
         return text;
     }
 
-    /** Returns the text if it fits; otherwise its longest prefix that ends at a sentence end within the room, or "". */
-    static String wholeSentences(String text, int room) {
+    /**
+     * Returns the text if it fits within room characters; otherwise its longest prefix that ends at a sentence end
+     * within the room, or "". Never returns a fragment of a sentence.
+     */
+    public static String wholeSentences(String text, int room) {
         if (room <= 0) return "";
         if (text.length() <= room) return text;
         int end = -1;
