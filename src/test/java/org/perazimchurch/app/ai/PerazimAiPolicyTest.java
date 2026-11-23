@@ -55,11 +55,17 @@ public class PerazimAiPolicyTest {
         assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("Please speak with the Bishop"));
     }
 
+    /** The crisis reply carries only the verified Kenya directory numbers (owner decision 9A); no other number may appear. */
     @Test public void crisisResponseDoesNotInventAContactOrPromiseAvailability() {
         String response = PerazimAiEngine.crisisResponse().getMessageText();
-        assertTrue(response.contains("local emergency services"));
+        assertTrue(response.contains("call 999 or 112 now"));
         assertTrue(response.contains("cannot provide emergency monitoring"));
-        assertFalse(response.matches("(?s).*\\+?\\d[\\d ()-]{6,}.*"));
+        java.util.Set<String> verified = new java.util.HashSet<>(java.util.Arrays.asList(
+                "999", "112", "922", "1195", "116", "1192", "+254 722 178 177"));
+        java.util.regex.Matcher numbers = java.util.regex.Pattern.compile("\\+?\\d[\\d ]*\\d").matcher(response);
+        while (numbers.find()) {
+            assertTrue("unverified number in crisis reply: " + numbers.group(), verified.contains(numbers.group()));
+        }
         assertFalse(response.contains("Bishop"));
     }
 
