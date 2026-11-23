@@ -179,6 +179,122 @@ def ccel_topical_entries(path):
     return [(h, t) for h, t in entries if len(h) > 1 and t.strip()]
 
 
+
+ROMAN = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100}
+
+
+def roman_to_int(text):
+    total, prev = 0, 0
+    for ch in reversed(text.upper()):
+        value = ROMAN[ch]
+        total = total - value if value < prev else total + value
+        prev = max(prev, value)
+    return total
+
+
+_CHAPTER_HEADING = re.compile(r"^\s*(?:CHAP\.|CHAPTER)\s+([IVXLC]+)\.?\s*$", re.I)
+_BOOK_KEYS = {re.sub(r"\s+", "", name).upper(): name for name in BOOK_NAMES.values()}
+
+
+def _book_heading(line):
+    """Return the canonical book name when a line is a book title (spaced or plain capitals), else None."""
+    stripped = line.strip()
+    if not stripped or len(stripped) > 60 or stripped != stripped.upper() and stripped.lower() == stripped:
+        return None
+    key = re.sub(r"\s+", "", stripped).upper()
+    return _BOOK_KEYS.get(key)
+
+
+def _chunk_paragraphs(paragraphs, limit=1800):
+    """Group paragraphs into chunks of at most about `limit` characters, never splitting a paragraph."""
+    chunks, current = [], []
+    size = 0
+    for para in paragraphs:
+        if current and size + len(para) > limit:
+            chunks.append(" ".join(current))
+            current, size = [], 0
+        current.append(para)
+        size += len(para) + 1
+    if current:
+        chunks.append(" ".join(current))
+    return chunks
+
+
+def _capital_heading(line):
+    """A section title written in capitals, such as 'THE GOSPEL OF LUKE'. Returns it in title case, else None."""
+    stripped = line.strip()
+    letters = re.sub(r"[^A-Za-z]", "", stripped)
+    if len(letters) < 4 or len(stripped) > 80 or letters != letters.upper():
+        return None
+    if re.fullmatch(r"[IVXLC.\s]+", stripped):
+        return None
+    words = [w.capitalize() if w.upper() not in ("OF", "THE", "AND", "ON", "TO", "IN") else w.lower()
+             for w in re.split(r"\s+", stripped.rstrip(".")) if w]
+    title = " ".join(words)
+    return title[:1].upper() + title[1:] if title else None
+
+
+def ccel_commentary_books(path):
+    """Book-by-book commentary (Wesley). Entries are paragraph chunks labelled by section title and part."""
+    lines = ccel_body_lines(path)
+    current_book = None
+    paragraphs = []
+    entries = []
+    previous_blank = True
+
+    def flush():
+        if current_book and paragraphs:
+            for n, chunk in enumerate(_chunk_paragraphs(paragraphs), 1):
+                label = "%s, part %d" % (current_book, n)
+                entries.append((label, chunk))
+
+    for line in lines:
+        heading = _capital_heading(line) if previous_blank else None
+        previous_blank = not line.strip()
+        if heading and len(heading) > 3:
+            flush()
+            current_book, paragraphs = heading, []
+            continue
+        if not line.strip():
+            continue
+        if current_book and line.strip():
+            paragraphs.append(re.sub(r"\s+", " ", line.strip()))
+    flush()
+    return entries
+
+
+def ccel_commentary_henry_file(path, state):
+    """One Henry volume. `state` carries the current book across the six volume files."""
+    lines = ccel_body_lines(path)
+    paragraphs = []
+    chapter = None
+    entries = []
+
+    def flush():
+        if state.get("book") and paragraphs:
+            label_base = ("%s, introduction" % state["book"]) if chapter is None else "%s %d" % (state["book"], chapter)
+            for n, chunk in enumerate(_chunk_paragraphs(paragraphs), 1):
+                entries.append((label_base, chunk, n))
+
+    for line in lines:
+        book = _book_heading(line)
+        if book:
+            flush()
+            state["book"], chapter, paragraphs = book, None, []
+            continue
+        match = _CHAPTER_HEADING.match(line)
+        if match:
+            flush()
+            chapter, paragraphs = roman_to_int(match.group(1)), []
+            continue
+        if not line.strip():
+            continue
+        if state.get("book"):
+            paragraphs.append(re.sub(r"\s+", " ", line.strip()))
+    flush()
+    return entries
+
+
 SOURCE_SCHEMA = """
 CREATE TABLE meta(key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE sources(
@@ -213,7 +329,7 @@ def load_sources():
         return json.load(handle)["sources"]
 
 
-def build(raw_dir, out_path, only=None):
+def build(raw_dir, out_path, only=None, tier="default"):
     raw_dir = Path(raw_dir)
     out_path = Path(out_path)
     tmp_path = out_path.with_suffix(out_path.suffix + ".building")
@@ -228,13 +344,40 @@ def build(raw_dir, out_path, only=None):
         sid = source["id"]
         if only and sid not in only:
             continue
-        path = raw_dir / source["file"]
-        if not path.exists():
-            raise SystemExit("Missing raw file for %s: %s (run fetch_reference_sources.py)" % (sid, path))
-        digest = sha256_file(path)
+        if source.get("tier", "default") != tier:
+            continue
+        files = source.get("files") or [{"file": source["file"]}]
+        paths = [raw_dir / f["file"] for f in files]
+        for path in paths:
+            if not path.exists():
+                raise SystemExit("Missing raw file for %s: %s (run fetch_reference_sources.py)" % (sid, path))
+        if len(paths) == 1:
+            digest = sha256_file(paths[0])
+        else:
+            joined = hashlib.sha256()
+            for path in paths:
+                joined.update(sha256_file(path).encode("ascii"))
+            digest = joined.hexdigest()
+        path = paths[0]
         parser = source["parser"]
         rows = 0
-        if parser == "openbible_xrefs":
+        if parser == "ccel_commentary_henry":
+            state = {}
+            for volume in paths:
+                state["book"] = None
+                for headword, chunk, part in ccel_commentary_henry_file(volume, state):
+                    entry_id += 1
+                    location = "%s, part %d" % (headword, part)
+                    conn.execute("INSERT INTO entries(id, source_id, headword, location, body) VALUES (?,?,?,?,?)",
+                                 (entry_id, sid, headword, location, chunk))
+                    rows += 1
+        elif parser == "ccel_commentary_books":
+            for headword, chunk in ccel_commentary_books(path):
+                entry_id += 1
+                conn.execute("INSERT INTO entries(id, source_id, headword, location, body) VALUES (?,?,?,?,?)",
+                             (entry_id, sid, headword, headword, chunk))
+                rows += 1
+        elif parser == "openbible_xrefs":
             conn.executemany("INSERT OR IGNORE INTO xrefs(from_key, to_start, to_end, votes) VALUES (?,?,?,?)",
                              parse_openbible_xrefs(path))
             rows = conn.execute("SELECT COUNT(*) FROM xrefs WHERE 1").fetchone()[0]
@@ -261,8 +404,8 @@ def build(raw_dir, out_path, only=None):
             (sid, source["title"], source.get("author"), source.get("edition"), source["category"],
              source["licence"], source.get("licenceUrl"), source.get("sourceUrl"), source.get("landingUrl"),
              source["attribution"], source["theologyTag"], source["tier"], digest,
-             os.path.getsize(path), rows))
-        report.append((sid, rows, os.path.getsize(path)))
+             sum(os.path.getsize(p) for p in paths), rows))
+        report.append((sid, rows, sum(os.path.getsize(p) for p in paths)))
     conn.commit()
     conn.execute("VACUUM")
     conn.close()
@@ -275,8 +418,10 @@ def main(argv=None):
     parser.add_argument("--raw", required=True, help="directory holding the downloaded raw files")
     parser.add_argument("--out", required=True, help="output reference.db path")
     parser.add_argument("--only", nargs="*", help="build only these source ids")
+    parser.add_argument("--tier", default="default", choices=["default", "pending"],
+                        help="default: the bundled set. pending: doctrinal sources awaiting Levi (separate file)")
     args = parser.parse_args(argv)
-    report = build(args.raw, args.out, set(args.only) if args.only else None)
+    report = build(args.raw, args.out, set(args.only) if args.only else None, args.tier)
     total = 0
     for sid, rows, size in report:
         print("%-28s rows=%-8d raw=%d bytes" % (sid, rows, size))

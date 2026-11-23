@@ -106,6 +106,79 @@
       "attribution": "Nave's Topical Bible (1921), public domain. Text from Christian Classics Ethereal Library.",
       "sizeBytes": 2107617,
       "sha256": "d78906aead3f71b8c49970fae3c4f983a51ffdbf7ef740f5e7c4dacd3c59cb9b"
+    },
+    {
+      "id": "matthew-henry-commentary",
+      "title": "Matthew Henry's Commentary on the Whole Bible",
+      "author": "Matthew Henry (1662-1714)",
+      "edition": "1706-1721 (CCEL text, six volumes)",
+      "category": "COMMENTARY",
+      "licence": "Public domain (CCEL: may be copied and distributed freely)",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://www.ccel.org/ccel/henry/mhc1/cache/mhc1.txt",
+      "landingUrl": "https://www.ccel.org/ccel/henry/mhc1",
+      "files": [
+        {
+          "file": "ccel/henry_mhc1.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc1/cache/mhc1.txt",
+          "sha256": "63ad5f200460b049488afc7b0e90dc87fa739f2f34ffbba75a4e5ef013cfe727",
+          "sizeBytes": 6260496
+        },
+        {
+          "file": "ccel/henry_mhc2.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc2/cache/mhc2.txt",
+          "sha256": "b53ca73cf69947ab4f815a54998811167d412253b4595340a057d5b87766acb7",
+          "sizeBytes": 7814959
+        },
+        {
+          "file": "ccel/henry_mhc3.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc3/cache/mhc3.txt",
+          "sha256": "676a2f0b7bc8317639a54d0dced5fcaf087458357a1d8b6e934bcb9170da5eef",
+          "sizeBytes": 8075277
+        },
+        {
+          "file": "ccel/henry_mhc4.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc4/cache/mhc4.txt",
+          "sha256": "c15670be62822c4d5678b5a5cf18d91061017d37a7233893e5b81ee2f6be9b2e",
+          "sizeBytes": 10442839
+        },
+        {
+          "file": "ccel/henry_mhc5.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc5/cache/mhc5.txt",
+          "sha256": "8b4c34ba8dc9abdafc5d15d711ace78b4e3ac86ceca4056c38cf4f4469ef3080",
+          "sizeBytes": 8511112
+        },
+        {
+          "file": "ccel/henry_mhc6.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc6/cache/mhc6.txt",
+          "sha256": "d6d0cdf15d3edbac8982e8c9b50e0c1dfaecc660af62b6d8e53d910516eb9fb7",
+          "sizeBytes": 8011439
+        }
+      ],
+      "parser": "ccel_commentary_henry",
+      "theologyTag": "PURITAN_REFORMED_COMMENTARY_PENDING_LEVI",
+      "tier": "pending",
+      "attribution": "Matthew Henry's Commentary on the Whole Bible (1706-1721), public domain. Text from Christian Classics Ethereal Library (ccel.org). Reference material, not Perazim's position.",
+      "sha256": "multi",
+      "sizeBytes": 49116122
+    },
+    {
+      "id": "wesley-notes-nt",
+      "title": "John Wesley's Explanatory Notes upon the New Testament",
+      "author": "John Wesley (1703-1791)",
+      "edition": "1755 (CCEL text)",
+      "category": "COMMENTARY",
+      "licence": "Public domain (CCEL rights line: Public Domain)",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://www.ccel.org/ccel/wesley/notes/cache/notes.txt",
+      "landingUrl": "https://www.ccel.org/ccel/wesley/notes",
+      "file": "ccel/wesley_notes.txt",
+      "sha256": "3b5e216b0a0955151f0242e451066d611efb876c9a275e7d68d29cedc88b80c7",
+      "sizeBytes": 6676836,
+      "parser": "ccel_commentary_books",
+      "theologyTag": "ARMINIAN_WESLEYAN_COMMENTARY_PENDING_LEVI",
+      "tier": "pending",
+      "attribution": "John Wesley's Explanatory Notes upon the New Testament (1755), public domain. Text from Christian Classics Ethereal Library (ccel.org). Reference material, not Perazim's position."
     }
   ],
   "candidates": [
@@ -182,15 +255,6 @@
       "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
     },
     {
-      "id": "matthew-henry",
-      "title": "Matthew Henry's Commentary on the Whole Bible",
-      "licence": "Public domain (CCEL: 'Public domain. May be copied and distributed freely.')",
-      "url": "https://www.ccel.org/ccel/henry/mhc1.toc",
-      "status": "OPTIONAL_LARGE",
-      "theology": "Puritan, Reformed (Calvinist)",
-      "note": "Six volumes at about 6 MB text each; ship only as an optional download."
-    },
-    {
       "id": "gill-exposition",
       "title": "John Gill's Exposition of the Entire Bible",
       "licence": "Public domain (author died 1771); verify CCEL rights line",
@@ -225,15 +289,6 @@
       "status": "CANDIDATE_VERIFY",
       "theology": "Wesleyan Arminian",
       "note": "Conflicts with Reformed commentaries; flag."
-    },
-    {
-      "id": "wesley-notes",
-      "title": "John Wesley's Explanatory Notes upon the New Testament",
-      "licence": "Public domain (author died 1791); verify CCEL rights line",
-      "url": "https://www.ccel.org/ccel/wesley/notes.toc",
-      "status": "CANDIDATE_VERIFY",
-      "theology": "Arminian, Wesleyan",
-      "note": "NT only."
     },
     {
       "id": "calvin-commentaries",

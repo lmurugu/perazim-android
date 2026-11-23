@@ -44,21 +44,26 @@ def main(argv=None):
     for source in data["sources"]:
         if args.only and source["id"] not in args.only:
             continue
-        target = raw / source["file"]
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if target.exists() and source.get("sha256") and sha256_bytes(target.read_bytes()) == source["sha256"]:
-            print("kept   %s" % source["id"])
-            continue
-        body = fetch(source["sourceUrl"])
-        digest = sha256_bytes(body)
-        if source.get("sha256") and digest != source["sha256"]:
-            sys.exit("sha256 mismatch for %s: expected %s, got %s" % (source["id"], source["sha256"], digest))
-        target.write_bytes(body)
-        print("fetched %-26s %9d bytes  sha256 %s" % (source["id"], len(body), digest[:16]))
-        if args.record and source.get("sha256") != digest:
-            source["sha256"] = digest
-            source["sizeBytes"] = len(body)
-            changed = True
+        # A source either names one file (file + sourceUrl) or several (files: [{file, url, sha256, sizeBytes}]).
+        items = source.get("files") or [{"file": source["file"], "url": source["sourceUrl"],
+                                         "sha256": source.get("sha256"), "sizeBytes": source.get("sizeBytes")}]
+        for item in items:
+            target = raw / item["file"]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists() and item.get("sha256") and sha256_bytes(target.read_bytes()) == item["sha256"]:
+                print("kept   %s %s" % (source["id"], item["file"]))
+                continue
+            body = fetch(item["url"])
+            digest = sha256_bytes(body)
+            if item.get("sha256") and digest != item["sha256"]:
+                sys.exit("sha256 mismatch for %s (%s): expected %s, got %s"
+                         % (source["id"], item["file"], item["sha256"], digest))
+            target.write_bytes(body)
+            print("fetched %-26s %9d bytes  sha256 %s" % (source["id"] + ":" + item["file"], len(body), digest[:16]))
+            if args.record and item.get("sha256") != digest:
+                item["sha256"] = digest
+                item["sizeBytes"] = len(body)
+                changed = True
     if changed:
         sources_path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return 0

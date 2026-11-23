@@ -140,3 +140,74 @@ class EndToEndTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CommentaryTest(unittest.TestCase):
+    HEADER = "     ____________\n\n   Title\n     ____________\n     ____________\n\n"
+
+    def test_roman_numerals_and_chunking(self):
+        self.assertEqual(b.roman_to_int("XIV"), 14)
+        self.assertEqual(b.roman_to_int("III"), 3)
+        chunks = b._chunk_paragraphs(["aaaa bbbb", "cccc", "dddd eeee ff"], limit=10)
+        self.assertEqual(chunks, ["aaaa bbbb", "cccc", "dddd eeee ff"])
+        self.assertEqual(b._chunk_paragraphs(["one", "two"], limit=1800), ["one two"])
+
+    def test_henry_chapters_get_their_own_entries(self):
+        body = ("G E N E S I S\n\nIntroduction to the book.\n\nCHAP. I.\n\n"
+                "In the beginning God created the heaven.\n\nSecond paragraph here.\n\n"
+                "CHAP. II.\n\nThus the heavens were finished.\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "mhc1.txt"
+            write(path, self.HEADER + body)
+            state = {}
+            entries = b.ccel_commentary_henry_file(path, state)
+        self.assertEqual(state["book"], "Genesis")
+        labels = [label for label, _, _ in entries]
+        self.assertEqual(labels, ["Genesis, introduction", "Genesis 1", "Genesis 2"])
+        by_label = {label: body for label, body, _ in entries}
+        self.assertEqual(by_label["Genesis 1"], "In the beginning God created the heaven. Second paragraph here.")
+        self.assertEqual(by_label["Genesis 2"], "Thus the heavens were finished.")
+
+    def test_henry_state_carries_book_across_volume_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            first = Path(tmp) / "mhc1.txt"
+            second = Path(tmp) / "mhc2.txt"
+            write(first, self.HEADER + "G E N E S I S\n\nCHAP. I.\n\nText one.\n")
+            write(second, self.HEADER + "CHAP. I.\n\nText two continues.\n")
+            state = {}
+            b.ccel_commentary_henry_file(first, state)
+            entries = b.ccel_commentary_henry_file(second, state)
+        self.assertEqual(entries[0][0], "Genesis 1")
+        self.assertEqual(entries[0][1], "Text two continues.")
+
+    def test_wesley_sections_titled_in_capitals(self):
+        body = ("THE GOSPEL OF LUKE\n\nFirst paragraph of notes.\n\nSecond paragraph.\n\n"
+                "THE ACTS OF THE APOSTLES\n\nAnother note.\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "wesley_notes.txt"
+            write(path, self.HEADER + body)
+            entries = b.ccel_commentary_books(path)
+        self.assertEqual(entries, [
+            ("The Gospel of Luke, part 1", "First paragraph of notes. Second paragraph."),
+            ("The Acts of the Apostles, part 1", "Another note."),
+        ])
+
+    def test_build_accepts_pending_tier_and_default_excludes_it(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / "raw"
+            write(raw / "ccel" / "wesley_notes.txt", self.HEADER + "THE GOSPEL OF LUKE\n\nA note.\n")
+            fake = [{
+                "id": "wesley-notes-nt", "title": "Wesley", "author": "John Wesley", "category": "commentary",
+                "licence": "Public domain", "attribution": "Wesley", "theologyTag": "ARMINIAN_WESLEYAN_COMMENTARY_PENDING_LEVI",
+                "tier": "pending", "parser": "ccel_commentary_books", "file": "ccel/wesley_notes.txt",
+                "sizeBytes": 0,
+            }]
+            with mock.patch.object(b, "load_sources", return_value=fake):
+                pending_db = Path(tmp) / "pending.db"
+                b.build(raw, pending_db, tier="pending")
+                default_db = Path(tmp) / "default.db"
+                b.build(raw, default_db, tier="default")
+            pending_rows = sqlite3.connect(pending_db).execute("SELECT COUNT(*) FROM entries").fetchone()[0]
+            default_rows = sqlite3.connect(default_db).execute("SELECT COUNT(*) FROM entries").fetchone()[0]
+        self.assertEqual(pending_rows, 1)
+        self.assertEqual(default_rows, 0)
