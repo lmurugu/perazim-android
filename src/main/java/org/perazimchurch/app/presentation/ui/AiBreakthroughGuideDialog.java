@@ -982,7 +982,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 actionListener.onNavigateTab(3);
                 break;
             case AiResponse.INTENT_NAVIGATE_PROFILE:
-                actionListener.onNavigateTab(4);
+                actionListener.onNavigateTab(5);
                 break;
             case AiResponse.INTENT_NAVIGATE_GIVING:
                 actionListener.onOpenGiving();
