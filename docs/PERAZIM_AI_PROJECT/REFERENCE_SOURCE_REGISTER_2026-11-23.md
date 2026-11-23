@@ -77,7 +77,7 @@ Commentaries carry their authors' theology and conflict with each other (Henry i
 
 Creeds and confessions (CCEL Schaff, *Creeds of Christendom*):
 
-- **Extracted and checked: the Nicene-Constantinopolitan Creed of 381** (`scripts/reference/creeds/nicene-constantinopolitan-381.txt`, 218 words). It is the clean English block in CCEL volume I (creeds1.txt). The text matches the source word for word, except the editor's gloss "(æons)", which is omitted. It is **pending Levi's approval** and is not in `approvals.json` or any database.
+- **Extracted and checked: the Nicene-Constantinopolitan Creed of 381** (`scripts/reference/creeds/nicene-constantinopolitan-381.txt`, 218 words). It is the clean English block in CCEL volume I (creeds1.txt). The text matches the source word for word, except the editor's gloss "(æons)", which is omitted. Levi approved it on 2026-11-23 (answer A), and its id is in `approvals.json`. No database row is built yet, because the creed parser is not written.
 - **Source needed: Apostles' Creed** (received form, 1662 Book of Common Prayer). No usable English text found: Wikisource has no 1662 Prayer Book page under the titles tried, and CCEL has no standalone text. The Prayer Book text also needs Levi's choice of form.
 - **Source needed: Athanasian Creed and Thirty-Nine Articles** (1662 Book of Common Prayer). Project Gutenberg returned 503 errors and the Justus transcription host was unreachable. The Wikisource Athanasian page has no English text.
 - **Source needed: Westminster Confession (1646/47).** The Wikisource 1647 text (The Humble Advice of the Assembly of Divines) is marked not proofread, so it is not clean. CCEL has only a modernised 1647 text inside volume III.
