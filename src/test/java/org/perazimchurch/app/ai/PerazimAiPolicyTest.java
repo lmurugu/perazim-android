@@ -57,9 +57,11 @@ public class PerazimAiPolicyTest {
 
     @Test public void crisisResponseDoesNotInventAContactOrPromiseAvailability() {
         String response = PerazimAiEngine.crisisResponse().getMessageText();
-        assertTrue(response.contains("local emergency services"));
+        assertTrue(response.contains("999 or 112"));
         assertTrue(response.contains("cannot provide emergency monitoring"));
-        assertFalse(response.matches("(?s).*\\+?\\d[\\d ()-]{6,}.*"));
+        // Only the Kenyan numbers approved by Levi may appear; no invented contacts.
+        assertTrue(response.contains("922") && response.contains("999 or 112"));
+        assertFalse(response.matches("(?s).*\\+1[\\d ()-]{6,}.*"));
         assertFalse(response.contains("Bishop"));
     }
 
