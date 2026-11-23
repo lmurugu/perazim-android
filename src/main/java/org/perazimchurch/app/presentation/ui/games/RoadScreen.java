@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.ui.games;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameMissLog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -80,7 +81,9 @@ public final class RoadScreen {
     }
 
     private static void tap(GameContext ctx, int level, RoadSession run, GameChrome chrome, String option, View v) {
+        String asked = run.prompt();
         GameSession.Outcome outcome = run.answer(option);
+        GameMissLog.answered(ctx.activity(), "road_to_jerusalem", asked, outcome);
         if (outcome == GameSession.Outcome.IGNORED) return;
         if (outcome == GameSession.Outcome.CORRECT) GameFx.correct(v);
         if (outcome == GameSession.Outcome.WRONG) GameFx.wrong(v);

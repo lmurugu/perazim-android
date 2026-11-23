@@ -16,6 +16,7 @@ import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
+import org.perazimchurch.app.presentation.ui.games.common.GameMissLog;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
 
 /**
@@ -87,7 +88,9 @@ public final class QuizScreen {
             option.setOnClickListener(v -> {
                 if (!ui.activeOwner()) return;
                 ui.click(v);
+                String asked = game.prompt();
                 GameSession.Outcome outcome = game.answer(choice);
+                GameMissLog.answered(ctx.activity(), "bible_quiz", asked, outcome);
                 tapFeedback(v, outcome);
                 String line = answerLine(game, outcome);
                 v.postDelayed(() -> render(game, line, outcome == GameSession.Outcome.CORRECT), 280);

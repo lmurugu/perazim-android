@@ -51,6 +51,7 @@ import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
+import org.perazimchurch.app.presentation.ui.games.common.GameMissLog;
 import org.perazimchurch.app.presentation.ui.games.common.GameUi;
 import org.perazimchurch.app.presentation.ui.games.common.GameRegistry;
 import org.perazimchurch.app.presentation.ui.games.common.GameResults;
@@ -923,7 +924,9 @@ public final class GamesHubDialog extends Dialog {
             Button b = button(events.get(i).title, false);
             b.setOnClickListener(v -> {
                 if (game.isPlaced(index)) return;
-                if (game.tap(index)) {
+                boolean placed = game.tap(index);
+                GameMissLog.answered(activity, "story_timeline", events.get(index).title, placed);
+                if (placed) {
                     addStar();
                     feedback().gameCue(FeedbackManager.GameCue.MATCH);
                     b.setText(game.placed() + ". " + events.get(index).title + " (" + events.get(index).reference + ")");
@@ -1148,13 +1151,17 @@ public final class GamesHubDialog extends Dialog {
         old.setOnClickListener(v -> {
             if (!activeOwner()) return;
             feedback().click(v);
-            renderTestamentSort(game, answerLine(game.place(TestamentSort.Testament.OLD), game));
+            boolean right = game.place(TestamentSort.Testament.OLD);
+            GameMissLog.answered(activity, "old_or_new", book.name, right);
+            renderTestamentSort(game, answerLine(right, game));
         });
         Button neu = button("New Testament", false);
         neu.setOnClickListener(v -> {
             if (!activeOwner()) return;
             feedback().click(v);
-            renderTestamentSort(game, answerLine(game.place(TestamentSort.Testament.NEW), game));
+            boolean right = game.place(TestamentSort.Testament.NEW);
+            GameMissLog.answered(activity, "old_or_new", book.name, right);
+            renderTestamentSort(game, answerLine(right, game));
         });
     }
 
@@ -1195,6 +1202,7 @@ public final class GamesHubDialog extends Dialog {
                 if (!activeOwner()) return;
                 feedback().click(v);
                 boolean right = game.answer(choice);
+                GameMissLog.answered(activity, "who_said_it", question.quote, right);
                 WhoSaidIt.Question answered = game.lastQuestion();
                 String line = (right ? "Correct. " : "Not quite. It was " + answered.answer + ". ")
                         + answered.reference + ".";
@@ -1233,6 +1241,7 @@ public final class GamesHubDialog extends Dialog {
                 if (!activeOwner()) return;
                 feedback().click(v);
                 boolean right = game.answer(choice);
+                GameMissLog.answered(activity, "fill_the_gap", question.before + "_____" + question.after, right);
                 FillTheGap.Question answered = game.lastQuestion();
                 String line = (right ? "Correct. " : "Not quite. The word was " + answered.answer + ". ")
                         + answered.reference + ".";
@@ -1530,11 +1539,19 @@ public final class GamesHubDialog extends Dialog {
         check.setOnClickListener(v -> submit(puzzle.sentence()));
     }
 
+    /** Catalog id for the legacy round in progress, used when recording each answer. */
+    private String legacyGameId() {
+        if (mode == Mode.WHO_AM_I) return "who_am_i";
+        if (mode == Mode.VERSE_ORDER) return "verse_builder";
+        return "bible_quiz";
+    }
+
     private void submit(String value) {
         if (!activeOwner() || round.answered()) return;
         hideKeyboard();
         Card card = round.current();
         boolean correct = round.answer(value);
+        GameMissLog.answered(activity, legacyGameId(), card.prompt, correct);
         if (correct) addStar();
         screen(correct ? "Well done!" : "Let's learn this one", "Score " + round.score() + " · Question " + round.position() + " of " + round.size(), true);
         text(card.answer, 24, true);

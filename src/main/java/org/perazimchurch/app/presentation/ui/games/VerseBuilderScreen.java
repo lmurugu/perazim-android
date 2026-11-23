@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.ui.games;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameMissLog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -118,7 +119,9 @@ public final class VerseBuilderScreen {
             check.setOnClickListener(v -> {
                 if (!ui.activeOwner()) return;
                 ui.click(v);
+                String asked = game.prompt();
                 GameSession.Outcome outcome = game.answer(puzzle.sentence());
+                GameMissLog.answered(ctx.activity(), "verse_builder", asked, outcome);
                 tapFeedback(v, outcome);
                 String line = answerLine(game, outcome);
                 v.postDelayed(() -> render(game, line, outcome == GameSession.Outcome.CORRECT), 280);

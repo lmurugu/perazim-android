@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.ui.games;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameMissLog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,7 +56,9 @@ public final class WhoAmIScreen {
         TextView feedbackLine = ui.text("", 14, false);
         Button check = ui.button("Check answer", true);
         check.setOnClickListener(v -> {
+            String asked = session.prompt();
             GameSession.Outcome outcome = session.answer(input.getText().toString());
+            GameMissLog.answered(ctx.activity(), "who_am_i", asked, outcome);
             if (outcome == GameSession.Outcome.CORRECT) GameFx.correct(input);
             if (outcome == GameSession.Outcome.WRONG) GameFx.wrong(input);
             check.setEnabled(false);
