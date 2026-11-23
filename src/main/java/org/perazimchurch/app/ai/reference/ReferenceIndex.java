@@ -92,6 +92,18 @@ public final class ReferenceIndex {
 
     /** Dictionary entries whose headword matches exactly (case-insensitive), from approved sources only. */
     public List<ReferenceHit> dictionary(String headword, ReferenceApprovals approvals, int limit) {
+        return headwordEntries(headword, approvals, limit, "ORDER BY e.source_id");
+    }
+
+    /**
+     * Every stored part of a multi-part text (such as a creed) under one headword, in stored order, from approved
+     * sources only. Returns at most {@code limit} parts.
+     */
+    public List<ReferenceHit> parts(String headword, ReferenceApprovals approvals, int limit) {
+        return headwordEntries(headword, approvals, limit, "ORDER BY e.source_id, e.id");
+    }
+
+    private List<ReferenceHit> headwordEntries(String headword, ReferenceApprovals approvals, int limit, String order) {
         List<ReferenceHit> out = new ArrayList<>();
         if (db == null || headword == null || approvals == null || approvals.isEmpty() || limit <= 0) return out;
         List<String> ids = new ArrayList<>(approvals.ids());
@@ -106,7 +118,7 @@ public final class ReferenceIndex {
         String sql = "SELECT e.source_id, e.headword, e.body, s.title, s.author, s.licence, s.theology_tag "
                 + "FROM entries e JOIN sources s ON s.source_id = e.source_id "
                 + "WHERE e.headword = ? COLLATE NOCASE AND e.source_id IN (" + in + ") "
-                + "ORDER BY e.source_id LIMIT ?";
+                + order + " LIMIT ?";
         try (Cursor c = db.rawQuery(sql, args.toArray(new String[0]))) {
             while (c.moveToNext()) {
                 out.add(new ReferenceHit(ReferenceHit.KIND_DICTIONARY, c.getString(0), c.getString(3),

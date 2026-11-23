@@ -27,6 +27,10 @@ public final class ReferenceGuide {
     /** One commentary excerpt at most. It is added last, after the governed position and the factual references. */
     static final int MAX_COMMENTARY_ITEMS = 1;
     private static final int MAX_WORDS = 4;
+    /** Headword under which the approved Nicene-Constantinopolitan Creed is stored, in chunks. */
+    static final String CREED_HEADWORD = "Nicene";
+    /** All chunks of the creed are returned when it is asked for. The creed is three chunks of at most 560 characters. */
+    static final int MAX_CREED_PARTS = 4;
 
     private static final Set<String> STOP = new HashSet<>(Arrays.asList(
             "about", "after", "again", "against", "also", "because", "before", "being", "between", "could",
@@ -51,9 +55,14 @@ public final class ReferenceGuide {
                 if (verse > 0) hits.addAll(index.crossReferences(verse, approvals, 2));
                 for (String word : words(question)) {
                     if (hits.size() >= MAX_REFERENCE_ITEMS) break;
+                    if (CREED_HEADWORD.equals(word)) continue;
                     hits.addAll(index.dictionary(word, approvals, 1));
                 }
                 JSONArray withReferences = ReferenceEvidence.append(evidence, hits, MAX_REFERENCE_ITEMS);
+                if (asksForCreed(question)) {
+                    withReferences = ReferenceEvidence.append(withReferences,
+                            index.parts(CREED_HEADWORD, approvals, MAX_CREED_PARTS), MAX_CREED_PARTS);
+                }
                 if (verse <= 0) return withReferences;
                 List<ReferenceHit> commentary = index.commentaries(ReferenceKeys.chapterHeadword(verse), approvals,
                         MAX_COMMENTARY_ITEMS);
@@ -65,6 +74,11 @@ public final class ReferenceGuide {
             Log.w(TAG, "Reference evidence skipped", e);
             return evidence;
         }
+    }
+
+    /** True when the question names the Nicene Creed. Its chunks are then returned in full, in order. */
+    static boolean asksForCreed(String question) {
+        return words(question).contains(CREED_HEADWORD);
     }
 
     static List<String> words(String question) {
