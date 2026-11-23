@@ -118,6 +118,13 @@ public class PerazimAiEngine {
             return boundaryResponseFor(rawQuery);
         }
 
+        // 0b. SCRIPTURE REFERENCE UNDERSTANDING: ask one short question when the book name is unclear
+        org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer.Result reference =
+                org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer.normalize(rawQuery);
+        if (reference != null && !reference.confident && reference.clarify != null) {
+            return AiResponse.plainText(reference.clarify, Arrays.asList("📖 Open the Bible"));
+        }
+
         // 1. BIBLE RIDDLES & TRIVIA
         if (containsAny(q, "riddle", "trivia", "quiz", "puzzle")) {
             return handleRiddlesQuery();
