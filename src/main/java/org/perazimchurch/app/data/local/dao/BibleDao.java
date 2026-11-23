@@ -11,6 +11,9 @@ import org.perazimchurch.app.data.local.entity.BibleBookEntity;
 import org.perazimchurch.app.data.local.entity.BibleChapterEntity;
 import org.perazimchurch.app.data.local.entity.BibleTranslationEntity;
 import org.perazimchurch.app.data.local.entity.BibleVerseEntity;
+import org.perazimchurch.app.data.local.entity.BibleVerseHighlightEntity;
+import org.perazimchurch.app.data.local.entity.BibleWordHighlightEntity;
+import org.perazimchurch.app.data.local.entity.BibleTopicVerseEntity;
 
 import java.util.List;
 
@@ -87,7 +90,7 @@ public interface BibleDao {
     @Query("SELECT * FROM bible_verses WHERE (translationId = 'KJV' OR translationId IS NULL) AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
     BibleVerseEntity getVerse(int bookNumber, int chapterNumber, int verseNumber);
 
-    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :query || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 200")
     List<BibleVerseEntity> searchVerses(String translationId, String query);
 
     @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND text LIKE '%' || :firstTerm || '%' AND text LIKE '%' || :secondTerm || '%' ORDER BY bookNumber ASC, chapterNumber ASC, verseNumber ASC LIMIT 50")
@@ -119,4 +122,73 @@ public interface BibleDao {
 
     @Query("DELETE FROM bible_translations")
     void deleteAllTranslations();
+
+    // --- Bulk text import (bundled public-domain translations) ---
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertVersesIgnoringExisting(List<BibleVerseEntity> verses);
+
+    @Query("SELECT COUNT(*) FROM bible_verses WHERE translationId = :translationId")
+    int countVerses(String translationId);
+
+    // --- Highlights (per verse position, shared by every translation) ---
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertHighlight(BibleVerseHighlightEntity highlight);
+
+    @Query("DELETE FROM bible_verse_highlights WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber")
+    void deleteHighlight(int bookNumber, int chapterNumber, int verseNumber);
+
+    @Query("SELECT * FROM bible_verse_highlights WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber")
+    List<BibleVerseHighlightEntity> getHighlightsForChapter(int bookNumber, int chapterNumber);
+
+    // --- Word and character-range highlights (per translation and verse body) ---
+    @Insert
+    void insertWordHighlight(BibleWordHighlightEntity highlight);
+
+    @Query("SELECT * FROM bible_word_highlights WHERE translationId = :translationId AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber")
+    List<BibleWordHighlightEntity> getWordHighlightsForChapter(String translationId, int bookNumber, int chapterNumber);
+
+    @Query("DELETE FROM bible_word_highlights WHERE id = :id")
+    void deleteWordHighlight(long id);
+
+    @Query("SELECT * FROM bible_verse_highlights ORDER BY updatedMillis DESC")
+    List<BibleVerseHighlightEntity> getAllHighlights();
+
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber LIMIT 1")
+    BibleVerseEntity getVerseInTranslation(String translationId, int bookNumber, int chapterNumber, int verseNumber);
+
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId")
+    List<BibleVerseEntity> getAllVerses(String translationId);
+
+    // --- Topics (labels on saved verses) ---
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void upsertTopicVerse(BibleTopicVerseEntity link);
+
+    @Query("DELETE FROM bible_topic_verses WHERE topic = :topic AND bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber")
+    void deleteTopicVerse(String topic, int bookNumber, int chapterNumber, int verseNumber);
+
+    @Query("SELECT topic FROM bible_topic_verses GROUP BY topic ORDER BY topic COLLATE NOCASE")
+    List<String> getTopicNames();
+
+    @Query("SELECT COUNT(*) FROM bible_topic_verses WHERE topic = :topic")
+    int countTopicVerses(String topic);
+
+    @Query("SELECT * FROM bible_topic_verses WHERE topic = :topic ORDER BY bookNumber, chapterNumber, verseNumber")
+    List<BibleTopicVerseEntity> getTopicVerses(String topic);
+
+    @Query("SELECT * FROM bible_topic_verses WHERE bookNumber = :bookNumber AND chapterNumber = :chapterNumber AND verseNumber = :verseNumber")
+    List<BibleTopicVerseEntity> getTopicsForVerse(int bookNumber, int chapterNumber, int verseNumber);
+
+    // --- Moving verse text to the separate text database ---
+    @Query("SELECT DISTINCT translationId FROM bible_verses")
+    List<String> getVerseTranslationIds();
+
+    @Query("SELECT * FROM bible_verses WHERE translationId = :translationId AND bookNumber = :bookNumber")
+    List<BibleVerseEntity> getVersesForBook(String translationId, int bookNumber);
+
+    /** Removes verse rows of one translation that hold no bookmark and no note. */
+    @Query("DELETE FROM bible_verses WHERE translationId = :translationId AND isFavorite = 0 AND (note IS NULL OR note = '')")
+    void deleteVersesWithoutUserData(String translationId);
+
+    @Query("SELECT COUNT(*) FROM bible_verses")
+    int countAllVerseRows();
 }

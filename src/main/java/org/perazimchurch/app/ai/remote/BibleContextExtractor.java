@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.remote;
 
+import org.perazimchurch.app.data.local.text.BibleVerseReader;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -56,6 +57,7 @@ public final class BibleContextExtractor {
         try {
             PerazimDatabase db = PerazimDatabase.getInstance(context);
             BibleDao dao = db.bibleDao();
+            BibleVerseReader reader = BibleVerseReader.create(context, dao);
 
             List<String> keywords = extractKeywords(rawQuery);
             if (keywords.isEmpty()) {
@@ -70,7 +72,7 @@ public final class BibleContextExtractor {
             for (String kw : keywords) {
                 if (results.size() >= MAX_PASSAGES) break;
 
-                List<BibleVerseEntity> matches = dao.searchVerses(kw);
+                List<BibleVerseEntity> matches = reader.search("KJV", kw);
                 if (matches == null || matches.isEmpty()) continue;
 
                 for (BibleVerseEntity v : matches) {

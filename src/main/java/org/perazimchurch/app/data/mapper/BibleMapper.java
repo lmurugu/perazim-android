@@ -414,6 +414,36 @@ public final class BibleMapper {
         return 1;
     }
 
+    /**
+     * Strict lookup of a book by id, full name or common abbreviation.
+     *
+     * @return the canonical book number 1-66, or -1 when the text does not name a book
+     */
+    public static int findBookNumber(String bookIdOrName) {
+        if (bookIdOrName == null || bookIdOrName.trim().isEmpty()) {
+            return -1;
+        }
+        String clean = bookIdOrName.trim().toUpperCase(Locale.US).replaceAll("\\s+", " ");
+        Integer canonical = BOOK_NAME_OR_ID_TO_NUMBER.get(clean);
+        if (canonical == null) {
+            canonical = BOOK_NAME_OR_ID_TO_NUMBER.get(clean.replace(" ", ""));
+        }
+        if (canonical != null) {
+            return canonical;
+        }
+        // Common abbreviations such as "1 Cor" or "Phil": accept a prefix only when it names one book.
+        int found = -1;
+        for (Map.Entry<String, Integer> entry : BOOK_NAME_OR_ID_TO_NUMBER.entrySet()) {
+            if (entry.getKey().length() >= 3 && entry.getKey().startsWith(clean)) {
+                if (found != -1 && found != entry.getValue()) {
+                    return -1;
+                }
+                found = entry.getValue();
+            }
+        }
+        return found;
+    }
+
     public static String getBookIdFromNumber(int bookNumber) {
         if (bookNumber >= 1 && bookNumber < BOOK_NUMBER_TO_ID.length) {
             return BOOK_NUMBER_TO_ID[bookNumber];

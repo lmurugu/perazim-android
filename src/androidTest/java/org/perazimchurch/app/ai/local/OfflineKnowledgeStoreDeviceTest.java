@@ -60,7 +60,7 @@ public final class OfflineKnowledgeStoreDeviceTest {
         String oldOverride = preferences.getString("server_base_url", null);
         ApiClient.setBaseUrl(context, baseUrl);
         try {
-            Map<String, String> trust = Collections.singletonMap(keyId, publicKey);
+            Map<String, String> trust = Collections.singletonMap(keyId, TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, publicKey));
             CountDownLatch verificationCheck = new CountDownLatch(1);
             AtomicReference<String> verificationFailure = new AtomicReference<>();
             ApiClient.get(context, "/api/ai/offline-package/current", token, new ApiClient.ApiCallback() {
@@ -179,10 +179,12 @@ public final class OfflineKnowledgeStoreDeviceTest {
             key = bytes.toString("UTF-8").trim();
         }
         java.util.Map<String, String> trust = new java.util.HashMap<>();
-        trust.put("synthetic-device-key", key);
-        trust.put("synthetic-control-key", readTestAsset("offline-control-public-key.txt").trim());
+        trust.put("synthetic-device-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, key));
+        trust.put("synthetic-control-key", TrustAnchors.encode(TrustAnchors.Purpose.CONTROL,
+                readTestAsset("offline-control-public-key.txt").trim()));
         assertEquals(key, OfflineKnowledgeStore.parseTrustedKeysJson(
-                "{\"synthetic-device-key\":" + JSONObject.quote(key) + "}").get("synthetic-device-key"));
+                "{\"synthetic-device-key\":" + JSONObject.quote(TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, key)) + "}")
+                .get("synthetic-device-key"));
         assertThrows(SecurityException.class, () -> OfflineKnowledgeStore.parseTrustedKeysJson(
                 "{\"bad-key\":\"not base64\"}"));
         long now = System.currentTimeMillis();
@@ -275,8 +277,8 @@ public final class OfflineKnowledgeStoreDeviceTest {
         String oldKey = readTestAsset("offline-package-public-key.txt").trim();
         String nextKey = readTestAsset("offline-package-rollback-public-key.txt").trim();
         org.json.JSONObject trustJson = new org.json.JSONObject()
-                .put("synthetic-device-key", oldKey)
-                .put("synthetic-rollback-key", nextKey);
+                .put("synthetic-device-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, oldKey))
+                .put("synthetic-rollback-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, nextKey));
         java.util.Map<String, String> overlap = OfflineKnowledgeStore.parseTrustedKeysJson(trustJson.toString());
         assertEquals("Both old and next keys must be trusted during rotation overlap", 2, overlap.size());
         long now = 8_000L; // Both synthetic snapshots are valid at this fixture time.
@@ -303,8 +305,9 @@ public final class OfflineKnowledgeStoreDeviceTest {
         String newerEnvelope = readTestAsset("offline-package-newer-v2.json");
         String key = readTestAsset("offline-package-rollback-public-key.txt").trim();
         Map<String, String> trust = new java.util.HashMap<>();
-        trust.put("synthetic-rollback-key", key);
-        trust.put("synthetic-expiring-key", readTestAsset("offline-package-expiring-public-key.txt").trim());
+        trust.put("synthetic-rollback-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, key));
+        trust.put("synthetic-expiring-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE,
+                readTestAsset("offline-package-expiring-public-key.txt").trim()));
         try {
             OfflineKnowledgeStore.VerifiedPackage first = OfflineKnowledgeStore.install(
                     context, olderEnvelope, trust, "2.2.1", 1500L);

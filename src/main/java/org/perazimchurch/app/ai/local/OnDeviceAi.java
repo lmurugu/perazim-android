@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -123,8 +124,12 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(PerazimAiEngine.sensitivePastoralResponse().getMessageText()));
             return;
         }
-        if (PerazimAiEngine.isClearlyOutOfScopeQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.outOfScopeResponse().getMessageText()));
+        if (PerazimAiEngine.isHumanDecisionQuery(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.humanDecisionResponse().getMessageText()));
+            return;
+        }
+        if (PerazimAiEngine.isOutOfScopeForModel(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.boundaryResponseFor(question).getMessageText()));
             return;
         }
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
@@ -148,22 +153,43 @@ public final class OnDeviceAi {
                 String evidenceQuery = evidenceQuery(question, history);
                 JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,
                         System.currentTimeMillis(), evidenceQuery);
+                // Word study by Strong's number (G26, H7225): answer from the bundled entry, never generate it.
+                java.util.regex.Matcher strongsMatch = java.util.regex.Pattern.compile("\\b([GH]\\d{1,4})\\b").matcher(question);
+                if (strongsMatch.find()) {
+                    org.perazimchurch.app.domain.model.StrongsEntry entry =
+                            org.perazimchurch.app.data.interlinear.StrongsStore.getEntry(c, strongsMatch.group(1));
+                    if (entry != null) {
+                        String wordAnswer = entry.getCode() + " (" + entry.getOriginal() + ", "
+                                + entry.getTransliteration() + "): " + entry.getDefinition();
+                        MAIN.post(() -> callback.onSuccess(wordAnswer));
+                        return;
+                    }
+                }
+                // Exact verse reference with one KJV passage: quote the Bible text directly, never generate it.
+                if (evidence.length() == 1 && LocalScriptureRetriever.hasExplicitReference(question)
+                        && "Bible".equals(evidence.optJSONObject(0) == null ? "" : evidence.optJSONObject(0).optString("sourceId"))) {
+                    JSONObject verse = evidence.getJSONObject(0);
+                    String verseAnswer = verse.optString("location") + " (King James Version): “"
+                            + verse.optString("text") + "”";
+                    MAIN.post(() -> callback.onSuccess(verseAnswer));
+                    return;
+                }
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
-                String prompt = LocalPrompt.build(question, history, evidence);
+                LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence);
+                // Only excerpts the model actually saw may be cited, verified, or titled.
+                JSONArray shown = built.shownEvidence;
+                if (shown.length() == 0) throw new IOException("The question is too long for the on-device model. Ask a shorter question.");
                 if (!isInstalled(c)) throw new IOException("Download the on-device model first.");
-                if (!MODEL_SHA.equals(sha256(modelFile(c)))) {
-                    cacheModelStatus(modelFile(c), false);
-                    throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
-                }
-                cacheModelStatus(modelFile(c), true);
+                // Uses the cached verification; a full 491 MB digest runs only when the file changed.
+                if (!isModelVerified(c)) throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
                 if (cancelled) throw new IOException("Generation cancelled.");
                 String dir = c.getApplicationInfo().nativeLibraryDir;
                 int answerLimit = LocalPrompt.requiresStructuredBiblicalAnswer(question) ? 280 : 120;
                 ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
-                        "-m", modelFile(c).getAbsolutePath(), "-p", prompt,
+                        "-m", modelFile(c).getAbsolutePath(), "-p", built.prompt,
                         "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
-                        "--grammar", CitationGrammar.build(evidence, answerLimit),
+                        "--grammar", CitationGrammar.build(shown, answerLimit),
                         "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
                 builder.environment().put("LD_LIBRARY_PATH", dir);
                 process = builder.start(); active = process;
@@ -193,12 +219,18 @@ public final class OnDeviceAi {
                 if (cancelled) throw new IOException("Generation cancelled.");
                 if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
                 if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
-                String result = answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim();
+                String result = LocalPrompt.stripStockPhrases(
+                        answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim());
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
-                if (!hasVerifiedCitations(result, evidence)) {
+                if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
+                        || (PerazimAiEngine.claimsOfficialStatus(result)
+                        && !PerazimAiEngine.officialClaimHasApprovedProvenance(result, shown))) {
+                    throw new IOException("The local model made a claim the app cannot verify. Ask again or contact the church office.");
+                }
+                if (!hasVerifiedCitations(result, shown)) {
                     throw new IOException("The local model did not return a verified source citation.");
                 }
-                String citedResult = appendVerifiedSourceTitles(result, evidence);
+                String citedResult = appendVerifiedSourceTitles(result, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();
@@ -336,7 +368,10 @@ public final class OnDeviceAi {
                 if (!part.renameTo(target)) throw new IOException("Cannot finish model installation.");
                 cacheModelStatus(target, true);
                 MAIN.post(callback::onComplete);
-            } catch (Exception e) { String error = e.getMessage(); MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
+            } catch (Exception e) {
+                // Cancel closes the socket, which surfaces as a low-level error; report it as a pause instead.
+                String error = cancelled ? "Download paused. Tap Download to resume." : e.getMessage();
+                MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
             finally { if (connection != null) connection.disconnect(); activeDownload = null; busy.set(false); }
         });
     }
