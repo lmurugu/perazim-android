@@ -226,6 +226,9 @@ def _capital_heading(line):
     letters = re.sub(r"[^A-Za-z]", "", stripped)
     if len(letters) < 4 or len(stripped) > 80 or letters != letters.upper():
         return None
+    # Wesley's captions end with a comma ("THIS CONTAINS,", "MARK,"); real section titles do not.
+    if stripped.endswith((",", ";", ":")):
+        return None
     if re.fullmatch(r"[IVXLC.\s]+", stripped):
         return None
     words = [w.capitalize() if w.upper() not in ("OF", "THE", "AND", "ON", "TO", "IN") else w.lower()
@@ -251,7 +254,9 @@ def ccel_commentary_books(path):
     for line in lines:
         heading = _capital_heading(line) if previous_blank else None
         previous_blank = not line.strip()
-        if heading and len(heading) > 3:
+        # Wesley's real section titles begin "Notes on ..." (or are the Preface). Bare book names in capitals are
+        # sub-captions inside a section and stay as body text.
+        if heading and (heading.lower().startswith("notes on") or heading == "Preface"):
             flush()
             current_book, paragraphs = heading, []
             continue
@@ -418,8 +423,8 @@ def main(argv=None):
     parser.add_argument("--raw", required=True, help="directory holding the downloaded raw files")
     parser.add_argument("--out", required=True, help="output reference.db path")
     parser.add_argument("--only", nargs="*", help="build only these source ids")
-    parser.add_argument("--tier", default="default", choices=["default", "pending"],
-                        help="default: the bundled set. pending: doctrinal sources awaiting Levi (separate file)")
+    parser.add_argument("--tier", default="default", choices=["default", "optional", "pending"],
+                        help="default: the bundled set. optional: approved large sources for a separate download. pending: sources awaiting Levi")
     args = parser.parse_args(argv)
     report = build(args.raw, args.out, set(args.only) if args.only else None, args.tier)
     total = 0

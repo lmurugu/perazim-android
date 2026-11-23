@@ -181,21 +181,34 @@ class CommentaryTest(unittest.TestCase):
         self.assertEqual(entries[0][1], "Text two continues.")
 
     def test_wesley_sections_titled_in_capitals(self):
-        body = ("THE GOSPEL OF LUKE\n\nFirst paragraph of notes.\n\nSecond paragraph.\n\n"
-                "THE ACTS OF THE APOSTLES\n\nAnother note.\n")
+        body = ("NOTES ON THE GOSPEL ACCORDING TO ST. LUKE\n\nFirst paragraph of notes.\n\nSecond paragraph.\n\n"
+                "NOTES ON THE ACTS OF THE APOSTLES\n\nAnother note.\n")
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "wesley_notes.txt"
             write(path, self.HEADER + body)
             entries = b.ccel_commentary_books(path)
         self.assertEqual(entries, [
-            ("The Gospel of Luke, part 1", "First paragraph of notes. Second paragraph."),
-            ("The Acts of the Apostles, part 1", "Another note."),
+            ("Notes on the Gospel According to St. Luke, part 1", "First paragraph of notes. Second paragraph."),
+            ("Notes on the Acts of the Apostles, part 1", "Another note."),
         ])
+
+    def test_wesley_captions_ending_in_comma_are_not_sections(self):
+        body = ("THIS CONTAINS,\n\nA caption note.\n\n"
+                "NOTES ON THE GOSPEL ACCORDING TO ST. LUKE\n\nA real note.\n\nMARK,\n\nAnother caption.\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "wesley_notes.txt"
+            write(path, self.HEADER + body)
+            entries = b.ccel_commentary_books(path)
+        # The caption before any section is dropped; "MARK," is not a heading, so it stays as body text.
+        self.assertEqual(entries, [("Notes on the Gospel According to St. Luke, part 1", "A real note. MARK, Another caption.")])
+        self.assertIsNone(b._capital_heading("THIS CONTAINS,"))
+        self.assertEqual(b._capital_heading("NOTES ON THE GOSPEL ACCORDING TO ST. LUKE"),
+                         "Notes on the Gospel According to St. Luke")
 
     def test_build_accepts_pending_tier_and_default_excludes_it(self):
         with tempfile.TemporaryDirectory() as tmp:
             raw = Path(tmp) / "raw"
-            write(raw / "ccel" / "wesley_notes.txt", self.HEADER + "THE GOSPEL OF LUKE\n\nA note.\n")
+            write(raw / "ccel" / "wesley_notes.txt", self.HEADER + "NOTES ON THE GOSPEL ACCORDING TO ST. LUKE\n\nA note.\n")
             fake = [{
                 "id": "wesley-notes-nt", "title": "Wesley", "author": "John Wesley", "category": "commentary",
                 "licence": "Public domain", "attribution": "Wesley", "theologyTag": "ARMINIAN_WESLEYAN_COMMENTARY_PENDING_LEVI",

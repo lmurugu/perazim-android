@@ -37,4 +37,4 @@ The six factual sources below are listed in `src/main/assets/reference/approvals
 
 Strong's Greek data (already in the app): used under MIT with attribution, by coordinator decision. The upstream licence line is to be re-checked against the source before release.
 
-Pending, not in the app: Matthew Henry's Commentary and Wesley's Explanatory Notes (both public domain on CCEL). They are built into a separate pending database and are not approved for use.
+Matthew Henry's Commentary on the Whole Bible and Wesley's Explanatory Notes upon the New Testament (both public domain, text from Christian Classics Ethereal Library, ccel.org). Approved by Levi for use as an optional download, not part of the default install. Excerpts are labelled with author and tradition.

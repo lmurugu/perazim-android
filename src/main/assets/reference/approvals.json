@@ -1,11 +1,13 @@
 {
-  "_comment": "Reference sources approved for the on-phone guide. Factual reference only (cross-references, places, dictionaries, topical index); none of these is doctrinal. Approved 2026-11-23 on the coordinator's technical decision, following Levi's request that these resources be added to the model's package. Levi to confirm. Doctrinal items (creeds, commentaries) are NOT listed here and stay pending Levi's approval. Each id must match a sources row in scripts/reference/sources.json.",
+  "_comment": "Reference sources approved for the on-phone guide. Factual sources (cross-references, places, dictionaries, topical index) were approved 2026-11-23 on the coordinator's technical decision. Matthew Henry and Wesley's commentaries were approved 2026-11-23 on Levi's answer A: both are used, each excerpt labelled with author and tradition, and Perazim's own view always comes first. Commentaries ship as an optional download, not in the default install. Creeds and confessions are NOT listed. Each id must match a sources row in scripts/reference/sources.json.",
   "approvedSourceIds": [
     "openbible-xrefs",
     "openbible-geo",
     "smith-bible-dictionary",
     "easton-bible-dictionary",
     "hitchcock-bible-names",
-    "naves-topical-bible"
+    "naves-topical-bible",
+    "matthew-henry-commentary",
+    "wesley-notes-nt"
   ]
 }

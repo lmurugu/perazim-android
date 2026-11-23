@@ -63,17 +63,17 @@ The Strong's Greek data is used under MIT with attribution (coordinator's decisi
 both GPL 3.0 and MIT, so the upstream licence should still be checked once against the source before release.
 This is not verified here.
 
-## E. Pending Levi's approval: commentaries and confessions (not in approvals.json)
+## E. Commentaries: approved by Levi (answer A), optional download. Confessions: not yet extracted
 
 | Id | Source | Licence | Tradition tag | Build status |
 |---|---|---|---|---|
-| matthew-henry-commentary | Matthew Henry's Commentary on the Whole Bible (CCEL, six volumes) | Public domain (CCEL: may be copied and distributed freely) | PURITAN_REFORMED_COMMENTARY_PENDING_LEVI | Built into `reference-commentaries.db` (22,678 entries, 49 MB raw) |
-| wesley-notes-nt | John Wesley's Explanatory Notes upon the New Testament (CCEL) | Public domain | ARMINIAN_WESLEYAN_COMMENTARY_PENDING_LEVI | Built into `reference-commentaries.db` (3,350 entries, 6.7 MB raw). Some caption-like headings (e.g. "This Contains,") are picked up as section titles; known noise |
+| matthew-henry-commentary | Matthew Henry's Commentary on the Whole Bible (CCEL, six volumes) | Public domain (CCEL: may be copied and distributed freely) | PURITAN_REFORMED_COMMENTARY (Reformed, Puritan) | Optional database, 22,678 entries, 49 MB raw. Approved in approvals.json |
+| wesley-notes-nt | John Wesley's Explanatory Notes upon the New Testament (CCEL) | Public domain | ARMINIAN_WESLEYAN_COMMENTARY (Arminian, Wesleyan) | Optional database, 3,339 entries, 6.7 MB raw. Sections are the 67 "Notes on ..." titles and the Preface. Approved in approvals.json |
 
-The pending database is built separately with `--tier pending`. It is 16.4 MB gzipped and is staged at
-`/mnt/project-files/reference/reference-commentaries.db.gz`. It is not in the APK and not in `approvals.json`.
-Commentaries carry their authors' theology and conflict with each other (Henry is Reformed, Wesley Arminian).
-Both need Levi's decision on use, and the retrieval must present them as "reference material, not Perazim's position".
+The commentary database is built with `--tier optional`. It is 16.4 MB gzipped (sha256 9eb494a0c5f5144af911835f7ecc30f575ef218296d02033c21d0fbcbfc0a1e6) and is staged at
+`/mnt/project-files/reference/reference-commentaries.db.gz`. It is not in the APK. The default build is unchanged at 16,564,224 bytes.
+Retrieval must label each excerpt with its author and tradition and present Perazim's own view first; that wiring and the optional download are not built yet.
+Commentaries carry their authors' theology and conflict with each other (Henry is Reformed, Wesley Arminian). Levi's answer A: use both, labelled, Perazim's view first.
 
 Creeds and confessions (CCEL Schaff, *Creeds of Christendom*): **not extracted yet.** The CCEL volumes are
 bilingual or carry critical apparatus. In volume III the Westminster Confession and the Thirty-Nine Articles
@@ -85,7 +85,7 @@ from memory. Until a checked transcription exists, creeds are not in the databas
 ## F. What needs Levi
 
 1. Confirm the six approved factual sources in section A (`approvals.json`, approved on the coordinator's decision).
-2. Decide whether Henry and Wesley (section E) may be used, and how the guide should present differing traditions.
+2. Where the optional commentary download is hosted (a GitHub release on this repo is the free option; it needs your go-ahead before I create one).
 3. Decide on share-alike text (Swahili 2019 under CC BY-SA 4.0). Parked for now.
 4. Confirm the Strong's Greek licence (section D), which is MIT with attribution by coordinator decision and not yet re-verified upstream.
 5. Approve the confessions and creeds once they are transcribed and checked (section E).

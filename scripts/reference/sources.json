@@ -156,8 +156,8 @@
         }
       ],
       "parser": "ccel_commentary_henry",
-      "theologyTag": "PURITAN_REFORMED_COMMENTARY_PENDING_LEVI",
-      "tier": "pending",
+      "theologyTag": "PURITAN_REFORMED_COMMENTARY",
+      "tier": "optional",
       "attribution": "Matthew Henry's Commentary on the Whole Bible (1706-1721), public domain. Text from Christian Classics Ethereal Library (ccel.org). Reference material, not Perazim's position.",
       "sha256": "multi",
       "sizeBytes": 49116122
@@ -176,8 +176,8 @@
       "sha256": "3b5e216b0a0955151f0242e451066d611efb876c9a275e7d68d29cedc88b80c7",
       "sizeBytes": 6676836,
       "parser": "ccel_commentary_books",
-      "theologyTag": "ARMINIAN_WESLEYAN_COMMENTARY_PENDING_LEVI",
-      "tier": "pending",
+      "theologyTag": "ARMINIAN_WESLEYAN_COMMENTARY",
+      "tier": "optional",
       "attribution": "John Wesley's Explanatory Notes upon the New Testament (1755), public domain. Text from Christian Classics Ethereal Library (ccel.org). Reference material, not Perazim's position."
     }
   ],
