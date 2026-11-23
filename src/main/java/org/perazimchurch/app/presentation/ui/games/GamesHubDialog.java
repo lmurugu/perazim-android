@@ -5,9 +5,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +19,42 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.data.remote.GamesLeaderboardRemoteSource;
+import org.json.JSONObject;
+import androidx.annotation.NonNull;
 import org.perazimchurch.app.domain.games.BibleGames;
+import org.perazimchurch.app.domain.games.engine.GameDefinition;
+import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
+import org.perazimchurch.app.presentation.ui.games.common.GameAudio;
+import org.perazimchurch.app.presentation.ui.games.common.GameAudioSettings;
 import org.perazimchurch.app.domain.games.BibleGames.Card;
+import org.perazimchurch.app.domain.games.FillTheGap;
+import org.perazimchurch.app.domain.games.LadderOfFaith;
+import org.perazimchurch.app.domain.games.MemoryMatch;
+import org.perazimchurch.app.domain.games.MiniCrossword;
+import org.perazimchurch.app.domain.games.RoadToJerusalem;
+import org.perazimchurch.app.domain.games.TestamentSort;
+import org.perazimchurch.app.domain.games.TimelineSort;
+import org.perazimchurch.app.domain.games.WhoSaidIt;
+import org.perazimchurch.app.domain.games.WordSearch;
 import org.perazimchurch.app.domain.games.BibleGames.Mode;
 import org.perazimchurch.app.domain.games.BibleGames.Round;
 import org.perazimchurch.app.domain.games.BibleGames.VersePuzzle;
+import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
+import org.perazimchurch.app.presentation.ui.games.common.GameContext;
+import org.perazimchurch.app.presentation.ui.games.common.GameUi;
+import org.perazimchurch.app.presentation.ui.games.common.GameRegistry;
+import org.perazimchurch.app.presentation.ui.games.common.GameResults;
+import org.perazimchurch.app.ui.components.FeedbackManager;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.nio.charset.StandardCharsets;
@@ -34,12 +62,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /** Three complete offline Bible games; best scores are local and account-scoped. */
 public final class GamesHubDialog extends Dialog {
+
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
     private final Activity activity;
+    private final GameUi ui;
     private final String ownerId;
     private final SharedPreferences scores;
     private final String scorePrefix;
@@ -48,19 +85,52 @@ public final class GamesHubDialog extends Dialog {
     private Round round;
     private Mode mode;
     private VersePuzzle puzzle;
+    private LadderOfFaith ladder;
     private long seed;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    /** Set before showing when a single game should open straight away, for example from Home. */
+    private String pendingGame;
+
+    /** Opens the Games tab directly on one game. Unknown ids open the hub. */
+    public static void open(Activity activity, String gameId) {
+        if (activity.isFinishing() || activity.isDestroyed()) return;
+        GamesHubDialog dialog = new GamesHubDialog(activity);
+        dialog.pendingGame = gameId;
+        dialog.show();
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            window.getDecorView().setBackground(PerazimTheme.createBackgroundGradient());
+        }
+    }
 
     public static void show(Activity activity) {
         if (activity.isFinishing() || activity.isDestroyed()) return;
         GamesHubDialog dialog = new GamesHubDialog(activity);
         dialog.show();
         Window window = dialog.getWindow();
-        if (window != null) window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        if (window != null) {
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            // The Dialog's default theme draws its own (light) window frame; paint the decor in the app's current mode too.
+            window.getDecorView().setBackground(PerazimTheme.createBackgroundGradient());
+        }
+    }
+
+    /**
+     * A plain Dialog uses the framework's light Theme.Dialog, which paints a light window frame
+     * and light default text. Pick a Material theme that matches the app's current mode instead.
+     */
+    private static int windowTheme() {
+        return PerazimTheme.isLight()
+                ? android.R.style.Theme_Material_Light_NoActionBar
+                : android.R.style.Theme_Material_NoActionBar;
     }
 
     private GamesHubDialog(Activity activity) {
-        super(activity);
+        super(activity, windowTheme());
         this.activity = activity;
+        this.ui = new GameUi(activity);
         ownerId = SessionManager.getInstance(activity).getActiveUserId();
         scorePrefix = ownerKey(ownerId);
         scores = activity.getSharedPreferences("perazim_game_scores_v1", Context.MODE_PRIVATE);
@@ -69,12 +139,37 @@ public final class GamesHubDialog extends Dialog {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        builtLight = PerazimTheme.isLight();
+        applyWindow();
         Window window = getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_DEEP));
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        }
+        if (window != null) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        if (pendingGame != null && launchGame(pendingGame)) return;
+        GameAudio audio = GameAudio.get(activity);
+        audio.bindAccount(scores, scorePrefix);
+        audio.enterGame(null);
         hub();
+    }
+
+    private boolean builtLight;
+
+    private void applyWindow() {
+        Window window = getWindow();
+        if (window == null) return;
+        window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+        drawBehindSystemBars(window);
+    }
+
+    /**
+     * The phone's light or dark setting can flip while the hub is open (System appearance).
+     * When the window regains focus, rebuild in the new colours. A game in progress restarts its screen.
+     */
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && PerazimTheme.isLight() != builtLight) {
+            builtLight = PerazimTheme.isLight();
+            applyWindow();
+            hub();
+        }
     }
 
     private boolean activeOwner() {
@@ -86,57 +181,1267 @@ public final class GamesHubDialog extends Dialog {
         return same;
     }
 
+    /** Transparent status and navigation bars with the glow behind them, like MainActivity. */
+    @SuppressWarnings("deprecation")
+    private void drawBehindSystemBars(Window window) {
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+        if (PerazimTheme.isLight()) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        }
+        window.getDecorView().setSystemUiVisibility(flags);
+    }
+
     private void screen(String title, String subtitle, boolean playing) {
+        handler.removeCallbacksAndMessages(null);
         scroll = new ScrollView(activity);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+        scroll.setBackground(PerazimTheme.createBackgroundGradient());
+        // Edge to edge like the rest of the app: content is padded below the status bar and above the nav bar.
+        scroll.setClipToPadding(false);
+        scroll.setOnApplyWindowInsetsListener((v, insets) -> {
+            scroll.setPadding(0, insets.getSystemWindowInsetTop(), 0, insets.getSystemWindowInsetBottom());
+            return insets;
+        });
         page = new LinearLayout(activity);
+        ui.setPage(page);
         page.setOrientation(LinearLayout.VERTICAL);
-        page.setPadding(dp(20), dp(16), dp(20), dp(28));
+        page.setPadding(dp(14), dp(16), dp(14), dp(28));
         scroll.addView(page, new ScrollView.LayoutParams(-1, -2));
         setContentView(scroll);
-        Button back = button(playing ? "← Games" : "Close games", false);
+        // Small round glass back button, matching the mockups (not a full-width button).
+        ImageView back = new ImageView(activity);
+        back.setImageResource(org.perazimchurch.app.R.drawable.ic_back_round);
+        back.setPadding(dp(10), dp(10), dp(10), dp(10));
+        back.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        back.setClickable(true);
+        back.setContentDescription(playing ? "Back to games" : "Close games");
+        GradientDrawable glass = new GradientDrawable();
+        glass.setShape(GradientDrawable.OVAL);
+        glass.setColor(PerazimTheme.COLOR_SURFACE_2);
+        glass.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
+        back.setBackground(glass);
         back.setOnClickListener(v -> {
             hideKeyboard();
             if (playing) hub(); else dismiss();
         });
-        text(title, 28, true);
-        text(subtitle, 15, false);
+        LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(44), dp(44));
+        backParams.bottomMargin = dp(12);
+        page.addView(back, backParams);
+        text(title, 24, true);
+        text(subtitle, 13, false);
         gap(16);
+    }
+
+    /** Games the hub draws by hand. Any other catalog game gets a card from its catalog entry. */
+    private static final Set<String> HAND_LISTED = new HashSet<>();
+    static {
+        Collections.addAll(HAND_LISTED, "bible_quiz", "who_am_i", "verse_builder", "ladder_of_faith",
+                "word_search", "memory_match", "story_timeline", "mini_crossword", "road_to_jerusalem",
+                "old_or_new", "who_said_it", "fill_the_gap");
+    }
+
+    /** A card for a catalog game the hub does not draw by hand: title, description and icon from the catalog. */
+    private void catalogCard(GameDefinition def) {
+        int best = GameResults.bestStars(scores, scorePrefix + def.id());
+        String bestLine = best == 0 ? "not played yet" : "Best: " + GameResults.starLine(best);
+        int icon = def.iconResource() != 0 ? def.iconResource() : org.perazimchurch.app.R.drawable.game_char_shepherd;
+        gameCard(icon, org.perazimchurch.app.R.drawable.game_char_shepherd, PerazimTheme.COLOR_ORANGE_BRAND,
+                def.title(), def.description(), bestLine, () -> {
+                    if (!launchGame(def.id())) Toast.makeText(activity, "Coming soon", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void hub() {
         if (!activeOwner()) return;
+        refreshGameSettings();
         round = null;
-        screen("Bible Games", "Learn, remember and enjoy. All three games work without internet.", false);
-        gameCard(Mode.QUIZ, "Bible Quiz", "Five questions, four choices each. Discover the story behind every answer.");
-        gameCard(Mode.WHO_AM_I, "Who am I?", "Read a Bible character's clues, ask for a hint, then type your answer.");
-        gameCard(Mode.VERSE_ORDER, "Verse Builder", "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.");
-        text("Scores stay on this phone for the current account. Games do not change XP, streaks or Grace points.", 14, false);
+        openRow = null;
+        screen("Bible Games", "Learn, remember and enjoy. Every game works without internet.", false);
+        statsBar();
+        button("Game sound", false).setOnClickListener(v -> GameAudioSettings.show(activity, scores, scorePrefix));
+        leaderboardCard();
+        flushStars();
+        int shepherd = org.perazimchurch.app.R.drawable.game_char_shepherd;
+        int dove = org.perazimchurch.app.R.drawable.game_char_dove;
+        int explorer = org.perazimchurch.app.R.drawable.game_char_explorer;
+        gameCard(org.perazimchurch.app.R.drawable.game_art_quiz, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Bible Quiz",
+                "Five questions, four choices each. Discover the story behind every answer.",
+                modeBestLine(Mode.QUIZ, 5), () -> startMode(Mode.QUIZ));
+        gameCard(org.perazimchurch.app.R.drawable.game_art_who_am_i, explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Who am I?",
+                "Read a Bible character's clues, ask for a hint, then type your answer.",
+                modeBestLine(Mode.WHO_AM_I, 5), () -> startMode(Mode.WHO_AM_I));
+        gameCard(org.perazimchurch.app.R.drawable.game_art_verse_builder, dove, PerazimTheme.COLOR_ORANGE_SOFT, "Verse Builder",
+                "Tap shuffled word tiles to rebuild a short KJV verse. Undo and try your order before checking.",
+                modeBestLine(Mode.VERSE_ORDER, 5), () -> startMode(Mode.VERSE_ORDER));
+        gameCard(org.perazimchurch.app.R.drawable.game_art_ladder, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Ladder of Faith",
+                "Climb 20 rungs from easy to hard with three lives. Every run draws fresh questions from a bank of nearly 300.",
+                modeBestLine(Mode.LADDER, LadderOfFaith.RUNGS), () -> startMode(Mode.LADDER));
+        gameCard(org.perazimchurch.app.R.drawable.game_art_word_search, shepherd, PerazimTheme.COLOR_ORANGE_BRAND, "Word Search",
+                "Find Bible names hidden in the letters. Tap a start letter, then the end letter of the word.",
+                solvedLine("WORD_SEARCH"), this::wordSearch);
+        gameCard(org.perazimchurch.app.R.drawable.game_art_memory_match, dove, PerazimTheme.COLOR_PURPLE_SOFT, "Memory Match",
+                "Flip two tiles at a time and match the Bible symbols. Each match shows its verse.",
+                solvedLine("MEMORY_MATCH"), this::memoryMatch);
+        gameCard(org.perazimchurch.app.R.drawable.game_art_timeline, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Story Timeline",
+                "Tap the Bible events in the order they happen in the story.",
+                solvedLine("TIMELINE"), this::timeline);
+        // Mini Crossword is replaced by Vine Words (catalog card). Its code stays in place.
+        gameCard(org.perazimchurch.app.R.drawable.ic_game_road, explorer, PerazimTheme.COLOR_PURPLE_SOFT, "Road to Jerusalem",
+                "Roll the die and race a fellow traveller to Jerusalem. Some squares help you on the way, others slow you down.",
+                solvedLine("ROAD"), this::roadToJerusalem);
+        gameCard(org.perazimchurch.app.R.drawable.game_art_old_or_new, shepherd, PerazimTheme.COLOR_ORANGE_SOFT, "Old or New?",
+                "Place each Bible book in the Old or New Testament. Learn where every book belongs in the story.",
+                bestLineOf("TESTAMENT_SORT", 8), this::testamentSort);
+        gameCard(org.perazimchurch.app.R.drawable.game_art_who_said_it, shepherd, PerazimTheme.COLOR_PURPLE_SOFT, "Who Said It?",
+                "Read a Bible quotation and choose the person who spoke it. Five quotations, four names each.",
+                bestLineOf("WHO_SAID_IT", WhoSaidIt.ROUND_SIZE), this::whoSaidIt);
+        gameCard(org.perazimchurch.app.R.drawable.game_art_verse_builder, explorer, PerazimTheme.COLOR_ORANGE_SOFT, "Fill the Gap",
+                "A famous verse has one word missing. Choose the word that completes it. Five verses per run.",
+                bestLineOf("FILL_THE_GAP", FillTheGap.ROUND_SIZE), this::fillTheGap);
+        for (GameDefinition def : GameCatalog.all()) {
+            if (!HAND_LISTED.contains(def.id())) catalogCard(def);
+        }
+        text("Stars stay on this phone. They go to the church leaderboard only for signed-in adult members, and your name shows only if you turn it on. Games do not change XP, streaks or Grace points.", 12, false);
     }
 
-    private void gameCard(Mode selected, String title, String description) {
+    /** Starts one game by its catalog id. Returns false for an unknown id. */
+    private boolean launchGame(String gameId) {
+        if (!activeOwner()) return true;
+        seed = System.nanoTime();
+        switch (gameId) {
+            case "bible_quiz": startMode(Mode.QUIZ); return true;
+            case "who_am_i": startMode(Mode.WHO_AM_I); return true;
+            case "verse_builder": startMode(Mode.VERSE_ORDER); return true;
+            case "ladder_of_faith": startMode(Mode.LADDER); return true;
+            case "word_search": wordSearch(); return true;
+            case "memory_match": memoryMatch(); return true;
+            case "story_timeline": timeline(); return true;
+            case "mini_crossword": miniCrossword(); return true;
+            case "road_to_jerusalem": roadToJerusalem(); return true;
+            case "old_or_new": testamentSort(); return true;
+            case "who_said_it": whoSaidIt(); return true;
+            case "fill_the_gap": fillTheGap(); return true;
+            default: return GameRegistry.launch(gameId, new GameContext(activity, () -> hub(), scores, scorePrefix,
+                    () -> activeOwner(), () -> seed = System.nanoTime()));
+        }
+    }
+
+    private void statsBar() {
+        LinearLayout bar = new LinearLayout(activity);
+        bar.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams barParams = new LinearLayout.LayoutParams(-1, -2);
+        barParams.bottomMargin = dp(16);
+        page.addView(bar, barParams);
+        int streak = currentStreak();
+        stat(bar, org.perazimchurch.app.R.drawable.ic_game_star, stars() + " stars");
+        stat(bar, org.perazimchurch.app.R.drawable.ic_game_flame, streak + (streak == 1 ? " day" : " days"));
+        stat(bar, org.perazimchurch.app.R.drawable.ic_game_trophy, "Best " + scores.getInt(scorePrefix + Mode.LADDER.name(), 0) + "/" + LadderOfFaith.RUNGS);
+    }
+
+    private void stat(LinearLayout bar, int icon, String label) {
+        LinearLayout pill = new LinearLayout(activity);
+        pill.setOrientation(LinearLayout.HORIZONTAL);
+        pill.setGravity(Gravity.CENTER_VERTICAL);
+        pill.setPadding(dp(8), dp(6), dp(10), dp(6));
+        pill.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        pill.addView(icon(icon, 26), new LinearLayout.LayoutParams(dp(26), dp(26)));
+        TextView text = new TextView(activity);
+        text.setText(label);
+        text.setTextSize(12);
+        text.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        text.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        text.setPadding(dp(6), 0, 0, 0);
+        text.setSingleLine(true);
+        pill.addView(text);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+        params.setMargins(dp(2), 0, dp(2), 0);
+        bar.addView(pill, params);
+    }
+
+    private ImageView icon(int drawable, int sizeDp) {
+        ImageView view = new ImageView(activity);
+        view.setImageResource(drawable);
+        view.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        view.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        return view;
+    }
+
+    private static int iconFor(Mode mode) {
+        switch (mode) {
+            case QUIZ: return org.perazimchurch.app.R.drawable.ic_game_scroll;
+            case WHO_AM_I: return org.perazimchurch.app.R.drawable.ic_game_who;
+            case VERSE_ORDER: return org.perazimchurch.app.R.drawable.ic_game_puzzle;
+            default: return org.perazimchurch.app.R.drawable.ic_game_ladder;
+        }
+    }
+
+    // ---- Stars and daily streak (local to this phone and account) ----
+
+    private int stars() { return scores.getInt(scorePrefix + "stars", 0); }
+    private void addStar() {
+        // Levi's Q2: at most StarCap.DEFAULT_DAILY_CAP stars a local day count toward the leaderboard.
+        String today = org.perazimchurch.app.data.local.preference.GamificationStore.getTodayDateNairobi();
+        String dayKey = scorePrefix + "starDay", countKey = scorePrefix + "starDayCount";
+        int earnedToday = today.equals(scores.getString(dayKey, "")) ? scores.getInt(countKey, 0) : 0;
+        int allowed = org.perazimchurch.app.domain.games.StarCap.allowed(earnedToday, 1,
+                org.perazimchurch.app.data.local.preference.GameSettingsStore.load(activity).dailyStarCap);
+        if (allowed <= 0) return;
+        scores.edit().putInt(scorePrefix + "stars", stars() + 1)
+                .putString(dayKey, today).putInt(countKey, earnedToday + 1)
+                .putInt(scorePrefix + "pendingStars", scores.getInt(scorePrefix + "pendingStars", 0) + 1).apply();
+    }
+
+    // ---- Church leaderboard (opt-in, first name only) ----
+
+    private static final int MAX_STARS_PER_UPLOAD = 60;
+    private boolean uploading;
+
+    /**
+     * Sends stars earned on this phone to the church leaderboard. Each batch keeps its run id until the server
+     * confirms it, so a retry after a dropped connection is never counted twice. Guests keep their stars locally.
+     */
+    private void flushStars() {
+        SessionManager session = SessionManager.getInstance(activity);
+        if (uploading || session.isGuest()) return;
+        String token = session.getAuthToken();
+        String runKey = scorePrefix + "batchRunId", pointsKey = scorePrefix + "batchPoints";
+        String runId = scores.getString(runKey, null);
+        int points = scores.getInt(pointsKey, 0);
+        if (runId == null) {
+            int pending = scores.getInt(scorePrefix + "pendingStars", 0);
+            if (pending <= 0) return;
+            points = Math.min(pending, MAX_STARS_PER_UPLOAD);
+            runId = java.util.UUID.randomUUID().toString().replace("-", "");
+            scores.edit().putString(runKey, runId).putInt(pointsKey, points)
+                    .putInt(scorePrefix + "pendingStars", pending - points).apply();
+        }
+        uploading = true;
+        GamesLeaderboardRemoteSource.uploadStars(activity, token, runId, points, new GamesLeaderboardRemoteSource.Callback() {
+            @Override public void onSuccess(@NonNull JSONObject json) {
+                uploading = false;
+                scores.edit().remove(runKey).remove(pointsKey).apply();
+                if (scores.getInt(scorePrefix + "pendingStars", 0) > 0) flushStars();
+            }
+            @Override public void onError(int statusCode, @NonNull String message) {
+                uploading = false;
+                // A 400 means the batch itself was refused; drop it rather than retry forever.
+                if (statusCode == 400) scores.edit().remove(runKey).remove(pointsKey).apply();
+            }
+        });
+    }
+
+    private void leaderboardCard() {
         LinearLayout card = new LinearLayout(activity);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(16), dp(12), dp(16), dp(16));
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setPadding(dp(16), dp(14), dp(16), dp(14));
         card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        card.addView(icon(org.perazimchurch.app.R.drawable.ic_game_trophy, 48), new LinearLayout.LayoutParams(dp(48), dp(48)));
+        LinearLayout words = new LinearLayout(activity);
+        words.setOrientation(LinearLayout.VERTICAL);
+        words.setPadding(dp(12), 0, 0, 0);
+        addText(words, "Church leaderboard", 19, true);
+        addText(words, "See who is climbing this week. You choose whether your first name appears.", 14, false);
+        card.addView(words, new LinearLayout.LayoutParams(0, -2, 1f));
+        card.setClickable(true);
+        card.setContentDescription("Open the church leaderboard");
+        card.setOnClickListener(v -> leaderboard(false));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
         params.bottomMargin = dp(16);
         page.addView(card, params);
-        addText(card, title, 21, true);
-        addText(card, description, 16, false);
-        String key = scorePrefix + selected.name();
-        addText(card, scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/5" : "Your best: not played yet", 14, false);
-        Button start = new Button(activity);
-        styleButton(start, "Play " + title, selected == Mode.QUIZ);
-        card.addView(start, new LinearLayout.LayoutParams(-1, -2));
-        start.setOnClickListener(v -> {
-            if (!activeOwner()) return;
-            mode = selected;
-            seed = System.nanoTime();
-            round = new Round(mode, seed);
-            question();
+    }
+
+    private void leaderboard(boolean allTime) {
+        if (!activeOwner()) return;
+        flushStars();
+        screen("Leaderboard", allTime ? "All-time stars from the whole church" : "Stars earned this week across the church", true);
+        LinearLayout tabs = new LinearLayout(activity);
+        tabs.setOrientation(LinearLayout.HORIZONTAL);
+        page.addView(tabs, new LinearLayout.LayoutParams(-1, -2));
+        for (int i = 0; i < 2; i++) {
+            boolean tabAll = i == 1;
+            Button tab = new Button(activity);
+            styleButton(tab, tabAll ? "All time" : "This week", tabAll == allTime);
+            tab.setOnClickListener(v -> { if (tabAll != allTime) leaderboard(tabAll); });
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+            params.setMargins(dp(2), 0, dp(2), dp(8));
+            tabs.addView(tab, params);
+        }
+        SessionManager session = SessionManager.getInstance(activity);
+        boolean guest = session.isGuest();
+        String token = guest ? null : session.getAuthToken();
+        if (guest) {
+            text("Sign in from Profile to add your stars to the church leaderboard.", 15, false);
+        } else {
+            optInRow(token);
+        }
+        LinearLayout board = new LinearLayout(activity);
+        board.setOrientation(LinearLayout.VERTICAL);
+        page.addView(board, new LinearLayout.LayoutParams(-1, -2));
+        addText(board, "Loading the leaderboard…", 15, false);
+        GamesLeaderboardRemoteSource.leaderboard(activity, token, allTime, new GamesLeaderboardRemoteSource.Callback() {
+            @Override public void onSuccess(@NonNull JSONObject json) {
+                if (!isShowing()) return;
+                board.removeAllViews();
+                renderBoard(board, json);
+            }
+            @Override public void onError(int statusCode, @NonNull String message) {
+                if (!isShowing()) return;
+                board.removeAllViews();
+                addText(board, "The leaderboard needs an internet connection. Your stars are saved on this phone and will be added when you're back online.", 15, false);
+            }
         });
+    }
+
+    private void optInRow(String token) {
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(14), dp(10), dp(14), dp(10));
+        row.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        TextView label = new TextView(activity);
+        label.setText("Show my first name on the leaderboard");
+        label.setTextSize(15);
+        label.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        row.addView(label, new LinearLayout.LayoutParams(0, -2, 1f));
+        android.widget.Switch toggle = new android.widget.Switch(activity);
+        toggle.setEnabled(false);
+        toggle.setContentDescription("Show my first name on the leaderboard");
+        row.addView(toggle);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(12);
+        page.addView(row, params);
+        GamesLeaderboardRemoteSource.profile(activity, token, new GamesLeaderboardRemoteSource.Callback() {
+            @Override public void onSuccess(@NonNull JSONObject json) {
+                toggle.setChecked(json.optBoolean("optIn", false));
+                if (!json.optBoolean("eligible", false)) {
+                    label.setText("The church leaderboard is open to adult members. Your stars stay on this phone.");
+                    return;
+                }
+                String name = json.optString("displayName", "");
+                if (!name.isEmpty()) label.setText("Show me as \u201c" + name + "\u201d on the leaderboard");
+                toggle.setEnabled(true);
+                toggle.setOnCheckedChangeListener((button, checked) -> {
+                    toggle.setEnabled(false);
+                    GamesLeaderboardRemoteSource.setOptIn(activity, token, checked, new GamesLeaderboardRemoteSource.Callback() {
+                        @Override public void onSuccess(@NonNull JSONObject result) { if (isShowing()) leaderboard(false); }
+                        @Override public void onError(int statusCode, @NonNull String message) {
+                            toggle.setOnCheckedChangeListener(null);
+                            toggle.setChecked(!checked);
+                            toggle.setEnabled(true);
+                            Toast.makeText(activity, "Could not save. Check your connection and try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+            }
+            @Override public void onError(int statusCode, @NonNull String message) {
+                label.setText("Connect to the internet to choose whether your name appears.");
+            }
+        });
+    }
+
+    private void renderBoard(LinearLayout board, JSONObject json) {
+        org.json.JSONArray entries = json.optJSONArray("entries");
+        int count = entries == null ? 0 : entries.length();
+        if (count == 0) {
+            addText(board, "No one has joined the leaderboard yet. Turn on your name above and be the first to climb.", 15, false);
+        } else {
+            podium(board, entries);
+            for (int i = 0; i < count; i++) {
+                JSONObject e = entries.optJSONObject(i);
+                if (e != null) boardRow(board, e);
+            }
+        }
+        JSONObject me = json.optJSONObject("me");
+        if (me != null) addText(board, "You are #" + me.optInt("rank") + " with " + me.optInt("points") + " stars.", 15, true);
+    }
+
+    /** Top three on raised glass steps: second, first (tallest, with a crown), third. */
+    private void podium(LinearLayout board, org.json.JSONArray entries) {
+        LinearLayout steps = new LinearLayout(activity);
+        steps.setOrientation(LinearLayout.HORIZONTAL);
+        steps.setGravity(Gravity.BOTTOM);
+        int[] order = {1, 0, 2};
+        int[] heights = {96, 128, 76};
+        for (int k = 0; k < 3; k++) {
+            int index = order[k];
+            LinearLayout column = new LinearLayout(activity);
+            column.setOrientation(LinearLayout.VERTICAL);
+            column.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+            JSONObject e = index < entries.length() ? entries.optJSONObject(index) : null;
+            if (e != null) {
+                if (index == 0) column.addView(icon(org.perazimchurch.app.R.drawable.ic_game_crown, 40), new LinearLayout.LayoutParams(dp(40), dp(40)));
+                TextView name = new TextView(activity);
+                name.setText(e.optString("name"));
+                name.setTextSize(15);
+                name.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                name.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                name.setGravity(Gravity.CENTER);
+                name.setSingleLine(true);
+                column.addView(name, new LinearLayout.LayoutParams(-1, -2));
+                TextView step = new TextView(activity);
+                step.setText(e.optInt("rank") + "\n" + e.optInt("points") + " \u2605");
+                step.setTextSize(16);
+                step.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                step.setGravity(Gravity.CENTER);
+                step.setTextColor(index == 0 ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
+                step.setBackground(shape(index == 0 ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE));
+                column.addView(step, new LinearLayout.LayoutParams(-1, dp(heights[k])));
+            }
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+            params.setMargins(dp(4), 0, dp(4), 0);
+            steps.addView(column, params);
+        }
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(16);
+        board.addView(steps, params);
+    }
+
+    private void boardRow(LinearLayout board, JSONObject e) {
+        boolean me = e.optBoolean("me", false);
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(14), dp(12), dp(14), dp(12));
+        row.setBackground(shape(me ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE));
+        int ink = me ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY;
+        TextView rank = new TextView(activity);
+        rank.setText("#" + e.optInt("rank"));
+        rank.setTextSize(16);
+        rank.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        rank.setTextColor(ink);
+        row.addView(rank, new LinearLayout.LayoutParams(dp(48), -2));
+        TextView name = new TextView(activity);
+        name.setText(e.optString("name") + (me ? " (you)" : ""));
+        name.setTextSize(16);
+        name.setTextColor(ink);
+        row.addView(name, new LinearLayout.LayoutParams(0, -2, 1f));
+        TextView points = new TextView(activity);
+        points.setText(e.optInt("points") + " \u2605");
+        points.setTextSize(16);
+        points.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        points.setTextColor(ink);
+        row.addView(points);
+        row.setContentDescription("Rank " + e.optInt("rank") + ", " + e.optString("name") + (me ? ", you" : "") + ", " + e.optInt("points") + " stars");
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        params.bottomMargin = dp(8);
+        board.addView(row, params);
+    }
+    private static long today() {
+        long now = System.currentTimeMillis();
+        return (now + java.util.TimeZone.getDefault().getOffset(now)) / 86_400_000L;
+    }
+    private int currentStreak() {
+        long last = scores.getLong(scorePrefix + "streakDay", -1);
+        int streak = scores.getInt(scorePrefix + "streak", 0);
+        return last >= today() - 1 ? streak : 0;
+    }
+    private void recordPlay() {
+        long last = scores.getLong(scorePrefix + "streakDay", -1);
+        int next = org.perazimchurch.app.domain.games.GameStreak.next(last, today(), scores.getInt(scorePrefix + "streak", 0));
+        scores.edit().putLong(scorePrefix + "streakDay", today()).putInt(scorePrefix + "streak", next).apply();
+    }
+
+    /** One card layout for every game on the hub: icon, character, title, one line, best score, play. */
+    /** Row that holds two cards side by side; closed after the second card. */
+    private LinearLayout openRow;
+
+    /**
+     * One hub card: the game's art fills the top edge to edge (square, so it is never cropped), clipped to the
+     * card's rounded corners. The title, description, best line and a pill Play button sit below it.
+     * characterRes is no longer drawn; it is kept so existing callers still compile.
+     */
+    private void gameCard(int iconRes, int characterRes, int accent, String title, String description, String bestLine, Runnable start) {
+        boolean played = !bestLine.contains("not played yet") && !bestLine.contains("Solved: not yet");
+        final int radius = dp(18);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        GradientDrawable cardBg = new GradientDrawable();
+        cardBg.setColor(PerazimTheme.COLOR_SURFACE);
+        cardBg.setCornerRadius(radius);
+        cardBg.setStroke(dp(1), accent);
+        card.setBackground(cardBg);
+        card.setClipToOutline(true);
+        card.setOutlineProvider(new android.view.ViewOutlineProvider() {
+            @Override public void getOutline(View view, android.graphics.Outline outline) {
+                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
+            }
+        });
+
+        // A square frame: its height always equals its width, so the square art fills it without cropping.
+        FrameLayout artFrame = new FrameLayout(activity) {
+            @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+            }
+        };
+        ImageView art = new ImageView(activity);
+        art.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        art.setImageResource(iconRes);
+        art.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        artFrame.addView(art, new FrameLayout.LayoutParams(-1, -1));
+        card.addView(artFrame, new LinearLayout.LayoutParams(-1, -2));
+
+        LinearLayout body = new LinearLayout(activity);
+        body.setOrientation(LinearLayout.VERTICAL);
+        body.setPadding(dp(12), dp(10), dp(12), dp(12));
+        if (!played) {
+            TextView badge = new TextView(activity);
+            badge.setText("New");
+            badge.setTextSize(10);
+            badge.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+            badge.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+            badge.setPadding(dp(6), dp(2), dp(6), dp(2));
+            badge.setBackground(shape(accent));
+            body.addView(badge, new LinearLayout.LayoutParams(-2, -2));
+        }
+        TextView titleView = new TextView(activity);
+        titleView.setText(title);
+        titleView.setTextSize(14);
+        titleView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        titleView.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+        body.addView(titleView, wrapParams(2));
+        addText(body, description, 12, false);
+        addText(body, bestLine, 11, false);
+
+        // The pill is a plain rounded fill, so no sprite-sheet corners show behind it.
+        Button play = new Button(activity);
+        play.setText("Play");
+        play.setAllCaps(false);
+        play.setTextSize(15);
+        play.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        boolean orange = accent == PerazimTheme.COLOR_ORANGE_BRAND || accent == PerazimTheme.COLOR_ORANGE_SOFT;
+        play.setTextColor(orange ? PerazimTheme.COLOR_BG_DEEP : Color.WHITE);
+        GradientDrawable pill = new GradientDrawable();
+        pill.setColor(orange ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_PURPLE_SOFT);
+        pill.setCornerRadius(dp(22));
+        play.setBackground(pill);
+        play.setStateListAnimator(null);
+        play.setMinHeight(dp(44));
+        play.setMinimumHeight(dp(44));
+        play.setPadding(dp(12), 0, dp(12), 0);
+        LinearLayout.LayoutParams playParams = new LinearLayout.LayoutParams(-1, -2);
+        playParams.topMargin = dp(10);
+        body.addView(play, playParams);
+        card.addView(body, new LinearLayout.LayoutParams(-1, -2));
+
+        card.setClickable(true);
+        play.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            seed = System.nanoTime();
+            start.run();
+        });
+
+        if (openRow == null) {
+            openRow = new LinearLayout(activity);
+            openRow.setOrientation(LinearLayout.HORIZONTAL);
+            page.addView(openRow, wrapParams(10));
+        }
+        LinearLayout.LayoutParams cell = new LinearLayout.LayoutParams(0, -2, 1f);
+        cell.rightMargin = openRow.getChildCount() == 0 ? dp(5) : 0;
+        if (openRow.getChildCount() == 1) cell.leftMargin = dp(5);
+        openRow.addView(card, cell);
+        if (openRow.getChildCount() == 2) openRow = null;
+    }
+
+    private String bestLineOf(String key, int total) {
+        String full = scorePrefix + key;
+        return scores.contains(full) ? "Your best: " + scores.getInt(full, 0) + "/" + total : "Your best: not played yet";
+    }
+
+    private String modeBestLine(Mode selected, int total) {
+        String key = scorePrefix + selected.name();
+        return scores.contains(key) ? "Your best: " + scores.getInt(key, 0) + "/" + total : "Your best: not played yet";
+    }
+
+    private void startMode(Mode selected) {
+        mode = selected;
+        recordPlay();
+        if (mode == Mode.LADDER) { startLadder(); return; }
+        round = new Round(mode, seed);
+        question();
+    }
+
+    // ---- Custom games: Word Search, Memory Match, Story Timeline, Mini Crossword, Road to Jerusalem ----
+
+    private String solvedLine(String key) {
+        int n = scores.getInt(scorePrefix + key, 0);
+        return n == 0 ? "Solved: not yet" : "Solved: " + n + (n == 1 ? " time" : " times");
+    }
+
+    private void solvedOnce(String key) {
+        scores.edit().putInt(scorePrefix + key, scores.getInt(scorePrefix + key, 0) + 1).apply();
+    }
+
+    private FeedbackManager feedback() { return ui.feedback(); }
+
+    private void wordSearch() {
+        WordSearch game = new WordSearch(seed);
+        screen("Word Search", "Tap a start letter, then the end letter of a word. Words run in any direction.", true);
+        TextView status = text("Found 0 of " + game.words().size(), 16, true);
+        TextView[][] cells = new TextView[WordSearch.SIZE][WordSearch.SIZE];
+        Set<Integer> foundCells = new HashSet<>();
+        int[] start = {-1, -1};
+        LinearLayout grid = new LinearLayout(activity);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        grid.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        grid.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int r = 0; r < WordSearch.SIZE; r++) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (int c = 0; c < WordSearch.SIZE; c++) {
+                final int rr = r, cc = c;
+                TextView cell = new TextView(activity);
+                cell.setText(String.valueOf(game.letter(r, c)));
+                cell.setGravity(Gravity.CENTER);
+                cell.setTextSize(16);
+                cell.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                cell.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                cells[r][c] = cell;
+                row.addView(cell, new LinearLayout.LayoutParams(0, dp(36), 1f));
+                cell.setOnClickListener(v -> {
+                    if (start[0] < 0) {
+                        start[0] = rr; start[1] = cc;
+                        cell.setBackgroundColor(PerazimTheme.COLOR_PURPLE_SOFT);
+                        feedback().gameCue(FeedbackManager.GameCue.PICK);
+                        return;
+                    }
+                    int[][] hit = game.select(start[0], start[1], rr, cc);
+                    start[0] = -1; start[1] = -1;
+                    if (hit != null) {
+                        for (int[] p : hit) foundCells.add(p[0] * WordSearch.SIZE + p[1]);
+                        addStar();
+                        feedback().gameCue(FeedbackManager.GameCue.MATCH);
+                        status.setText("Found " + game.found().size() + " of " + game.words().size());
+                        if (game.complete()) {
+                            solvedOnce("WORD_SEARCH");
+                            feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                            feedback().celebrateIn(getWindow());
+                            status.setText("All words found. Well done.");
+                        }
+                    } else {
+                        feedback().gameCue(FeedbackManager.GameCue.MISS);
+                        Toast.makeText(activity, "Not a word in that line. Try again.", Toast.LENGTH_SHORT).show();
+                    }
+                    for (int r2 = 0; r2 < cells.length; r2++) {
+                        for (int c2 = 0; c2 < cells[r2].length; c2++) {
+                            boolean found = foundCells.contains(r2 * WordSearch.SIZE + c2);
+                            cells[r2][c2].setBackgroundColor(found ? PerazimTheme.COLOR_ORANGE_GHOST : 0x00000000);
+                        }
+                    }
+                });
+            }
+            grid.addView(row);
+        }
+        page.addView(grid, wrapParams(12));
+        StringBuilder list = new StringBuilder("Find: ");
+        for (String w : game.words()) list.append(w).append("   ");
+        text(list.toString().trim(), 16, false);
+        button("New puzzle", false).setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); wordSearch(); });
+    }
+
+    private void memoryMatch() {
+        MemoryMatch game = new MemoryMatch(seed, 6);
+        screen("Memory Match", "Flip two tiles. Match the pairs in as few moves as you can.", true);
+        TextView status = text("Moves: 0", 16, true);
+        TextView reveal = text("", 15, false);
+        int cols = 3;
+        TextView[] tileViews = new TextView[game.tiles().size()];
+        LinearLayout grid = new LinearLayout(activity);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        for (int i = 0; i < tileViews.length; i += cols) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (int j = i; j < i + cols && j < tileViews.length; j++) {
+                final int index = j;
+                TextView tile = new TextView(activity);
+                tile.setGravity(Gravity.CENTER);
+                tile.setTextSize(14);
+                tile.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                tileViews[j] = tile;
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, dp(78), 1f);
+                lp.setMargins(dp(4), dp(4), dp(4), dp(4));
+                row.addView(tile, lp);
+                tile.setOnClickListener(v -> {
+                    if (game.mismatchShowing() || !game.flip(index)) return;
+                    if (game.mismatchShowing()) feedback().gameCue(FeedbackManager.GameCue.MISS);
+                    else if (game.tiles().get(index).matched) feedback().gameCue(FeedbackManager.GameCue.MATCH);
+                    else feedback().gameCue(FeedbackManager.GameCue.PICK);
+                    refreshTiles(game, tileViews);
+                    status.setText("Moves: " + game.moves());
+                    MemoryMatch.Tile t = game.tiles().get(index);
+                    reveal.setText(t.faceUp || t.matched ? t.symbol.reference : "");
+                    if (game.complete()) {
+                        addStar();
+                        solvedOnce("MEMORY_MATCH");
+                        feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                        feedback().celebrateIn(getWindow());
+                        status.setText("Complete in " + game.moves() + " moves.");
+                        reveal.setText("Every pair found.");
+                    } else if (game.mismatchShowing()) {
+                        handler.postDelayed(() -> {
+                            game.hideMismatch();
+                            refreshTiles(game, tileViews);
+                        }, 800);
+                    }
+                });
+            }
+            grid.addView(row);
+        }
+        refreshTiles(game, tileViews);
+        page.addView(grid, wrapParams(12));
+        button("New deck", false).setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); memoryMatch(); });
+    }
+
+    private void refreshTiles(MemoryMatch game, TextView[] views) {
+        List<MemoryMatch.Tile> tiles = game.tiles();
+        for (int i = 0; i < views.length; i++) {
+            MemoryMatch.Tile t = tiles.get(i);
+            boolean shown = t.faceUp || t.matched;
+            views[i].setText(shown ? t.symbol.label : "?");
+            views[i].setTextColor(shown ? PerazimTheme.COLOR_TEXT_DARK : PerazimTheme.COLOR_TEXT_PRIMARY);
+            views[i].setBackground(shape(t.matched ? PerazimTheme.COLOR_ORANGE_SOFT
+                    : shown ? PerazimTheme.COLOR_WARM_CREAM : PerazimTheme.COLOR_PURPLE_MUTED));
+        }
+    }
+
+    private void timeline() {
+        TimelineSort game = new TimelineSort(seed, 6);
+        screen("Story Timeline", "Tap the events in the order they happen in the Bible story.", true);
+        TextView status = text("Placed 0 of " + game.ordered().size(), 16, true);
+        List<TimelineSort.Event> events = game.shuffled();
+        for (int i = 0; i < events.size(); i++) {
+            final int index = i;
+            Button b = button(events.get(i).title, false);
+            b.setOnClickListener(v -> {
+                if (game.isPlaced(index)) return;
+                if (game.tap(index)) {
+                    addStar();
+                    feedback().gameCue(FeedbackManager.GameCue.MATCH);
+                    b.setText(game.placed() + ". " + events.get(index).title + " (" + events.get(index).reference + ")");
+                    b.setAlpha(0.7f);
+                    status.setText("Placed " + game.placed() + " of " + game.ordered().size());
+                    if (game.complete()) {
+                        solvedOnce("TIMELINE");
+                        feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                        feedback().celebrateIn(getWindow());
+                        status.setText("Story in order. Mistakes: " + game.mistakes());
+                    }
+                } else {
+                    feedback().gameCue(FeedbackManager.GameCue.MISS);
+                    Toast.makeText(activity, "Not yet. Think about what comes first in the story.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        button("New timeline", false).setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); timeline(); });
+    }
+
+    private void miniCrossword() {
+        MiniCrossword cw = new MiniCrossword();
+        screen("Mini Crossword", "Fill in the grid from the clues below. Tap Check to see which letters are right.", true);
+        EditText[][] cells = new EditText[MiniCrossword.SIZE][MiniCrossword.SIZE];
+        LinearLayout grid = new LinearLayout(activity);
+        grid.setOrientation(LinearLayout.VERTICAL);
+        grid.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        grid.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int r = 0; r < MiniCrossword.SIZE; r++) {
+            LinearLayout row = new LinearLayout(activity);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            for (int c = 0; c < MiniCrossword.SIZE; c++) {
+                if (!cw.isLetter(r, c)) {
+                    View black = new View(activity);
+                    black.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
+                    row.addView(black, new LinearLayout.LayoutParams(0, dp(52), 1f));
+                    continue;
+                }
+                EditText cell = new EditText(activity);
+                cell.setGravity(Gravity.CENTER);
+                cell.setSingleLine(true);
+                cell.setTextSize(20);
+                cell.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                cell.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                cell.setPadding(0, 0, 0, 0);
+                cell.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                cell.setFilters(new android.text.InputFilter[]{
+                        new android.text.InputFilter.AllCaps(), new android.text.InputFilter.LengthFilter(1)});
+                cell.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+                cells[r][c] = cell;
+                row.addView(cell, new LinearLayout.LayoutParams(0, dp(52), 1f));
+            }
+            grid.addView(row);
+        }
+        page.addView(grid, wrapParams(12));
+        for (MiniCrossword.Clue clue : cw.clues()) {
+            text(clue.number + " " + clue.direction + ": " + clue.text, 15, false);
+        }
+        TextView status = text("", 16, true);
+        button("Check my answers", true).setOnClickListener(v -> {
+            feedback().click(v);
+            String[][] typed = new String[MiniCrossword.SIZE][MiniCrossword.SIZE];
+            int right = 0, total = 0;
+            for (int r = 0; r < MiniCrossword.SIZE; r++) {
+                for (int c = 0; c < MiniCrossword.SIZE; c++) {
+                    if (cells[r][c] == null) { typed[r][c] = ""; continue; }
+                    typed[r][c] = cells[r][c].getText().toString();
+                    total++;
+                    boolean ok = cw.matches(r, c, typed[r][c]);
+                    if (ok) right++;
+                    cells[r][c].setBackgroundColor(typed[r][c].isEmpty() ? PerazimTheme.COLOR_SURFACE
+                            : ok ? 0x6610B981 : 0x66EF4444);
+                }
+            }
+            if (cw.solved(typed)) {
+                addStar();
+                solvedOnce("CROSSWORD");
+                feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+                feedback().celebrateIn(getWindow());
+                status.setText("Solved. Every answer is right.");
+            } else {
+                feedback().gameCue(FeedbackManager.GameCue.MISS);
+                status.setText(right + " of " + total + " letters are right so far.");
+            }
+        });
+    }
+
+    private void roadToJerusalem() {
+        RoadToJerusalem game = new RoadToJerusalem(seed);
+        screen("Road to Jerusalem", "Roll the die to move. The phone travels too. First to square 20 wins.", true);
+        TextView status = text("Roll to begin your journey.", 16, true);
+        TextView[] squares = new TextView[RoadToJerusalem.FINISH + 1];
+        LinearLayout board = new LinearLayout(activity);
+        board.setOrientation(LinearLayout.VERTICAL);
+        board.setBackground(shape(PerazimTheme.COLOR_SURFACE_2));
+        board.setPadding(dp(6), dp(6), dp(6), dp(6));
+        for (int first = 0; first <= RoadToJerusalem.FINISH; first += 5) {
+            LinearLayout line = new LinearLayout(activity);
+            line.setOrientation(LinearLayout.HORIZONTAL);
+            for (int sq = first; sq < first + 5 && sq <= RoadToJerusalem.FINISH; sq++) {
+                TextView t = new TextView(activity);
+                t.setGravity(Gravity.CENTER);
+                t.setTextSize(12);
+                t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+                t.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
+                squares[sq] = t;
+                line.addView(t, new LinearLayout.LayoutParams(0, dp(58), 1f));
+            }
+            board.addView(line);
+        }
+        page.addView(board, wrapParams(12));
+        refreshRoad(game, squares);
+        Button roll = button("Roll the die", true);
+        Button again = button("New road", false);
+        again.setVisibility(View.GONE);
+        roll.setOnClickListener(v -> {
+            if (game.finished()) return;
+            feedback().gameCue(FeedbackManager.GameCue.PICK);
+            roll.setEnabled(false);
+            RoadToJerusalem.Move mine = game.turn(true);
+            String line = "You rolled " + mine.roll + "." + (mine.note == null ? "" : " " + mine.note);
+            status.setText(line);
+            refreshRoad(game, squares);
+            if (game.finished()) { finishRoad(game, status, roll, again); return; }
+            handler.postDelayed(() -> {
+                RoadToJerusalem.Move theirs = game.turn(false);
+                status.setText(line + "\nThe phone rolled " + theirs.roll + "." + (theirs.note == null ? "" : " " + theirs.note));
+                refreshRoad(game, squares);
+                if (game.finished()) finishRoad(game, status, roll, again);
+                else roll.setEnabled(true);
+            }, 900);
+        });
+        again.setOnClickListener(v -> { feedback().click(v); seed = System.nanoTime(); roadToJerusalem(); });
+    }
+
+    private void finishRoad(RoadToJerusalem game, TextView status, Button roll, Button again) {
+        roll.setEnabled(false);
+        again.setVisibility(View.VISIBLE);
+        if ("You".equals(game.winner())) {
+            addStar();
+            solvedOnce("ROAD");
+            feedback().gameCue(FeedbackManager.GameCue.FOUND_ALL);
+            feedback().celebrateIn(getWindow());
+            status.setText(status.getText() + "\nYou reached Jerusalem first.");
+        } else {
+            status.setText(status.getText() + "\nThe phone reached Jerusalem first. Try a new road.");
+        }
+    }
+
+    private void refreshRoad(RoadToJerusalem game, TextView[] squares) {
+        for (int i = 0; i < squares.length; i++) {
+            StringBuilder label = new StringBuilder();
+            label.append(i == 0 ? "Start" : i == RoadToJerusalem.FINISH ? "Jerusalem" : String.valueOf(i));
+            if (game.playerAt() == i) label.append("\nYou");
+            if (game.computerAt() == i) label.append("\nPhone");
+            squares[i].setText(label.toString());
+            squares[i].setBackground(shape(game.hasNote(i) ? PerazimTheme.COLOR_ORANGE_GHOST : PerazimTheme.COLOR_SURFACE));
+        }
+    }
+
+    // ---- Shared results and pause for every run ----
+
+    /** Results screen for a finished run. The shared logic lives in GameChrome. */
+    private void finishedRun(String gameId, String title, int score, int size, Runnable replay) {
+        chrome().finishedRun(gameId, title, score, size, replay);
+    }
+
+    /** Results for an engine GameSession. Stars are saved once, through GameResults.finishRun. */
+    private void finishedRun(String gameId, String title, GameSession session, int level, int levelCount, Runnable replay) {
+        chrome().finishedRun(gameId, title, session, level, levelCount, replay);
+    }
+
+    /** Pause button for an active run. The shared logic lives in GameChrome. */
+    private void pauseButton(Runnable resume) {
+        chrome().pauseButton(resume);
+    }
+
+    /** Adapter that lets GameChrome draw on this dialog's page. */
+    private GameChrome chrome() {
+        return new GameChrome(new GameChrome.Host() {
+            @Override public Activity activity() { return activity; }
+            @Override public SharedPreferences scores() { return scores; }
+            @Override public String scorePrefix() { return scorePrefix; }
+            @Override public boolean activeOwner() { return GamesHubDialog.this.activeOwner(); }
+            @Override public void screen(String title, String subtitle) { GamesHubDialog.this.screen(title, subtitle, false); }
+            @Override public TextView text(String value, int size, boolean bold) { return GamesHubDialog.this.text(value, size, bold); }
+            @Override public Button button(String label, boolean primary) { return GamesHubDialog.this.button(label, primary); }
+            @Override public void click(View v) { feedback().click(v); }
+            @Override public void newSeed() { seed = System.nanoTime(); }
+            @Override public void hub() { GamesHubDialog.this.hub(); }
+            @Override public void addRow(View row) { GamesHubDialog.this.page.addView(row, GamesHubDialog.this.wrapParams(12)); }
+        });
+    }
+
+    // ---- Old or New?: sort each Bible book into its testament ----
+
+    private void testamentSort() {
+        renderTestamentSort(new TestamentSort(seed), null);
+    }
+
+    private void renderTestamentSort(TestamentSort game, String feedback) {
+        screen("Old or New?", "Place each book in its testament. Eight books per run.", true);
+        if (game.finished()) {
+            String key = scorePrefix + "TESTAMENT_SORT";
+            if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
+            finishedRun("old_or_new", "Old or New?", game.score(), game.size(), this::testamentSort);
+            return;
+        }
+        TestamentSort.Book book = game.current();
+        text("Book " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        addText(card, book.name, 20, true);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(-1, -2);
+        cardParams.bottomMargin = dp(12);
+        page.addView(card, cardParams);
+        if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderTestamentSort(game, feedback));
+        Button old = button("Old Testament", false);
+        old.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            renderTestamentSort(game, answerLine(game.place(TestamentSort.Testament.OLD), game));
+        });
+        Button neu = button("New Testament", false);
+        neu.setOnClickListener(v -> {
+            if (!activeOwner()) return;
+            feedback().click(v);
+            renderTestamentSort(game, answerLine(game.place(TestamentSort.Testament.NEW), game));
+        });
+    }
+
+    private String answerLine(boolean right, TestamentSort game) {
+        TestamentSort.Book placed = game.lastBook();
+        if (placed == null) return null;
+        String home = placed.testament == TestamentSort.Testament.OLD ? "Old" : "New";
+        return (right ? "Correct. " : "Not quite. " + placed.name + " belongs in the " + home + " Testament. ") + placed.fact;
+    }
+
+    // ---- Who Said It?: pick the speaker of a short KJV quotation ----
+
+    private void whoSaidIt() {
+        renderWhoSaidIt(new WhoSaidIt(seed), null);
+    }
+
+    private void renderWhoSaidIt(WhoSaidIt game, String feedback) {
+        screen("Who Said It?", "Choose who spoke each quotation. Five quotations per run.", true);
+        if (game.finished()) {
+            String key = scorePrefix + "WHO_SAID_IT";
+            if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
+            finishedRun("who_said_it", "Who Said It?", game.score(), game.size(), this::whoSaidIt);
+            return;
+        }
+        WhoSaidIt.Question question = game.current();
+        text("Quotation " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        addText(card, "\u201C" + question.quote + "\u201D", 18, true);
+        page.addView(card, wrapParams(12));
+        if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderWhoSaidIt(game, feedback));
+        for (String choice : question.choices) {
+            Button option = button(choice, false);
+            option.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                feedback().click(v);
+                boolean right = game.answer(choice);
+                WhoSaidIt.Question answered = game.lastQuestion();
+                String line = (right ? "Correct. " : "Not quite. It was " + answered.answer + ". ")
+                        + answered.reference + ".";
+                renderWhoSaidIt(game, line);
+            });
+        }
+    }
+
+    // ---- Fill the Gap: choose the missing word of a famous KJV verse ----
+
+    private void fillTheGap() {
+        renderFillTheGap(new FillTheGap(seed), null);
+    }
+
+    private void renderFillTheGap(FillTheGap game, String feedback) {
+        screen("Fill the Gap", "Choose the missing word. Five verses per run.", true);
+        if (game.finished()) {
+            String key = scorePrefix + "FILL_THE_GAP";
+            if (game.score() > scores.getInt(key, 0)) scores.edit().putInt(key, game.score()).apply();
+            finishedRun("fill_the_gap", "Fill the Gap", game.score(), game.size(), this::fillTheGap);
+            return;
+        }
+        FillTheGap.Question question = game.current();
+        text("Verse " + game.position() + " of " + game.size() + " · Score " + game.score(), 12, false);
+        LinearLayout card = new LinearLayout(activity);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(14), dp(14), dp(14));
+        card.setBackground(shape(PerazimTheme.COLOR_SURFACE));
+        addText(card, question.before + "_____" + question.after, 18, true);
+        page.addView(card, wrapParams(12));
+        if (feedback != null) text(feedback, 13, false);
+        pauseButton(() -> renderFillTheGap(game, feedback));
+        for (String choice : question.choices) {
+            Button option = button(choice, false);
+            option.setOnClickListener(v -> {
+                if (!activeOwner()) return;
+                feedback().click(v);
+                boolean right = game.answer(choice);
+                FillTheGap.Question answered = game.lastQuestion();
+                String line = (right ? "Correct. " : "Not quite. The word was " + answered.answer + ". ")
+                        + answered.reference + ".";
+                renderFillTheGap(game, line);
+            });
+        }
+    }
+
+    private LinearLayout.LayoutParams wrapParams(int bottomDp) { return ui.wrapParams(bottomDp); }
+
+    // ---- Ladder of Faith ----
+
+    /** Maps game events onto the app-wide FeedbackManager, so the user's sound, haptics and celebration switches apply. */
+    private void announce(List<LadderOfFaith.Event> events) {
+        FeedbackManager feedback = FeedbackManager.get(activity);
+        boolean milestone = events.contains(LadderOfFaith.Event.MILESTONE);
+        for (LadderOfFaith.Event event : events) {
+            switch (event) {
+                case CORRECT:
+                    if (!milestone) feedback.reward(activity);
+                    break;
+                case MILESTONE:
+                    feedback.milestone(activity);
+                    feedback.celebrateIn(getWindow());
+                    break;
+                case WRONG:
+                case LIFELINE_USED:
+                    if (scroll != null) feedback.click(scroll);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void startLadder() {
+        seed = System.nanoTime();
+        org.perazimchurch.app.domain.games.GameSettings settings =
+                org.perazimchurch.app.data.local.preference.GameSettingsStore.load(activity);
+        ladder = new LadderOfFaith(seed,
+                org.perazimchurch.app.data.local.preference.QuestionHistoryStore.load(
+                        activity, org.perazimchurch.app.data.local.preference.QuestionHistoryStore.LADDER),
+                settings.unseenPercent, settings.missedPercent);
+        showMap();
+    }
+
+    private void showMap() {
+        if (!activeOwner()) return;
+        boolean done = ladder.finished();
+        screen("Ladder of Faith", done ? "Run complete · Score " + ladder.score()
+                : "Rung " + ladder.position() + " of " + LadderOfFaith.RUNGS + " · " + tierName(LadderOfFaith.tierOf(ladder.position())), true);
+        livesRow();
+        LadderMapView map = new LadderMapView(activity);
+        int best = scores.getInt(scorePrefix + Mode.LADDER.name(), 0);
+        map.setProgress(done ? ladder.score() : ladder.position(), best, done);
+        map.setOnClimb(this::ladderQuestion);
+        page.addView(map, new LinearLayout.LayoutParams(-1, -2));
+        if (done) {
+            button("See results", true).setOnClickListener(v -> ladderFinished());
+        } else {
+            button("Climb rung " + ladder.position(), true).setOnClickListener(v -> ladderQuestion());
+            int rung = ladder.position();
+            scroll.post(() -> scroll.scrollTo(0, Math.max(0, (int) (map.getTop() + map.nodeY(rung)) - scroll.getHeight() / 2)));
+        }
+    }
+
+    private void livesRow() {
+        LinearLayout row = new LinearLayout(activity);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setContentDescription(ladder.lives() + " lives left");
+        for (int i = 0; i < LadderOfFaith.LIVES; i++) {
+            ImageView heart = icon(org.perazimchurch.app.R.drawable.ic_game_heart, 28);
+            heart.setAlpha(i < ladder.lives() ? 1f : 0.25f);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(28), dp(28));
+            params.rightMargin = dp(4);
+            row.addView(heart, params);
+        }
+        LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(-1, -2);
+        rowParams.bottomMargin = dp(10);
+        page.addView(row, rowParams);
+    }
+
+    private void ladderQuestion() {
+        if (!activeOwner()) return;
+        if (ladder.finished()) { ladderFinished(); return; }
+        Card card = ladder.current();
+        screen("Ladder of Faith", "Rung " + ladder.position() + " of " + LadderOfFaith.RUNGS + " · " + tierName(LadderOfFaith.tierOf(ladder.position())) + " · Score " + ladder.score() + " · Lives " + ladder.lives(), true);
+        livesRow();
+        text(card.prompt, 23, true);
+        if (ladder.peeked()) text("Verse Peek: " + card.reference, 16, true);
+        Button hint = button("Show a hint", false);
+        TextView hintText = text("", 16, false);
+        hintText.setVisibility(View.GONE);
+        hint.setOnClickListener(v -> { hintText.setText(card.hint); hintText.setVisibility(View.VISIBLE); hint.setEnabled(false); });
+
+        LinearLayout lifelines = new LinearLayout(activity);
+        lifelines.setOrientation(LinearLayout.HORIZONTAL);
+        page.addView(lifelines, new LinearLayout.LayoutParams(-1, -2));
+        Button fifty = new Button(activity);
+        styleButton(fifty, "50/50", false);
+        lifelineIcon(fifty, org.perazimchurch.app.R.drawable.ic_game_fifty);
+        fifty.setEnabled(ladder.fiftyAvailable());
+        fifty.setOnClickListener(v -> { ladder.useFiftyFifty(); announce(ladder.drainEvents()); ladderQuestion(); });
+        Button peek = new Button(activity);
+        styleButton(peek, "Verse Peek", false);
+        lifelineIcon(peek, org.perazimchurch.app.R.drawable.ic_game_eye);
+        peek.setEnabled(ladder.peekAvailable());
+        peek.setOnClickListener(v -> { ladder.usePeek(); announce(ladder.drainEvents()); ladderQuestion(); });
+        Button pass = new Button(activity);
+        styleButton(pass, "Pass", false);
+        lifelineIcon(pass, org.perazimchurch.app.R.drawable.ic_game_skip);
+        pass.setEnabled(ladder.passAvailable());
+        pass.setOnClickListener(v -> { ladder.usePass(); announce(ladder.drainEvents()); ladderQuestion(); });
+        for (Button b : new Button[] { fifty, peek, pass }) {
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1f);
+            params.setMargins(dp(2), dp(3), dp(2), dp(3));
+            lifelines.addView(b, params);
+        }
+        gap(8);
+
+        List<String> hidden = ladder.hiddenOptions();
+        List<String> options = new ArrayList<>(card.options);
+        Collections.shuffle(options, new java.util.Random(seed + ladder.position()));
+        for (String option : options) {
+            if (hidden.contains(option)) continue;
+            button(option, false).setOnClickListener(v -> ladderAnswer(option));
+        }
+    }
+
+    private void lifelineIcon(Button button, int drawable) {
+        android.graphics.drawable.Drawable d = androidx.core.content.ContextCompat.getDrawable(activity, drawable);
+        if (d == null) return;
+        d.setBounds(0, 0, dp(30), dp(30));
+        button.setCompoundDrawables(null, d, null, null);
+        button.setCompoundDrawablePadding(dp(2));
+        if (!button.isEnabled()) button.setAlpha(0.45f);
+    }
+
+    private static String tierName(int tier) {
+        return tier == 1 ? "Easy" : tier == 2 ? "Medium" : "Hard";
+    }
+
+    /** Downloads the game settings in the background. Failures keep the cached or default values. */
+    private void refreshGameSettings() {
+        org.perazimchurch.app.data.remote.GamesLeaderboardRemoteSource.settings(activity,
+                new org.perazimchurch.app.data.remote.GamesLeaderboardRemoteSource.Callback() {
+                    @Override public void onSuccess(@NonNull JSONObject json) {
+                        org.perazimchurch.app.data.local.preference.GameSettingsStore.save(activity,
+                                json.optInt("dailyStarCap", -1), json.optInt("unseenPercent", -1), json.optInt("missedPercent", -1));
+                    }
+                    @Override public void onError(int statusCode, @NonNull String message) { /* keep cached values */ }
+                });
+    }
+
+    /** Opens the Bible reader at the verse the member last missed in a lost Ladder run. */
+    private void practiseLastMiss() {
+        org.perazimchurch.app.domain.games.BookReference.Target target =
+                org.perazimchurch.app.domain.games.BookReference.parse(lastMissedCitation);
+        if (target == null) return;
+        org.perazimchurch.app.presentation.ui.BibleReaderDialog reader = new org.perazimchurch.app.presentation.ui.BibleReaderDialog(activity);
+        reader.setTargetPassage(target.bookId, target.chapter);
+        reader.show();
+    }
+
+    private String lastMissedCitation;
+
+    private void ladderAnswer(String value) {
+        if (!activeOwner() || ladder.answered()) return;
+        hideKeyboard();
+        Card card = ladder.current();
+        boolean right = ladder.answer(value);
+        org.perazimchurch.app.data.local.preference.QuestionHistoryStore.record(
+                activity, org.perazimchurch.app.data.local.preference.QuestionHistoryStore.LADDER, card.prompt, right);
+        if (right) addStar(); else lastMissedCitation = card.reference;
+        List<LadderOfFaith.Event> events = ladder.drainEvents();
+        announce(events);
+        boolean milestone = ladder.milestone();
+        String headline = ladder.correct()
+                ? (milestone ? "Milestone reached!" : "Well done!")
+                : "Let's learn this one";
+        screen(headline, "Score " + ladder.score() + " · Lives " + ladder.lives(), true);
+        text(card.answer, 24, true);
+        text(card.reference, 17, false);
+        text(card.explanation, 18, false);
+        boolean last = ladder.finished();
+        button(last ? "See results" : "Next rung", true).setOnClickListener(v -> {
+            if (last) { showMap(); return; }
+            if (ladder.next()) { if (milestone) showMap(); else ladderQuestion(); }
+        });
+        if (!last) button("View ladder map", false).setOnClickListener(v -> { if (ladder.next()) showMap(); });
+    }
+
+    private void ladderFinished() {
+        if (!activeOwner()) return;
+        String key = scorePrefix + Mode.LADDER.name();
+        int best = Math.max(scores.getInt(key, 0), ladder.score());
+        scores.edit().putInt(key, best).apply();
+        screen("Ladder complete", "Ladder of Faith", true);
+        text(ladder.score() + " / " + LadderOfFaith.RUNGS, 40, true);
+        text(ladder.score() == LadderOfFaith.RUNGS ? "You climbed the whole ladder. Keep putting what you learn into practice." : "Every rung is a chance to learn. Read the references and climb again.", 19, false);
+        text("Your best on this phone: " + best + "/" + LadderOfFaith.RUNGS, 17, false);
+        if (ladder.lives() <= 0 && lastMissedCitation != null
+                && org.perazimchurch.app.domain.games.BookReference.parse(lastMissedCitation) != null) {
+            button("Practise " + lastMissedCitation, false).setOnClickListener(v -> practiseLastMiss());
+        }
+        button("Climb again", true).setOnClickListener(v -> startLadder());
+        button("View ladder map", false).setOnClickListener(v -> showMap());
+        button("Choose another game", false).setOnClickListener(v -> hub());
     }
 
     private String modeTitle() {
@@ -230,6 +1535,7 @@ public final class GamesHubDialog extends Dialog {
         hideKeyboard();
         Card card = round.current();
         boolean correct = round.answer(value);
+        if (correct) addStar();
         screen(correct ? "Well done!" : "Let's learn this one", "Score " + round.score() + " · Question " + round.position() + " of " + round.size(), true);
         text(card.answer, 24, true);
         text(card.reference, 17, false);
@@ -256,55 +1562,19 @@ public final class GamesHubDialog extends Dialog {
         button("Choose another game", false).setOnClickListener(v -> hub());
     }
 
-    private TextView text(String value, int size, boolean bold) { return addText(page, value, size, bold); }
-    private TextView addText(LinearLayout parent, String value, int size, boolean bold) {
-        TextView view = new TextView(activity);
-        view.setText(value);
-        view.setTextSize(size);
-        view.setTextColor(bold ? PerazimTheme.COLOR_TEXT_PRIMARY : PerazimTheme.COLOR_TEXT_SECONDARY);
-        if (bold) view.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        view.setLineSpacing(dp(3), 1f);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
-        params.bottomMargin = dp(12);
-        parent.addView(view, params);
-        return view;
-    }
-    private Button button(String label, boolean primary) {
-        Button view = new Button(activity);
-        styleButton(view, label, primary);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
-        params.bottomMargin = dp(10);
-        page.addView(view, params);
-        return view;
-    }
-    private void styleButton(Button button, String label, boolean primary) {
-        button.setText(label);
-        button.setAllCaps(false);
-        button.setTextSize(17);
-        button.setTextColor(primary ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
-        button.setMinHeight(dp(52));
-        button.setMinimumWidth(0);
-        button.setMinWidth(0);
-        button.setGravity(Gravity.CENTER);
-        button.setPadding(dp(12), dp(12), dp(12), dp(12));
-        button.setBackground(shape(primary ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE_2));
-    }
-    private GradientDrawable shape(int color) {
-        GradientDrawable shape = new GradientDrawable();
-        shape.setColor(color);
-        shape.setCornerRadius(dp(14));
-        return shape;
-    }
-    private void gap(int height) {
-        page.addView(new View(activity), new LinearLayout.LayoutParams(1, dp(height)));
-    }
-    private int dp(int value) { return Math.round(value * activity.getResources().getDisplayMetrics().density); }
+    private TextView text(String value, int size, boolean bold) { return ui.text(value, size, bold); }
+    private TextView addText(LinearLayout parent, String value, int size, boolean bold) { return ui.addText(parent, value, size, bold); }
+    private Button button(String label, boolean primary) { return ui.button(label, primary); }
+    private void styleButton(Button button, String label, boolean primary) { ui.styleButton(button, label, primary); }
+    private GradientDrawable shape(int color) { return ui.shape(color); }
+    private void gap(int height) { ui.gap(height); }
+    private int dp(int value) { return ui.dp(value); }
     private void hideKeyboard() {
         InputMethodManager input = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         Window window = getWindow();
         if (input != null && window != null) input.hideSoftInputFromWindow(window.getDecorView().getWindowToken(), 0);
     }
-    static String ownerKey(String owner) {
+    public static String ownerKey(String owner) {
         try {
             byte[] bytes = MessageDigest.getInstance("SHA-256").digest(owner.getBytes(StandardCharsets.UTF_8));
             StringBuilder key = new StringBuilder();

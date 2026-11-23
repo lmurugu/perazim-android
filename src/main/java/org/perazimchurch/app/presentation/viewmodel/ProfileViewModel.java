@@ -147,7 +147,7 @@ public class ProfileViewModel extends ViewModel {
             try {
                 List<DownloadedContent> downloads = downloadedContentRepo.getAllDownloads();
                 List<Hymn> favoriteHymns = hymnRepo.getFavoriteHymns();
-                List<BibleVerse> bookmarks = bibleRepo.getBookmarkedVerses();
+                List<BibleVerse> bookmarks = bibleRepo.getSavedVerses();
 
                 SavedContentData data = new SavedContentData(downloads, favoriteHymns, bookmarks);
                 savedContentState.postValue(UiState.success(data));

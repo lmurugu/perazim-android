@@ -26,7 +26,10 @@ final class Ed25519Verifier {
         if (s.compareTo(L) >= 0) return false;
         Point a = decode(publicBytes);
         Point r = decode(rBytes);
-        if (a == null || r == null || !multiply(a, L).equals(IDENTITY) || !multiply(r, L).equals(IDENTITY)) return false;
+        // Reject the identity element explicitly: it satisfies the prime-order check (x*L == identity)
+        // and would otherwise allow forgeries under a degenerate public key (S2-01).
+        if (a == null || r == null || a.equals(IDENTITY) || r.equals(IDENTITY)
+                || !multiply(a, L).equals(IDENTITY) || !multiply(r, L).equals(IDENTITY)) return false;
         byte[] hashInput = new byte[64 + message.length];
         System.arraycopy(rBytes, 0, hashInput, 0, 32);
         System.arraycopy(publicBytes, 0, hashInput, 32, 32);

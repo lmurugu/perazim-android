@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.AlertDialog;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -29,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.ai.AiResponse;
+import org.perazimchurch.app.ai.local.ModelDownloadService;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.AiPreferences;
 import org.perazimchurch.app.ai.remote.AiRelayClient;
@@ -38,6 +42,8 @@ import org.perazimchurch.app.ai.local.OfflineScriptureLookup;
 import org.perazimchurch.app.ai.local.OnDeviceAi;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.R;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.ArrayList;
@@ -50,6 +56,12 @@ import java.util.List;
  */
 public class AiBreakthroughGuideDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     public interface AiActionListener {
         void onNavigateTab(int tabIndex);
         void onOpenGiving();
@@ -61,16 +73,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private static final int COLOR_PRIMARY_PURPLE = Color.parseColor("#681A7D");
-    private static final int COLOR_PURPLE_DARK    = Color.parseColor("#2D0938");
+    private static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     private static final int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
     private static final int COLOR_PURPLE_TINT    = Color.parseColor("#F5ECF7");
-    private static final int COLOR_BORDER_GREY    = Color.parseColor("#E7D5EC");
+    private static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_STROKE; }
     private static final int COLOR_ACCENT_ORANGE  = Color.parseColor("#E17D2F");
     private static final int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
     private static final int COLOR_WHITE          = Color.parseColor("#FFFFFF");
-    private static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1225");
-    private static final int COLOR_TEXT_MUTED     = Color.parseColor("#725B78");
-    private static final int COLOR_BG_NEUTRAL     = Color.parseColor("#FAF7FB");
+    private static int COLOR_TEXT_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
+    private static int COLOR_TEXT_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
+    private static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private final Activity activity;
     private final PerazimAiEngine aiEngine;
@@ -96,7 +108,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     public AiBreakthroughGuideDialog(@NonNull Activity activity, @NonNull AiActionListener actionListener) {
-        super(activity);
+        super(activity, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.activity = activity;
         this.actionListener = actionListener;
         this.aiEngine = new PerazimAiEngine(activity);
@@ -140,7 +152,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private View buildRootLayout() {
         LinearLayout root = new LinearLayout(activity);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(Color.parseColor("#99000000")); // Scrim
+        root.setBackgroundColor(PerazimTheme.isLight() ? Color.parseColor("#B32A0F33") : Color.parseColor("#99000000")); // Scrim
         root.setGravity(Gravity.BOTTOM);
         root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -155,7 +167,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         sheet.setPadding(dp(16), dp(12), dp(16), dp(16));
 
         LinearLayout.LayoutParams lpSheet = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.82));
+                LinearLayout.LayoutParams.MATCH_PARENT, (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.66));
         sheet.setLayoutParams(lpSheet);
 
         // Drag Handle
@@ -176,11 +188,15 @@ public class AiBreakthroughGuideDialog extends Dialog {
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(0, 0, 0, dp(10));
 
-        TextView tvIcon = new TextView(activity);
-        tvIcon.setText("🤖");
-        tvIcon.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        tvIcon.setPadding(0, 0, dp(10), 0);
-        header.addView(tvIcon);
+        ImageView logo = new ImageView(activity);
+        logo.setImageResource(R.drawable.ic_perazim_logo);
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        logo.setBackground(GlassKit.glassControl(activity, 999));
+        logo.setPadding(dp(6), dp(6), dp(6), dp(6));
+        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(40), dp(40));
+        lpLogo.setMargins(0, 0, dp(12), 0);
+        logo.setLayoutParams(lpLogo);
+        header.addView(logo);
 
         LinearLayout titleCol = new LinearLayout(activity);
         titleCol.setOrientation(LinearLayout.VERTICAL);
@@ -216,7 +232,17 @@ public class AiBreakthroughGuideDialog extends Dialog {
         btnMode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         btnMode.setAllCaps(false);
         btnMode.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnMode.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
+        btnMode.setTextColor(GlassKit.text());
+        btnMode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        btnMode.setBackground(GlassKit.glassControl(activity, 999));
+        btnMode.setPadding(dp(14), dp(6), dp(14), dp(6));
+        btnMode.setMinHeight(0);
+        btnMode.setMinimumHeight(0);
+        LinearLayout.LayoutParams lpMode = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, dp(34));
+        lpMode.gravity = Gravity.START;
+        lpMode.setMargins(0, 0, 0, dp(8));
+        btnMode.setLayoutParams(lpMode);
         btnMode.setOnClickListener(v -> {
             if (localRequest) { OnDeviceAi.cancel(); return; }
             if (!requestInFlight) showModeOptions();
@@ -254,14 +280,15 @@ public class AiBreakthroughGuideDialog extends Dialog {
         LinearLayout inputBar = new LinearLayout(activity);
         inputBar.setOrientation(LinearLayout.HORIZONTAL);
         inputBar.setGravity(Gravity.CENTER_VERTICAL);
-        inputBar.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-        inputBar.setPadding(dp(12), dp(2), dp(6), dp(2));
+        inputBar.setBackground(GlassKit.glassControl(activity, 999));
+        inputBar.setPadding(dp(16), dp(4), dp(6), dp(4));
 
         etInput = new EditText(activity);
         etInput.setHint("Ask about Scripture, breakthrough, sermons...");
         etInput.setHintTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         etInput.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        etInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        etInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        etInput.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         etInput.setBackground(null);
         etInput.setSingleLine(true);
         etInput.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEND);
@@ -277,12 +304,21 @@ public class AiBreakthroughGuideDialog extends Dialog {
         inputBar.addView(etInput);
 
         btnSend = new Button(activity);
-        btnSend.setText("➤ Send");
-        btnSend.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnSend.setTypeface(Typeface.DEFAULT_BOLD);
-        btnSend.setTextColor(COLOR_WHITE);
-        btnSend.setBackground(create3dButtonDrawable(COLOR_PRIMARY_PURPLE, COLOR_PURPLE_SHADOW, 10, 2));
-        btnSend.setPadding(dp(12), dp(6), dp(12), dp(6));
+        btnSend.setText("");
+        styleOrangePill(btnSend, 13);
+        android.graphics.drawable.GradientDrawable sendBg = new android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{GlassKit.ORANGE_TOP, GlassKit.ORANGE_BOTTOM});
+        sendBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        btnSend.setBackground(sendBg);
+        android.graphics.drawable.Drawable sendIcon = activity.getResources()
+                .getDrawable(android.R.drawable.ic_menu_send).mutate();
+        sendIcon.setTint(COLOR_WHITE);
+        btnSend.setCompoundDrawablesWithIntrinsicBounds(sendIcon, null, null, null);
+        btnSend.setContentDescription("Send");
+        btnSend.setPadding(0, 0, 0, 0);
+        LinearLayout.LayoutParams lpSend = new LinearLayout.LayoutParams(dp(44), dp(44));
+        btnSend.setLayoutParams(lpSend);
         btnSend.setOnClickListener(v -> submitQuery(etInput.getText().toString()));
         inputBar.addView(btnSend);
 
@@ -338,7 +374,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
         if ("online".equals(mode) && !BuildConfig.ONLINE_AI_ENABLED) {
             tvSub.setText("Online AI unavailable in this build");
-            tvSub.setTextColor(COLOR_TEXT_MUTED);
+            tvSub.setTextColor(COLOR_TEXT_MUTED());
             tvSub.setOnClickListener(null);
             return;
         }
@@ -365,10 +401,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 choices.add("Restore previous signed knowledge package");
             }
         }
+        int memoryIndex = choices.size();
+        choices.add("What the guide remembers");
         choices.add("Clear this conversation");
         final int selectedUpdateIndex = updateIndex;
         final int selectedRollbackIndex = rollbackIndex;
-        new AlertDialog.Builder(activity).setTitle("Choose your guide")
+        final int selectedMemoryIndex = memoryIndex;
+        AppDialogs.builder(activity).setTitle("Choose your guide")
                 .setItems(choices.toArray(new String[0]), (dialog, which) -> {
                     if (which == 0) setGuideMode("local");
                     else if (which == 1) showModelDownload();
@@ -376,6 +415,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     else if (which == 3) setGuideMode("guide");
                     else if (which == selectedUpdateIndex) showKnowledgeUpdate();
                     else if (which == selectedRollbackIndex) showKnowledgeRollback();
+                    else if (which == selectedMemoryIndex) GuideMemoryDialog.show(activity);
                     else {
                         localHistory.clear();
                         messagesContainer.removeAllViews();
@@ -388,16 +428,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
         java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
         String sessionToken = SessionManager.getInstance(activity).getAuthToken();
         if (trustedKeys.isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("This build has no trusted knowledge signing key.")
+            AppDialogs.builder(activity).setMessage("This build has no trusted knowledge signing key.")
                     .setPositiveButton("OK", null).show();
             return;
         }
         if (sessionToken == null || sessionToken.trim().isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("Sign in before checking for an authorized knowledge rollback.")
+            AppDialogs.builder(activity).setMessage("Sign in before checking for an authorized knowledge rollback.")
                     .setPositiveButton("OK", null).show();
             return;
         }
-        AlertDialog progress = new AlertDialog.Builder(activity)
+        AlertDialog progress = AppDialogs.builder(activity)
                 .setTitle("Checking authorized rollback")
                 .setMessage("Verifying the signed authorization for the previous package…")
                 .setCancelable(false).create();
@@ -415,7 +455,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
                     @Override public void onError(String message) {
                         progress.dismiss();
-                        if (isShowing()) new AlertDialog.Builder(activity).setMessage(message)
+                        if (isShowing()) AppDialogs.builder(activity).setMessage(message)
                                 .setPositiveButton("OK", null).show();
                     }
                 });
@@ -424,13 +464,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private void showKnowledgeUpdate() {
         java.util.Map<String, String> trustedKeys = OfflineKnowledgeStore.trustedKeys(activity);
         if (trustedKeys.isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("This build has no trusted knowledge signing key.")
+            AppDialogs.builder(activity).setMessage("This build has no trusted knowledge signing key.")
                     .setPositiveButton("OK", null).show();
             return;
         }
         String sessionToken = SessionManager.getInstance(activity).getAuthToken();
         if (sessionToken == null || sessionToken.trim().isEmpty()) {
-            new AlertDialog.Builder(activity).setMessage("Sign in before downloading approved offline knowledge.")
+            AppDialogs.builder(activity).setMessage("Sign in before downloading approved offline knowledge.")
                     .setPositiveButton("OK", null).show();
             return;
         }
@@ -440,7 +480,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 : "Last successful sync: "
                 + java.text.DateFormat.getDateTimeInstance().format(new java.util.Date(previous.lastSuccessAt))
                 + " (verified package version " + previous.lastSuccessVersion + ").";
-        AlertDialog progress = new AlertDialog.Builder(activity)
+        AlertDialog progress = AppDialogs.builder(activity)
                 .setTitle("Updating offline knowledge")
                 .setMessage(previousSuccess + "\n\nDownloading and verifying the signed package…")
                 .setCancelable(false).create();
@@ -458,7 +498,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
                     @Override public void onError(String message) {
                         progress.dismiss();
-                        if (isShowing()) new AlertDialog.Builder(activity).setMessage(message)
+                        if (isShowing()) AppDialogs.builder(activity).setMessage(message)
                                 .setPositiveButton("OK", null).show();
                     }
                 });
@@ -466,7 +506,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void showModelDownload() {
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
-            new AlertDialog.Builder(activity)
+            AppDialogs.builder(activity)
                     .setMessage("On-device AI downloads are disabled until an approved knowledge package and trusted signing key are provisioned.")
                     .setPositiveButton("OK", null).show();
             return;
@@ -474,19 +514,45 @@ public class AiBreakthroughGuideDialog extends Dialog {
         String modelMessage = "validation".equals(BuildConfig.BUILD_TYPE)
                 ? "Validation only: verifies or repairs the installed model from the locally staged Qwen artifact and uses a synthetic signed knowledge passage."
                 : "This checks the installed model integrity first. If it is missing or damaged, the verified model is downloaded and installed.";
-        new AlertDialog.Builder(activity).setTitle("Download on-phone AI")
+        AppDialogs.builder(activity).setTitle("Download on-phone AI")
                 .setMessage(modelMessage)
                 .setNegativeButton("Not now", null)
-                .setPositiveButton("Check / download", (dialog, which) -> {
-                    AlertDialog progress = new AlertDialog.Builder(activity).setTitle("Downloading on-phone model")
-                            .setMessage("Starting…").setCancelable(false).setNegativeButton("Pause", (d,w) -> OnDeviceAi.cancel()).create();
-                    progress.show();
-                    OnDeviceAi.download(activity, new OnDeviceAi.DownloadCallback() {
-                        public void onProgress(int percent) { if (progress.isShowing()) progress.setMessage(percent + "% · The download can be paused and resumed."); }
-                        public void onComplete() { progress.dismiss(); setGuideMode("local"); if (isShowing()) displayAiMessage(AiResponse.plainText("The model is ready. You can turn off Wi-Fi and mobile data and ask your question.", null), "On-phone AI ready"); }
-                        public void onError(String error) { progress.dismiss(); if (isShowing()) new AlertDialog.Builder(activity).setMessage(error).setPositiveButton("OK", null).show(); }
-                    });
-                }).show();
+                .setPositiveButton("Check / download", (dialog, which) -> showDownloadProgress(false))
+                .show();
+    }
+
+    /**
+     * Shows download progress without blocking the app. Back or X dismisses the card and the download keeps
+     * running in the foreground service; "Cancel download" stops it. Reopening the guide shows progress again.
+     */
+    private void showDownloadProgress(boolean reattach) {
+        if (activity == null || activity.isFinishing()) return;
+        if (!reattach) ModelDownloadService.start(activity);
+        final AlertDialog progress = AppDialogs.builder(activity).setTitle("Downloading on-phone model")
+                .setMessage(ModelDownloadService.isRunning()
+                        ? ModelDownloadService.percent() + "% · You can leave the app; the download continues."
+                        : "Starting…")
+                .setCancelable(true)
+                .setPositiveButton("Run in background", null)
+                .setNegativeButton("Cancel download", (d, w) -> ModelDownloadService.cancel(activity))
+                .create();
+        progress.show();
+        ModelDownloadService.setListener(new ModelDownloadService.Listener() {
+            public void onProgress(int percent) {
+                if (progress.isShowing()) progress.setMessage(percent + "% · You can leave the app; the download continues.");
+            }
+            public void onFinished(String error) {
+                ModelDownloadService.setListener(null);
+                if (progress.isShowing()) progress.dismiss();
+                if (!isShowing()) return;
+                if (error == null) {
+                    setGuideMode("local");
+                    displayAiMessage(AiResponse.plainText("The model is ready. Ask your question again, or choose On-phone AI.", null), "Perazim Guide · on-phone");
+                } else {
+                    AppDialogs.builder(activity).setMessage(error).setPositiveButton("OK", null).show();
+                }
+            }
+        });
     }
 
     @Override public void dismiss() {
@@ -498,22 +564,22 @@ public class AiBreakthroughGuideDialog extends Dialog {
     public void showConsentDialog() {
         if (activity == null || activity.isFinishing()) return;
         if (!BuildConfig.ONLINE_AI_ENABLED) {
-            new AlertDialog.Builder(activity)
+            AppDialogs.builder(activity)
                     .setMessage("Online AI is unavailable in this build while the authenticated church service is being verified.")
                     .setPositiveButton("OK", null).show();
             return;
         }
 
-        final Dialog consentDlg = new Dialog(activity);
+        final Dialog consentDlg = new Dialog(activity, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         consentDlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
         consentDlg.setCanceledOnTouchOutside(false);
 
         LinearLayout layout = new LinearLayout(activity);
         layout.setOrientation(LinearLayout.VERTICAL);
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_WHITE);
+        bg.setColor(PerazimTheme.COLOR_SURFACE_SOLID);
         bg.setCornerRadius(dp(16));
-        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), COLOR_BORDER_GREY());
         layout.setBackground(bg);
         layout.setPadding(dp(20), dp(20), dp(20), dp(20));
 
@@ -521,20 +587,20 @@ public class AiBreakthroughGuideDialog extends Dialog {
         title.setText("🤖 Google Gemini AI Guide");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
+        title.setTextColor(COLOR_PURPLE_DARK());
         layout.addView(title);
 
         TextView body = new TextView(activity);
         body.setText("Online AI sends your current question to the church service. If the request is eligible, Gemini may process it with approved source excerpts. Keep personal, prayer and counselling details out of online questions.");
         body.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        body.setTextColor(COLOR_TEXT_DARK);
+        body.setTextColor(COLOR_TEXT_DARK());
         body.setPadding(0, dp(12), 0, dp(10));
         body.setLineSpacing(dp(2), 1.1f);
         layout.addView(body);
 
         final CheckBox cbConsent = new CheckBox(activity);
         cbConsent.setText("I understand and agree");
-        cbConsent.setTextColor(COLOR_PURPLE_DARK);
+        cbConsent.setTextColor(COLOR_PURPLE_DARK());
         cbConsent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         layout.addView(cbConsent);
 
@@ -546,7 +612,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         Button btnDecline = new Button(activity);
         btnDecline.setText("Offline Guide");
         btnDecline.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnDecline.setTextColor(COLOR_TEXT_MUTED);
+        btnDecline.setTextColor(COLOR_TEXT_MUTED());
         btnDecline.setBackground(null);
         btnDecline.setOnClickListener(v -> {
             AiPreferences.setConsent(activity, false);
@@ -604,6 +670,21 @@ public class AiBreakthroughGuideDialog extends Dialog {
             return;
         }
 
+        // Scope, referral and human-authority checks run before the model-installed check, so an off-topic
+        // question is refused even when no model is installed.
+        AiResponse builtIn = PerazimAiEngine.builtInAppAnswer(query);
+        if (builtIn != null) {
+            localHistory.clear();
+            displayAiMessage(builtIn, "Perazim Guide · built-in");
+            return;
+        }
+        AiResponse deterministic = PerazimAiEngine.deterministicModelRefusal(query);
+        if (deterministic != null) {
+            localHistory.clear();
+            displayAiMessage(deterministic, "Perazim Guide · built-in");
+            return;
+        }
+
         String mode = guideMode();
         if ("local".equals(mode)) {
             if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
@@ -624,6 +705,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     String result = ConversationHistory.withoutRepeatedGreeting(answer, !localHistory.isEmpty());
                     localHistory.addExchange(query, result);
                     displayAiMessage(AiResponse.plainText(result, null), "On-phone AI · Qwen · Offline");
+                    GuideFeedbackRow.attach(activity, messagesContainer, query, result);
                 }
                 public void onError(String error) {
                     removeTypingIndicator(indicator); localRequest = false; finishInFlight(); updateSubtitle();
@@ -702,15 +784,11 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         TextView tv = new TextView(activity);
         tv.setText("🤖 Pondering with Scripture...");
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tv.setTypeface(Typeface.DEFAULT_BOLD);
-        tv.setTextColor(COLOR_PRIMARY_PURPLE);
-        tv.setPadding(dp(12), dp(6), dp(12), dp(6));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_PURPLE_TINT);
-        bg.setCornerRadius(dp(12));
-        tv.setBackground(bg);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        tv.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+        tv.setTextColor(GlassKit.muted());
+        tv.setPadding(dp(14), dp(10), dp(14), dp(10));
+        tv.setBackground(GlassKit.glass(activity, 18));
 
         row.addView(tv);
         messagesContainer.addView(row);
@@ -731,18 +809,16 @@ public class AiBreakthroughGuideDialog extends Dialog {
         LinearLayout row = new LinearLayout(activity);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.END);
-        row.setPadding(dp(40), dp(4), 0, dp(6));
+        row.setPadding(dp(48), dp(4), 0, dp(8));
 
         TextView tv = new TextView(activity);
         tv.setText(text);
         tv.setTextColor(COLOR_WHITE);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tv.setPadding(dp(12), dp(8), dp(12), dp(8));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(COLOR_PRIMARY_PURPLE);
-        bg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), dp(2), dp(2), dp(14), dp(14)});
-        tv.setBackground(bg);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tv.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        tv.setLineSpacing(dp(2), 1.1f);
+        tv.setPadding(dp(16), dp(10), dp(16), dp(10));
+        tv.setBackground(GlassKit.orange(activity, 18));
 
         row.addView(tv);
         messagesContainer.addView(row);
@@ -752,46 +828,40 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private void displayAiMessage(AiResponse response, @Nullable String badgeText) {
         LinearLayout bubbleCol = new LinearLayout(activity);
         bubbleCol.setOrientation(LinearLayout.VERTICAL);
-        bubbleCol.setPadding(0, dp(4), dp(40), dp(8));
+        bubbleCol.setPadding(0, dp(4), dp(24), dp(10));
 
         // Badge pill
         if (badgeText != null && !badgeText.isEmpty()) {
             TextView tvBadge = new TextView(activity);
             tvBadge.setText(badgeText);
-            tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvBadge.setTypeface(Typeface.DEFAULT_BOLD);
-            tvBadge.setTextColor((int) (badgeText.contains("Offline") ? PerazimTheme.COLOR_PURPLE_MUTED : PerazimTheme.COLOR_ORANGE_BRAND));
-            tvBadge.setPadding(dp(4), 0, 0, dp(2));
+            tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+            tvBadge.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+            tvBadge.setTextColor(badgeText.contains("Offline") ? GlassKit.muted() : GlassKit.accent());
+            tvBadge.setPadding(dp(4), 0, 0, dp(6));
             bubbleCol.addView(tvBadge);
         }
 
         // Message text
         TextView tv = new TextView(activity);
         tv.setText(response.getMessageText());
-        tv.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tv.setPadding(dp(14), dp(10), dp(14), dp(10));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(PerazimTheme.COLOR_SURFACE_2);
-        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        bg.setCornerRadii(new float[]{dp(14), dp(14), dp(14), dp(14), dp(14), dp(14), dp(2), dp(2)});
-        tv.setBackground(bg);
+        tv.setTextColor(GlassKit.text());
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        tv.setTypeface(Typeface.create(Typeface.SERIF, Typeface.NORMAL));
+        tv.setLineSpacing(dp(2), 1.15f);
+        tv.setPadding(dp(16), dp(14), dp(16), dp(14));
+        tv.setBackground(GlassKit.glass(activity, 18));
         bubbleCol.addView(tv);
 
         // Interactive Action Button
         if (response.hasAction()) {
             Button btnAction = new Button(activity);
             btnAction.setText(response.getActionButtonLabel());
-            btnAction.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            btnAction.setTypeface(Typeface.DEFAULT_BOLD);
-            btnAction.setTextColor(COLOR_WHITE);
-            btnAction.setBackground(create3dButtonDrawable(COLOR_ACCENT_ORANGE, COLOR_ORANGE_SHADOW, 10, 3));
-            btnAction.setPadding(dp(14), dp(8), dp(14), dp(8));
+            styleOrangePill(btnAction, 13);
+            btnAction.setPadding(dp(20), dp(10), dp(20), dp(10));
 
             LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lpBtn.setMargins(0, dp(6), 0, dp(4));
+            lpBtn.setMargins(0, dp(10), 0, dp(4));
             btnAction.setLayoutParams(lpBtn);
 
             btnAction.setOnClickListener(v -> {
@@ -851,15 +921,20 @@ public class AiBreakthroughGuideDialog extends Dialog {
         for (final String chipText : chips) {
             Button chip = new Button(activity);
             chip.setText(chipText);
-            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            chip.setTypeface(Typeface.DEFAULT_BOLD);
-            chip.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-            chip.setBackground(createPillBg(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
-            chip.setPadding(dp(10), dp(4), dp(10), dp(4));
+            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            chip.setAllCaps(false);
+            chip.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+            chip.setTextColor(GlassKit.text());
+            chip.setBackground(GlassKit.glass(activity, 999));
+            chip.setPadding(dp(16), dp(8), dp(16), dp(8));
+            chip.setMinHeight(0);
+            chip.setMinimumHeight(0);
+            chip.setMinWidth(0);
+            chip.setMinimumWidth(0);
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, dp(32));
-            lp.setMargins(0, 0, dp(6), 0);
+                    LinearLayout.LayoutParams.WRAP_CONTENT, dp(36));
+            lp.setMargins(0, 0, dp(8), 0);
             chip.setLayoutParams(lp);
 
             chip.setOnClickListener(v -> submitQuery(chipText));
@@ -869,6 +944,20 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void scrollToBottom() {
         chatScrollView.post(() -> chatScrollView.fullScroll(ScrollView.FOCUS_DOWN));
+    }
+
+    /** Orange gradient pill with the Bible tab's glow; used for Send and for action buttons. */
+    private void styleOrangePill(Button b, float textSp) {
+        b.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
+        b.setAllCaps(false);
+        b.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+        b.setTextColor(COLOR_WHITE);
+        b.setBackground(GlassKit.orange(activity, 999));
+        b.setMinHeight(0);
+        b.setMinimumHeight(0);
+        b.setMinWidth(0);
+        b.setMinimumWidth(0);
+        GlassKit.glow(b, GlassKit.ORANGE, 8);
     }
 
     private int dp(int value) {

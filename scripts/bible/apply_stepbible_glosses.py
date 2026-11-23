@@ -1,0 +1,288 @@
+#!/usr/bin/env python3
+"""Replace the English gloss of each interlinear word with the contextual gloss from STEPBible.
+
+Source: STEPBible.org Translators Amalgamated data (Tyndale House, Cambridge), CC BY 4.0:
+  * TAHOT (Hebrew Old Testament), files "TAHOT *.txt"
+  * TAGNT (Greek New Testament), files "TAGNT *.txt"
+  https://github.com/STEPBible/STEPBible-Data  (attribute Tyndale House and STEPBible.org)
+
+Only the English gloss and the Strong's number are read from the STEPBible files. Their text is not copied
+into the repository. Words are aligned to the bundled cells by Strong's number, so a verse whose word split
+differs (for example Hebrew prefixes) keeps the existing gloss for unmatched words.
+
+Usage:
+    python3 scripts/bible/apply_stepbible_glosses.py --assets src/main/assets/bible --stepbible DIR
+"""
+
+import argparse
+import difflib
+import glob
+import gzip
+import os
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+OT = ("Gen Exo Lev Num Deu Jos Jdg Rut 1Sa 2Sa 1Ki 2Ki 1Ch 2Ch Ezr Neh Est Job Psa Pro Ecc Sng Isa Jer Lam "
+      "Ezk Dan Hos Jol Amo Oba Jon Mic Nam Hab Zep Hag Zec Mal").split()
+NT = ("Mat Mrk Luk Jhn Act Rom 1Co 2Co Gal Eph Php Col 1Th 2Th 1Ti 2Ti Tit Phm Heb Jas 1Pe 2Pe 1Jn 2Jn "
+      "3Jn Jud Rev").split()
+REF = re.compile(r"^([A-Za-z0-9]+)\.(\d+)\.(\d+)#(\d+)")
+SKIP = {"the", "a", "an", "of", "to", "in", "and", "by", "with", "from", "at", "on", "for",
+        "will", "shall", "would", "should", "can", "could", "may", "might", "must", "do", "does", "did"}
+PRONOUNS = {"he", "she", "they", "it", "i", "we", "you", "his", "her", "its", "their", "him", "them", "us", "me"}
+PLAIN = re.compile(r"^[a-z][a-z'-]*$")
+
+
+def contextual_gloss(text):
+    """First content word of the translators' gloss, with brackets and articles removed.
+
+    Pronouns are used only when the gloss has no other word, so "he created" gives "created".
+    """
+    text = re.sub(r"\[[^\]]*\]", " ", text or "")
+    text = re.sub(r"\([^)]*\)", " ", text)
+    pronoun = ""
+    for part in re.split(r"[/\s]+", text):
+        word = part.strip(".,;:!?")
+        lower = word.lower()
+        if not word or lower in SKIP or not PLAIN.match(lower):
+            continue
+        if lower in PRONOUNS:
+            pronoun = pronoun or lower
+            continue
+        return word
+    return pronoun
+
+
+# Reading fixes where the translators' context gloss is wrong for a very common word. Keyed by Strong's
+# number; applied to every occurrence. Checked against standard English readings of Gen 1:1, John 1:1 and
+# Psalm 23:1; the ESV and NASB text itself is not bundled.
+GREEK_OVERRIDES = {1722: "in", 4314: "with", 1064: "womb"}  # en, pros (πρὸς), gastrí (γαστρί)
+# English does not put "the" before these names, so the article before them gets no gloss.
+NO_ARTICLE_BEFORE = {2316, 2424}  # theos (God), Iēsous (Jesus)
+PRONOUN_1 = {"G": "our", "D": "us", "A": "us", "N": "we"}
+PRONOUN_2 = {"G": "your", "D": "you", "A": "you", "N": "you"}
+HEBREW_OVERRIDES = {7462: ("", "shepherd"), 776: ("", "earth")}  # ro'eh (shepherd/tend); 'erets (earth, not country)
+POSSESSIVE = {"1cs": "my", "1cp": "our", "2ms": "your", "2fs": "your", "2mp": "your", "2fp": "your",
+              "3ms": "his", "3fs": "her", "3mp": "their", "3fp": "their"}
+OBJECT_PRONOUN = {"1cs": "me", "1cp": "us", "2ms": "you", "2fs": "you", "2mp": "you", "2fp": "you",
+                  "3ms": "him", "3fs": "her", "3mp": "them", "3fp": "them"}
+
+
+def with_suffix(gloss, morph):
+    """Add the pronoun suffix to a Hebrew gloss: "my shepherd" for a noun, "keep_him" for a verb or preposition."""
+    segments = [x.lstrip("H") for x in morph.split("/")]
+    suffix = next((x for x in segments if x.startswith("S") and len(x) >= 5), None)
+    base = [x for x in segments if not x.startswith("S")]
+    if not suffix or not base or gloss in ("", "-"):
+        return gloss
+    key = suffix[2:5]
+    # A participle with a suffix is a noun with a possessive ("my shepherd"); a finite verb or a preposition takes
+    # the suffix as its object ("keep him", "upon him").
+    participle = base[-1][:1] == "V" and len(base[-1]) > 2 and base[-1][2] in "rs"
+    object_form = base[-1][:1] in ("V", "R") and not participle
+    if object_form:
+        pronoun = OBJECT_PRONOUN.get(key)
+        if not pronoun or gloss.endswith("_" + pronoun):
+            return gloss
+        return gloss + "_" + pronoun
+    pronoun = POSSESSIVE.get(key)
+    if not pronoun or gloss.startswith(pronoun + "_"):
+        return gloss
+    return pronoun + "_" + gloss
+
+
+def sanitize_cell(cell):
+    """Glosses that are a single letter, contain a digit or are a stray placeholder show a dash instead."""
+    fields = cell.split("|")
+    if len(fields) == 5:
+        gloss = fields[4]
+        if len(gloss) < 2 or re.search(r"[0-9()\[\]{}]", gloss) or gloss.lower() in {"x", "properly"}:
+            fields[4] = "-"
+    return "|".join(fields)
+
+
+LEXICAL_PRONOUNS = {"he", "she", "it", "self", "i", "we", "you"}
+
+
+def greek_gloss(row):
+    """Literal lexical gloss; a lexical pronoun (he/it/self) takes the contextual form (him, his, ...).
+    Participles (V-P... codes) take the -ing form."""
+    lexical = lexical_gloss(row[4]) if len(row) > 4 else ""
+    contextual = contextual_gloss(row[2])
+    if lexical and lexical.lower() in LEXICAL_PRONOUNS and contextual:
+        return contextual
+    gloss = lexical or contextual
+    morph = row[3].split("=", 1)[1] if len(row) > 3 and "=" in row[3] else ""
+    if gloss and lexical and morph.startswith("V-P") and gloss.lower() not in LEXICAL_PRONOUNS:
+        return ing_form(gloss)
+    return gloss
+
+
+def ing_form(word):
+    """Present participle of a verb gloss: "have" -> "having", "give" -> "giving", "be" -> "being"."""
+    if word == "be":
+        return "being"
+    if word.endswith("ie"):
+        return word[:-2] + "ying"
+    if word.endswith("e") and not word.endswith("ee"):
+        return word[:-1] + "ing"
+    return word + "ing"
+
+
+def is_participle(morph):
+    """Greek V-P... codes, and Hebrew OSHB verb codes whose conjugation letter is r (active participle)."""
+    if morph.startswith("V-P"):
+        return True
+    last = morph.split("/")[-1]
+    return len(last) > 2 and last[0] == "V" and last[2] == "r"
+
+
+def hebrew_lemma_gloss(text):
+    """Main lemma meaning from the STEPBible lexical column, for example "{H1254A=בָּרָא=to create}" -> "create"."""
+    groups = re.findall(r"\{H\d+[A-Z]?=[^=}]*=([^}]*)\}", text or "")
+    if not groups:
+        return ""
+    meaning = groups[-1].lstrip(": ")
+    first = re.split(r"[»/,;:]", meaning)[0].strip().rstrip(".!?")
+    first = re.sub(r"^to\s+", "", first, flags=re.IGNORECASE)
+    if not first or " " in first or not PLAIN.match(first.lower()):
+        return ""
+    return first
+
+
+def hebrew_gloss(row):
+    """Literal lexical gloss; the contextual gloss is the fallback. Active participles take the -ing form."""
+    lexical = hebrew_lemma_gloss(row[11]) if len(row) > 11 else ""
+    contextual = contextual_gloss(row[3])
+    gloss = lexical or contextual
+    morph = row[5] if len(row) > 5 else ""
+    if gloss and is_participle(morph) and lexical:
+        return ing_form(gloss)
+    return gloss
+
+
+def lexical_gloss(text):
+    """First meaning of the lemma in the STEPBible lexical column, for example "βίβλος=book" gives "book",
+    "ἔχω=to have/be" gives "have"."""
+    if "=" not in (text or ""):
+        return ""
+    meaning = text.split("=", 1)[1]
+    first = re.split(r"[/,;]", meaning)[0].strip().rstrip(".!?")
+    first = re.sub(r"^to\s+", "", first, flags=re.IGNORECASE)
+    if not first or not PLAIN.match(first.lower()) or " " in first:
+        return ""
+    return first
+
+
+def strongs_of(field):
+    numbers = re.findall(r"[GH](\d+)", field)
+    return int(numbers[-1]) if numbers else 0
+
+
+def read_stepbible(directory, pattern):
+    rows = defaultdict(list)
+    for path in glob.glob(os.path.join(directory, pattern)):
+        with open(path, encoding="utf-8") as handle:
+            for line in handle:
+                match = REF.match(line)
+                if match:
+                    cols = line.rstrip("\n").split("\t")
+                    rows[(match.group(1), int(match.group(2)), int(match.group(3)))].append(cols)
+    return rows
+
+
+def apply(path, step_rows, books, hebrew):
+    out_lines = []
+    changed = 0
+    with gzip.open(path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            book, chapter, verse, cells = line.rstrip("\n").split("\t", 3)
+            number = int(book)
+            name = books[number - 1] if hebrew else books[number - 40]
+            key = (name, int(chapter), int(verse))
+            cell_list = cells.split(" ")
+            rows = step_rows.get(key, [])
+            if rows:
+                ours = [int(c.split("|")[1] or 0) for c in cell_list]
+                if hebrew:
+                    theirs = [strongs_of(r[4]) for r in rows]
+                    glosses = [hebrew_gloss(r) for r in rows]
+                else:
+                    theirs = [strongs_of(r[3]) for r in rows]
+                    # The lexical column is closer to word for word; the contextual gloss is the fallback.
+                    glosses = [greek_gloss(r) for r in rows]
+                matcher = difflib.SequenceMatcher(a=ours, b=theirs, autojunk=False)
+                for block in matcher.get_matching_blocks():
+                    for offset in range(block.size):
+                        i = block.a + offset
+                        gloss = glosses[block.b + offset]
+                        fields = cell_list[i].split("|")
+                        if not gloss or len(fields) != 5:
+                            continue
+                        fields[4] = gloss.replace(" ", "_")
+                        cell_list[i] = "|".join(fields)
+                        changed += 1
+                for i, c in enumerate(cell_list):
+                    f = c.split("|")
+                    if len(f) != 5:
+                        continue
+                    number = int(f[1] or 0)
+                    empty = f[4] in ("", "-")
+                    if hebrew and number == 1961:
+                        # hayah, "to be": a perfect or sequential-perfect third-person form reads "was".
+                        last = f[2].split("/")[-1].lstrip("H")
+                        if len(last) > 3 and last[0] == "V" and last[1] == "q" and last[2] in "pw" and last[3] == "3":
+                            f[4] = "was"
+                    if not hebrew and number == 1510:
+                        # eimi, "to be", takes the tense shown by its grammar code.
+                        morph = f[2]
+                        if morph.startswith("V-I"):
+                            f[4] = "was"
+                        elif morph.startswith("V-PAI-3S"):
+                            f[4] = "is"
+                        elif morph.startswith("V-PAI-3P"):
+                            f[4] = "are"
+                        elif morph.startswith("V-FDI"):
+                            f[4] = "will_be"
+                    if not hebrew and number in GREEK_OVERRIDES:
+                        f[4] = GREEK_OVERRIDES[number]
+                    elif not hebrew and f[2].startswith("T-") and f[4] in ("", "-", "the"):
+                        nxt = cell_list[i + 1].split("|") if i + 1 < len(cell_list) else ["", "0"]
+                        f[4] = "-" if int(nxt[1] or 0) in NO_ARTICLE_BEFORE else "the"
+                    elif not hebrew and empty and f[2].startswith("P-1") and len(f[2]) >= 4:
+                        f[4] = PRONOUN_1.get(f[2][3], "")
+                    elif not hebrew and empty and f[2].startswith("P-2") and len(f[2]) >= 4:
+                        f[4] = PRONOUN_2.get(f[2][3], "")
+                    elif hebrew and number in HEBREW_OVERRIDES and f[2].startswith(HEBREW_OVERRIDES[number][0]):
+                        f[4] = HEBREW_OVERRIDES[number][1]
+                    if hebrew:
+                        f[4] = with_suffix(f[4], f[2])
+                    cell_list[i] = "|".join(f)
+            cell_list = [sanitize_cell(c) for c in cell_list]
+            out_lines.append("%s\t%s\t%s\t%s\n" % (book, chapter, verse, " ".join(cell_list)))
+    return out_lines, changed
+
+
+def main(argv):
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--assets", required=True)
+    parser.add_argument("--stepbible", required=True, help="Folder with the TAHOT and TAGNT .txt files")
+    args = parser.parse_args(argv)
+    base = Path(args.assets) / "interlinear"
+    jobs = (
+        ("hebrew_ot", read_stepbible(args.stepbible, "TAHOT*"), OT, True),
+        ("greek_nt", read_stepbible(args.stepbible, "TAGNT*"), NT, False),
+    )
+    for name, rows, books, hebrew in jobs:
+        path = base / (name + ".tsv.gz")
+        lines, changed = apply(path, rows, books, hebrew)
+        with gzip.open(path, "wt", encoding="utf-8", newline="\n") as handle:
+            handle.writelines(lines)
+        print("%s: %d words given a STEPBible gloss" % (name, changed))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

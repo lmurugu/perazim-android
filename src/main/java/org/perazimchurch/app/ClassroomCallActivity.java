@@ -23,6 +23,11 @@ import java.util.ArrayList;
 
 /** Local, trusted WebRTC page; only native authenticated signaling reaches the PC. */
 public final class ClassroomCallActivity extends Activity {
+    @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(org.perazimchurch.app.ui.theme.UiScale.wrap(newBase));
+    }
+
     private static final String ORIGIN = "https://appassets.androidplatform.net";
     private static final String PAGE = ORIGIN + "/classroom.html";
     private WebView web;

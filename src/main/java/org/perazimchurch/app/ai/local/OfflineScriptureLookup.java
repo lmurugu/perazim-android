@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.local;
 
+import org.perazimchurch.app.data.local.text.BibleVerseReader;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
@@ -36,7 +37,8 @@ public final class OfflineScriptureLookup {
     public static AiResponse answer(Context context, String question) {
         if (!matchesRequest(question)) return null;
         try {
-            return answer(PerazimDatabase.getInstance(context).bibleDao(), question);
+            BibleDao dao = PerazimDatabase.getInstance(context).bibleDao();
+            return answer(dao, BibleVerseReader.create(context, dao), question);
         } catch (android.database.sqlite.SQLiteException | IllegalStateException failure) {
             return unavailable();
         }
@@ -44,6 +46,11 @@ public final class OfflineScriptureLookup {
 
     @Nullable
     static AiResponse answer(BibleDao dao, String question) {
+        return answer(dao, BibleVerseReader.mainOnly(dao), question);
+    }
+
+    @Nullable
+    static AiResponse answer(BibleDao dao, BibleVerseReader reader, String question) {
         Matcher request = REQUEST.matcher(question.trim());
         if (!request.matches()) return null;
         String requestedBook = request.group(1).replaceAll("\\s+", "");
@@ -64,7 +71,7 @@ public final class OfflineScriptureLookup {
                 return AiResponse.plainText("Choose an ascending range of up to 20 verses in one chapter.", null);
             }
             if (chapter > book.getChapterCount()) return unavailable();
-            List<BibleVerseEntity> verses = dao.getVerses(TRANSLATION, book.getBookNumber(), chapter);
+            List<BibleVerseEntity> verses = reader.getVerses(TRANSLATION, book.getBookNumber(), chapter);
             StringBuilder text = new StringBuilder(name).append(' ').append(chapter)
                     .append(':').append(first);
             if (first != last) text.append('–').append(last);

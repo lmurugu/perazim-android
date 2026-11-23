@@ -1,8 +1,11 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.Activity;
+import org.perazimchurch.app.ui.theme.PerazimTheme;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,13 +34,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class SermonsActivity extends Activity implements View.OnClickListener {
+    @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(org.perazimchurch.app.ui.theme.UiScale.wrap(newBase));
+    }
+
 
     public static final int COLOR_PURPLE = Color.parseColor("#681A7D");
-    public static final int COLOR_PURPLE_DARK = Color.parseColor("#2D0938");
+    public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     public static final int COLOR_PURPLE_SHADOW = Color.parseColor("#450E53");
-    public static final int COLOR_PURPLE_BORDER = Color.parseColor("#E7D5EC");
+    public static int COLOR_PURPLE_BORDER() { return PerazimTheme.COLOR_STROKE; }
     public static final int COLOR_PURPLE_TINT = Color.parseColor("#F5ECF7");
-    public static final int COLOR_PURPLE_MUTED = Color.parseColor("#725B78");
+    public static int COLOR_PURPLE_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }
 
     public static final int COLOR_ORANGE = Color.parseColor("#E17D2F");
     public static final int COLOR_ORANGE_DARK = Color.parseColor("#78350A");
@@ -46,7 +54,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
     public static final int COLOR_ORANGE_TINT = Color.parseColor("#FDF5EF");
 
     public static final int COLOR_WHITE = Color.parseColor("#FFFFFF");
-    public static final int COLOR_CANVAS = Color.parseColor("#FAF7FB");
+    public static int COLOR_CANVAS() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private Button btnBack;
     private Button btnWatchSeminar;
@@ -58,7 +66,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
 
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_CANVAS);
+        scrollView.setBackgroundColor(COLOR_CANVAS());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -84,7 +92,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         title.setText("SERMONS & MEDIA");
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(COLOR_PURPLE_DARK);
+        title.setTextColor(COLOR_PURPLE_DARK());
         title.setPadding(dp(16), 0, 0, 0);
         navBar.addView(title);
 
@@ -105,7 +113,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         }
 
         // Featured Speaker Header
-        LinearLayout speakerCard = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout speakerCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         speakerCard.setOrientation(LinearLayout.HORIZONTAL);
         speakerCard.setGravity(Gravity.CENTER_VERTICAL);
 
@@ -127,7 +135,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         spName.setText("Bishop Dr. David Mutweri");
         spName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         spName.setTypeface(Typeface.DEFAULT_BOLD);
-        spName.setTextColor(COLOR_PURPLE_DARK);
+        spName.setTextColor(COLOR_PURPLE_DARK());
         spInfo.addView(spName);
 
         TextView spTitle = new TextView(this);
@@ -140,12 +148,12 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         TextView spContact = new TextView(this);
         spContact.setText("📞 " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · ✉️ bishop@perazimchurch.org");
         spContact.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        spContact.setTextColor(COLOR_PURPLE_MUTED);
+        spContact.setTextColor(COLOR_PURPLE_MUTED());
         spContact.setPadding(0, dp(2), 0, 0);
         spInfo.addView(spContact);
 
         speakerCard.setOnClickListener(v -> {
-            new android.app.AlertDialog.Builder(this)
+            AppDialogs.builder(this)
                     .setTitle("Bishop Dr. David Mutweri")
                     .setMessage("Presiding Bishop · Perazim Mission Church\n\n"
                             + "• Direct Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + "\n"
@@ -170,7 +178,7 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         content.addView(speakerCard);
 
         // Featured Seminar Card
-        LinearLayout seminarCard = createCard(this, COLOR_WHITE, dp(16), COLOR_ORANGE_BORDER, dp(2));
+        LinearLayout seminarCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_ORANGE_BORDER, dp(2));
         seminarCard.setOrientation(LinearLayout.VERTICAL);
 
         TextView semTag = createPillInline("FEATURED LEADERSHIP SEMINAR", COLOR_ORANGE_TINT, COLOR_ORANGE);
@@ -180,21 +188,21 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         semTitle.setText("Embu Pastors & Leaders Couples Seminar 2025");
         semTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
         semTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        semTitle.setTextColor(COLOR_PURPLE_DARK);
+        semTitle.setTextColor(COLOR_PURPLE_DARK());
         semTitle.setPadding(0, dp(8), 0, dp(4));
         seminarCard.addView(semTitle);
 
         TextView semMeta = new TextView(this);
         semMeta.setText("Recorded Live at Perazim Mission Church Headquarters, Embu");
         semMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        semMeta.setTextColor(COLOR_PURPLE_MUTED);
+        semMeta.setTextColor(COLOR_PURPLE_MUTED());
         semMeta.setPadding(0, 0, 0, dp(12));
         seminarCard.addView(semMeta);
 
         TextView semNotes = new TextView(this);
         semNotes.setText("• Kingdom Order: True ministerial fruitfulness begins at the family altar.\n• Spiritual Roots: The depth of your private prayer determines your public breakout.\n• Covenant Power: God's breakthrough surges where couples stand in righteous unity.");
         semNotes.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        semNotes.setTextColor(COLOR_PURPLE_DARK);
+        semNotes.setTextColor(COLOR_PURPLE_DARK());
         semNotes.setLineSpacing(dp(3), 1.15f);
         semNotes.setPadding(0, 0, 0, dp(14));
         seminarCard.addView(semNotes);
@@ -212,20 +220,20 @@ public class SermonsActivity extends Activity implements View.OnClickListener {
         content.addView(seminarCard);
 
         // Official Channel Portal Card
-        LinearLayout channelCard = createCard(this, COLOR_WHITE, dp(16), COLOR_PURPLE_BORDER, dp(1));
+        LinearLayout channelCard = createCard(this, PerazimTheme.COLOR_SURFACE_SOLID, dp(16), COLOR_PURPLE_BORDER(), dp(1));
         channelCard.setOrientation(LinearLayout.VERTICAL);
 
         TextView chTitle = new TextView(this);
         chTitle.setText("Official YouTube Broadcasts");
         chTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         chTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        chTitle.setTextColor(COLOR_PURPLE_DARK);
+        chTitle.setTextColor(COLOR_PURPLE_DARK());
         channelCard.addView(chTitle);
 
         TextView chDesc = new TextView(this);
         chDesc.setText("Subscribe to @perazimchurchembu for Sunday service live streams, Kesha revivals, and biblical doctrine series.");
         chDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        chDesc.setTextColor(COLOR_PURPLE_MUTED);
+        chDesc.setTextColor(COLOR_PURPLE_MUTED());
         chDesc.setPadding(0, dp(4), 0, dp(12));
         channelCard.addView(chDesc);
 
