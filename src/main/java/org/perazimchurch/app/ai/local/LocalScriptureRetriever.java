@@ -26,9 +26,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Retrieves only locally stored public-domain KJV verses for grounded offline answers. */
+/** Retrieves only locally stored Bible text for grounded offline answers: public-domain KJV, and the NASB when the owner has loaded the licensed file and the question names it. */
 public final class LocalScriptureRetriever {
-    private static final String TRANSLATION_ID = "KJV";
+    private static final String KJV = "KJV";
+    private static final String NASB = "NASB";
+    /** Used only when the question names the NASB and the owner has loaded the licensed file. */
+    private static final Pattern NASB_NAME = Pattern.compile(
+            "(?<![\\p{L}\\p{N}])nasb(?![\\p{L}\\p{N}])", Pattern.CASE_INSENSITIVE);
     private static final int MAX_TERMS = 6;
     private static final int MAX_PASSAGES = 3;
     private static final int MAX_TOTAL_CHARS = 900;
@@ -36,12 +40,12 @@ public final class LocalScriptureRetriever {
             "(?<![\\p{L}\\p{N}])(?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,3}\\s+[1-9]\\d{0,2}(?::|\\s+)[1-9]\\d{0,2}(?:\\s*[-–]\\s*[1-9]\\d{0,2})?(?!\\d)",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Set<String> SCRIPTURE_TERMS = new HashSet<>(Arrays.asList(
-            "bible", "scripture", "verse", "verses", "chapter", "kjv", "god", "jesus", "christ",
+            "bible", "scripture", "verse", "verses", "chapter", "kjv", "nasb", "god", "jesus", "christ",
             "messiah", "spirit", "sin", "sins", "salvation", "saved", "redeem", "forgive",
             "forgiveness", "faith", "prayer", "pray", "grace", "heaven", "hell", "gospel",
             "resurrection", "disciple", "disciples", "worship", "lord", "love"));
     private static final Set<String> STOP_WORDS = new HashSet<>(Arrays.asList(
-            "about", "after", "also", "and", "are", "because", "bible", "can", "could", "does",
+            "about", "after", "also", "and", "are", "because", "bible", "can", "could", "does", "nasb",
             "for", "from", "give", "help", "how", "into", "just", "like", "please", "read",
             "show", "tell", "that", "the", "their", "them", "there", "these", "they", "this",
             "those", "through", "what", "when", "where", "which", "who", "with", "would", "you"));
@@ -60,28 +64,26 @@ public final class LocalScriptureRetriever {
 
     static JSONArray retrieve(BibleDao dao, BibleVerseReader reader, String question) throws Exception {
         if (question == null || question.trim().isEmpty() || !isScriptureRelated(question)) return new JSONArray();
-        BibleTranslationEntity translation = dao.getTranslationById(TRANSLATION_ID);
-        if (translation == null || !"Public Domain".equalsIgnoreCase(translation.getLicenseInfo())) {
-            return new JSONArray();
-        }
+        String translationId = translationFor(dao, question);
+        if (translationId == null) return new JSONArray();
 
         List<String> terms = queryTerms(question);
         Map<Integer, String> names = new HashMap<>();
-        List<BibleBookEntity> books = dao.getBooksByTranslation(TRANSLATION_ID);
+        List<BibleBookEntity> books = dao.getBooksByTranslation(translationId);
         if (books != null) {
             for (BibleBookEntity book : books) {
                 if (book.getName() != null) names.put(book.getBookNumber(), book.getName());
             }
         }
 
-        JSONArray exactReference = retrieveExactReference(reader, books, question);
+        JSONArray exactReference = retrieveExactReference(reader, translationId, books, question);
         if (exactReference != null) return exactReference;
         if (terms.isEmpty()) return new JSONArray();
 
         Map<String, Candidate> candidates = new HashMap<>();
         for (int first = 0; first < terms.size(); first++) {
             for (int second = first + 1; second < terms.size(); second++) {
-                List<BibleVerseEntity> matches = reader.searchTerms(TRANSLATION_ID,
+                List<BibleVerseEntity> matches = reader.searchTerms(translationId,
                         terms.get(first), terms.get(second));
                 if (matches == null) continue;
                 for (BibleVerseEntity verse : matches) {
@@ -118,9 +120,9 @@ public final class LocalScriptureRetriever {
             if (entryChars > 600 || characters + entryChars > MAX_TOTAL_CHARS) continue;
             JSONObject item = new JSONObject();
             item.put("sourceId", "Bible");
-            item.put("title", "King James Version");
+            item.put("title", titleFor(translationId));
             item.put("authorityClass", "SCRIPTURE");
-            item.put("version", TRANSLATION_ID);
+            item.put("version", translationId);
             item.put("location", location);
             item.put("text", text);
             evidence.put(item);
@@ -143,8 +145,25 @@ public final class LocalScriptureRetriever {
         return question != null && REFERENCE_SHAPE.matcher(question).find();
     }
 
-    private static JSONArray retrieveExactReference(BibleVerseReader dao, List<BibleBookEntity> books,
-                                                    String question) throws Exception {
+    /** KJV when it is public domain. NASB only when the question names it and the owner's licensed file is loaded. */
+    static String translationFor(BibleDao dao, String question) {
+        if (question != null && NASB_NAME.matcher(question).find()) {
+            BibleTranslationEntity nasb = dao.getTranslationById(NASB);
+            if (nasb != null && nasb.getLicenseInfo() != null && nasb.getLicenseInfo().startsWith("Licensed")) {
+                return NASB;
+            }
+        }
+        BibleTranslationEntity kjv = dao.getTranslationById(KJV);
+        if (kjv != null && "Public Domain".equalsIgnoreCase(kjv.getLicenseInfo())) return KJV;
+        return null;
+    }
+
+    static String titleFor(String translationId) {
+        return NASB.equals(translationId) ? "New American Standard Bible" : "King James Version";
+    }
+
+    private static JSONArray retrieveExactReference(BibleVerseReader dao, String translationId,
+                                                    List<BibleBookEntity> books, String question) throws Exception {
         if (books == null || books.isEmpty() || !REFERENCE_SHAPE.matcher(question).find()) return null;
         BibleBookEntity matchBook = null;
         int chapter = -1;
@@ -181,7 +200,7 @@ public final class LocalScriptureRetriever {
             }
         }
         if (matchBook == null) return null;
-        List<BibleVerseEntity> chapterVerses = dao.getVerses(TRANSLATION_ID, matchBook.getBookNumber(), chapter);
+        List<BibleVerseEntity> chapterVerses = dao.getVerses(translationId, matchBook.getBookNumber(), chapter);
         if (chapterVerses == null || chapterVerses.isEmpty()) return new JSONArray();
         int targetIndex = -1;
         for (int i = 0; i < chapterVerses.size(); i++) {
@@ -210,9 +229,9 @@ public final class LocalScriptureRetriever {
             if (entryChars > 600 || characters + entryChars > MAX_TOTAL_CHARS) continue;
             JSONObject item = new JSONObject();
             item.put("sourceId", "Bible");
-            item.put("title", "King James Version");
+            item.put("title", titleFor(translationId));
             item.put("authorityClass", "SCRIPTURE");
-            item.put("version", TRANSLATION_ID);
+            item.put("version", translationId);
             item.put("location", location);
             item.put("text", text);
             boolean requestedPassage = verse.getVerseNumber() >= verseNumber
