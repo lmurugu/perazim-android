@@ -24,6 +24,8 @@ public final class ReferenceGuide {
 
     private static final String TAG = "ReferenceGuide";
     static final int MAX_REFERENCE_ITEMS = 2;
+    /** One commentary excerpt at most. It is added last, after the governed position and the factual references. */
+    static final int MAX_COMMENTARY_ITEMS = 1;
     private static final int MAX_WORDS = 4;
 
     private static final Set<String> STOP = new HashSet<>(Arrays.asList(
@@ -51,7 +53,11 @@ public final class ReferenceGuide {
                     if (hits.size() >= MAX_REFERENCE_ITEMS) break;
                     hits.addAll(index.dictionary(word, approvals, 1));
                 }
-                return ReferenceEvidence.append(evidence, hits, MAX_REFERENCE_ITEMS);
+                JSONArray withReferences = ReferenceEvidence.append(evidence, hits, MAX_REFERENCE_ITEMS);
+                if (verse <= 0) return withReferences;
+                List<ReferenceHit> commentary = index.commentaries(ReferenceKeys.chapterHeadword(verse), approvals,
+                        MAX_COMMENTARY_ITEMS);
+                return ReferenceEvidence.append(withReferences, commentary, MAX_COMMENTARY_ITEMS);
             } finally {
                 index.close();
             }

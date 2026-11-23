@@ -62,4 +62,11 @@ public class ReferenceKeysTest {
     private static void assertTrue(boolean value) {
         org.junit.Assert.assertTrue(value);
     }
+
+    @Test
+    public void chapterHeadwordMatchesCommentaryLabels() {
+        assertEquals("Genesis 1", ReferenceKeys.chapterHeadword(ReferenceKeys.verseKey(1, 1, 1)));
+        assertEquals("1 Corinthians 13", ReferenceKeys.chapterHeadword(ReferenceKeys.verseKey(46, 13, 4)));
+        assertEquals("", ReferenceKeys.chapterHeadword(0));
+    }
 }

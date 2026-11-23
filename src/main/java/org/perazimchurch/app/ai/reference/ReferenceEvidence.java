@@ -36,6 +36,8 @@ public final class ReferenceEvidence {
         String text = hit.text == null ? "" : hit.text.trim();
         if (ReferenceHit.KIND_CROSS_REFERENCE.equals(hit.kind)) {
             text = "Cross-reference from " + hit.headword + " to " + text + " (" + hit.votes + " votes).";
+        } else if (ReferenceHit.KIND_COMMENTARY.equals(hit.kind)) {
+            text = commentaryText(hit.author, hit.theologyTag, hit.headword, text);
         }
         item.put("text", clip(text, MAX_TEXT_CHARS));
         return item;
@@ -60,6 +62,21 @@ public final class ReferenceEvidence {
             }
         }
         return out;
+    }
+
+    /** Tradition label for a commentary's theology tag. Empty when the tag is not a known commentary tradition. */
+    static String tradition(String theologyTag) {
+        if ("PURITAN_REFORMED_COMMENTARY".equals(theologyTag)) return "Puritan, Reformed";
+        if ("ARMINIAN_WESLEYAN_COMMENTARY".equals(theologyTag)) return "Arminian, Wesleyan";
+        return "";
+    }
+
+    /** Puts the author and tradition in front of every commentary excerpt, so the model cannot present it unlabelled. */
+    static String commentaryText(String author, String theologyTag, String headword, String body) {
+        String name = author == null || author.trim().isEmpty() ? "Commentary" : author.trim();
+        String tradition = tradition(theologyTag);
+        String label = tradition.isEmpty() ? name : name + " (" + tradition + ")";
+        return label + ", commentary on " + headword + ": " + body;
     }
 
     static String safeId(String value) {

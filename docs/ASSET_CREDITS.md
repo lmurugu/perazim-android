@@ -37,4 +37,4 @@ The six factual sources below are listed in `src/main/assets/reference/approvals
 
 Strong's Greek data (already in the app): used under MIT with attribution, by coordinator decision. The upstream licence line is to be re-checked against the source before release.
 
-Matthew Henry's Commentary on the Whole Bible and Wesley's Explanatory Notes upon the New Testament (both public domain, text from Christian Classics Ethereal Library, ccel.org). Approved by Levi for use as an optional download, not part of the default install. Excerpts are labelled with author and tradition.
+Matthew Henry's Commentary on the Whole Bible and Wesley's Explanatory Notes upon the New Testament (both public domain, text from Christian Classics Ethereal Library, ccel.org). Approved by Levi for use, bundled in the app as a separate database. Excerpts are labelled with author and tradition.

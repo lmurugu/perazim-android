@@ -75,4 +75,24 @@ public class ReferenceEvidenceTest {
                 Collections.singletonList(dictionaryHit("Empty", "  ")), 2);
         assertEquals(0, result.length());
     }
+
+    @Test
+    public void commentaryExcerptNamesAuthorAndTraditionBeforeItsText() throws Exception {
+        ReferenceHit henry = new ReferenceHit(ReferenceHit.KIND_COMMENTARY, "matthew-henry-commentary",
+                "Matthew Henry's Commentary on the Whole Bible", "Matthew Henry", "Public domain",
+                "PURITAN_REFORMED_COMMENTARY", "Genesis 1", "In the beginning God created the heaven.", 0);
+        JSONObject item = ReferenceEvidence.toEvidence(henry);
+        assertEquals("REFERENCE", item.getString("authorityClass"));
+        assertEquals("Matthew Henry (Puritan, Reformed), commentary on Genesis 1: In the beginning God created the heaven.",
+                item.getString("text"));
+        assertEquals("Reference material, not Perazim's position.", item.getString("notice"));
+    }
+
+    @Test
+    public void wesleyExcerptIsLabelledArminianWesleyan() {
+        assertEquals("Arminian, Wesleyan", ReferenceEvidence.tradition("ARMINIAN_WESLEYAN_COMMENTARY"));
+        assertEquals("", ReferenceEvidence.tradition("REFERENCE_ONLY"));
+        assertEquals("John Wesley (Arminian, Wesleyan), commentary on Mark 1: A note.",
+                ReferenceEvidence.commentaryText("John Wesley", "ARMINIAN_WESLEYAN_COMMENTARY", "Mark 1", "A note."));
+    }
 }

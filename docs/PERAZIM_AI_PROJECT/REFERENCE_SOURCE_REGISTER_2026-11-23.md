@@ -63,16 +63,16 @@ The Strong's Greek data is used under MIT with attribution (coordinator's decisi
 both GPL 3.0 and MIT, so the upstream licence should still be checked once against the source before release.
 This is not verified here.
 
-## E. Commentaries: approved by Levi (answer A), optional download. Confessions: not yet extracted
+## E. Commentaries: approved by Levi (answer A), bundled in the APK. Confessions: not yet extracted
 
 | Id | Source | Licence | Tradition tag | Build status |
 |---|---|---|---|---|
 | matthew-henry-commentary | Matthew Henry's Commentary on the Whole Bible (CCEL, six volumes) | Public domain (CCEL: may be copied and distributed freely) | PURITAN_REFORMED_COMMENTARY (Reformed, Puritan) | Optional database, 22,678 entries, 49 MB raw. Approved in approvals.json |
 | wesley-notes-nt | John Wesley's Explanatory Notes upon the New Testament (CCEL) | Public domain | ARMINIAN_WESLEYAN_COMMENTARY (Arminian, Wesleyan) | Optional database, 3,339 entries, 6.7 MB raw. Sections are the 67 "Notes on ..." titles and the Preface. Approved in approvals.json |
 
-The commentary database is built with `--tier optional`. It is 16.4 MB gzipped (sha256 9eb494a0c5f5144af911835f7ecc30f575ef218296d02033c21d0fbcbfc0a1e6) and is staged at
-`/mnt/project-files/reference/reference-commentaries.db.gz`. It is not in the APK. The default build is unchanged at 16,564,224 bytes.
-Retrieval must label each excerpt with its author and tradition and present Perazim's own view first; that wiring and the optional download are not built yet.
+The commentary database is built with `--tier optional` and bundled as `src/main/assets/reference/reference-commentaries.db.gz` (coordinator decision: bundle, no download, the repository is private). It is 16.4 MB gzipped (sha256 9eb494a0c5f5144af911835f7ecc30f575ef218296d02033c21d0fbcbfc0a1e6) and is staged at
+`/mnt/project-files/reference/reference-commentaries.db.gz`. The default factual build is unchanged at 16,564,224 bytes.
+Retrieval labels each excerpt with its author and tradition (`ReferenceEvidence.commentaryText`) and adds commentary last, after the governed position and the factual references (`ReferenceGuide.augment`). Host tests cover the labels and chapter headwords; the Android path compiles against stubs only, and the laptop thread tests it on the device.
 Commentaries carry their authors' theology and conflict with each other (Henry is Reformed, Wesley Arminian). Levi's answer A: use both, labelled, Perazim's view first.
 
 Creeds and confessions (CCEL Schaff, *Creeds of Christendom*): **not extracted yet.** The CCEL volumes are
@@ -85,7 +85,7 @@ from memory. Until a checked transcription exists, creeds are not in the databas
 ## F. What needs Levi
 
 1. Confirm the six approved factual sources in section A (`approvals.json`, approved on the coordinator's decision).
-2. Where the optional commentary download is hosted (a GitHub release on this repo is the free option; it needs your go-ahead before I create one).
+2. Nothing further on hosting: the commentaries are bundled as an asset (coordinator decision).
 3. Decide on share-alike text (Swahili 2019 under CC BY-SA 4.0). Parked for now.
 4. Confirm the Strong's Greek licence (section D), which is MIT with attribution by coordinator decision and not yet re-verified upstream.
 5. Approve the confessions and creeds once they are transcribed and checked (section E).

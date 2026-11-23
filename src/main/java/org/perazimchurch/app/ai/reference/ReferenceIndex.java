@@ -28,36 +28,54 @@ public final class ReferenceIndex {
     /** Bump when the database format or contents change, so the unpacked copy is rebuilt. */
     static final String UNPACKED_NAME = "reference-v1.db";
     static final String CROSS_REFERENCE_SOURCE = "openbible-xrefs";
+    /** Commentaries are in their own database so the factual index stays small. */
+    static final String COMMENTARY_ASSET = "reference/reference-commentaries.db.gz";
+    static final String COMMENTARY_UNPACKED = "reference-commentaries-v1.db";
+    static final String HENRY_SOURCE = "matthew-henry-commentary";
+    static final String WESLEY_SOURCE = "wesley-notes-nt";
+    static final List<String> COMMENTARY_SOURCES = java.util.Arrays.asList(HENRY_SOURCE, WESLEY_SOURCE);
 
     private final SQLiteDatabase db;
+    private final SQLiteDatabase commentaries;
 
-    private ReferenceIndex(SQLiteDatabase db) {
+    private ReferenceIndex(SQLiteDatabase db, SQLiteDatabase commentaries) {
         this.db = db;
+        this.commentaries = commentaries;
     }
 
     /** Returns the index, or null when the bundled database is missing or cannot be opened. */
     public static ReferenceIndex open(Context context) {
         if (context == null) return null;
         try {
-            File file = unpack(context);
+            File file = unpack(context, ASSET, UNPACKED_NAME);
             if (file == null) return null;
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(file.getAbsolutePath(), null,
-                    SQLiteDatabase.OPEN_READONLY);
-            return new ReferenceIndex(db);
+            SQLiteDatabase db = openReadOnly(file);
+            SQLiteDatabase commentaryDb = null;
+            try {
+                File commentaryFile = unpack(context, COMMENTARY_ASSET, COMMENTARY_UNPACKED);
+                if (commentaryFile != null) commentaryDb = openReadOnly(commentaryFile);
+            } catch (Exception e) {
+                Log.w(TAG, "Commentaries unavailable", e);
+            }
+            return new ReferenceIndex(db, commentaryDb);
         } catch (Exception e) {
             Log.w(TAG, "Reference index unavailable", e);
             return null;
         }
     }
 
-    private static File unpack(Context context) throws Exception {
+    private static SQLiteDatabase openReadOnly(File file) {
+        return SQLiteDatabase.openDatabase(file.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
+    }
+
+    private static File unpack(Context context, String asset, String unpackedName) throws Exception {
         File dir = new File(context.getFilesDir(), "reference");
-        File target = new File(dir, UNPACKED_NAME);
+        File target = new File(dir, unpackedName);
         if (target.isFile() && target.length() > 0) return target;
         if (!dir.isDirectory() && !dir.mkdirs()) return null;
-        try (InputStream raw = context.getAssets().open(ASSET);
+        try (InputStream raw = context.getAssets().open(asset);
              InputStream in = new GZIPInputStream(new BufferedInputStream(raw))) {
-            File temp = new File(dir, UNPACKED_NAME + ".tmp");
+            File temp = new File(dir, unpackedName + ".tmp");
             try (OutputStream out = new FileOutputStream(temp)) {
                 byte[] buffer = new byte[64 * 1024];
                 int read;
@@ -127,7 +145,42 @@ public final class ReferenceIndex {
         return out;
     }
 
+    /**
+     * Commentary excerpts for one chapter (for example "Genesis 1"), from approved commentaries only. Each hit is
+     * labelled with its author and tradition by {@link ReferenceEvidence}.
+     */
+    public List<ReferenceHit> commentaries(String chapterHeadword, ReferenceApprovals approvals, int limit) {
+        List<ReferenceHit> out = new ArrayList<>();
+        if (commentaries == null || chapterHeadword == null || chapterHeadword.trim().isEmpty()
+                || approvals == null || limit <= 0) {
+            return out;
+        }
+        List<String> ids = new ArrayList<>();
+        for (String id : COMMENTARY_SOURCES) if (approvals.isApproved(id)) ids.add(id);
+        if (ids.isEmpty()) return out;
+        StringBuilder in = new StringBuilder();
+        for (int i = 0; i < ids.size(); i++) in.append(i == 0 ? "?" : ",?");
+        List<String> args = new ArrayList<>();
+        args.add(chapterHeadword.trim());
+        args.addAll(ids);
+        args.add(String.valueOf(limit));
+        String sql = "SELECT e.source_id, e.headword, e.body, s.title, s.author, s.licence, s.theology_tag "
+                + "FROM entries e JOIN sources s ON s.source_id = e.source_id "
+                + "WHERE e.headword = ? COLLATE NOCASE AND e.source_id IN (" + in + ") "
+                + "ORDER BY e.source_id, e.id LIMIT ?";
+        try (Cursor c = commentaries.rawQuery(sql, args.toArray(new String[0]))) {
+            while (c.moveToNext()) {
+                out.add(new ReferenceHit(ReferenceHit.KIND_COMMENTARY, c.getString(0), c.getString(3),
+                        c.getString(4), c.getString(5), c.getString(6), c.getString(1), c.getString(2), 0));
+            }
+        } catch (RuntimeException e) {
+            Log.w(TAG, "Commentary lookup failed", e);
+        }
+        return out;
+    }
+
     public void close() {
         if (db != null && db.isOpen()) db.close();
+        if (commentaries != null && commentaries.isOpen()) commentaries.close();
     }
 }

@@ -88,6 +88,15 @@ public final class ReferenceKeys {
         return alias == null ? 0 : alias;
     }
 
+    /** Chapter headword used by the commentaries, such as "Genesis 1". Returns "" for an invalid key. */
+    public static String chapterHeadword(int key) {
+        if (key <= 0) return "";
+        int book = key / 1_000_000;
+        int chapter = (key / 1000) % 1000;
+        if (book < 1 || book > 66 || chapter < 1) return "";
+        return BOOK_NAMES.get(book - 1) + " " + chapter;
+    }
+
     /** Canonical display form for a verse key, such as "John 3:16". Returns "" for an invalid key. */
     public static String format(int key) {
         if (key <= 0) return "";
