@@ -83,13 +83,26 @@ adb shell svc wifi enable
 adb shell svc data enable || true
 
 received=false
-for _ in $(seq 1 60); do
-  if curl -fsS http://127.0.0.1:18080/__received | grep -q 'wm_process_restart_probe'; then
+forced=false
+for i in $(seq 1 75); do
+  if curl -fsS http://127.0.0.1:18080/__received 2>/dev/null | grep -q 'wm_process_restart_probe'; then
     received=true
     break
   fi
+  # Emulators batch job runs. If nothing arrives 30 s after the network is back, force the queued job
+  # once with JobScheduler. The app is not relaunched; this only runs the job the process death left behind.
+  if [[ "$i" -eq 15 && "$forced" != true ]]; then
+    forced=true
+    js_now="$(adb shell dumpsys jobscheduler 2>/dev/null || true)"
+    job_id="$(grep -o 'JOB #u[0-9a-z]*/[0-9]*' <<<"$js_now" | head -n 1 | sed 's#.*/##' || true)"
+    echo "No delivery 30 s after the network came back; forcing job ${job_id:-unknown} for org.perazimchurch." >&2
+    if [[ -n "$job_id" ]]; then
+      adb shell cmd jobscheduler run -f org.perazimchurch "$job_id" >&2 || true
+    fi
+  fi
   sleep 2
 done
+echo "Delivery check: received=$received, forced_job=$forced" >&2
 if [[ "$received" != true ]]; then
   echo 'Diagnostics: connectivity and job state after the app process was killed.' >&2
   adb shell dumpsys connectivity | grep -iE 'NetworkAgentInfo|CONNECTED|VALIDATED' | head -n 20 >&2 || true
