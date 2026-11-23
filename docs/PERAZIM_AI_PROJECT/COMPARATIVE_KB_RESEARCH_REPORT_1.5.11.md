@@ -1,14 +1,14 @@
 # Perazim Comparative Knowledge Base — Research and Revision Report
 
-**Knowledge-base version:** 1.5.11  
+**Knowledge-base version at current PR head:** 1.5.15  
 **PR:** [#76](https://github.com/lmurugu/perazim-android/pull/76)  
-**Research base:** merged Streams A–E, with further source checks and content revisions on 24 November 2026  
+**Research base:** merged Streams A–E, with further source checks and content revisions through KB 1.5.15 on 24 November 2026  
 **Approval state:** 4 `APPROVED_LEVI`; 23 `DRAFT_PENDING_LEVI`  
 **Release state:** PR remains draft; no merge, model activation, or further Qwen transfer is authorised by this report.
 
 ## Purpose and method
 
-This report records the supporting evidence added, the claims revised, and the limits that remain for the 23 entries which were pending after the four earlier approvals. The objective was to make each model-facing statement no broader than the evidence permits.
+This report records the supporting evidence added, the claims revised, and the limits that remain for the 23 entries which were pending after the four earlier approvals. The objective was to make each model-facing statement no broader than the evidence permits. The initial report was created alongside KB 1.5.11; subsequent precision, attribution and source-order corrections were integrated through KB 1.5.15. The live JSON at PR head is authoritative if any wording in this historical report differs from it.
 
 The source hierarchy used was: (1) primary religious texts and official institutional statements; (2) official educational explanations and confessions; (3) reputable academic reference works and peer-reviewed research; and (4) secondary historical summaries, used only when clearly labelled as such. An inaccessible primary source was not treated as verified. Instead, claims were either corroborated by independent scholarship, attributed to the source actually read, narrowed, or removed.
 
@@ -317,4 +317,17 @@ At commit `b43c3cc436242b7c6d33912c409683b896da2c46`, a structural check of the 
 
 ## Final status
 
-The 23 entries have been revised with claim-specific evidence, source limitations and corrected model-facing wording. They remain `DRAFT_PENDING_LEVI` until the owner reviews or further delegates approval of the exact final package. The four previously approved entries remain unchanged. PR 76 must remain draft; this report does not authorise merge, release, model activation or transfer of additional entries to Qwen.
+The 23 entries have been researched and revised with claim-specific evidence, source limitations and corrected model-facing wording in the current KB version 1.5.15. They remain `DRAFT_PENDING_LEVI` until the owner reviews or further delegates approval of the exact final package. The four previously approved entries remain unchanged. PR 76 must remain draft; this report does not authorise merge, release, model activation or transfer of additional entries to Qwen.
+
+
+## Version and owner-status reconciliation (24 November 2026)
+
+The current PR head carries comparative knowledge-base version **1.5.15**. The exact entry statuses in the JSON remain authoritative:
+- `APPROVED_LEVI`: `eternal_progression`, `holy_spirit_force`, `baptism_for_dead`, `church_identity_question`.
+- `DRAFT_PENDING_LEVI`: the other 23 entries, including the revised material documented in this report.
+
+This report is a research deliverable and recommendation package. Completion of research does not itself change an entry's approval status. The four previously authorised approvals remain unchanged, and no additional entry is treated as approved by this report.
+
+The current JSON has also received final wording refinements after the initial report was written: icons and saint-intercession claims are more precisely attributed to Reformed confessional interpreters; the African-ancestors summary is limited to sources actually read; the source titles most relevant to the model-visible notes are placed first; and the top-level KB comment now agrees with the four-approved/23-pending status. See the current JSON rather than this report's earlier wording for the exact latest text.
+
+The current commit has not yet been verified by a fresh full Android/Gradle CI run. The earlier successful run on c718a3a and the separate advisory WorkManager failure are historical evidence only. Do not treat them as proof that KB 1.5.15 has passed CI.
