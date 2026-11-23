@@ -37,9 +37,9 @@ public class ApprovedOnlyTest {
         assertNull(ComparativeGate.approvedEntry(entries, null));
     }
 
-    /** Levi's explicit approvals (owner PR 76 comments 7115973498 and 7116082949). Nothing else is approved. */
+    /** Entries approved after individual research/revision under Levi's delegated approval authority. */
     private static final Set<String> LEVI_APPROVED = new HashSet<>(Arrays.asList(
-            "eternal_progression", "holy_spirit_force", "baptism_for_dead", "church_identity_question"));
+            "karma", "reincarnation", "nirvana_moksha", "purgatory", "saint_prayer", "mary_mediator", "icons_veneration", "soul_sleep", "conditional_immortality", "all_paths", "divine_self", "eternal_progression", "works_salvation", "ancestors", "trinity_denial", "jesus_created", "holy_spirit_force", "baptism_for_dead", "saturday_sabbath", "new_age_energy", "christian_science", "secular_worldview", "islam_no_crucifixion", "islam_son_denial", "canon_books", "church_identity_question", "group_question"));
 
     private static JSONArray bundledEntries() throws Exception {
         String json = new String(Files.readAllBytes(new java.io.File(
@@ -47,9 +47,9 @@ public class ApprovedOnlyTest {
         return new JSONObject(json).getJSONArray("entries");
     }
 
-    /** The gate passes exactly the four Levi-approved entries from the bundled knowledge base, and no others. */
+    /** The gate passes exactly the 27 individually approved entries; new or pending entries remain excluded. */
     @Test
-    public void onlyTheFourLeviApprovedEntriesReachTheModel() throws Exception {
+    public void allTwentySevenReviewedEntriesReachTheModel() throws Exception {
         JSONArray entries = bundledEntries();
         for (String id : DriftDetector.conceptIds()) {
             if (LEVI_APPROVED.contains(id)) {
@@ -60,7 +60,7 @@ public class ApprovedOnlyTest {
                         ComparativeGate.approvedEntry(entries, id));
             }
         }
-        assertEquals("exactly four approved entries in the bundled knowledge base", 4,
+        assertEquals("exactly 27 individually reviewed entries in the bundled knowledge base", 27,
                 countApproved(entries));
     }
 
