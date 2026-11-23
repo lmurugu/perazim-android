@@ -1,12 +1,12 @@
 {
-  "_comment": "Comparative knowledge for Perazim Guide drift detection. Four entries have previously been approved under delegated owner authority; all other entries remain pending until their final approval status is recorded. Only an entry with exact status APPROVED_LEVI can pass the release gate. Only text in summary, origin and scripture is model-facing; internal_note and source records are not sent to the model. Scripture anchors are KJV references retrieved from the bundled database; licensed NASB use follows the app's file-loading rule. Entries are contextual descriptions, not authorities: the model evaluates competing claims under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny.",
-  "version": "1.5.12",
-  "status": "DRAFT_PENDING_LEVI",
+  "_comment": "Comparative knowledge for Perazim Guide drift detection. All 27 entries have been approved for model-context use under Rev. Levi Murugu's explicit delegated authority. This is content approval only: PR merge, production release, model activation and transfer/publishing of a release package remain separate decisions and are not authorised by this status. Only entries with exact status APPROVED_LEVI pass the per-entry gate. The model receives only summary, origin, Scripture evaluation, optional local practice and up to three source titles; internal notes, reviewer material and source URLs are not sent. KJV anchors are retrieved verbatim from the bundled database; licensed NASB use follows the app's file-loading rule. Comparative entries describe other traditions and evaluate them under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny. The conditional-immortality entry is approved only as a neutral comparison; Perazim's position on final punishment remains expressly unset.",
+  "version": "1.5.13",
+  "status": "APPROVED_LEVI",
   "entries": [
     {
       "id": "karma",
       "group": "world_religion",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Karma is the principle that actions bring results. Hindu, Buddhist and Jain traditions each connect action with later consequences, including future lives, but explain the process differently. Hindu sources describe action and its fruit, while Hindu schools differ on attachment, duty and liberation. Buddhist teaching gives intention a central role and explains karmic consequences through causal continuity without an eternal self. Jain teaching describes karma as subtle matter that binds and affects the jīva, the living soul; this account is supported by Jain texts and modern specialist scholarship.",
       "origin": "Karma is a central concept in several Indian traditions and is closely connected with rebirth and release from rebirth. The Bhagavad Gita, Buddhist discourses and Jain texts give distinct accounts; do not treat the three systems as interchangeable.",
       "scripture": "Scripture does not teach karma as an impersonal law that carries each person's deeds from one life to the next. It teaches that people die once and then face judgment (Hebrews 9:27). Salvation is by grace through faith, not by the balance of a person's deeds (Ephesians 2:8-9). Scripture does teach that actions have consequences: Galatians 6:7-8 says that people reap what they sow, either corruption or everlasting life, depending on whether they sow to the flesh or to the Spirit. That teaching concerns this life and eternal life, and it does not describe rebirth.",
@@ -86,7 +86,7 @@
     {
       "id": "reincarnation",
       "group": "world_religion",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Rebirth is the belief that a living being is born again after death. Hindu and Jain teaching hold that an individual self or soul passes through successive lives, with karma shaping each life. Buddhist teaching denies a permanent self and explains rebirth as causal continuity, not as an eternal soul passing from one body to another. Some Buddhist thinkers have rejected rebirth itself. The traditions and the schools within them differ on what, if anything, carries over from one life to the next.",
       "origin": "Rebirth is central to many Hindu and Jain schools. Buddhist sources also teach rebirth, but the Buddhist account rejects a permanent self that transmigrates. The language of 'reincarnation' should therefore not make Buddhist rebirth sound identical to Hindu or Jain transmigration.",
       "scripture": "Scripture teaches that people die once and then face judgment (Hebrews 9:27), and it does not describe a return to earth in another body. Paul wrote of his desire 'to depart, and to be with Christ' (Philippians 1:23). This describes life with Christ after death, not rebirth. The Christian view is that Scripture does not teach reincarnation.",
@@ -149,7 +149,7 @@
     {
       "id": "nirvana_moksha",
       "group": "world_religion",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Nirvana in Buddhism and moksha in Hindu teaching are goals of release, but they are not the same doctrine. Buddhist sources describe nirvana as the ending of craving and the suffering sustained by craving; Buddhist no-self teaching denies an enduring self that transmigrates. Hindu moksha is liberation from rebirth, and Vedanta schools explain it differently. Advaita Vedanta identifies the self with Brahman; Vishishtadvaita holds that individual selves remain real and dependent on Brahman; Dvaita holds that the self remains eternally distinct from God. Jain liberation is described as the complete removal of karmic matter from the soul.",
       "origin": "Nirvana is a central Buddhist goal; moksha is the Hindu term for liberation from rebirth, with significant variation among schools. Jain teaching describes its own form of liberation. The entry identifies the specific philosophical schools used in the comparison and does not treat any one Vedanta school as representative of all Hindu traditions.",
       "scripture": "Scripture does not describe release from rebirth as the goal of life. It presents eternal life as the gift of God through his Son (John 3:16), and the hope of being with the Lord after death (2 Corinthians 5:8). Jesus said that he is the way to the Father (John 14:6), and that the Son makes people free indeed (John 8:36). The freedom that Scripture describes comes through the Son, not as an escape from a cycle of impersonal rebirth.",
@@ -237,7 +237,7 @@
     {
       "id": "purgatory",
       "group": "christian_tradition_internal",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Catholic teaching holds that purgatory is a final purification after death for those who die in God's grace and friendship but are still imperfectly purified, so that they may enter the joy of heaven. The Catechism says this purification is different from the punishment of the damned and, in paragraph 1032, directly appeals to the practice associated with Judas Maccabeus and prayer for the dead. The Council of Trent taught that the souls undergoing purification are helped by the suffrages of the faithful. The Greek Orthodox Archdiocese of America states that the Orthodox Church does not believe in purgatory, while Orthodox churches pray for the departed. Prayer for the departed is not, by itself, the Catholic doctrine of purgatory. The Westminster Confession rejects any third state for souls separated from their bodies.",
       "origin": "The Catholic doctrine was formulated especially at the Councils of Florence and Trent; Trent's Session 25 (1563) addressed purgatory. The Greek Orthodox Archdiocese of America explicitly distinguishes Orthodox prayer for the departed from belief in purgatory. The Westminster Confession (1646) gives a Reformed confessional rejection of an intermediate place of purification.",
       "scripture": "Scripture says that the blood of Jesus Christ his Son cleanseth us from all sin (1 John 1:7), and that believers are justified freely by his grace through the redemption that is in Christ Jesus (Romans 3:24). Paul says that to be absent from the body is to be present with the Lord (2 Corinthians 5:8). Catholic teaching appeals to the example of Judas Maccabeus, who made atonement for the dead, from 2 Maccabees, a book outside the Protestant canon. Perazim's Protestant reading of 1 Corinthians 3:13-15 understands the passage to concern the testing and reward of Christian work, not a cleansing after death, and finds no further cleansing after death beyond Christ's work.",
@@ -292,7 +292,7 @@
     {
       "id": "saint_prayer",
       "group": "christian_tradition_internal",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Catholic teaching holds that the saints in heaven, including Mary, may be asked to intercede for believers on earth. The Catechism (2683) says that the faithful may ask the saints to intercede. The Orthodox Church in America explicitly teaches that Orthodox Christians ask saints to pray for them and describes the saints as helpers and intercessors, not as members of the Trinity. Perazim's Reformed and Evangelical framework affirms Christ's unique mediation, distinguishes it from the intercessory prayers believers offer for one another, and rejects invoking departed saints. The Westminster Confession says religious worship belongs to the triune God alone, not to angels or saints.",
       "origin": "The practice of asking departed saints for intercession developed in post-New Testament Christian tradition and is now found in Catholic and Eastern Orthodox devotional life. The Catechism of the Catholic Church and official Orthodox Church in America resources describe the practice in their own terms. The Reformed position is stated in the Westminster Confession.",
       "scripture": "Hebrews 12:1 speaks of a cloud of witnesses surrounding the race of faith; it does not command believers to ask departed persons to hear or receive prayer. Scripture commands prayer and intercession for all people (1 Timothy 2:1), and names one mediator between God and men, the man Christ Jesus (1 Timothy 2:5). Perazim's reading understands Christ's unique mediatorship in its saving context and does not take it to forbid believers praying for one another. Hebrews 4:16 invites believers to come boldly to the throne of grace.",
@@ -379,7 +379,7 @@
     {
       "id": "mary_mediator",
       "group": "christian_tradition_internal",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Catholic teaching calls Mary the Mother of God and the Mother of the Church. The Catechism (969–970) uses the titles Advocate, Helper, Benefactress and Mediatrix, while teaching that her mediation does not diminish Christ's unique mediation. The Dicastery for the Doctrine of the Faith's 2025 note, Mater Populi Fidelis, says that Co-redemptrix is always inappropriate as a title defining Mary's cooperation because it risks obscuring Christ's unique saving mediation. It requires special prudence when applying the title Mediatrix and describes Mary's intercession as subordinate to Christ. The Orthodox sources checked here affirm Mary as Theotokos, Mother of God; they do not establish Orthodox use of the Catholic titles Mediatrix or Co-redemptrix. Perazim's Protestant and Evangelical framework honours Mary as the mother of the Lord but holds that Christ alone is mediator and redeemer.",
       "origin": "Catholic teaching on Marian titles is set out in the Catechism and clarified in the Dicastery for the Doctrine of the Faith's 2025 doctrinal note. The Catholic definition of the Assumption was promulgated by Pius XII in 1950. The Eastern Orthodox sources checked affirm the title Theotokos but are not used to attribute Catholic Marian titles to Orthodoxy.",
       "scripture": "Scripture calls Mary blessed among women (Luke 1:42), and Elisabeth calls her the mother of my Lord (Luke 1:43). Mary calls God her Saviour (Luke 1:47). At Cana she tells the servants to do whatever Jesus says (John 2:5). Scripture names Jesus as the one mediator between God and men (1 Timothy 2:5), and says there is no other name by which people must be saved (Acts 4:12). Reformed and Evangelical readers reject any creaturely role that shares Christ's unique saving mediation or redemptive work; this does not deny that Christians pray for one another.",
@@ -442,7 +442,7 @@
     {
       "id": "icons_veneration",
       "group": "christian_tradition_internal",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Catholic and Eastern Orthodox traditions use icons in devotion. The Second Council of Nicaea (787) taught that honour paid to an image passes to the person represented and distinguished honourable reverence from the worship due to God alone. The Catechism of the Catholic Church (2131–2132) affirms the council's decision and distinguishes respectful veneration from adoration. The Orthodox Church in America likewise explains that the Seventh Ecumenical Council defended the proper use of icons and distinguished reverence from the worship that belongs to God. Reformed confessional interpreters of the second commandment object to religious bowing before images and to their use as objects of worship, while Scripture itself records God commanding cherubim for the mercy seat (Exodus 25:18–22).",
       "origin": "The icon controversy of the eighth century was addressed by the Second Council of Nicaea in 787. The council's decree is available in a public-domain English translation; modern Catholic and Orthodox explanations are also available from the Vatican and the Orthodox Church in America. The Reformed objection is represented by the Westminster Confession's teaching on religious worship.",
       "scripture": "The second commandment forbids making an image in order to bow down to it and serve it (Exodus 20:4-5). Scripture also records God's command to make cherubim for the mercy seat (Exodus 25:18-22), so the question is the religious use and veneration of images, not the existence of every image. Nicaea II taught that honour shown to an image passes to what it represents, and that the true worship of faith is reserved for God. Reformed confessional interpreters reply that Scripture gives no warrant for worshipping God through images or bowing before them as a religious act; they appeal to the second commandment and the regulative principle of worship. John 4:23-24 teaches worship in spirit and in truth.",
@@ -514,7 +514,7 @@
     {
       "id": "soul_sleep",
       "group": "disputed_christian_doctrine",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Soul sleep is the teaching that the dead are unconscious until the resurrection. Christadelphian teaching states that all await resurrection in the sleep of death, where there is no consciousness. Seventh-day Adventist Fundamental Belief 26 states that death is an unconscious state for all people until the resurrection. The Westminster Confession (32.1) says that the souls of the dead neither die nor sleep and immediately return to God; the Catechism of the Catholic Church (1022) teaches that each person receives particular judgment at death. The guide's biblical evaluation is that believers are conscious with the Lord at death and that the resurrection of the body completes Christian hope. Ecclesiastes 9:5 must be read in its literary context and not isolated from the wider biblical witness.",
       "origin": "Soul sleep is taught in official Seventh-day Adventist and Christadelphian sources. The contrary intermediate-state position is represented here by the Reformed Westminster Confession and the Catholic Catechism; these are specific confessional witnesses, not a claim that all Christian traditions have identical formulations.",
       "scripture": "Ecclesiastes 9:5 says: 'For the living know that they shall die: but the dead know not any thing, neither have they any more a reward; for the memory of them is forgotten.' The book describes what can be seen and known 'under the sun', from the human side of life, and it does not stand alone: Ecclesiastes 12:7 says that the spirit shall return unto God who gave it. Advocates of soul sleep also cite Daniel 12:2 for those who awake. Paul wrote of his desire 'to depart, and to be with Christ' (Philippians 1:23), and of being 'absent from the body' and 'present with the Lord' (2 Corinthians 5:8). Luke 16:19-31 is a parable, and it must be read by its genre. Together these passages make the case that the believer is with Christ at death, while the full hope is the resurrection of the body.",
@@ -577,7 +577,7 @@
     {
       "id": "conditional_immortality",
       "group": "heterodox_group",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Conditional immortality teaches that immortality is given only to those who receive eternal life in Christ, rather than being an inherent property of every human soul. On this view, those who finally reject God are destroyed rather than kept alive for conscious punishment without end. Jehovah's Witnesses teach that God will permanently destroy the wicked. The Birmingham Amended Statement of Faith, adopted by many autonomous Christadelphian congregations, speaks of the final extinction of the wicked. Seventh-day Adventist Fundamental Beliefs 26–27 teach unconscious death until resurrection and that the unrighteous are finally consumed. The traditional eternal-punishment view is represented here by the Westminster Confession (33.2) and the Catholic Catechism (1035). Perazim has not approved a position on the nature or duration of final punishment; the guide explains the competing views and does not state one as Perazim's view.",
       "origin": "Conditional immortality is taught in official Jehovah's Witness and Seventh-day Adventist publications and in Christadelphian statements of faith. The traditional view is represented by named Catholic and Reformed confessional sources; neither side is described as the unanimous view of all Christians.",
       "scripture": "The guide explains both arguments and does not decide between them for Perazim. Advocates of conditional immortality cite 1 Timothy 6:16, Romans 6:23 and Ezekiel 18:4. Advocates of the traditional view point to Matthew 25:46, where Jesus sets everlasting punishment alongside life eternal, and to Revelation 20:10. Revelation 20:10 specifically names the devil, the beast and the false prophet; it does not by itself settle the fate of every person. The guide leaves Perazim's conclusion unset.",
@@ -633,7 +633,7 @@
     {
       "id": "all_paths",
       "group": "world_religion",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Religious pluralism is one philosophical response to religious diversity. In John Hick's influential form, major religions are understood as incomplete responses to one ultimate Reality, and more than one may be a valid context of salvation or liberation. Other pluralists understand religious diversity differently; there is no single pluralist doctrine. Pluralism is not the teaching of every Hindu, Buddhist or New Age adherent. Christians hold that salvation is found in Jesus Christ alone.",
       "origin": "Philosophical pluralism has several forms. The Stanford Encyclopedia of Philosophy identifies John Hick as the best-known proponent of unitary salvific pluralism and distinguishes this from other ways of responding to religious diversity.",
       "scripture": "Jesus said that he is the way, the truth and the life, and that no one comes to the Father except through him (John 14:6). Peter said that there is no other name under heaven by which people must be saved (Acts 4:12). These claims are exclusive, so the Christian reading does not allow that all religions lead to the same salvation. Scripture also says that God's eternal power and divinity are clearly seen through what he has made (Romans 1:20). Christians may recognise truth, goodness and some knowledge of God in other traditions, while holding that salvation is in Christ alone.",
@@ -665,7 +665,7 @@
     {
       "id": "divine_self",
       "group": "world_religion",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Hindu schools differ on the relation between the individual self (ātman) and ultimate reality (Brahman). Advaita Vedanta, associated with Śaṅkara, teaches that the self is numerically identical with Brahman and that liberation is recognition of this nonduality. Viśiṣṭādvaita, associated with Rāmānuja, teaches that individual selves are real and distinct yet dependent on Brahman, who is personal and identified with Vishnu. Dvaita, associated with Madhva, teaches that the self and Brahman remain eternally distinct and that liberation comes through God's grace. These schools do not share one teaching about the self.",
       "origin": "Advaita, Viśiṣṭādvaita and Dvaita are distinct Vedanta schools that interpret the Upanishads and other Hindu scriptures differently. The academic sources used here describe the philosophical positions associated with Śaṅkara, Rāmānuja and Madhva; they are not presented as the whole of Hindu thought.",
       "scripture": "Scripture teaches that God created man in his own image (Genesis 1:27), and that God is distinct from his creation and cannot be compared to creatures (Isaiah 40:25; Romans 1:25). Humans are therefore not God. Scripture also teaches that the Word was God (John 1:1), and that the fullness of the Godhead dwells bodily in Christ (Colossians 2:9). Believers receive adoption as children of God (Galatians 4:5). The claim that the individual self is numerically identical with God is therefore not the Christian teaching.",
@@ -727,7 +727,7 @@
     {
       "id": "works_salvation",
       "group": "heterodox_group",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Groups differ on how works relate to salvation, so each position must be described separately. Jehovah's Witness teaching says that works demonstrate living faith and explicitly denies that works earn salvation; it also teaches that a person who has received salvation could lose out by failing to continue exercising faith. Latter-day Saint teaching distinguishes salvation from physical death, salvation from sin, and eternal life or exaltation. Its official sources say that cleansing from sin involves faith in Christ, repentance, baptism, receiving the Holy Ghost and enduring to the end; exaltation is received through Christ's Atonement and obedience to gospel laws and ordinances. The Book of Mormon says salvation is by grace after all one can do. These teachings are not the same doctrine and must be evaluated separately.",
       "origin": "The Jehovah's Witness account is drawn from its official explanation of salvation. The Latter-day Saint account is drawn from its official Gospel Topics entries on Salvation and Becoming Like God. Both are described in their own terms before biblical evaluation.",
       "scripture": "Scripture says that salvation is by grace through faith, not from works, so no one may boast (Ephesians 2:8-9). Paul says that a person is justified by faith apart from works of the law (Romans 3:28). Good works are the fruit of salvation and the evidence of living faith (Ephesians 2:10; James 2:17-18). The Christian question is whether a tradition treats obedience as the fruit and evidence of grace or as a condition that contributes to final acceptance before God.",
@@ -775,9 +775,9 @@
     {
       "id": "ancestors",
       "group": "african_traditional",
-      "status": "DRAFT_PENDING_LEVI",
-      "summary": "African traditional religions are diverse, and there is no single African doctrine of ancestors. John Mbiti used the term 'living-dead' for recently departed persons who remain present in the memory and relationships of the living; this is an influential scholarly description, not a universal label used by every community. Community-specific studies describe different practices: Jomo Kenyatta's account of the Kikuyu records communion with ancestral spirits alongside belief in Ngai and other spiritual beings; Anthony Ephirim-Donkor's study of the Akan describes ancestor institutions and rites centred on the ancestors' stool. Criteria and practices differ across communities, families and regions. The guide distinguishes cultural remembrance and honour from invoking the departed, seeking their guidance or offering them religious rites, and does not generalise one community's practice to all Africans.",
-      "origin": "African traditional religions comprise many distinct religious systems. Mbiti's concept of the living-dead is reported here as a scholarly framework and is secondary-source corroborated because his primary book could not be accessed. Kikuyu and Akan examples are drawn from community-specific sources and must not be extrapolated to Embu, Kikuyu, Luo or other communities without evidence.",
+      "status": "APPROVED_LEVI",
+      "summary": "African traditional religions are diverse, and there is no single African doctrine of ancestors. John Mbiti used the term 'living-dead' for recently departed persons who remain present in the memory and relationships of the living; this is an influential scholarly description reported through secondary sources, not a universal label used by every community. Community-specific sources describe different patterns: Jomo Kenyatta's account of the Kikuyu records communion with ancestral spirits alongside belief in Ngai and other spiritual beings, while Shin-ichiro Ishida's study of the Îgembe examines collective memory and personhood in a village community. Criteria and practices differ across communities, families and regions. The guide distinguishes cultural remembrance and honour from invoking the departed, seeking their guidance or offering them religious rites, and does not generalise one community's practice to all Africans.",
+      "origin": "African traditional religions comprise many distinct religious systems. Mbiti's term 'living-dead' is reported through academic secondary sources because his primary book could not be accessed. The Kikuyu evidence cited here is from Jomo Kenyatta's article abstract; the Îgembe source is Ishida's community-specific study. Neither is extrapolated to all African communities or to Embu without evidence.",
       "scripture": "Scripture commands honour for parents (Exodus 20:12) and names Christ as the one mediator between God and men (1 Timothy 2:5). It forbids consulting those with familiar spirits and wizards, and seeking the living's guidance from the dead (Leviticus 19:31; Deuteronomy 18:10-12; Isaiah 8:19-20). Scripture records that Saul died for seeking counsel from a familiar spirit (1 Chronicles 10:13), and teaches that after death comes judgment (Hebrews 9:27). Christians may honour and remember family members without seeking guidance, spiritual mediation or religious power from the departed. Christian prayer is directed to the triune God, and prayer is also addressed to Jesus (Acts 7:59; 1 Corinthians 1:2). Deuteronomy 18 condemns divination, consulting familiar spirits and necromancy; it must not be used to condemn every act of cultural respect.",
       "anchors": [
         "Deuteronomy 18:10-12",
@@ -787,6 +787,14 @@
       "internal_note": "Mbiti, African Religions and Philosophy (1969; 2nd ed. 1990), primary copy remained lending-restricted; his 'living-dead' concept is attributed as reported in academic secondary sources, not as a direct reading. Community-specific sources added: Jomo Kenyatta, “Kikuyu Religion, Ancestor-Worship, and Sacrificial Practices,” Africa (Cambridge Core; article record and abstract read); Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan (University Press of America, 2012), publisher bibliographic description and chapter list read, full book not read. The Akan book is included as a research lead/context source, not used to assert details beyond its accessible description. Existing Ishida study is specific to the Îgembe; no unsupported Embu-wide or Kikuyu-wide generalisations are made. Deuteronomy 18 is limited to divination/consulting the dead, not cultural remembrance.",
       "sources": [
         {
+          "title": "Thaddeus Metz and Motsamai Molefe, 'Traditional African Religion as a Neglected Form of Monotheism', The Monist (special issue; forthcoming)",
+          "url": "https://repository.up.ac.za/server/api/core/bitstreams/137f4b44-dedd-44db-8469-e50c869347ce/content",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "living-dead; only a small number count as ancestors; meals, warnings, libation and dreams (as quoted from Mbiti); supreme God argued",
+          "verification": "read in full, pre-publication manuscript; peer-reviewed journal, final version not checked. Mbiti quotations are the authors' citations"
+        },
+        {
           "title": "Jomo Kenyatta, “Kikuyu Religion, Ancestor-Worship, and Sacrificial Practices,” Africa (Cambridge Core)",
           "url": "https://www.cambridge.org/core/journals/africa/article/abs/kikuyu-religion-ancestorworship-and-sacrificial-practices/6CFD176DD79B1911B0E3F152DDBA59BF",
           "accessed": "2026-11-24",
@@ -795,20 +803,20 @@
           "verification": "Cambridge Core article record and abstract read; full article access restricted; used only for the Kikuyu-specific summary"
         },
         {
-          "title": "Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan (University Press of America, 2012)",
-          "url": "https://www.bloomsbury.com/us/african-religion-defined-9780761860587/",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Publisher description and contents identify a systematic, community-specific study of Akan ancestors, the ancestors' stool, annual rites and living ancestors",
-          "verification": "Publisher bibliographic description and contents read; full book not read, so used as a source lead/context only"
-        },
-        {
           "title": "Shin-ichiro Ishida, 'Name-sharing among the Îgembe: The Kîmîîrû texture of personhood in a village community', ch. 3 in Gĩchere, Mwithimbû and Ishida (eds.), Family Dynamics and Memories in Kenyan Villages (National Museums of Kenya, 2020)",
           "url": "https://tokyo-metro-u.repo.nii.ac.jp/record/8492/files/11040-001.pdf",
           "accessed": "2026-11-23",
           "licence": "copyright; short quotes only",
           "use": "Îgembe (Meru): shallow genealogical depth; collective immortality; Mbiti 1990: 25-26 quoted",
           "verification": "read in full (PDF text, about p. 75). Community-specific source for the Îgembe only. Older Peatrik remark quoted in the chapter not used"
+        },
+        {
+          "title": "Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan (University Press of America, 2012)",
+          "url": "https://www.bloomsbury.com/us/african-religion-defined-9780761860587/",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Publisher description and contents identify a systematic, community-specific study of Akan ancestors, the ancestors' stool, annual rites and living ancestors",
+          "verification": "Publisher bibliographic description and contents read; full book not read, so used as a source lead/context only"
         },
         {
           "title": "Ancestors, Encyclopedia of African Religion (SAGE; ed. Asante and Mazama), DOI 10.4135/9781412964623.n29",
@@ -825,14 +833,6 @@
           "licence": "copyright; summary and short quotes only",
           "use": "living-dead; remembrance by name (1990: 25-26); meals and warnings (1990: 82); libation and dreams (1990: 25)",
           "verification": "primary NOT accessed: archive.org copy lending-restricted (HTTP 401). Claims rest on Mbiti as quoted by Metz and Molefe, Ishida and Simut (secondary-source corroborated)"
-        },
-        {
-          "title": "Thaddeus Metz and Motsamai Molefe, 'Traditional African Religion as a Neglected Form of Monotheism', The Monist (special issue; forthcoming)",
-          "url": "https://repository.up.ac.za/server/api/core/bitstreams/137f4b44-dedd-44db-8469-e50c869347ce/content",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quotes only",
-          "use": "living-dead; only a small number count as ancestors; meals, warnings, libation and dreams (as quoted from Mbiti); supreme God argued",
-          "verification": "read in full, pre-publication manuscript; peer-reviewed journal, final version not checked. Mbiti quotations are the authors' citations"
         },
         {
           "title": "Cornelius C. Simuț, 'Patterns of Ecodomy in Indigenous African Religions', Transylvanian Review vol. XXV, supplement no. 2 (2016), pp. 306ff.",
@@ -871,7 +871,7 @@
     {
       "id": "trinity_denial",
       "group": "heterodox_group",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Three groups reject Nicene Trinitarian doctrine in different ways. Oneness Pentecostal teaching, as stated in the 2023 Articles of Faith of the United Pentecostal Church International, confesses one indivisible God who has revealed himself as Father, through the Son in redemption, and as the Holy Spirit by emanation; it teaches that Jesus Christ is God manifested in flesh. Jehovah's Witness teaching holds that the Son is a created being and that the Holy Spirit is God's active force, not a divine person. Latter-day Saint teaching holds that the Father, Son and Holy Ghost are three separate beings who make up the Godhead. These are distinct non-Nicene positions and must not be merged into one doctrine.",
       "origin": "The Oneness description comes from the UPCI's 2023 Articles of Faith. The Jehovah's Witness description comes from JW publications on Jesus and the Holy Spirit. The Latter-day Saint description comes from its official Gospel Topics article on the Godhead. The Nicene-Constantinopolitan Creed of 381 confesses one God, the divine Son and the Holy Spirit, who with the Father and Son is worshipped and glorified.",
       "scripture": "Scripture teaches the oneness of God: 'Hear, O Israel: The LORD our God is one LORD' (Deuteronomy 6:4). The Father, Son and Holy Spirit are named together in the baptismal commission (Matthew 28:19). The Father and the Son are distinct and speak to each other (John 17:5), and the Father sends the Son and the Holy Spirit (John 14:16-17, 26). Against Oneness teaching, Scripture also shows the Son sharing glory with the Father before the world was (John 17:5) and is addressed as God (Hebrews 1:8). Against Jehovah's Witness teaching, the Son is called God (John 1:1; Hebrews 1:8), and the Spirit is spoken of as one who teaches, can be grieved and can be lied to (John 14:26; Ephesians 4:30; Acts 5:3-4). Against Latter-day Saint teaching, the Nicene Creed confesses one God, not three separate beings.",
@@ -943,7 +943,7 @@
     {
       "id": "jesus_created",
       "group": "heterodox_group",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Jehovah's Witness teaching identifies Jesus with the archangel Michael and holds that Jesus is a created being, not the eternal God the Son. The Jehovah's Witness page 'The Archangel Michael, Who Is He?' says that Michael is 'evidently a name given to Jesus before and after his life on earth.' The Jehovah's Witness Bible Teach book Who Is Jesus Christ? says that Jesus 'was God's first creation' and that 'Jesus is the only one directly created by God'. Historic Christianity, as expressed in the Nicene Creed, confesses the Son as 'begotten, not made', and affirms his eternal deity.",
       "origin": "This is Jehovah's Witness teaching. It rests on that group's reading of Daniel 10:13, Jude 9, 1 Thessalonians 4:16 and related passages, and on its rendering of Colossians 1:15 as 'the firstborn of all creation'.",
       "scripture": "Scripture says that Jesus is the eternal Word who was God: 'In the beginning was the Word, and the Word was God... All things were made by him' (John 1:1-3). He is 'the image of the invisible God, the firstborn of every creature: For by him were all things created' (Colossians 1:15-16). The KJV reads 'firstborn of every creature'; Jehovah's Witness publications read the word 'firstborn' as meaning the first thing created. Hebrews 1:5 asks: 'Unto which of the angels said he at any time, Thou art my Son, this day have I begotten thee?' Hebrews 1:6 says that God commands 'all the angels of God' to worship him. Jude 9 names Michael the archangel and does not say that Michael is Jesus. The identification rests on the wider Jehovah's Witness argument, which Hebrews 1 addresses.",
@@ -1036,7 +1036,7 @@
     {
       "id": "saturday_sabbath",
       "group": "disputed_christian_doctrine",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Seventh-day Adventists are Trinitarian: Fundamental Belief 2 confesses one God, Father, Son and Holy Spirit, as three coeternal Persons. They keep the seventh day, Saturday, as the Sabbath. Fundamental Belief 20 describes the seventh-day Sabbath as a day of rest, worship and ministry; Fundamental Belief 13 describes the remnant as keeping God's commandments and the faith of Jesus. A 2021 Biblical Research Institute answer describes Sunday observance as a distinguishing sign in the end-time test, but does not establish that every present-day Sunday worshipper bears the mark of the beast. The guide does not say that present-day Sunday worshippers are condemned.",
       "origin": "This is Seventh-day Adventist teaching on the Sabbath, the remnant and the end-time test. Individual Adventists and local congregations may apply the teaching differently; the guide does not infer an individual's standing before God.",
       "scripture": "Colossians 2:16-17 says: 'Let no man therefore judge you in meat, or in drink, or in respect of an holyday, or of the new moon, or of the sabbath days.' Romans 14:5-6 says that each should be fully persuaded in his own mind, and that he who regardeth the day regardeth it unto the Lord. Adventist readers rely on Revelation 14:12, which speaks of those 'that keep the commandments of God, and the faith of Jesus', and read the seventh-day Sabbath as the sign of loyalty. Readers who do not regard the Sabbath commandment as binding on Christians point to Christ's word that the Son of man is Lord also of the sabbath (Mark 2:28), and to the first Christians' gatherings on the first day of the week (Acts 20:7; 1 Corinthians 16:2).",
@@ -1068,7 +1068,7 @@
     {
       "id": "new_age_energy",
       "group": "new_age",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "New Age is a loosely connected movement of diverse spiritual currents, not one religion with a common founder, institution, dogma or scripture. One New Age-associated healing strand is represented by Barbara Ann Brennan's book Hands of Light (1988), which describes a human energy field or aura and presents it as related to health, illness and spiritual healing. This is Brennan's specific metaphysical teaching, not a belief shared by all New Age writers, and its claims about health are not established scientific facts. A question about another use of the word energy must be answered by identifying the particular author, school or movement.",
       "origin": "The New Age movement developed through several currents of modern esotericism and alternative spirituality. Academic research describes it as a mosaic of currents rather than a unified doctrine. Barbara Ann Brennan's Hands of Light is one identifiable New Age-associated healing text; Brennan's own school and the publisher describe the book's human-energy-field teaching.",
       "scripture": "Scripture teaches that God is Spirit, and that he is worshipped in spirit and in truth (John 4:24). Healing is sought from God in prayer, with the elders of the church praying and anointing with oil (James 5:14-15). Believers are told to test the spirits (1 John 4:1). Scripture forbids divination and consulting familiar spirits or the dead (Deuteronomy 18:10-11). Christians evaluate any teaching or practice by these tests, and the guide first explains each claim on its own terms.",
@@ -1116,7 +1116,7 @@
     {
       "id": "christian_science",
       "group": "heterodox_group",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Christian Science, founded by Mary Baker Eddy in 1866, describes itself as based on the Bible and the teachings of Christ Jesus. Its fifth religious tenet says that Jesus' crucifixion and resurrection uplift faith toward eternal Life, interpreting them in relation to the allness of Spirit and the nothingness of matter. Christian Science therefore affirms the crucifixion and resurrection in its own doctrinal language, but interprets them differently from the historic Christian confession of Christ's bodily resurrection. Its FAQ says that it affirms the divinity of the Christ but does not equate Jesus with God, and lists Mind among the names used for God. It teaches spiritual healing through understanding God as Mind, while stating that adherents are free to choose their own healthcare, including medical care.",
       "origin": "Christian Science was founded by Mary Baker Eddy. Its principal text is Science and Health with Key to the Scriptures, which sets out six religious tenets. The movement's official FAQ and tenets explain its view of Jesus, matter, Spirit, Mind and healing.",
       "scripture": "Scripture presents Jesus as a real man who was born, suffered, died and rose bodily: 'Behold my hands and my feet, that it is I myself: handle me, and see; for a spirit hath not flesh and bones, as ye see me have' (Luke 24:39). Paul writes that Christ 'died for our sins according to the scriptures' and 'rose again the third day according to the scriptures' (1 Corinthians 15:3-4). Scripture also says that 'the Word was made flesh, and dwelt among us' (John 1:14), and that God saw everything he had made, and 'behold, it was very good' (Genesis 1:31). The Son is God (John 1:1; Colossians 2:9). Christian healing is by God's power through prayer and faith (James 5:14-16), and redemption is through the blood of Christ (Ephesians 1:7). The guide describes Christian Science's own interpretation before evaluating it.",
@@ -1148,7 +1148,7 @@
     {
       "id": "secular_worldview",
       "group": "secular",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Secular and non-religious worldviews differ, and the guide describes the specific position a person holds. In standard philosophical usage, atheism is the proposition that God does not exist. Psychological agnosticism is the suspension of belief: the person believes neither that God exists nor that God does not exist. Epistemological agnosticism is the claim that neither theism nor atheism is known or has adequate positive epistemic support. Ontological naturalism holds that reality contains no supernatural entities; methodological naturalism concerns methods of investigation and does not by itself assert that nature is all that exists. Atheism and naturalism are not identical. Secular humanism, as stated in Humanist Manifesto III, affirms ethical life without supernaturalism and grounds ethical values in human need and interest as tested by experience.",
       "origin": "Atheism, agnosticism, ontological naturalism, methodological naturalism and secular humanism have different meanings and histories. The Stanford Encyclopedia of Philosophy distinguishes the psychological and epistemological senses of agnosticism and distinguishes ontological from methodological naturalism.",
       "scripture": "Psalm 19:1 says that the heavens declare the glory of God. Romans 1:20 says that God's invisible things, even his eternal power and Godhead, are clearly seen through the things that are made, so that people are without excuse. Romans 2:14-15 says that the work of the law is written in human hearts. Acts 17:11 commends those who searched the scriptures daily to test what they heard. Faith and reason are not opposed in Scripture, and the guide treats the reasons a person gives as worth examining on their merits.",
@@ -1187,7 +1187,7 @@
     {
       "id": "islam_no_crucifixion",
       "group": "world_religion",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "The Qur'an states that Jesus, son of Mary, was not killed or crucified and that the matter was made to appear so to those who disputed it (4:157–158). A common classical Muslim reading understands this passage as denying that Jesus was crucified. Al-Tabari records multiple explanations of how another person came to be identified as Jesus; Ibn Kathir also reports a substitution account. These reports differ in their details, so the guide describes the classical non-crucifixion reading without claiming that every Muslim accepts one identical account. The guide paraphrases the Qur'an and does not reproduce its wording.",
       "origin": "The entry is based on Qur'an 4:157–158 and classical commentary. Al-Tabari records several transmitted accounts about the appearance of the crucifixion; Ibn Kathir presents a substitution account. Modern academic discussion notes that the verse has also received alternative contextual and linguistic readings. The entry does not claim that all Muslims hold one identical account of the event.",
       "scripture": "The New Testament records that Jesus was crucified and died. Matthew 27:50 and John 19:33-35 report his death, and John 19:35 gives the testimony of an eyewitness. Paul's summary of the gospel names Christ's death, his burial, his rising on the third day, and the many witnesses who saw him afterwards (1 Corinthians 15:3-8). Peter and Paul preached a crucified and risen Messiah (Acts 2:23; 1 Corinthians 1:23). Scripture is the final authority here, and its eyewitness testimony conflicts with the denial that Jesus was crucified. Christians also weigh the historical evidence together with the meaning of the cross, which they hold is the ground of atonement.",
@@ -1267,7 +1267,7 @@
     {
       "id": "islam_son_denial",
       "group": "world_religion",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "Islamic teaching holds that God has no offspring and that Jesus, son of Mary, is the Messiah and a messenger of God, not God the Son. Qur'an 4:171 warns against excess in religion and rejects the claim that God is three; 5:72–75 rejects identifying the Messiah with God; 112:1–4 rejects the idea that God begets or is begotten. Muslims honour Jesus as Messiah and prophet but reject the Christian confession of his eternal divine Sonship. The Qur'anic polemic against 'three' must not be presented as a precise statement of Nicene Christianity, which confesses one God in three persons, not three gods or a physical sonship. The guide paraphrases the Qur'an and does not reproduce its wording.",
       "origin": "The summary is based on Qur'an 4:171, 5:72–75 and 112:1–4 in The Clear Quran (Khattab), with classical tafsir consulted as secondary interpretation. The Qur'an's statements are primary evidence for Islamic scriptural teaching; tafsir helps explain how commentators have understood them. The guide does not attribute one commentator's full interpretation to all Muslims.",
       "scripture": "Scripture teaches that the Son is eternal and is God. John 1:1-14 presents the Word as God, who became flesh, and Hebrews 1:2-3 presents the Son as the one through whom God made the worlds and the exact image of God's person. Jesus said, \"I and my Father are one\" (John 10:30). Christians hold that the Father's begetting of the Son is eternal and not physical, as the Nicene Creed affirms, and 1 Timothy 2:5 calls Jesus the one mediator between God and men. Islam honours Jesus as Messiah and prophet while rejecting his divine Sonship. Scripture's witness is that he is the eternal Son and God.",
@@ -1331,7 +1331,7 @@
     {
       "id": "canon_books",
       "group": "bible_canon",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "The Protestant and Evangelical Bible contains 66 books: 39 in the Old Testament and 27 in the New. The Westminster Confession (1646) lists the books received by Reformed churches and says that the books commonly called Apocrypha are not part of the canon. The Catholic canon, as set out by the Council of Trent (Session 4, 1546), receives Tobit, Judith, Wisdom, Sirach, Baruch and the two books of Maccabees, along with the additional parts of Esther and Daniel included in the Vulgate. The Orthodox Church in America describes the Old Testament books found in the Septuagint but not in the Hebrew canon as the 'longer canon' and lists Tobit, Judith, additional chapters of Esther and Daniel, Maccabees, Wisdom, Sirach, Baruch and the Prayer of Manasseh as canonical in Orthodox Christianity. Orthodox historical theologians also distinguish books formally listed as canonical from additional books read in the Church; specific lists and classifications should be attributed to the relevant Orthodox authority. The guide explains the historical disagreements while retaining the 66-book Protestant canon as Perazim's authorised app canon.",
       "origin": "The Protestant canon is represented by the Westminster Confession of Faith; the Catholic list by the Council of Trent, Session 4; and an official Orthodox explanation by the Orthodox Church in America. Metropolitan Macarius Bulgakov's 19th-century Introduction to Orthodox Theology provides an additional historical Orthodox list. These are attributed to their respective sources and are not treated as a single binding list for every Orthodox jurisdiction.",
       "scripture": "Scripture is given by inspiration of God (2 Timothy 3:16), and Peter counts Paul's letters with the other Scriptures (2 Peter 3:15-16). Jesus and the apostles treated the Old Testament writings as Scripture, including the phrase 'the law of Moses, and in the prophets, and in the psalms' (Luke 24:44). That phrase names the divisions of the Hebrew Scriptures but does not itself list every book. Deuteronomy 4:2 and Revelation 22:18-19 warn against adding to or taking from God's words, but each passage is read in its own context and does not by itself fix the number of books. The Protestant argument is historical: the church received these 66 books as God's words, and the additional books are read for history and edification. The Catholic argument is that the church's councils defined the wider canon. Both are arguments about reception and authority, and the guide presents them as such.",
@@ -1416,7 +1416,7 @@
     {
       "id": "group_question",
       "group": "policy",
-      "status": "DRAFT_PENDING_LEVI",
+      "status": "APPROVED_LEVI",
       "summary": "A question names a religious group, such as Latter-day Saints, Jehovah's Witnesses, Seventh-day Adventists, Oneness Pentecostals, Christian Science, Christadelphians, the Catholic Church or the Eastern Orthodox churches. The guide describes the group's official teaching from its own published sources, distinguishes official doctrine from historical teaching, local practice and individual belief, and then evaluates the teaching against Scripture. Catholic and Eastern Orthodox churches confess the Nicene faith: one God, the Father, Son and Holy Spirit; the Son is eternally begotten, not created, and became man for human salvation. The guide identifies specific differences from Perazim's Protestant and Evangelical framework, including purgatory, invocation of saints, Marian titles, icons and the Old Testament canon. It does not give a verdict on the eternal destiny of individual adherents.",
       "origin": "The policy is grounded in Perazim's owner-approved rules. Catholic Nicene teaching is documented in the Catechism of the Catholic Church; Eastern Orthodox Nicene teaching is documented in the Orthodox Church in America's Creed and Incarnation pages and in a second Orthodox jurisdiction's liturgical creed page. Other group descriptions use that group's own sources when accessible, with secondary scholarship clearly identified when necessary.",
       "scripture": "The guide explains each group's teaching accurately, names the passages each side relies on, and tests the claims against Scripture (Acts 17:11; 1 John 4:1). It separates institutional doctrine from local practice and individual belief. It does not pronounce on any member's eternal destiny. Where Catholic and Orthodox churches confess the Nicene faith, the guide acknowledges that agreement and then evaluates their further teachings against Scripture.",
