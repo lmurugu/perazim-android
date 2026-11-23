@@ -21,10 +21,10 @@ Images were checked against the Openverse tags for people; a human check of each
 
 The art is kept swappable: replace any file under `scenes/` with the same name to change a game's scene.
 
-## Reference sources for the on-phone guide (pending Levi's approval)
+## Reference sources for the on-phone guide
 
 Full register with licences, sizes and status: `docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md`.
-Nothing below is used by the guide until it is listed in `src/main/assets/reference/approvals.json`.
+The six factual sources below are listed in `src/main/assets/reference/approvals.json` (approved on the coordinator's decision, Levi to confirm). Commentaries and confessions are not approved and are not listed here; see the register, section E.
 
 | Source | Licence | Attribution |
 |---|---|---|
@@ -34,3 +34,7 @@ Nothing below is used by the guide until it is listed in `src/main/assets/refere
 | Easton's Bible Dictionary (1897) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
 | Hitchcock's Bible Names Dictionary (1858) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
 | Nave's Topical Bible (1921) | Public domain | Text from Christian Classics Ethereal Library (ccel.org). |
+
+Strong's Greek data (already in the app): used under MIT with attribution, by coordinator decision. The upstream licence line is to be re-checked against the source before release.
+
+Pending, not in the app: Matthew Henry's Commentary and Wesley's Explanatory Notes (both public domain on CCEL). They are built into a separate pending database and are not approved for use.
