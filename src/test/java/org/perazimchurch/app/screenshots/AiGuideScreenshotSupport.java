@@ -33,6 +33,8 @@ final class AiGuideScreenshotSupport {
             public void onNavigateTab(int tabIndex) { }
             public void onOpenGiving() { }
             public void onOpenLiveSermons() { }
+            public void onOpenGames() { }
+            public void onOpenProfile() { }
             public void onOpenBible(String book) { }
             public void onLaunchRiddles() { }
             public void onLaunchJokes() { }

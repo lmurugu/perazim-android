@@ -5,6 +5,7 @@ import static org.junit.Assume.assumeTrue;
 import androidx.test.core.app.ApplicationProvider;
 
 import org.perazimchurch.app.ai.PerazimAiEngine;
+import org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer;
 
 import android.content.Context;
 
@@ -174,12 +175,7 @@ public class EvalPipelineTest {
                     status = "routed:scope-refusal";
                     answer = PerazimAiEngine.boundaryResponseFor(q).getMessageText();
                 } else {
-                    JSONArray evidence;
-                    try {
-                        evidence = LocalScriptureRetriever.retrieve(c, q);
-                    } catch (Exception e) {
-                        evidence = new JSONArray();
-                    }
+                    JSONArray evidence = kjvEvidence(q);
                     String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
                     long t0 = System.currentTimeMillis();
                     String raw = runLlama(llama, modelPath, prompt, 128);
@@ -199,5 +195,40 @@ public class EvalPipelineTest {
                 out.flush();
             }
         }
+    }
+
+    /** Exact single-verse KJV evidence from the bundled JSON (SQLCipher is unavailable on the JVM). */
+    static JSONArray kjvEvidence(String q) throws Exception {
+        JSONArray out = new JSONArray();
+        ScriptureReferenceNormalizer.Result ref = ScriptureReferenceNormalizer.normalize(q);
+        if (ref == null || ref.normalized == null || !ref.confident) return out;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^(.+) (\\d+):(\\d+)$").matcher(ref.normalized);
+        if (!m.find()) return out;
+        String book = m.group(1);
+        int chapter = Integer.parseInt(m.group(2));
+        int verse = Integer.parseInt(m.group(3));
+        File base = new File("src/main/assets/bible");
+        JSONArray manifest = new JSONArray(new String(Files.readAllBytes(new File(base, "kjv_manifest.json").toPath()), StandardCharsets.UTF_8));
+        int bookNumber = -1;
+        for (int i = 0; i < manifest.length(); i++) {
+            if (manifest.getJSONObject(i).getString("name").equalsIgnoreCase(book)) bookNumber = manifest.getJSONObject(i).getInt("bookNumber");
+        }
+        if (bookNumber < 0) return out;
+        JSONArray verses = new JSONArray(new String(Files.readAllBytes(new File(base, "kjv_verses.json").toPath()), StandardCharsets.UTF_8));
+        for (int i = 0; i < verses.length(); i++) {
+            JSONObject v = verses.getJSONObject(i);
+            if (v.getInt("bookNumber") == bookNumber && v.getInt("chapterNumber") == chapter && v.getInt("verseNumber") == verse) {
+                JSONObject item = new JSONObject();
+                item.put("sourceId", "Bible");
+                item.put("title", "King James Version");
+                item.put("authorityClass", "SCRIPTURE");
+                item.put("version", "KJV");
+                item.put("location", book + " " + chapter + ":" + verse);
+                item.put("text", v.getString("text"));
+                out.put(item);
+                break;
+            }
+        }
+        return out;
     }
 }
