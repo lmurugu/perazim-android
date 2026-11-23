@@ -1,6 +1,6 @@
 # Perazim Comparative Knowledge Base — Research and Revision Report
 
-**Knowledge-base version at current PR head:** 1.5.15  
+**Knowledge-base version at current PR head:** 1.5.17  
 **PR:** [#76](https://github.com/lmurugu/perazim-android/pull/76)  
 **Research base:** merged Streams A–E, with further source checks and content revisions through KB 1.5.15 on 24 November 2026  
 **Approval state:** 4 `APPROVED_LEVI`; 23 `DRAFT_PENDING_LEVI`  
@@ -322,7 +322,7 @@ The 23 entries have been researched and revised with claim-specific evidence, so
 
 ## Version and owner-status reconciliation (24 November 2026)
 
-The current PR head carries comparative knowledge-base version **1.5.15**. The exact entry statuses in the JSON remain authoritative:
+The current PR head carries comparative knowledge-base version **1.5.15**. The exact entry statuses in the JSON remain authoritative at KB 1.5.17:
 - `APPROVED_LEVI`: `eternal_progression`, `holy_spirit_force`, `baptism_for_dead`, `church_identity_question`.
 - `DRAFT_PENDING_LEVI`: the other 23 entries, including the revised material documented in this report.
 
@@ -331,3 +331,14 @@ This report is a research deliverable and recommendation package. Completion of 
 The current JSON has also received final wording refinements after the initial report was written: icons and saint-intercession claims are more precisely attributed to Reformed confessional interpreters; the African-ancestors summary is limited to sources actually read; the source titles most relevant to the model-visible notes are placed first; and the top-level KB comment now agrees with the four-approved/23-pending status. See the current JSON rather than this report's earlier wording for the exact latest text.
 
 The current commit has not yet been verified by a fresh full Android/Gradle CI run. The earlier successful run on c718a3a and the separate advisory WorkManager failure are historical evidence only. Do not treat them as proof that KB 1.5.15 has passed CI.
+
+
+### Final precision updates in KB 1.5.17
+
+After the initial 1.5.15 report was written, the live JSON received a further wording review:
+- Seventh-day Adventist Fundamental Belief 26 (unconscious death) is now distinguished from Fundamental Belief 27 (final destruction of the unrighteous) in the conditional-immortality entry.
+- The ancestors entry no longer refers to a Kikuyu claim in its model-facing origin when the summary's concrete example is the Îgembe study; the source register preserves the broader research evidence and access limitations.
+- The group-question entry paraphrases the shared Nicene claims rather than reproducing a long Creed translation. The Catholic and Orthodox Creed sources remain in provenance.
+- The four original approvals remain intact; the other 23 entries remain pending.
+
+These changes are wording and attribution refinements. They do not settle Perazim's final-punishment position, approve any additional entry, or authorise release.
