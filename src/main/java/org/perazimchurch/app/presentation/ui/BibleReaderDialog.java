@@ -1490,7 +1490,7 @@ public class BibleReaderDialog extends Dialog {
      * the braces in regular weight, so the reader sees the English first.
      */
     private void appendInterlinearVerse(android.text.SpannableStringBuilder sb, String text) {
-        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\{([^}]*)\\}\\s*([^{]*)").matcher(text);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\{([^}]*)\\}\\s*+([^{]*)").matcher(text);
         int last = 0;
         while (m.find()) {
             if (m.start() > last) {

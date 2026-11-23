@@ -117,7 +117,9 @@ public final class GameBanks {
         StringBuilder before = new StringBuilder();
         for (int i = 0; i < gap; i++) before.append(words[i]).append(' ');
         String token = words[gap];
-        String punctuation = token.replaceAll("^.*?([.,;:!?”’\"']*)$", "$1");
+        int punctStart = token.length();
+        while (punctStart > 0 && ".,;:!?”’\"'".indexOf(token.charAt(punctStart - 1)) >= 0) punctStart--;
+        String punctuation = token.substring(punctStart);
         StringBuilder after = new StringBuilder(punctuation);
         for (int i = gap + 1; i < words.length; i++) after.append(' ').append(words[i]);
         List<String> wrong = new ArrayList<>();
