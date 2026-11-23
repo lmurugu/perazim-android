@@ -11,17 +11,81 @@ import org.json.JSONObject;
 public final class ComparativeGate {
 
     public static final String APPROVED_STATUS = "APPROVED_LEVI";
-    static final int MAX_NOTE_CHARS = 700;
+    /** Budget for one model-facing note. Fields are kept whole or cut at a whole sentence, never mid-sentence. */
+    static final int MAX_NOTE_CHARS = 900;
+    static final String HEADER = "Comparative note, not Perazim's position.";
+    static final int MAX_SOURCE_TITLES = 3;
 
     private ComparativeGate() {}
 
     /**
-     * The model-facing note: origin and Scripture only. Internal notes, sources and church names never reach the model.
+     * The model-facing note, built field by field in priority order: the official teaching, the Scripture evaluation,
+     * local practice (when the entry has one), origin, then source titles. Internal notes, reviewer material and URLs
+     * never appear. A field that does not fit whole is cut at its last whole sentence, or dropped.
      */
     public static String noteText(JSONObject entry) {
-        String text = "Comparative note, not Perazim's position. Origin: " + entry.optString("origin")
-                + " Scripture: " + entry.optString("scripture");
-        return text.length() > MAX_NOTE_CHARS ? text.substring(0, MAX_NOTE_CHARS) : text;
+        return noteText(entry, MAX_NOTE_CHARS);
+    }
+
+    static String noteText(JSONObject entry, int budget) {
+        StringBuilder out = new StringBuilder(HEADER);
+        out.append(" Category: ").append(categoryLabel(entry.optString("group"))).append('.');
+        int room = budget - out.length();
+        String[][] fields = {
+                {"Official teaching", entry.optString("summary")},
+                {"Scripture evaluation", entry.optString("scripture")},
+                {"Local practice", entry.optString("practice")},
+                {"Origin", entry.optString("origin")},
+                {"Sources", sourceTitles(entry.optJSONArray("sources"))}
+        };
+        for (String[] field : fields) {
+            String value = field[1].trim();
+            if (value.isEmpty()) continue;
+            String prefix = " " + field[0] + ": ";
+            String whole = prefix + value;
+            if (whole.length() <= room) {
+                out.append(whole);
+                room -= whole.length();
+            } else {
+                String cut = wholeSentences(value, room - prefix.length());
+                if (!cut.isEmpty()) {
+                    out.append(prefix).append(cut);
+                    room -= prefix.length() + cut.length();
+                }
+            }
+        }
+        return out.toString();
+    }
+
+    /** Returns the text if it fits; otherwise its longest prefix that ends at a sentence end within the room, or "". */
+    static String wholeSentences(String text, int room) {
+        if (room <= 0) return "";
+        if (text.length() <= room) return text;
+        int end = -1;
+        for (int i = 0; i < room; i++) {
+            char c = text.charAt(i);
+            boolean stop = c == '.' || c == '!' || c == '?';
+            boolean boundary = i + 1 == text.length() || Character.isWhitespace(text.charAt(i + 1));
+            if (stop && boundary) end = i;
+        }
+        return end < 0 ? "" : text.substring(0, end + 1);
+    }
+
+    static String categoryLabel(String group) {
+        return group == null || group.isEmpty() ? "unspecified" : group.replace('_', ' ');
+    }
+
+    static String sourceTitles(JSONArray sources) {
+        if (sources == null) return "";
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < sources.length() && i < MAX_SOURCE_TITLES; i++) {
+            JSONObject source = sources.optJSONObject(i);
+            String title = source == null ? "" : source.optString("title").trim();
+            if (title.isEmpty()) continue;
+            if (out.length() > 0) out.append("; ");
+            out.append(title);
+        }
+        return out.toString();
     }
 
     /** Returns the entry for the concept only when its status is exactly APPROVED_LEVI; otherwise null. */

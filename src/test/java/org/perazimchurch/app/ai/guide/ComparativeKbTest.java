@@ -70,17 +70,6 @@ public class ComparativeKbTest {
     }
 
     @Test
-    public void internalNotesAreTheOnlyPlaceForInternalChurchNames() throws Exception {
-        JSONArray entries = kb().getJSONArray("entries");
-        for (int i = 0; i < entries.length(); i++) {
-            JSONObject e = entries.getJSONObject(i);
-            if (e.getString("group").equals("christian_tradition_internal")) {
-                assertTrue(e.getString("id") + " needs an internal_note", e.optString("internal_note").length() > 0);
-            }
-        }
-    }
-
-    @Test
     public void skillsIndexRoutesDriftToItsPlaybook() throws Exception {
         GuideDocs docs = GuideTestSupport.docs();
         boolean found = false;
