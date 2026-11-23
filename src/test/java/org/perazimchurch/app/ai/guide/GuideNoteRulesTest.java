@@ -19,8 +19,8 @@ import org.junit.Test;
 public class GuideNoteRulesTest {
 
     private static final Set<String> GROUPS = new HashSet<>(Arrays.asList(
-            "african_traditional", "bible_canon", "christian_tradition_internal", "heterodox_group",
-            "new_age", "policy", "secular", "world_religion"));
+            "african_traditional", "bible_canon", "christian_tradition_internal", "disputed_christian_doctrine",
+            "heterodox_group", "new_age", "policy", "secular", "world_religion"));
     private static final String[] LABELS = {"Official teaching: ", "Scripture evaluation: ", "Local practice: ",
             "Origin: ", "Sources: "};
 
