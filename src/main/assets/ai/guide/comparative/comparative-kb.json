@@ -1,6 +1,6 @@
 {
   "_comment": "Comparative knowledge for the Perazim Guide's drift detection. Status DRAFT_PENDING_LEVI: every entry is a summary written for review, not an approved source. Only the text in 'summary', 'origin' and 'scripture' is shown to the model. 'internal_note' is never shown to the model or to users. Scripture references are KJV and are retrieved verbatim from the bundled KJV database; no other translation is quoted. Entries are context only: the model may explain them but may not cite them. Standard: historic Protestant, Evangelical and Pentecostal orthodoxy, with Scripture as supreme authority. Under Levi's PR 76 correction, O-2 is superseded: the guide may name and accurately describe the Roman Catholic and Eastern Orthodox traditions from their own primary sources, and evaluates them from Scripture.",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "status": "DRAFT_PENDING_LEVI",
   "entries": [
     {
@@ -530,38 +530,79 @@
       "id": "ancestors",
       "group": "african_traditional",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "In many African traditional religions, the dead who lived well are remembered as ancestors who remain part of the family and community. Scholars describe veneration and reverence as the usual terms, rather than worship, and note that ancestral spirits are consulted on important occasions. Practices differ between peoples, regions and families, and some communities also recognise a supreme God. The guide distinguishes honouring and remembering the dead from invoking, consulting or making offerings to them, and does not generalise one practice across African peoples.",
-      "origin": "African traditional religions are many systems, not one. The SAGE Encyclopedia of African Religion (2009) calls the veneration of ancestors a fundamental part of African religion, while noting both shared patterns and variation. Community-specific accounts should be consulted before release.",
-      "scripture": "Scripture commands honour for parents (Exodus 20:12) and names Christ as the one mediator (1 Timothy 2:5). It forbids divination, consulting familiar spirits and inquiring of the dead (Deuteronomy 18:10-12), so Christians distinguish honouring and remembering family from seeking guidance or mediation from them. Christian prayer and worship are addressed to the triune God, and Christ is addressed in prayer as well (Acts 7:59; 1 Corinthians 1:2). Christians may honour and remember family members without seeking their intercession, and Deuteronomy 18 is not to be used to condemn every act of cultural respect.",
+      "summary": "In many African traditional religions, the departed who are still remembered by name are spoken of as the living-dead. The scholar John Mbiti held that they remain in personal memory for as long as someone living remembers them by name. Not everyone who dies becomes an ancestor: many accounts say a person must have lived an exemplary life, and among various peoples a good death is also expected. The living-dead are believed to remain part of family life. They are thought to share in meals and libations, and to send dreams, warnings or instructions. Practices differ between peoples, families and regions, and many traditions also speak of a supreme God. Scholars disagree about whether honouring the dead is worship: Mbiti treats remembrance as a feature of social life rather than worship, and others describe it as worship. The guide distinguishes honouring and remembering the dead from invoking them, consulting them and making offerings to them, and it does not present one practice as the belief of all African peoples.",
+      "origin": "African traditional religions are many systems, not one, and the word ancestor covers several different ideas. Mbiti distinguished the departed who are still remembered by name from ancestors proper, who are no longer remembered individually. Idowu (1973) describes the ancestral cults as a means of communion and communication between the living and the spirit world of the ancestors. Among the Îgembe (Meru) community of Kenya, people often do not recall their ancestors' personal names, and the departed are remembered collectively rather than through a deep lineage; the study describes this as different from lineage-based peoples. A 2022 journal article on Kenyan history states that not everyone who dies becomes an ancestor, so the cult of the dead is not to be equated with the cult of the ancestors.",
+      "scripture": "Scripture commands honour for parents (Exodus 20:12) and names Christ as the one mediator between God and men (1 Timothy 2:5). It forbids consulting those with familiar spirits and wizards, and it forbids seeking the living's guidance from the dead (Leviticus 19:31; Deuteronomy 18:10-12; Isaiah 8:19-20). Scripture records that Saul died for asking counsel of one that had a familiar spirit (1 Chronicles 10:13). It teaches that after death comes judgment (Hebrews 9:27). Christians may honour and remember family members, and show them respect, without seeking their guidance or intercession. Christian prayer and worship are addressed to the triune God, and Christ is addressed in prayer as well (Acts 7:59; 1 Corinthians 1:2). Deuteronomy 18 condemns divination, consulting familiar spirits and necromancy; it is not to be used to condemn every act of cultural respect.",
       "anchors": [
         "Deuteronomy 18:10-12",
-        "1 Timothy 2:5"
+        "1 Timothy 2:5",
+        "Hebrews 9:27"
       ],
-      "internal_note": "Pending: Mbiti, African Religions and Philosophy (1969), and community-specific academic sources on ancestor practice. SAGE source partly read (paywalled after the opening sections).",
+      "internal_note": "Round 3, Stream E (2026-11-23). Proposed revision; not yet integrated (Session A integrates). Removed: 'veneration and reverence rather than worship' (not in accessible SAGE text; scholars dispute the point); 'a fundamental part of African religion' and 'consulted on important occasions' (not in accessible SAGE text); 'devotion to one's own ancestors', 'respect for elders' and 'having children' (SAGE only, not corroborated by a peer-reviewed source). Narrowed: 'remain part of the family' now rests on Mbiti as quoted in Metz and Molefe. Mbiti primary (1969; 2nd ed. 1990) not accessible: archive.org copy is lending-restricted (HTTP 401), so Mbiti claims are secondary-source corroborated (Metz and Molefe; Ishida, NMK 2020; Simut 2016). SAGE full text is paywalled; only the opening section was read and it is a reference work (context only). Embu-specific and Kikuyu-specific scholarship not yet found: no Embu claim and no Kikuyu-specific doctrine claim. Luo claims (small SDA descriptive study, abstract only) and Hobley 1922 (colonial ethnography) examined and not used. Gathogo's 'hospitable' gloss is his own reading and is not adopted. Bediako's 'Christ as Supreme Ancestor' is a Christian theological proposal and is excluded. Peatrik's 'no ancestors' remark (Meru), quoted by Ishida, is an older statement and is not used. Scripture: KJV checked for every reference (aruljohn/Bible-kjv copy; Session A to confirm against the bundled KJV DB). Deut 18:11 in KJV reads 'a consulter with familiar spirits, or a wizard, or a necromancer'. Merge (Session A, 1.5.7): anchors trimmed to three (schema limit); Leviticus 19:31, Isaiah 8:19-20 and 1 Chronicles 10:13 stay in the model-facing scripture text.",
       "sources": [
         {
-          "title": "Ancestors, Encyclopedia of African Religion (SAGE, 2009), pp. 45-51",
+          "title": "Ancestors, Encyclopedia of African Religion (SAGE; ed. Asante and Mazama), DOI 10.4135/9781412964623.n29",
           "url": "https://sk.sagepub.com/ency/edvol/embed/africanreligion/chpt/ancestors",
           "accessed": "2026-11-23",
           "licence": "copyright; short quotes only",
-          "use": "ancestral spirits consulted on important occasions; veneration and reverence rather than worship; good death",
-          "verification": "partly verified (paywalled after opening sections)"
+          "use": "exemplary life; good death among various ethnic groups (opening section only)",
+          "verification": "verified against raw page text for the opening paragraph only; full entry paywalled and not read. Year 2009 carried from earlier register; not visible on the fetched page. Reference work: context only"
         },
         {
-          "title": "John S. Mbiti, African Religions and Philosophy (1969)",
+          "title": "John S. Mbiti, African Religions and Philosophy (1969; 2nd ed. 1990)",
           "url": "",
           "accessed": "2026-11-23",
-          "licence": "copyright; summary only",
-          "use": "to be added",
-          "verification": "pending"
+          "licence": "copyright; summary and short quotes only",
+          "use": "living-dead; remembrance by name (1990: 25-26); meals and warnings (1990: 82); libation and dreams (1990: 25)",
+          "verification": "primary NOT accessed: archive.org copy lending-restricted (HTTP 401). Claims rest on Mbiti as quoted by Metz and Molefe, Ishida and Simut (secondary-source corroborated)"
         },
         {
-          "title": "Community-specific academic sources on ancestor practice",
+          "title": "Thaddeus Metz and Motsamai Molefe, 'Traditional African Religion as a Neglected Form of Monotheism', The Monist (special issue; forthcoming)",
+          "url": "https://repository.up.ac.za/server/api/core/bitstreams/137f4b44-dedd-44db-8469-e50c869347ce/content",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "living-dead; only a small number count as ancestors; meals, warnings, libation and dreams (as quoted from Mbiti); supreme God argued",
+          "verification": "read in full, pre-publication manuscript; peer-reviewed journal, final version not checked. Mbiti quotations are the authors' citations"
+        },
+        {
+          "title": "Cornelius C. Simuț, 'Patterns of Ecodomy in Indigenous African Religions', Transylvanian Review vol. XXV, supplement no. 2 (2016), pp. 306ff.",
+          "url": "https://dspace.bcucluj.ro/bitstream/123456789/194364/1/Simut.pdf",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "Mbiti: remembrance not worship (reported); Ephirim-Donkor view that ancestors are worshipped (reported); Mbiti prefers 'living-dead'; Lalèyê on good death (reported)",
+          "verification": "read in full; journal peer-review status not verified. Mbiti and Ephirim-Donkor claims are as reported by Simut (secondary)"
+        },
+        {
+          "title": "Shin-ichiro Ishida, 'Name-sharing among the Îgembe: The Kîmîîrû texture of personhood in a village community', ch. 3 in Gĩchere, Mwithimbû and Ishida (eds.), Family Dynamics and Memories in Kenyan Villages (National Museums of Kenya, 2020)",
+          "url": "https://tokyo-metro-u.repo.nii.ac.jp/record/8492/files/11040-001.pdf",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "Îgembe (Meru): shallow genealogical depth; collective immortality; Mbiti 1990: 25-26 quoted",
+          "verification": "read in full (PDF text, about p. 75). Community-specific source for the Îgembe only. Older Peatrik remark quoted in the chapter not used"
+        },
+        {
+          "title": "Julius M. Gathogo, 'Njega wa Gioko and the European missionaries in the colonial Kenya', HTS Teologiese Studies/Theological Studies 78(3), a6790 (2022), doi:10.4102/hts.v78i3.6790",
+          "url": "https://hts.org.za/index.php/hts/article/view/6790/21461",
+          "accessed": "2026-11-23",
+          "licence": "open access journal; short quotes",
+          "use": "not everyone who dies becomes an ancestor; cult of the dead not equated with ancestor cult",
+          "verification": "read in full; peer-reviewed journal. The cited page (p. 198) and the source of the general statement are not identified in the text; the statement is the author's own"
+        },
+        {
+          "title": "Reuben Turbi Luka, 'Jesus Christ as Ancestor', St Andrews Encyclopaedia of Theology (30 August 2024)",
+          "url": "https://www.saet.ac.uk/Christianity/JesusChristasAncestor.pdf",
+          "accessed": "2026-11-23",
+          "licence": "copyright per source; short quotes only",
+          "use": "quotes Idowu (1973: 186) on ancestral cults as communion and communication",
+          "verification": "reference article: context only. Idowu quotation read as printed in Luka; Idowu primary (African Traditional Religion: A Definition, Orbis, 1973) not accessed"
+        },
+        {
+          "title": "Perazim Guide rules (Agents.md, rule 5); owner decision on PR 76",
           "url": "",
           "accessed": "2026-11-23",
-          "licence": "to be recorded",
-          "use": "to be added",
-          "verification": "pending"
+          "licence": "internal",
+          "use": "policy",
+          "verification": "internal"
         }
       ]
     },
@@ -1073,13 +1114,14 @@
       "id": "group_question",
       "group": "policy",
       "status": "DRAFT_PENDING_LEVI",
-      "summary": "A question names a religious group, such as Latter-day Saints, Jehovah's Witnesses, Seventh-day Adventists, Oneness Pentecostals, Christian Science, Christadelphians, the Catholic Church or the Eastern Orthodox churches. The guide describes the group's official teaching from its own published sources, keeps apart official teaching, historical teaching, local practice and individual belief, and then evaluates the official teaching against Scripture. The Catholic Church and the Eastern Orthodox churches confess the Nicene faith: one God, and Jesus Christ the only Son of God, eternally begotten of the Father, true God from true God, who became man. The guide states their differences from the Perazim framework specifically, and points to the entries on those differences, such as purgatory, saint prayer, Marian titles, icons and the canon.",
-      "origin": "Policy entry applying the group-specific entries. Each group's self-description comes from a primary source, with a scholarly source where needed.",
+      "summary": "A question names a religious group, such as Latter-day Saints, Jehovah's Witnesses, Seventh-day Adventists, Oneness Pentecostals, Christian Science, Christadelphians, the Catholic Church or the Eastern Orthodox churches. The guide describes the group's official teaching from its own published sources, keeps apart official teaching, historical teaching, local practice and individual belief, and then evaluates the official teaching against Scripture. The Catholic Church and the Eastern Orthodox churches confess the Nicene faith: one God, and in one Lord Jesus Christ the only-begotten Son of God, begotten of the Father before all worlds, very God of very God, begotten, not made, who for us men, and for our salvation, came down from heaven, and was made man. The guide states their differences from the Perazim framework specifically, and points to the entries on those differences, such as purgatory, saint prayer, Marian titles, icons and the canon.",
+      "origin": "Policy entry applying the group-specific entries. Where a group's own published sources could be read, the guide uses them for that group's official teaching; where a point rests on a secondary source, the group entry says so. The Nicene statements come from the Catechism of the Catholic Church and from Orthodox sources: the Orthodox Church in America's pages on the Nicene Creed and the Incarnation, and a parish of the Greek Orthodox Archdiocese of Thyateira and Great Britain that prints the same creed.",
       "scripture": "The guide explains each group's teaching in plain words, names the passages each side relies on, and shows what Scripture teaches (Acts 17:11; 1 John 4:1). It separates an institution's official teaching from local practice and individual belief, and it gives no verdict on any member's eternal destiny. Where Catholic and Orthodox churches confess the Nicene faith, the guide acknowledges that confession and then tests their further teachings against Scripture (Acts 17:11).",
       "anchors": [
         "Acts 17:11",
         "1 John 4:1"
       ],
+      "internal_note": "Round 3, Stream E (2026-11-23). Proposed revision; not yet integrated. Re-verified this round against raw text fetched 2026-11-23: CCC Credo (vatican.va, full Credo: 'the only Son of God, eternally begotten of the Father, God from God, Light from Light, true God from true God, begotten, not made'; 'became man'); CCC 232 ('The faith of all Christians rests on the Trinity.') and 253 ('We do not confess three Gods, but one God in three persons'); OCA Nicene Creed; OCA Incarnation (Chalcedon: 'true God and true Man'). Changed: summary now uses the creed's own words 'begotten not made' and 'for our salvation' in place of 'who became man'. 'Uncreated' is not used as a description of the Son in model-facing text; the OCA uses 'eternal, divine, and uncreated' only to describe the Nicene side's view in its own introduction, and the creed's wording is 'begotten, not made'. 'Consubstantial' is not used. Added: St Andrew's Greek Orthodox Cathedral (London) page printing the Nicene-Constantinopolitan Creed, to show the confession across two Orthodox jurisdictions. It is a parish page, not a central Ecumenical Patriarchate or GOA statement, so the Orthodox generalisation carries medium confidence. Origin changed: the old statement that every group's self-description comes from a primary source was not accurate (several group entries rest on summaries or secondary sources). Policy sources stay internal.",
       "sources": [
         {
           "title": "Perazim Guide rules (Agents.md, rule 5); owner decision on PR 76",
@@ -1094,8 +1136,8 @@
           "url": "https://www.vatican.va/content/catechism/en/part_one/section_one/chapter_three/article_2/the_credo.html",
           "accessed": "2026-11-23",
           "licence": "copyright; short quotes only",
-          "use": "'We believe in one Lord, Jesus Christ, the only Son of God, eternally begotten of the Father, God from God, Light from Light, true God from true God, begotten, not made, of one Being with the Father.'; 'became man' in the Nicene text",
-          "verification": "verified against raw page text (first 39,888 of 75,871 characters)"
+          "use": "'We believe in one Lord, Jesus Christ, the only Son of God, eternally begotten of the Father, God from God, Light from Light, true God from true God, begotten, not made, of one Being with the Father.'; 'by the power of the Holy Spirit he was born of the Virgin Mary, and became man'",
+          "verification": "verified against raw page text, re-checked 2026-11-23 (full Credo text fetched, 110,175 bytes including markup; quotations found verbatim). Official Catholic source (tier 1)"
         },
         {
           "title": "Paragraph 2. The Father, Catechism of the Catholic Church (vatican.va), paragraphs 232-267",
@@ -1103,26 +1145,33 @@
           "accessed": "2026-11-23",
           "licence": "copyright; short quotes only",
           "use": "232: 'The faith of all Christians rests on the Trinity.'; 253: 'We do not confess three Gods, but one God in three persons'",
-          "verification": "verified against raw page text (first 39,877 of 90,567 characters; paragraphs 232, 234 and 253 verbatim)"
+          "verification": "verified against raw page text, re-checked 2026-11-23 (paragraphs 232 and 253 verbatim). Official Catholic source (tier 1)"
         },
         {
           "title": "Nicene Creed, Orthodox Church in America",
           "url": "https://www.oca.org/orthodoxy/the-orthodox-faith/doctrine-scripture/the-symbol-of-faith/nicene-creed",
           "accessed": "2026-11-23",
           "licence": "copyright; short quotes only",
-          "use": "introduction: 'the Son of God is eternal, divine, and uncreated' (describing the Nicene side); creed: 'true God of true God; begotten, not made; of one essence with the Father'",
-          "verification": "verified against raw page text"
+          "use": "introduction: 'Others contended that the Son of God is eternal, divine, and uncreated' (describes the Nicene side); creed: 'true God of true God; begotten, not made; of one essence with the Father'; 'and became man'",
+          "verification": "verified against raw page text, re-checked 2026-11-23. Official jurisdiction source (tier 1, one Orthodox jurisdiction)"
         },
         {
           "title": "Incarnation, Orthodox Church in America",
           "url": "https://www.oca.org/orthodoxy/the-orthodox-faith/doctrine-scripture/the-symbol-of-faith/incarnation",
           "accessed": "2026-11-23",
           "licence": "copyright; short quotes only",
-          "use": "Chalcedonian definition: 'He is perfect in Divinity and perfect in Humanity, true God and true Man'; 'Jesus is indeed the divine Son of God, of one essence with the Father'",
-          "verification": "verified against raw page text"
+          "use": "Chalcedonian definition: 'perfect in Divinity and perfect in Humanity, true God and true Man'",
+          "verification": "verified against raw page text, re-checked 2026-11-23. Official jurisdiction source (tier 1). Not used in the model-facing summary"
+        },
+        {
+          "title": "The Nicene-Constantinopolitan Creed, St Andrew's Greek Orthodox Cathedral (London), a church of the Greek Orthodox Archdiocese of Thyateira and Great Britain (Ecumenical Patriarchate)",
+          "url": "https://www.standrewsgreekorthodoxcathedral.co.uk/our-faith/the-nicene-creed/",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "'Only-begotten Son of God, begotten from the Father before all ages; Light from Light, true God from true God; begotten, not made; of one essence with the Father'; the creed is repeated at every Divine Liturgy",
+          "verification": "verified against raw page text (5,294 characters). Parish page of a jurisdiction of the Ecumenical Patriarchate: supports the creed text across a second Orthodox jurisdiction, not a central statement (tier 2)"
         }
-      ],
-      "internal_note": "Round 2 (Levi): Catholic and Orthodox Nicene confession sourced to the CCC Credo, the CCC Father section (paragraphs 232, 253), the OCA Nicene Creed and the OCA Incarnation page (Chalcedon: 'true God and true Man'). 'Consubstantial' is not used; the Credo and OCA pages render the phrase as 'of one Being' and 'of one essence'. Policy sources stay internal."
+      ]
     }
   ]
 }
