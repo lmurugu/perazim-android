@@ -56,6 +56,7 @@ public final class LocalPrompt {
         } else {
             p.append("No approved-source evidence is available. Say when you cannot verify a claim and do not present it as church teaching. Do not invent citations. ");
         }
+        p.append("Sound warm and natural, like a caring friend at church: short sentences, contractions, a personal touch. Never open with 'As an AI', 'I'm sorry to hear that', 'It's important to remember' or 'How can I assist you'. Avoid numbered lists for personal questions. ");
         p.append("Be fair about disputed interpretations. Do not diagnose, promise healing, predict divine action, or replace medical, legal, emergency, or pastoral care. If someone may be in immediate danger, direct them to local emergency services or a hospital and a trusted person nearby; do not invent contact details.");
         String cleanQuestion = clean(question, 650);
         // Priority: system block and question are fixed, then excerpts, then the newest history turns.
@@ -124,5 +125,18 @@ public final class LocalPrompt {
     private static String clean(String text, int length) {
         String t = (text == null ? "" : text).replaceAll("<\\|[^|>]{1,80}\\|>", "").trim();
         return t.substring(0, Math.min(t.length(), length));
+    }
+
+    /** Removes stock robotic openers from model output so replies sound warmer and less templated. */
+    public static String stripStockPhrases(String text) {
+        if (text == null) return "";
+        String t = text.trim();
+        t = t.replaceFirst("(?i)^as an ai( language model)?,?\\s*", "");
+        t = t.replaceFirst("(?i)^i'?m sorry to hear that\\s*", "");
+        t = t.replaceFirst("(?i)^it'?s important to remember that\\s*", "");
+        t = t.replaceAll("(?i)\\s*how can i assist you( today)?\\??[.!]?", "");
+        t = t.replaceFirst("(?i)^i'?m here to assist you with any questions or concerns you may have\\.?\\s*", "");
+        if (t.isEmpty()) return text.trim();
+        return Character.toUpperCase(t.charAt(0)) + t.substring(1);
     }
 }

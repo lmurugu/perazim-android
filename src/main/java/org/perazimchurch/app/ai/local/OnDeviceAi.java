@@ -197,7 +197,8 @@ public final class OnDeviceAi {
                 if (cancelled) throw new IOException("Generation cancelled.");
                 if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
                 if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
-                String result = answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim();
+                String result = LocalPrompt.stripStockPhrases(
+                        answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim());
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
                 if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
                         || (PerazimAiEngine.claimsOfficialStatus(result)
