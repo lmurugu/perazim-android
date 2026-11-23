@@ -1,6 +1,6 @@
 {
-  "_comment": "Comparative knowledge for Perazim Guide drift detection. All 27 entries have been approved for model-context use under Rev. Levi Murugu's explicit delegated authority. This is content approval only: PR merge, production release, model activation and transfer/publishing of a release package remain separate decisions and are not authorised by this status. Only entries with exact status APPROVED_LEVI pass the per-entry gate. The model receives only summary, origin, Scripture evaluation, optional local practice and up to three source titles; internal notes, reviewer material and source URLs are not sent. KJV anchors are retrieved verbatim from the bundled database; licensed NASB use follows the app's file-loading rule. Comparative entries describe other traditions and evaluate them under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny. The conditional-immortality entry is approved only as a neutral comparison; Perazim's position on final punishment remains expressly unset.",
-  "version": "1.5.14",
+  "_comment": "Comparative knowledge for the Perazim Guide's drift detection. Four entries are approved by explicit owner delegation: eternal_progression, holy_spirit_force, baptism_for_dead and church_identity_question. The other 23 entries remain DRAFT_PENDING_LEVI pending final owner review of the exact revised text. Only entries whose status is exactly APPROVED_LEVI may pass the per-entry model gate. PR merge, production release, model activation and transfer/publishing of additional content to Qwen are not authorised by this metadata. The model receives only summary, origin, Scripture evaluation, optional local practice and up to three source titles; internal notes, reviewer material and source URLs are not sent. KJV anchors are retrieved verbatim from the bundled database; licensed NASB use follows the app's file-loading rule. Comparative entries describe other traditions and evaluate them under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny. The conditional-immortality entry is a neutral comparison only; Perazim's position on final punishment remains expressly unset.",
+  "version": "1.5.15",
   "status": "APPROVED_LEVI",
   "entries": [
     {
@@ -256,14 +256,6 @@
           "verification": "Verified verbatim against official Vatican text, paragraphs 1030–1032, on 24 November 2026. Paragraph 1032 directly appeals to the practice associated with Judas Maccabeus and prayer for the dead; the footnote apparatus was not separately transcribed."
         },
         {
-          "title": "Council of Trent, Session 25, Decree Concerning Purgatory (Hanover Historical Texts)",
-          "url": "https://history.hanover.edu/texts/trent/CT25PUR.html",
-          "accessed": "2026-11-23",
-          "licence": "public domain",
-          "use": "souls there are helped by the suffrages of the faithful",
-          "verification": "verified (page read, 1.5.1 register)"
-        },
-        {
           "title": "Greek Orthodox Archdiocese of America, Death: The Threshold to Eternal Life",
           "url": "https://www.goarch.org/-/death-the-threshold-to-eternal-life",
           "accessed": "2026-11-23",
@@ -272,20 +264,28 @@
           "verification": "verified against raw page text; spelling on the page preserved"
         },
         {
-          "title": "Westminster Confession of Faith, chapter 32, section 1 (Blue Letter Bible)",
-          "url": "https://www.blueletterbible.org/study/ccc/westminster/Of_The_State_Of_Men_After_Death.cfm",
-          "accessed": "2026-11-23",
-          "licence": "public domain text",
-          "use": "'Beside these two places, for souls separated from their bodies, the Scripture acknowledgeth none.'",
-          "verification": "verified (section read; Scripture references omitted)"
-        },
-        {
           "title": "Westminster Confession of Faith (1646), chapter 32.1, “Of the State of Man After Death” (Westminster Theological Seminary)",
           "url": "https://wts.edu/wcf",
           "accessed": "2026-11-24",
           "licence": "copyright; short quotes or summary only",
           "use": "Reformed confession says souls neither die nor sleep, and names heaven and hell as the states of separated souls; no third place for purification",
           "verification": "Verified against the published confession text; chapter 32.1"
+        },
+        {
+          "title": "Council of Trent, Session 25, Decree Concerning Purgatory (Hanover Historical Texts)",
+          "url": "https://history.hanover.edu/texts/trent/CT25PUR.html",
+          "accessed": "2026-11-23",
+          "licence": "public domain",
+          "use": "souls there are helped by the suffrages of the faithful",
+          "verification": "verified (page read, 1.5.1 register)"
+        },
+        {
+          "title": "Westminster Confession of Faith, chapter 32, section 1 (Blue Letter Bible)",
+          "url": "https://www.blueletterbible.org/study/ccc/westminster/Of_The_State_Of_Men_After_Death.cfm",
+          "accessed": "2026-11-23",
+          "licence": "public domain text",
+          "use": "'Beside these two places, for souls separated from their bodies, the Scripture acknowledgeth none.'",
+          "verification": "verified (section read; Scripture references omitted)"
         }
       ]
     },
@@ -462,6 +462,14 @@
           "verification": "Verified against official Vatican text; paragraphs 2129–2132"
         },
         {
+          "title": "Westminster Larger Catechism (1648), Question 109, “What are the sins forbidden in the second commandment?”",
+          "url": "https://www.opc.org/lc.html",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or paraphrase only",
+          "use": "Lists making images of God and worshipping God in or by images among sins forbidden by the second commandment",
+          "verification": "Official Orthodox Presbyterian Church publication of the Westminster Larger Catechism; Q109 checked"
+        },
+        {
           "title": "Orthodox Church in America, “Iconoclasm,” The Orthodox Faith, Volume III",
           "url": "https://www.oca.org/orthodoxy/the-orthodox-faith/church-history/eighth-century/iconoclasm",
           "accessed": "2026-11-24",
@@ -500,14 +508,6 @@
           "licence": "copyright; short quotes or summary only",
           "use": "Reformed confession says the acceptable way of worshipping the true God is instituted by God himself and limited by his revealed will",
           "verification": "Verified against published confession text; chapter 21.1"
-        },
-        {
-          "title": "Westminster Larger Catechism (1648), Question 109, “What are the sins forbidden in the second commandment?”",
-          "url": "https://www.opc.org/lc.html",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or paraphrase only",
-          "use": "Lists making images of God and worshipping God in or by images among sins forbidden by the second commandment",
-          "verification": "Official Orthodox Presbyterian Church publication of the Westminster Larger Catechism; Q109 checked"
         }
       ]
     },
