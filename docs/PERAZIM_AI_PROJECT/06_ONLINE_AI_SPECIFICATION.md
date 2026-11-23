@@ -557,9 +557,9 @@ If approved evidence is unavailable, the AI must disclose the limitation.
 
 Biblical answers must identify references accurately.
 
-The ESV is the preferred translation for quotations and teaching, subject to confirmed licensing and redistribution rights.
+The KJV and the NASB are the translations for quotations and teaching, with translation attribution (decision A-105, 23 November 2026). The ESV is excluded from AI quotations, even where ESV text is present in an app database.
 
-Until the necessary rights are established, the system must not assume that the ESV text already present in a database can legally be redistributed or included in offline packages.
+Use of NASB text requires confirmed licensing and redistribution rights.
 
 Where another translation is used, it must be identified correctly.
 

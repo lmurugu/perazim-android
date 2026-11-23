@@ -213,9 +213,9 @@ The current `BibleContextExtractor.java` uses local SQLite retrieval and keyword
 
 Codex must inspect its current implementation and improve it without breaking the Bible reader or existing Scripture features.
 
-The current KJV default must be reviewed against the product's ESV-first preference.
+The KJV default matches the AI's translation policy, which is the KJV and the NASB only (decision A-105).
 
-The system must not package or redistribute ESV content without verified permission.
+The system must not package, redistribute or quote ESV content for the AI.
 
 ## 7.2 General document retrieval
 
@@ -287,7 +287,7 @@ For detailed biblical study, retrieval may include:
 
 The system must identify the translation accurately.
 
-The ESV is the preferred translation, subject to verified licensing.
+The AI quotes the KJV and the NASB, with translation attribution (decision A-105). The ESV is excluded.
 
 The system must not fabricate biblical quotations or references when retrieval fails.
 
@@ -649,7 +649,7 @@ The offline AI is acceptable only when testing demonstrates that:
 2. The existing Qwen and llama.cpp integration is preserved unless a justified change is approved.
 3. Approved church knowledge is retrieved locally.
 4. Relevant Scripture is supplied to the local model.
-5. ESV preference is implemented where licensing permits.
+5. The AI quotes only the KJV and the NASB, with translation attribution (decision A-105).
 6. KJV is not silently presented as ESV.
 7. Source references are retained.
 8. Authority and audience classifications are enforced.
