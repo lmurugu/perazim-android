@@ -14,12 +14,11 @@ import org.perazimchurch.app.BuildConfig;
 @RunWith(AndroidJUnit4.class)
 public final class NetworkSecurityConfigTest {
     @Test
-    public void cleartextIsRestrictedToLoopbackInValidationBuild() {
+    public void cleartextIsRestrictedToApprovedHostsInValidationBuild() {
         assertTrue("instrumentation must use the validation build", "validation".equals(BuildConfig.BUILD_TYPE));
         NetworkSecurityPolicy policy = NetworkSecurityPolicy.getInstance();
-        assertTrue(policy.isCleartextTrafficPermitted("localhost"));
         assertTrue(policy.isCleartextTrafficPermitted("127.0.0.1"));
-        assertTrue(policy.isCleartextTrafficPermitted("::1"));
+        assertTrue(policy.isCleartextTrafficPermitted("10.0.2.2"));
         assertFalse(policy.isCleartextTrafficPermitted("198.51.100.20"));
     }
 }
