@@ -31,23 +31,34 @@ public final class ComparativeGate {
         StringBuilder out = new StringBuilder(HEADER);
         out.append(" Category: ").append(categoryLabel(entry.optString("group"))).append('.');
         int room = budget - out.length();
+        String summary = entry.optString("summary").trim();
+        String scripture = entry.optString("scripture").trim();
         String[][] fields = {
-                {"Official teaching", entry.optString("summary")},
-                {"Scripture evaluation", entry.optString("scripture")},
+                {"Official teaching", summary},
+                {"Scripture evaluation", scripture},
                 {"Local practice", entry.optString("practice")},
                 {"Origin", entry.optString("origin")},
                 {"Sources", sourceTitles(entry.optJSONArray("sources"))}
         };
+        // The official summary and the Scripture evaluation both must reach the model. When both first sentences
+        // fit, keep room for the Scripture first sentence so the summary's length cannot push it out.
+        String scriptureLead = scripture.isEmpty() ? "" : " Scripture evaluation: " + firstSentence(scripture);
+        int reserve = 0;
+        if (!summary.isEmpty() && !scripture.isEmpty()
+                && (" Official teaching: " + firstSentence(summary)).length() + scriptureLead.length() <= room) {
+            reserve = scriptureLead.length();
+        }
         for (String[] field : fields) {
             String value = field[1].trim();
             if (value.isEmpty()) continue;
             String prefix = " " + field[0] + ": ";
             String whole = prefix + value;
-            if (whole.length() <= room) {
+            int allowed = field[0].equals("Official teaching") ? room - reserve : room;
+            if (whole.length() <= allowed) {
                 out.append(whole);
                 room -= whole.length();
             } else {
-                String cut = wholeSentences(value, room - prefix.length());
+                String cut = wholeSentences(value, allowed - prefix.length());
                 if (!cut.isEmpty()) {
                     out.append(prefix).append(cut);
                     room -= prefix.length() + cut.length();
@@ -55,6 +66,17 @@ public final class ComparativeGate {
             }
         }
         return out.toString();
+    }
+
+    /** The first sentence of the text, ending at sentence punctuation followed by a space or the end. */
+    static String firstSentence(String text) {
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            boolean stop = c == '.' || c == '!' || c == '?';
+            boolean boundary = i + 1 == text.length() || Character.isWhitespace(text.charAt(i + 1));
+            if (stop && boundary) return text.substring(0, i + 1);
+        }
+        return text;
     }
 
     /** Returns the text if it fits; otherwise its longest prefix that ends at a sentence end within the room, or "". */
