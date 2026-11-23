@@ -74,13 +74,7 @@ public final class DriftEvidence {
     }
 
     static JSONObject entry(Context context, String conceptId) throws Exception {
-        JSONObject root = load(context);
-        JSONArray entries = root.optJSONArray("entries");
-        for (int i = 0; entries != null && i < entries.length(); i++) {
-            JSONObject e = entries.optJSONObject(i);
-            if (e != null && conceptId.equals(e.optString("id"))) return e;
-        }
-        return null;
+        return ComparativeGate.approvedEntry(load(context).optJSONArray("entries"), conceptId);
     }
 
     private static JSONObject load(Context context) throws Exception {

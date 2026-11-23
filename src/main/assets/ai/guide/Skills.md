@@ -28,7 +28,7 @@ Version 1.2.0. The loader matches each question against the triggers below. It l
 - SH1 Citation: every citation must match a supplied source (sourceId, version and location). Otherwise the answer is refused.
 - SH2 Quote: any quoted phrase of four or more words must appear in the supplied evidence. Otherwise replace the quote with a note that it could not be verified.
 - SH3 Verdict: an answer that judges a named person's salvation is replaced with the no-verdict reply.
-- SH4 Safety: a sensitive pastoral answer must mention a trusted person, the Bishop or a professional. If it does not, append the referral line.
+- SH4 Safety: a sensitive pastoral answer must mention a trusted person or a professional. If it does not, append the referral line.
 - SH5 Translation: an answer that quotes ESV, NIV or NKJV is refused.
 - SH6 Length: an answer over 900 characters is cut at a sentence boundary.
 - SH7 Chapter: a reference whose chapter is outside the book's range is removed.

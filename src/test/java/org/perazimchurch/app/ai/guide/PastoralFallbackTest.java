@@ -28,6 +28,7 @@ public class PastoralFallbackTest {
                 PastoralFallback.VERSE);
         String answer = PastoralFallback.answer();
         assertTrue(answer, answer.startsWith("Psalm 34:18 (King James Version): “The LORD is nigh unto them"));
-        assertTrue(answer, answer.contains("Bishop or a trusted leader"));
+        assertTrue(answer, answer.contains("talk with a trusted church leader"));
+        assertFalse(answer, answer.contains("Bishop"));
     }
 }

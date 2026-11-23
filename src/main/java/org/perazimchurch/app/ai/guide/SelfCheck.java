@@ -22,12 +22,12 @@ public final class SelfCheck {
     public static final String ISSUE_LENGTH = "LENGTH_CUT";
 
     public static final String NO_VERDICT = "I cannot judge whether any person is saved or lost. Only God knows hearts. "
-            + "Please talk with the Bishop or a trusted pastor about this, and pray together.";
+            + "Please talk with a trusted church leader about this, and pray together.";
     public static final String UNVERIFIED_QUOTE = "(quotation not verified in the approved sources)";
     public static final String REFERENCE_CHECK = "(reference to be checked)";
-    public static final String SAFETY_LINE = " Please also talk with the Bishop or a trusted person about this.";
+    public static final String SAFETY_LINE = " Please also talk with a trusted person about this.";
     public static final String REFUSED = "I cannot verify an answer to this from the approved sources. "
-            + "Please ask the church office or the Bishop.";
+            + "Please ask the church office.";
     public static final int MAX_CHARS = 900;
 
     private static final Pattern TRANSLATION = Pattern.compile("\\b(ESV|NIV|NKJV)\\b");

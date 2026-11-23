@@ -25,6 +25,6 @@ public final class PastoralFallback {
     /** The fixed answer: the verse with its location, then a referral to a trusted leader. */
     public static String answer() {
         return LOCATION + " (King James Version): “" + VERSE + "” "
-                + "God's promises do not depend on how you feel. Please also talk with the Bishop or a trusted leader.";
+                + "God's promises do not depend on how you feel. Please also talk with a trusted church leader.";
     }
 }
