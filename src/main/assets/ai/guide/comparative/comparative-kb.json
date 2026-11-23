@@ -34,6 +34,14 @@
           "verification": "verified (read via SuttaCentral bilara data)"
         },
         {
+          "title": "Ana Bajželj, “Self and Matter: Jaina Non-one-sided Dualism,” Journal of Indian Philosophy 54 (2026), 341–360",
+          "url": "https://link.springer.com/article/10.1007/s10781-026-09641-2",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Independent peer-reviewed study of the Tattvārtha-sūtra commentaries of Pūjyapāda and Akalaṅka; analyzes karmic matter and its relation to the self, corroborating the qualified statement that Jain karmic matter binds and affects the jīva",
+          "verification": "Open-access full article read; published 23 September 2026"
+        },
+        {
           "title": "Acaranga Sutra, Book 1, Lecture 1, translated by Hermann Jacobi, Sacred Books of the East vol. 22 (1884), Wikisource transcription",
           "url": "https://en.wikisource.org/wiki/Sacred_Books_of_the_East/Volume_22/%C3%82k%C3%A2r%C3%A2%E1%B9%85ga_S%C3%BBtra/Book_1/Lecture_1",
           "accessed": "2026-11-23",
@@ -72,14 +80,6 @@
           "licence": "open-access reference",
           "use": "soteriology section: individual selves covered by nescience in the form of karma, embodied in varieties of bodies, in transmigratory existence",
           "verification": "verified (full text read); academic encyclopedia; second independent source for Hindu karma"
-        },
-        {
-          "title": "Ana Bajželj, “Self and Matter: Jaina Non-one-sided Dualism,” Journal of Indian Philosophy 54 (2026), 341–360",
-          "url": "https://link.springer.com/article/10.1007/s10781-026-09641-2",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Independent peer-reviewed study of the Tattvārtha-sūtra commentaries of Pūjyapāda and Akalaṅka; analyzes karmic matter and its relation to the self, corroborating the qualified statement that Jain karmic matter binds and affects the jīva",
-          "verification": "Open-access full article read; published 23 September 2026"
         }
       ]
     },
@@ -170,6 +170,22 @@
           "verification": "verified (read)"
         },
         {
+          "title": "Marie-Helene Gorisse, Jaina Philosophy, Stanford Encyclopedia of Philosophy",
+          "url": "https://plato.stanford.edu/entries/jaina-philosophy/",
+          "accessed": "2026-11-23",
+          "licence": "open-access reference",
+          "use": "section 1.3: the state of complete annihilation of karmic matter in the pure sentient substance (mokṣa)",
+          "verification": "verified (full text read)"
+        },
+        {
+          "title": "Neil Dalal, Sankara (Śaṅkara), Stanford Encyclopedia of Philosophy (first published 4 Oct 2021)",
+          "url": "https://plato.stanford.edu/entries/shankara/",
+          "accessed": "2026-11-23",
+          "licence": "open-access reference",
+          "use": "introduction: atman is numerically identical with brahman; liberation (moksha) is the recognition of this identity",
+          "verification": "verified (full text read); Shankara's own Brahmasutra commentary not read (A-U07)"
+        },
+        {
           "title": "Anguttara Nikaya 6.63 'Penetrative', translated by Bhikkhu Sujato, SuttaCentral",
           "url": "https://suttacentral.net/an6.63/en/sujato",
           "accessed": "2026-11-23",
@@ -194,14 +210,6 @@
           "verification": "verified (full text read)"
         },
         {
-          "title": "Neil Dalal, Sankara (Śaṅkara), Stanford Encyclopedia of Philosophy (first published 4 Oct 2021)",
-          "url": "https://plato.stanford.edu/entries/shankara/",
-          "accessed": "2026-11-23",
-          "licence": "open-access reference",
-          "use": "introduction: atman is numerically identical with brahman; liberation (moksha) is the recognition of this identity",
-          "verification": "verified (full text read); Shankara's own Brahmasutra commentary not read (A-U07)"
-        },
-        {
           "title": "Valerie Stoker, Madhva, Internet Encyclopedia of Philosophy",
           "url": "https://iep.utm.edu/madhva/",
           "accessed": "2026-11-23",
@@ -218,12 +226,12 @@
           "verification": "verified (full text read)"
         },
         {
-          "title": "Marie-Helene Gorisse, Jaina Philosophy, Stanford Encyclopedia of Philosophy",
-          "url": "https://plato.stanford.edu/entries/jaina-philosophy/",
-          "accessed": "2026-11-23",
-          "licence": "open-access reference",
-          "use": "section 1.3: the state of complete annihilation of karmic matter in the pure sentient substance (mokṣa)",
-          "verification": "verified (full text read)"
+          "title": "Bhagavad Gita, translated by K. T. Telang, Sacred Books of the East vol. 8 (1882), 2.47 and 18.12",
+          "url": "https://archive.org/details/bhagavadgtwithsa00tela",
+          "accessed": "2026-11-24",
+          "licence": "Public domain translation (1882)",
+          "use": "Hindu primary text used for the distinction between action, attachment to fruits and liberation",
+          "verification": "Full text read in Stream A; section numbering follows Telang's layout"
         }
       ]
     },
@@ -241,14 +249,6 @@
       "internal_note": "B-S01: Catechism of the Catholic Church 1030–1032 read verbatim on vatican.va. Paragraph 1032 explicitly appeals to Judas Maccabeus and prayer for the dead (footnote 607); this closes the earlier 2 Maccabees source question at the paragraph level. The footnote link's underlying apparatus was not separately transcribed, so do not claim that footnote 607's full text was read. B-S03: Council of Trent, Session 25, verified. B-S06: Greek Orthodox Archdiocese of America page checked against raw text; its exact statement is attributed to that jurisdiction. B-S09: Westminster Confession 32.1 verified. Do not equate Orthodox prayers for the departed with the Catholic doctrine of purgatory.",
       "sources": [
         {
-          "title": "Catechism of the Catholic Church, 1030-1032, III. The Final Purification, or Purgatory (vatican.va)",
-          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_three/article_12/iii_the_final_purification%2C_or_purgatory.html",
-          "accessed": "2026-11-23",
-          "licence": "copyright; quoted phrases only",
-          "use": "1030: 'All who die in God's grace and friendship, but still imperfectly purified, are indeed assured of their eternal salvation'; 1031: 'The Church gives the name Purgatory to this final purification of the elect, which is entirely different from the punishment of the damned.'; 1032: 'From the beginning the Church has honored the memory of the dead and offered prayers in suffrage for them.'",
-          "verification": "verified verbatim (paragraphs 1030-1032 read in full); footnote text not on page"
-        },
-        {
           "title": "Council of Trent, Session 25, Decree Concerning Purgatory (Hanover Historical Texts)",
           "url": "https://history.hanover.edu/texts/trent/CT25PUR.html",
           "accessed": "2026-11-23",
@@ -265,20 +265,20 @@
           "verification": "verified against raw page text; spelling on the page preserved"
         },
         {
+          "title": "Catechism of the Catholic Church, 1030-1032, III. The Final Purification, or Purgatory (vatican.va)",
+          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_three/article_12/iii_the_final_purification%2C_or_purgatory.html",
+          "accessed": "2026-11-23",
+          "licence": "copyright; quoted phrases only",
+          "use": "1030: 'All who die in God's grace and friendship, but still imperfectly purified, are indeed assured of their eternal salvation'; 1031: 'The Church gives the name Purgatory to this final purification of the elect, which is entirely different from the punishment of the damned.'; 1032: 'From the beginning the Church has honored the memory of the dead and offered prayers in suffrage for them.'",
+          "verification": "verified verbatim (paragraphs 1030-1032 read in full); footnote text not on page"
+        },
+        {
           "title": "Westminster Confession of Faith, chapter 32, section 1 (Blue Letter Bible)",
           "url": "https://www.blueletterbible.org/study/ccc/westminster/Of_The_State_Of_Men_After_Death.cfm",
           "accessed": "2026-11-23",
           "licence": "public domain text",
           "use": "'Beside these two places, for souls separated from their bodies, the Scripture acknowledgeth none.'",
           "verification": "verified (section read; Scripture references omitted)"
-        },
-        {
-          "title": "Catechism of the Catholic Church, paragraphs 1030–1032, “The Final Purification, or Purgatory” (Vatican)",
-          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_three/article_12/iii_the_final_purification%2C_or_purgatory.html",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "1030–1031 define final purification after death and distinguish it from the punishment of the damned; 1032 explicitly appeals to Judas Maccabeus and prayer for the dead",
-          "verification": "Verified verbatim against official Vatican text on 24 November 2026; paragraph 1032 directly names Judas Maccabeus"
         },
         {
           "title": "Westminster Confession of Faith (1646), chapter 32.1, “Of the State of Man After Death” (Westminster Theological Seminary)",
@@ -310,6 +310,22 @@
           "licence": "copyright; short quote only",
           "use": "'We can and should ask them to intercede for us and for the whole world.'",
           "verification": "verified (partial quote); footnotes 41-42 not read"
+        },
+        {
+          "title": "Orthodox Church in America, “Canonization”",
+          "url": "https://www.oca.org/fs/canonization",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Official OCA explanation: Orthodox Christians ask saints to pray for them; explains the practice in the OCA's own words",
+          "verification": "Official OCA page read; paragraphs on asking saints for prayers checked"
+        },
+        {
+          "title": "Westminster Confession of Faith (1646), chapter 21.2, “Of Religious Worship, and the Sabbath Day” (Westminster Theological Seminary)",
+          "url": "https://wts.edu/wcf",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Reformed confession states that religious worship is given to the triune God alone, not to angels, saints or any other creature",
+          "verification": "Verified against published confession text; chapter 21.2"
         },
         {
           "title": "Synod of Jerusalem (1672), Confession of Dositheus, Article VIII, as summarised in Philip Schaff, The Creeds of Christendom, section 17",
@@ -344,14 +360,6 @@
           "verification": "verified (section read)"
         },
         {
-          "title": "Orthodox Church in America, “Canonization”",
-          "url": "https://www.oca.org/fs/canonization",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Official OCA explanation: Orthodox Christians ask saints to pray for them; explains the practice in the OCA's own words",
-          "verification": "Official OCA page read; paragraphs on asking saints for prayers checked"
-        },
-        {
           "title": "Orthodox Church in America, “Prayer,” The Orthodox Faith, Volume II",
           "url": "https://www.oca.org/orthodoxy/the-orthodox-faith/worship/the-daily-cycles-of-prayer/prayer",
           "accessed": "2026-11-24",
@@ -366,14 +374,6 @@
           "licence": "copyright; short quotes or summary only",
           "use": "Explains Christ's unique intercession, Christian intercessory prayer, and Orthodox teaching on prayer for others including the departed",
           "verification": "Official OCA educational text read"
-        },
-        {
-          "title": "Westminster Confession of Faith (1646), chapter 21.2, “Of Religious Worship, and the Sabbath Day” (Westminster Theological Seminary)",
-          "url": "https://wts.edu/wcf",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Reformed confession states that religious worship is given to the triune God alone, not to angels, saints or any other creature",
-          "verification": "Verified against published confession text; chapter 21.2"
         }
       ]
     },
@@ -397,6 +397,14 @@
           "licence": "copyright; short quotes only",
           "use": "paragraph 22: 'it is always inappropriate to use the title Co-redemptrix to define Mary's cooperation'; 'This title risks obscuring Christ's unique salvific mediation'; paragraph 24: 'special prudence is required when applying the term Mediatrix to Mary'; paragraph 25: the note does 'not intend to add any efficacy or power to the unique mediation of Jesus Christ'; paragraph 27: 'Strictly speaking, we cannot talk of any other mediation in grace apart from that of the incarnate Son of God'; paragraph 53: any expression about her mediation in grace 'must be understood as a distant analogy to Christ and his unique mediation'",
           "verification": "verified verbatim to about paragraph 75; paragraphs 76-80 and closing lines not verified; paragraph numbers as printed in the fetched text"
+        },
+        {
+          "title": "Orthodox Church in America, On Spiritual Life in the Church (Holy Synod encyclical)",
+          "url": "https://www.oca.org/holy-synod/encyclicals/on-spiritual-life",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "'the Holy Theotokos Virgin Mary'",
+          "verification": "read in full; official; no date printed"
         },
         {
           "title": "Catechism of the Catholic Church, paragraphs 963-971 (vatican.va, article 9, paragraph 6)",
@@ -423,14 +431,6 @@
           "verification": "read in full; secondary summary of a primary document"
         },
         {
-          "title": "Orthodox Church in America, On Spiritual Life in the Church (Holy Synod encyclical)",
-          "url": "https://www.oca.org/holy-synod/encyclicals/on-spiritual-life",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quotes only",
-          "use": "'the Holy Theotokos Virgin Mary'",
-          "verification": "read in full; official; no date printed"
-        },
-        {
           "title": "Luke 1:42-47, John 2:5, 1 Timothy 2:5, Acts 4:12 (KJV, bundled database)",
           "url": "",
           "accessed": "2026-11-23",
@@ -454,6 +454,14 @@
       "internal_note": "HOLD CLOSED: modern official sources now read. Catholic: Catechism 2129–2132 (Vatican), including 2131–2132 on Nicaea II, respectful veneration and adoration due to God alone. Orthodox: OCA, “Iconoclasm,” explains the Seventh Ecumenical Council and quotes the council's distinction between honourable reverence and true worship. Historical primary document: Second Council of Nicaea (787), Horos on images, Percival translation, 1900; full decree read. Schaff's English summary of Dositheus is explicitly secondary. Reformed confessional source: Westminster Confession 21.1. The entry does not claim that Scripture prohibits every religious image; it distinguishes image-making from bowing to and serving images.",
       "sources": [
         {
+          "title": "Catechism of the Catholic Church, paragraphs 2129–2132, “You Shall Not Make for Yourself a Graven Image” (Vatican)",
+          "url": "https://www.vatican.va/content/catechism/en/part_three/section_two/chapter_one/article_1/iv_you_shall_not_make_for_yourself_a_graven_image.index.html",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "2131 says Nicaea II justified veneration of icons; 2132 distinguishes respectful veneration from the adoration due to God alone",
+          "verification": "Verified against official Vatican text; paragraphs 2129–2132"
+        },
+        {
           "title": "Second Council of Nicaea (787), Horos on images (Fordham Medieval Sourcebook; Percival translation, NPNF 2nd series vol. 14, 1900)",
           "url": "https://sourcebooks.web.fordham.edu/source/nicea2-dec.asp",
           "accessed": "2026-11-23",
@@ -476,14 +484,6 @@
           "licence": "public domain",
           "use": "scripture reference",
           "verification": "scripture reference"
-        },
-        {
-          "title": "Catechism of the Catholic Church, paragraphs 2129–2132, “You Shall Not Make for Yourself a Graven Image” (Vatican)",
-          "url": "https://www.vatican.va/content/catechism/en/part_three/section_two/chapter_one/article_1/iv_you_shall_not_make_for_yourself_a_graven_image.index.html",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "2131 says Nicaea II justified veneration of icons; 2132 distinguishes respectful veneration from the adoration due to God alone",
-          "verification": "Verified against official Vatican text; paragraphs 2129–2132"
         },
         {
           "title": "Orthodox Church in America, “Iconoclasm,” The Orthodox Faith, Volume III",
@@ -517,12 +517,12 @@
       "internal_note": "Official SDA Fundamental Belief 26 checked against the General Conference of Seventh-day Adventists' current official 28 Fundamental Beliefs page. Christadelphian Faith statement checked. Westminster Confession 32.1 and Catechism 1022 verified. Scripture evaluation includes Ecclesiastes 9 in context, Philippians 1:20–23 and 2 Corinthians 5:1–10; Luke 16 is identified as a parable and Luke 23:43 is not used as the sole proof because punctuation varies in ancient manuscripts.",
       "sources": [
         {
-          "title": "Seventh-day Adventist Church, Fundamental Beliefs No. 26, Death and Resurrection",
-          "url": "https://adventist.org/beliefs/",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quote only",
-          "use": "'Until that day death is an unconscious state for all people.'",
-          "verification": "verified (page read)"
+          "title": "General Conference of Seventh-day Adventists, Fundamental Beliefs 26–27, “Death and Resurrection” and “The Millennium and the End of Sin”",
+          "url": "https://gc.adventist.org/beliefs/",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "26 states death is unconscious until resurrection; 27 states that at the end the unrighteous are consumed and the universe is freed of sin and sinners",
+          "verification": "Verified against current official General Conference website on 24 November 2026"
         },
         {
           "title": "Christadelphian Faith, Our Faith and Beliefs",
@@ -531,6 +531,14 @@
           "licence": "copyright; summary only",
           "use": "sleep of death with no consciousness",
           "verification": "verified (page read); summary of teaching"
+        },
+        {
+          "title": "Westminster Confession of Faith (1646), chapter 32.1, “Of the State of Man After Death” (Westminster Theological Seminary)",
+          "url": "https://wts.edu/wcf",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Reformed confession says souls neither die nor sleep and return immediately to God; the righteous are received into heaven",
+          "verification": "Verified against published confession text; chapter 32.1"
         },
         {
           "title": "Catechism of the Catholic Church, paragraphs 1021-1022 (vatican.va, particular judgment)",
@@ -557,28 +565,12 @@
           "verification": "scripture reference"
         },
         {
-          "title": "General Conference of Seventh-day Adventists, Fundamental Beliefs 26–27, “Death and Resurrection” and “The Millennium and the End of Sin”",
-          "url": "https://gc.adventist.org/beliefs/",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "26 states death is unconscious until resurrection; 27 states that at the end the unrighteous are consumed and the universe is freed of sin and sinners",
-          "verification": "Verified against official General Conference website, 24 November 2026"
-        },
-        {
           "title": "Catechism of the Catholic Church, paragraph 1022, “The Particular Judgment” (Vatican)",
-          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_three/article_12/ii_heaven.html",
+          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_three/article_12/i_the_particular_judgment.index.html",
           "accessed": "2026-11-24",
           "licence": "copyright; short quotes or summary only",
           "use": "States that each person receives eternal retribution in the immortal soul at the moment of death, through a particular judgment",
-          "verification": "Official Vatican text; paragraph 1022 checked"
-        },
-        {
-          "title": "Westminster Confession of Faith (1646), chapter 32.1, “Of the State of Man After Death” (Westminster Theological Seminary)",
-          "url": "https://wts.edu/wcf",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Reformed confession says souls neither die nor sleep and return immediately to God; the righteous are received into heaven",
-          "verification": "Verified against published confession text; chapter 32.1"
+          "verification": "Official Vatican text; paragraph 1022 checked on 24 November 2026"
         }
       ]
     },
@@ -605,28 +597,12 @@
           "verification": "verified against page text, Stream C session 2026-11-23"
         },
         {
-          "title": "Christadelphian Birmingham Amended Statement of Faith, clauses 25 and 29 (christadelphia.org/basf.php)",
-          "url": "https://christadelphia.org/basf.php",
-          "accessed": "2026-11-23",
-          "licence": "copyright holder not confirmed; short quote only",
-          "use": "clause 25: 'the second death'; clause 29: 'the final extinction of the wicked' at the close of the thousand years",
-          "verification": "verified verbatim against page text; clause 29 counted from clause 24 note. Authority: statement adopted by most ecclesias, which are autonomous, so it is not a central binding creed"
-        },
-        {
           "title": "General Conference of Seventh-day Adventists, Fundamental Beliefs 26–27, “Death and Resurrection” and “The Millennium and the End of Sin”",
           "url": "https://gc.adventist.org/beliefs/",
           "accessed": "2026-11-24",
           "licence": "copyright; short quotes or summary only",
           "use": "26 says death is unconscious until resurrection; 27 says fire consumes the unrighteous and the universe is freed from sin and sinners",
-          "verification": "Verified against official General Conference website, 24 November 2026"
-        },
-        {
-          "title": "Catechism of the Catholic Church, paragraph 1035, “Hell” (Vatican)",
-          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_three/article_12/iii_the_final_purification%2C_or_purgatory.html",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "The Catechism states that the punishment of hell is eternal and describes definitive self-exclusion from communion with God",
-          "verification": "Official Vatican text; paragraph 1035 checked"
+          "verification": "Verified against current official General Conference website on 24 November 2026"
         },
         {
           "title": "Westminster Confession of Faith (1646), chapter 33.2, “Of the Last Judgment” (Westminster Theological Seminary)",
@@ -635,6 +611,22 @@
           "licence": "copyright; short quotes or summary only",
           "use": "Reformed confession teaches that the wicked are cast into eternal torments and are punished with everlasting destruction from the presence of the Lord",
           "verification": "Verified against published confession text; chapter 33.2"
+        },
+        {
+          "title": "Christadelphian Birmingham Amended Statement of Faith, clauses 25 and 29 (christadelphia.org/basf.php)",
+          "url": "https://christadelphia.org/basf.php",
+          "accessed": "2026-11-23",
+          "licence": "copyright holder not confirmed; short quote only",
+          "use": "clause 25: 'the second death'; clause 29: 'the final extinction of the wicked' at the close of the thousand years",
+          "verification": "verified verbatim against page text; clause 29 counted from clause 24 note. Authority: statement adopted by most ecclesias, which are autonomous, so it is not a central binding creed"
+        },
+        {
+          "title": "Catechism of the Catholic Church, paragraph 1035, “Hell” (Vatican)",
+          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_three/article_12/iv_hell.index.html",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "The Catechism states that the punishment of hell is eternal and describes definitive self-exclusion from communion with God",
+          "verification": "Official Vatican text; paragraph 1035 checked on 24 November 2026"
         }
       ]
     },
@@ -754,6 +746,14 @@
           "verification": "verified against page text, Stream C session 2026-11-23"
         },
         {
+          "title": "The Church of Jesus Christ of Latter-day Saints, Gospel Topics, “Salvation”",
+          "url": "https://www.churchofjesuschrist.org/study/manual/gospel-topics/salvation?lang=eng",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Distinguishes salvation from physical death, salvation from sin and eternal life/exaltation; describes faith, repentance, baptism, receiving the Holy Ghost and enduring to the end",
+          "verification": "Official LDS page read; sections on salvation from sin and eternal life/exaltation checked"
+        },
+        {
           "title": "Becoming Like God, Gospel Topics Essays (The Church of Jesus Christ of Latter-day Saints)",
           "url": "https://www.churchofjesuschrist.org/study/manual/gospel-topics-essays/becoming-like-god?lang=eng",
           "accessed": "2026-11-23",
@@ -768,14 +768,6 @@
           "licence": "public domain for the 1830 text; verify current wording",
           "use": "'it is by grace that we are saved, after all we can do'",
           "verification": "verified against page text"
-        },
-        {
-          "title": "The Church of Jesus Christ of Latter-day Saints, Gospel Topics, “Salvation”",
-          "url": "https://www.churchofjesuschrist.org/study/manual/gospel-topics/salvation?lang=eng",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Distinguishes salvation from physical death, salvation from sin and eternal life/exaltation; describes faith, repentance, baptism, receiving the Holy Ghost and enduring to the end",
-          "verification": "Official LDS page read; sections on salvation from sin and eternal life/exaltation checked"
         }
       ],
       "internal_note": "Stream C: JW official “What Does the Bible Say About Salvation?” verified; it states works prove living faith, cannot earn salvation, and says a saved person may lose out by not continuing in faith. LDS official “Becoming Like God” and “Salvation” pages verified; these distinguish salvation from physical death, salvation from sin and eternal life/exaltation. The LDS summary must not be described merely as 'salvation by works'."
@@ -794,6 +786,30 @@
       ],
       "internal_note": "Mbiti, African Religions and Philosophy (1969; 2nd ed. 1990), primary copy remained lending-restricted; his 'living-dead' concept is attributed as reported in academic secondary sources, not as a direct reading. Community-specific sources added: Jomo Kenyatta, “Kikuyu Religion, Ancestor-Worship, and Sacrificial Practices,” Africa (Cambridge Core; article record and abstract read); Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan (University Press of America, 2012), publisher bibliographic description and chapter list read, full book not read. The Akan book is included as a research lead/context source, not used to assert details beyond its accessible description. Existing Ishida study is specific to the Îgembe; no unsupported Embu-wide or Kikuyu-wide generalisations are made. Deuteronomy 18 is limited to divination/consulting the dead, not cultural remembrance.",
       "sources": [
+        {
+          "title": "Jomo Kenyatta, “Kikuyu Religion, Ancestor-Worship, and Sacrificial Practices,” Africa (Cambridge Core)",
+          "url": "https://www.cambridge.org/core/journals/africa/article/abs/kikuyu-religion-ancestorworship-and-sacrificial-practices/6CFD176DD79B1911B0E3F152DDBA59BF",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Community-specific Kikuyu article; abstract says the Kikuyu maintain relations with spiritual entities, commune with ancestral spirits and worship Ngai and other supernatural beings",
+          "verification": "Cambridge Core article record and abstract read; full article access restricted; used only for the Kikuyu-specific summary"
+        },
+        {
+          "title": "Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan (University Press of America, 2012)",
+          "url": "https://www.bloomsbury.com/us/african-religion-defined-9780761860587/",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Publisher description and contents identify a systematic, community-specific study of Akan ancestors, the ancestors' stool, annual rites and living ancestors",
+          "verification": "Publisher bibliographic description and contents read; full book not read, so used as a source lead/context only"
+        },
+        {
+          "title": "Shin-ichiro Ishida, 'Name-sharing among the Îgembe: The Kîmîîrû texture of personhood in a village community', ch. 3 in Gĩchere, Mwithimbû and Ishida (eds.), Family Dynamics and Memories in Kenyan Villages (National Museums of Kenya, 2020)",
+          "url": "https://tokyo-metro-u.repo.nii.ac.jp/record/8492/files/11040-001.pdf",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "Îgembe (Meru): shallow genealogical depth; collective immortality; Mbiti 1990: 25-26 quoted",
+          "verification": "read in full (PDF text, about p. 75). Community-specific source for the Îgembe only. Older Peatrik remark quoted in the chapter not used"
+        },
         {
           "title": "Ancestors, Encyclopedia of African Religion (SAGE; ed. Asante and Mazama), DOI 10.4135/9781412964623.n29",
           "url": "https://sk.sagepub.com/ency/edvol/embed/africanreligion/chpt/ancestors",
@@ -827,14 +843,6 @@
           "verification": "read in full; journal peer-review status not verified. Mbiti and Ephirim-Donkor claims are as reported by Simut (secondary)"
         },
         {
-          "title": "Shin-ichiro Ishida, 'Name-sharing among the Îgembe: The Kîmîîrû texture of personhood in a village community', ch. 3 in Gĩchere, Mwithimbû and Ishida (eds.), Family Dynamics and Memories in Kenyan Villages (National Museums of Kenya, 2020)",
-          "url": "https://tokyo-metro-u.repo.nii.ac.jp/record/8492/files/11040-001.pdf",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quotes only",
-          "use": "Îgembe (Meru): shallow genealogical depth; collective immortality; Mbiti 1990: 25-26 quoted",
-          "verification": "read in full (PDF text, about p. 75). Community-specific source for the Îgembe only. Older Peatrik remark quoted in the chapter not used"
-        },
-        {
           "title": "Julius M. Gathogo, 'Njega wa Gioko and the European missionaries in the colonial Kenya', HTS Teologiese Studies/Theological Studies 78(3), a6790 (2022), doi:10.4102/hts.v78i3.6790",
           "url": "https://hts.org.za/index.php/hts/article/view/6790/21461",
           "accessed": "2026-11-23",
@@ -857,22 +865,6 @@
           "licence": "internal",
           "use": "policy",
           "verification": "internal"
-        },
-        {
-          "title": "Jomo Kenyatta, “Kikuyu Religion, Ancestor-Worship, and Sacrificial Practices,” Africa (Cambridge Core)",
-          "url": "https://www.cambridge.org/core/journals/africa/article/abs/kikuyu-religion-ancestorworship-and-sacrificial-practices/6CFD176DD79B1911B0E3F152DDBA59BF",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Community-specific Kikuyu article; abstract says the Kikuyu maintain relations with spiritual entities, commune with ancestral spirits and worship Ngai and other supernatural beings",
-          "verification": "Cambridge Core article record and abstract read; full article access restricted; used only for the Kikuyu-specific summary"
-        },
-        {
-          "title": "Anthony Ephirim-Donkor, African Religion Defined: A Systematic Study of Ancestor Worship among the Akan (University Press of America, 2012)",
-          "url": "https://www.bloomsbury.com/us/african-religion-defined-9780761860587/",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Publisher description and contents identify a systematic, community-specific study of Akan ancestors, the ancestors' stool, annual rites and living ancestors",
-          "verification": "Publisher bibliographic description and contents read; full book not read, so used as a source lead/context only"
         }
       ]
     },
@@ -891,12 +883,12 @@
       "internal_note": "The missing primary Oneness source is now added: United Pentecostal Church International, 2023 Articles of Faith, page 1, section “The One True God”. It explicitly states the one indivisible deity, Father/Son/Spirit as modes of revelation and Jesus as God manifested in flesh. JW official source on the active force checked; LDS official Godhead essay checked. Nicene Creed text in the repository and OCA official Nicene Creed page verify the counter-position. Do not apply the label 'modalism' without a source or without explaining that it is an external classification.",
       "sources": [
         {
-          "title": "United Pentecostal Church International, Our Beliefs (upci.org)",
-          "url": "https://upci.org/our-beliefs",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quote only",
-          "use": "'There is one God, who has revealed Himself as Father; through His Son, in redemption; and as the Holy Spirit, by emanation. Jesus Christ is God manifested in flesh.'",
-          "verification": "verified against page text. This is the overview page. The full Statement of Fundamental Truths was not located at a reachable official URL (U-C3)"
+          "title": "United Pentecostal Church International, 2023 Articles of Faith, “The One True God”",
+          "url": "https://dmc.upci.org/wp-content/uploads/2023/03/2023-UPCI-ARTICLES-OF-FAITH.pdf",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Official UPCI document says God possesses absolute, indivisible deity and has revealed himself as Father, through the Son in redemption and as the Holy Spirit by emanation; identifies Jesus Christ as God manifested in flesh",
+          "verification": "Page 1 screenshot and text checked; official UPCI document, 2023"
         },
         {
           "title": "The Holy Spirit, God's Active Force (jw.org, Should You Believe in the Trinity?)",
@@ -915,12 +907,12 @@
           "verification": "verified against page text"
         },
         {
-          "title": "Seventh-day Adventist Church, Fundamental Belief 2, The Trinity",
-          "url": "https://adventist.org/beliefs/",
+          "title": "United Pentecostal Church International, Our Beliefs (upci.org)",
+          "url": "https://upci.org/our-beliefs",
           "accessed": "2026-11-23",
           "licence": "copyright; short quote only",
-          "use": "'There is one God: Father, Son, and Holy Spirit, a unity of three coeternal Persons.'",
-          "verification": "verified in an earlier session; RE-CHECK BLOCKED today (HTTP 429, Vercel checkpoint). Keep unless re-check fails (U-C4)"
+          "use": "'There is one God, who has revealed Himself as Father; through His Son, in redemption; and as the Holy Spirit, by emanation. Jesus Christ is God manifested in flesh.'",
+          "verification": "verified against page text. This is the overview page. The full Statement of Fundamental Truths was not located at a reachable official URL (U-C3)"
         },
         {
           "title": "Nicene-Constantinopolitan Creed of 381, approved text (scripts/reference/creeds/nicene-constantinopolitan-381.txt; approved by Levi 2026-11-23)",
@@ -937,14 +929,6 @@
           "licence": "copyright; short quotes only",
           "use": "Constantinopolitan clause on the Holy Spirit: 'who with the Father and the Son together is worshipped and glorified'",
           "verification": "verified against raw page text (S47)"
-        },
-        {
-          "title": "United Pentecostal Church International, 2023 Articles of Faith, “The One True God”",
-          "url": "https://dmc.upci.org/wp-content/uploads/2023/03/2023-UPCI-ARTICLES-OF-FAITH.pdf",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Official UPCI document says God possesses absolute, indivisible deity and has revealed himself as Father, through the Son in redemption and as the Holy Spirit by emanation; identifies Jesus Christ as God manifested in flesh",
-          "verification": "Page 1 screenshot and text checked; official UPCI document, 2023"
         }
       ]
     },
@@ -1056,12 +1040,12 @@
       "internal_note": "Official source replaced with the General Conference of Seventh-day Adventists world headquarters page, gc.adventist.org/beliefs, which provides the current 28 Fundamental Beliefs and was checked on 24 November 2026. FB2, FB20, FB26 and FB27 were checked. The 2021 General Conference Executive Committee Newsletter, Biblical Research Institute answers, pages 1–14 only, remains the source for the future end-time test; pages 15–18 were not used. The claim is attributed to that specific document.",
       "sources": [
         {
-          "title": "Official Beliefs of the Seventh-day Adventist Church (adventist.org/beliefs)",
-          "url": "https://adventist.org/beliefs/",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quotes only",
-          "use": "No. 2 The Trinity; No. 13 The Remnant; No. 20 The Sabbath",
-          "verification": "verified in an earlier session (not truncated). RE-CHECK BLOCKED today (HTTP 429, Vercel checkpoint). Fundamental Belief 13 and 20 wording must be re-read before merge (U-C4)"
+          "title": "General Conference of Seventh-day Adventists, “What Do Seventh-day Adventists Believe?” official 28 Fundamental Beliefs",
+          "url": "https://gc.adventist.org/beliefs/",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "FB2: Trinity; FB13: remnant; FB20: seventh-day Sabbath; FB26: unconscious death; FB27: final destruction of sin and sinners",
+          "verification": "Verified against current official General Conference website on 24 November 2026"
         },
         {
           "title": "General Conference Executive Committee Newsletter, July-September 2021, Biblical Research Institute answers on the mark of the beast",
@@ -1070,14 +1054,6 @@
           "licence": "copyright; summary and short quotes only",
           "use": "Sunday as a distinguishing sign in the final test; the document does not settle whether Sunday worship marks a person before the future test",
           "verification": "verified in an earlier session, pages 1-14 read; pages 15-18 not relied on"
-        },
-        {
-          "title": "General Conference of Seventh-day Adventists, “What Do Seventh-day Adventists Believe?” official 28 Fundamental Beliefs",
-          "url": "https://gc.adventist.org/beliefs/",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "FB2: Trinity; FB13: remnant; FB20: seventh-day Sabbath; FB26: unconscious death; FB27: final destruction of sin and sinners",
-          "verification": "Official world church website read; relevant beliefs 2, 13, 20, 26 and 27 checked on 24 November 2026"
         }
       ]
     },
@@ -1096,12 +1072,12 @@
       "internal_note": "Cambridge University Press, Margrethe Løøv, The New Age Movement (Elements in New Religious Movements, published online 14 February 2024; print 17 October 2024) replaces Britannica as the primary academic source for the movement's diversity. The source expressly says there is no common founder, leader, institution, dogma or scripture. No specific universal-energy or law-of-attraction doctrine is attributed to the movement as a whole.",
       "sources": [
         {
-          "title": "New Age movement, Encyclopaedia Britannica",
-          "url": "https://www.britannica.com/topic/New-Age-movement",
-          "accessed": "2026-11-23",
-          "licence": "copyright; summary only (not quoted)",
-          "use": "diverse believers; roots in esotericism and Theosophy; healing, self-transformation, meditation",
-          "verification": "verified earlier in this pass (register S18); re-read blocked (403) today"
+          "title": "Margrethe Løøv, The New Age Movement, Elements in New Religious Movements (Cambridge University Press, 2024)",
+          "url": "https://www.cambridge.org/core/elements/abs/new-age-movement/C739F64CCC20918EFF40756AB1BDABE9",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Academic overview describes New Age as a loosely cohesive conglomerate of different spiritual currents without a common founder, leader, institution, dogma or scripture",
+          "verification": "Cambridge University Press abstract read; 2024 publication details checked"
         },
         {
           "title": "Scripture (KJV), John 4:24; James 5:14-15; 1 John 4:1; Deuteronomy 18:10-11",
@@ -1112,12 +1088,12 @@
           "verification": "verified (KJV wording checked)"
         },
         {
-          "title": "Margrethe Løøv, The New Age Movement, Elements in New Religious Movements (Cambridge University Press, 2024)",
-          "url": "https://www.cambridge.org/core/elements/abs/new-age-movement/C739F64CCC20918EFF40756AB1BDABE9",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Academic overview describes New Age as a loosely cohesive conglomerate of different spiritual currents without a common founder, leader, institution, dogma or scripture",
-          "verification": "Cambridge University Press abstract read; 2024 publication details checked"
+          "title": "New Age movement, Encyclopaedia Britannica",
+          "url": "https://www.britannica.com/topic/New-Age-movement",
+          "accessed": "2026-11-23",
+          "licence": "copyright; summary only (not quoted)",
+          "use": "diverse believers; roots in esotericism and Theosophy; healing, self-transformation, meditation",
+          "verification": "verified earlier in this pass (register S18); re-read blocked (403) today"
         }
       ]
     },
@@ -1171,7 +1147,7 @@
           "accessed": "2026-11-23",
           "licence": "open access reference",
           "use": "atheism construed as 'the proposition that God does not exist'; psychological and epistemological senses of agnosticism; atheism and naturalism 'are not identical'",
-          "verification": "verified against page text (first 40,000 characters). Agnosticism wording to be re-read against the full entry before merge"
+          "verification": "Verified against full SEP sections 1–2; distinguishes psychological agnosticism (suspending judgment) from epistemological agnosticism (neither theism nor atheism known)"
         },
         {
           "title": "David Papineau, Naturalism, Stanford Encyclopedia of Philosophy",
@@ -1179,7 +1155,7 @@
           "accessed": "2026-11-23",
           "licence": "open access reference",
           "use": "'naturalism can be separated into an ontological and a methodological component'; ontological: reality has no place for 'supernatural' or other 'spooky' kinds of entity; 'there is nothing more to the mental, biological and social realms than arrangements of physical entities'; methodological: 'concerned with ways of investigating reality'",
-          "verification": "verified against page text (first 39,945 of 98,164 characters); later sections not relied on"
+          "verification": "Verified against SEP discussion of ontological and methodological naturalism; the two are explicitly distinguished"
         },
         {
           "title": "Humanist Manifesto III (American Humanist Association)",
@@ -1350,6 +1326,14 @@
       "internal_note": "Trent Session 4 verified from Hanover Historical Texts (Waterworth 1848 translation); the decree refers to the Vulgate's books and parts, including Esther and Daniel. Westminster Confession chapter 1 verified. Important new primary institutional source: OCA, “Canon of Scripture” (official OCA Q&A) expressly calls these books the 'longer canon' and lists Tobit, Judith, additional parts of Esther and Daniel, Maccabees, Wisdom, Sirach, Baruch and Prayer of Manasseh as canonical in Orthodox Christianity. Additional Orthodox theological history: Metropolitan Macarius Bulgakov, Introduction to Orthodox Theology, §125–126; §125 enumerates the OT canonical books according to the Orthodox Church's then-current canon. It is a theological handbook, not a pan-Orthodox synodal decree. The previous reliance on Schaff as the only Orthodox evidence has been superseded; Schaff remains secondary context only. The app remains on the 66-book Protestant canon.",
       "sources": [
         {
+          "title": "Orthodox Church in America, “Canon of Scripture” (Questions & Answers)",
+          "url": "https://www.oca.org/questions/scripture/canon-of-scripture",
+          "accessed": "2026-11-24",
+          "licence": "copyright; short quotes or summary only",
+          "use": "Official OCA answer calls the Septuagint-based books the 'longer canon' and lists Tobit, Judith, additions to Esther and Daniel, Maccabees, Wisdom, Sirach, Baruch and Prayer of Manasseh as canonical in Orthodox Christianity",
+          "verification": "Official OCA answer read; list checked"
+        },
+        {
           "title": "Council of Trent, Session 4, Decree Concerning the Canonical Scriptures (Hanover Historical Texts, Waterworth translation, 1848)",
           "url": "https://history.hanover.edu/texts/trent/ct04.html",
           "accessed": "2026-11-23",
@@ -1388,14 +1372,6 @@
           "licence": "public domain",
           "use": "scripture reference",
           "verification": "scripture reference"
-        },
-        {
-          "title": "Orthodox Church in America, “Canon of Scripture” (Questions & Answers)",
-          "url": "https://www.oca.org/questions/scripture/canon-of-scripture",
-          "accessed": "2026-11-24",
-          "licence": "copyright; short quotes or summary only",
-          "use": "Official OCA answer calls the Septuagint-based books the 'longer canon' and lists Tobit, Judith, additions to Esther and Daniel, Maccabees, Wisdom, Sirach, Baruch and Prayer of Manasseh as canonical in Orthodox Christianity",
-          "verification": "Official OCA answer read; list checked"
         },
         {
           "title": "Metropolitan Macarius (Bulgakov), Introduction to Orthodox Theology, Part II, chapter II, §125–126, “On the Canonical Books of Holy Scripture”",
@@ -1443,28 +1419,12 @@
       "internal_note": "Group policy follows the owner's instruction: name and describe Catholic and Eastern Orthodox churches where relevant; evaluate institutional doctrine against Scripture; never judge individual members' eternal destiny. Catholic sources: Catechism, Credo and paragraphs 232–267. Orthodox sources: OCA Nicene Creed and Incarnation pages; St Andrew's Greek Orthodox Cathedral (Thyateira and Great Britain jurisdiction) prints the Nicene-Constantinopolitan Creed. The long direct creed quotation has been replaced by paraphrase to avoid reproducing an extended translation. The guide does not assume every group's self-description is supported by a primary source; each entry identifies when secondary evidence is used.",
       "sources": [
         {
-          "title": "Perazim Guide rules (Agents.md, rule 5); owner decision on PR 76",
-          "url": "",
-          "accessed": "2026-11-23",
-          "licence": "internal",
-          "use": "policy",
-          "verification": "internal"
-        },
-        {
           "title": "The Credo, Catechism of the Catholic Church (vatican.va), Part One, Section One, Chapter Three, Article 2",
           "url": "https://www.vatican.va/content/catechism/en/part_one/section_one/chapter_three/article_2/the_credo.html",
           "accessed": "2026-11-23",
           "licence": "copyright; short quotes only",
           "use": "'We believe in one Lord, Jesus Christ, the only Son of God, eternally begotten of the Father, God from God, Light from Light, true God from true God, begotten, not made, of one Being with the Father.'; 'by the power of the Holy Spirit he was born of the Virgin Mary, and became man'",
           "verification": "verified against raw page text, re-checked 2026-11-23 (full Credo text fetched, 110,175 bytes including markup; quotations found verbatim). Official Catholic source (tier 1)"
-        },
-        {
-          "title": "Paragraph 2. The Father, Catechism of the Catholic Church (vatican.va), paragraphs 232-267",
-          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_one/article_1/paragraph_2_the_father.html",
-          "accessed": "2026-11-23",
-          "licence": "copyright; short quotes only",
-          "use": "232: 'The faith of all Christians rests on the Trinity.'; 253: 'We do not confess three Gods, but one God in three persons'",
-          "verification": "verified against raw page text, re-checked 2026-11-23 (paragraphs 232 and 253 verbatim). Official Catholic source (tier 1)"
         },
         {
           "title": "Nicene Creed, Orthodox Church in America",
@@ -1481,6 +1441,22 @@
           "licence": "copyright; short quotes only",
           "use": "Chalcedonian definition: 'perfect in Divinity and perfect in Humanity, true God and true Man'",
           "verification": "verified against raw page text, re-checked 2026-11-23. Official jurisdiction source (tier 1). Not used in the model-facing summary"
+        },
+        {
+          "title": "Perazim Guide rules (Agents.md, rule 5); owner decision on PR 76",
+          "url": "",
+          "accessed": "2026-11-23",
+          "licence": "internal",
+          "use": "policy",
+          "verification": "internal"
+        },
+        {
+          "title": "Paragraph 2. The Father, Catechism of the Catholic Church (vatican.va), paragraphs 232-267",
+          "url": "https://www.vatican.va/content/catechism/en/part_one/section_two/chapter_one/article_1/paragraph_2_the_father.html",
+          "accessed": "2026-11-23",
+          "licence": "copyright; short quotes only",
+          "use": "232: 'The faith of all Christians rests on the Trinity.'; 253: 'We do not confess three Gods, but one God in three persons'",
+          "verification": "verified against raw page text, re-checked 2026-11-23 (paragraphs 232 and 253 verbatim). Official Catholic source (tier 1)"
         },
         {
           "title": "The Nicene-Constantinopolitan Creed, St Andrew's Greek Orthodox Cathedral (London), a church of the Greek Orthodox Archdiocese of Thyateira and Great Britain (Ecumenical Patriarchate)",
