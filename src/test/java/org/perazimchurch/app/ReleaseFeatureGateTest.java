@@ -1,7 +1,6 @@
 package org.perazimchurch.app;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -10,9 +9,8 @@ public class ReleaseFeatureGateTest {
     @Test public void remoteFeaturesStayDisabledAndQwenIsValidationOnly() {
         assertFalse(BuildConfig.REMOTE_SHEET_FEEDS_ENABLED);
         assertFalse(BuildConfig.ONLINE_AI_ENABLED);
-        if ("validation".equals(BuildConfig.BUILD_TYPE)) {
-            assertTrue(BuildConfig.OFFLINE_QWEN_ENABLED);
-        } else {
+        // On-phone Qwen is debug/validation-only: release must keep it off until gate L7 passes.
+        if ("release".equals(BuildConfig.BUILD_TYPE)) {
             assertFalse(BuildConfig.OFFLINE_QWEN_ENABLED);
         }
     }

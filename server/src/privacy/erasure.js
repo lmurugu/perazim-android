@@ -28,6 +28,9 @@ const ERASURE_POLICY = {
   'community_posts.author_id': 'delete',
   'post_comments.author_id': 'delete',
   'post_amens.user_id': 'delete',
+  'game_leaderboard_profiles.user_id': 'delete',
+  'game_score_weeks.user_id': 'delete',
+  'game_score_events.user_id': 'delete',
   'event_rsvps.user_id': 'delete',
   'group_memberships.user_id': 'delete',
   'in_app_notifications.user_id': 'delete',
@@ -122,6 +125,9 @@ async function eraseMemberData(client, userId, now = Date.now()) {
 
   // Progress and uploads.
   await client.query('DELETE FROM user_challenge_completions WHERE user_id = $1', [userId]);
+  await client.query('DELETE FROM game_score_events WHERE user_id = $1', [userId]);
+  await client.query('DELETE FROM game_score_weeks WHERE user_id = $1', [userId]);
+  await client.query('DELETE FROM game_leaderboard_profiles WHERE user_id = $1', [userId]);
   await client.query('DELETE FROM community_media WHERE owner_id = $1', [userId]);
   await client.query('DELETE FROM membership_account_identities WHERE user_id = $1', [userId]);
 

@@ -1,5 +1,7 @@
 package org.perazimchurch.app;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import org.perazimchurch.app.config.ChurchConfig;
 
 import android.app.Activity;
@@ -22,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.TypedValue;
@@ -64,6 +67,7 @@ import org.perazimchurch.app.presentation.viewmodel.SermonsViewModel;
 import org.perazimchurch.app.presentation.viewmodel.ViewModelFactory;
 import org.perazimchurch.app.presentation.viewmodel.WorshipViewModel;
 import org.perazimchurch.app.sync.SheetSyncManager;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
@@ -79,10 +83,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public static final int COLOR_PURPLE_SHADOW   = Color.parseColor("#450E53"); // 3D bevel shadow
     public static final int COLOR_PURPLE_LIGHT    = Color.parseColor("#8E30A8"); // Brightened purple
     public static final int COLOR_PURPLE_SOFT     = Color.parseColor("#C896D8"); // Soft purple text
-    public static final int COLOR_BORDER_GREY     = Color.parseColor("#E7D5EC"); // Whitened purple card border
+    public static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_STROKE; } // Whitened purple card border
     public static final int COLOR_PURPLE_TINT     = Color.parseColor("#F5ECF7"); // Pastel purple tint
-    public static final int COLOR_TEXT_MUTED      = Color.parseColor("#725B78"); // Muted purple-grey text
-    public static final int COLOR_TEXT_DARK       = Color.parseColor("#1A1225"); // Deep purple-black text
+    public static int COLOR_TEXT_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; } // Muted purple-grey text
+    public static int COLOR_TEXT_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; } // Deep purple-black text
 
     public static final int COLOR_ACCENT_ORANGE   = Color.parseColor("#E17D2F"); // Secondary Brand Warm Amber/Orange
     public static final int COLOR_ORANGE_DARK     = Color.parseColor("#78350A"); // Darkened orange
@@ -91,7 +95,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     public static final int COLOR_ORANGE_TINT     = Color.parseColor("#FDF5EF"); // Pastel orange tint
 
     public static final int COLOR_WHITE           = Color.parseColor("#FFFFFF"); // Card surface
-    public static final int COLOR_BG_NEUTRAL      = Color.parseColor("#FAF7FB"); // Whitened purple canvas
+    public static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_DEEP; } // Whitened purple canvas
 
     // --- STATE VARIABLES ---
     private int streakCount = 0;
@@ -166,8 +170,47 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private FrameLayout splashContainer;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public boolean dispatchTouchEvent(android.view.MotionEvent ev) {
+        if (ev.getActionMasked() == android.view.MotionEvent.ACTION_UP) {
+            org.perazimchurch.app.ui.components.FeedbackManager.get(this).clickAt(this, ev.getRawX(), ev.getRawY());
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        // Keep the mode in step with the phone (System) before any screen is built.
+        org.perazimchurch.app.ui.theme.PerazimTheme.applyPreference(newBase);
+        // Lay the screen out at the chosen app size and text size.
+        super.attachBaseContext(org.perazimchurch.app.ui.theme.UiScale.wrap(newBase));
+    }
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        // Press and selection colour follows the in-app mode, set before any view is built.
+        getTheme().applyStyle(org.perazimchurch.app.ui.theme.PerazimTheme.isLight()
+                ? R.style.PerazimPressLight : R.style.PerazimPressDark, true);
         super.onCreate(savedInstanceState);
+        if (savedInstanceState == null) {
+            // Cold start: show the black logo screen first, then build the app behind it. While the words fade in,
+            // open the database on another thread, so the app build that follows finds it ready and is shorter.
+            final android.content.Context appContext = getApplicationContext();
+            Thread warm = new Thread(() -> {
+                try {
+                    SessionManager.getInstance(appContext);
+                } catch (Throwable ignored) {
+                    // Opening it again on the main thread will report any real problem.
+                }
+            }, "startup-warm-up");
+            warm.start();
+            org.perazimchurch.app.ui.components.StartupSplash.begin(this, () -> initApp(null));
+        } else {
+            initApp(savedInstanceState);
+        }
+    }
+
+    private void initApp(Bundle savedInstanceState) {
+        org.perazimchurch.app.ui.theme.Glass.useDensity(getResources().getDisplayMetrics().density);
 
         // Initialize gamification persistence
         UserMapper.init(this);
@@ -193,7 +236,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         rootLayout.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         rootLayout.setOrientation(LinearLayout.VERTICAL);
-        rootLayout.setBackground(PerazimTheme.createBackgroundGradient());
+        // The glow sits on the root window so it also runs behind the status and navigation bars.
+        rootWindow.setBackground(PerazimTheme.createBackgroundGradient());
+        drawBehindSystemBars(rootWindow);
 
         // 1. Top App Bar
         View topBar = createTopAppBar();
@@ -212,23 +257,35 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tabViews[4] = buildGivingScreen();
         tabViews[5] = buildProfileScreen();
         for (int i = 0; i < tabViews.length; i++) {
+            // One glow behind the whole screen (header included), and room under the floating nav bar.
+            tabViews[i].setBackground(null);
+            tabViews[i].setClipToPadding(false);
+            tabViews[i].setPadding(tabViews[i].getPaddingLeft(), tabViews[i].getPaddingTop(),
+                    tabViews[i].getPaddingRight(), tabViews[i].getPaddingBottom() + dp(104));
             tabContainer.addView(tabViews[i]);
             tabViews[i].setVisibility(i == 0 ? View.VISIBLE : View.GONE);
         }
         rootLayout.addView(tabContainer);
-
-        // 3. Persistent Mini-Player (Subsplash pattern)
-        View miniPlayer = createMiniPlayer();
-        rootLayout.addView(miniPlayer);
-
-        // 4. Bottom Navigation Bar
-        View bottomBar = createBottomTabBar();
-        rootLayout.addView(bottomBar);
-
         rootWindow.addView(rootLayout);
 
+        // 3 + 4. Mini-player and the floating glass nav bar sit over the content, as in the mockups.
+        LinearLayout bottomDock = new LinearLayout(this);
+        bottomDock.setOrientation(LinearLayout.VERTICAL);
+        bottomDock.setClipChildren(false);
+        bottomDock.setClipToPadding(false);
+        View miniPlayer = createMiniPlayer();
+        LinearLayout.LayoutParams lpMini = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lpMini.setMargins(dp(16), 0, dp(16), dp(8));
+        bottomDock.addView(miniPlayer, lpMini);
+        View bottomBar = createBottomTabBar();
+        bottomDock.addView(bottomBar);
+        rootWindow.addView(bottomDock, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+
         // 5. Illustrated Quiet-Dark Splash Overlay
-        splashContainer = createSplashScreen();
+        splashContainer = getIntent() != null && getIntent().getBooleanExtra("show_splash", false)
+                ? createSplashScreen() : null;
         if (splashContainer != null) {
             rootWindow.addView(splashContainer);
             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
@@ -245,7 +302,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             }, 1200);
         }
 
-        setContentView(rootWindow);
+        // On a cold start the app goes under the black logo screen, which then fades away.
+        org.perazimchurch.app.ui.components.StartupSplash.showApp(this, rootWindow);
         handleIntent(getIntent());
     }
 
@@ -403,45 +461,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private View createTopAppBar() {
-        LinearLayout header = new LinearLayout(this);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-        header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setBackground(PerazimTheme.createTopBarGradient(dp(1)));
-        header.setPadding(dp(16), dp(10), dp(16), dp(10));
-
-        // Official Church Logo
-        ImageView logo = new ImageView(this);
-        logo.setImageResource(R.drawable.ic_perazim_logo);
-        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(28), dp(28));
-        lpLogo.setMargins(0, 0, dp(10), 0);
-        logo.setLayoutParams(lpLogo);
-        header.addView(logo);
-
-        // Wordmark "Perazim"
-        TextView wordmark = new TextView(this);
-        wordmark.setText("Perazim");
-        wordmark.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-        wordmark.setTypeface(Typeface.DEFAULT_BOLD);
-        wordmark.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        wordmark.setLetterSpacing(0.04f);
-        header.addView(wordmark);
-
-        View spacer = new View(this);
-        LinearLayout.LayoutParams lpSpacer = new LinearLayout.LayoutParams(0, 0, 1.0f);
-        spacer.setLayoutParams(lpSpacer);
-        header.addView(spacer);
-
-        // Profile ("Me") moved from the bottom bar to the header, so Giving can have its own tab.
-        ImageView meButton = new ImageView(this);
-        meButton.setImageResource(NavigationContract.TAB_ICON_RES_ME);
-        meButton.setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
-        meButton.setPadding(dp(8), dp(8), dp(8), dp(8));
-        meButton.setContentDescription("My profile");
-        meButton.setLayoutParams(new LinearLayout.LayoutParams(dp(40), dp(40)));
-        meButton.setOnClickListener(v -> switchTab(NavigationContract.TAB_ID_PROFILE));
-        header.addView(meButton);
-
-        return header;
+        // Mockup header: logo and "Perazim", then the light/dark switch and the glass profile button.
+        return GlassKit.header(this,
+                v -> org.perazimchurch.app.ui.components.ThemeSwitcher.choose(this, v),
+                v -> switchTab(NavigationContract.TAB_ID_PROFILE));
     }
 
     private void persistGamification() {
@@ -578,23 +601,127 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // 3. BOTTOM TAB BAR NAVIGATION
     // =========================================================================
 
+    /**
+     * Transparent status and navigation bars with the glow behind them, as in the mockups. Content is
+     * padded by the bar insets so nothing hides under the clock or the system buttons. Icons turn dark in
+     * light mode so they stay readable.
+     */
+    @SuppressWarnings("deprecation")
+    private void drawBehindSystemBars(FrameLayout root) {
+        android.view.Window window = getWindow();
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+        if (PerazimTheme.isLight()) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) {
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+        }
+        if (Build.VERSION.SDK_INT < 30) {
+            window.getDecorView().setSystemUiVisibility(flags);
+        }
+        root.setOnApplyWindowInsetsListener((v, insets) -> {
+            v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
+                    insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+            return insets.consumeSystemWindowInsets();
+        });
+        if (Build.VERSION.SDK_INT >= 30) {
+            // Same flow as the Bible tab: the glow runs from the very top to the very bottom edge,
+            // behind the camera cutout, the status bar and the navigation bar.
+            window.getDecorView();  // make sure the decor view exists before using the insets controller
+            window.setDecorFitsSystemWindows(false);
+            window.setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
+            if (Build.VERSION.SDK_INT >= 28) {
+                android.view.WindowManager.LayoutParams attrs = window.getAttributes();
+                attrs.layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+                window.setAttributes(attrs);
+            }
+            root.setOnApplyWindowInsetsListener((v, insets) -> {
+                android.graphics.Insets bars = insets.getInsets(
+                        android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
+                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                return android.view.WindowInsets.CONSUMED;
+            });
+            android.view.WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+            }
+        }
+        root.requestApplyInsets();
+        if (Build.VERSION.SDK_INT >= 30) {
+            // The system resets bar appearance while the window attaches, so apply it again afterwards.
+            root.post(() -> applySystemBarLook(window));
+            root.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    v.post(() -> applySystemBarLook(window));
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                }
+            });
+        }
+    }
+
+    /** Transparent bars with dark icons in light mode and light icons in dark mode, no contrast scrim. */
+    private void applySystemBarLook(android.view.Window window) {
+        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setNavigationBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 29) {
+            window.setStatusBarContrastEnforced(false);
+            window.setNavigationBarContrastEnforced(false);
+        }
+        android.view.WindowInsetsController controller = window.getInsetsController();
+        if (controller != null) {
+            int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                    | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+            controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+        }
+    }
+
     private View createBottomTabBar() {
         LinearLayout bottomNav = new LinearLayout(this);
         LinearLayout.LayoutParams lpNav = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(58));
+                LinearLayout.LayoutParams.MATCH_PARENT, dp(64));
+        lpNav.setMargins(dp(16), dp(28), dp(16), dp(18));
         bottomNav.setLayoutParams(lpNav);
+        bottomNav.setClipChildren(false);
+        bottomNav.setClipToPadding(false);
         bottomNav.setOrientation(LinearLayout.HORIZONTAL);
         bottomNav.setGravity(Gravity.CENTER_VERTICAL);
-        bottomNav.setPadding(0, dp(4), 0, dp(4));
 
-        bottomNav.setBackground(PerazimTheme.createBottomNavGradient(dp(1)));
+        // Frosted bar: content scrolling underneath is washed out, as a backdrop blur would.
+        GradientDrawable navBg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                PerazimTheme.isLight()
+                        ? new int[]{Color.parseColor("#FAFFFFFF"), Color.parseColor("#F5FFFFFF")}
+                        : new int[]{Color.parseColor("#FA3A1A45"), Color.parseColor("#FC2A0F33")});
+        navBg.setCornerRadius(dp(32));
+        navBg.setStroke(Math.max(1, dp(1)), Color.parseColor(PerazimTheme.isLight() ? "#F2FFFFFF" : "#2EFFFFFF"));
+        bottomNav.setBackground(navBg);
+        // Mockup: light bar 0 8px 24px rgba(61,23,73,0.15); the dark bar gets a deep shadow to float.
+        if (PerazimTheme.isLight()) {
+            GlassKit.shadow(bottomNav, Color.parseColor("#263D1749"), 8, 24);
+        } else {
+            GlassKit.shadow(bottomNav, Color.parseColor("#59000000"), 10, 30);
+        }
+        GlassKit.keep(bottomNav);
 
         final int[] iconResIds = {
-                NavigationContract.TAB_ICON_RES_HOME,
-                NavigationContract.TAB_ICON_RES_SERMONS,
-                NavigationContract.TAB_ICON_RES_WORSHIP,
-                NavigationContract.TAB_ICON_RES_PRAYER,
-                org.perazimchurch.app.R.drawable.ic_give
+                R.drawable.gl_home,
+                R.drawable.gl_mic,
+                R.drawable.gl_music,
+                R.drawable.gl_people,
+                R.drawable.gl_give
         };
         final String[] labels = {
                 NavigationContract.TAB_TITLE_HOME,
@@ -604,32 +731,64 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 "Give"
         };
 
-        for (int i = 0; i < 5; i++) {
+        final int[] visualOrder = {0, 1, 4, 2, 3};
+        for (int pos = 0; pos < 5; pos++) {
+            final int i = visualOrder[pos];
             final int index = i;
             LinearLayout tab = new LinearLayout(this);
             tab.setOrientation(LinearLayout.VERTICAL);
             tab.setGravity(Gravity.CENTER);
+            tab.setClipChildren(false);
+            tab.setClipToPadding(false);
             LinearLayout.LayoutParams lpTab = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
             tab.setLayoutParams(lpTab);
-            tab.setPadding(dp(4), dp(4), dp(4), dp(4));
 
             ImageView ivIcon = new ImageView(this);
-            LinearLayout.LayoutParams lpIcon = new LinearLayout.LayoutParams(dp(22), dp(22));
-            ivIcon.setLayoutParams(lpIcon);
             ivIcon.setImageResource(iconResIds[i]);
-
-            TextView tvLabel = new TextView(this);
-            tvLabel.setText(labels[i]);
-            tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            tvLabel.setGravity(Gravity.CENTER);
-            tvLabel.setPadding(0, dp(2), 0, 0);
-
-            tab.addView(ivIcon);
-            tab.addView(tvLabel);
+            if (i == 4) {
+                // Give: the raised orange orb in the middle of the bar
+                GradientDrawable orb = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                        new int[]{GlassKit.ORANGE_TOP, GlassKit.ORANGE_BOTTOM});
+                orb.setShape(GradientDrawable.OVAL);
+                orb.setStroke(Math.max(1, dp(1)), Color.parseColor("#66FFFFFF"));
+                ivIcon.setBackground(orb);
+                ivIcon.setPadding(dp(16), dp(16), dp(16), dp(16));
+                // The tab fills the whole bar so every tap on the orb reaches Give; the orb itself
+                // is lifted above the bar with a translation (a negative margin left its top outside the tab).
+                tab.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+                ivIcon.setLayoutParams(new LinearLayout.LayoutParams(dp(56), dp(56)));
+                ivIcon.setTranslationY(-dp(15));
+                // Mockup: dark 0 0 30px rgba(225,125,47,0.8) halo; light 0 8px 22px rgba(225,125,47,0.5)
+                if (PerazimTheme.isLight()) {
+                    GlassKit.shadow(ivIcon, GlassKit.withAlpha(GlassKit.ORANGE, 0.5f), 8, 22);
+                } else {
+                    GlassKit.shadow(ivIcon, GlassKit.withAlpha(GlassKit.ORANGE, 0.8f), 0, 30);
+                }
+                ivIcon.setContentDescription("Give");
+                tab.addView(ivIcon);
+            } else {
+                ivIcon.setLayoutParams(new LinearLayout.LayoutParams(dp(22), dp(22)));
+                TextView tvLabel = new TextView(this);
+                tvLabel.setText(labels[i]);
+                // Nav labels stay on one line: text size is capped at 1.1x so "Community" never wraps at Larger text.
+                float navFont = getResources().getConfiguration().fontScale;
+                if (navFont <= 0f) {
+                    navFont = 1f;
+                }
+                tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        11f * getResources().getDisplayMetrics().density * Math.min(navFont, 1.1f));
+                tvLabel.setSingleLine(true);
+                tvLabel.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                tvLabel.setGravity(Gravity.CENTER);
+                tvLabel.setIncludeFontPadding(false);
+                tvLabel.setPadding(0, dp(2), 0, 0);
+                tab.addView(ivIcon);
+                tab.addView(tvLabel);
+                navTabLabels[i] = tvLabel;
+            }
             tab.setOnClickListener(v -> switchTab(index));
 
             navTabButtons[i] = tab;
-            navTabLabels[i] = tvLabel;
             navTabIcons[i] = ivIcon;
 
             bottomNav.addView(tab);
@@ -656,31 +815,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void refreshTabStyles() {
+        int on = GlassKit.light() ? Color.parseColor("#3D1749") : Color.WHITE;
+        int off = GlassKit.muted();
         for (int i = 0; i < 5; i++) {
             boolean isSelected = (i == currentTabIndex);
-            if (isSelected) {
-                if (navTabLabels[i] != null) {
-                    navTabLabels[i].setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-                    navTabLabels[i].setTypeface(Typeface.DEFAULT_BOLD);
-                }
-                if (navTabIcons[i] != null) {
-                    navTabIcons[i].setColorFilter(PerazimTheme.COLOR_TEXT_PRIMARY, PorterDuff.Mode.SRC_IN);
-                }
-                if (navTabButtons[i] != null) {
-                    GradientDrawable activePill = PerazimTheme.createActivePillGradient(dp(12));
-                    navTabButtons[i].setBackground(activePill);
-                }
-            } else {
-                if (navTabLabels[i] != null) {
-                    navTabLabels[i].setTextColor(PerazimTheme.COLOR_PURPLE_MUTED);
-                    navTabLabels[i].setTypeface(Typeface.DEFAULT);
-                }
-                if (navTabIcons[i] != null) {
-                    navTabIcons[i].setColorFilter(PerazimTheme.COLOR_PURPLE_MUTED, PorterDuff.Mode.SRC_IN);
-                }
-                if (navTabButtons[i] != null) {
-                    navTabButtons[i].setBackground(null);
-                }
+            if (navTabLabels[i] != null) {
+                navTabLabels[i].setTextColor(isSelected ? on : off);
+                navTabLabels[i].setTypeface(isSelected ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+            }
+            if (navTabIcons[i] != null) {
+                navTabIcons[i].setColorFilter(i == 4 ? Color.WHITE : (isSelected ? on : off), PorterDuff.Mode.SRC_IN);
+            }
+            if (navTabButtons[i] != null) {
+                navTabButtons[i].setBackground(null);
             }
         }
     }
@@ -710,6 +857,11 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 factory.createHomeViewModel(),
                 bibleViewModel,
                 new HomeUiBinder.HomeUiListener() {
+                    @Override
+                    public void onOpenAiGuide() {
+                        if (BuildConfig.OFFLINE_QWEN_ENABLED) showAiBreakthroughGuide();
+                    }
+
                     @Override
                     public void onStreakUpdated(int streak) {
                         streakCount = streak;
@@ -748,7 +900,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacyHomeScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -773,7 +925,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(tvSubGreeting);
 
         // Quick Actions Grid (Give / Tithe, Full Scripture, Submit Prayer)
-        LinearLayout quickActionsCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout quickActionsCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         quickActionsCard.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams lpQuick = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -795,7 +947,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(quickActionsCard);
 
         // 2. Daily Devotion Progress Track
-        LinearLayout progressCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout progressCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         progressCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpProgressCard = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -832,7 +984,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             progressTextView.setText(progressPercent + "% completed — Step " + routineStep + " of 3 in progress");
         }
         progressTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        progressTextView.setTextColor(COLOR_TEXT_DARK);
+        progressTextView.setTextColor(COLOR_TEXT_DARK());
         progressTextView.setPadding(0, dp(4), 0, dp(8));
         progressCard.addView(progressTextView);
 
@@ -948,22 +1100,22 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         stepBox.setOrientation(LinearLayout.VERTICAL);
         stepBox.setPadding(dp(12), dp(10), dp(12), dp(10));
         GradientDrawable sbBg = new GradientDrawable();
-        sbBg.setColor(COLOR_BG_NEUTRAL);
+        sbBg.setColor(COLOR_BG_NEUTRAL());
         sbBg.setCornerRadius(dp(10));
-        sbBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        sbBg.setStroke(dp(1), COLOR_BORDER_GREY());
         stepBox.setBackground(sbBg);
 
         tvRoutineStepTitle = new TextView(this);
         tvRoutineStepTitle.setText("Step 1 of 3: Read Today's Word (30s)");
         tvRoutineStepTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvRoutineStepTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvRoutineStepTitle.setTextColor(COLOR_TEXT_DARK);
+        tvRoutineStepTitle.setTextColor(COLOR_TEXT_DARK());
         stepBox.addView(tvRoutineStepTitle);
 
         tvRoutineStepContent = new TextView(this);
         tvRoutineStepContent.setText("“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20");
         tvRoutineStepContent.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvRoutineStepContent.setTextColor(COLOR_TEXT_MUTED);
+        tvRoutineStepContent.setTextColor(COLOR_TEXT_MUTED());
         tvRoutineStepContent.setPadding(0, dp(4), 0, dp(10));
         tvRoutineStepContent.setLineSpacing(dp(2), 1.15f);
         stepBox.addView(tvRoutineStepContent);
@@ -998,7 +1150,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         };
 
         for (final String[] ev : churchEvents) {
-            LinearLayout evCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+            LinearLayout evCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
             evCard.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams lpEv = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1024,7 +1176,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             TextView tvDate = new TextView(this);
             tvDate.setText(ev[1]);
             tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-            tvDate.setTextColor(COLOR_TEXT_MUTED);
+            tvDate.setTextColor(COLOR_TEXT_MUTED());
             tagRow.addView(tvDate);
             evCard.addView(tagRow);
 
@@ -1032,14 +1184,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             evTitle.setText(ev[0]);
             evTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             evTitle.setTypeface(Typeface.DEFAULT_BOLD);
-            evTitle.setTextColor(COLOR_TEXT_DARK);
+            evTitle.setTextColor(COLOR_TEXT_DARK());
             evTitle.setPadding(0, dp(4), 0, dp(2));
             evCard.addView(evTitle);
 
             TextView evDesc = new TextView(this);
             evDesc.setText(ev[3]);
             evDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            evDesc.setTextColor(COLOR_TEXT_MUTED);
+            evDesc.setTextColor(COLOR_TEXT_MUTED());
             evDesc.setLineSpacing(dp(2), 1.15f);
             evDesc.setPadding(0, 0, 0, dp(8));
             evCard.addView(evDesc);
@@ -1049,12 +1201,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             btnRsvp.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             btnRsvp.setTypeface(Typeface.DEFAULT_BOLD);
             btnRsvp.setTextColor(COLOR_PRIMARY_PURPLE);
-            btnRsvp.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+            btnRsvp.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
             btnRsvp.setPadding(dp(8), dp(4), dp(8), dp(4));
             btnRsvp.setOnClickListener(v -> {
                 xpCount += 5;
                 GamificationStore.saveSpiritualXp(this, resolveGamificationUserId(), xpCount);
                 updateHud();
+                org.perazimchurch.app.ui.components.FeedbackManager.get(this).reward(this);
                 btnRsvp.setText("✓ RSVP Confirmed!");
                 btnRsvp.setEnabled(false);
                 Toast.makeText(this, "Reminder set for " + ev[0] + "! (+5 XP)", Toast.LENGTH_SHORT).show();
@@ -1101,9 +1254,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             bg.setStroke(dp(1), COLOR_ACCENT_ORANGE);
             tv.setTextColor(COLOR_ACCENT_ORANGE);
         } else {
-            bg.setColor(COLOR_BG_NEUTRAL);
-            bg.setStroke(dp(1), COLOR_BORDER_GREY);
-            tv.setTextColor(COLOR_TEXT_MUTED);
+            bg.setColor(COLOR_BG_NEUTRAL());
+            bg.setStroke(dp(1), COLOR_BORDER_GREY());
+            tv.setTextColor(COLOR_TEXT_MUTED());
         }
         bg.setCornerRadius(dp(12));
         tv.setBackground(bg);
@@ -1136,7 +1289,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             progressTextView.setText("100% completed — All daily devotions accomplished! 🎉");
             updateRoutineView();
 
-            new AlertDialog.Builder(this)
+            org.perazimchurch.app.ui.components.FeedbackManager.get(this).milestone(this);
+            AppDialogs.builder(this)
                     .setTitle("🎉 3-Minute Breakthrough Complete!")
                     .setMessage("Hallelujah! You completed your daily breakthrough routine!\n\n"
                             + "• Streak Extended: " + streakCount + " Days 🔥\n"
@@ -1154,12 +1308,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             stepIndicatorRead.setTextColor(COLOR_ACCENT_ORANGE);
 
             stepIndicatorReflect.setText("2. Reflect");
-            stepIndicatorReflect.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
-            stepIndicatorReflect.setTextColor(COLOR_TEXT_MUTED);
+            stepIndicatorReflect.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
+            stepIndicatorReflect.setTextColor(COLOR_TEXT_MUTED());
 
             stepIndicatorPray.setText("3. Pray");
-            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
-            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED);
+            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
+            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED());
 
             tvRoutineStepTitle.setText("Step 1: Read Today's Word (30s)");
             tvRoutineStepContent.setText("“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20");
@@ -1176,8 +1330,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             stepIndicatorReflect.setTextColor(COLOR_ACCENT_ORANGE);
 
             stepIndicatorPray.setText("3. Pray");
-            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
-            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED);
+            stepIndicatorPray.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
+            stepIndicatorPray.setTextColor(COLOR_TEXT_MUTED());
 
             tvRoutineStepTitle.setText("Step 2: Bishop's Key Insight (1 min)");
             tvRoutineStepContent.setText("“Breakthrough is not accidental; it is covenantal. At Baal-Perazim, David stood in faith and saw God burst through his obstacles like rushing waters. Whatever mountain you face today, God is breaking through!” — Bishop Dr. David Mutweri");
@@ -1245,8 +1399,35 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         new BibleReaderDialog(this, bibleViewModel).show();
     }
 
+    /**
+     * Opens the Bible reader at "bookId|chapter" from the guide. A missing or unreadable payload opens the reader where it
+     * was last left, as the Bible tab does.
+     */
+    private void openPassageFromGuide(String payload) {
+        int bar = payload == null ? -1 : payload.indexOf('|');
+        if (bar <= 0) {
+            showFullScriptureDialog();
+            return;
+        }
+        String bookId = payload.substring(0, bar);
+        int chapter;
+        try {
+            chapter = Integer.parseInt(payload.substring(bar + 1));
+        } catch (NumberFormatException e) {
+            showFullScriptureDialog();
+            return;
+        }
+        if (factory == null) {
+            factory = ViewModelFactory.getInstance(this);
+        }
+        if (bibleViewModel == null) {
+            bibleViewModel = factory.createBibleViewModel();
+        }
+        org.perazimchurch.app.presentation.ui.BibleReaderDialog.showPassage(this, bibleViewModel, bookId, chapter);
+    }
+
     private void showLegacyFullScriptureDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         ScrollView sv = new ScrollView(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
@@ -1263,7 +1444,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvSub = new TextView(this);
         tvSub.setText("The Account of David's Breakthrough in the Valley of Rephaim");
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSub.setTextColor(COLOR_TEXT_MUTED);
+        tvSub.setTextColor(COLOR_TEXT_MUTED());
         tvSub.setPadding(0, dp(2), 0, dp(12));
         container.addView(tvSub);
 
@@ -1290,7 +1471,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             TextView tvText = new TextView(this);
             tvText.setText(v[1]);
             tvText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            tvText.setTextColor(COLOR_TEXT_DARK);
+            tvText.setTextColor(COLOR_TEXT_DARK());
             tvText.setLineSpacing(dp(2), 1.15f);
             if (v[0].equals("20")) {
                 tvText.setTypeface(Typeface.DEFAULT_BOLD);
@@ -1305,7 +1486,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         LinearLayout commBox = new LinearLayout(this);
         commBox.setOrientation(LinearLayout.VERTICAL);
         commBox.setPadding(dp(12), dp(10), dp(12), dp(10));
-        commBox.setBackground(createPillBg(COLOR_BG_NEUTRAL, COLOR_BORDER_GREY));
+        commBox.setBackground(createPillBg(COLOR_BG_NEUTRAL(), COLOR_BORDER_GREY()));
         LinearLayout.LayoutParams lpComm = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lpComm.setMargins(0, dp(14), 0, dp(14));
@@ -1321,7 +1502,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView commBody = new TextView(this);
         commBody.setText("The Valley of Rephaim ('Valley of the Giants') was a strategic agricultural corridor outside Jerusalem. The Philistines mobilized their full army to crush David before his kingdom was unified.\n\nDavid did not depend on past military intellect; he inquired of the LORD. God answered with swift, overwhelming breakthrough—like a burst dam sweeping away all barriers. This is the divine lineage of Perazim Mission Church: whatever giant opposes you, God will burst forth as a flood of breakthrough!");
         commBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        commBody.setTextColor(COLOR_TEXT_MUTED);
+        commBody.setTextColor(COLOR_TEXT_MUTED());
         commBody.setPadding(0, dp(4), 0, 0);
         commBody.setLineSpacing(dp(2), 1.15f);
         commBox.addView(commBody);
@@ -1344,7 +1525,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showWhatsAppVerseCardDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -1360,7 +1541,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvModalSub = new TextView(this);
         tvModalSub.setText("Formatted 9:16 portrait story for WhatsApp Status");
         tvModalSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvModalSub.setTextColor(COLOR_TEXT_MUTED);
+        tvModalSub.setTextColor(COLOR_TEXT_MUTED());
         tvModalSub.setPadding(0, dp(2), 0, dp(12));
         container.addView(tvModalSub);
 
@@ -1426,7 +1607,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable thmBg = new GradientDrawable();
         thmBg.setColor(COLOR_PURPLE_TINT);
         thmBg.setCornerRadius(dp(8));
-        thmBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        thmBg.setStroke(dp(1), COLOR_BORDER_GREY());
         btnTheme.setBackground(thmBg);
         LinearLayout.LayoutParams lpBtnTheme = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1492,7 +1673,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable copyBg = new GradientDrawable();
         copyBg.setColor(COLOR_WHITE);
         copyBg.setCornerRadius(dp(8));
-        copyBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        copyBg.setStroke(dp(1), COLOR_BORDER_GREY());
         btnCopy.setBackground(copyBg);
         btnCopy.setOnClickListener(v -> {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -1515,7 +1696,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showGracePointDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
         container.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -1539,7 +1720,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView desc = new TextView(this);
         desc.setText("In God's kingdom, grace exceeds the law. Grace Points allow you to protect your devotional streak when life, travel, or ministry takes you away from your phone.");
         desc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        desc.setTextColor(COLOR_TEXT_MUTED);
+        desc.setTextColor(COLOR_TEXT_MUTED());
         desc.setPadding(0, 0, 0, dp(14));
         container.addView(desc);
 
@@ -1619,7 +1800,17 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
             @Override
             public void onOpenBible(String book) {
-                showFullScriptureDialog();
+                openPassageFromGuide(book);
+            }
+
+            @Override
+            public void onOpenGames() {
+                org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(MainActivity.this);
+            }
+
+            @Override
+            public void onOpenProfile() {
+                switchTab(5);
             }
 
             @Override
@@ -1667,13 +1858,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacySermonsScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(32));
 
-        LinearLayout liveCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout liveCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         liveCard.setOrientation(LinearLayout.VERTICAL);
 
         LinearLayout liveBadgeRow = new LinearLayout(this);
@@ -1697,14 +1888,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvSermonTitle.setText("Walking in Faith: Overcoming Fear in Difficult Times");
         tvSermonTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         tvSermonTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvSermonTitle.setTextColor(COLOR_TEXT_DARK);
+        tvSermonTitle.setTextColor(COLOR_TEXT_DARK());
         tvSermonTitle.setPadding(0, dp(8), 0, dp(4));
         liveCard.addView(tvSermonTitle);
 
         TextView tvSpeaker = new TextView(this);
         tvSpeaker.setText("Speaker: Bishop Dr. David Mutweri | Central Campus");
         tvSpeaker.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvSpeaker.setTextColor(COLOR_TEXT_MUTED);
+        tvSpeaker.setTextColor(COLOR_TEXT_MUTED());
         tvSpeaker.setPadding(0, 0, 0, dp(12));
         liveCard.addView(tvSpeaker);
 
@@ -1748,7 +1939,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private LinearLayout createSermonCard(String title, String metadata, String assetThumbnail) {
-        LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout card = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         card.setOrientation(LinearLayout.HORIZONTAL);
         card.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -1776,13 +1967,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvTitle.setText(title);
         tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(COLOR_TEXT_DARK);
+        tvTitle.setTextColor(COLOR_TEXT_DARK());
         textCol.addView(tvTitle);
 
         TextView tvMeta = new TextView(this);
         tvMeta.setText(metadata);
         tvMeta.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvMeta.setTextColor(COLOR_TEXT_MUTED);
+        tvMeta.setTextColor(COLOR_TEXT_MUTED());
         tvMeta.setPadding(0, dp(3), 0, 0);
         textCol.addView(tvMeta);
 
@@ -1821,7 +2012,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             prayerTitle.setTypeface(Typeface.DEFAULT_BOLD);
             prayerTitle.setPadding(dp(20), dp(16), dp(20), dp(8));
             prayerTitle.setBackgroundColor(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_BG_DEEP);
-            AlertDialog dialog = new AlertDialog.Builder(this).setCustomTitle(prayerTitle)
+            AlertDialog dialog = AppDialogs.builder(this).setCustomTitle(prayerTitle)
                     .setView(prayer).setNegativeButton("Close", null).create();
             dialog.show();
             if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawable(
@@ -1837,7 +2028,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacyFellowshipScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -1880,7 +2071,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             final String prayerText = prayerData[i][2];
             final int initialCount = Integer.parseInt(prayerData[i][3]);
 
-            LinearLayout pCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+            LinearLayout pCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
             pCard.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams lpP = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1891,20 +2082,20 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             tvTitle.setText("🙏 " + prayerTitle);
             tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-            tvTitle.setTextColor(COLOR_TEXT_DARK);
+            tvTitle.setTextColor(COLOR_TEXT_DARK());
             pCard.addView(tvTitle);
 
             TextView tvAuthor = new TextView(this);
             tvAuthor.setText("Submitted by: " + prayerAuthor + " · Embu Community");
             tvAuthor.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-            tvAuthor.setTextColor(COLOR_TEXT_MUTED);
+            tvAuthor.setTextColor(COLOR_TEXT_MUTED());
             tvAuthor.setPadding(0, dp(2), 0, dp(6));
             pCard.addView(tvAuthor);
 
             TextView tvDesc = new TextView(this);
             tvDesc.setText(prayerText);
             tvDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            tvDesc.setTextColor(COLOR_TEXT_DARK);
+            tvDesc.setTextColor(COLOR_TEXT_DARK());
             tvDesc.setLineSpacing(dp(2), 1.15f);
             tvDesc.setPadding(0, 0, 0, dp(10));
             pCard.addView(tvDesc);
@@ -1951,7 +2142,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(createInteractiveRiddleCard("Geography", "Where did Elijah contest against the 450 prophets of Baal?", "Mount Carmel (1 Kings 18:19)", 25));
 
         // Section: Biblical Humor & Joy Card
-        LinearLayout humorCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        LinearLayout humorCard = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         humorCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpHumor = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1969,7 +2160,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvJokeQ.setText("Q: Who was the greatest financier in the Bible?");
         tvJokeQ.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         tvJokeQ.setTypeface(Typeface.DEFAULT_BOLD);
-        tvJokeQ.setTextColor(COLOR_TEXT_DARK);
+        tvJokeQ.setTextColor(COLOR_TEXT_DARK());
         tvJokeQ.setPadding(0, dp(8), 0, dp(4));
         humorCard.addView(tvJokeQ);
 
@@ -1984,7 +2175,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         final TextView tvJokeA = new TextView(this);
         tvJokeA.setText("A: Noah! He was floating his stock while everyone else was in liquidation! 🌊🚢\n\nBonus: Who was the greatest babysitter? David, because he rocked Goliath to sleep! 😴");
         tvJokeA.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvJokeA.setTextColor(COLOR_TEXT_DARK);
+        tvJokeA.setTextColor(COLOR_TEXT_DARK());
         tvJokeA.setTypeface(Typeface.SERIF, Typeface.ITALIC);
         tvJokeA.setPadding(0, dp(6), 0, 0);
         tvJokeA.setVisibility(View.GONE);
@@ -2044,12 +2235,12 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvSlogan.setText("Slogan: “A place where everybody is somebody, and no body is a nobody”");
         tvSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvSlogan.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-        tvSlogan.setTextColor(COLOR_TEXT_DARK);
+        tvSlogan.setTextColor(COLOR_TEXT_DARK());
         tvSlogan.setPadding(0, 0, 0, dp(8));
         identityCard.addView(tvSlogan);
 
         View sepId = new View(this);
-        sepId.setBackgroundColor(COLOR_BORDER_GREY);
+        sepId.setBackgroundColor(COLOR_BORDER_GREY());
         LinearLayout.LayoutParams lpSepId = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dp(1));
         lpSepId.setMargins(0, dp(2), 0, dp(8));
@@ -2067,7 +2258,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvMission = new TextView(this);
         tvMission.setText("Mission: “Perazim exists to draw people to Christ, to disciple them to belong to His family, and to have them glorify GOD with their lives and their services.”");
         tvMission.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvMission.setTextColor(COLOR_TEXT_DARK);
+        tvMission.setTextColor(COLOR_TEXT_DARK());
         tvMission.setLineSpacing(dp(2), 1.15f);
         tvMission.setPadding(0, 0, 0, dp(8));
         identityCard.addView(tvMission);
@@ -2085,7 +2276,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvValues.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvValues.setTypeface(Typeface.DEFAULT_BOLD);
         tvValues.setTextColor(COLOR_PURPLE_DARK);
-        tvValues.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        tvValues.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
         tvValues.setPadding(dp(8), dp(6), dp(8), dp(6));
         identityCard.addView(tvValues);
 
@@ -2136,7 +2327,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvLeaderTitle = new TextView(this);
         tvLeaderTitle.setText("Presiding Bishop · Perazim Mission Church");
         tvLeaderTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvLeaderTitle.setTextColor(COLOR_TEXT_MUTED);
+        tvLeaderTitle.setTextColor(COLOR_TEXT_MUTED());
         leaderDetails.addView(tvLeaderTitle);
         leaderRow.addView(leaderDetails);
         contactCard.addView(leaderRow);
@@ -2144,7 +2335,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvContactDesc = new TextView(this);
         tvContactDesc.setText("Reach out directly for pastoral care, prayer covenants, church administration, or giving support:");
         tvContactDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvContactDesc.setTextColor(COLOR_TEXT_DARK);
+        tvContactDesc.setTextColor(COLOR_TEXT_DARK());
         tvContactDesc.setLineSpacing(dp(2), 1.15f);
         tvContactDesc.setPadding(0, 0, 0, dp(10));
         contactCard.addView(tvContactDesc);
@@ -2208,67 +2399,86 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private ScrollView buildGivingScreen() {
+        // Mockup board "Give (dark glass)"
         ScrollView scroll = new ScrollView(this);
         scroll.setBackground(PerazimTheme.createBackgroundGradient());
         LinearLayout col = new LinearLayout(this);
         col.setOrientation(LinearLayout.VERTICAL);
-        col.setPadding(dp(16), dp(16), dp(16), dp(32));
+        col.setPadding(0, dp(8), 0, dp(16));
 
-        TextView title = new TextView(this);
-        title.setText("Give");
-        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        title.setTypeface(Typeface.DEFAULT_BOLD);
-        title.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        col.addView(title);
+        LinearLayout heading = new LinearLayout(this);
+        heading.setOrientation(LinearLayout.VERTICAL);
+        heading.setPadding(dp(20), 0, dp(20), 0);
+        heading.addView(GlassKit.text(this, "Give", 26, true, GlassKit.text()));
+        heading.addView(GlassKit.text(this, "Your giving supports the work of Perazim Mission Church.", 13, false,
+                GlassKit.muted()), GlassKit.matchWrap(this, 3));
+        col.addView(GlassKit.keep(heading));
 
-        TextView intro = new TextView(this);
-        intro.setText("Your giving supports the work of Perazim Mission Church.");
-        intro.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        intro.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        intro.setPadding(0, dp(4), 0, dp(16));
-        col.addView(intro);
+        LinearLayout card = GlassKit.card(this, 28, 20);
+        if (!PerazimTheme.isLight()) {
+            // Mockup: the paybill card lifts off the page, box-shadow 0 16px 36px rgba(0,0,0,0.3)
+            GlassKit.shadow(card, Color.parseColor("#4D000000"), 16, 36);
+        }
+        card.addView(GlassKit.label(this, "M-PESA PAYBILL"));
+        TextView paybill = GlassKit.text(this, ChurchConfig.MPESA_PAYBILL, 40, true, GlassKit.text());
+        paybill.setLetterSpacing(0.04f);
+        card.addView(paybill, GlassKit.matchWrap(this, 6));
 
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(16), dp(16), dp(16), dp(16));
-        GradientDrawable cardBg = new GradientDrawable();
-        cardBg.setColor(PerazimTheme.COLOR_SURFACE);
-        cardBg.setCornerRadius(dp(14));
-        card.setBackground(cardBg);
-
-        TextView label = new TextView(this);
-        label.setText("M-Pesa Paybill");
-        label.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        label.setTextColor(PerazimTheme.COLOR_PURPLE_SOFT);
-        card.addView(label);
-
-        TextView paybill = new TextView(this);
-        paybill.setText(ChurchConfig.MPESA_PAYBILL);
-        paybill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        paybill.setTypeface(Typeface.DEFAULT_BOLD);
-        paybill.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        paybill.setPadding(0, dp(4), 0, dp(12));
-        card.addView(paybill);
-
-        Button give = new Button(this);
-        give.setText("Give now");
-        give.setAllCaps(false);
-        give.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        give.setTypeface(Typeface.DEFAULT_BOLD);
-        give.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(14)));
-        give.setMinHeight(dp(56));
+        TextView give = GlassKit.orangeButton(this, "GIVE NOW", 14);
         give.setOnClickListener(v -> showGivingDialog());
-        card.addView(give, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        card.addView(give, GlassKit.matchHeight(this, 50, 18));
 
-        col.addView(card);
+        TextView copy = GlassKit.glassButton(this, "COPY PAYBILL NUMBER", 12);
+        copy.setOnClickListener(v -> {
+            android.content.ClipboardManager cm =
+                    (android.content.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            if (cm != null) {
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("M-Pesa Paybill", ChurchConfig.MPESA_PAYBILL));
+                Toast.makeText(this, "Paybill " + ChurchConfig.MPESA_PAYBILL + " copied", Toast.LENGTH_SHORT).show();
+            }
+        });
+        card.addView(copy, GlassKit.matchHeight(this, 44, 10));
+        LinearLayout.LayoutParams lpCard = GlassKit.matchWrap(this, 20);
+        lpCard.leftMargin = dp(16);
+        lpCard.rightMargin = dp(16);
+        col.addView(card, lpCard);
 
-        TextView note = new TextView(this);
-        note.setText("Giving is completed through M-Pesa, outside this app. The app does not store payment details.");
-        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        note.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        note.setPadding(0, dp(16), 0, 0);
-        col.addView(note);
+        LinearLayout how = GlassKit.card(this, 26, 16);
+        how.addView(GlassKit.label(this, "HOW TO GIVE"));
+        String[] steps = {
+                "Open M-Pesa on your phone",
+                "Choose Lipa na M-Pesa, then Paybill",
+                "Enter business number " + ChurchConfig.MPESA_PAYBILL
+                        + ", add your account details and confirm with your M-Pesa PIN"
+        };
+        for (int i = 0; i < steps.length; i++) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            TextView num = GlassKit.text(this, String.valueOf(i + 1), 12, true, Color.WHITE);
+            num.setGravity(Gravity.CENTER);
+            num.setBackground(GlassKit.purple(this, 13));
+            row.addView(num, new LinearLayout.LayoutParams(dp(26), dp(26)));
+            TextView tv = GlassKit.text(this, steps[i], 13, false, GlassKit.text());
+            tv.setLineSpacing(0f, 1.3f);
+            LinearLayout.LayoutParams lpTv = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            lpTv.leftMargin = dp(12);
+            row.addView(tv, lpTv);
+            how.addView(GlassKit.keep(row), GlassKit.matchWrap(this, 12));
+        }
+        LinearLayout.LayoutParams lpHow = GlassKit.matchWrap(this, 20);
+        lpHow.leftMargin = dp(16);
+        lpHow.rightMargin = dp(16);
+        col.addView(how, lpHow);
+
+        TextView note = GlassKit.text(this,
+                "Giving is completed through M-Pesa, outside this app. The app does not store payment details.",
+                11, false, GlassKit.muted());
+        note.setLineSpacing(0f, 1.35f);
+        LinearLayout.LayoutParams lpNote = GlassKit.matchWrap(this, 18);
+        lpNote.leftMargin = dp(24);
+        lpNote.rightMargin = dp(24);
+        col.addView(note, lpNote);
 
         scroll.addView(col);
         return scroll;
@@ -2285,14 +2495,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ScrollView buildLegacyProfileScreen() {
         ScrollView scrollView = new ScrollView(this);
         scrollView.setFillViewport(true);
-        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL);
+        scrollView.setBackgroundColor(COLOR_BG_NEUTRAL());
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(dp(16), dp(16), dp(16), dp(32));
 
         // 1. MEMBER PROFILE HEADER CARD
-        LinearLayout profileHeaderCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout profileHeaderCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         profileHeaderCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpProfHeader = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2340,7 +2550,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvMemberSub = new TextView(this);
         tvMemberSub.setText("Perazim Mission Church · Embu Headquarters");
         tvMemberSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvMemberSub.setTextColor(COLOR_TEXT_MUTED);
+        tvMemberSub.setTextColor(COLOR_TEXT_MUTED());
         tvMemberSub.setPadding(0, dp(2), 0, dp(6));
         memberInfo.addView(tvMemberSub);
 
@@ -2350,7 +2560,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvCovenantBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvCovenantBadge.setTypeface(Typeface.DEFAULT_BOLD);
         tvCovenantBadge.setTextColor(COLOR_PRIMARY_PURPLE);
-        tvCovenantBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        tvCovenantBadge.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
         tvCovenantBadge.setPadding(dp(8), dp(3), dp(8), dp(3));
         memberInfo.addView(tvCovenantBadge);
 
@@ -2359,7 +2569,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
         // Divider
         View divHeader = new View(this);
-        divHeader.setBackgroundColor(COLOR_BORDER_GREY);
+        divHeader.setBackgroundColor(COLOR_BORDER_GREY());
         LinearLayout.LayoutParams lpDiv = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
         lpDiv.setMargins(0, 0, 0, dp(12));
@@ -2380,7 +2590,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         hudRow.setGravity(Gravity.CENTER_VERTICAL);
 
         LinearLayout streakCard = createMetricCard("🔥 " + streakCount + " Days", "Streak", streakFrozen ? "❄️ Frozen" : "Active", COLOR_ORANGE_TINT, COLOR_ACCENT_ORANGE);
-        LinearLayout xpCard = createMetricCard("⭐ " + xpCount + " XP", "Spiritual XP", "Level 3 Disciple", COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE);
+        LinearLayout xpCard = createMetricCard("⭐ " + xpCount + " XP", "Spiritual XP", "Level " + org.perazimchurch.app.domain.model.SpiritualLevel.levelFor(xpCount) + " Disciple", COLOR_PURPLE_TINT, COLOR_PRIMARY_PURPLE);
         LinearLayout graceCard = createMetricCard("💜 " + graceCount + " Pts", "Grace Points", "Tokens Available", COLOR_ORANGE_TINT, COLOR_ORANGE_DARK);
 
         hudRow.addView(streakCard);
@@ -2426,7 +2636,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(actionsRow2);
 
         // 4. CHURCH IDENTITY & AFFILIATION CARD (Guidebook §73.2)
-        LinearLayout churchCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout churchCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         churchCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpChurch = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2459,7 +2669,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvChurchSlogan = new TextView(this);
         tvChurchSlogan.setText("“A place where everybody is somebody, and no body is a nobody”");
         tvChurchSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvChurchSlogan.setTextColor(COLOR_TEXT_MUTED);
+        tvChurchSlogan.setTextColor(COLOR_TEXT_MUTED());
         tvChurchSlogan.setPadding(0, 0, 0, dp(8));
         churchCard.addView(tvChurchSlogan);
 
@@ -2469,7 +2679,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(churchCard);
 
         // 5. PERSONAL CONTENT & OFFLINE CACHE STATUS CARD (Guidebook §73.4)
-        LinearLayout cacheCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout cacheCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         cacheCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpCache = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2510,7 +2720,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(cacheCard);
 
         // 6. PASTORAL CARE DIRECT ACTIONS CARD (Guidebook §73.5)
-        LinearLayout pastoralCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY, dp(1));
+        LinearLayout pastoralCard = createCard(COLOR_WHITE, dp(14), COLOR_BORDER_GREY(), dp(1));
         pastoralCard.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpPastoral = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2528,7 +2738,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvPastoralDesc = new TextView(this);
         tvPastoralDesc.setText("Reach out directly for counseling, prayer covenants, or pastoral blessings:");
         tvPastoralDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tvPastoralDesc.setTextColor(COLOR_TEXT_DARK);
+        tvPastoralDesc.setTextColor(COLOR_TEXT_DARK());
         tvPastoralDesc.setPadding(0, 0, 0, dp(8));
         pastoralCard.addView(tvPastoralDesc);
 
@@ -2562,7 +2772,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(bgColor);
         bg.setCornerRadius(dp(10));
-        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), COLOR_BORDER_GREY());
         card.setBackground(bg);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
@@ -2581,7 +2791,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvLbl.setText(label);
         tvLbl.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
         tvLbl.setTypeface(Typeface.DEFAULT_BOLD);
-        tvLbl.setTextColor(COLOR_TEXT_DARK);
+        tvLbl.setTextColor(COLOR_TEXT_DARK());
         tvLbl.setGravity(Gravity.CENTER);
         tvLbl.setPadding(0, dp(2), 0, dp(1));
         card.addView(tvLbl);
@@ -2589,7 +2799,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView tvSub = new TextView(this);
         tvSub.setText(sublabel);
         tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
-        tvSub.setTextColor(COLOR_TEXT_MUTED);
+        tvSub.setTextColor(COLOR_TEXT_MUTED());
         tvSub.setGravity(Gravity.CENTER);
         card.addView(tvSub);
 
@@ -2613,7 +2823,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void showSettingsDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         builder.setTitle("⚙️ Preferences & Data Saver");
 
         LinearLayout layout = new LinearLayout(this);
@@ -2625,7 +2835,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                 "Offline Cache: 24.8 MB preserved\n\n" +
                 "App Version: " + org.perazimchurch.app.BuildConfig.VERSION_NAME + " (Build " + org.perazimchurch.app.BuildConfig.VERSION_CODE + ")");
         tvInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        tvInfo.setTextColor(COLOR_TEXT_DARK);
+        tvInfo.setTextColor(COLOR_TEXT_DARK());
         tvInfo.setLineSpacing(dp(3), 1.2f);
         layout.addView(tvInfo);
 
@@ -2663,7 +2873,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private LinearLayout createInteractiveRiddleCard(String category, String question, final String answer, final int xpReward) {
-        final LinearLayout card = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY, dp(1));
+        final LinearLayout card = createCard(COLOR_WHITE, dp(16), COLOR_BORDER_GREY(), dp(1));
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -2679,7 +2889,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         catTag.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         catTag.setTypeface(Typeface.DEFAULT_BOLD);
         catTag.setTextColor(COLOR_PRIMARY_PURPLE);
-        catTag.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY));
+        catTag.setBackground(createPillBg(COLOR_PURPLE_TINT, COLOR_BORDER_GREY()));
         catTag.setPadding(dp(8), dp(4), dp(8), dp(4));
         badgeRow.addView(catTag);
 
@@ -2700,7 +2910,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvQuestion.setText(question);
         tvQuestion.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         tvQuestion.setTypeface(Typeface.DEFAULT_BOLD);
-        tvQuestion.setTextColor(COLOR_TEXT_DARK);
+        tvQuestion.setTextColor(COLOR_TEXT_DARK());
         tvQuestion.setPadding(0, dp(8), 0, dp(8));
         tvQuestion.setLineSpacing(dp(3), 1.15f);
         card.addView(tvQuestion);
@@ -2718,9 +2928,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         answerBox.setOrientation(LinearLayout.VERTICAL);
         answerBox.setPadding(dp(12), dp(10), dp(12), dp(10));
         GradientDrawable ansBg = new GradientDrawable();
-        ansBg.setColor(COLOR_BG_NEUTRAL);
+        ansBg.setColor(COLOR_BG_NEUTRAL());
         ansBg.setCornerRadius(dp(10));
-        ansBg.setStroke(dp(1), COLOR_BORDER_GREY);
+        ansBg.setStroke(dp(1), COLOR_BORDER_GREY());
         answerBox.setBackground(ansBg);
         answerBox.setVisibility(View.GONE);
 
@@ -2734,7 +2944,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView ansText = new TextView(this);
         ansText.setText(answer);
         ansText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-        ansText.setTextColor(COLOR_TEXT_DARK);
+        ansText.setTextColor(COLOR_TEXT_DARK());
         ansText.setPadding(0, dp(2), 0, 0);
         answerBox.addView(ansText);
         card.addView(answerBox);
@@ -2765,7 +2975,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showPrayerRequestDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         builder.setTitle("🙏 Submit Prayer Request");
         builder.setMessage("Your petition will be submitted to Bishop Dr. David Mutweri and the Perazim Intercessory Prayer Team.\n\nPastoral Office: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + " · info@perazimchurch.org");
 
@@ -2806,7 +3016,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             btnMiniPlayPause.setText("⏸");
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         LinearLayout box = new LinearLayout(this);
         box.setOrientation(LinearLayout.VERTICAL);
         box.setPadding(dp(18), dp(18), dp(18), dp(18));
@@ -2816,13 +3026,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         t.setText(sermonTitle);
         t.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         t.setTypeface(Typeface.DEFAULT_BOLD);
-        t.setTextColor(COLOR_TEXT_DARK);
+        t.setTextColor(COLOR_TEXT_DARK());
         box.addView(t);
 
         TextView s = new TextView(this);
         s.setText(speaker);
         s.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        s.setTextColor(COLOR_TEXT_MUTED);
+        s.setTextColor(COLOR_TEXT_MUTED());
         s.setPadding(0, dp(2), 0, dp(14));
         box.addView(s);
 
@@ -2872,7 +3082,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             GamificationStore.saveSpiritualXp(this, resolveGamificationUserId(), xpCount);
             updateHud();
             Toast.makeText(this, "+10 XP for spending time in prayer!", Toast.LENGTH_SHORT).show();
-            new AlertDialog.Builder(this)
+            AppDialogs.builder(this)
                     .setTitle("Daily Guided Prayer")
                     .setMessage("Heavenly Father, we worship You as the God of the Breakthrough. As waters burst forth, let every mountain before us be swept away. Amen.")
                     .setPositiveButton("Amen", null)
@@ -2926,7 +3136,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     }
 
     private void showContactDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = AppDialogs.builder(this);
         ScrollView sv = new ScrollView(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
@@ -2943,7 +3153,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         TextView subtitle = new TextView(this);
         subtitle.setText("Perazim Mission Church Headquarters, Embu\nPresiding Bishop: Bishop Dr. David Mutweri\n\nTap an action below to connect instantly:");
         subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        subtitle.setTextColor(COLOR_TEXT_MUTED);
+        subtitle.setTextColor(COLOR_TEXT_MUTED());
         subtitle.setPadding(0, dp(4), 0, dp(14));
         container.addView(subtitle);
 
@@ -2996,7 +3206,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(COLOR_PURPLE_TINT);
         bg.setCornerRadius(dp(8));
-        bg.setStroke(dp(1), COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), COLOR_BORDER_GREY());
         row.setBackground(bg);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -3018,7 +3228,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         tvLabel.setText(label.toUpperCase());
         tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
         tvLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        tvLabel.setTextColor(COLOR_TEXT_MUTED);
+        tvLabel.setTextColor(COLOR_TEXT_MUTED());
         textCol.addView(tvLabel);
 
         TextView tvVal = new TextView(this);
@@ -3149,6 +3359,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         splash.setLayoutParams(new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         splash.setBackgroundColor(Color.parseColor("#140319"));
+        // Swallow taps while the splash shows, so nothing behind it (such as the light/dark switch) gets pressed.
+        splash.setClickable(true);
+        splash.setFocusable(true);
 
         Bitmap splashBmp = loadAssetBitmap("backgrounds/bg_splash_breakthrough.png", 720);
         if (splashBmp != null) {

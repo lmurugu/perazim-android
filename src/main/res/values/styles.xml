@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Press and selection colour: frosted dark purple in light mode, frosted white in dark mode.
+         Applied at runtime by MainActivity, so it follows the in-app Light / Dark choice. -->
+    <style name="PerazimPressLight">
+        <item name="colorControlHighlight">#4D3D1749</item>
+        <item name="android:colorControlHighlight">#4D3D1749</item>
+        <item name="android:textColorHighlight">#4D3D1749</item>
+    </style>
+    <style name="PerazimPressDark">
+        <item name="colorControlHighlight">#40FFFFFF</item>
+        <item name="android:colorControlHighlight">#40FFFFFF</item>
+        <item name="android:textColorHighlight">#40FFFFFF</item>
+    </style>
     <style name="UiCard">
         <item name="android:padding">16dp</item>
     </style>
@@ -9,5 +21,35 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">#FF1A0A20</item>
         <item name="android:navigationBarColor">#FF1A0A20</item>
+    </style>
+    <!-- Alert dialogs in Dark mode: deep purple glass for the body, title bar and footer. -->
+    <style name="PerazimDialogDark" parent="android:Theme.Material.Dialog">
+        <item name="android:colorBackground">#FF2A0F33</item>
+        <item name="android:colorBackgroundFloating">#FF2A0F33</item>
+        <item name="android:textColorPrimary">#FFFFFFFF</item>
+        <item name="android:textColorSecondary">#FFE6D5EE</item>
+        <item name="android:colorAccent">#FFC06BE0</item>
+    </style>
+    <!-- Full-window dialogs in Dark mode: deep purple glass behind the content and title area. -->
+    <style name="PerazimWindowDark" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#FF2A0F33</item>
+        <item name="android:colorBackground">#FF2A0F33</item>
+        <item name="android:colorBackgroundFloating">#FF2A0F33</item>
+        <item name="android:textColorPrimary">#FFFFFFFF</item>
+        <item name="android:textColorSecondary">#FFE6D5EE</item>
+        <item name="android:colorAccent">#FFC06BE0</item>
+    </style>
+    <style name="PerazimWindowFullscreenDark" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">#FF2A0F33</item>
+        <item name="android:colorBackground">#FF2A0F33</item>
+        <item name="android:textColorPrimary">#FFFFFFFF</item>
+        <item name="android:textColorSecondary">#FFE6D5EE</item>
+        <item name="android:colorAccent">#FFC06BE0</item>
+    </style>
+    <!-- Launch theme: solid black while the app starts, so there is no white flash. -->
+    <style name="PerazimLaunch" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
     </style>
 </resources>

@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.local;
 
+import org.perazimchurch.app.data.local.text.BibleVerseReader;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -32,7 +33,7 @@ public final class LocalScriptureRetriever {
     private static final int MAX_PASSAGES = 3;
     private static final int MAX_TOTAL_CHARS = 900;
     private static final Pattern REFERENCE_SHAPE = Pattern.compile(
-            "(?<![\\p{L}\\p{N}])(?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,3}\\s+[1-9]\\d{0,2}:[1-9]\\d{0,2}(?:\\s*[-–]\\s*[1-9]\\d{0,2})?(?!\\d)",
+            "(?<![\\p{L}\\p{N}])(?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,3}\\s+[1-9]\\d{0,2}(?::|\\s+)[1-9]\\d{0,2}(?:\\s*[-–]\\s*[1-9]\\d{0,2})?(?!\\d)",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Set<String> SCRIPTURE_TERMS = new HashSet<>(Arrays.asList(
             "bible", "scripture", "verse", "verses", "chapter", "kjv", "god", "jesus", "christ",
@@ -49,10 +50,15 @@ public final class LocalScriptureRetriever {
 
     @NonNull
     public static JSONArray retrieve(@NonNull Context context, String question) throws Exception {
-        return retrieve(PerazimDatabase.getInstance(context).bibleDao(), question);
+        BibleDao dao = PerazimDatabase.getInstance(context).bibleDao();
+        return retrieve(dao, BibleVerseReader.create(context, dao), question);
     }
 
     static JSONArray retrieve(BibleDao dao, String question) throws Exception {
+        return retrieve(dao, BibleVerseReader.mainOnly(dao), question);
+    }
+
+    static JSONArray retrieve(BibleDao dao, BibleVerseReader reader, String question) throws Exception {
         if (question == null || question.trim().isEmpty() || !isScriptureRelated(question)) return new JSONArray();
         BibleTranslationEntity translation = dao.getTranslationById(TRANSLATION_ID);
         if (translation == null || !"Public Domain".equalsIgnoreCase(translation.getLicenseInfo())) {
@@ -68,14 +74,14 @@ public final class LocalScriptureRetriever {
             }
         }
 
-        JSONArray exactReference = retrieveExactReference(dao, books, question);
+        JSONArray exactReference = retrieveExactReference(reader, books, question);
         if (exactReference != null) return exactReference;
         if (terms.isEmpty()) return new JSONArray();
 
         Map<String, Candidate> candidates = new HashMap<>();
         for (int first = 0; first < terms.size(); first++) {
             for (int second = first + 1; second < terms.size(); second++) {
-                List<BibleVerseEntity> matches = dao.searchVersesByTerms(TRANSLATION_ID,
+                List<BibleVerseEntity> matches = reader.searchTerms(TRANSLATION_ID,
                         terms.get(first), terms.get(second));
                 if (matches == null) continue;
                 for (BibleVerseEntity verse : matches) {
@@ -137,7 +143,7 @@ public final class LocalScriptureRetriever {
         return question != null && REFERENCE_SHAPE.matcher(question).find();
     }
 
-    private static JSONArray retrieveExactReference(BibleDao dao, List<BibleBookEntity> books,
+    private static JSONArray retrieveExactReference(BibleVerseReader dao, List<BibleBookEntity> books,
                                                     String question) throws Exception {
         if (books == null || books.isEmpty() || !REFERENCE_SHAPE.matcher(question).find()) return null;
         BibleBookEntity matchBook = null;
@@ -157,7 +163,7 @@ public final class LocalScriptureRetriever {
                 namePattern.append(Pattern.quote(words[i]));
             }
             Pattern exact = Pattern.compile("(?<![\\p{L}\\p{N}])" + namePattern
-                    + "\\s+([1-9]\\d{0,2}):([1-9]\\d{0,2})(?:\\s*[-–]\\s*([1-9]\\d{0,2}))?(?!\\d)",
+                    + "\\s+([1-9]\\d{0,2})(?::|\\s+)([1-9]\\d{0,2})(?:\\s*[-–]\\s*([1-9]\\d{0,2}))?(?!\\d)",
                     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
             Matcher matcher = exact.matcher(question);
             if (matcher.find()) {

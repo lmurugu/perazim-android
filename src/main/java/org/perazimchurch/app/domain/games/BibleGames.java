@@ -10,7 +10,7 @@ import java.util.Random;
 
 /** Offline learning games. Scores belong to these games, never member rewards. */
 public final class BibleGames {
-    public enum Mode { QUIZ, WHO_AM_I, VERSE_ORDER }
+    public enum Mode { QUIZ, WHO_AM_I, VERSE_ORDER, LADDER }
 
     public static final class Card {
         public final String prompt;
@@ -51,7 +51,12 @@ public final class BibleGames {
         private boolean correct;
 
         public Round(Mode mode, long seed) {
-            List<Card> shuffled = new ArrayList<>(cards(mode));
+            this(cards(mode), seed);
+        }
+
+        /** A round of five cards drawn from the given pool with a fixed seed. */
+        public Round(List<Card> pool, long seed) {
+            List<Card> shuffled = new ArrayList<>(pool);
             Collections.shuffle(shuffled, new Random(seed));
             cards = Collections.unmodifiableList(new ArrayList<>(shuffled.subList(0, Math.min(5, shuffled.size()))));
         }
@@ -118,6 +123,17 @@ public final class BibleGames {
         }
     }
 
+    /** A multiple-choice card from a bank file. The answer must be one of the options. */
+    public static Card trivia(String question, String answer, String reference, String explanation,
+                              String hint, List<String> options) {
+        return new Card(question, answer, reference, explanation, hint, String.join("|", options), "");
+    }
+
+    /** A verse-order card from a bank file. The explanation is empty; the reference is shown after the check. */
+    public static Card verse(String text, String reference) {
+        return new Card("Put the words in order", text, reference, "", "", "", "");
+    }
+
     private static Card c(String q, String a, String ref, String explanation, String hint, String options, String aliases) {
         return new Card(q, a, ref, explanation, hint, options, aliases);
     }
@@ -130,6 +146,7 @@ public final class BibleGames {
             case QUIZ: return QUIZ;
             case WHO_AM_I: return PEOPLE;
             case VERSE_ORDER: return VERSES;
+            case LADDER: return LadderBank.all();
             default: throw new IllegalArgumentException("Unknown game");
         }
     }
@@ -163,6 +180,11 @@ public final class BibleGames {
         c("I heard God calling my name as a child in the sanctuary. Who am I?", "Samuel", "1 Samuel 3", "With Eli's help, Samuel learned to recognise and answer God's call.", "My mother was Hannah.", "", "Samweli"),
         c("I met Jesus at a well and told my town about him. Who am I?", "The Samaritan woman", "John 4:4–30", "John does not give her name; her testimony led others to meet Jesus.", "The conversation happened in Samaria.", "", "Samaritan woman|Woman at the well|The woman at the well|Samaritan")
     ));
+
+    /** Builds a bank question; the correct answer must be one of the pipe-separated options. */
+    static Card ladderCard(String q, String a, String ref, String explanation, String hint, String options) {
+        return new Card(q, a, ref, explanation, hint, options, "");
+    }
 
     // Short public-domain KJV passages; these games do not require downloaded translations.
     private static final List<Card> VERSES = Collections.unmodifiableList(Arrays.asList(

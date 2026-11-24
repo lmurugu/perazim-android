@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.local;
 
+import org.perazimchurch.app.ai.reference.ReferenceGuide;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -7,6 +8,9 @@ import android.os.Looper;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
+import org.perazimchurch.app.ai.guide.GuideRuntime;
+import org.perazimchurch.app.ai.guide.GuideSafety;
+import org.perazimchurch.app.ai.guide.SelfCheck;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +18,7 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -35,6 +40,10 @@ public final class OnDeviceAi {
     private static long verifiedModelModified = -1L;
     private static boolean verifiedModelStatus;
     private OnDeviceAi() {}
+    /** Test seam for the model call. Production code never sets this. */
+    public interface ModelRunner { String generate(String prompt, String grammar, int limit) throws IOException; }
+    static volatile ModelRunner testRunner;
+
     public interface Callback { void onSuccess(String answer); void onError(String error); }
     public interface DownloadCallback { void onProgress(int percent); void onComplete(); void onError(String error); }
     public interface ModelStatusCallback { void onComplete(boolean verified); }
@@ -119,12 +128,29 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
             return;
         }
+        String missingReference = missingReferenceMessage(c, question);
+        if (missingReference != null) {
+            MAIN.post(() -> callback.onError(missingReference));
+            return;
+        }
+        if (PerazimAiEngine.isOverdoseQuery(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.overdoseResponse().getMessageText()));
+            return;
+        }
+        if (PerazimAiEngine.isHarmToOthersQuery(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.harmToOthersResponse().getMessageText()));
+            return;
+        }
         if (PerazimAiEngine.isSensitivePastoralDisclosure(question)) {
             MAIN.post(() -> callback.onError(PerazimAiEngine.sensitivePastoralResponse().getMessageText()));
             return;
         }
-        if (PerazimAiEngine.isClearlyOutOfScopeQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.outOfScopeResponse().getMessageText()));
+        if (PerazimAiEngine.isHumanDecisionQuery(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.humanDecisionResponse().getMessageText()));
+            return;
+        }
+        if (PerazimAiEngine.isOutOfScopeForModel(question)) {
+            MAIN.post(() -> callback.onError(PerazimAiEngine.boundaryResponseFor(question).getMessageText()));
             return;
         }
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
@@ -148,57 +174,102 @@ public final class OnDeviceAi {
                 String evidenceQuery = evidenceQuery(question, history);
                 JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,
                         System.currentTimeMillis(), evidenceQuery);
+                // Word study by Strong's number (G26, H7225): answer from the bundled entry, never generate it.
+                java.util.regex.Matcher strongsMatch = java.util.regex.Pattern.compile("\\b([GH]\\d{1,4})\\b").matcher(question);
+                if (strongsMatch.find()) {
+                    org.perazimchurch.app.domain.model.StrongsEntry entry =
+                            org.perazimchurch.app.data.interlinear.StrongsStore.getEntry(c, strongsMatch.group(1));
+                    if (entry != null) {
+                        String wordAnswer = entry.getCode() + " (" + entry.getOriginal() + ", "
+                                + entry.getTransliteration() + "): " + entry.getDefinition();
+                        MAIN.post(() -> callback.onSuccess(wordAnswer));
+                        return;
+                    }
+                }
+                // Exact verse reference with one KJV passage: quote the Bible text directly, never generate it.
+                if (evidence.length() == 1 && LocalScriptureRetriever.hasExplicitReference(question)
+                        && "Bible".equals(evidence.optJSONObject(0) == null ? "" : evidence.optJSONObject(0).optString("sourceId"))) {
+                    JSONObject verse = evidence.getJSONObject(0);
+                    String verseAnswer = verse.optString("location") + " (King James Version): “"
+                            + verse.optString("text") + "”";
+                    MAIN.post(() -> callback.onSuccess(verseAnswer));
+                    return;
+                }
+                // Approved reference items (dictionary and cross-references). A no-op until Levi approves a source.
+                evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
+                // Drift: a question that uses another faith's idea gets KJV passages and a comparative note (no-op otherwise).
+                evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
-                String prompt = LocalPrompt.build(question, history, evidence);
+                // Locked rules, one playbook, style and learned notes (guide memory is optional and bounded).
+                String guideText = GuideRuntime.contextFor(c, question).text;
+                LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence, guideText);
+                // Only excerpts the model actually saw may be cited, verified, or titled.
+                JSONArray shown = built.shownEvidence;
+                if (shown.length() == 0) throw new IOException("The question is too long for the on-device model. Ask a shorter question.");
                 if (!isInstalled(c)) throw new IOException("Download the on-device model first.");
-                if (!MODEL_SHA.equals(sha256(modelFile(c)))) {
-                    cacheModelStatus(modelFile(c), false);
-                    throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
-                }
-                cacheModelStatus(modelFile(c), true);
+                // Uses the cached verification; a full 491 MB digest runs only when the file changed.
+                if (!isModelVerified(c)) throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
                 if (cancelled) throw new IOException("Generation cancelled.");
                 String dir = c.getApplicationInfo().nativeLibraryDir;
                 int answerLimit = LocalPrompt.requiresStructuredBiblicalAnswer(question) ? 280 : 120;
-                ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
-                        "-m", modelFile(c).getAbsolutePath(), "-p", prompt,
-                        "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
-                        "--grammar", CitationGrammar.build(evidence, answerLimit),
-                        "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
-                builder.environment().put("LD_LIBRARY_PATH", dir);
-                process = builder.start(); active = process;
-                if (cancelled) throw new IOException("Generation cancelled.");
-                final Process running = process;
-                Thread stderrDrain = new Thread(() -> {
-                    try (InputStream errors = running.getErrorStream()) {
-                        byte[] discard = new byte[4096];
-                        while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
-                    } catch (IOException ignored) { }
-                }, "perazim-ai-stderr");
-                stderrDrain.setDaemon(true);
-                stderrDrain.start();
-                ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-                java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
-                ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
-                StringBuilder answer = new StringBuilder();
-                try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
-                    char[] buffer = new char[512]; int count;
-                    while ((count = reader.read(buffer)) != -1) {
-                        int available = 16000 - answer.length();
-                        if (available > 0) answer.append(buffer, 0, Math.min(available, count));
-                    }
-                    process.waitFor();
-                } finally { deadline.cancel(false); timer.shutdownNow(); }
-                int exit = process.exitValue();
-                if (cancelled) throw new IOException("Generation cancelled.");
-                if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
-                if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
-                String result = answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim();
+                String rawAnswer;
+                if (testRunner != null) {
+                    // Test-only seam: production never sets testRunner, so this branch is unreachable in the app.
+                    rawAnswer = testRunner.generate(built.prompt, CitationGrammar.build(shown, answerLimit), answerLimit);
+                } else {
+                    ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
+                            "-m", modelFile(c).getAbsolutePath(), "-p", built.prompt,
+                            "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
+                            "--grammar", CitationGrammar.build(shown, answerLimit),
+                            "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
+                    builder.environment().put("LD_LIBRARY_PATH", dir);
+                    process = builder.start(); active = process;
+                    if (cancelled) throw new IOException("Generation cancelled.");
+                    final Process running = process;
+                    Thread stderrDrain = new Thread(() -> {
+                        try (InputStream errors = running.getErrorStream()) {
+                            byte[] discard = new byte[4096];
+                            while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
+                        } catch (IOException ignored) { }
+                    }, "perazim-ai-stderr");
+                    stderrDrain.setDaemon(true);
+                    stderrDrain.start();
+                    ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+                    java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
+                    ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
+                    StringBuilder answer = new StringBuilder();
+                    try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
+                        char[] buffer = new char[512]; int count;
+                        while ((count = reader.read(buffer)) != -1) {
+                            int available = 16000 - answer.length();
+                            if (available > 0) answer.append(buffer, 0, Math.min(available, count));
+                        }
+                        process.waitFor();
+                    } finally { deadline.cancel(false); timer.shutdownNow(); }
+                    int exit = process.exitValue();
+                    if (cancelled) throw new IOException("Generation cancelled.");
+                    if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
+                    if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
+                    rawAnswer = answer.toString();
+                }
+                String result = LocalPrompt.stripStockPhrases(
+                        rawAnswer.replace("<|im_end|>", "").replace("<|endoftext|>", "").trim());
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
-                if (!hasVerifiedCitations(result, evidence)) {
+                if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
+                        || (PerazimAiEngine.claimsOfficialStatus(result)
+                        && !PerazimAiEngine.officialClaimHasApprovedProvenance(result, shown))) {
+                    throw new IOException("The local model made a claim the app cannot verify. Ask again or contact the church office.");
+                }
+                if (!hasVerifiedCitations(result, shown)) {
                     throw new IOException("The local model did not return a verified source citation.");
                 }
-                String citedResult = appendVerifiedSourceTitles(result, evidence);
+                // Self-heal before the answer is shown: fix or refuse unverified quotes, verdicts and references.
+                boolean sensitive = GuideSafety.isSensitive(question);
+                SelfCheck.Result checked = SelfCheck.check(result, GuideRuntime.evidenceTexts(shown), sensitive);
+                GuideRuntime.afterAnswer(c, question, checked.issues, sensitive);
+                if (checked.refused) throw new IOException(checked.answer);
+                String citedResult = appendVerifiedSourceTitles(checked.answer, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();
@@ -336,7 +407,10 @@ public final class OnDeviceAi {
                 if (!part.renameTo(target)) throw new IOException("Cannot finish model installation.");
                 cacheModelStatus(target, true);
                 MAIN.post(callback::onComplete);
-            } catch (Exception e) { String error = e.getMessage(); MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
+            } catch (Exception e) {
+                // Cancel closes the socket, which surfaces as a low-level error; report it as a pause instead.
+                String error = cancelled ? "Download paused. Tap Download to resume." : e.getMessage();
+                MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
             finally { if (connection != null) connection.disconnect(); activeDownload = null; busy.set(false); }
         });
     }
@@ -374,5 +448,26 @@ public final class OnDeviceAi {
         if (!partial.renameTo(target)) throw new IOException("Cannot install the staged validation model.");
         cacheModelStatus(target, true);
         return true;
+    }
+
+    /** Says a confidently parsed reference does not exist in the KJV, instead of quoting or generating text. */
+    static String missingReferenceMessage(Context c, String question) {
+        org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer.Result ref = ScriptureReferenceNormalizer.normalize(question);
+        if (ref == null || !ref.confident || ref.normalized == null) return null;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^(.+) (\\d+):(\\d+)$").matcher(ref.normalized);
+        if (!m.find()) return null;
+        try {
+            String json;
+            try (InputStream in = c.getAssets().open("ai/library/scripture/kjv-verse-counts.json")) {
+                json = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            }
+            org.perazimchurch.app.ai.library.ScriptureRangeTable table = org.perazimchurch.app.ai.library.ScriptureRangeTable.fromJson(json);
+            int book = table.bookNumber(m.group(1));
+            if (book <= 0) return null;
+            if (table.isValid(book, Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)))) return null;
+        } catch (Exception ignored) {
+            return null;
+        }
+        return "I can't find " + ref.normalized + " in the King James Version, so I won't quote it. Please check the reference, or ask a church leader.";
     }
 }
