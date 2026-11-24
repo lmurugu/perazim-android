@@ -47,7 +47,7 @@ public class KnowledgeLibraryTest {
                 files++;
             }
         }
-        assertEquals(4, files);
+        assertEquals(10, files);
     }
 
     @Test
@@ -57,10 +57,27 @@ public class KnowledgeLibraryTest {
             JSONObject topic = topics.getJSONObject(i);
             String status = topic.getString("status");
             assertTrue("status " + status,
-                    status.equals("APPROVED") || status.equals("UNDER_REVIEW") || status.equals("UNDECIDED")
-                            || status.equals("DRAFT_PENDING_LEVI"));
-            // Fail-closed: no content file is attached to any topic yet.
+                    status.equals("APPROVED") || status.equals("APPROVED_LEVI") || status.equals("UNDER_REVIEW")
+                            || status.equals("UNDECIDED") || status.equals("DRAFT_PENDING_LEVI"));
+            // Fail-closed: no content file is attached to any topic yet, and every draft stays pending.
             assertTrue(topic.isNull("contentFile"));
+            if (topic.has("draft")) {
+                assertEquals("DRAFT_PENDING_LEVI", topic.getJSONObject("draft").getString("status"));
+            }
+            assertFalse(topic.has("approvedText"));
+        }
+    }
+
+    @Test
+    public void doctrineEntriesAreApprovedByLevelAndCarryTheirVerses() throws Exception {
+        JSONArray entries = new JSONObject(read(new File(LIB, "doctrine/entries.json"))).getJSONArray("entries");
+        assertEquals(4, entries.length());
+        for (int i = 0; i < entries.length(); i++) {
+            JSONObject entry = entries.getJSONObject(i);
+            assertEquals("APPROVED_LEVI", entry.getString("status"));
+            assertEquals("Levi", entry.getJSONObject("approval").getString("approver"));
+            assertFalse(entry.has("approvedText"));
+            assertTrue(entry.getJSONArray("verses").length() > 0);
         }
     }
 
