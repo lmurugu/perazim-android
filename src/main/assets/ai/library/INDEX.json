@@ -19,8 +19,8 @@
    "files": [
     {
      "path": "doctrine/positions.json",
-     "sha256": "f2129206430334a7d28db19aa967a212b40db8714212ba0967663c8b61c69b3c",
-     "bytes": 4085
+     "sha256": "4e2199e4f9322ef2b60d522b64485d61679e348444047e5e08aaf154e40b7d08",
+     "bytes": 7945
     }
    ]
   },
@@ -30,8 +30,8 @@
    "files": [
     {
      "path": "kenya/crisis-contacts.json",
-     "sha256": "2b72ffc04bcc0b129336d1a336d83aca9a7e4245ce7a8ee52e9ab7628673123e",
-     "bytes": 1971
+     "sha256": "f23513e96789b856eccc5c97ae4e5dc7d0dc9401ae5a50431eda06341161d9e5",
+     "bytes": 2172
     }
    ]
   },
@@ -43,6 +43,22 @@
      "path": "sources/register.json",
      "sha256": "f523efece92ef2f2c9af9fe9459de973f54df753d591dc4879d104a35064713f",
      "bytes": 12709
+    }
+   ]
+  },
+  {
+   "part": "creeds",
+   "description": "Creed texts awaiting approval. DRAFT_PENDING_LEVI. Not read by any loader until Levi approves them.",
+   "files": [
+    {
+     "path": "creeds/SOURCE.md",
+     "sha256": "a459f26a3e5f567376b4b44f0dc632cc3be1f190947a33f1d12dfcdf838aaaa0",
+     "bytes": 809
+    },
+    {
+     "path": "creeds/apostles-creed.txt",
+     "sha256": "605d40a40ed8280d20573c3436db88cd186dc4d92b6a9b360405b33c9d8ef583",
+     "bytes": 647
     }
    ]
   }

@@ -1,5 +1,5 @@
 {
- "_comment": "Kenya contacts for the guide's crisis and safeguarding answers. Copied from the approved crisis record (Levi, 2026-11-23, answer 9A). Status is as recorded: VERIFIED (999 and 112), PARTLY_VERIFIED (922), UNCONFIRMED_CURRENT (1195), LISTED_IN_RECORD (listed with no qualifier recorded; confirm before a release). Never add a number that is not listed here.",
+ "_comment": "Kenya contacts for the guide's crisis and safeguarding answers. Levi approved this directory on 2026-11-23 (answer 9A). The verification column is kept as recorded: VERIFIED (999, 112), PARTLY_VERIFIED (922), UNCONFIRMED_CURRENT (1195), LISTED_IN_RECORD (116, 1192, Befrienders; no qualifier recorded). Never add a number that is not listed here.",
  "approver": "Levi",
  "rows": [
   {
@@ -11,7 +11,8 @@
    ],
    "hours": "Not recorded",
    "status": "VERIFIED",
-   "use": "Immediate danger, violence, or a life at risk"
+   "use": "Immediate danger, violence, or a life at risk",
+   "approvedByLevi": "2026-11-23"
   },
   {
    "id": "medical-922",
@@ -21,7 +22,8 @@
    ],
    "hours": "Not recorded",
    "status": "PARTLY_VERIFIED",
-   "use": "Overdose, poisoning, medical emergency; go to the nearest emergency department"
+   "use": "Overdose, poisoning, medical emergency; go to the nearest emergency department",
+   "approvedByLevi": "2026-11-23"
   },
   {
    "id": "gbv-1195",
@@ -31,7 +33,8 @@
    ],
    "hours": "Not recorded",
    "status": "UNCONFIRMED_CURRENT",
-   "use": "Violence in the home or relationships. Confirm before relying on it"
+   "use": "Violence in the home or relationships. Confirm before relying on it",
+   "approvedByLevi": "2026-11-23"
   },
   {
    "id": "child-116",
@@ -41,7 +44,8 @@
    ],
    "hours": "Not recorded",
    "status": "LISTED_IN_RECORD",
-   "use": "A child at risk"
+   "use": "A child at risk",
+   "approvedByLevi": "2026-11-23"
   },
   {
    "id": "nacada-1192",
@@ -51,7 +55,8 @@
    ],
    "hours": "Not recorded",
    "status": "LISTED_IN_RECORD",
-   "use": "Drug and alcohol use"
+   "use": "Drug and alcohol use",
+   "approvedByLevi": "2026-11-23"
   },
   {
    "id": "befrienders-kenya",
@@ -61,7 +66,8 @@
    ],
    "hours": "Weekdays 9am to 5pm only. Not 24 hours",
    "status": "LISTED_IN_RECORD",
-   "use": "Emotional support. Say the hours when giving it"
+   "use": "Emotional support. Say the hours when giving it",
+   "approvedByLevi": "2026-11-23"
   }
  ],
  "notInLibrary": "Other numbers, counties, shelters and clinics are not listed here. Add them only after a check against an official source and Levi's approval."

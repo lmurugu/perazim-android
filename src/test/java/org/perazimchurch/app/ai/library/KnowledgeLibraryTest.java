@@ -47,7 +47,7 @@ public class KnowledgeLibraryTest {
                 files++;
             }
         }
-        assertEquals(4, files);
+        assertEquals(6, files);
     }
 
     @Test
@@ -59,8 +59,11 @@ public class KnowledgeLibraryTest {
             assertTrue("status " + status,
                     status.equals("APPROVED") || status.equals("UNDER_REVIEW") || status.equals("UNDECIDED")
                             || status.equals("DRAFT_PENDING_LEVI"));
-            // Fail-closed: no content file is attached to any topic yet.
+            // Fail-closed: no content file is attached to any topic yet, and every draft stays pending.
             assertTrue(topic.isNull("contentFile"));
+            JSONObject draft = topic.getJSONObject("draft");
+            assertEquals("DRAFT_PENDING_LEVI", draft.getString("status"));
+            assertFalse(topic.has("approvedText"));
         }
     }
 

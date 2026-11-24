@@ -47,6 +47,9 @@ src/main/assets/ai/library/
     crisis-contacts.json          Kenyan numbers with their recorded verification status
   sources/
     register.json                 35 sources: licence, URL, APPROVED_FOR_GUIDE or NOT_APPROVED
+  creeds/
+    apostles-creed.txt            DRAFT_PENDING_LEVI. Public domain text, source in SOURCE.md
+    SOURCE.md                     where the text came from and its status
 ```
 
 Scripts (run from the repo root):
@@ -110,8 +113,8 @@ Other gaps:
 - Kenya legal summaries (Constitution, Children Act, Sexual Offences Act, Mental Health Act). Not added: Kenya Law
   was unreachable from this session (HTTP 503 and 202). Needs a retry from a working network, with citations and a
   licence check before entry.
-- Creeds and confessions other than Nicene 381. Not extracted. CCEL text needs a clean English transcription first.
-  Nothing written from memory.
+- Westminster Confession (1647). Not added yet. The CCEL text is interleaved with Latin and apparatus, so it needs a clean English-only pass before it can be checked. Nothing written from memory.
+- Assemblies of God Statement of Fundamental Truths. Not added. The publisher's page states "All rights reserved", so it is excluded.
 - The 0.5B model drifts in quotation wording. The library lowers the risk; the self-check still has to catch the rest.
 
 ## 5. Decisions needed from Levi
@@ -155,3 +158,14 @@ in, in this order:
 No new external content was added in this PR. The 35 rows in `sources/register.json` are the existing candidates and
 approved sources from `scripts/reference/sources.json`, unchanged. Each row keeps its licence and URL. Any new source
 will need a row here with licence, URL and the date it was checked before it is used.
+
+## 8. This round (after the coordinator's follow-up)
+
+- **Crisis contacts** carry `approvedByLevi: 2026-11-23` (Levi's answer 9A). The verification column stays as recorded, so 922 is still partly verified and 1195 is still unconfirmed.
+- **Doctrine register**: each of the 15 topics now has a `draft` block. Wording comes only from Levi's recorded decisions. Every draft is DRAFT_PENDING_LEVI. Undecided topics say that no position is set. The Holy Spirit and tongues topics stay UNDECIDED while Levi decides.
+- **Apostles' Creed** (received form, Schaff 1877, public domain via CCEL) is in `creeds/`, marked DRAFT_PENDING_LEVI. No loader reads it.
+- **Treasury of Scripture Knowledge** cross-references are already in the approved `openbible-xrefs` source (OpenBible.info, CC BY 4.0, seeded from the public-domain TSK). No second copy is added.
+- **Easton's Bible Dictionary** is already approved and in `reference.db`. No change.
+- **Westminster Confession**: not added in this PR (see section 4).
+- **Assemblies of God Statement**: not added. The publisher's page says "All rights reserved".
+- **Kenya Law summaries**: not added. The Kenya Law constitution page returns HTTP 202 with an empty body to scripted requests, and the homepage loads. I did not try to get around the block. A summary needs the Kenya Law text itself, with citations, so it can be checked. Retry from another network, or give me the text.
