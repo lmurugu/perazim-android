@@ -128,6 +128,11 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
             return;
         }
+        String missingReference = missingReferenceMessage(c, question);
+        if (missingReference != null) {
+            MAIN.post(() -> callback.onError(missingReference));
+            return;
+        }
         if (PerazimAiEngine.isOverdoseQuery(question)) {
             MAIN.post(() -> callback.onError(PerazimAiEngine.overdoseResponse().getMessageText()));
             return;
@@ -443,5 +448,26 @@ public final class OnDeviceAi {
         if (!partial.renameTo(target)) throw new IOException("Cannot install the staged validation model.");
         cacheModelStatus(target, true);
         return true;
+    }
+
+    /** Says a confidently parsed reference does not exist in the KJV, instead of quoting or generating text. */
+    static String missingReferenceMessage(Context c, String question) {
+        org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer.Result ref = ScriptureReferenceNormalizer.normalize(question);
+        if (ref == null || !ref.confident || ref.normalized == null) return null;
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^(.+) (\\d+):(\\d+)$").matcher(ref.normalized);
+        if (!m.find()) return null;
+        try {
+            String json;
+            try (InputStream in = c.getAssets().open("ai/library/scripture/kjv-verse-counts.json")) {
+                json = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            }
+            org.perazimchurch.app.ai.library.ScriptureRangeTable table = org.perazimchurch.app.ai.library.ScriptureRangeTable.fromJson(json);
+            int book = table.bookNumber(m.group(1));
+            if (book <= 0) return null;
+            if (table.isValid(book, Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)))) return null;
+        } catch (Exception ignored) {
+            return null;
+        }
+        return "I can't find " + ref.normalized + " in the King James Version, so I won't quote it. Please check the reference, or ask a church leader.";
     }
 }
