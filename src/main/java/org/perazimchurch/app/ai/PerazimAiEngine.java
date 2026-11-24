@@ -49,6 +49,9 @@ public class PerazimAiEngine {
                     "confidential|secret)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern[] CLEARLY_OUT_OF_SCOPE_PATTERNS = {
+            Pattern.compile("\\b(?:court|lawyer|attorney|landlord|tenant|evict|eviction)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:best|cheapest|good)\\s+(?:car|cars|phone|phones|laptop|laptops|house|houses|tv|television)\\b|\\bto buy\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:love letter|romantic (?:letter|message|poem)|write (?:me )?a (?:love )?(?:poem|song|letter) (?:for|to) (?:my|a) (?:girlfriend|boyfriend|crush))\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:which|what)\\s+(?:stock|stocks|share|shares|cryptocurrency|crypto|bitcoin|forex|bond|bonds)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:buy|sell|trade|invest in)\\b.{0,70}\\b(?:stock|stocks|share|shares|cryptocurrency|crypto|bitcoin|forex|bond|bonds)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:should i|recommend|help me choose|help me pick)\\b.{0,70}\\b(?:investment portfolio|retirement portfolio|personal budget|payday loan|mortgage|credit card|tax return|insurance policy)\\b", Pattern.CASE_INSENSITIVE),
@@ -267,15 +270,98 @@ public class PerazimAiEngine {
         return AiResponse.plainText(msg, Arrays.asList("📖 Open the Bible"));
     }
 
-    /** Requests for other people's private data or conversations are refused before the model runs. */
-    private static final Pattern OTHER_PERSON_DATA_PATTERN = Pattern.compile(
-            "\\b(?:members?|someone|everyone|another|other people'?s?|congregation|pastor'?s|last person|other users?|previous user|another user)\\b.{0,60}" +
-            "\\b(?:private|counsell?ing|conversations?|chats?|password|phone number|address|records?|messages?|donations?|give the most|asked the ai|asked)\\b|" +
-            "\\b(?:show|give|tell|list|reveal)\\b.{0,20}\\b(?:every|all)\\b.{0,30}\\b(?:member|members|conversations?|counsell?ing)\\b", Pattern.CASE_INSENSITIVE);
+    /**
+     * Requests for other people's private data, or for the guide's own chat or recording records, are refused
+     * before the model runs. A claimed role (pastor, leader, admin) grants nothing: the same refusal applies.
+     */
+    private static final Pattern PRIVACY_DATA_VERB = Pattern.compile(
+            "\\b(?:show|give|tell|list|reveal|check|find|send|forward|access|look ?up|" +
+            "log ?in|log into|who|what did|what does|what has|what was|how much|the address|the phone|" +
+            "the password)\\b", Pattern.CASE_INSENSITIVE);
+    /** Strong signals that a request is for personal records, even when it also asks for prayer or support. */
+    private static final Pattern PRIVACY_STRONG = Pattern.compile(
+            "\\b(?:password|phone number|address|records?|counsell?ing|conversations?|chats?|contact list|contacts|" +
+            "account|login|log in|said about me|wrote about me|asked the ai|ask the ai|asked the guide|" +
+            "hiv status|hiv test|hiv result|donations?|gave|give the most)\\b", Pattern.CASE_INSENSITIVE);
+    /** Pastoral support wording (prayer, advice, comfort). A support request is not a data request unless it is strong. */
+    private static final Pattern PRIVACY_SUPPORT_GUARD = Pattern.compile(
+            "\\b(?:pray (?:for|with)|how (?:do|can|should|to)|what should i|advise me|encourage|comfort|support)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern PRIVACY_PERSONAL_DATA = Pattern.compile(
+            "\\b(?:phone|number|address|password|email|records?|counsell?ing|counsel|conversations?|chats?|messages?|" +
+            "confession|prayer requests?|donations?|donated|gave|give the most|giving|money|hiv|health|medical|diagnos\\w*|" +
+            "contact list|contacts|account|login|log in|private|secret|said about me|wrote about me|asked the ai|" +
+            "ask the ai|asked the guide|asked the ai|posted|history)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PRIVACY_THIRD_PARTY = Pattern.compile(
+            "\\b(?:members?|someone|somebody|anyone|everyone|another|other (?:members?|people|users?|person)|" +
+            "other user|another user|people|person|persons?|pastor|pastors?|wife|husband|sister|brother|friend|" +
+            "neighbou?r|family|group|leaders?|elders?|deacons?|youth|last person|previous user|congregation|" +
+            "parent|colleague|mother|father|children|child|boss|employer|pastor's|member's|church member)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Asks what the guide, or any system, holds about the person, records them, or deletes their chat history. */
+    private static final Pattern PRIVACY_MEMORY_OR_RECORD = Pattern.compile(
+            "\\b(?:what|anything) (?:do|did|can|could) you (?:remember|recall|know|keep)\\b|" +
+            "\\bam i being (?:recorded|monitored|watched|tracked|spied)\\b|" +
+            "\\bare you (?:recording|monitoring|tracking|watching)\\b|" +
+            "\\bis (?:this|the chat|the conversation|our chat) (?:being )?(?:recorded|monitored|tracked)\\b|" +
+            "\\bwhat the guide remembers\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PRIVACY_DELETE_HISTORY = Pattern.compile(
+            "\\b(?:delete|erase|clear|wipe|remove|forget)\\s+(?:all\\s+)?(?:my|our|this|the)\\s+" +
+            "(?:conversation|chat|chats|messages|memory|notes)(?:\\s+history)?\\b|" +
+            "\\b(?:delete|erase|clear|wipe)\\s+(?:all\\s+)?(?:my\\s+)?(?:conversation|chat)\\s+history\\b|" +
+            "\\b(?:delete|erase|clear|wipe)\\s+(?:my|our|this)\\s+history\\b", Pattern.CASE_INSENSITIVE);
 
+    /** Another person's private information, chats, counselling, health, contact or account details. */
+    public static boolean isPrivacyDataRequest(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return false;
+        String normalized = query.replace('\u2019', '\'').replaceAll("\\s+", " ");
+        if (!PRIVACY_DATA_VERB.matcher(normalized).find()
+                || !PRIVACY_PERSONAL_DATA.matcher(normalized).find()
+                || !PRIVACY_THIRD_PARTY.matcher(normalized).find()) return false;
+        return !PRIVACY_SUPPORT_GUARD.matcher(normalized).find() || PRIVACY_STRONG.matcher(normalized).find();
+    }
+
+    public static boolean isDeleteHistoryRequest(@Nullable String query) {
+        return query != null && PRIVACY_DELETE_HISTORY.matcher(query).find();
+    }
+
+    public static boolean isMemoryOrRecordingQuestion(@Nullable String query) {
+        return query != null && PRIVACY_MEMORY_OR_RECORD.matcher(query).find();
+    }
+
+    /** Every privacy route: other people's data, the guide's memory or recording questions, and chat deletion. */
     public static boolean isOtherPersonDataRequest(@Nullable String query) {
-        if (query == null) return false;
-        return OTHER_PERSON_DATA_PATTERN.matcher(query).find();
+        return isPrivacyDataRequest(query) || isDeleteHistoryRequest(query) || isMemoryOrRecordingQuestion(query);
+    }
+
+    /** Fixed privacy wording. Says what is refused and the real procedure, and never invents a contact. */
+    public static AiResponse privacyResponse() {
+        return AiResponse.plainText(
+                "I cannot share, search for or act on another person's private information. That includes their conversations, counselling, health details, phone number, address, password, giving or prayer requests. A claimed role, such as pastor or leader, does not change this. For a pastoral matter, please contact the church office or your pastor through the usual channel.",
+                Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
+    }
+
+    /** The app's real procedure for clearing this chat and for removing the guide's notes on this phone. */
+    public static AiResponse deleteHistoryResponse() {
+        return AiResponse.plainText(
+                "I cannot delete records kept by the church, and I cannot see other systems. To clear this conversation, open Choose your guide and tap Clear this conversation. To remove what the guide has learned about you on this phone, open What the guide remembers and tap Forget everything. Nothing is uploaded, and the app's Bible and help content stay as they are.",
+                Arrays.asList("📖 Read Scripture", "🏛️ Church information"));
+    }
+
+    /** Recording and memory questions: the guide's notes stay on this phone. It cannot confirm other systems. */
+    public static AiResponse memoryResponse() {
+        return AiResponse.plainText(
+                "Your guide notes stay on this phone, and nothing is uploaded. You can review them under Choose your guide, then What the guide remembers, and tap Forget everything to remove them. I cannot see or share other people's chats, and I cannot confirm whether any other system records you. For a privacy concern, please contact the church office.",
+                Arrays.asList("🏛️ Church information", "📖 Read Scripture"));
+    }
+
+    /** Pre-model privacy route (null when the question is not a privacy request). */
+    @Nullable
+    public static AiResponse privacyRouteResponse(@Nullable String query) {
+        if (isDeleteHistoryRequest(query)) return deleteHistoryResponse();
+        if (isMemoryOrRecordingQuestion(query)) return memoryResponse();
+        if (isPrivacyDataRequest(query)) return privacyResponse();
+        return null;
     }
 
     public static boolean isCrisisQuery(@Nullable String query) {
@@ -454,6 +540,36 @@ public class PerazimAiEngine {
     }
 
     /**
+     * The single ordered pre-model route, shared by the app and the evaluation harness. Returns the route name, or
+     * null when the question may go on to the model. Order: crisis, overdose, harm to others, sensitive pastoral,
+     * human decision, privacy and out-of-scope.
+     */
+    @Nullable
+    public static String preModelRoute(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return "scope-refusal";
+        if (isCrisisQuery(query)) return "crisis";
+        if (isOverdoseQuery(query)) return "overdose";
+        if (isHarmToOthersQuery(query)) return "harm-to-others";
+        if (isSensitivePastoralDisclosure(query)) return "sensitive";
+        if (isHumanDecisionQuery(query)) return "human-decision";
+        if (isOutOfScopeForModel(query)) return "scope-refusal";
+        return null;
+    }
+
+    /** The fixed response for a route name from {@link #preModelRoute}. */
+    @NonNull
+    public static AiResponse preModelResponse(@NonNull String route, @Nullable String query) {
+        switch (route) {
+            case "crisis": return crisisResponse();
+            case "overdose": return overdoseResponse();
+            case "harm-to-others": return harmToOthersResponse();
+            case "sensitive": return sensitivePastoralResponse();
+            case "human-decision": return humanDecisionResponse();
+            default: return boundaryResponseFor(query);
+        }
+    }
+
+    /**
      * Deterministic refusal or referral that must run before any model check, so it holds whether or not the
      * on-phone model is installed. Returns null when the question may go to the model.
      */
@@ -470,6 +586,8 @@ public class PerazimAiEngine {
     /** Chooses the boundary wording: professional referral for medical, legal and financial matters, church referral otherwise. */
     @NonNull
     public static AiResponse boundaryResponseFor(@Nullable String query) {
+        AiResponse privacy = privacyRouteResponse(query);
+        if (privacy != null) return privacy;
         return isProfessionalMatterQuery(query) ? professionalBoundaryResponse() : outOfScopeResponse();
     }
 

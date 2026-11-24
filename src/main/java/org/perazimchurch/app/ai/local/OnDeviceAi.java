@@ -133,24 +133,11 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(missingReference));
             return;
         }
-        if (PerazimAiEngine.isOverdoseQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.overdoseResponse().getMessageText()));
-            return;
-        }
-        if (PerazimAiEngine.isHarmToOthersQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.harmToOthersResponse().getMessageText()));
-            return;
-        }
-        if (PerazimAiEngine.isSensitivePastoralDisclosure(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.sensitivePastoralResponse().getMessageText()));
-            return;
-        }
-        if (PerazimAiEngine.isHumanDecisionQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.humanDecisionResponse().getMessageText()));
-            return;
-        }
-        if (PerazimAiEngine.isOutOfScopeForModel(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.boundaryResponseFor(question).getMessageText()));
+        // One ordered pre-model route (overdose, harm to others, sensitive, human decision, privacy, scope).
+        String route = PerazimAiEngine.preModelRoute(question);
+        if (route != null) {
+            final String routed = PerazimAiEngine.preModelResponse(route, question).getMessageText();
+            MAIN.post(() -> callback.onError(routed));
             return;
         }
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {

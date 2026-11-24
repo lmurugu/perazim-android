@@ -165,18 +165,10 @@ public class EvalPipelineTest {
                 String q = kase.getString("prompt");
                 String status;
                 String answer;
-                if (PerazimAiEngine.isCrisisQuery(q)) {
-                    status = "routed:crisis";
-                    answer = PerazimAiEngine.crisisResponse().getMessageText();
-                } else if (PerazimAiEngine.isHarmToOthersQuery(q)) {
-                    status = "routed:harm-to-others";
-                    answer = PerazimAiEngine.harmToOthersResponse().getMessageText();
-                } else if (PerazimAiEngine.isSensitivePastoralDisclosure(q)) {
-                    status = "routed:sensitive";
-                    answer = PerazimAiEngine.sensitivePastoralResponse().getMessageText();
-                } else if (PerazimAiEngine.isOutOfScopeForModel(q)) {
-                    status = "routed:scope-refusal";
-                    answer = PerazimAiEngine.boundaryResponseFor(q).getMessageText();
+                String route = PerazimAiEngine.preModelRoute(q);
+                if (route != null) {
+                    status = "routed:" + route;
+                    answer = PerazimAiEngine.preModelResponse(route, q).getMessageText();
                 } else {
                     JSONArray evidence = kjvEvidence(q);
                     String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
