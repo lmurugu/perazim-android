@@ -59,5 +59,16 @@ class PastoralTopicsTest(unittest.TestCase):
                 self.assertEqual(v["translation"], "KJV")
 
 
+class DoctrineEntriesTest(unittest.TestCase):
+    def test_committed_entries_match_the_kjv_and_stay_fail_closed(self):
+        import build_doctrine_entries as bde
+        with open(bde.OUT, encoding="utf-8") as f:
+            committed = json.load(f)
+        self.assertEqual(bde.build(), committed, "run build_doctrine_entries.py after editing the entries")
+        for entry in committed["entries"]:
+            self.assertEqual(entry["status"], "DRAFT_PENDING_LEVI")
+            self.assertTrue(entry["verses"])
+
+
 if __name__ == "__main__":
     unittest.main()

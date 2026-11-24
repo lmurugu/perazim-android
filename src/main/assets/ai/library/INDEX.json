@@ -18,9 +18,14 @@
    "description": "Doctrine status register. Topic status only (APPROVED, UNDER_REVIEW, UNDECIDED, DRAFT_PENDING_LEVI). Fail-closed.",
    "files": [
     {
+     "path": "doctrine/entries.json",
+     "sha256": "ee3ddd0b901260dcb99e309ce91154b583971b1b97da9486f60e1eaf6aaebd0f",
+     "bytes": 7501
+    },
+    {
      "path": "doctrine/positions.json",
-     "sha256": "4e2199e4f9322ef2b60d522b64485d61679e348444047e5e08aaf154e40b7d08",
-     "bytes": 7945
+     "sha256": "ce2820b1f846085d68f503dfcb67f2fcdd8e599cfe5e04d8f6e1127fb975e959",
+     "bytes": 9946
     }
    ]
   },

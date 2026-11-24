@@ -47,7 +47,7 @@ public class KnowledgeLibraryTest {
                 files++;
             }
         }
-        assertEquals(9, files);
+        assertEquals(10, files);
     }
 
     @Test
@@ -64,6 +64,18 @@ public class KnowledgeLibraryTest {
             JSONObject draft = topic.getJSONObject("draft");
             assertEquals("DRAFT_PENDING_LEVI", draft.getString("status"));
             assertFalse(topic.has("approvedText"));
+        }
+    }
+
+    @Test
+    public void doctrineEntriesAreDraftOnlyAndCarryTheirVerses() throws Exception {
+        JSONArray entries = new JSONObject(read(new File(LIB, "doctrine/entries.json"))).getJSONArray("entries");
+        assertEquals(4, entries.length());
+        for (int i = 0; i < entries.length(); i++) {
+            JSONObject entry = entries.getJSONObject(i);
+            assertEquals("DRAFT_PENDING_LEVI", entry.getString("status"));
+            assertFalse(entry.has("approvedText"));
+            assertTrue(entry.getJSONArray("verses").length() > 0);
         }
     }
 

@@ -102,7 +102,7 @@
    "id": "tithing",
    "topic": "Tithing",
    "status": "UNDECIDED",
-   "basis": "Not yet approved by Levi, 2026-11-24",
+   "basis": "Not yet approved by Levi. Levi's 2026-11-24 decision on prosperity says tithing stays UNDECIDED.",
    "contentFile": null,
    "draft": {
     "status": "DRAFT_PENDING_LEVI",
@@ -180,6 +180,54 @@
     "status": "DRAFT_PENDING_LEVI",
     "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
     "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "holy-spirit-baptism",
+   "topic": "Baptism in the Holy Spirit and tongues",
+   "status": "DRAFT_PENDING_LEVI",
+   "basis": "Levi's decision of 2026-11-24 (answer B). Full entry in doctrine/entries.json",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Spirit baptism is an experience distinct from conversion. Tongues are normal and desirable, but not the only evidence.",
+    "basis": "Levi, 2026-11-24"
+   }
+  },
+  {
+   "id": "prosperity-and-giving",
+   "topic": "Prosperity teaching, giving and seed offerings",
+   "status": "DRAFT_PENDING_LEVI",
+   "basis": "Levi's decision of 2026-11-24 (answer A). Full entry in doctrine/entries.json",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Generous, cheerful giving is taught. God's blessing cannot be bought with a seed or a pledge. Manipulation and pressure are warned against.",
+    "basis": "Levi, 2026-11-24"
+   }
+  },
+  {
+   "id": "polygamy",
+   "topic": "Polygamy and families already in polygamous marriages",
+   "status": "DRAFT_PENDING_LEVI",
+   "basis": "Levi's decision of 2026-11-24 (answer A). Full entry in doctrine/entries.json",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Marriage is one man and one woman. Families already in polygamy receive pastoral care and are not told to break up or abandon wives and children.",
+    "basis": "Levi, 2026-11-24"
+   }
+  },
+  {
+   "id": "dowry",
+   "topic": "Dowry and bride wealth",
+   "status": "DRAFT_PENDING_LEVI",
+   "basis": "Levi's decision of 2026-11-24 (answer A). Full entry in doctrine/entries.json",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Dowry is an acceptable custom when it honours both families. It must not become a sale of a person, a debt trap, or a reason to delay marriage.",
+    "basis": "Levi, 2026-11-24"
    }
   }
  ]
