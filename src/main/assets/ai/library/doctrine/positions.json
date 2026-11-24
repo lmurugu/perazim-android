@@ -185,28 +185,28 @@
   {
    "id": "holy-spirit-baptism",
    "topic": "Baptism in the Holy Spirit and tongues",
-   "status": "APPROVED",
+   "status": "APPROVED_LEVI",
    "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
    "contentFile": null
   },
   {
    "id": "prosperity-and-giving",
    "topic": "Prosperity teaching, giving and seed offerings",
-   "status": "APPROVED",
+   "status": "APPROVED_LEVI",
    "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
    "contentFile": null
   },
   {
    "id": "polygamy",
    "topic": "Polygamy and families already in polygamous marriages",
-   "status": "APPROVED",
+   "status": "APPROVED_LEVI",
    "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
    "contentFile": null
   },
   {
    "id": "dowry",
    "topic": "Dowry and bride wealth",
-   "status": "APPROVED",
+   "status": "APPROVED_LEVI",
    "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
    "contentFile": null
   }

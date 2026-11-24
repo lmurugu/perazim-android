@@ -57,8 +57,8 @@ public class KnowledgeLibraryTest {
             JSONObject topic = topics.getJSONObject(i);
             String status = topic.getString("status");
             assertTrue("status " + status,
-                    status.equals("APPROVED") || status.equals("UNDER_REVIEW") || status.equals("UNDECIDED")
-                            || status.equals("DRAFT_PENDING_LEVI"));
+                    status.equals("APPROVED") || status.equals("APPROVED_LEVI") || status.equals("UNDER_REVIEW")
+                            || status.equals("UNDECIDED") || status.equals("DRAFT_PENDING_LEVI"));
             // Fail-closed: no content file is attached to any topic yet, and every draft stays pending.
             assertTrue(topic.isNull("contentFile"));
             if (topic.has("draft")) {
