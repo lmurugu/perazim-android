@@ -26,7 +26,7 @@ Rule the library enforces: the model only words answers. Facts, verses and posit
 | `assets/reference/reference.db.gz` | `ReferenceIndex` | 5.8 MB gz | Cross-references (OpenBible, CC BY 4.0), places, Smith's, Easton's, Hitchcock's, Nave's Topical, Nicene Creed 381 |
 | `assets/reference/reference-commentaries.db.gz` | `ReferenceIndex` (optional) | 16.4 MB gz | Matthew Henry and Wesley NT notes, labelled by tradition. Approved by Levi (answer A), optional download |
 | `assets/reference/approvals.json` | `ReferenceApprovals` | small | The 9 approved source ids |
-| `assets/ai/guide/comparative/comparative-kb.json` | `DriftDetector` | 29 KB, 27 entries | Comparative drift terms (1.5.22 in the eval branch). Draft, pending Levi |
+| `assets/ai/guide/comparative/comparative-kb.json` | `DriftDetector` | 29 KB, 27 entries | Comparative drift terms, version 1.0.0 on this base, status DRAFT_PENDING_LEVI. The larger 1.5.22 set is in PR 76, not on this base |
 | `assets/ai/guide/playbooks/*.md` | `GuideDocs` | 3.7 KB total for 11 files | One short playbook per skill |
 | `ai-eval/perazim-guide/cases.jsonl` | Laptop benchmark | 532 cases, 129 scripture references | Eval set |
 | `scripts/reference/sources.json` | Reference builder | 35 rows | Every candidate and approved source, with licence |
@@ -88,7 +88,7 @@ checks only, not final. Case counts are from `cases.jsonl`.
 | israel_church_eschatology | 24 | 3/24 | Approved text for pre-trib premillennialism and Israel. UNDER_REVIEW | No. Needs Levi (A1) |
 | historical_apologetics | 24 | 10/24 | Approved apologetics. PR 71 bank is isolated and not used here | No. Needs Levi |
 | holy_spirit_pentecostal | 26 | 7/26 | No topic in the doctrine register yet. Positions not recorded | Register entry needed. Needs Levi (A2) |
-| denominational_fairness | 16 | 5/16 | Comparative KB 1.5.22 exists but is pending Levi. Engine must cite it | No. Needs Levi |
+| denominational_fairness | 16 | 5/16 | Comparative KB here is 1.0.0 (draft). The 1.5.22 set in PR 76 is not on this base and is pending Levi | No. Needs Levi |
 | scripture_exegesis | 42 | 10/42 | Passage context. Approved commentaries exist (optional DB) but are not wired for every book | No. Engine wiring |
 | safety_crisis_safeguarding | 36 | 23/36 | Must reach 100%. Crisis answers are fixed code. Numbers 922 (partly verified), 1195 (unconfirmed) | Numbers recorded. Release blocked until 100% |
 | privacy_confidentiality | 30 | 6/30 | No knowledge asset. Enforced in code. Privacy playbook is 323 bytes | No. Engine and playbook |
