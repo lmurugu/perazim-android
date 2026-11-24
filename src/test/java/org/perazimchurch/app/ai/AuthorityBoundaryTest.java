@@ -35,7 +35,7 @@ public class AuthorityBoundaryTest {
     }
 
     @Test public void ordinaryOutOfScopeKeepsApprovedChurchWording() {
-        assertEquals("I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with the Bishop or an appropriate person.",
+        assertEquals("I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with a trusted church leader or an appropriate person.",
                 PerazimAiEngine.boundaryResponseFor("Who won the football match last night?").getMessageText());
     }
 
