@@ -1,0 +1,111 @@
+{
+  "_comment": "Doctrine status register for the guide knowledge library. Topic status only: this file holds no position text. Statuses: APPROVED (Levi has approved the position), UNDER_REVIEW (Levi's developing or working view, marked as under review), UNDECIDED (no position; the guide explains the question and says no position is set), DRAFT_PENDING_LEVI (drafted content waiting for Levi; fail-closed, never shown). Only Levi approves positions (sole approver, 2026-11-23). Until a topic is APPROVED the guide must not state a position on it. Source of each status: the decision named in basis.",
+  "approver": "Levi (sole final theological approver for the app and AI, 2026-11-23)",
+  "topics": [
+    {
+      "id": "canon-66-books",
+      "topic": "Biblical canon (66 books)",
+      "status": "DRAFT_PENDING_LEVI",
+      "basis": "Recorded as the default canon in the apologetics review, 2026-11-24. Levi has not yet signed it off as a position",
+      "contentFile": null
+    },
+    {
+      "id": "nicene-chalcedonian-orthodoxy",
+      "topic": "Nicene and Chalcedonian orthodoxy (Trinity, two natures of Christ)",
+      "status": "APPROVED",
+      "basis": "Established orthodoxy recorded as settled by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "penal-substitution",
+      "topic": "Penal substitution in the atonement",
+      "status": "APPROVED",
+      "basis": "Levi: a major Reformation formulation, not the sole account of the atonement, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "apostasy-assurance",
+      "topic": "Apostasy and assurance of salvation",
+      "status": "UNDER_REVIEW",
+      "basis": "Levi's developing view: a genuinely saved person can freely and finally depart. Assurance is taught; no individual verdicts, 2026-11-23 and 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "unconditional-election",
+      "topic": "Unconditional election",
+      "status": "UNDER_REVIEW",
+      "basis": "Working view under review by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "pre-trib-premillennialism",
+      "topic": "Pre-tribulation premillennialism and the future turning of national Israel",
+      "status": "UNDER_REVIEW",
+      "basis": "Working view under review by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "women-in-ministry",
+      "topic": "Women in ministry",
+      "status": "UNDECIDED",
+      "basis": "Levi's answer 3D: explain the question, no position, 2026-11-23",
+      "contentFile": null
+    },
+    {
+      "id": "divorce-remarriage",
+      "topic": "Divorce and remarriage",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "tithing",
+      "topic": "Tithing",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "alcohol",
+      "topic": "Alcohol",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "healing-in-atonement",
+      "topic": "Healing in the atonement",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "evolution-age-of-earth",
+      "topic": "Evolution and the age of the earth",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "sexuality",
+      "topic": "Sexuality",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "inerrancy-formulation",
+      "topic": "Inerrancy formulation",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    },
+    {
+      "id": "final-punishment",
+      "topic": "Final punishment",
+      "status": "UNDECIDED",
+      "basis": "Not yet approved by Levi, 2026-11-24",
+      "contentFile": null
+    }
+  ]
+}

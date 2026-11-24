@@ -1,0 +1,68 @@
+{
+ "_comment": "Kenya contacts for the guide's crisis and safeguarding answers. Copied from the approved crisis record (Levi, 2026-11-23, answer 9A). Status is as recorded: VERIFIED (999 and 112), PARTLY_VERIFIED (922), UNCONFIRMED_CURRENT (1195), LISTED_IN_RECORD (listed with no qualifier recorded; confirm before a release). Never add a number that is not listed here.",
+ "approver": "Levi",
+ "rows": [
+  {
+   "id": "emergency-999-112",
+   "name": "Police and emergency",
+   "numbers": [
+    "999",
+    "112"
+   ],
+   "hours": "Not recorded",
+   "status": "VERIFIED",
+   "use": "Immediate danger, violence, or a life at risk"
+  },
+  {
+   "id": "medical-922",
+   "name": "Medical emergency (lead for overdose and poisoning)",
+   "numbers": [
+    "922"
+   ],
+   "hours": "Not recorded",
+   "status": "PARTLY_VERIFIED",
+   "use": "Overdose, poisoning, medical emergency; go to the nearest emergency department"
+  },
+  {
+   "id": "gbv-1195",
+   "name": "Gender-based violence line",
+   "numbers": [
+    "1195"
+   ],
+   "hours": "Not recorded",
+   "status": "UNCONFIRMED_CURRENT",
+   "use": "Violence in the home or relationships. Confirm before relying on it"
+  },
+  {
+   "id": "child-116",
+   "name": "Child helpline",
+   "numbers": [
+    "116"
+   ],
+   "hours": "Not recorded",
+   "status": "LISTED_IN_RECORD",
+   "use": "A child at risk"
+  },
+  {
+   "id": "nacada-1192",
+   "name": "NACADA, substance use",
+   "numbers": [
+    "1192"
+   ],
+   "hours": "Not recorded",
+   "status": "LISTED_IN_RECORD",
+   "use": "Drug and alcohol use"
+  },
+  {
+   "id": "befrienders-kenya",
+   "name": "Befrienders Kenya",
+   "numbers": [
+    "+254 722 178 177"
+   ],
+   "hours": "Weekdays 9am to 5pm only. Not 24 hours",
+   "status": "LISTED_IN_RECORD",
+   "use": "Emotional support. Say the hours when giving it"
+  }
+ ],
+ "notInLibrary": "Other numbers, counties, shelters and clinics are not listed here. Add them only after a check against an official source and Levi's approval."
+}
