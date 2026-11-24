@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original game character: a shepherd with a crook (generated). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M20,58 V36 C20,26 44,26 44,36 V58 Z" android:fillColor="#E8A23A" android:strokeColor="#5A3A00" android:strokeWidth="2"/>
+    <path android:pathData="M24,20 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 Z" android:fillColor="#F2C9A0" android:strokeColor="#5A3A00" android:strokeWidth="2"/>
+    <path android:pathData="M22,16 C24,8 40,8 42,16 L42,18 L22,18 Z" android:fillColor="#7A4A00"/>
+    <path android:pathData="M50,58 V20 C50,12 58,12 58,20 V24" android:strokeColor="#7A4A00" android:strokeWidth="3" android:strokeLineCap="round"/>
+</vector>

@@ -36,6 +36,9 @@ import java.util.UUID;
  */
 @RunWith(AndroidJUnit4.class)
 public class PerazimDatabaseMigrationTest {
+    /** Must match @Database(version) in PerazimDatabase and schemas/12.json. */
+    private static final int CURRENT_SCHEMA_VERSION = 12;
+
 
     private static final String FIXTURE_USER_ID = "migration-fixture-user";
     private static final String FIXTURE_VERSE_ID = "migration-fixture-verse";
@@ -95,7 +98,7 @@ public class PerazimDatabaseMigrationTest {
     }
 
     @Test
-    public void bundledVersion5AssetMigratesTo6WithoutLosingBibleContent() throws IOException {
+    public void bundledVersion5AssetMigratesToCurrentVersionWithoutLosingBibleContent() throws IOException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         String databaseName = uniqueName("bundled_asset_v5");
         File databaseFile = context.getDatabasePath(databaseName);
@@ -125,11 +128,14 @@ public class PerazimDatabaseMigrationTest {
             rawHelper.close();
 
             upgraded = Room.databaseBuilder(context, PerazimDatabase.class, databaseName)
-                    .addMigrations(PerazimDatabase.MIGRATION_5_6, PerazimDatabase.MIGRATION_6_7)
+                    .addMigrations(PerazimDatabase.MIGRATION_5_6, PerazimDatabase.MIGRATION_6_7,
+                            PerazimDatabase.MIGRATION_7_8, PerazimDatabase.MIGRATION_8_9,
+                            PerazimDatabase.MIGRATION_9_10, PerazimDatabase.MIGRATION_10_11,
+                            PerazimDatabase.MIGRATION_11_12)
                     .build();
             SupportSQLiteDatabase after = upgraded.getOpenHelper().getWritableDatabase();
 
-            assertEquals(7, pragmaInt(after, "user_version"));
+            assertEquals(CURRENT_SCHEMA_VERSION, pragmaInt(after, "user_version"));
             assertEquals(translationCountsBefore, translationCounts(after));
             assertFixtureRowsPreserved(after, verseId, "synthetic migration note");
             assertEquals("", firstString(after,
@@ -160,7 +166,7 @@ public class PerazimDatabaseMigrationTest {
             SupportSQLiteDatabase sourceDb = source.getOpenHelper().getWritableDatabase();
             seedUser(sourceDb);
             seedVerse(sourceDb);
-            seedMessageAndDraft(sourceDb);
+            seedCurrentSchemaMessageAndDraft(sourceDb);
             try (Cursor checkpoint = sourceDb.query("PRAGMA wal_checkpoint(FULL)")) {
                 assertTrue("Checkpoint should return its status row", checkpoint.moveToFirst());
                 assertEquals("Checkpoint should complete without a busy writer", 0,
@@ -178,7 +184,7 @@ public class PerazimDatabaseMigrationTest {
 
             restored = Room.databaseBuilder(context, PerazimDatabase.class, restoredName).build();
             SupportSQLiteDatabase restoredDb = restored.getOpenHelper().getWritableDatabase();
-            assertEquals(7, pragmaInt(restoredDb, "user_version"));
+            assertEquals(CURRENT_SCHEMA_VERSION, pragmaInt(restoredDb, "user_version"));
             assertFixtureRowsPreserved(restoredDb, FIXTURE_VERSE_ID, "synthetic private note");
             assertEquals("Database copy must not replace the separate preferences file", 73,
                     preferences.getInt(xpKey, -1));
@@ -245,6 +251,23 @@ public class PerazimDatabaseMigrationTest {
                         + "status, retryCount, lastError) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 new Object[]{FIXTURE_QUEUE_ID, "CREATE", "message", FIXTURE_MESSAGE_ID,
                         "{\"body\":\"synthetic draft\"}", 1700000003L, "pending", 0, ""});
+    }
+
+    /**
+     * Same fixture as seedMessageAndDraft, for a database already at the current schema (v7),
+     * where sync_queue.nextAttemptAt is NOT NULL and must be provided.
+     */
+    private static void seedCurrentSchemaMessageAndDraft(SupportSQLiteDatabase db) {
+        db.execSQL("INSERT INTO messages "
+                        + "(id, conversationId, senderId, senderName, content, sentMillis, "
+                        + "deliveryStatus, syncStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                new Object[]{FIXTURE_MESSAGE_ID, "fixture-conversation", FIXTURE_USER_ID,
+                        "Synthetic Member", "Synthetic message body", 1700000002L, "pending", "pending"});
+        db.execSQL("INSERT INTO sync_queue "
+                        + "(id, operationType, entityType, entityId, payloadJson, timestampMillis, "
+                        + "nextAttemptAt, status, retryCount, lastError) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                new Object[]{FIXTURE_QUEUE_ID, "CREATE", "message", FIXTURE_MESSAGE_ID,
+                        "{\"body\":\"synthetic draft\"}", 1700000003L, 0L, "pending", 0, ""});
     }
 
     private static void assertFixtureRowsPreserved(SupportSQLiteDatabase db,

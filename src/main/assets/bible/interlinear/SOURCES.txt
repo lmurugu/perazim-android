@@ -1,0 +1,9 @@
+greek_nt.tsv.gz: Greek New Testament interlinear.
+Source: Maurice A. Robinson's parsed Antoniades 1904/1912 Patriarchal text, with morphological
+parsing and Strong's numbers, from https://github.com/byztxt/greektext-antoniades (parsed/*.UAN).
+Licence: "Public Domain. Copy freely." (repository README).
+Converted by scripts/bible/build_greek_interlinear.py. 27 books, 7,956 verses.
+Transliteration and gloss are added by scripts/bible/enrich_interlinear.py (see NOTICE.md).
+Cells: original|strongs|morph|transliteration|gloss.
+
+English glosses: STEPBible.org Translators Amalgamated OT/NT (Tyndale House, CC BY 4.0), applied by scripts/bible/apply_stepbible_glosses.py.

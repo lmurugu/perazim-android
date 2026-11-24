@@ -7,6 +7,10 @@ The **source code** in this repository is licensed under the MIT License (see `L
 | Translation | Status in this repository | Action |
 |---|---|---|
 | King James Version (KJV) | Public domain; documented in `docs/bible-source.md` §2.1 | None |
+| World English Bible (WEB), American Standard Version (ASV, 1901), Berean Standard Bible (BSB) | Public domain (eBible.org statements; BSB dedicated to the public domain 30 April 2023). Full text bundled in `src/main/assets/bible/text/`, see `SOURCES.txt` there | Owner to confirm with decision D4 |
+| Greek New Testament interlinear (Antoniades 1904/1912 with parsing and Strong's numbers) | Public domain (byztxt/greektext-antoniades README). Asset in `src/main/assets/bible/interlinear/`, see `SOURCES.txt` there | None beyond attribution |
+| Strong's Greek and Hebrew dictionary (offline lookup). Hebrew entries: CC BY 4.0 (Open Scriptures Hebrew Bible Project), Strong's text public domain. Greek entries: Strong's 1890 text public domain; OpenScriptures corrections stated as GPL 3.0 in the source header, which also quotes MIT text. **Owner to confirm the Greek correction licence** | `src/main/assets/bible/strongs/`, see `SOURCES.txt` there | Owner confirmation pending |
+| New American Standard Bible (NASB) | Copyright The Lockman Foundation. **Not in the repository.** Loaded only from a local file the owner supplies (`Android/data/org.perazimchurch.app/files/bible/NASB.tsv.gz`); ignored by `.gitignore` | Owner licence required before any distribution |
 | Swahili Union Version (SUV, 1952) | Documented as public domain in `docs/bible-source.md` §2.2; the owner has not yet confirmed it with the Bible Society of Kenya | **Pending** owner confirmation (decision D4) |
 | New International Version (NIV) | Copyrighted (Biblica). Bundled in the database | **Pending removal** (decision D4) |
 | English Standard Version (ESV) | Copyrighted (Crossway). Bundled in the database | **Pending removal** (decision D4) |
@@ -33,3 +37,19 @@ The **source code** in this repository is licensed under the MIT License (see `L
 ## Build-time dependencies
 
 Dependencies are listed in `build.gradle` and `server/package.json`. Their licences are the licences of the upstream projects.
+
+## Interlinear glosses, transliterations and parsing (added with the interlinear update)
+
+| Item | Source and licence | Notes |
+|---|---|---|
+| Hebrew Old Testament text, lemmas and morphology (`hebrew_ot.tsv.gz`) | Open Scriptures Hebrew Bible (OSHB, morphhb). **CC BY 4.0**; WLC text public domain | Attribution shown in the Interlinear screen |
+| Glosses and Strong's entries for Greek words | Strong's 1890 dictionary text, public domain (via the bundled Strong's dictionary) | Gloss is the first English rendering in the Strong's entry for the lemma |
+| Glosses for Hebrew words | Strong's Hebrew entries, from openscriptures HebrewStrong.xml, **CC BY 4.0** | Same source as the Strong's dictionary above |
+| Transliterations | Computed by `scripts/bible/enrich_interlinear.py` from a fixed letter table written for this project | No outside data |
+| Plain-English parsing | Written for this project (`GrammarDescriber`) from the Robinson and OSHB code schemes | No outside data |
+
+## English glosses (STEPBible Translators Amalgamated data)
+
+| Item | Source and licence | Notes |
+|---|---|---|
+| English contextual glosses for every word of the Hebrew OT and Greek NT interlinears | STEPBible.org, Translators Amalgamated OT (TAHOT) and NT (TAGNT), based on work at Tyndale House, Cambridge. **CC BY 4.0**. Attribute Tyndale House and STEPBible.org, and link https://github.com/STEPBible/STEPBible-Data | Only the gloss and Strong's number are bundled, not the data files. Applied by `scripts/bible/apply_stepbible_glosses.py` |

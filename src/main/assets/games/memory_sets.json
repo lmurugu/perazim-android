@@ -1,0 +1,1117 @@
+{
+ "translation": "KJV",
+ "sets": [
+  {
+   "id": "m01",
+   "title": "Creation",
+   "pairs": [
+    {
+     "a": "LIGHT",
+     "b": "DAY",
+     "reference": "Genesis 1:5"
+    },
+    {
+     "a": "HEAVEN",
+     "b": "EARTH",
+     "reference": "Genesis 1:1"
+    },
+    {
+     "a": "WATERS",
+     "b": "FIRMAMENT",
+     "reference": "Genesis 1:6"
+    },
+    {
+     "a": "MAN",
+     "b": "IMAGE",
+     "reference": "Genesis 1:27"
+    },
+    {
+     "a": "FRUIT",
+     "b": "SEED",
+     "reference": "Genesis 1:29"
+    },
+    {
+     "a": "SEA",
+     "b": "FISH",
+     "reference": "Genesis 1:26"
+    },
+    {
+     "a": "FOWL",
+     "b": "AIR",
+     "reference": "Genesis 1:26"
+    }
+   ]
+  },
+  {
+   "id": "m02",
+   "title": "Noah",
+   "pairs": [
+    {
+     "a": "NOAH",
+     "b": "GRACE",
+     "reference": "Genesis 6:8"
+    },
+    {
+     "a": "GOPHER",
+     "b": "ARK",
+     "reference": "Genesis 6:14"
+    },
+    {
+     "a": "DOVE",
+     "b": "OLIVE",
+     "reference": "Genesis 8:11"
+    },
+    {
+     "a": "BOW",
+     "b": "CLOUD",
+     "reference": "Genesis 9:13"
+    },
+    {
+     "a": "ALTAR",
+     "b": "BURNT",
+     "reference": "Genesis 8:20"
+    },
+    {
+     "a": "FLOOD",
+     "b": "WATERS",
+     "reference": "Genesis 7:6"
+    }
+   ]
+  },
+  {
+   "id": "m03",
+   "title": "Joseph",
+   "pairs": [
+    {
+     "a": "COAT",
+     "b": "COLOURS",
+     "reference": "Genesis 37:3"
+    },
+    {
+     "a": "JOSEPH",
+     "b": "DREAMED",
+     "reference": "Genesis 37:5"
+    },
+    {
+     "a": "PHARAOH",
+     "b": "DREAM",
+     "reference": "Genesis 41:25"
+    },
+    {
+     "a": "CORN",
+     "b": "EGYPT",
+     "reference": "Genesis 42:1"
+    },
+    {
+     "a": "PRISON",
+     "b": "KEEPER",
+     "reference": "Genesis 39:21"
+    }
+   ]
+  },
+  {
+   "id": "m04",
+   "title": "Moses and the bush",
+   "pairs": [
+    {
+     "a": "BUSH",
+     "b": "FIRE",
+     "reference": "Exodus 3:2"
+    },
+    {
+     "a": "ROD",
+     "b": "SERPENT",
+     "reference": "Exodus 4:3"
+    },
+    {
+     "a": "PHARAOH",
+     "b": "PLAGUE",
+     "reference": "Exodus 11:1"
+    },
+    {
+     "a": "MANNA",
+     "b": "BREAD",
+     "reference": "Exodus 16:15"
+    },
+    {
+     "a": "MOUNT",
+     "b": "SINAI",
+     "reference": "Exodus 19:20"
+    },
+    {
+     "a": "TABLES",
+     "b": "STONE",
+     "reference": "Exodus 31:18"
+    }
+   ]
+  },
+  {
+   "id": "m05",
+   "title": "Plagues",
+   "pairs": [
+    {
+     "a": "BLOOD",
+     "b": "RIVER",
+     "reference": "Exodus 7:20"
+    },
+    {
+     "a": "LICE",
+     "b": "DUST",
+     "reference": "Exodus 8:17"
+    },
+    {
+     "a": "HAIL",
+     "b": "FIRE",
+     "reference": "Exodus 9:24"
+    },
+    {
+     "a": "LOCUSTS",
+     "b": "LAND",
+     "reference": "Exodus 10:14"
+    },
+    {
+     "a": "DARKNESS",
+     "b": "LIGHT",
+     "reference": "Exodus 10:23"
+    },
+    {
+     "a": "FIRSTBORN",
+     "b": "CATTLE",
+     "reference": "Exodus 12:29"
+    }
+   ]
+  },
+  {
+   "id": "m06",
+   "title": "Passover",
+   "pairs": [
+    {
+     "a": "BLOOD",
+     "b": "LINTEL",
+     "reference": "Exodus 12:7"
+    },
+    {
+     "a": "UNLEAVENED",
+     "b": "BREAD",
+     "reference": "Exodus 12:15"
+    },
+    {
+     "a": "BITTER",
+     "b": "HERBS",
+     "reference": "Exodus 12:8"
+    },
+    {
+     "a": "PASSOVER",
+     "b": "LORD",
+     "reference": "Exodus 12:11"
+    },
+    {
+     "a": "EGYPT",
+     "b": "LAMB",
+     "reference": "Exodus 12:3"
+    }
+   ]
+  },
+  {
+   "id": "m07",
+   "title": "Red Sea",
+   "pairs": [
+    {
+     "a": "SEA",
+     "b": "DRY",
+     "reference": "Exodus 14:16"
+    },
+    {
+     "a": "PILLAR",
+     "b": "CLOUD",
+     "reference": "Exodus 14:19"
+    },
+    {
+     "a": "CHARIOT",
+     "b": "WHEELS",
+     "reference": "Exodus 14:25"
+    },
+    {
+     "a": "WALL",
+     "b": "WATERS",
+     "reference": "Exodus 14:22"
+    },
+    {
+     "a": "MIRIAM",
+     "b": "TIMBREL",
+     "reference": "Exodus 15:20"
+    },
+    {
+     "a": "MOSES",
+     "b": "ARM",
+     "reference": "Exodus 14:21"
+    },
+    {
+     "a": "WIND",
+     "b": "EAST",
+     "reference": "Exodus 14:21"
+    },
+    {
+     "a": "PHARAOH",
+     "b": "HORSE",
+     "reference": "Exodus 14:23"
+    }
+   ]
+  },
+  {
+   "id": "m08",
+   "title": "Wilderness",
+   "pairs": [
+    {
+     "a": "QUAILS",
+     "b": "CAMP",
+     "reference": "Exodus 16:13"
+    },
+    {
+     "a": "MANNA",
+     "b": "DEW",
+     "reference": "Exodus 16:14"
+    },
+    {
+     "a": "ROCK",
+     "b": "WATER",
+     "reference": "Exodus 17:6"
+    },
+    {
+     "a": "AMALEK",
+     "b": "SWORD",
+     "reference": "Exodus 17:13"
+    },
+    {
+     "a": "HUR",
+     "b": "AARON",
+     "reference": "Exodus 17:12"
+    },
+    {
+     "a": "MOSES",
+     "b": "REED",
+     "reference": "Exodus 17:5"
+    }
+   ]
+  },
+  {
+   "id": "m09",
+   "title": "Sinai commands",
+   "pairs": [
+    {
+     "a": "SABBATH",
+     "b": "SEVENTH",
+     "reference": "Exodus 20:10"
+    },
+    {
+     "a": "HONOUR",
+     "b": "FATHER",
+     "reference": "Exodus 20:12"
+    },
+    {
+     "a": "COVET",
+     "b": "NEIGHBOUR",
+     "reference": "Exodus 20:17"
+    },
+    {
+     "a": "STONE",
+     "b": "TABLES",
+     "reference": "Exodus 31:18"
+    },
+    {
+     "a": "MOUNT",
+     "b": "CLOUD",
+     "reference": "Exodus 24:15"
+    }
+   ]
+  },
+  {
+   "id": "m10",
+   "title": "Tabernacle",
+   "pairs": [
+    {
+     "a": "ALTAR",
+     "b": "BRASS",
+     "reference": "Exodus 27:1"
+    },
+    {
+     "a": "CURTAINS",
+     "b": "LINEN",
+     "reference": "Exodus 26:1"
+    },
+    {
+     "a": "ARK",
+     "b": "SHITTIM",
+     "reference": "Exodus 25:10"
+    },
+    {
+     "a": "CHERUBIMS",
+     "b": "GOLD",
+     "reference": "Exodus 25:18"
+    },
+    {
+     "a": "BOARDS",
+     "b": "SILVER",
+     "reference": "Exodus 26:19"
+    },
+    {
+     "a": "PRIEST",
+     "b": "EPHOD",
+     "reference": "Exodus 28:4"
+    },
+    {
+     "a": "BREASTPLATE",
+     "b": "JUDGMENT",
+     "reference": "Exodus 28:15"
+    }
+   ]
+  },
+  {
+   "id": "m11",
+   "title": "Twelve spies",
+   "pairs": [
+    {
+     "a": "CANAAN",
+     "b": "LAND",
+     "reference": "Numbers 13:17"
+    },
+    {
+     "a": "GRAPES",
+     "b": "CLUSTER",
+     "reference": "Numbers 13:23"
+    },
+    {
+     "a": "JOSHUA",
+     "b": "CALEB",
+     "reference": "Numbers 14:6"
+    },
+    {
+     "a": "GIANTS",
+     "b": "GRASSHOPPERS",
+     "reference": "Numbers 13:33"
+    },
+    {
+     "a": "ASS",
+     "b": "ANGEL",
+     "reference": "Numbers 22:22"
+    },
+    {
+     "a": "BALAK",
+     "b": "MOAB",
+     "reference": "Numbers 22:4"
+    }
+   ]
+  },
+  {
+   "id": "m12",
+   "title": "Deborah and Barak",
+   "pairs": [
+    {
+     "a": "DEBORAH",
+     "b": "BARAK",
+     "reference": "Judges 4:6"
+    },
+    {
+     "a": "SISERA",
+     "b": "JAEL",
+     "reference": "Judges 4:17"
+    },
+    {
+     "a": "TENT",
+     "b": "NAIL",
+     "reference": "Judges 4:21"
+    },
+    {
+     "a": "GIDEON",
+     "b": "FLEECE",
+     "reference": "Judges 6:37"
+    },
+    {
+     "a": "TRUMPET",
+     "b": "PITCHER",
+     "reference": "Judges 7:16"
+    },
+    {
+     "a": "KISHON",
+     "b": "RIVER",
+     "reference": "Judges 4:13"
+    }
+   ]
+  },
+  {
+   "id": "m13",
+   "title": "Samson",
+   "pairs": [
+    {
+     "a": "LION",
+     "b": "HONEY",
+     "reference": "Judges 14:8"
+    },
+    {
+     "a": "JAWBONE",
+     "b": "ASS",
+     "reference": "Judges 15:15"
+    },
+    {
+     "a": "DELILAH",
+     "b": "LOCKS",
+     "reference": "Judges 16:19"
+    },
+    {
+     "a": "DAGON",
+     "b": "HOUSE",
+     "reference": "Judges 16:23"
+    },
+    {
+     "a": "WHEAT",
+     "b": "WINEPRESS",
+     "reference": "Judges 6:11"
+    }
+   ]
+  },
+  {
+   "id": "m17",
+   "title": "David and Goliath",
+   "pairs": [
+    {
+     "a": "DAVID",
+     "b": "GOLIATH",
+     "reference": "1 Samuel 17:50"
+    },
+    {
+     "a": "SLING",
+     "b": "STONE",
+     "reference": "1 Samuel 17:50"
+    },
+    {
+     "a": "SHEEP",
+     "b": "LION",
+     "reference": "1 Samuel 17:34"
+    },
+    {
+     "a": "BRASS",
+     "b": "HELMET",
+     "reference": "1 Samuel 17:5"
+    },
+    {
+     "a": "SCRIP",
+     "b": "STONES",
+     "reference": "1 Samuel 17:40"
+    }
+   ]
+  },
+  {
+   "id": "m20",
+   "title": "Bathsheba",
+   "pairs": [
+    {
+     "a": "URIAH",
+     "b": "HITTITE",
+     "reference": "2 Samuel 11:3"
+    },
+    {
+     "a": "NATHAN",
+     "b": "LAMB",
+     "reference": "2 Samuel 12:4"
+    },
+    {
+     "a": "DAVID",
+     "b": "SINNED",
+     "reference": "2 Samuel 12:13"
+    },
+    {
+     "a": "BATHSHEBA",
+     "b": "WIFE",
+     "reference": "2 Samuel 11:27"
+    },
+    {
+     "a": "CHILD",
+     "b": "DIED",
+     "reference": "2 Samuel 12:18"
+    },
+    {
+     "a": "LORD",
+     "b": "SENT",
+     "reference": "2 Samuel 12:1"
+    }
+   ]
+  },
+  {
+   "id": "m26",
+   "title": "Three friends",
+   "pairs": [
+    {
+     "a": "SHADRACH",
+     "b": "MESHACH",
+     "reference": "Daniel 3:12"
+    },
+    {
+     "a": "MUSIC",
+     "b": "IMAGE",
+     "reference": "Daniel 3:5"
+    },
+    {
+     "a": "KING",
+     "b": "GODS",
+     "reference": "Daniel 3:12"
+    },
+    {
+     "a": "FOURTH",
+     "b": "GOD",
+     "reference": "Daniel 3:25"
+    },
+    {
+     "a": "FURNACE",
+     "b": "FIRE",
+     "reference": "Daniel 3:23"
+    }
+   ]
+  },
+  {
+   "id": "m29",
+   "title": "The LORD my shepherd",
+   "pairs": [
+    {
+     "a": "LORD",
+     "b": "SHEPHERD",
+     "reference": "Psalms 23:1"
+    },
+    {
+     "a": "WATERS",
+     "b": "STILL",
+     "reference": "Psalms 23:2"
+    },
+    {
+     "a": "PASTURES",
+     "b": "GREEN",
+     "reference": "Psalms 23:2"
+    },
+    {
+     "a": "VALLEY",
+     "b": "SHADOW",
+     "reference": "Psalms 23:4"
+    },
+    {
+     "a": "ROD",
+     "b": "STAFF",
+     "reference": "Psalms 23:4"
+    },
+    {
+     "a": "TABLE",
+     "b": "ENEMIES",
+     "reference": "Psalms 23:5"
+    }
+   ]
+  },
+  {
+   "id": "m30",
+   "title": "Proverbs",
+   "pairs": [
+    {
+     "a": "WISDOM",
+     "b": "FEAR",
+     "reference": "Proverbs 1:7"
+    },
+    {
+     "a": "PRIDE",
+     "b": "FALL",
+     "reference": "Proverbs 16:18"
+    },
+    {
+     "a": "SOFT",
+     "b": "WRATH",
+     "reference": "Proverbs 15:1"
+    },
+    {
+     "a": "HONEYCOMB",
+     "b": "PLEASANT",
+     "reference": "Proverbs 16:24"
+    },
+    {
+     "a": "TRUST",
+     "b": "HEART",
+     "reference": "Proverbs 3:5"
+    },
+    {
+     "a": "LEAN",
+     "b": "ACKNOWLEDGE",
+     "reference": "Proverbs 3:6"
+    }
+   ]
+  },
+  {
+   "id": "m31",
+   "title": "Abraham",
+   "pairs": [
+    {
+     "a": "ABRAM",
+     "b": "COUNTRY",
+     "reference": "Genesis 12:1"
+    },
+    {
+     "a": "LORD",
+     "b": "KINDRED",
+     "reference": "Genesis 12:1"
+    },
+    {
+     "a": "ISAAC",
+     "b": "MORIAH",
+     "reference": "Genesis 22:2"
+    },
+    {
+     "a": "OFFER",
+     "b": "BURNT",
+     "reference": "Genesis 22:2"
+    },
+    {
+     "a": "ALTAR",
+     "b": "WOOD",
+     "reference": "Genesis 22:9"
+    },
+    {
+     "a": "RAM",
+     "b": "THICKET",
+     "reference": "Genesis 22:13"
+    }
+   ]
+  },
+  {
+   "id": "m32",
+   "title": "Jacob",
+   "pairs": [
+    {
+     "a": "LADDER",
+     "b": "ANGELS",
+     "reference": "Genesis 28:12"
+    },
+    {
+     "a": "STONES",
+     "b": "PILLOWS",
+     "reference": "Genesis 28:11"
+    },
+    {
+     "a": "JACOB",
+     "b": "WRESTLED",
+     "reference": "Genesis 32:24"
+    },
+    {
+     "a": "RACHEL",
+     "b": "SEVEN",
+     "reference": "Genesis 29:20"
+    },
+    {
+     "a": "MAN",
+     "b": "DAY",
+     "reference": "Genesis 32:24"
+    }
+   ]
+  },
+  {
+   "id": "m33",
+   "title": "Moses in Midian",
+   "pairs": [
+    {
+     "a": "MIDIAN",
+     "b": "WELL",
+     "reference": "Exodus 2:15"
+    },
+    {
+     "a": "PRIEST",
+     "b": "DAUGHTERS",
+     "reference": "Exodus 2:16"
+    },
+    {
+     "a": "SEVEN",
+     "b": "FLOCK",
+     "reference": "Exodus 2:16"
+    },
+    {
+     "a": "ZIPPORAH",
+     "b": "MOSES",
+     "reference": "Exodus 2:21"
+    },
+    {
+     "a": "GERSHOM",
+     "b": "STRANGER",
+     "reference": "Exodus 2:22"
+    }
+   ]
+  },
+  {
+   "id": "m34",
+   "title": "Gideon",
+   "pairs": [
+    {
+     "a": "GIDEON",
+     "b": "WHEAT",
+     "reference": "Judges 6:11"
+    },
+    {
+     "a": "LORD",
+     "b": "MIGHTY",
+     "reference": "Judges 6:12"
+    },
+    {
+     "a": "FLEECE",
+     "b": "DEW",
+     "reference": "Judges 6:37"
+    },
+    {
+     "a": "TRUMPET",
+     "b": "PITCHERS",
+     "reference": "Judges 7:16"
+    },
+    {
+     "a": "SWORD",
+     "b": "FELLOW",
+     "reference": "Judges 7:22"
+    }
+   ]
+  },
+  {
+   "id": "m35",
+   "title": "Jericho falls",
+   "pairs": [
+    {
+     "a": "WALL",
+     "b": "TRUMPETS",
+     "reference": "Joshua 6:20"
+    },
+    {
+     "a": "PEOPLE",
+     "b": "SHOUT",
+     "reference": "Joshua 6:20"
+    },
+    {
+     "a": "FIRSTBORN",
+     "b": "YOUNGEST",
+     "reference": "Joshua 6:26"
+    },
+    {
+     "a": "ASS",
+     "b": "SHEEP",
+     "reference": "Joshua 6:21"
+    },
+    {
+     "a": "BURNT",
+     "b": "FIRE",
+     "reference": "Joshua 6:24"
+    },
+    {
+     "a": "SCARLET",
+     "b": "WINDOW",
+     "reference": "Joshua 2:18"
+    }
+   ]
+  },
+  {
+   "id": "m36",
+   "title": "Nehemiah",
+   "pairs": [
+    {
+     "a": "JERUSALEM",
+     "b": "WASTE",
+     "reference": "Nehemiah 2:17"
+    },
+    {
+     "a": "WALL",
+     "b": "BUILT",
+     "reference": "Nehemiah 4:6"
+    },
+    {
+     "a": "BOOK",
+     "b": "LAW",
+     "reference": "Nehemiah 8:8"
+    },
+    {
+     "a": "JOY",
+     "b": "STRENGTH",
+     "reference": "Nehemiah 8:10"
+    },
+    {
+     "a": "GOD",
+     "b": "HEAVEN",
+     "reference": "Nehemiah 2:20"
+    }
+   ]
+  },
+  {
+   "id": "m37",
+   "title": "Esther",
+   "pairs": [
+    {
+     "a": "KINGDOM",
+     "b": "TIME",
+     "reference": "Esther 4:14"
+    },
+    {
+     "a": "FAST",
+     "b": "THREE",
+     "reference": "Esther 4:16"
+    },
+    {
+     "a": "ESTHER",
+     "b": "ROYAL",
+     "reference": "Esther 5:1"
+    },
+    {
+     "a": "HAMAN",
+     "b": "GALLOWS",
+     "reference": "Esther 7:10"
+    },
+    {
+     "a": "KING",
+     "b": "WOMEN",
+     "reference": "Esther 2:17"
+    }
+   ]
+  },
+  {
+   "id": "m38",
+   "title": "Hezekiah",
+   "pairs": [
+    {
+     "a": "WALL",
+     "b": "PRAYED",
+     "reference": "2 Kings 20:2"
+    },
+    {
+     "a": "TEARS",
+     "b": "HEAL",
+     "reference": "2 Kings 20:5"
+    },
+    {
+     "a": "FIFTEEN",
+     "b": "YEARS",
+     "reference": "2 Kings 20:6"
+    },
+    {
+     "a": "FIGS",
+     "b": "LUMP",
+     "reference": "2 Kings 20:7"
+    },
+    {
+     "a": "SHADOW",
+     "b": "DEGREES",
+     "reference": "2 Kings 20:11"
+    },
+    {
+     "a": "DIAL",
+     "b": "AHAZ",
+     "reference": "2 Kings 20:11"
+    }
+   ]
+  },
+  {
+   "id": "m39",
+   "title": "Josiah and the book",
+   "pairs": [
+    {
+     "a": "HILKIAH",
+     "b": "BOOK",
+     "reference": "2 Kings 22:8"
+    },
+    {
+     "a": "WRATH",
+     "b": "LORD",
+     "reference": "2 Kings 22:13"
+    },
+    {
+     "a": "TENDER",
+     "b": "HUMBLED",
+     "reference": "2 Kings 22:19"
+    },
+    {
+     "a": "COVENANT",
+     "b": "ELDERS",
+     "reference": "2 Kings 23:2"
+    },
+    {
+     "a": "PASSOVER",
+     "b": "KEEP",
+     "reference": "2 Kings 23:21"
+    }
+   ]
+  },
+  {
+   "id": "m40",
+   "title": "Psalms of David",
+   "pairs": [
+    {
+     "a": "MERCY",
+     "b": "BLOT",
+     "reference": "Psalms 51:1"
+    },
+    {
+     "a": "CLEAN",
+     "b": "HEART",
+     "reference": "Psalms 51:10"
+    },
+    {
+     "a": "JOY",
+     "b": "SALVATION",
+     "reference": "Psalms 51:12"
+    },
+    {
+     "a": "HILLS",
+     "b": "EYES",
+     "reference": "Psalms 121:1"
+    },
+    {
+     "a": "HELP",
+     "b": "LORD",
+     "reference": "Psalms 121:2"
+    },
+    {
+     "a": "REFUGE",
+     "b": "STRENGTH",
+     "reference": "Psalms 46:1"
+    }
+   ]
+  },
+  {
+   "id": "m41",
+   "title": "Blessed man",
+   "pairs": [
+    {
+     "a": "COUNSEL",
+     "b": "UNGODLY",
+     "reference": "Psalms 1:1"
+    },
+    {
+     "a": "LAW",
+     "b": "MEDITATE",
+     "reference": "Psalms 1:2"
+    },
+    {
+     "a": "RIVERS",
+     "b": "FRUIT",
+     "reference": "Psalms 1:3"
+    },
+    {
+     "a": "CHAFF",
+     "b": "WIND",
+     "reference": "Psalms 1:4"
+    },
+    {
+     "a": "WAY",
+     "b": "PERISH",
+     "reference": "Psalms 1:6"
+    },
+    {
+     "a": "LEAF",
+     "b": "WITHER",
+     "reference": "Psalms 1:3"
+    }
+   ]
+  },
+  {
+   "id": "m42",
+   "title": "Isaiah's promises",
+   "pairs": [
+    {
+     "a": "CHILD",
+     "b": "BORN",
+     "reference": "Isaiah 9:6"
+    },
+    {
+     "a": "PRINCE",
+     "b": "PEACE",
+     "reference": "Isaiah 9:6"
+    },
+    {
+     "a": "COUNSELLOR",
+     "b": "WONDERFUL",
+     "reference": "Isaiah 9:6"
+    },
+    {
+     "a": "WOUNDED",
+     "b": "BRUISED",
+     "reference": "Isaiah 53:5"
+    },
+    {
+     "a": "WINGS",
+     "b": "EAGLES",
+     "reference": "Isaiah 40:31"
+    },
+    {
+     "a": "EVERLASTING",
+     "b": "FATHER",
+     "reference": "Isaiah 9:6"
+    }
+   ]
+  },
+  {
+   "id": "m43",
+   "title": "Jeremiah",
+   "pairs": [
+    {
+     "a": "THOUGHTS",
+     "b": "PEACE",
+     "reference": "Jeremiah 29:11"
+    },
+    {
+     "a": "PROPHET",
+     "b": "NATIONS",
+     "reference": "Jeremiah 1:5"
+    },
+    {
+     "a": "WOMB",
+     "b": "SANCTIFIED",
+     "reference": "Jeremiah 1:5"
+    },
+    {
+     "a": "ANSWER",
+     "b": "CALL",
+     "reference": "Jeremiah 33:3"
+    },
+    {
+     "a": "EVERLASTING",
+     "b": "LOVE",
+     "reference": "Jeremiah 31:3"
+    },
+    {
+     "a": "EXPECTED",
+     "b": "END",
+     "reference": "Jeremiah 29:11"
+    }
+   ]
+  },
+  {
+   "id": "m44",
+   "title": "The nativity",
+   "pairs": [
+    {
+     "a": "SWADDLING",
+     "b": "MANGER",
+     "reference": "Luke 2:7"
+    },
+    {
+     "a": "INN",
+     "b": "ROOM",
+     "reference": "Luke 2:7"
+    },
+    {
+     "a": "SHEPHERDS",
+     "b": "FIELD",
+     "reference": "Luke 2:8"
+    },
+    {
+     "a": "TIDINGS",
+     "b": "JOY",
+     "reference": "Luke 2:10"
+    },
+    {
+     "a": "HOST",
+     "b": "PRAISING",
+     "reference": "Luke 2:13"
+    },
+    {
+     "a": "GLORY",
+     "b": "PEACE",
+     "reference": "Luke 2:14"
+    }
+   ]
+  }
+ ]
+}
