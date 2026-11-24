@@ -136,6 +136,131 @@
    ],
    "resources": "If you think you might harm yourself, call 999 or 112 now, or tell a trusted person today. Befrienders Kenya is listed for weekdays 9am to 5pm, not 24 hours: +254 722 178 177.",
    "notes": "Crisis answers use the fixed crisis wording. Do not improvise safety advice."
+  },
+  {
+   "id": "hiv-and-stigma",
+   "topic": "HIV and the stigma that hurts people",
+   "status": "DRAFT_PENDING_LEVI",
+   "summary": "HIV is a medical condition. Shame and rejection often hurt people more than the illness does. Scripture shows Jesus welcoming people others turned away from, and it calls believers to bear one another's burdens, not to blame.",
+   "verses": [
+    {
+     "ref": "John 9:3",
+     "translation": "KJV",
+     "text": "Jesus answered, Neither hath this man sinned, nor his parents: but that the works of God should be made manifest in him."
+    },
+    {
+     "ref": "Luke 5:31",
+     "translation": "KJV",
+     "text": "And Jesus answering said unto them, They that are whole need not a physician; but they that are sick."
+    },
+    {
+     "ref": "Matthew 25:36",
+     "translation": "KJV",
+     "text": "Naked, and ye clothed me: I was sick, and ye visited me: I was in prison, and ye came unto me."
+    },
+    {
+     "ref": "Galatians 6:2",
+     "translation": "KJV",
+     "text": "Bear ye one another’s burdens, and so fulfil the law of Christ."
+    }
+   ],
+   "resources": "For medical questions and testing, see a clinic or health worker. Do not replace medical care with prayer alone. If someone is in immediate danger, call 999 or 112.",
+   "notes": "Does not judge anyone's past or status. Safety line on medical care is for Levi to confirm."
+  },
+  {
+   "id": "grief-and-burial",
+   "topic": "Grief, death and burial",
+   "status": "DRAFT_PENDING_LEVI",
+   "summary": "Grief after a death is deep and can last a long time. Scripture does not forbid sorrow. It shows Jesus weeping with grieving friends, and it gives believers hope in the resurrection and the promise that God will end all tears.",
+   "verses": [
+    {
+     "ref": "1 Thessalonians 4:13",
+     "translation": "KJV",
+     "text": "But I would not have you to be ignorant, brethren, concerning them which are asleep, that ye sorrow not, even as others which have no hope."
+    },
+    {
+     "ref": "John 11:35",
+     "translation": "KJV",
+     "text": "Jesus wept."
+    },
+    {
+     "ref": "Revelation 21:4",
+     "translation": "KJV",
+     "text": "And God shall wipe away all tears from their eyes; and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain: for the former things are passed away."
+    },
+    {
+     "ref": "Psalms 147:3",
+     "translation": "KJV",
+     "text": "He healeth the broken in heart, and bindeth up their wounds."
+    }
+   ],
+   "resources": "If grief has become hopeless or you think you might harm yourself, call 999 or 112 now, or tell a trusted person today.",
+   "notes": "Does not address burial customs or land after a death. Those are open topics (see the Kenya research list)."
+  },
+  {
+   "id": "family-conflict",
+   "topic": "Family conflict and in-laws",
+   "status": "DRAFT_PENDING_LEVI",
+   "summary": "Family conflict can be painful and long. Scripture asks children to honour parents, asks everyone to forbear one another, and teaches patient, honest talk. Peace is worth working for where it is possible and safe.",
+   "verses": [
+    {
+     "ref": "Ephesians 6:1",
+     "translation": "KJV",
+     "text": "Children, obey your parents in the Lord: for this is right."
+    },
+    {
+     "ref": "Colossians 3:13",
+     "translation": "KJV",
+     "text": "Forbearing one another, and forgiving one another, if any man have a quarrel against any: even as Christ forgave you, so also do ye."
+    },
+    {
+     "ref": "Matthew 18:15",
+     "translation": "KJV",
+     "text": "Moreover if thy brother shall trespass against thee, go and tell him his fault between thee and him alone: if he shall hear thee, thou hast gained thy brother."
+    },
+    {
+     "ref": "Proverbs 15:1",
+     "translation": "KJV",
+     "text": "A soft answer turneth away wrath: but grievous words stir up anger."
+    },
+    {
+     "ref": "Romans 12:18",
+     "translation": "KJV",
+     "text": "If it be possible, as much as lieth in you, live peaceably with all men."
+    }
+   ],
+   "resources": "If the conflict involves threats or violence, call 999 or 112 now. Then talk to a trusted church leader.",
+   "notes": "Does not take sides in a family dispute. Polygamy and dowry questions are covered by their own approved entries."
+  },
+  {
+   "id": "violence-and-safeguarding",
+   "topic": "Violence, abuse and safeguarding children",
+   "status": "DRAFT_PENDING_LEVI",
+   "summary": "Violence and abuse are never to be kept secret or excused. Scripture calls believers to defend the poor and the fatherless, to speak for those who cannot speak, and warns severely against harming little ones.",
+   "verses": [
+    {
+     "ref": "Psalms 82:3",
+     "translation": "KJV",
+     "text": "Defend the poor and fatherless: do justice to the afflicted and needy."
+    },
+    {
+     "ref": "Proverbs 31:8",
+     "translation": "KJV",
+     "text": "Open thy mouth for the dumb in the cause of all such as are appointed to destruction."
+    },
+    {
+     "ref": "Matthew 18:6",
+     "translation": "KJV",
+     "text": "But whoso shall offend one of these little ones which believe in me, it were better for him that a millstone were hanged about his neck, and that he were drowned in the depth of the sea."
+    },
+    {
+     "ref": "Psalms 147:3",
+     "translation": "KJV",
+     "text": "He healeth the broken in heart, and bindeth up their wounds."
+    }
+   ],
+   "resources": "If a child or anyone is in danger now, call 999 or 112. For a child, Childline Kenya is 116. The gender-based violence line 1195 may not be current; use it only as a secondary line.",
+   "notes": "Safeguarding referral goes to the trusted leader and to the authorities. Never ask the person to keep it secret. Privacy rules apply."
   }
  ]
 }

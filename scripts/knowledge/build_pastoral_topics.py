@@ -18,8 +18,9 @@ import check_eval_references as cer  # noqa: E402  (range table)
 
 KJV = os.path.join(ROOT, "src/main/assets/bible/text/KJV.tsv.gz")
 OUT = os.path.join(ROOT, "src/main/assets/ai/library/pastoral/kenya-topics.json")
-BOOK_NUMBER = {"Deuteronomy": 5, "1 Kings": 11, "Psalms": 19, "Proverbs": 20, "Matthew": 40, "Galatians": 48,
-               "Ephesians": 49, "1 Timothy": 54, "Romans": 45, "1 John": 62}
+def book_numbers():
+    with open(os.path.join(ROOT, "src/main/assets/ai/library/scripture/kjv-verse-counts.json"), encoding="utf-8") as f:
+        return {b["name"]: b["book"] for b in json.load(f)["books"]}
 
 TOPICS = [
     {
@@ -54,6 +55,38 @@ TOPICS = [
         "resources": "If you think you might harm yourself, call 999 or 112 now, or tell a trusted person today. Befrienders Kenya is listed for weekdays 9am to 5pm, not 24 hours: +254 722 178 177.",
         "notes": "Crisis answers use the fixed crisis wording. Do not improvise safety advice.",
     },
+    {
+        "id": "hiv-and-stigma",
+        "topic": "HIV and the stigma that hurts people",
+        "summary": "HIV is a medical condition. Shame and rejection often hurt people more than the illness does. Scripture shows Jesus welcoming people others turned away from, and it calls believers to bear one another's burdens, not to blame.",
+        "verses": ["John 9:3", "Luke 5:31", "Matthew 25:36", "Galatians 6:2"],
+        "resources": "For medical questions and testing, see a clinic or health worker. Do not replace medical care with prayer alone. If someone is in immediate danger, call 999 or 112.",
+        "notes": "Does not judge anyone's past or status. Safety line on medical care is for Levi to confirm.",
+    },
+    {
+        "id": "grief-and-burial",
+        "topic": "Grief, death and burial",
+        "summary": "Grief after a death is deep and can last a long time. Scripture does not forbid sorrow. It shows Jesus weeping with grieving friends, and it gives believers hope in the resurrection and the promise that God will end all tears.",
+        "verses": ["1 Thessalonians 4:13", "John 11:35", "Revelation 21:4", "Psalms 147:3"],
+        "resources": "If grief has become hopeless or you think you might harm yourself, call 999 or 112 now, or tell a trusted person today.",
+        "notes": "Does not address burial customs or land after a death. Those are open topics (see the Kenya research list).",
+    },
+    {
+        "id": "family-conflict",
+        "topic": "Family conflict and in-laws",
+        "summary": "Family conflict can be painful and long. Scripture asks children to honour parents, asks everyone to forbear one another, and teaches patient, honest talk. Peace is worth working for where it is possible and safe.",
+        "verses": ["Ephesians 6:1", "Colossians 3:13", "Matthew 18:15", "Proverbs 15:1", "Romans 12:18"],
+        "resources": "If the conflict involves threats or violence, call 999 or 112 now. Then talk to a trusted church leader.",
+        "notes": "Does not take sides in a family dispute. Polygamy and dowry questions are covered by their own approved entries.",
+    },
+    {
+        "id": "violence-and-safeguarding",
+        "topic": "Violence, abuse and safeguarding children",
+        "summary": "Violence and abuse are never to be kept secret or excused. Scripture calls believers to defend the poor and the fatherless, to speak for those who cannot speak, and warns severely against harming little ones.",
+        "verses": ["Psalms 82:3", "Proverbs 31:8", "Matthew 18:6", "Psalms 147:3"],
+        "resources": "If a child or anyone is in danger now, call 999 or 112. For a child, Childline Kenya is 116. The gender-based violence line 1195 may not be current; use it only as a secondary line.",
+        "notes": "Safeguarding referral goes to the trusted leader and to the authorities. Never ask the person to keep it secret. Privacy rules apply.",
+    },
 ]
 
 
@@ -77,6 +110,7 @@ def parse(ref):
 def build():
     kjv = load_kjv()
     table = cer.Table()
+    books = book_numbers()
     out = []
     for t in TOPICS:
         rows = []
@@ -85,7 +119,7 @@ def build():
             ok, reason = table.check(ref)
             if not ok:
                 raise SystemExit("bad reference %s: %s" % (ref, reason))
-            key = (BOOK_NUMBER[book], c, v)
+            key = (books[book], c, v)
             if key not in kjv:
                 raise SystemExit("not in KJV: %s" % ref)
             rows.append({"ref": ref, "translation": "KJV", "text": kjv[key]})
