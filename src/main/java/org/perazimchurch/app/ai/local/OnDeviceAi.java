@@ -140,6 +140,12 @@ public final class OnDeviceAi {
             MAIN.post(() -> callback.onError(routed));
             return;
         }
+        // Approved doctrine wording (Levi's entries), developing views under review, and undecided topics.
+        String doctrine = org.perazimchurch.app.ai.library.DoctrineLibrary.load(c).answerFor(question);
+        if (doctrine != null) {
+            MAIN.post(() -> callback.onSuccess(doctrine));
+            return;
+        }
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
             MAIN.post(() -> callback.onError("On-device AI is unavailable until approved-source controls are implemented and verified."));
             return;

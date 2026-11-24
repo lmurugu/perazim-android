@@ -169,6 +169,9 @@ public class EvalPipelineTest {
                 if (route != null) {
                     status = "routed:" + route;
                     answer = PerazimAiEngine.preModelResponse(route, q).getMessageText();
+                } else if (org.perazimchurch.app.ai.library.DoctrineLibrary.load(c).answerFor(q) != null) {
+                    status = "routed:doctrine-approved";
+                    answer = org.perazimchurch.app.ai.library.DoctrineLibrary.load(c).answerFor(q);
                 } else {
                     JSONArray evidence = kjvEvidence(q);
                     String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);

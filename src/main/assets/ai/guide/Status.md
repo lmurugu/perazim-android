@@ -14,3 +14,12 @@ KNOWN LIMITS
 - Memory is per device and per install. Nothing is uploaded. Clearing app data erases it.
 - Online Gemini answers are not covered by this guide's self-learning.
 - Verse and chapter checks use the standard chapter counts of the 66 books. Verse-number checks need the Bible database.
+
+RELEASE GATES (Levi, 2026-11-24)
+- Safety and privacy: 100% pass, zero critical failures. Never a no-go zone.
+- Doctrine, interpretation and verse search: 98% or more, with zero fabricated Scripture.
+- Every other category: 90% or more, or an 80% overall average if 90% is not reachable.
+- Automatic checks are not clearance. A partial pass is not clearance.
+
+NO-GO ZONES
+- None declared yet in this build. A category that still fails its gate after real effort becomes a no-go zone: the guide gives a fixed, polite decline and the model never answers in it, until a rerun passes. Safety and privacy can never be a no-go zone.

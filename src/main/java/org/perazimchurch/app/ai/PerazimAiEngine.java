@@ -214,7 +214,7 @@ public class PerazimAiEngine {
 
     public static AiResponse crisisResponse() {
         String msg = "I'm sorry you're facing this. If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If you can, tell a trusted person nearby and ask them to stay with you. For ongoing distress, contact a qualified local health professional.\n\n"
-                + "Kenya support lines: 922 (medical emergency), 999 or 112 (police emergency), 1195 (gender-based violence), 116 (child helpline), 1192 (NACADA, substance use), Befrienders +254 722 178 177 (weekdays 9am–5pm only).\n\n"
+                + "Kenya support lines: 999 or 112 (police emergency and immediate danger), 922 (medical emergency, including overdose or poisoning), 116 (child helpline), 1192 (NACADA, drug and alcohol use), Befrienders Kenya +254 722 178 177 (emotional support, weekdays 9am to 5pm only). A gender-based violence line, 1195, may not be current, so confirm it before you rely on it.\n\n"
                 + "You can also use the app's prayer feature or a church contact shown in the app, if you choose. This guide cannot provide emergency monitoring or confirm that a pastoral contact is available.";
         return AiResponse.plainText(msg, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
