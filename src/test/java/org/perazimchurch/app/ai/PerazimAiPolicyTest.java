@@ -52,7 +52,7 @@ public class PerazimAiPolicyTest {
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("How can I support someone who is grieving?"));
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("Explain John 3:16"));
         assertTrue(PerazimAiEngine.boundaryResponseFor("Which medication should I take?").getMessageText().contains("qualified professional"));
-        assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("Please speak with the Bishop"));
+        assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("Please speak with a trusted church leader"));
     }
 
     @Test public void crisisResponseDoesNotInventAContactOrPromiseAvailability() {

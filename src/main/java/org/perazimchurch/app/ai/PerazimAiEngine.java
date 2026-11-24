@@ -381,7 +381,7 @@ public class PerazimAiEngine {
     @NonNull
     public static AiResponse humanDecisionResponse() {
         return AiResponse.plainText(
-                "This decision belongs to church leadership, and I cannot make it. Please speak with the Bishop or an authorised leader.",
+                "This decision belongs to church leadership, and I cannot make it. Please speak with a trusted church leader or an authorised leader.",
                 Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
@@ -523,7 +523,7 @@ public class PerazimAiEngine {
     @NonNull
     public static AiResponse outOfScopeResponse() {
         return AiResponse.plainText(
-                "I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with the Bishop or an appropriate person.",
+                "I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with a trusted church leader or an appropriate person.",
                 Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
