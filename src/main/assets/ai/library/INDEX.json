@@ -30,8 +30,8 @@
    "files": [
     {
      "path": "kenya/crisis-contacts.json",
-     "sha256": "f23513e96789b856eccc5c97ae4e5dc7d0dc9401ae5a50431eda06341161d9e5",
-     "bytes": 2172
+     "sha256": "ad5418be934ba97e03448524ab1bb49a052a964765a0f7d4b604e3fd46159be6",
+     "bytes": 3365
     },
     {
      "path": "kenya/legal-summaries.json",
@@ -48,6 +48,17 @@
      "path": "sources/register.json",
      "sha256": "f523efece92ef2f2c9af9fe9459de973f54df753d591dc4879d104a35064713f",
      "bytes": 12709
+    }
+   ]
+  },
+  {
+   "part": "pastoral",
+   "description": "Kenyan pastoral-support topics. Verse text from the bundled KJV only. DRAFT_PENDING_LEVI. Fail-closed.",
+   "files": [
+    {
+     "path": "pastoral/kenya-topics.json",
+     "sha256": "fb47b51969a75a76b262f5f97323485f07a5e1a66910e0fad779f0c95a2f1771",
+     "bytes": 6691
     }
    ]
   },

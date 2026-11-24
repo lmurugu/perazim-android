@@ -35,7 +35,8 @@
    "status": "UNCONFIRMED_CURRENT",
    "use": "Violence in the home or relationships. Confirm before relying on it",
    "approvedByLevi": "2026-11-23",
-   "reviewNote": "Conflict to resolve. The research thread (2026-11-24) found only a 2020 report and says do not use this number until it is confirmed. Levi approved it as UNCONFIRMED_CURRENT on 2026-11-23. Levi to decide: keep or remove."
+   "reviewNote": "Conflict to resolve. The research thread (2026-11-24) found only a 2020 report and says do not use this number until it is confirmed. Levi approved it as UNCONFIRMED_CURRENT on 2026-11-23. Levi to decide: keep or remove.",
+   "displayRule": "Secondary line only. Show it after 999 and 112, labelled 'may not be current'. Never show it as the only number. Decision kept from Levi, 2026-11-23. Confirmation required before release."
   },
   {
    "id": "child-116",
@@ -73,5 +74,13 @@
    "approvedByLevi": "2026-11-23"
   }
  ],
- "notInLibrary": "Other numbers, counties, shelters and clinics are not listed here. Add them only after a check against an official source and Levi's approval."
+ "notInLibrary": "Other numbers, counties, shelters and clinics are not listed here. Add them only after a check against an official source and Levi's approval.",
+ "preReleaseConfirmation": [
+  "1195 (gender-based violence line): confirm it is current, or keep it as a labelled secondary line. Levi's decision stands.",
+  "922 (medical emergency): status PARTLY_VERIFIED. Confirm before release.",
+  "NACADA 1192 hours: research thread reports 24 hours. Confirm.",
+  "Childline 116: confirm it is current.",
+  "Befrienders Kenya: confirm the hours (weekdays 9am to 5pm, not 24 hours).",
+  "Kenya Act summaries (Children Act 2022, FGM Act 2011 and others): not added. Open gap."
+ ]
 }

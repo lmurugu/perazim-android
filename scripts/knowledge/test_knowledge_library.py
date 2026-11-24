@@ -44,5 +44,20 @@ class ReferenceCheckTest(unittest.TestCase):
         self.assertEqual([r[0] for r in invalid], ["FW-079"])
 
 
+class PastoralTopicsTest(unittest.TestCase):
+    def test_committed_topics_match_the_kjv_and_stay_fail_closed(self):
+        import build_pastoral_topics as bpt
+        rebuilt = bpt.build()
+        path = bpt.OUT
+        with open(path, encoding="utf-8") as f:
+            committed = json.load(f)
+        self.assertEqual(rebuilt, committed, "run build_pastoral_topics.py after editing the topics")
+        for topic in committed["topics"]:
+            self.assertEqual(topic["status"], "DRAFT_PENDING_LEVI")
+            self.assertTrue(topic["verses"])
+            for v in topic["verses"]:
+                self.assertEqual(v["translation"], "KJV")
+
+
 if __name__ == "__main__":
     unittest.main()

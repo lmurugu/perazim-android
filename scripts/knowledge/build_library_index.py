@@ -22,6 +22,7 @@ PARTS = {
     "doctrine": "Doctrine status register. Topic status only (APPROVED, UNDER_REVIEW, UNDECIDED, DRAFT_PENDING_LEVI). Fail-closed.",
     "kenya": "Kenyan contacts with their verification status, as recorded by Levi, and constitutional summaries with citations (DRAFT_PENDING_LEVI).",
     "sources": "Source register: licence, URL and approval status of every reference source.",
+    "pastoral": "Kenyan pastoral-support topics. Verse text from the bundled KJV only. DRAFT_PENDING_LEVI. Fail-closed.",
     "creeds": "Creed and confession texts awaiting approval: Apostles' Creed and the Westminster Confession (historical, not a Perazim position). DRAFT_PENDING_LEVI. Not read by any loader until Levi approves them.",
 }
 

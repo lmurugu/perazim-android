@@ -172,3 +172,16 @@ will need a row here with licence, URL and the date it was checked before it is 
 - **Kenya Act summaries** (Children Act 2022, FGM Act 2011, and others) are still not added. Kenya Law's Act PDFs return HTTP 403. I did not get around the block.
 - **Kenya research thread** (draft PR 81, `docs/PERAZIM_AI_PROJECT/KENYA_QUESTION_LANDSCAPE.md`) has been received. Its topics are not added as content here. Its verified-resource list conflicts with the 1195 status. See `reviewNote` in `kenya/crisis-contacts.json`.
 
+
+## 9. Round four (coordinator decisions, 2026-11-24)
+
+- **1195 (gender-based violence line)** keeps Levi's 2026-11-23 decision. It is shown only as a secondary line, after 999 and 112, labelled "may not be current". It is never the only number. The rule is in `displayRule` in `kenya/crisis-contacts.json`. It is on the pre-release confirmation list in the same file. Levi is not asked again now.
+- **Act summaries** (Children Act 2022, FGM Act 2011 and others) stay an open gap. Kenya Law's Act PDFs return HTTP 403.
+- **Kenyan pastoral topics** (`pastoral/kenya-topics.json`, DRAFT_PENDING_LEVI, fail-closed):
+  - Debt, loans and betting.
+  - Fear of witchcraft and curses.
+  - False prophets and miracle claims.
+  - Depression, anxiety and the stigma around them.
+  Every verse is taken from the bundled KJV by `scripts/knowledge/build_pastoral_topics.py`. The build stops on any reference the range table rejects, and the Python test checks the committed file against a fresh build. The text is written neutrally, with no verdict on any person and no position on any contested doctrine.
+- **Gap**: no verified helpline for debt or betting is recorded. The topic says so and refers the reader to a trusted church leader. A gambling or debt-counselling number needs a source check before it can be shown.
+- **Waiting on Levi's four doctrine answers** (prosperity and tithing, polygamy, the Sabbath, dowry). The coordinator will relay them. No position is added until then.
