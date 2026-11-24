@@ -26,12 +26,17 @@
   },
   {
    "part": "kenya",
-   "description": "Kenyan contacts with their verification status, as recorded by Levi.",
+   "description": "Kenyan contacts with their verification status, as recorded by Levi, and constitutional summaries with citations (DRAFT_PENDING_LEVI).",
    "files": [
     {
      "path": "kenya/crisis-contacts.json",
      "sha256": "f23513e96789b856eccc5c97ae4e5dc7d0dc9401ae5a50431eda06341161d9e5",
      "bytes": 2172
+    },
+    {
+     "path": "kenya/legal-summaries.json",
+     "sha256": "bce15e8be18c82b4600647ff41db2ed755f82b49a4a857e1b4995c2262353283",
+     "bytes": 3194
     }
    ]
   },
@@ -48,17 +53,22 @@
   },
   {
    "part": "creeds",
-   "description": "Creed texts awaiting approval. DRAFT_PENDING_LEVI. Not read by any loader until Levi approves them.",
+   "description": "Creed and confession texts awaiting approval: Apostles' Creed and the Westminster Confession (historical, not a Perazim position). DRAFT_PENDING_LEVI. Not read by any loader until Levi approves them.",
    "files": [
     {
      "path": "creeds/SOURCE.md",
-     "sha256": "a459f26a3e5f567376b4b44f0dc632cc3be1f190947a33f1d12dfcdf838aaaa0",
-     "bytes": 809
+     "sha256": "ce214f0715bdacac0c16b59cd89bec03b615d74c9aee38959e6735550ad1ada5",
+     "bytes": 1807
     },
     {
      "path": "creeds/apostles-creed.txt",
      "sha256": "605d40a40ed8280d20573c3436db88cd186dc4d92b6a9b360405b33c9d8ef583",
      "bytes": 647
+    },
+    {
+     "path": "creeds/westminster-confession-1647.txt",
+     "sha256": "6293d363d85e90eaf6c3db432c4c403f023450c36bf244bc8f6bc563da08bd12",
+     "bytes": 66925
     }
    ]
   }

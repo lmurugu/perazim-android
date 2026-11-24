@@ -166,6 +166,9 @@ will need a row here with licence, URL and the date it was checked before it is 
 - **Apostles' Creed** (received form, Schaff 1877, public domain via CCEL) is in `creeds/`, marked DRAFT_PENDING_LEVI. No loader reads it.
 - **Treasury of Scripture Knowledge** cross-references are already in the approved `openbible-xrefs` source (OpenBible.info, CC BY 4.0, seeded from the public-domain TSK). No second copy is added.
 - **Easton's Bible Dictionary** is already approved and in `reference.db`. No change.
-- **Westminster Confession**: not added in this PR (see section 4).
+- **Westminster Confession (1646, English)**: added to `creeds/` as DRAFT_PENDING_LEVI. The text is the 1946 Carruthers transcription on Wikisource, which states the work is public domain. The transcription is under CC BY-SA 4.0 page terms. It is a historical confession, not a Perazim position. Its chapters cover divorce, the Sabbath and civil magistrates, which are UNDECIDED topics here, so it must never be shown without that label.
 - **Assemblies of God Statement**: not added. The publisher's page says "All rights reserved".
-- **Kenya Law summaries**: not added. The Kenya Law constitution page returns HTTP 202 with an empty body to scripted requests, and the homepage loads. I did not try to get around the block. A summary needs the Kenya Law text itself, with citations, so it can be checked. Retry from another network, or give me the text.
+- **Constitution of Kenya 2010 summaries** (Articles 26, 28, 29, 43(1), 53(1)) are in `kenya/legal-summaries.json`, DRAFT_PENDING_LEVI. The text comes from the Constitute Project mirror. Sub-paragraph letters need checking against Kenya Law.
+- **Kenya Act summaries** (Children Act 2022, FGM Act 2011, and others) are still not added. Kenya Law's Act PDFs return HTTP 403. I did not get around the block.
+- **Kenya research thread** (draft PR 81, `docs/PERAZIM_AI_PROJECT/KENYA_QUESTION_LANDSCAPE.md`) has been received. Its topics are not added as content here. Its verified-resource list conflicts with the 1195 status. See `reviewNote` in `kenya/crisis-contacts.json`.
+

@@ -34,7 +34,8 @@
    "hours": "Not recorded",
    "status": "UNCONFIRMED_CURRENT",
    "use": "Violence in the home or relationships. Confirm before relying on it",
-   "approvedByLevi": "2026-11-23"
+   "approvedByLevi": "2026-11-23",
+   "reviewNote": "Conflict to resolve. The research thread (2026-11-24) found only a 2020 report and says do not use this number until it is confirmed. Levi approved it as UNCONFIRMED_CURRENT on 2026-11-23. Levi to decide: keep or remove."
   },
   {
    "id": "child-116",
@@ -45,7 +46,8 @@
    "hours": "Not recorded",
    "status": "LISTED_IN_RECORD",
    "use": "A child at risk",
-   "approvedByLevi": "2026-11-23"
+   "approvedByLevi": "2026-11-23",
+   "reviewNote": "The research thread reports Childline Kenya 116 as verified. Not re-checked here."
   },
   {
    "id": "nacada-1192",
@@ -56,7 +58,8 @@
    "hours": "Not recorded",
    "status": "LISTED_IN_RECORD",
    "use": "Drug and alcohol use",
-   "approvedByLevi": "2026-11-23"
+   "approvedByLevi": "2026-11-23",
+   "reviewNote": "The research thread reports 24-hour hours for NACADA. Not confirmed here, so hours stay not recorded."
   },
   {
    "id": "befrienders-kenya",

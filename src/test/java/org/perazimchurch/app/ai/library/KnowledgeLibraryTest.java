@@ -47,7 +47,7 @@ public class KnowledgeLibraryTest {
                 files++;
             }
         }
-        assertEquals(6, files);
+        assertEquals(8, files);
     }
 
     @Test
