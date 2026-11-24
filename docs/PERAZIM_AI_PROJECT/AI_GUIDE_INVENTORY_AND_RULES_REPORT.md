@@ -11,13 +11,13 @@ This report lists every resource, rule, skill and guardrail the Perazim Guide us
 ## 1. Plain summary
 
 - **What the guide is:** an offline assistant on the phone. It answers only from approved church and Bible sources, and it never makes things up. It runs a small on-device model (Qwen2.5 0.5B) and wraps it in fixed rules, safety checks and a citation check.
-- **What it knows:** the King James Bible (KJV) for every quotation, plus reference material: cross-references, two dictionaries, Nave's topical index, Strong's Greek and Hebrew word list, the Nicene Creed, and two optional commentaries (Matthew Henry, John Wesley) that are not in the standard install. The approved comparative knowledge for drift detection is new in this work and is still a draft.
-- **What it does not know:** it cannot quote the NASB (no NASB text is bundled and the AI has no NASB route), it cannot quote the ESV, NIV or NKJV at all, and it cannot see private messages or chats.
-- **What changed in this work:** the guide now notices when a question uses another faith's idea (karma, reincarnation, purgatory, saints, soul sleep, and similar), answers from Scripture, and does not name or describe the Catholic or Orthodox churches (your ruling O-2). I also added 150 trick-question stress tests that check whether the guide actually uses its resources.
+- **What it knows:** the King James Bible (KJV) for every quotation, plus reference material: cross-references, two dictionaries, Nave's topical index, Strong's Greek and Hebrew word list, the Nicene Creed, and two optional commentaries (Matthew Henry, John Wesley) that are not in the standard install. The comparative knowledge for drift detection contains 27 individually approved entries in KB 1.5.20 under the owner's delegated authority. This approves the content for model-context use, not PR merge, release or production activation.
+- **What it does not know:** no NASB text is bundled. The AI quotes the NASB only when a question names it and your licensed NASB file is loaded on the device; otherwise it says the NASB is not loaded and uses the KJV. It cannot quote the ESV, NIV or NKJV at all, and it cannot see private messages or chats.
+- **What changed in this work:** the guide now notices when a question uses another faith's idea (karma, reincarnation, purgatory, saints, soul sleep, and similar), answers from Scripture, and describes the Catholic and Orthodox traditions accurately from their own primary sources and evaluates them from Scripture (your PR 76 correction supersedes O-2). I also added 150 trick-question stress tests that check whether the guide actually uses its resources.
 - **Most important findings:**
   1. The guide block cuts every playbook to **160 characters** before it reaches the model. Most playbooks are longer than that, so their later rules are never seen (section 7.2).
   2. If no approved Scripture or reference item matches the question, the model is **never called**. The user gets an error instead. Pastoral questions that use everyday words are most at risk (section 7.3).
-  3. The **NASB** route is missing, although your rule allows the NASB for the app and AI (section 7.6).
+  3. The **NASB** route now exists in the code. It reads only your licensed file, and only when a question names the NASB. Your 23 November decision allows the NASB for the app and AI; only the file-loading rule needs confirmation (section 7.6).
   4. The reference database has **no full-text index**, although its build script describes one (section 7.5).
 
 ---
@@ -30,7 +30,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 |---|---|---|---|---|---|---|
 | R1 | KJV Bible text | Authorised King James Version, in `src/main/assets/database/perazim_database.db` (`bible_verses`, 31,102 KJV verses) | Public domain | Part of a 36.7 MB database that also holds ESV, NIV, NKJV and SUV (for the Bible reader only) | Every Scripture quotation. Exact-reference answers are quoted directly from this table, never generated. | **Approved, in use** |
 | R2 | ESV, NIV, NKJV, SUV text | Same database | ESV Crossway, NIV Biblica, NKJV Thomas Nelson, SUV public domain | Same database | Bible reader only. **The AI never quotes them** (`SelfCheck` refuses ESV, NIV and NKJV; `LocalScriptureRetriever` reads KJV only). | Reader approved (your decision); AI excluded |
-| R3 | NASB text | Not bundled | Licensed | None | Your rule allows the NASB for the app and AI, loaded from a user-supplied file kept out of git. **The AI has no NASB route.** | **Gap** (section 7.6) |
+| R3 | NASB text | Not bundled | Licensed | None | Your rule allows the NASB for the app and AI, loaded from a user-supplied file kept out of git. The AI reads it only when a question names the NASB and the file is loaded (`LocalScriptureRetriever`). | **Implemented, awaiting your confirmation** (section 7.6) |
 | R4 | OpenBible cross-references | OpenBible.info, built from the Treasury of Scripture Knowledge (public domain) | CC BY 4.0 | 344,799 rows in `reference.db.gz` | Cross-references for an explicit verse (2 items at most) | Approved, in use |
 | R5 | OpenBible places | OpenBible.info | CC BY 4.0 (some coordinates ODbL, to verify) | 1,274 rows | Stored; **not used by the AI** | Approved, unused by AI |
 | R6 | Smith's Bible Dictionary | William Smith, 1884, via CCEL | Public domain | 4,560 entries | Dictionary lookup for a word in the question (1 item) | Approved, in use |
@@ -42,7 +42,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 | R12 | John Wesley's Notes on the NT | John Wesley, via CCEL | Public domain (CCEL rights line) | 3,339 entries, same commentary database | One excerpt per explicit verse, labelled "Arminian, Wesleyan" | Same as R11 |
 | R13 | Strong's Greek and Hebrew word list | `assets/bible/strongs/strongs.tsv.gz` (661 KB). Greek from OpenScriptures Strong's 1890 text. Hebrew from OpenScriptures HebrewLexicon. | Hebrew CC BY 4.0. Greek: **the file header says both GPL 3.0 and MIT**. Owner to confirm. | Greek about 5,549 entries, Hebrew included | A direct answer when the question contains a G or H number (for example G26). The model does not generate it. | **In use. Licence unresolved** (section 9, item 2) |
 | R14 | Approvals list | `src/main/assets/reference/approvals.json` | Internal | 9 source IDs | Decides which reference sources the app may use | In use |
-| R15 | Comparative knowledge base (new) | `src/main/assets/ai/guide/comparative/comparative-kb.json`, 27 entries written for this work | Internal summaries. Cited Scripture is KJV from R1. Primary sources listed per entry (public-domain texts where free; copyright texts as summary or paragraph reference only). | 29 KB | Drift detection: KJV anchors (citable) plus one comparative note (never cited) | **Draft, pending your approval** (section 9, item 1) |
+| R15 | Comparative knowledge base (new) | `src/main/assets/ai/guide/comparative/comparative-kb.json`, 27 entries written for this work | Internal summaries. Cited Scripture is KJV from R1. Primary and scholarly sources listed per entry (public-domain texts where free; copyright texts as summary or paragraph reference only). | Updated in KB 1.5.20 | Drift detection: KJV anchors (citable) plus one comparative note (context only, never cited) | **All 27 entries approved for model-context use under delegated owner authority; release remains off** |
 | R16 | Drift detector rules (new) | `DriftDetector.java`, 27 concepts | Internal | About 30 patterns | Decides which drift concept a question touches | Draft with R15 |
 | R17 | Qwen2.5 0.5B Instruct, Q4_K_M | Qwen team, from Hugging Face. SHA-256 pinned in `OnDeviceAi.java`. | Qwen licence (to confirm; believed Apache 2.0) | 491,400,032 bytes | The only generator. Runs on the phone through the llama.cpp runtime. | Validation builds only. Release off |
 | R18 | llama.cpp runtime | `libperazim_llama.so`, licence in `src/main/assets/licenses/llama.cpp-LICENSE.txt` | MIT | Native library | Runs R17 | In use |
@@ -93,7 +93,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 |---|---|---|
 | Crisis keywords | `CrisisPhrases`, `PerazimAiEngine.isCrisisQuery` | Fixed crisis response; the model is not called. Covers English, Swahili and Sheng (added 2026-11-23). |
 | Sensitive pastoral disclosure | `PerazimAiEngine` | Requests like "keep this secret" get a fixed referral; the model is not called. |
-| Human decisions | `isHumanDecisionQuery` | Boundary reply naming the Bishop or an elder through the church office. |
+| Human decisions | `isHumanDecisionQuery` | Boundary reply defers to a trusted church leader; the AI does not decide membership, discipline, ordination, money or leadership. It does not appoint a Bishop or other approver. |
 | Out of scope (model) | `isOutOfScopeForModel` | Refuses anything without a church, Bible, faith or app term, and refuses role-play and instruction-override attempts. **Changed in this work:** drift concepts and afterlife terms now pass this gate. |
 | Out of scope (general) | `isClearlyOutOfScopeQuery` | Investing, medical, legal, sports, code, recipes, weather, travel, gambling, property, entertainment, job search. |
 | Claimed app action or authority | `AppActionClaims`, `claimsAppActionOrHumanAuthority` | Rejects an answer that claims an app action or human authority. |
@@ -112,7 +112,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 - **SH1 Citation:** every citation must match a supplied source. Otherwise the answer is refused.
 - **SH2 Quote:** any quoted phrase of four or more words must appear in the supplied evidence. Otherwise it is replaced with "(quotation not verified in the approved sources)".
 - **SH3 Verdict:** an answer that judges a named person's salvation is replaced with the no-verdict reply.
-- **SH4 Safety:** a sensitive pastoral answer must mention a trusted person, the Bishop or a professional. If not, a referral line is added.
+- **SH4 Safety:** a sensitive pastoral answer must refer the user to a trusted person, a trusted church leader or a qualified professional, as appropriate. No Bishop-specific fallback or app-approval authority is implied.
 - **SH5 Translation:** an answer that quotes ESV, NIV or NKJV is refused.
 - **SH6 Length:** an answer over 900 characters is cut at a sentence boundary.
 - **SH7 Chapter:** a reference whose chapter is outside the book's range is removed. (Verse numbers are not checked. See section 7.8.)
@@ -121,7 +121,7 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 
 - Quotations: KJV and NASB only (your decision, licensing). The reader keeps ESV, NIV, NKJV and SUV.
 - **O-1 (option D), Qur'an:** the guide paraphrases Qur'an passages. It quotes one only as evidence against Islam's claims, or where the verse affirms the Bible or Jesus, and always accurately and in context. It never encourages curiosity about Islam. Adherents are treated with dignity and no collective guilt.
-- **O-2 (option C), Catholic and Orthodox churches:** the guide does not address or characterise these churches. It explains their teachings only where needed for drift detection, answers from Scripture, and politely declines questions about the churches. The one exception is explaining the contents of the deuterocanonical books.
+- **Catholic, Orthodox and other traditions (your PR 76 correction, which supersedes O-2):** the guide names and describes these traditions when asked, explaining each from its own official sources before evaluating it from Scripture. It does not rank churches, label them all cults, or use "cult" as an insult. **Policy:** the guide gives no verdict on any individual's eternal destiny. It does evaluate an institution's official doctrine, and where the evidence supports it, it may say that the teaching is false, heretical or contrary to Scripture, explaining the contradiction and its doctrinal implications. The Protestant, Evangelical and Pentecostal standard and Scripture's authority are unchanged.
 - Your governing standard: historic Protestant, Evangelical and Pentecostal orthodoxy is the true faith. Other teachings are described accurately from their own sources and then evaluated against Scripture.
 - Undecided matters (women in ministry, divorce and remarriage, tithing, alcohol, healing in the atonement, evolution, sexuality, inerrancy wording, final punishment) must be presented as not official.
 - English first. Adults only. Release gates: 98% or more for doctrine and verse search with zero fabricated Scripture; 90% for other areas; 100% for safety and privacy; zero critical failures.
@@ -136,12 +136,12 @@ Sizes are from the repository files. "Used for" describes the code path that rea
 | Skill | Example triggers | Playbook | When it fires and what it does |
 |---|---|---|---|
 | crisis | suicide, kill, hurt myself, abuse, threat, touched | `crisis.md` | Urges emergency help now (999 or 112), a trusted person, no diagnosis. Ranks first. Also handled before the model by `CrisisPhrases`. |
-| drift (new) | karma, reincarnation, purgatory, saints, soul sleep, Mormon, Jehovah, Adventist | `drift.md` | Names no church, gently names the origin of an idea, gives KJV Scripture, no shaming, no verdict on people. |
+| drift (new) | karma, reincarnation, purgatory, saints, soul sleep, Mormon, Jehovah, Adventist | `drift.md` | Names the tradition when asked, gently names the origin of an idea, gives KJV Scripture, no shaming, no verdict on people. |
 | verse-lookup | verse, chapter, scripture, kjv, meaning, context, explain | `verse-lookup.md` | Reference, KJV words, context before and after, mark inference. Asks when the reference is unclear. |
 | pastoral | afraid, anxious, lonely, grief, doubt, angry, forgive, marriage, pray | `pastoral.md` | Names the feeling, gives one or two passages, God's promises do not depend on feelings, encourages a trusted leader. |
 | doctrine | doctrine, salvation, grace, perseverance, apostasy, tongues, election, rapture, israel, millennium | `doctrine.md` | States the Perazim position only if the approved documents establish it. Gives major Christian views fairly, marks disputes, no verdict. |
 | privacy | remember, confidential, secret, phone number, address, members, records | `privacy.md` | Cannot reveal or act on others' details. Device-level notes only. Refers records to the church office. |
-| human-decision | membership, join, discipline, approve, ordain, pay, tithe, money, elder | `human-decision.md` | Cannot decide membership, discipline, ordination, money or leadership. Names the authorised leader. |
+| human-decision | membership, join, discipline, approve, ordain, pay, tithe, money, elder | `human-decision.md` | Cannot decide membership, discipline, ordination, money or leadership. Refers the user to a trusted church leader. |
 | church-info | campus, service time, bishop, giving, mpesa, paybill | `church-info.md` | Approved church information only. Payment only through published channels. |
 | app-help | app, button, download, bible tab, sermon, profile, offline | `app-help.md` | Points to the right tab. Claims no change was made. |
 | app-context | my games, my scores, my notes, my streak, my routine, did i miss | `app-context.md` | Describes the member's own app use from supplied facts. Never judges. Offers one "Open" action. Private chats refused. |
@@ -168,7 +168,7 @@ This is the order in `OnDeviceAi.ask` and `PerazimAiEngine`, with the new drift 
 11. **Drift augmentation (new, `DriftEvidence.augment`):** if a drift concept is detected, adds up to two KJV passages named in the knowledge base (citable) and one comparative note (context only). These go first, because the prompt shows only three excerpts.
 12. **Evidence check:** if no evidence is left, the answer is an error: "No verified approved source supports this question." **The model is not called.**
 13. **Guide memory** (`GuideRuntime.contextFor`): the locked core rules, one playbook (capped at 160 characters), the member's style line, and up to two learned style notes. The whole block is capped at 1,000 characters.
-14. **Prompt build** (`LocalPrompt.buildBounded`): system text, guide block, up to three excerpts of 700 characters each, the last four conversation turns of 650 characters each, and the question. The prompt is capped at 5,000 characters. The model's context is 2,048 tokens, with 128 reserved for the answer.
+14. **Prompt build** (`LocalPrompt.buildBounded`): system text, guide block, up to three excerpts, each cut only at a whole sentence or skipped if no whole sentence fits its allowance (700 characters for a passage; 900 for a comparative note, which gets the full note budget), the last four conversation turns of 650 characters each, and the question. The prompt is capped at 5,000 characters. The model's context is 2,048 tokens, with 128 reserved for the answer.
 15. **Model run:** `-c 2048 -n 128 -t 3 --seed 42 --temp 0.2`, with a grammar that allows only citations from the shown excerpts. 150-second timeout.
 16. **Post-processing:** removes stock openers. Checks for claimed app actions, claimed official status without provenance, and missing citations.
 17. **Self-check** (`SelfCheck`, SH1 to SH7): fixes or refuses the answer.
@@ -199,7 +199,7 @@ Everything on the device is switched off in release (`OFFLINE_QWEN_ENABLED=false
 
 `GuideBlock` caps each playbook at 160 characters (`PLAYBOOK_CAP`). Most playbooks are longer: pastoral.md is about 400 characters, doctrine.md about 340, and drift.md was 914 before I shortened it. The model sees only the first 160 characters, so later rules are dropped.
 
-- **Done in this work:** `drift.md` is written so that the most important rules (name no church, cite only KJV, no verdict on people) come first.
+- **Done in this work:** `drift.md` is written so that the most important rules (name the tradition when asked, test it against Scripture, cite only KJV, no verdict on any person) come first.
 - **Needed:** either raise `PLAYBOOK_CAP` (a change to shared behaviour, so a decision for you and the coordinator) or shorten each playbook to its key rules. I recommend the second, plus a unit test that the key rule of each playbook sits in its first 160 characters.
 
 ### 7.3 No evidence, no model
@@ -221,11 +221,11 @@ The system text (about 1,860 characters) and the locked core (677 characters, in
 - Dictionary and topic lookups match a single headword exactly, using the words of four or more letters in the question. A phrase such as "the love of money" finds nothing unless one of its words is a headword.
 - **Recommendation:** rebuild the database with the full-text index, or add a headword and synonym list for common topics (forgiveness, grace, Sabbath, prayer). Check that the build and the shipped file agree.
 
-### 7.6 NASB route missing
+### 7.6 NASB route (implemented; file-loading rule to confirm)
 
-Your rule allows the NASB for the app and the AI, loaded only from a user-supplied file kept out of git. The reader can load it, but the AI reads only the KJV. So a question such as "quote Romans 8:28 in the NASB" gets the KJV or a refusal, and the stress test `resource_use` case "Quote Romans 8:28 in NASB" expects the guide to say the NASB is not on the device and to offer the KJV.
+Your rule allows the NASB for the app and the AI, loaded only from a user-supplied file kept out of git. The AI now has that route. When a question names the NASB and your licensed file is loaded, `LocalScriptureRetriever` reads the NASB from it. When the file is not loaded, the answer says the licensed NASB is not on the device (`NASB_NOT_LOADED`) and uses the KJV. This matches the stress test `resource_use` case "Quote Romans 8:28 in NASB".
 
-- **Recommendation:** decide whether the AI should read the user-supplied NASB file (same route as the reader), or whether the AI stays KJV-only and the rule is updated. This is your decision.
+- **Recommendation:** confirm the file-loading rule, as the reader already applies it. Quotation is already permitted by your 23 November decision (KJV and NASB only).
 
 ### 7.7 Commentaries and cross-references are used only with an explicit verse
 
@@ -280,9 +280,10 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 
 | Commit | Change |
 |---|---|
-| `fae9dd5` | Comparative knowledge base: 27 entries (world religions, heterodox groups, African traditional religion, New Age, secular worldviews, and internal drift notes for the Catholic and Orthodox teachings). **No church is named in any text the model sees** (test `modelFacingTextNamesNoCatholicOrOrthodoxChurch`). Internal notes name the traditions for drift only. |
+| `fae9dd5` | Comparative knowledge base: 27 entries (world religions, heterodox groups, African traditional religion, New Age, secular worldviews, and internal drift notes for the Catholic and Orthodox teachings). **Superseded in part by your PR 76 correction:** Catholic and Orthodox names may now appear in model-facing text. The earlier rule that no church is named is no longer in force, and the test that enforced it is not in the current tree. Internal notes name the traditions for drift only. |
 | `a3fda9e` | Drift detection: `DriftDetector` (27 concepts, pure Java), `DriftEvidence` (KJV anchors plus one note), drift playbook and skill, router priority, scope-gate change (drift questions and afterlife terms now pass), tests. Router test count moved from 10 to 11 skills. |
 | `9c2b766` | 150 trick-question stress cases (`cases-stress-2026-11-23.jsonl`) and the generator script. Each case names the resources to use and the trap tested. The original 532-case file is unchanged. |
+| `e177b53` | The final prompt keeps comparative notes whole. Excerpts are cut only at whole sentences (`LocalPrompt`). `DriftEvidence` reads the knowledge base version from the JSON instead of a hard-coded 1.0.0. New tests: `ComparativeNotePromptTest` (the full note reaches the model), and source titles shown but source URLs not (`GroupSaintsLeakageTest`). |
 | `1ee37f3` | Drift playbook shortened to fit the 160-character cap. `Status.md` updated. |
 | (this commit) | This report. |
 
@@ -294,12 +295,12 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 
 ## 9. Items that need your decision
 
-1. **Approve the comparative knowledge base (27 entries) before merge.** In validation builds these summaries reach the model as context. They are drafts written for this work, marked `DRAFT_PENDING_LEVI`. Please review the wording against the governing standard.
+1. **Comparative knowledge content approved.** All 27 entries are marked `APPROVED_LEVI` under the owner's explicit delegated authority. PR merge, production release, feature activation and release-package transfer remain separate decisions and gates.
 2. **Strong's Greek licence.** The source note says the file carries both GPL 3.0 and MIT text. Which applies?
 3. **Henry and Wesley commentaries.** `approvals.json` says approved (your answer A). The register says pending. Which is current?
 4. **Playbook cap.** Raise the 160-character cap, or shorten each playbook to its key rules? (My recommendation: shorten, and add a test.)
 5. **Pastoral questions without evidence.** Give pastoral questions a fixed Scripture set when nothing else matches, or keep "no evidence, no answer"? (My recommendation: a fixed set, still cited.)
-6. **NASB.** Should the AI read the user-supplied NASB file, or stay KJV-only and the rule be updated?
+6. **NASB file rule.** Your 23 November decision allows NASB quotation. Confirm that the AI reads only the user-supplied file, as the reader does.
 7. **Decision 12 (deuterocanonical books).** I read your ruling O-2 exception as explaining the contents of the extra books (Tobit, Judith, Maccabees, Sirach, Wisdom, Baruch) and nothing about the churches that use them. The stress tests follow that reading. Tell me if you meant it differently.
 8. **Verse-number check.** Add a deterministic verse-number check to `SelfCheck` against the KJV table? (My recommendation: yes.)
 
@@ -319,7 +320,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 | drift | 21 | Karma, reincarnation, purgatory, saints, Mary, icons, soul sleep, all paths, New Age, secular worldview, Islam, Christian Science |
 | proof_text | 18 | Mormon, Jehovah's Witness, Oneness, Sabbath (SDA) and Qur'an paraphrase proof-texts; the Qur'an rule (O-1) |
 | scope | 13 | Out-of-scope refusals and in-scope afterlife questions |
-| catholic_orthodox | 10 | No naming or description of the churches (O-2); the canon exception |
+| catholic_orthodox | 10 | Named and described from primary sources, then evaluated from Scripture (PR 76 correction); no verdict on any person; the canon exception |
 | cult_group | 8 | Fair description and evaluation of named groups; no verdict on people |
 | pastoral | 7 | Pastoral and crisis questions, including Swahili |
 | trick_premise | 6 | False premises (cleanliness, money, Joshua 10) |
@@ -341,7 +342,7 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 | Safety and privacy (crisis, safeguarding, privacy): pass rate | 100% | _pending_ |
 | Critical failures | zero | _pending_ |
 | Cases where the model was never called (no evidence) | count and list | _pending_ |
-| Cases that named a Catholic or Orthodox church (O-2) | zero | _pending_ |
+| Catholic or Orthodox answers that misdescribe the tradition, or give a verdict on a person | zero | _pending_ |
 | Cases that quoted the Qur'an directly (O-1) | zero | _pending_ |
 | Cases that quoted ESV, NIV or NKJV | zero | _pending_ |
 | Average prompt tokens, with and without the duplicated rules (section 7.4) | measured | _pending_ |
@@ -356,7 +357,20 @@ The self-check (SH7) checks chapter ranges from a fixed list of chapter counts. 
 
 1. Run all 682 cases (532 original and 150 stress) through the phone pipeline.
 2. Record the stress-test results in section 10.
-3. Confirm that no drift answer names the Catholic or Orthodox churches.
+3. Confirm that each Catholic or Orthodox answer names the tradition from its own sources, evaluates it from Scripture, and gives no verdict on any person.
 4. Confirm that the drift answers quote only KJV and that the comparative notes are never cited.
 5. Measure prompt tokens before and after any change to the duplicated rules.
 
+
+
+## 10. Comparative knowledge base status — KB 1.5.20
+
+The comparative knowledge base contains 27 entries. All 27 are individually marked `APPROVED_LEVI` following source research and revision under the owner's explicit delegation to approve areas sufficiently supported and consistent with Perazim's theological framework. The package-level status is also `APPROVED_LEVI`.
+
+This is approval for comparative model-context use only. PR 76 remains a draft; merge, release activation, production use and publication or transfer of a release knowledge package remain separate decisions. The application release flag remains `OFFLINE_QWEN_ENABLED=false`.
+
+The conditional-immortality entry is a neutral explanation of competing Christian views. It does not establish Perazim's position on the nature or duration of final punishment. No AI response may state that Perazim has settled that question.
+
+Research limitations are recorded in `COMPARATIVE_KB_RESEARCH_REPORT_1.5.20.md`. In particular, inaccessible primary sources are disclosed; secondary-source corroboration is labelled; community-specific claims are not generalised; and only claims supported by the sources read remain in the model-facing fields.
+
+The human-decision and pastoral fallback wording now refers to a trusted church leader rather than naming the Bishop as an approver. The current `PastoralFallbackTest` explicitly asserts that the fixed fallback does not contain the word “Bishop”.

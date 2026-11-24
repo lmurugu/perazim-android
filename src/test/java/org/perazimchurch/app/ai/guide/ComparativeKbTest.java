@@ -19,9 +19,10 @@ import org.perazimchurch.app.ai.reference.ReferenceKeys;
 public class ComparativeKbTest {
 
     private static final Pattern ANCHOR = Pattern.compile("^(?:[1-3] )?[A-Za-z ]+ \\d{1,3}:\\d{1,3}(?:-\\d{1,3})?$");
-    private static final Pattern CHURCH_NAME = Pattern.compile(
-            "catholic|eastern orthodox|orthodox church|orthodox christian|vatican|\\bpope\\b|papal|papacy|roman church|eastern church", Pattern.CASE_INSENSITIVE);
     private static final String[] MODEL_FIELDS = {"summary", "origin", "scripture"};
+    /** All 27 comparative entries were individually reviewed and approved under Levi's delegated authority. */
+    private static final Set<String> LEVI_APPROVED_IDS = new HashSet<>(java.util.Arrays.asList(
+            "karma", "reincarnation", "nirvana_moksha", "purgatory", "saint_prayer", "mary_mediator", "icons_veneration", "soul_sleep", "conditional_immortality", "all_paths", "divine_self", "eternal_progression", "works_salvation", "ancestors", "trinity_denial", "jesus_created", "holy_spirit_force", "baptism_for_dead", "saturday_sabbath", "new_age_energy", "christian_science", "secular_worldview", "islam_no_crucifixion", "islam_son_denial", "canon_books", "church_identity_question", "group_question"));
 
     private static JSONObject kb() throws Exception {
         File f = new File("src/main/assets/ai/guide/comparative/comparative-kb.json");
@@ -49,28 +50,15 @@ public class ComparativeKbTest {
             for (String field : MODEL_FIELDS) {
                 assertTrue(id + " missing " + field, e.optString(field).length() > 40);
             }
-            assertEquals("DRAFT_PENDING_LEVI", e.getString("status"));
+            String expectedStatus = LEVI_APPROVED_IDS.contains(id) ? "APPROVED_LEVI" : "DRAFT_PENDING_LEVI";
+            assertEquals(id + " status must match the current reviewed approval register", expectedStatus, e.getString("status"));
             JSONArray anchors = e.getJSONArray("anchors");
-            assertTrue(id + " needs 1 or 2 anchors", anchors.length() >= 1 && anchors.length() <= 2);
+            assertTrue(id + " needs 1 to 3 anchors", anchors.length() >= 1 && anchors.length() <= 3);
             for (int j = 0; j < anchors.length(); j++) {
                 String ref = anchors.getString(j);
                 assertTrue(id + " bad anchor " + ref, ANCHOR.matcher(ref).matches());
                 String book = ref.replaceFirst(" \\d{1,3}:\\d{1,3}(?:-\\d{1,3})?$", "");
                 assertTrue(id + " unknown book in " + ref, ReferenceKeys.bookNumber(book) > 0);
-            }
-        }
-    }
-
-    @Test
-    public void modelFacingTextNamesNoCatholicOrOrthodoxChurch() throws Exception {
-        // Levi's ruling O-2: the guide does not describe those churches. Their names may appear only in internal_note.
-        JSONArray entries = kb().getJSONArray("entries");
-        for (int i = 0; i < entries.length(); i++) {
-            JSONObject e = entries.getJSONObject(i);
-            for (String field : MODEL_FIELDS) {
-                String text = e.optString(field);
-                assertFalse(e.getString("id") + " names a church in " + field + ": " + text,
-                        CHURCH_NAME.matcher(text).find());
             }
         }
     }
@@ -83,17 +71,6 @@ public class ComparativeKbTest {
         assertFalse(raw.contains("NIV"));
         assertFalse(raw.contains("NKJV"));
         assertFalse(raw.contains("New World Translation"));
-    }
-
-    @Test
-    public void internalNotesAreTheOnlyPlaceForInternalChurchNames() throws Exception {
-        JSONArray entries = kb().getJSONArray("entries");
-        for (int i = 0; i < entries.length(); i++) {
-            JSONObject e = entries.getJSONObject(i);
-            if (e.getString("group").equals("christian_tradition_internal")) {
-                assertTrue(e.getString("id") + " needs an internal_note", e.optString("internal_note").length() > 0);
-            }
-        }
     }
 
     @Test

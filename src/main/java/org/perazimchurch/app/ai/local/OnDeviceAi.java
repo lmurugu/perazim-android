@@ -185,7 +185,8 @@ public final class OnDeviceAi {
                 if (evidence.length() == 1 && LocalScriptureRetriever.hasExplicitReference(question)
                         && "Bible".equals(evidence.optJSONObject(0) == null ? "" : evidence.optJSONObject(0).optString("sourceId"))) {
                     JSONObject verse = evidence.getJSONObject(0);
-                    String verseAnswer = verse.optString("location") + " (King James Version): “"
+                    String noticeForQuote = LocalScriptureRetriever.nasbNotice(c, question);
+                    String verseAnswer = (noticeForQuote == null ? "" : noticeForQuote + " ") + verse.optString("location") + " (" + verse.optString("title") + "): “"
                             + verse.optString("text") + "”";
                     MAIN.post(() -> callback.onSuccess(verseAnswer));
                     return;
@@ -194,6 +195,13 @@ public final class OnDeviceAi {
                 evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
                 // Drift: a question that uses another faith's idea gets KJV passages and a comparative note (no-op otherwise).
                 evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
+                // A pastoral question with no approved evidence gets a fixed, cited KJV verse instead of an error.
+                if (evidence.length() == 0 && org.perazimchurch.app.ai.guide.PastoralFallback.applies(
+                        org.perazimchurch.app.ai.guide.GuideRuntime.skillIndex(c), question)) {
+                    final String fallback = org.perazimchurch.app.ai.guide.PastoralFallback.answer();
+                    MAIN.post(() -> callback.onSuccess(fallback));
+                    return;
+                }
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
                 // Locked rules, one playbook, style and learned notes (guide memory is optional and bounded).
@@ -264,7 +272,9 @@ public final class OnDeviceAi {
                 SelfCheck.Result checked = SelfCheck.check(result, GuideRuntime.evidenceTexts(shown), sensitive);
                 GuideRuntime.afterAnswer(c, question, checked.issues, sensitive);
                 if (checked.refused) throw new IOException(checked.answer);
-                String citedResult = appendVerifiedSourceTitles(checked.answer, shown);
+                String noticeForAnswer = LocalScriptureRetriever.nasbNotice(c, question);
+                String citedResult = (noticeForAnswer == null ? "" : noticeForAnswer + " ")
+                        + appendVerifiedSourceTitles(checked.answer, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();

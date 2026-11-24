@@ -15,15 +15,15 @@ import org.perazimchurch.app.ai.local.LocalScriptureRetriever;
  * Adds drift evidence to a question's evidence array: up to two KJV passages named in the comparative knowledge base
  * (citable, retrieved verbatim from the bundled KJV) and one comparative note (context only, never cited). The KJV
  * passages go first, because the prompt shows only the first three excerpts. Nothing is added when no concept drifts.
- * Internal notes and church names never reach this path: only summary, origin and scripture text are sent.
+ * The note carries only the approved fields (see {@link ComparativeGate#noteText}): the official teaching summary, the
+ * Scripture evaluation, optional local practice, origin, and up to three approved source titles. Internal notes,
+ * reviewer material and source URLs never reach this path. The provenance version is read from the knowledge base.
  */
 public final class DriftEvidence {
 
     static final String KB_ASSET = "ai/guide/comparative/comparative-kb.json";
-    static final String SOURCE_ID = "perazim-comparative-kb";
-    static final String KB_VERSION = "1.0.0";
+    static final String SOURCE_ID = ComparativeGate.NOTE_SOURCE_ID;
     static final int MAX_ANCHORS = 2;
-    static final int MAX_NOTE_CHARS = 700;
 
     private static JSONObject kb;
     private static final Object LOCK = new Object();
@@ -46,7 +46,7 @@ public final class DriftEvidence {
                     added++;
                 }
             }
-            out.put(noteItem(entry));
+            out.put(noteItem(entry, kbVersion(load(context))));
             for (int i = 0; evidence != null && i < evidence.length(); i++) {
                 if (evidence.optJSONObject(i) != null) out.put(evidence.getJSONObject(i));
             }
@@ -56,15 +56,18 @@ public final class DriftEvidence {
         }
     }
 
-    /** The model-facing note: origin and the Scripture evaluation. Context only; the model may not cite it. */
-    static JSONObject noteItem(JSONObject entry) throws Exception {
+    /** The knowledge base's own version, read from its JSON so provenance cannot drift from the data. */
+    static String kbVersion(JSONObject kb) {
+        return kb.optString("version", "unversioned");
+    }
+
+    /** The model-facing note: the approved fields. Context only; the model may not cite it. */
+    static JSONObject noteItem(JSONObject entry, String kbVersion) throws Exception {
         String id = entry.optString("id");
-        String text = "Comparative note, not Perazim's position. Origin: " + entry.optString("origin")
-                + " Scripture: " + entry.optString("scripture");
-        if (text.length() > MAX_NOTE_CHARS) text = text.substring(0, MAX_NOTE_CHARS);
+        String text = ComparativeGate.noteText(entry);
         JSONObject item = new JSONObject();
         item.put("sourceId", SOURCE_ID);
-        item.put("version", KB_VERSION);
+        item.put("version", kbVersion);
         item.put("location", id);
         item.put("title", "Comparative note: " + id.replace('_', ' '));
         item.put("authorityClass", "REFERENCE");
@@ -74,13 +77,7 @@ public final class DriftEvidence {
     }
 
     static JSONObject entry(Context context, String conceptId) throws Exception {
-        JSONObject root = load(context);
-        JSONArray entries = root.optJSONArray("entries");
-        for (int i = 0; entries != null && i < entries.length(); i++) {
-            JSONObject e = entries.optJSONObject(i);
-            if (e != null && conceptId.equals(e.optString("id"))) return e;
-        }
-        return null;
+        return ComparativeGate.approvedEntry(load(context).optJSONArray("entries"), conceptId);
     }
 
     private static JSONObject load(Context context) throws Exception {

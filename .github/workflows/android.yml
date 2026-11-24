@@ -22,7 +22,7 @@ jobs:
           java-version: "17"
           cache: gradle
       - name: Unit tests and debug build
-        run: ./gradlew testDebugUnitTest assembleDebug --no-daemon
+        run: ./gradlew testDebugUnitTest assembleDebug --no-daemon --stacktrace
       - name: Upload debug APK
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
@@ -42,7 +42,18 @@ jobs:
           java-version: "17"
           cache: gradle
       - name: Render main tabs in dark and light mode
-        run: ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon
+        # Robolectric downloads android-all jars from Maven during the test run. A single failed download
+        # (MavenArtifactFetcher, IOException) fails every screenshot test while the unit job passes on the same
+        # commit, so retry the whole step up to three times, 30 s apart, before failing.
+        run: |
+          for attempt in 1 2 3; do
+            if ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon --stacktrace; then
+              exit 0
+            fi
+            echo "Screenshot run attempt ${attempt} failed; retrying in 30 s"
+            sleep 30
+          done
+          exit 1
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

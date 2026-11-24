@@ -63,6 +63,8 @@ public class PerazimAiEngine {
             Pattern.compile("\\b(?:weather (?:today|tomorrow|forecast|this week)|forecast for (?:today|tomorrow|this week))\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:book|find|cheap)\\b.{0,30}\\b(?:flights?|hotels?|airbnb|train tickets?)\\b|\\bvisa application\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:movie|movies|netflix|tv show|celebrity|box office)\\b", Pattern.CASE_INSENSITIVE),
+            // Lotteries, romance letters, tenancy disputes and shopping advice: general-interest, not church or Bible topics.
+            Pattern.compile("\\b(?:lottery|lotto|jackpot|love letter|love poem|landlord|eviction|best car|car to buy)\\b", Pattern.CASE_INSENSITIVE),
             // Denylist applied to every query, including ones that contain allowlisted church or Bible words
             // (for example "John", "Paul", "Grace", "offering", "profile"). Finance and investment first.
             Pattern.compile("\\b(?:share prices?|stock prices?|stock market|stock exchange|dividends?|index funds?|mutual funds?|"

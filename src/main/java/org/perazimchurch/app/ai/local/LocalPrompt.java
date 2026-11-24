@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.perazimchurch.app.ai.guide.ComparativeGate;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
 
 /** Qwen ChatML prompt, bounded to fit the compact model's 2048-token context. */
@@ -86,9 +87,14 @@ public final class LocalPrompt {
                                 clean(item.optString("location"), 120))
                         + (contextOnlyCitation ? "; context only, do not cite" : "")
                         + "]\n";
-                int materialLimit = Math.min(EXCERPT_CHARS, room - header.length() - END_EXCERPT.length());
+                // A comparative note may use its full note budget. Every excerpt is cut only at a whole sentence:
+                // a passage that has no whole sentence within the allowance is skipped, never clipped mid-sentence.
+                boolean comparativeNote = ComparativeGate.NOTE_SOURCE_ID.equals(item.optString("sourceId"));
+                int cap = comparativeNote ? ComparativeGate.MAX_NOTE_CHARS : EXCERPT_CHARS;
+                int materialLimit = Math.min(cap, room - header.length() - END_EXCERPT.length());
                 if (materialLimit < MIN_EXCERPT_CHARS) break;
-                String material = clean(item.optString("text"), materialLimit);
+                String material = ComparativeGate.wholeSentences(sanitise(item.optString("text")), materialLimit);
+                if (material.isEmpty()) continue;
                 evidenceBlock.append(header).append(material).append(END_EXCERPT);
                 room -= header.length() + material.length() + END_EXCERPT.length();
                 shown.put(item);
@@ -130,9 +136,24 @@ public final class LocalPrompt {
                 && INTERPRETIVE_REQUEST.matcher(question).find();
     }
 
+    /** Removes chat-template delimiters from text without cutting it. */
+    private static String sanitise(String text) {
+        return (text == null ? "" : text).replaceAll("<\\|[^|>]{1,80}\\|>", "").trim();
+    }
+
+    /**
+     * Sanitises user, history and guide text and cuts it to length at a word boundary, never mid-word. Doctrinal
+     * evidence does not pass through here: excerpts and notes are cut only at whole sentences (see the excerpt loop).
+     */
     private static String clean(String text, int length) {
-        String t = (text == null ? "" : text).replaceAll("<\\|[^|>]{1,80}\\|>", "").trim();
-        return t.substring(0, Math.min(t.length(), length));
+        String t = sanitise(text);
+        if (t.length() <= length) return t;
+        int cut = length;
+        if (!Character.isWhitespace(t.charAt(length))) {
+            int space = t.lastIndexOf(' ', length);
+            if (space > 0) cut = space;
+        }
+        return t.substring(0, cut).trim();
     }
 
     /** Removes stock robotic openers from model output so replies sound warmer and less templated. */

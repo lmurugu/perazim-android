@@ -55,6 +55,7 @@ public class PerazimAiPolicyTest {
         assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("Please speak with a trusted church leader"));
     }
 
+    /** The crisis reply carries only the verified Kenya directory numbers (owner decision 9A); no other number may appear. */
     @Test public void crisisResponseDoesNotInventAContactOrPromiseAvailability() {
         String response = PerazimAiEngine.crisisResponse().getMessageText();
         assertTrue(response.contains("999 or 112"));
@@ -62,6 +63,13 @@ public class PerazimAiPolicyTest {
         // Only the Kenyan numbers approved by Levi may appear; no invented contacts.
         assertTrue(response.contains("922") && response.contains("999 or 112"));
         assertFalse(response.matches("(?s).*\\+1[\\d ()-]{6,}.*"));
+        // Every number in the reply must be on the verified Kenya directory (owner decision 9A).
+        java.util.Set<String> verified = new java.util.HashSet<>(java.util.Arrays.asList(
+                "999", "112", "922", "1195", "116", "1192", "+254 722 178 177"));
+        java.util.regex.Matcher numbers = java.util.regex.Pattern.compile("\\+?\\d[\\d ]*\\d").matcher(response);
+        while (numbers.find()) {
+            assertTrue("unverified number in crisis reply: " + numbers.group(), verified.contains(numbers.group()));
+        }
         assertFalse(response.contains("Bishop"));
     }
 
