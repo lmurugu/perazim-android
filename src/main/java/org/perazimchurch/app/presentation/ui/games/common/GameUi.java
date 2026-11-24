@@ -122,6 +122,11 @@ public final class GameUi implements GameChrome.Host {
         return scroll;
     }
 
+    /** Sets the illustrated scene behind the current page (see {@link GameScene}). Call after {@link #page}. */
+    public void scene(String name) {
+        if (scroll != null) scroll.setBackground(GameScene.background(activity, name));
+    }
+
     /**
      * Uses an existing page as the target of text, buttons and gaps. For hosts that build their own
      * page (the games hub) and still want these helpers.
@@ -205,21 +210,24 @@ public final class GameUi implements GameChrome.Host {
         return view;
     }
 
-    /** Applies the game button look to an existing button: the orange or purple pill frame, or a plain fill. */
+    /**
+     * Applies the game button look to an existing button. Drawn, not bitmap: a rounded gradient with a soft
+     * glow, so no square background shows behind it. Primary is orange; secondary is purple.
+     */
     public void styleButton(Button button, String label, boolean primary) {
         button.setText(label);
         button.setAllCaps(false);
         button.setTextSize(17);
-        button.setTextColor(primary ? PerazimTheme.COLOR_BG_DEEP : PerazimTheme.COLOR_TEXT_PRIMARY);
-        button.setMinHeight(dp(52));
+        button.setTextColor(PerazimTheme.COLOR_WHITE);
+        button.setShadowLayer(dp(3), 0, dp(1), 0x66000000);
+        button.setTypeface(button.getTypeface(), android.graphics.Typeface.BOLD);
+        button.setMinHeight(dp(56));
         button.setMinimumWidth(0);
         button.setMinWidth(0);
         button.setGravity(Gravity.CENTER);
-        button.setPadding(dp(12), dp(12), dp(12), dp(12));
-        // The pill frame is drawn with a height-based corner, so it reads as a rounded button at any width.
-        Drawable pill = GameArt.frame(activity, primary ? GameArt.FRAME_PILL_ORANGE : GameArt.FRAME_PILL_PURPLE,
-                GameArt.FRAME_BORDER, dp(26));
-        button.setBackground(pill != null ? pill : shape(primary ? PerazimTheme.COLOR_ORANGE_BRAND : PerazimTheme.COLOR_SURFACE_2));
+        button.setPadding(dp(14), dp(12), dp(14), dp(12));
+        button.setBackground(GameButtons.drawn(activity, primary));
+        button.setElevation(0f);
     }
 
     /**
