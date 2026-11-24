@@ -61,19 +61,21 @@ public class KnowledgeLibraryTest {
                             || status.equals("DRAFT_PENDING_LEVI"));
             // Fail-closed: no content file is attached to any topic yet, and every draft stays pending.
             assertTrue(topic.isNull("contentFile"));
-            JSONObject draft = topic.getJSONObject("draft");
-            assertEquals("DRAFT_PENDING_LEVI", draft.getString("status"));
+            if (topic.has("draft")) {
+                assertEquals("DRAFT_PENDING_LEVI", topic.getJSONObject("draft").getString("status"));
+            }
             assertFalse(topic.has("approvedText"));
         }
     }
 
     @Test
-    public void doctrineEntriesAreDraftOnlyAndCarryTheirVerses() throws Exception {
+    public void doctrineEntriesAreApprovedByLevelAndCarryTheirVerses() throws Exception {
         JSONArray entries = new JSONObject(read(new File(LIB, "doctrine/entries.json"))).getJSONArray("entries");
         assertEquals(4, entries.length());
         for (int i = 0; i < entries.length(); i++) {
             JSONObject entry = entries.getJSONObject(i);
-            assertEquals("DRAFT_PENDING_LEVI", entry.getString("status"));
+            assertEquals("APPROVED_LEVI", entry.getString("status"));
+            assertEquals("Levi", entry.getJSONObject("approval").getString("approver"));
             assertFalse(entry.has("approvedText"));
             assertTrue(entry.getJSONArray("verses").length() > 0);
         }

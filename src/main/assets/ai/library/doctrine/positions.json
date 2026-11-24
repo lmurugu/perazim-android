@@ -185,50 +185,30 @@
   {
    "id": "holy-spirit-baptism",
    "topic": "Baptism in the Holy Spirit and tongues",
-   "status": "DRAFT_PENDING_LEVI",
-   "basis": "Levi's decision of 2026-11-24 (answer B). Full entry in doctrine/entries.json",
-   "contentFile": null,
-   "draft": {
-    "status": "DRAFT_PENDING_LEVI",
-    "wording": "Spirit baptism is an experience distinct from conversion. Tongues are normal and desirable, but not the only evidence.",
-    "basis": "Levi, 2026-11-24"
-   }
+   "status": "APPROVED",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
   },
   {
    "id": "prosperity-and-giving",
    "topic": "Prosperity teaching, giving and seed offerings",
-   "status": "DRAFT_PENDING_LEVI",
-   "basis": "Levi's decision of 2026-11-24 (answer A). Full entry in doctrine/entries.json",
-   "contentFile": null,
-   "draft": {
-    "status": "DRAFT_PENDING_LEVI",
-    "wording": "Generous, cheerful giving is taught. God's blessing cannot be bought with a seed or a pledge. Manipulation and pressure are warned against.",
-    "basis": "Levi, 2026-11-24"
-   }
+   "status": "APPROVED",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
   },
   {
    "id": "polygamy",
    "topic": "Polygamy and families already in polygamous marriages",
-   "status": "DRAFT_PENDING_LEVI",
-   "basis": "Levi's decision of 2026-11-24 (answer A). Full entry in doctrine/entries.json",
-   "contentFile": null,
-   "draft": {
-    "status": "DRAFT_PENDING_LEVI",
-    "wording": "Marriage is one man and one woman. Families already in polygamy receive pastoral care and are not told to break up or abandon wives and children.",
-    "basis": "Levi, 2026-11-24"
-   }
+   "status": "APPROVED",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
   },
   {
    "id": "dowry",
    "topic": "Dowry and bride wealth",
-   "status": "DRAFT_PENDING_LEVI",
-   "basis": "Levi's decision of 2026-11-24 (answer A). Full entry in doctrine/entries.json",
-   "contentFile": null,
-   "draft": {
-    "status": "DRAFT_PENDING_LEVI",
-    "wording": "Dowry is an acceptable custom when it honours both families. It must not become a sale of a person, a debt trap, or a reason to delay marriage.",
-    "basis": "Levi, 2026-11-24"
-   }
+   "status": "APPROVED",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
   }
  ]
 }

@@ -66,7 +66,8 @@ class DoctrineEntriesTest(unittest.TestCase):
             committed = json.load(f)
         self.assertEqual(bde.build(), committed, "run build_doctrine_entries.py after editing the entries")
         for entry in committed["entries"]:
-            self.assertEqual(entry["status"], "DRAFT_PENDING_LEVI")
+            self.assertEqual(entry["status"], "APPROVED_LEVI")
+            self.assertEqual(entry["approval"]["approver"], "Levi")
             self.assertTrue(entry["verses"])
 
 
