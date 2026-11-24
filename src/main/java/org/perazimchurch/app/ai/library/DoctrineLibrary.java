@@ -28,8 +28,8 @@ public final class DoctrineLibrary {
 
     /** Question shapes that ask for a doctrinal position. Undecided topics are answered only for these. */
     private static final Pattern DOCTRINAL_CUE = Pattern.compile(
-            "\\b(?:is it|is|are|does|do|should|can|may|position|view|views|teach|taught|biblical|biblically|permitted|allowed|" +
-            "what does the (?:church|guide|bible|perazim)|what is the (?:church|guide|perazim)|church (?:position|teaching))\\b",
+            "\\b(?:is it|is|are|should|can|may|position|view|views|teach|taught|biblical|biblically|permitted|allowed|" +
+            "does the (?:church|bible|guide)|what does the (?:church|guide|bible|perazim)|what is the (?:church|guide|perazim)|church (?:position|teaching))\\b",
             Pattern.CASE_INSENSITIVE);
     private static final String ENTRIES = "ai/library/doctrine/entries.json";
     private static final String POSITIONS = "ai/library/doctrine/positions.json";

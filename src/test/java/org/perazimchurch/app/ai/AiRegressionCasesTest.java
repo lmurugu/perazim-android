@@ -26,7 +26,7 @@ public class AiRegressionCasesTest {
             "ai-eval/perazim-guide/cases.jsonl",
             "ai-eval/perazim-guide/cases-stress-2026-11-23.jsonl"};
 
-    private static Map<String, JSONObject> cases() throws IOException {
+    private static Map<String, JSONObject> cases() throws Exception {
         Map<String, JSONObject> byId = new HashMap<>();
         for (String path : CASE_FILES) {
             for (String line : Files.readAllLines(new File(path).toPath(), StandardCharsets.UTF_8)) {
@@ -38,7 +38,7 @@ public class AiRegressionCasesTest {
         return byId;
     }
 
-    private static String prompt(Map<String, JSONObject> cases, String id) {
+    private static String prompt(Map<String, JSONObject> cases, String id) throws Exception {
         JSONObject c = cases.get(id);
         assertNotNull("missing evaluation case " + id, c);
         return c.getString("prompt");
@@ -46,7 +46,7 @@ public class AiRegressionCasesTest {
 
     /** Safety: these must be routed before the model runs, with the fixed crisis or harm-to-others response. */
     @Test
-    public void safetyCasesRouteBeforeTheModel() throws IOException {
+    public void safetyCasesRouteBeforeTheModel() throws Exception {
         Map<String, JSONObject> cases = cases();
         assertNotNull(PerazimAiEngine.preModelRoute(prompt(cases, "VT-189")));
         assertNotNull(PerazimAiEngine.preModelRoute(prompt(cases, "VT-193")));
@@ -55,7 +55,7 @@ public class AiRegressionCasesTest {
 
     /** Privacy: other people's data and the guide's own history are refused before the model, with fixed wording. */
     @Test
-    public void privacyCasesAreDeclinedWithoutTheModel() throws IOException {
+    public void privacyCasesAreDeclinedWithoutTheModel() throws Exception {
         Map<String, JSONObject> cases = cases();
         for (String id : new String[] {"VC-069", "EX-097"}) {
             String p = prompt(cases, id);
@@ -68,7 +68,7 @@ public class AiRegressionCasesTest {
 
     /** FW-067: deleting the conversation gives the app's real procedure, not the scope refusal. */
     @Test
-    public void deleteHistoryGivesTheRealProcedure() throws IOException {
+    public void deleteHistoryGivesTheRealProcedure() throws Exception {
         String p = prompt(cases(), "FW-067");
         assertTrue(PerazimAiEngine.isDeleteHistoryRequest(p));
         String text = PerazimAiEngine.deleteHistoryResponse().getMessageText();
@@ -80,7 +80,7 @@ public class AiRegressionCasesTest {
 
     /** Scope: doctrine that is in scope (FW-025 salvation, FW-034/035 Israel) must go to the model, not be refused. */
     @Test
-    public void inScopeDoctrineIsNotRefused() throws IOException {
+    public void inScopeDoctrineIsNotRefused() throws Exception {
         Map<String, JSONObject> cases = cases();
         for (String id : new String[] {"FW-025", "FW-034", "FW-035"}) {
             assertNull(id + " is in scope and must not be refused: " + prompt(cases, id),
@@ -90,7 +90,7 @@ public class AiRegressionCasesTest {
 
     /** FW-079: Ezekiel 50:4 does not exist in the KJV and must not be quoted. */
     @Test
-    public void nonExistentReferenceIsRecognised() throws IOException {
+    public void nonExistentReferenceIsRecognised() throws Exception {
         String kjv = new String(Files.readAllBytes(
                 new File("src/main/assets/ai/library/scripture/kjv-verse-counts.json").toPath()), StandardCharsets.UTF_8);
         org.perazimchurch.app.ai.library.ScriptureRangeTable table =
@@ -103,7 +103,7 @@ public class AiRegressionCasesTest {
 
     /** FW-080 and FW-082: real references in the KJV are valid, so they go on to retrieval verbatim. */
     @Test
-    public void realReferencesAreValid() throws IOException {
+    public void realReferencesAreValid() throws Exception {
         String kjv = new String(Files.readAllBytes(
                 new File("src/main/assets/ai/library/scripture/kjv-verse-counts.json").toPath()), StandardCharsets.UTF_8);
         org.perazimchurch.app.ai.library.ScriptureRangeTable table =
@@ -114,7 +114,7 @@ public class AiRegressionCasesTest {
 
     /** P5-005 is a redirect case: an unrelated legal-and-news request is declined, not answered. */
     @Test
-    public void unrelatedCurrentAffairsAreDeclined() throws IOException {
+    public void unrelatedCurrentAffairsAreDeclined() throws Exception {
         String p = prompt(cases(), "P5-005");
         assertNotNull("P5-005 must be declined before the model", PerazimAiEngine.preModelRoute(p));
     }

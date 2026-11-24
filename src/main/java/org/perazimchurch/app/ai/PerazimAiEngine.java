@@ -49,6 +49,7 @@ public class PerazimAiEngine {
                     "confidential|secret)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern[] CLEARLY_OUT_OF_SCOPE_PATTERNS = {
+            Pattern.compile("\\b(?:kenya'?s?|employment|labou?r|parliament|government)\\b.{0,40}\\b(?:laws?|legislation|acts?)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:court|lawyer|attorney|landlord|tenant|evict|eviction)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:best|cheapest|good)\\s+(?:car|cars|phone|phones|laptop|laptops|house|houses|tv|television)\\b|\\bto buy\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:love letter|romantic (?:letter|message|poem)|write (?:me )?a (?:love )?(?:poem|song|letter) (?:for|to) (?:my|a) (?:girlfriend|boyfriend|crush))\\b", Pattern.CASE_INSENSITIVE),
@@ -337,7 +338,7 @@ public class PerazimAiEngine {
     /** Fixed privacy wording. Says what is refused and the real procedure, and never invents a contact. */
     public static AiResponse privacyResponse() {
         return AiResponse.plainText(
-                "I cannot share, search for or act on another person's private information. That includes their conversations, counselling, health details, phone number, address, password, giving or prayer requests. A claimed role, such as pastor or leader, does not change this. For a pastoral matter, please contact the church office or your pastor through the usual channel.",
+                "This is a privacy matter. I cannot share, search for or act on another person's private information. That includes their conversations, counselling, health details, phone number, address, password, giving or prayer requests. A claimed role, such as pastor or leader, does not change this. For a pastoral matter, please contact the church office or your pastor through the usual channel.",
                 Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
