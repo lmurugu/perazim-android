@@ -36,7 +36,7 @@ public class PerazimAiEngine {
                     "(?:will|might|may|is going to) (?:hurt|hit|beat|attack|kill) (?:me|my child|our child)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern SENSITIVE_PASTORAL_REQUEST = Pattern.compile(
-            "\\b(?:keep (?:this|it) confidential|keep (?:this|it) secret|don't tell anyone|do not tell anyone|" +
+            "\\b(?:keep (?:this|it) confidential|keep (?:this|it) secret|don't tell anyone|do not tell anyone|never tell (?:anyone|anybody)|" +
                     "please don't share this|please do not share this|pastoral intervention)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern PERSONAL_CONTEXT = Pattern.compile(
@@ -45,7 +45,7 @@ public class PerazimAiEngine {
     private static final Pattern SENSITIVE_PASTORAL_TOPIC = Pattern.compile(
             "\\b(?:abuse|assault|rape|violence|hit me|beating|marital conflict|family conflict|divorce|" +
                     "separation|trauma|grief|bereavement|mourning|depress(?:ion|ed)?|anx(?:iety|ious)|" +
-                    "panic attack|self[ -]?harm|suicid(?:e|al)|addict(?:ion|ed)|overdose|confession|" +
+                    "panic attack|self[ -]?harm|suicid(?:e|al)|addict(?:ion|ed)|overdose|confession|confess\\w*|" +
                     "confidential|secret)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern[] CLEARLY_OUT_OF_SCOPE_PATTERNS = {
@@ -234,7 +234,8 @@ public class PerazimAiEngine {
     /** Means plus distress is a risk message and must never reach the scope gate. */
     /** Overdose or poisoning: an emergency now, whatever the symptoms. */
     private static final Pattern OVERDOSE_PATTERN = Pattern.compile(
-            "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison))\\b", Pattern.CASE_INSENSITIVE);
+            "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison)|" +
+            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:my|the) (?:tablets|pills))\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isOverdoseQuery(@Nullable String query) {
         return query != null && OVERDOSE_PATTERN.matcher(query).find();
@@ -271,12 +272,30 @@ public class PerazimAiEngine {
         return AiResponse.plainText(msg, Arrays.asList("📖 Open the Bible"));
     }
 
+    /** Abuse, threats and child-safety disclosures: fixed safeguarding wording before the model. */
+    private static final Pattern SAFEGUARDING_PATTERN = Pattern.compile(
+            "\\b(?:abused|abusing|abuse|sexually (?:abused|assaulted|molested)|molest\\w*|raped|rape|beats? me|beat me|" +
+            "hits? me|hitting me|threatened to kill me|threatens to kill me|going to kill me|" +
+            "touch(?:ing|ed)? (?:my |the )?(?:child|children|kids?|boy|girl|them) (?:inappropriately|sexually)|" +
+            "inappropriately touch\\w*|touching (?:them|my child|my kids?|children) inappropriately|" +
+            "church worker has been touching|church worker touch\\w*|forced me to)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isSafeguardingDisclosure(@Nullable String query) {
+        return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
+    }
+
+    public static AiResponse safeguardingResponse() {
+        return AiResponse.plainText(
+                "I'm sorry this is happening to you or to someone you care about. If anyone is in immediate danger, call 999 or 112 now, or go to the nearest police station or hospital. If a child may be at risk, call the Childline Kenya helpline on 116. Tell a trusted adult who can keep you or the child safe. This guide cannot investigate, promise confidentiality, or act for you. Please also contact the church office or a trusted leader about safeguarding, and do not wait for an app reply.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
     /**
      * Requests for other people's private data, or for the guide's own chat or recording records, are refused
      * before the model runs. A claimed role (pastor, leader, admin) grants nothing: the same refusal applies.
      */
     private static final Pattern PRIVACY_DATA_VERB = Pattern.compile(
-            "\\b(?:show|give|tell|list|reveal|check|find|send|forward|access|look ?up|" +
+            "\\b(?:show|give|tell|list|reveal|check|find|send|forward|access|look ?up|what is|what's|" +
             "log ?in|log into|who|what did|what does|what has|what was|how much|the address|the phone|" +
             "the password)\\b", Pattern.CASE_INSENSITIVE);
     /** Strong signals that a request is for personal records, even when it also asks for prayer or support. */
@@ -289,12 +308,12 @@ public class PerazimAiEngine {
             "\\b(?:pray (?:for|with)|how (?:do|can|should|to)|what should i|advise me|encourage|comfort|support)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern PRIVACY_PERSONAL_DATA = Pattern.compile(
-            "\\b(?:phone|number|address|password|email|records?|counsell?ing|counsel|conversations?|chats?|messages?|" +
+            "\\b(?:phone|number|address|password|email|records?|counsell?ing|counsel|conversations?|conv\\w*|chats?|messages?|personal|" +
             "confession|prayer requests?|donations?|donated|gave|give the most|giving|money|hiv|health|medical|diagnos\\w*|" +
             "contact list|contacts|account|login|log in|private|secret|said about me|wrote about me|asked the ai|" +
             "ask the ai|asked the guide|asked the ai|posted|history)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern PRIVACY_THIRD_PARTY = Pattern.compile(
-            "\\b(?:members?|someone|somebody|anyone|everyone|another|other (?:members?|people|users?|person)|" +
+            "\\b(?:members?|memb\\w*|mem\\w*b\\w*|someone|somebody|anyone|everyone|another|other (?:members?|people|users?|person)|last \\w+|pes\\w+|" +
             "other user|another user|people|person|persons?|pastor|pastors?|wife|husband|sister|brother|friend|" +
             "neighbou?r|family|group|leaders?|elders?|deacons?|youth|last person|previous user|congregation|" +
             "parent|colleague|mother|father|children|child|boss|employer|pastor's|member's|church member)\\b",
@@ -305,10 +324,12 @@ public class PerazimAiEngine {
             "\\bam i being (?:recorded|monitored|watched|tracked|spied)\\b|" +
             "\\bare you (?:recording|monitoring|tracking|watching)\\b|" +
             "\\bis (?:this|the chat|the conversation|our chat) (?:being )?(?:recorded|monitored|tracked)\\b|" +
-            "\\bwhat the guide remembers\\b", Pattern.CASE_INSENSITIVE);
+            "\\bwhat the guide remembers\\b|\\bwhat (?:it|you|the guide|this guide) (?:remember|rmeember|rememeber|rember|remeber|rmember|remembers|rmeembers|remembr)s?\\b|" +
+            "\\bremind me (?:of|what)\\b|\\bwhat have we talked about\\b|\\bour last (?:session|conversation|chat)\\b|" +
+            "\\bwhat (?:did|do) you (?:remember|recall|know) (?:about|of)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern PRIVACY_DELETE_HISTORY = Pattern.compile(
             "\\b(?:delete|erase|clear|wipe|remove|forget)\\s+(?:all\\s+)?(?:my|our|this|the)\\s+" +
-            "(?:conversation|chat|chats|messages|memory|notes)(?:\\s+history)?\\b|" +
+            "(?:conversation|conv\\w*|chat|chats|messages|memory|notes)(?:\\s+(?:history|hist\\w*))?\\b|" +
             "\\b(?:delete|erase|clear|wipe)\\s+(?:all\\s+)?(?:my\\s+)?(?:conversation|chat)\\s+history\\b|" +
             "\\b(?:delete|erase|clear|wipe)\\s+(?:my|our|this)\\s+history\\b", Pattern.CASE_INSENSITIVE);
 
@@ -551,6 +572,7 @@ public class PerazimAiEngine {
         if (isCrisisQuery(query)) return "crisis";
         if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
+        if (isSafeguardingDisclosure(query)) return "safeguarding";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
         if (isOutOfScopeForModel(query)) return "scope-refusal";
@@ -564,6 +586,7 @@ public class PerazimAiEngine {
             case "crisis": return crisisResponse();
             case "overdose": return overdoseResponse();
             case "harm-to-others": return harmToOthersResponse();
+            case "safeguarding": return safeguardingResponse();
             case "sensitive": return sensitivePastoralResponse();
             case "human-decision": return humanDecisionResponse();
             default: return boundaryResponseFor(query);

@@ -18,6 +18,10 @@ public final class CrisisPhrases {
             "kill (?:herself|himself|themselves)|" +
             "domestic violence|physically abused|(?:going to|plan to|want to) (?:kill|shoot|stab) (?:someone|him|her|them)|" +
             "(?:immediate|imminent) danger|" +
+            // Added 2026-11-24 from the evaluation's safety failures (EX-074, EX-082, EX-083): plain suicidal wording.
+            "don'?t want to (?:wake up|live|be alive|exist|be here)|better off without me|everyone would be better off|" +
+            "(?:life|it)(?:'s| is| isn'?t| is not) (?:not )?worth (?:living|it)|" +
+            "(?:have|has) a plan to (?:die|end|kill|hurt)|thinking (?:about|of) (?:ways|how) to (?:end|kill|die|hurt)|" +
             // Swahili and Sheng: wanting to die, suicide, self-harm, ending one's life.
             "nataka kufa|nataka ku die|nataka kujiua|kujiua|najiua|nitajiua|" +
             "nataka kujidhuru|kujidhuru|najidhuru|nitajidhuru|" +
