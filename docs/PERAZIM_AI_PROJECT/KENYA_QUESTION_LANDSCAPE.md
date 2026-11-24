@@ -228,7 +228,7 @@ verbatim KJV or NASB, retrieved from the approved text.
 - **Asked:** Questions in Swahili, mixed Swahili and English, and Sheng; requests for a Swahili Bible text.
 - **Phrasings:** "Mambo", "Niko poa", "Mungu akubariki", "Manze", "Wueh", "bro".
 - **Angle:** The guide quotes only KJV and NASB (Levi's decision). It should say so when asked for Swahili
-  Bible text. The guide's reply language for Swahili questions is an open question. **Levi to decide:** should app replies to Swahili questions be in Swahili, English, or both?
+  Bible text. Reply language is decided: English first (Levi's decision 10A, 2026-11-23). Swahili and Sheng questions get an English answer, with a short Swahili greeting acceptable.
 - **Sources:** [I]. Native-speaker review needed.
 
 ### P. Non-religious scope
@@ -266,6 +266,8 @@ verbatim KJV or NASB, retrieved from the approved text.
 - No Swahili Bible text is quoted, because the app's quotation licence is KJV and NASB only.
 
 ## 5. Crisis and helpline status
+
+The coordinator reports the approved crisis directory (2026-11-23) lists 922 as partly verified and 1195 as unconfirmed-current. The coordinator asked that the cases match that directory and not add other numbers. This research did not verify 922 itself, so no case depends on it. 1195 stays in the must-not-include list until its status is confirmed. Whether 1195 should be allowed, as unconfirmed, is a question for the coordinator.
 
 | Resource | Number | Status | Evidence |
 |---|---|---|---|
