@@ -10,7 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.perazimchurch.app.domain.games.engine.GameSession;
+import org.perazimchurch.app.presentation.ui.games.common.GameButtons;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
+import org.perazimchurch.app.presentation.ui.games.common.GameScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideSession;
 
@@ -38,6 +40,7 @@ public final class LampSlideScreen {
         page.setGravity(Gravity.CENTER_HORIZONTAL);
         int pad = dp(context, 16);
         page.setPadding(pad, pad, pad, pad);
+        page.setBackground(GameScene.background(context, "lamp_scene"));
 
         TextView status = text(context, "", 14, false);
         page.addView(status);
@@ -59,6 +62,7 @@ public final class LampSlideScreen {
         page.addView(banner);
 
         Button next = button(context, "Continue");
+        next.setBackground(GameButtons.drawn(context, true));
         next.setVisibility(View.GONE);
         page.addView(next);
 
@@ -152,6 +156,9 @@ public final class LampSlideScreen {
         button.setText(label);
         button.setAllCaps(false);
         button.setTextColor(0xFFFFFFFF);
+        button.setTypeface(button.getTypeface(), android.graphics.Typeface.BOLD);
+        button.setMinHeight(dp(context, 56));
+        button.setBackground(GameButtons.drawn(context, false));
         return button;
     }
 
