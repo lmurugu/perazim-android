@@ -47,6 +47,9 @@ src/main/assets/ai/library/
     crisis-contacts.json          Kenyan numbers with their recorded verification status
   sources/
     register.json                 35 sources: licence, URL, APPROVED_FOR_GUIDE or NOT_APPROVED
+  creeds/
+    apostles-creed.txt            DRAFT_PENDING_LEVI. Public domain text, source in SOURCE.md
+    SOURCE.md                     where the text came from and its status
 ```
 
 Scripts (run from the repo root):
@@ -110,8 +113,8 @@ Other gaps:
 - Kenya legal summaries (Constitution, Children Act, Sexual Offences Act, Mental Health Act). Not added: Kenya Law
   was unreachable from this session (HTTP 503 and 202). Needs a retry from a working network, with citations and a
   licence check before entry.
-- Creeds and confessions other than Nicene 381. Not extracted. CCEL text needs a clean English transcription first.
-  Nothing written from memory.
+- Westminster Confession (1647). Not added yet. The CCEL text is interleaved with Latin and apparatus, so it needs a clean English-only pass before it can be checked. Nothing written from memory.
+- Assemblies of God Statement of Fundamental Truths. Not added. The publisher's page states "All rights reserved", so it is excluded.
 - The 0.5B model drifts in quotation wording. The library lowers the risk; the self-check still has to catch the rest.
 
 ## 5. Decisions needed from Levi
@@ -155,3 +158,30 @@ in, in this order:
 No new external content was added in this PR. The 35 rows in `sources/register.json` are the existing candidates and
 approved sources from `scripts/reference/sources.json`, unchanged. Each row keeps its licence and URL. Any new source
 will need a row here with licence, URL and the date it was checked before it is used.
+
+## 8. This round (after the coordinator's follow-up)
+
+- **Crisis contacts** carry `approvedByLevi: 2026-11-23` (Levi's answer 9A). The verification column stays as recorded, so 922 is still partly verified and 1195 is still unconfirmed.
+- **Doctrine register**: each of the 15 topics now has a `draft` block. Wording comes only from Levi's recorded decisions. Every draft is DRAFT_PENDING_LEVI. Undecided topics say that no position is set. The Holy Spirit and tongues topics stay UNDECIDED while Levi decides.
+- **Apostles' Creed** (received form, Schaff 1877, public domain via CCEL) is in `creeds/`, marked DRAFT_PENDING_LEVI. No loader reads it.
+- **Treasury of Scripture Knowledge** cross-references are already in the approved `openbible-xrefs` source (OpenBible.info, CC BY 4.0, seeded from the public-domain TSK). No second copy is added.
+- **Easton's Bible Dictionary** is already approved and in `reference.db`. No change.
+- **Westminster Confession (1646, English)**: added to `creeds/` as DRAFT_PENDING_LEVI. The text is the 1946 Carruthers transcription on Wikisource, which states the work is public domain. The transcription is under CC BY-SA 4.0 page terms. It is a historical confession, not a Perazim position. Its chapters cover divorce, the Sabbath and civil magistrates, which are UNDECIDED topics here, so it must never be shown without that label.
+- **Assemblies of God Statement**: not added. The publisher's page says "All rights reserved".
+- **Constitution of Kenya 2010 summaries** (Articles 26, 28, 29, 43(1), 53(1)) are in `kenya/legal-summaries.json`, DRAFT_PENDING_LEVI. The text comes from the Constitute Project mirror. Sub-paragraph letters need checking against Kenya Law.
+- **Kenya Act summaries** (Children Act 2022, FGM Act 2011, and others) are still not added. Kenya Law's Act PDFs return HTTP 403. I did not get around the block.
+- **Kenya research thread** (draft PR 81, `docs/PERAZIM_AI_PROJECT/KENYA_QUESTION_LANDSCAPE.md`) has been received. Its topics are not added as content here. Its verified-resource list conflicts with the 1195 status. See `reviewNote` in `kenya/crisis-contacts.json`.
+
+
+## 9. Round four (coordinator decisions, 2026-11-24)
+
+- **1195 (gender-based violence line)** keeps Levi's 2026-11-23 decision. It is shown only as a secondary line, after 999 and 112, labelled "may not be current". It is never the only number. The rule is in `displayRule` in `kenya/crisis-contacts.json`. It is on the pre-release confirmation list in the same file. Levi is not asked again now.
+- **Act summaries** (Children Act 2022, FGM Act 2011 and others) stay an open gap. Kenya Law's Act PDFs return HTTP 403.
+- **Kenyan pastoral topics** (`pastoral/kenya-topics.json`, DRAFT_PENDING_LEVI, fail-closed):
+  - Debt, loans and betting.
+  - Fear of witchcraft and curses.
+  - False prophets and miracle claims.
+  - Depression, anxiety and the stigma around them.
+  Every verse is taken from the bundled KJV by `scripts/knowledge/build_pastoral_topics.py`. The build stops on any reference the range table rejects, and the Python test checks the committed file against a fresh build. The text is written neutrally, with no verdict on any person and no position on any contested doctrine.
+- **Gap**: no verified helpline for debt or betting is recorded. The topic says so and refers the reader to a trusted church leader. A gambling or debt-counselling number needs a source check before it can be shown.
+- **Waiting on Levi's four doctrine answers** (prosperity and tithing, polygamy, the Sabbath, dowry). The coordinator will relay them. No position is added until then.
