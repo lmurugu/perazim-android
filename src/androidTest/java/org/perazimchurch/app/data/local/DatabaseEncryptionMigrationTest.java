@@ -52,7 +52,8 @@ public class DatabaseEncryptionMigrationTest {
 
             room = openRoom(context, name, key);
             SupportSQLiteDatabase opened = room.getOpenHelper().getWritableDatabase();
-            assertEquals(7, encryptedUserVersion(database, key));
+            // Room opens the encrypted file at the current schema version, 12 (PerazimDatabase), so it ends there.
+            assertEquals(12, encryptedUserVersion(database, key));
             assertTrue("Seeded Bible rows remain available after encryption", scalarInt(opened, "SELECT COUNT(*) FROM bible_verses") > 0);
         } finally {
             if (room != null) room.close();
@@ -88,7 +89,8 @@ public class DatabaseEncryptionMigrationTest {
 
             room = openRoom(context, name, key);
             SupportSQLiteDatabase encryptedRoom = room.getOpenHelper().getWritableDatabase();
-            assertEquals(7, encryptedUserVersion(database, key));
+            // Room opens the upgraded file at the current schema version, 12 (PerazimDatabase), so it ends there.
+            assertEquals(12, encryptedUserVersion(database, key));
             assertEquals(2, scalarInt(encryptedRoom, "SELECT COUNT(*) FROM sync_queue"));
             assertEquals("{\"content\":\"retained\"}", stringValue(encryptedRoom,
                     "SELECT payloadJson FROM sync_queue WHERE id = '" + QUEUE_ID + "'"));
