@@ -167,6 +167,13 @@ public final class ApprovedRoutes {
                 + "We test every claim about Jesus against Scripture, and this is what the Bible teaches.",
                 "John 1:1", "John 10:30"));
 
+        r.add(new Route("first-gospel-preacher",
+                "first (?:person|one|man|preacher).{0,40}(?:preach|gospel)|who (?:was )?the first .{0,30}(?:preach|gospel)",
+                "Scripture records Jesus preaching the gospel of the kingdom of God as He began His public ministry (Mark 1:14–15). "
+                + "Before that, an angel brought the shepherds good tidings of great joy (Luke 2:10). The Bible does not give anyone "
+                + "the title \u201cthe first person to preach the gospel\u201d.",
+                "Mark 1:14", "Luke 2:10"));
+
         r.add(new Route("nicene-creed-spirit",
                 "nicene.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}nicene|creed.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}creed",
                 "Yes. The Nicene-Constantinopolitan Creed of 381 speaks of the Holy Spirit. In the creed's own words: \""

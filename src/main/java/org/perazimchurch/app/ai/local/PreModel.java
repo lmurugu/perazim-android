@@ -124,6 +124,9 @@ public final class PreModel {
      * The verbatim King James Version text for a valid reference that the bundled file holds, or a plain statement
      * when the file does not hold it. Returns null when the question names no confident, valid reference.
      */
+    private static final Pattern MEANING_ASK = Pattern.compile(
+            "\\bmean(?:s|ing)?\\b|\\bexplain|\\bcontext\\b|\\bpromis|\\bguarantee|\\bcontradict|\\bteach", Pattern.CASE_INSENSITIVE);
+
     static Decision verseDecision(ScriptureRangeTable table, KjvVerseText verses, String question) {
         Reference ref = reference(table, question);
         if (ref == null || !ref.valid) return null;
@@ -145,8 +148,13 @@ public final class PreModel {
         String notice = OTHER_TRANSLATION.matcher(question).find()
                 ? "I can't quote that translation here. The app holds the King James Version, so here it is in the KJV. "
                 : "";
+        // A request for meaning gets the verse and an honest note: the guide only explains what checked material supports.
+        String meaning = MEANING_ASK.matcher(question).find()
+                ? "\n\nI can quote the verse, but I can't give its meaning from checked material yet. Read the verses before and "
+                + "after it in the Bible tab, and talk it through with your pastor or a trusted church leader."
+                : "";
         return new Decision("routed:verse-kjv", notice + "From the King James Version (KJV), " + ref.label + ":\n\n" + out
-                + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
+                + "\n\nRead it in its context. The Bible tab shows the whole chapter." + meaning);
     }
 
     /** A quoted phrase of at least three words, the phrase after "the Bible says", or null. */
