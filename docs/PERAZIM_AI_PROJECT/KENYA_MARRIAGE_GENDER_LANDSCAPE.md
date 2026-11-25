@@ -126,3 +126,17 @@ Summaries are paraphrased. Attributed quotes are short and should be quoted only
 - The Supreme Court cohabitation ruling needs the judgment checked.
 - Sheng and Swahili terms (*kugongewa*, *kugongeana*, *mpango wa kando*) need Levi's native-speaker check.
 - No Kenyan source reviewed measures how men and women each feel about submission, accountability or feminism. Do not present opinion polls as data.
+
+---
+
+## F. Update, 25 November 2026 (verification of Levi's framework citations)
+
+- **KMDHS 2025–26 union figures:** corroborated in part. Citizen Digital's figures (47.7% married and 7.3% living with a partner, 32.9% never married) agree with the 55% in a union and 33% never married in Levi's framework. The report itself and the 18% registration figure were not reached.
+- **KDHS 2022 partner violence (men):** partly corroborated by a Nation feature (about 36% any partner violence, about 25% psychological, 7.5–9% physical, about 5% sexual). Women's figures and the help-seeking figures were not verified.
+- **Achami et al. (Kilifi South, 81.3% / 18.7%):** not verified. The document found under that name is a 2015 Kenyatta University MA thesis on Mwingi Central, Kitui County. Do not cite the Kilifi figures.
+- **Waila et al. (2026):** not verified. The publisher's record blocked access.
+- **Pike et al. (2018):** verified. 74 in-depth interviews, not necessarily 74 individuals.
+- **Warach et al. (2024):** verified (305 studies, 508,241 respondents, 47 countries).
+- **Ofcom (2025):** sample verified (38 men and 1 woman). The community list is not on the public page.
+
+The section 1 and 2 claims above in this note stand as written, except that the Kilifi figure must not be used anywhere. Full detail is in `marriage-gender-DRAFT.md`, section 0.
