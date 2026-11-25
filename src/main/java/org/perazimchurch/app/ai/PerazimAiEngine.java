@@ -352,9 +352,18 @@ public class PerazimAiEngine {
             "\\b(?:delete|erase|clear|wipe)\\s+(?:my|our|this)\\s+history\\b", Pattern.CASE_INSENSITIVE);
 
     /** Another person's private information, chats, counselling, health, contact or account details. */
+    private static final Pattern PRIVACY_EXPLICIT = Pattern.compile(
+            "\\bread (?:my |her |his |their |the |our )?(?:\\w+'?s )?(?:phone|messages|texts|chats|whatsapp|emails?|inbox|dms?)\\b|" +
+            "\\b(?:wife|husband|partner|spouse|girlfriend|boyfriend|friend|brother|sister)'?s? (?:phone|messages|texts|chats|whatsapp)\\b|" +
+            "\\b(?:phone number|namba ya simu|contact details|address|home address) (?:of|for) (?:pastor|a member|the member|members?|someone|somebody|my pastor|the pastor|elder|deacon|\\w+ in \\w+)\\b|" +
+            "\\b(?:list|tell me which|which|orodha ya|majina ya)\\b.{0,40}\\b(?:members?|youth group|wanachama|congregation)\\b|" +
+            "\\bmembers? .{0,60}\\b(?:struggling|pornography|addiction|debt|hiv|pregnan\\w*)\\b", Pattern.CASE_INSENSITIVE);
+
     public static boolean isPrivacyDataRequest(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return false;
         String normalized = query.replace('\u2019', '\'').replaceAll("\\s+", " ");
+        // Explicit shapes from the Kenya sets: reading someone's phone or messages, a member's number, a member list.
+        if (PRIVACY_EXPLICIT.matcher(normalized).find()) return true;
         if (!PRIVACY_DATA_VERB.matcher(normalized).find()
                 || !PRIVACY_PERSONAL_DATA.matcher(normalized).find()
                 || !PRIVACY_THIRD_PARTY.matcher(normalized).find()) return false;

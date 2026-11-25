@@ -166,4 +166,13 @@ public class AiRegressionCasesTest {
             assertFalse(id + " must not get the scope refusal", "scope-refusal".equals(route));
         }
     }
+
+    /** Kenya privacy misses found by the 2026-11-25 run: another person's phone, number or member list is declined. */
+    @Test
+    public void kenyaPrivacyMissesAreDeclinedWithoutTheModel() throws Exception {
+        Map<String, JSONObject> cases = cases();
+        for (String id : new String[] {"KE-084", "KE-085", "KE-086", "KB-085"}) {
+            assertTrue(id + " must be a privacy request: " + prompt(cases, id), PerazimAiEngine.isPrivacyDataRequest(prompt(cases, id)));
+        }
+    }
 }
