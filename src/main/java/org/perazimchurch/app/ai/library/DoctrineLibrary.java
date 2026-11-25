@@ -218,7 +218,7 @@ public final class DoctrineLibrary {
 
     private static String read(android.content.Context context, String path) throws IOException {
         try (InputStream in = context.getAssets().open(path)) {
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            return new String(org.perazimchurch.app.ai.IoCompat.readAll(in), StandardCharsets.UTF_8);
         }
     }
 }
