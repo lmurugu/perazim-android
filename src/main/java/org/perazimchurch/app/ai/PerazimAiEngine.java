@@ -309,7 +309,9 @@ public class PerazimAiEngine {
     /** Overdose or poisoning: an emergency now, whatever the symptoms. */
     private static final Pattern OVERDOSE_PATTERN = Pattern.compile(
             "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison)|" +
-            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:my|the) (?:tablets|pills))\\b", Pattern.CASE_INSENSITIVE);
+            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:my|the) (?:tablets|pills)|" +
+            // Swallowed medicine with any short description in between ("swallowed a packet of tablets an hour ago"), and Swahili "nimemeza vidonge".
+            "swallowed (?:\\w+\\s+){0,4}?(?:tablets|pills|capsules|poison|medicine)|nimemeza (?:\\w+\\s+){0,3}?(?:vidonge|sumu))\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isOverdoseQuery(@Nullable String query) {
         return query != null && OVERDOSE_PATTERN.matcher(query).find();
@@ -873,12 +875,33 @@ public class PerazimAiEngine {
             + "\\bi\\s+(?:want|wish|hope)\\s+to\\s+die\\b|\\bi\\s+(?:wish|want)\\s+i\\s+(?:was|were)\\s+dead\\b|"
             + "\\bend\\s+(?:it|my\\s+life|everything)\\b", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * General self-harm and suicide wording, in English and Swahili, that the patterns above miss: a means already at hand
+     * ("I have the rope ready"), cutting, jumping, not wanting to live, feeling a burden, a goodbye letter (2026-11-25 safety run,
+     * KE-088 to KB-093). Each alternative is anchored to the speaker or to a clear self-harm phrase, so a Bible question about
+     * "the burden of sin" or "jumping for joy" does not match.
+     */
+    private static final Pattern SELF_HARM_GENERAL = Pattern.compile(
+            "\\bi\\s+(?:do not|don'?t|no longer|can'?t|cannot|won'?t)\\s+want\\s+to\\s+(?:live|be alive|be here|exist|go on|wake up)\\b|" +
+            "\\bi\\s+(?:do not|don'?t)\\s+want\\s+to\\s+be\\s+(?:a\\s+)?burden\\b|\\bi\\s+(?:am|'m)\\s+(?:only\\s+|just\\s+)?(?:a\\s+)?burden\\s+(?:to|on)\\b|" +
+            "\\bnobody (?:would|will) miss me\\b|\\bno ?one (?:would|will) miss me\\b|\\bbetter off without me\\b|" +
+            "\\b(?:going to|about to|thinking (?:of|about)|want to|plan to)\\s+jump(?:ing)?\\s+(?:off|from|in front)\\b|\\bi\\s+(?:am|'m)\\s+jumping\\s+off\\b|\\bjumping off\\b|" +
+            "\\bi\\s+(?:have|'ve)\\s+decided\\s+to\\s+(?:die|end|kill)\\b|\\bsuicide note\\b|\\bgoodbye letter\\b|\\bletter of goodbye\\b|" +
+            "\\b(?:hang|hanging)\\s+myself\\b|\\bnoose\\b|\\bi\\s+(?:have|got)\\s+the\\s+(?:rope|pills|tablets|gun|knife|poison)\\b|" +
+            "\\b(?:rope|noose|pills|tablets|poison)\\s+(?:is\\s+|are\\s+)?ready\\b|" +
+            "\\bcutting\\s+(?:my\\s+)?(?:arms?|wrists?|legs?|skin|self)\\b|\\bcut\\s+my\\s+(?:arms?|wrists?)\\b|" +
+            "\\b(?:can(?:'|’)?t|cannot)\\s+(?:take|bear)\\s+(?:it|this|life)\\s+(?:any\\s*more|anymore|any\\s+longer)\\b|" +
+            // Swahili: "sitaki kuishi" (I do not want to live), "nitajiua" / "najiua" (I will / I am killing myself), "nimeamua kufa"
+            // (I have decided to die), "barua ya kuaga" (goodbye letter), "hakuna mtu atakayenikosa" (no one will miss me).
+            "\\bsitaki\\s+(?:tena\\s+)?kuishi\\b|\\bnitajiua\\b|\\bnajiua\\b|\\bnataka\\s+kujiua\\b|\\bnimeamua\\s+kufa\\b|\\bnataka\\s+kufa\\b|" +
+            "\\bbarua\\s+ya\\s+kuaga\\b|\\bhakuna\\s+mtu\\s+atakayenikosa\\b", Pattern.CASE_INSENSITIVE);
+
     public static boolean isCrisisQuery(@Nullable String query) {
         if (query == null) return false;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
         return CRISIS_PATTERN.matcher(normalized).find() || CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find()
                 || SELF_HARM_TYPO_PATTERN.matcher(normalized).find() || isMeansAndDistress(normalized)
-                || SELF_HARM_INTENT.matcher(normalized).find();
+                || SELF_HARM_INTENT.matcher(normalized).find() || SELF_HARM_GENERAL.matcher(normalized).find();
     }
 
     /** Conservative pre-model route for personal pastoral disclosures; not a risk diagnosis. */
@@ -1066,16 +1089,16 @@ public class PerazimAiEngine {
 
     /**
      * The single ordered pre-model route, shared by the app and the evaluation harness. Returns the route name, or
-     * null when the question may go on to the model. Order: crisis, overdose, harm to others, sensitive pastoral,
-     * human decision, privacy and out-of-scope.
+     * null when the question may go on to the model. Order: overdose (the medical line leads), crisis, harm to others,
+     * sensitive pastoral, human decision, privacy and out-of-scope.
      */
     @Nullable
     public static String preModelRoute(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return "scope-refusal";
         String safety = safetyRoute(query);
         if (safety != null && !"topic-violence".equals(safety) && !"general-topic".equals(safety)) return safety;
+        if (safety == null && isOverdoseQuery(query)) return "overdose";
         if (safety == null && isCrisisQuery(query)) return "crisis";
-        if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
         if (isSafeguardingDisclosure(query)) return "safeguarding";
         if (isDrugSafetyQuery(query)) return "drug-safety";
