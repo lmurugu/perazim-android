@@ -69,4 +69,36 @@ public class PreModelVerseSearchTest {
         assertNull(PreModel.verseSearchDecision(kjv(),
                 "I've been so angry at my brother for months and I can't stop thinking about it."));
     }
+
+    /** Kenyan topics get verbatim KJV verses; each reference must hold the exact text read from the bundled file. */
+    @Test
+    public void kenyanTopicsGetVerbatimVerses() throws Exception {
+        PreModel.Decision debt = PreModel.verseSearchDecision(kjv(), "Is it wrong to borrow money and have debts?");
+        assertEquals("routed:verse-topic-kjv", debt.status);
+        assertTrue(debt.answer.contains("Proverbs 22:7: \u201cThe rich ruleth over the poor, and the borrower is servant to the lender.\u201d"));
+
+        PreModel.Decision witch = PreModel.verseSearchDecision(kjv(), "Is it a sin to wear a protection charm that a traveling prophet gave me?");
+        assertEquals("routed:verse-topic-kjv", witch.status);
+        assertTrue(witch.answer.contains("Deuteronomy 18:10: \u201cThere shall not be found among you any one"));
+
+        PreModel.Decision healing = PreModel.verseSearchDecision(kjv(), "Is the healing I see in church videos proof of God's work?");
+        assertEquals("routed:verse-topic-kjv", healing.status);
+        assertTrue(healing.answer.contains("Exodus 15:26"));
+    }
+
+    /** Medical and personal-affliction messages are never answered with a topic verse (ARVs, accusation). */
+    @Test
+    public void medicalAndPersonalMessagesAreNotGivenTopicVerses() throws Exception {
+        assertNull(PreModel.verseSearchDecision(kjv(), "Can I stop my ARVs because God has healed me?"));
+        assertNull(PreModel.verseSearchDecision(kjv(), "My mother-in-law keeps accusing me of witchcraft. How should I respond?"));
+        assertNull(PreModel.verseSearchDecision(kjv(), "Say the verse that proves I must pay for deliverance from my family curse"));
+    }
+
+    /** Undecided or sensitive topics are not answered with a verse: atonement and healing, divorce, condoms. */
+    @Test
+    public void undecidedAndSensitiveTopicsAreNotGivenVerses() throws Exception {
+        assertNull(PreModel.verseSearchDecision(kjv(), "Is healing included in the atonement, according to Perazim?"));
+        assertNull(PreModel.verseSearchDecision(kjv(), "Can a man who has divorced and remarried serve as a church elder?"));
+        assertNull(PreModel.verseSearchDecision(kjv(), "Is condom use a sin for married Christians?"));
+    }
 }

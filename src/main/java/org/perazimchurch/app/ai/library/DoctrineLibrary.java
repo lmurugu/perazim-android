@@ -79,10 +79,10 @@ public final class DoctrineLibrary {
         MATCH.put("unconditional-election", "unconditional election|predestin|calvinis|elect of god|chosen before the foundation");
         MATCH.put("pre-trib-premillennialism", "rapture|pre-?trib|premillennial|pre-?millennial|tribulation|millennium|national israel");
         MATCH.put("women-in-ministry", "women (?:in|as) (?:ministry|leadership|preach|pastor|elder)|women preach|female pastor|women pastors|ordain women|women elders");
-        MATCH.put("divorce-remarriage", "divorce|remarr");
+        MATCH.put("divorce-remarriage", "divorc[a-z]*|remarr[a-z]*");
         MATCH.put("tithing", "tithe|tithing");
         MATCH.put("alcohol", "alcohol|wine|beer|drunk|drunkenness");
-        MATCH.put("healing-in-atonement", "healing in the atonement|atonement.{0,30}heal|divine healing");
+        MATCH.put("healing-in-atonement", "healing in the atonement|atonement.{0,40}heal|heal.{0,40}atonement|divine healing");
         MATCH.put("evolution-age-of-earth", "evolution|evolve|age of the earth|young earth|old earth|creation science");
         MATCH.put("sexuality", "homosexu|same-sex|same sex|lgbt|transgender");
         MATCH.put("inerrancy-formulation", "inerran|infallib");

@@ -115,14 +115,37 @@ public final class PreModel {
     // An opening quote is not inside a word (so "I've" and "can't" do not open one), and a closing quote is not followed by a letter.
     private static final Pattern QUOTED_PHRASE = Pattern.compile(
             "(?<!\\p{L})[\"'\u2018\u201c]([^\"'\u2019\u201d]{8,160}?)[\"'\u2019\u201d](?!\\p{L})");
-    /** Topics with a verse the King James Version gives for them, verbatim from the bundled text. */
+    /**
+     * Topics with verses the King James Version gives for them, read verbatim from the bundled text. Each topic is a
+     * plain-language question shape from the Kenyan sets. Undecided and under-review topics never reach this list:
+     * the approved doctrine route runs first.
+     */
     static final Pattern[] TOPIC_PATTERNS = {
-        Pattern.compile("love of money|money is the (?:root|source)|root of all evil", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("love of money|money is the (?:root|source)|root of all evil|wealth|riches|\\brich\\b|silver", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("\\bdebt|\\bloans?\\b|\\bborrow|\\bowe\\b", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("witch|curse|cursed|\\bcharms?\\b|enchant|divination|sorcer|juju|magic|amulet|talisman", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("marri|husband|\\bwife\\b", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("healing|healed|\\bheal\\b|\\bsick|sickness", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("forgiv|forgave|revenge|bitterness|unforgiv", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("\\bafraid\\b|\\bscared\\b|\\bfear\\b|\\bdismayed\\b", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("cheerful giv|generous giv|offering to (?:the )?(?:church|god)|giving to (?:the )?church", Pattern.CASE_INSENSITIVE),
         Pattern.compile("pharaoh.*heart|heart of pharaoh", Pattern.CASE_INSENSITIVE),
     };
+    private static final Pattern TOPIC_EXCLUDE = Pattern.compile(
+            "\\bhiv\\b|\\barvs?\\b|antiretro|condom|contracept|unforgivable|blasphem|atonement|divorc|remarr|medic|doctor|hospital|tablets?|\\bpills?\\b|\\bdrugs?\\b|clinic|\\bnurse|"
+            + "stop taking|prayer cloth|\\btest(?:ed|s)?\\b|accus|bewitch|\\bmy (?:son|daughter|child|mother|father|aunt|uncle|"
+            + "family|husband|wife|mother-in-law|grandmother|grandfather|cousin|brother|sister)\\b|\\bverse that proves|pay for|\\bpay\\b",
+            Pattern.CASE_INSENSITIVE);
     private static final Pattern TOPIC_REF = Pattern.compile("^(.+) (\\d+):(\\d+)$");
     static final String[][] TOPIC_REFS = {
-        {"1 Timothy 6:10"},
+        {"1 Timothy 6:10", "Ecclesiastes 5:10", "Hebrews 13:5"},
+        {"Proverbs 22:7", "Psalms 37:21", "Romans 13:8"},
+        {"Deuteronomy 18:10", "Proverbs 26:2", "1 John 4:4"},
+        {"Genesis 2:24", "Hebrews 13:4", "Ephesians 5:25"},
+        {"James 5:14", "James 5:15", "Exodus 15:26"},
+        {"Matthew 6:14", "Matthew 6:15", "Ephesians 4:32"},
+        {"Isaiah 41:10", "2 Timothy 1:7", "Philippians 4:6"},
+        {"2 Corinthians 9:7", "Acts 20:35"},
         {"Exodus 9:12", "Romans 9:18"},
     };
 
@@ -167,6 +190,9 @@ public final class PreModel {
 
     private static String topicVerses(KjvVerseText verses, String question) {
         String normalized = question.toLowerCase(Locale.ROOT).replace('\u2019', '\'');
+        // Medical, accusation and personal-affliction messages are not answered with a verse. They go to the zones, which
+        // keep the pointer to a doctor, a church leader or a pastor.
+        if (TOPIC_EXCLUDE.matcher(normalized).find()) return null;
         for (int t = 0; t < TOPIC_PATTERNS.length; t++) {
             if (!TOPIC_PATTERNS[t].matcher(normalized).find()) continue;
             StringBuilder out = new StringBuilder();
