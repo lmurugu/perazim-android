@@ -522,7 +522,7 @@ public class PerazimAiEngine {
     /** Recording and memory questions: the guide's notes stay on this phone. It cannot confirm other systems. */
     public static AiResponse memoryResponse() {
         return AiResponse.plainText(
-                "Your guide notes stay on this phone, and nothing is uploaded. You can review them under Choose your guide, then What the guide remembers, and tap Forget everything to remove them. I cannot see or share other people's chats, and I cannot confirm whether any other system records you. For a privacy concern, please contact the church office.",
+                "Your guide notes stay on this phone. You can review them under Choose your guide, then What the guide remembers, and tap Forget everything to remove them. I cannot see or share other people's chats, and I cannot confirm whether any other system records you. For a privacy concern, please contact the church office.",
                 Arrays.asList("🏛️ Church information", "📖 Read Scripture"));
     }
 

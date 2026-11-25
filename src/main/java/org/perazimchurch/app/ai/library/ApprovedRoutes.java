@@ -333,6 +333,40 @@ public final class ApprovedRoutes {
                 + "it, and we do not treat each of his opinions as Perazim doctrine.",
                 "Psalm 42:1", "Psalm 42:2"));
 
+        // Coordinator-approved 2026-11-25 under Levi's delegation: historical evidence routes below
+        // (Tacitus, Ignatius, Justin, Augustine). Approved status: coordinator, pending Levi's final check.
+        r.add(new Route("dream-warning",
+                "dream|dreamt|dreamed|i saw in a vision|a vision (?:that|of)",
+                "A dream is not a sure sign from God, and no dream can tell us what will happen to a person. Scripture tells us to test "
+                + "every spirit and every claim against the Word of God (1 John 4:1; 1 Thessalonians 5:20–21). We do not fear dreams, and we "
+                + "do not treat them as settled truth. If a dream troubles you, bring it to the Lord in prayer, ask the Holy Spirit for peace, "
+                + "and talk with your pastor or a trusted church leader. Please do not act on a dream about someone's death, or make a "
+                + "decision about anyone's life because of it.",
+                "1 John 4:1", "1 Thessalonians 5:20"));
+
+        r.add(new Route("asking-for-miracles",
+                "miracle",
+                "Asking God for a miracle is not wrong. Jesus taught us to ask, and to keep on asking (Matthew 7:7; Luke 11:9). Scripture "
+                + "also teaches us to trust God's wisdom about how and when He answers, because His ways are higher than ours (Isaiah 55:8–9). "
+                + "The Holy Spirit helps us pray as we ought (Romans 8:26). Do not measure your faith by a miracle every week. Keep praying "
+                + "in faith, and talk with your pastor about your prayer life.",
+                "Matthew 7:7", "Isaiah 55:8"));
+
+        r.add(new Route("holy-spirit-swahili",
+                "roho mtakatifu",
+                "The Holy Spirit (Roho Mtakatifu) is God, the third person of the Trinity. The Spirit convicts the world of sin and guides "
+                + "believers into all truth (John 16:8, 13). He helps us pray (Romans 8:26), produces fruit such as love and peace in the "
+                + "believer (Galatians 5:22–23), and gives gifts for building up the church (1 Corinthians 12:7). The Spirit points us to "
+                + "Jesus, and Scripture is His written Word. I can answer in English first; please ask a church leader if you want more in Swahili.",
+                "John 16:8", "Galatians 5:22"));
+
+        r.add(new Route("tithing-undecided",
+                "tithe|tithing|tithes|tithed",
+                "Thank you for asking plainly. Tithing is one of the questions our church has not yet decided, so I cannot give you a yes "
+                + "or no on it, and I won't guess. Scripture teaches generous and cheerful giving (2 Corinthians 9:6–7), and that giving is part "
+                + "of worship. Please talk it through with your pastor, who can walk with you through the question.",
+                "2 Corinthians 9:6", "2 Corinthians 9:7"));
+
         r.add(new Route("nicene-creed-spirit",
                 "nicene.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}nicene|creed.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}creed",
                 "Yes. The Nicene-Constantinopolitan Creed of 381 speaks of the Holy Spirit. In the creed's own words: \""

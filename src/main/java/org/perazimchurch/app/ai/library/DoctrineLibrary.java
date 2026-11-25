@@ -75,7 +75,7 @@ public final class DoctrineLibrary {
     /** Topic matchers by id. A topic with no matcher is never routed here. */
     private static final java.util.Map<String, String> MATCH = new java.util.HashMap<>();
     static {
-        MATCH.put("holy-spirit-baptism", "holy spirit|holy ghost|tongues|speaking in tongues|spirit baptism|baptism in the spirit|pentecostal");
+        MATCH.put("holy-spirit-baptism", "holy spirit|holy ghost|tongues|tognue|tounge|speaking in tongues|spirit baptism|baptism in the spirit|pentecostal");
         MATCH.put("prosperity-and-giving", "prosperity|prosperity gospel|seed offering|seed faith|sow a seed|giving seed|health and wealth");
         MATCH.put("polygamy", "polygamy|polygamous|polygamist|multiple wives|more than one wife|second wife|many wives");
         MATCH.put("dowry", "dowry|bride price|bride wealth|lobola|roora");
