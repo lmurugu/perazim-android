@@ -367,6 +367,20 @@ public class PerazimAiEngine {
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
+    /** Karma and reincarnation questions: identify the teaching and refute it from Scripture (fixed wording). */
+    private static final Pattern REINCARNATION_PATTERN = Pattern.compile(
+            "reincarnat\\w*|reincarnashun|\\bkarma\\b|sowin and reapin|kufa.{0,40}zaliwa tena|tukifa.{0,40}zaliwa tena", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isReincarnationQuery(@Nullable String query) {
+        return query != null && REINCARNATION_PATTERN.matcher(query).find();
+    }
+
+    public static AiResponse reincarnationResponse() {
+        return AiResponse.plainText(
+                "Karma and reincarnation are taught in Hinduism and Buddhism. They say a person is reborn again and again until they reach release. Scripture teaches something different. Hebrews 9:27 says people die once, and after this comes judgment. Galatians 6:7 teaches that we reap what we sow, but Ephesians 2:8–9 says we are saved by grace through faith, not by the cycle of karma. Christ died once for our sins (Hebrews 9:28). Test what you hear by Scripture, and talk with a trusted church leader or your pastor about it.",
+                Arrays.asList("📖 Open the Bible", "🙏 Open prayer support"));
+    }
+
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
     }
@@ -673,6 +687,7 @@ public class PerazimAiEngine {
         if (isManipulationQuery(query)) return "manipulation";
         if (isTranslationPolicyQuery(query)) return "translation-policy";
         if (isForgeryQuery(query)) return "forgery";
+        if (isReincarnationQuery(query)) return "reincarnation";
         if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query)) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
@@ -692,6 +707,7 @@ public class PerazimAiEngine {
             case "manipulation": return manipulationResponse();
             case "translation-policy": return translationPolicyResponse();
             case "forgery": return forgeryResponse();
+            case "reincarnation": return reincarnationResponse();
             case "individual-destiny": return AiResponse.plainText(org.perazimchurch.app.ai.library.NoGoZones.DESTINY_DECLINE, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
             case "sensitive": return sensitivePastoralResponse();
             case "human-decision": return humanDecisionResponse();
