@@ -62,6 +62,10 @@ public final class PreModel {
         }
         String doctrine = DoctrineLibrary.load(c).answerFor(question);
         if (doctrine != null) return new Decision("routed:doctrine-approved", doctrine);
+        if (org.perazimchurch.app.ai.library.IdentifyRefute.ENABLED) {
+            String refute = identifyRefute(c, question);
+            if (refute != null) return new Decision("routed:identify-refute", refute);
+        }
         KjvVerseText verses = KjvVerseText.load(c);
         if (table != null) {
             Decision verse = verseDecision(table, verses, question);
@@ -71,6 +75,25 @@ public final class PreModel {
         if (search != null) return search;
         NoGoZones.Zone zone = NoGoZones.match(question);
         if (zone != null) return new Decision("routed:no-go:" + zone.id, zone.decline);
+        return null;
+    }
+
+    /** Identify-and-refute answer for an approved false-doctrine topic, or null. Used only while the gate is on. */
+    static String identifyRefute(Context c, String question) {
+        try {
+            String id = org.perazimchurch.app.ai.library.IdentifyRefute.entryIdFor(question);
+            if (id == null) return null;
+            org.json.JSONObject root = new org.json.JSONObject(read(c, "ai/guide/comparative/comparative-kb.json"));
+            org.json.JSONArray entries = root.getJSONArray("entries");
+            for (int i = 0; i < entries.length(); i++) {
+                if (id.equals(entries.getJSONObject(i).optString("id"))) {
+                    return org.perazimchurch.app.ai.library.IdentifyRefute.answerFor(question, entries.getJSONObject(i),
+                            KjvVerseText.load(c));
+                }
+            }
+        } catch (Exception ignored) {
+            return null;
+        }
         return null;
     }
 
