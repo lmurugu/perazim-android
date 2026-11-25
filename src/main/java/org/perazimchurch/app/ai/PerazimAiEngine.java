@@ -397,7 +397,7 @@ public class PerazimAiEngine {
                 + "now, or go to the nearest police station or hospital, and ask for help with what happened. A doctor or clinic can also "
                 + "check your health and help you get support. Please tell a trusted person outside the church, such as a family member "
                 + "or friend, who can stay with you. You do not have to keep silent, and no one should ask you to forgive before you are "
-                + "ready or to keep it secret. Gender-based violence line 1195 (may not be current, so confirm it before you rely on it). "
+                + "ready or to stay quiet about it. Gender-based violence line 1195 (may not be current, so confirm it before you rely on it). "
                 + "This guide cannot investigate, promise confidentiality, or act for you.",
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }

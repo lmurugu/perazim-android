@@ -306,7 +306,8 @@ public final class ApprovedRoutes {
                 + "historian Tacitus wrote, in Annals 15.44 (Church and Brodribb translation): 'Christus, from whom the name had its origin, "
                 + "suffered the extreme penalty during the reign of Tiberius at the hands of one of our procurators, Pontius Pilatus.' That "
                 + "shows that Jesus was executed under Pilate. It does not by itself prove the resurrection. The resurrection rests on the "
-                + "apostolic testimony, which we present as testimony, not as a proof that compels belief.",
+                + "apostolic testimony, which we present as testimony, not as a proof that compels belief. I cannot research beyond the sources stored in "
+                + "this guide, so I cannot verify other historical claims about the resurrection for you.",
                 "1 Corinthians 15:4", "1 Corinthians 15:14"));
 
         r.add(new Route("early-church-witnesses",
