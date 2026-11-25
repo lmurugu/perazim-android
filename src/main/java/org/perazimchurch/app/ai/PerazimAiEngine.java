@@ -426,7 +426,7 @@ public class PerazimAiEngine {
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
             + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene)\\b|"
-            + "rogw|uchawi|mchawi|nimeroga|manabii|nabii|tiktok|youtube|gold dust|visible sign|false teacher|on tv|on television|preacher i saw|judas|keep sinning|unforgivable|place in heaven|salvaiton|salvtion|sin on purpose|aposttae|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
+            + "rogw|uchawi|mchawi|nimeroga|manabii|nabii|tiktok|youtube|gold dust|visible sign|false teacher|on tv|on television|preacher i saw|judas|keep sinning|unforgivable|place in heaven|salvaiton|salvtion|sin on purpose|aposttae|icons?|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
 
     public static AiResponse drugSafetyResponse() {
         return AiResponse.plainText(

@@ -488,7 +488,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("pope-head-of-church",
                 "pope|papal|papacy|vicar of christ",
-                "Scripture names Christ as the head of the Church (Ephesians 1:22; Colossians 1:18). We do not accept an earthly head over the whole Church. Roman Catholic teaching gives the Pope that role, and we test that claim by Scripture alone, not by tradition or office.",
+                "Scripture names Christ as the head of the Church (Ephesians 1:22; Colossians 1:18). We do not accept an earthly head over the whole Church. We test any claim of such a role by Scripture alone, not by tradition or office.",
                 "Ephesians 1:22", "Colossians 1:18"));
 
         r.add(new Route("icons-scripture",
