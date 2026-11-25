@@ -1110,6 +1110,9 @@ public class PerazimAiEngine {
         if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query) && !PERSEVERANCE_QUESTION.matcher(query).find()) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
+        // Other people's records, the guide's memory and recording questions, and chat deletion get the privacy reply
+        // (delegated by the coordinator, 2026-11-25), not the generic scope line.
+        if (isOtherPersonDataRequest(query)) return "privacy";
         // Live web or current-news searches are declined even though "search for" is a Bible cue (Levi, 2026-11-25).
         // A quoted word is still a KJV word search, so quotation marks keep it in scope.
         if (WEB_SEARCH_REQUEST.matcher(query).find() && !query.contains("'") && !query.contains("\"")) return "scope-refusal";
@@ -1125,6 +1128,7 @@ public class PerazimAiEngine {
     public static AiResponse preModelResponse(@NonNull String route, @Nullable String query) {
         switch (route) {
             case "crisis": return crisisResponse();
+            case "privacy": { AiResponse p = privacyRouteResponse(query); return p != null ? p : privacyResponse(); }
             case "crisis-denial": return crisisDenialResponse();
             case "crisis-literary": return crisisLiteraryResponse();
             case "violence-safeguarding": return violenceSafeguardingResponse();
