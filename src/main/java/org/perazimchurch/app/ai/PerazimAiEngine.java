@@ -782,7 +782,7 @@ public class PerazimAiEngine {
      */
     private static final Pattern REPORTED_SPEECH = Pattern.compile(
             "(?<![Ii] )\\b(?:texted|messaged|wrote|told|sent|posted|called|ameniambia|ananiambia|ananitumia|aliniandikia|aliniambia|"
-                    + "anasema|alisema|amesema|says|said|saying)\\b[^.!?\\n]*",
+                    + "anasema|alisema|amesema|says|said|saying)\\b[^.!?\\n]{0,200}",
             Pattern.CASE_INSENSITIVE);
     /** Help-seeking questions such as "what should I do" name the reporter but do not state their own risk. */
     private static final Pattern HELP_SEEKING = Pattern.compile(
@@ -806,7 +806,7 @@ public class PerazimAiEngine {
     static boolean isThirdPartyFraming(String n) {
         String s = n.replace('“', '"').replace('”', '"').replace('‘', '\'').replace('’', '\'');
         s = s.replaceAll("\"[^\"]*\"", " ");
-        s = s.replaceAll("(?:^|[\\s,(])'.*?'(?=[\\s.,!?)]|$)", " ");
+        s = s.replaceAll("(?:^|[\\s,(])'[^']{0,200}'(?=[\\s.,!?)]|$)", " ");
         boolean reported = REPORTED_SPEECH.matcher(s).find();
         s = REPORTED_SPEECH.matcher(s).replaceAll(" ");
         s = HELP_SEEKING.matcher(s).replaceAll(" ");

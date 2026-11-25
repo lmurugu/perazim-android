@@ -268,7 +268,7 @@ public final class PreModel {
     static Decision missingReference(ScriptureRangeTable table, String question) {
         Reference ref = reference(table, question);
         if (ref == null || ref.valid) return null;
-        String book = ref.label.replaceFirst("\\s+\\d+:\\d+(?:-\\d+)?$", "");
+        String book = ref.label.replaceFirst(" \\d{1,3}:\\d{1,3}(?:-\\d{1,3})?$", "");
         String text;
         if (ref.chapter > table.chapterCount(ref.bookNumber)) {
             text = book + " has " + table.chapterCount(ref.bookNumber) + " chapters, so there is no chapter " + ref.chapter

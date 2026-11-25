@@ -47,9 +47,9 @@ public final class ConversationalTurn {
                     + "who are you|how can you help|how do i use you|what can i ask)[ !.,?]*$");
     /** Complaints about a repeated or missed answer, matched on the whole message. */
     private static final Pattern META = Pattern.compile(
-            "^(?:why are you (?:repeating|saying the same)[^?]*|you (?:didn'?t|did not) (?:answer|respond)[^?]*|you'?re repeating[^?]*|"
-                    + "that'?s not (?:what|my)[^?]*|not what i asked|say it (?:another|a different|differently)(?: way)?|try again|"
-                    + "answer my question|stop repeating[^?]*|same (?:message|answer|reply|thing|response)|repeating the same[^?]*)[ !.,?]*$");
+            "^(?:why are you (?:repeating|saying the same)[^?]{0,200}|you (?:didn'?t|did not) (?:answer|respond)[^?]{0,200}|you'?re repeating[^?]{0,200}|"
+                    + "that'?s not (?:what|my)[^?]{0,200}|not what i asked|say it (?:another|a different|differently)(?: way)?|try again|"
+                    + "answer my question|stop repeating[^?]{0,200}|same (?:message|answer|reply|thing|response)|repeating the same[^?]{0,200})[ !.,?]*$");
     private static final Pattern MARRIAGE_INTENT = Pattern.compile(
             "\\b(?:want to (?:get )?marr(?:y|ied)|want to marry|going to (?:get )?marr(?:y|ied)|thinking (?:of|about) (?:getting )?marr(?:y|iage)|"
                     + "getting married|how (?:do|can) i (?:choose|find|know|pick)(?: a| the)? (?:husband|wife|spouse|partner)|"

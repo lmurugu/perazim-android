@@ -50,7 +50,7 @@ public final class ScriptureReferenceNormalizer {
     };
 
     private static final Pattern REFERENCE = Pattern.compile(
-            "(?i)(?<![\\p{L}\\p{N}])((?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,2})\\s*(\\d{1,3})\\s*(?:[:.]\\s*|\\s+)(\\d{1,3})(?![\\d])");
+            "(?i)(?<![\\p{L}\\p{N}])((?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,2})\\s*(\\d{1,3})(?:\\s*[:.]\\s*|\\s+)(\\d{1,3})(?![\\d])");
 
     private ScriptureReferenceNormalizer() {}
 
