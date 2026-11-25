@@ -749,6 +749,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
         // Safety routing is mode-independent: selecting Qwen or cloud mode must not
         // bypass the deterministic immediate-support response.
         // Two-step check: a vague exhaustion phrase gets the warm check; crisis wording or a yes or plan after it gets the full response.
+        AiResponse safetyFirst = PerazimAiEngine.safetyFirstResponse(query);
+        if (safetyFirst != null) {
+            localHistory.clear();
+            displayAiMessage(safetyFirst, "Safety guidance · on-device");
+            return;
+        }
         SoftSafety.Verdict safety = SoftSafety.judge(query);
         if (safety != SoftSafety.Verdict.NONE) {
             if (safety == SoftSafety.Verdict.CRISIS) localHistory.clear();

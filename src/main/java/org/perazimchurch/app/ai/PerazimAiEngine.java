@@ -122,6 +122,19 @@ public class PerazimAiEngine {
      * Processes a user query and returns a structured AI response with intent actions.
      */
     @NonNull
+    /**
+     * The one safety-first decision for every app entry point (guide dialog, engine, online relay, model refusal).
+     * It uses the round 39c routing: suicide, third-party suicide, abuse, both risks, denial and literary context.
+     * Returns null when no safety route applies, so the normal path continues.
+     */
+    @Nullable
+    public static AiResponse safetyFirstResponse(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return null;
+        String route = safetyRoute(query);
+        if (route == null || "topic-violence".equals(route)) return null;
+        return preModelResponse(route, query);
+    }
+
     public AiResponse processQuery(@Nullable String rawQuery) {
         if (rawQuery == null || rawQuery.trim().isEmpty()) {
             return getWelcomeResponse();
@@ -129,6 +142,9 @@ public class PerazimAiEngine {
 
         String q = rawQuery.trim().toLowerCase(Locale.US);
 
+        // 0a. Round 39c safety routing first, so abuse is never answered with the suicide-plan question.
+        AiResponse safetyFirst = safetyFirstResponse(rawQuery);
+        if (safetyFirst != null) return safetyFirst;
         // 0. CRISIS & PASTORAL CARE INTERVENTION
         // Two-step check first: vague exhaustion gets the warm check; crisis wording, or a yes or plan after it, gets the full response.
         SoftSafety.Verdict safety = SoftSafety.judge(rawQuery);
@@ -1012,6 +1028,8 @@ public class PerazimAiEngine {
     @Nullable
     public static AiResponse deterministicModelRefusal(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return null;
+        AiResponse safetyFirst = safetyFirstResponse(query);
+        if (safetyFirst != null) return safetyFirst;
         if (isCrisisQuery(query)) return crisisResponse();
         if (isSensitivePastoralDisclosure(query)) return sensitivePastoralResponse();
         if (isHumanDecisionQuery(query)) return humanDecisionResponse();

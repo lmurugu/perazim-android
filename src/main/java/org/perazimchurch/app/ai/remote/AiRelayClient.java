@@ -29,6 +29,11 @@ public final class AiRelayClient {
     public static void askQuestion(@NonNull Context context, @NonNull String question,
                                    @NonNull RelayCallback callback) {
         Context app = context.getApplicationContext();
+        org.perazimchurch.app.ai.AiResponse safetyFirst = PerazimAiEngine.safetyFirstResponse(question);
+        if (safetyFirst != null) {
+            MAIN.post(() -> callback.onError(safetyFirst.getMessageText()));
+            return;
+        }
         if (PerazimAiEngine.isCrisisQuery(question)) {
             MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
             return;
