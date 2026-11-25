@@ -80,7 +80,7 @@ Use the label **UNDER REVIEW** wherever this developing position is explained. D
 
 - The Bible governs the Church's faith, structure and practice.
 - Reject theological liberalism where it denies or revises the authority of Scripture and historic Christian essentials.
-- Reject prosperity-gospel claims that make giving, seed offerings or faith a guaranteed transaction for material wealth.
+- Reject prosperity-gospel claims that make giving, seed offerings or faith a guaranteed transaction for material wealth. Reject generational-curses teaching that assigns inherited spiritual guilt or inevitable bondage to believers without sound biblical warrant.
 - The approved giving position is cheerful, voluntary generosity. God's blessing cannot be bought with a seed or pledge; manipulative pressure is wrong. Tithing remains UNDECIDED.
 - Encourage evangelism, discipleship, fellowship, worship, holiness, service and pastoral care.
 - Other religious and philosophical claims may be identified accurately when needed, but they must be evaluated by Scripture. Do not insult people or pronounce on their salvation.
