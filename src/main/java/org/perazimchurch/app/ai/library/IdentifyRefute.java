@@ -42,18 +42,18 @@ public final class IdentifyRefute {
     /** Topic keywords mapped to an approved entry id and the name used in the answer. */
     private static final String[][] TOPICS = {
             {"jehovah|witness", "jesus_created", "Jehovah's Witnesses",
-                    "Scripture says the Word was God, that all things were made through Him, and that He is worshipped by the angels, so the Son is not a created being (John 1:1, 3; Colossians 1:16; Hebrews 1:6)."},
+                    "Scripture says the Word is God, and that all things were made through Him (John 1:1, 3). It also calls the Son God, says that His throne is for ever, and says that He laid the foundations of the earth (Hebrews 1:8, 10). So the Son is not a created being."},
             {"latter.day|mormon|lds", "eternal_progression", "the Latter-day Saint church",
-                    "Scripture says there is one God, before and after whom none was formed (Isaiah 43:10; Isaiah 44:6), and that eternal life is God's gift through Jesus Christ, not something we earn (Romans 6:23). The atoning death of Christ is the ground of our acceptance with God."},
+                    "Latter-day Saint teaching distinguishes salvation from exaltation, and it grounds both in the Atonement of Jesus Christ. We do not say that they reject the Atonement. The specific disagreement is about God Himself: Scripture does not teach that a created person may become God. The LORD alone is God, and no god was formed before Him or after Him (Isaiah 43:10; Isaiah 44:6; 1 Timothy 6:15–16). Salvation is a gift of grace through faith, not of works, and good works are its fruit (Ephesians 2:8–10; Romans 6:23). We test their teaching about God and exaltation by Scripture."},
             {"purgatory", "purgatory", "the Catholic Church",
-                    "Our biblical conclusion is that Christ offered one sacrifice for sins for ever, so that the blood of Christ cleanses us from all sin (Hebrews 10:14; 1 John 1:7). To depart and be with Christ is far better, and to be absent from the body is to be present with the Lord (Philippians 1:23; 2 Corinthians 5:6–8)."},
-            {"\\bmary\\b|mariology|mother of god", "mary_mediator", "the Catholic Church",
-                    "Scripture names Christ as the one mediator between God and people (1 Timothy 2:5), who is able to save completely those who come to God through Him (Hebrews 7:25), and says there is no other name by which we must be saved (Acts 4:12). We do not deny that Christians may pray for one another (1 Timothy 2:1), but Christ alone is the mediator of grace."},
+                    "Our biblical conclusion is that Christ offered one sacrifice for sins for ever (Hebrews 10:10–14), and that His blood cleanses us from all sin (1 John 1:7). The believer's hope after death is to be with Christ, as Jesus told the thief (Luke 23:43). Paul says that to depart and be with Christ is far better (Philippians 1:23; 2 Corinthians 5:6–8). We find no biblical teaching of a further purifying state after death."},
+            {"mary.{0,60}(?:mediat|intercess|pray|invoc|saviour|savior|co-?redemp)|(?:mediat|intercess|pray|invoc)\\w*.{0,60}mary|mediatrix", "mary_mediator", "the Catholic Church",
+                    "Scripture names Christ as the one mediator between God and people, and Paul commands prayer for all people in that light (1 Timothy 2:1-6). Christ alone is able to save completely those who come to God through Him (Hebrews 7:25), and there is no other name by which we must be saved (Acts 4:12). Scripture does not command the invocation of Mary, and it directs believers to come to the Father through Christ. We do not deny that Christians may pray for one another (1 Timothy 2:1)."},
     };
     /** Topic-specific teaching line, used where the approved summary is wider than the question (Levi, 2026-11-25). */
     private static final java.util.Map<String, String> TEACHING_OVERRIDE = new java.util.HashMap<>();
     static {
-        TEACHING_OVERRIDE.put("mary_mediator", "Catholic teaching presents Mary as an additional mediator of grace, alongside Christ. The Catechism uses the title Mediatrix for her.");
+        TEACHING_OVERRIDE.put("mary_mediator", "Catholic teaching gives Mary the title Mediatrix and describes her role as dependent on Christ's unique mediation, not as a rival to it. Catholic teaching does not present Mary as equal to Christ or as an independent saviour.");
     }
     private IdentifyRefute() {}
 

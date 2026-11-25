@@ -174,6 +174,63 @@ public final class ApprovedRoutes {
                 + "the title \u201cthe first person to preach the gospel\u201d.",
                 "Mark 1:14", "Luke 2:10"));
 
+        r.add(new Route("creation-points-to-god",
+                "does god exist|god exists|god.s existence|existence of god|is there a god|prove (?:that )?god|proof (?:of|for) god|evidence for god",
+                "The Bible says that creation points beyond itself to its Creator. The heavens declare the glory of God, and His "
+                + "eternal power is clearly seen in what He has made (Psalm 19:1; Romans 1:20). Human moral awareness also points to a "
+                + "moral Lawgiver: the law is written on people's hearts, and their conscience bears witness (Romans 2:14–15).\n\n"
+                + "This is a reasoned case, not a claim that every question is settled or that every person will be compelled to believe. "
+                + "Hebrews 11:6 shows that faith is necessary to come to God: the one who comes must believe that He is, and that He is a "
+                + "rewarder of those who seek Him. It explains the Christian response; it is not a proof for a sceptic on its own.",
+                "Romans 1:20", "Psalm 19:1"));
+
+        r.add(new Route("christians-disagree",
+                "christians? (?:disagree|disagreement|disagreements)|disagree about doctrine|disagreements? among christians|"
+                + "christianity is false because|denominations? disagree",
+                "Disagreement by itself does not prove Christianity false. Scripture calls for unity around the central truths of the "
+                + "gospel: one Lord, one faith, one baptism (Ephesians 4:5), and the gospel that Christ died for our sins and rose again "
+                + "(1 Corinthians 15:3–4). Paul also says that even an angel from heaven must not be believed if he preaches another "
+                + "gospel (Galatians 1:8).\n\n"
+                + "So each disagreement must be examined by Scripture. Some concern secondary matters, and some touch the central truths. "
+                + "Not every disagreement is harmless, and not all churches teach the same thing. The answer is to test what is taught, "
+                + "not to give up on the Bible.",
+                "Ephesians 4:5", "Galatians 1:8"));
+
+        r.add(new Route("problem-of-evil",
+                "why does evil exist|problem of evil|all-powerful and all-loving|all powerful and all loving|if god is all.powerful|"
+                + "why does god allow (?:evil|suffering)|why is there (?:evil|suffering)",
+                "God does not commit evil, and He does not call evil good. Scripture traces the entrance of sin to the first human choice "
+                + "to rebel against God's word (Genesis 3). Human beings remain responsible for their evil choices, and Scripture does not "
+                + "excuse them (James 1:13). The men who put Jesus to death were responsible, even though God carried out His saving "
+                + "purpose through the cross (Acts 2:22–24).\n\n"
+                + "God can work good through hard things, as Joseph saw (Genesis 50:20), and Romans 8:28 is a promise to those who love "
+                + "God, not a claim that every event is good in itself. Creation waits for its redemption (Romans 8:18–25), and God will "
+                + "judge all wrong and put all things right (Acts 17:31; Revelation 21:4).\n\n"
+                + "We do not know why God permits every particular suffering, and we will not give a glib answer to someone who is "
+                + "grieving. The cross and future justice are our hope.",
+                "James 1:13", "Revelation 21:4"));
+
+        r.add(new Route("bible-contradictions",
+                "contradicts? itself|contradict each other|bible contradict|contradictions? in (?:the )?bible|bible.{0,30}contradict|"
+                + "circular reasoning",
+                "We take the claim seriously. The Bible claims to be God's true word (Psalm 119:160; John 17:17). Simply quoting that claim "
+                + "does not answer a specific alleged contradiction, so we examine each example on its own terms. The method is: identify "
+                + "the exact passages; read their context; check who is speaking and to whom; distinguish different events, times and "
+                + "perspectives; and check translation or manuscript questions where they apply.\n\n"
+                + "Proverbs 26:4–5 looks like a contradiction until we see that the two sayings answer two different situations. "
+                + "If you name two passages, we will examine that specific example together, in its context.",
+                "Proverbs 26:4", "Proverbs 26:5"));
+
+        r.add(new Route("faith-and-evidence",
+                "faith .{0,30}without evidence|believing without evidence|blind faith|faith (?:and|versus|vs\\.?) evidence",
+                "Biblical faith is trust in God based on what He has said and done. It is not pretending to know something without any "
+                + "reason. Hebrews 11:1 says that faith is the substance of things hoped for, the evidence of things not seen. The apostles "
+                + "wrote so that people would believe: John 20:31 says these things are written that you might believe that Jesus is the "
+                + "Christ, the Son of God, and that believing you might have life through His name.\n\n"
+                + "Faith includes trust and commitment, not merely agreeing that a fact is true. We do not claim that every spiritual "
+                + "truth can be shown in a laboratory.",
+                "Hebrews 11:1", "John 20:31"));
+
         r.add(new Route("nicene-creed-spirit",
                 "nicene.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}nicene|creed.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}creed",
                 "Yes. The Nicene-Constantinopolitan Creed of 381 speaks of the Holy Spirit. In the creed's own words: \""

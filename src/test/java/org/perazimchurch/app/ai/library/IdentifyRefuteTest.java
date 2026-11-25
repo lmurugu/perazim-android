@@ -37,7 +37,8 @@ public class IdentifyRefuteTest {
         assertFalse(answer.contains("in its own words"));
         assertFalse(answer.contains("Nicene"));
         assertTrue(answer.contains("John 1:1: “In the beginning was the Word"));
-        assertTrue(answer.contains("Colossians 1:16:"));
+        assertTrue(answer.contains("Hebrews 1:8:"));
+        assertTrue(answer.contains("Hebrews 1:10:"));
         assertTrue(answer.contains("John 1:3:"));
         assertTrue(answer.contains(IdentifyRefute.CLOSING));
     }
@@ -46,7 +47,7 @@ public class IdentifyRefuteTest {
     public void answerNeverNamesTheGuideOrPerazim() throws Exception {
         for (String id : new String[] {"jesus_created", "eternal_progression", "purgatory", "mary_mediator"}) {
             String q = id.equals("jesus_created") ? "Jehovah's Witnesses"
-                    : id.equals("eternal_progression") ? "Latter-day Saints" : id.equals("purgatory") ? "Catholic purgatory" : "Catholic Mary";
+                    : id.equals("eternal_progression") ? "Latter-day Saints" : id.equals("purgatory") ? "Catholic purgatory" : "Catholic teaching on Mary's mediation";
             String answer = IdentifyRefute.answerFor(q, entry(id), kjv());
             assertNotNull(id, answer);
             assertFalse(id, answer.toLowerCase().contains("guide"));

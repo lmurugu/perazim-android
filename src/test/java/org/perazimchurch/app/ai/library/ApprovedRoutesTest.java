@@ -124,12 +124,14 @@ public class ApprovedRoutesTest {
 
     @Test
     public void marySummaryIsNarrowedToAdditionalMediatorOfGrace() throws Exception {
-        String answer = IdentifyRefute.answerFor("What do Catholics teach about Mary?", entry("mary_mediator"), kjv());
+        String answer = IdentifyRefute.answerFor("Do Catholics teach that Mary is a mediator?", entry("mary_mediator"), kjv());
         assertNotNull(answer);
-        assertTrue(answer.contains("additional mediator of grace"));
+        assertTrue(answer.contains("dependent on Christ's unique mediation"));
+        assertFalse(answer.contains("additional mediator"));
         assertTrue(answer.contains("1 Timothy 2:1:"));
         assertTrue(answer.contains("Hebrews 7:25:"));
         assertFalse(answer.contains("Mother of God"));
+        assertNull(IdentifyRefute.answerFor("What do Catholics teach about Mary's birth?", entry("mary_mediator"), kjv()));
     }
 
     @Test
