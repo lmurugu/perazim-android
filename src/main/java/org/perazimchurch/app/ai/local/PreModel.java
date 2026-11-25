@@ -679,8 +679,9 @@ public final class PreModel {
         Decision found = table == null ? null : verseDecision(table, kv, question);
         if (found == null) found = phraseFirstDecision(kv, question);
         if (found != null) return found;
+        // Unquoted English word searches ("Where is the word grace found?") must reach the word search, not stop here: the
+        // early return that skipped English questions sent them to the no-source reply on the phone (2026-11-25 regression).
         String english = englishCues(normalisedQuestion(question));
-        if (english.equals(normalisedQuestion(question))) return null;
         Decision about = verseAboutDecision(kv, english);
         return about != null ? about : wordSearchDecision(kv, english);
     }
