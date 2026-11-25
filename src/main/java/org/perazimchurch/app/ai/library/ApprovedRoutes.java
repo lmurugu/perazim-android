@@ -231,6 +231,28 @@ public final class ApprovedRoutes {
                 + "truth can be shown in a laboratory.",
                 "Hebrews 11:1", "John 20:31"));
 
+        r.add(new Route("prophets-today",
+                "prophets? (?:still|today|operating|exist)|are there (?:still )?prophets|prophecy today|prophesy today|"
+                + "still prophe|prophets in the church|gift of prophecy",
+                "We believe the gift of prophecy continues in the Church today. It is given by the Holy Spirit to strengthen, encourage "
+                + "and comfort the Church (1 Corinthians 14:3). Believers are not to despise prophecies, but to test everything and hold "
+                + "fast what is good (1 Thessalonians 5:21). In the gathered church, prophetic messages are weighed and judged (1 Corinthians 14:29).\n\n"
+                + "A prophecy can never overrule, add to or correct Scripture. Not everyone who calls himself a prophet is exercising the "
+                + "gift, and we do not name any contemporary person as a prophet without an authorised, evidence-based church decision. "
+                + "Not every Christian is called to prophesy.",
+                "1 Corinthians 14:3", "1 Thessalonians 5:21"));
+
+        r.add(new Route("healing-and-faith",
+                "^(?!.*atonement)(?!.*\\b(?:medic|doctor|hospital|hiv|cancer|diabet|tablet|drug|clinic|treatment|surgery|pain)).*"
+                + "(?:enough faith|faith .{0,30}heal|heal.{0,30}faith|pray for (?:the )?sick|healed .{0,30}faith)",
+                "Christians should pray for the sick and trust God's power to heal. James tells the church to call for the elders to pray "
+                + "over a sick person, anointing with oil in the name of the Lord (James 5:14). Faith is not a price, payment or force that "
+                + "guarantees a requested physical healing. Paul asked the Lord three times to remove an affliction, and the Lord answered "
+                + "that His grace was sufficient for him (2 Corinthians 12:7–9). The passage does not name that affliction.\n\n"
+                + "God's answer is not controlled by the amount of a person's faith, and a person's illness does not prove that they lack "
+                + "faith. We pray in faith, and we trust God's wise answer.",
+                "James 5:14", "2 Corinthians 12:9"));
+
         r.add(new Route("nicene-creed-spirit",
                 "nicene.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}nicene|creed.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}creed",
                 "Yes. The Nicene-Constantinopolitan Creed of 381 speaks of the Holy Spirit. In the creed's own words: \""
