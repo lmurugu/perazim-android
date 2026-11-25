@@ -335,18 +335,19 @@ public final class ApprovedRoutes {
 
         r.add(new Route("medication-and-faith",
                 "antidepress|medication|medicine|tablets",
-                "I cannot judge your medicine from Scripture alone, and I cannot say what is a sin for you personally. Please talk with your "
-                + "doctor about your medicine and ask them to explain what it does. Do not stop or start a medicine without your doctor. Pray, "
-                + "and talk with your pastor or a trusted church leader too. Scripture calls us to seek wise counsel (Proverbs 11:14; "
-                + "Proverbs 15:22).",
+                "Please do not stop or change your medicine without the doctor or clinic who prescribed it. Talk with "
+                + "them about what it does, about any side effects, and about any concern you have. I cannot judge your "
+                + "medicine from Scripture alone, and I cannot say what is a sin for you personally. Pray, and talk "
+                + "with your pastor or a trusted church leader too. Scripture calls us to seek wise counsel (Proverbs "
+                + "11:14; Proverbs 15:22).",
                 "Proverbs 11:14", "Proverbs 15:22"));
 
         r.add(new Route("cancer-treatment-and-faith",
                 "chemo|cancer|surgery|doctors? (?:say|says|said)",
-                "Please keep following your doctors' plan until you have spoken with them. Trusting God and seeking medical care are not "
-                + "opposed; Jesus Himself said that the sick need a physician (Luke 5:31). Talk with your doctor, your family and your pastor "
-                + "together, and pray for wisdom and peace as you decide.",
-                "Luke 5:31", "Proverbs 11:14"));
+                "Please keep following your doctors' plan until you have spoken with them. Trusting God and seeking "
+                + "medical care are not opposed. Talk with your doctor, your family and your pastor together, and ask "
+                + "God for wisdom and peace as you decide (James 1:5).",
+                "Proverbs 11:14", "James 1:5"));
 
         r.add(new Route("obedience-and-the-bible",
                 "pastor says.{0,80}(?:obey|question)|questioning (?:him|the pastor|my pastor) is questioning god|questioning him is questioning god|obey him even when",
@@ -406,17 +407,30 @@ public final class ApprovedRoutes {
 
         r.add(new Route("remove-pastor",
                 "remove (?:a |the |our )?pastor|dismiss (?:a |the )?pastor|pastor from office|congregation remove|remove .{0,20}from office",
-                "Scripture gives the church a real role in caring for its leaders and in dealing with wrongdoing. Matthew 18:15–16 teaches patient, careful steps with witnesses, and Acts 6:3 shows that church leaders should be men of good report. The church's own constitution and leaders' process decides how this is done, and this guide cannot give a verdict on any leader. Please talk with the church office and a trusted church leader.",
+                "Scripture gives the church a real role in caring for its leaders and in dealing with wrongdoing. "
+                + "Matthew 18:15–16 describes careful steps, and Acts 6:3 shows that church leaders should be men of "
+                + "good report. Accountability and discipline follow the church's own constitution and proper "
+                + "procedures, and this guide cannot give a verdict on any leader. Please talk with the church office "
+                + "and a trusted church leader about the right process.",
                 "Matthew 18:15", "Acts 6:3"));
 
         r.add(new Route("accused-leader-abuse",
                 "accused of abuse|leader who is accused|leader .{0,40}accused|handle a leader",
-                "A church should take an accusation of abuse seriously. Scripture calls for truth, care for the person who was harmed, and a careful process with witnesses (1 Timothy 5:19; Matthew 18:16). The person harmed should have a trusted adult with them, and the matter should go to the police and the proper authorities.",
+                "Your safety comes first. If anyone is being abused or is in danger, go to a safe place and call 999 "
+                + "or 112 now, or report to the police or the appropriate authorities. You do not have to confront the "
+                + "alleged abuser, and no one may require two witnesses before you seek protection. Get support from a "
+                + "trusted adult or an independent counsellor. Church leaders should respond with truth and care for "
+                + "the person who was harmed, and internal church process must never delay safety or reporting. "
+                + "Scripture calls for truth and a careful process (1 Timothy 5:19; Matthew 18:16), but Matthew 18 is "
+                + "for restoring a brother in love and never exposes a victim to further harm.",
                 "1 Timothy 5:19", "Matthew 18:16"));
 
         r.add(new Route("which-leaders-trust",
                 "which (?:church )?leaders|can i trust|which pastors|who can i trust",
-                "Only God knows hearts and judges them, so I will not name or judge any leader. Test every leader by the Scriptures and by their fruit (Matthew 7:16; 1 John 4:1). Look for leaders who live openly, handle money honestly and accept accountability, and talk with a trusted church leader or the church office before you decide.",
+                "I will not name or judge any leader, because only God knows hearts. You can evaluate public teaching "
+                + "and observable conduct by the Scriptures: does the teaching agree with the Bible, and does the "
+                + "leader live openly, handle money honestly and accept accountability (Matthew 7:16; 1 John 4:1). Talk "
+                + "with a trusted church leader or the church office before you decide.",
                 "Matthew 7:16", "1 John 4:1"));
 
         r.add(new Route("false-teacher-check",
@@ -431,7 +445,13 @@ public final class ApprovedRoutes {
 
         r.add(new Route("politics-and-voting",
                 " vote|voting|candidate|political part|endorse|politic",
-                "This guide does not tell anyone who to vote for. Christians may hold different views on candidates and parties, and each person must follow their own conscience before God. Scripture calls us to pray for leaders (1 Timothy 2:1–2), to seek justice and honesty (Micah 6:8), and to ask God for wisdom (James 1:5). Please test each candidate by those standards, and talk with your pastor about how to honour God in your choice.",
+                "This guide does not endorse any candidate, party or political view. Christians may hold different "
+                + "views on candidates and parties, and each person must follow their own conscience before God. "
+                + "Scripture gives principles for every choice: pray for leaders and for peace (1 Timothy 2:1–2), act "
+                + "justly and love mercy (Micah 6:8), and ask God for wisdom when you need it (James 1:5). Scripture "
+                + "also condemns corruption and dishonest gain, and calls us to treat every person fairly, whatever "
+                + "their tribe. Please test each candidate by those standards, and talk with your pastor about how to "
+                + "honour God in your choice.",
                 "1 Timothy 2:1", "Micah 6:8"));
 
         r.add(new Route("welcome-new-believer",
@@ -439,10 +459,21 @@ public final class ApprovedRoutes {
                 "Karibu sana! Welcome, and we rejoice with you. The Bible says that if you confess with your mouth that Jesus is Lord, and believe in your heart that God raised Him from the dead, you shall be saved (Romans 10:9). Whoever calls upon the name of the Lord shall be saved (Romans 10:13). Take time to pray and thank God, and ask Him for His peace. Please talk with a pastor or a trusted church leader about baptism and how to grow in your new faith.",
                 "Romans 10:9", "Romans 10:13"));
 
+        r.add(new Route("thanks-help",
+                "kumshukuru|nimepata job|i got a job|found a job|got the job",
+                "Welcome, and thank you for sharing this with God. Thank God for your new job, and give thanks in "
+                + "everything (1 Thessalonians 5:18). Thanksgiving is a way of trusting God with what He has done and "
+                + "with what comes next (Philippians 4:6). Your pastor or a trusted church leader would be glad to "
+                + "rejoice with you as well.",
+                "1 Thessalonians 5:18", "Philippians 4:6"));
+
         r.add(new Route("thanks-and-prayer-help",
-                "kumshukuru|nimepata job|how do i pray|how to pray|help me pray|what to say to god|heart is heavy|jinsi ya kuomba",
-                "Welcome, and thank you for bringing this to God. Thank God for your new job. Pray with thanksgiving, and tell God what is on your heart (Philippians 4:6). God's peace will guard your heart and mind (Philippians 4:7). Scripture says we can pour out our hearts to God (Psalms 62:8), and the Holy Spirit helps us when we do not know what to say (Romans 8:26). A trusted church leader or your pastor can pray with you as well.",
-                "Philippians 4:6", "Psalms 62:8"));
+                "how do i pray|how to pray|help me pray|what to say to god|heart is heavy|jinsi ya kuomba",
+                "You can pour out your heart to God in plain words, and He hears you. Scripture says we can pour out "
+                + "our hearts to God (Psalms 62:8), and the Holy Spirit helps us when we do not know what to say "
+                + "(Romans 8:26). Tell God what is on your heart, and ask Him for peace. A trusted church leader or "
+                + "your pastor can pray with you as well.",
+                "Psalms 62:8", "Romans 8:26"));
 
         r.add(new Route("bible-text-request",
                 "kitabu cha|sura ya|zaburi|mathayo",
@@ -466,9 +497,11 @@ public final class ApprovedRoutes {
 
         r.add(new Route("leadership-appointment",
                 "approve me|join the leadership|join (?:the )?church leadership|leadership team|allowed to join",
-                "I cannot approve anyone for church leadership. Leadership appointments are decided by the church's leaders through the church "
-                + "office, and the Bishop's process is the right route. Please speak with the church office or your pastor about your interest in "
-                + "serving. Scripture shows that church leaders are chosen with care and prayer (Acts 6:3), so bring your desire to God in prayer too.",
+                "I cannot approve anyone for church leadership, and this guide cannot approve anyone. Leadership "
+                + "appointments follow the church's established process through the church office and the church's "
+                + "leaders. Please speak with the church office or your pastor about your interest in serving. "
+                + "Scripture shows that church leaders are chosen with care and prayer (Acts 6:3; 1 Timothy 3:10), so "
+                + "bring your desire to God in prayer too.",
                 "Acts 6:3", "1 Timothy 3:10"));
 
         r.add(new Route("pope-head-of-church",
@@ -478,38 +511,52 @@ public final class ApprovedRoutes {
 
         r.add(new Route("icons-scripture",
                 "icon|icons|orthodox teaching on icons",
-                "Scripture forbids making and worshipping images for worship: 'Thou shalt not make unto thee any graven image' (Exodus 20:4), which is the second commandment. God is spirit, and they that worship Him must worship Him in spirit and in truth (John 4:24). We do not use images in worship, and we test any teaching on icons by Scripture alone.",
-                "Exodus 20:4", "John 4:24"));
+                "Read together, Exodus 20:4 and Exodus 20:5 forbid making an image to bow down to and worship (Exodus "
+                + "20:4–5). God is spirit, and those who worship Him must worship in spirit and in truth (John 4:24). "
+                + "We reject the veneration of images as a way of worship, and we do not hold that every picture or "
+                + "image is forbidden. We test any teaching on icons by Scripture, and please talk with your pastor "
+                + "about how it applies.",
+                "Exodus 20:4", "Exodus 20:5"));
 
         r.add(new Route("eastern-church-judge",
                 "eastern church|eastern orthodox|orthodox church|better than the protestant|better than the catholic",
-                "We do not rank churches or judge which is better before God. Only Christ, the head of the Church, judges (Colossians 1:18). The right question is whether a teaching agrees with Scripture, and the Bereans tested what they heard by the Scriptures (Acts 17:11). Please talk this through with a trusted church leader.",
-                "Colossians 1:18", "Acts 17:11"));
+                "We do not rank churches, and we do not judge anyone's eternal destiny. Scripture says the Father has "
+                + "committed all judgment to the Son (John 5:22). The right question is whether an official teaching "
+                + "agrees with Scripture, and the Bereans tested what they heard by the Scriptures (Acts 17:11). We can "
+                + "evaluate the official doctrine of any church against the Bible, while leaving the judgement of "
+                + "individual people to God. Please talk this through with a trusted church leader.",
+                "John 5:22", "Acts 17:11"));
 
         r.add(new Route("apocrypha-books",
                 "apocrypha|deuterocanon|catholic bible|more books|tobit|maccabees|sirach|judith|baruch",
-                "The Protestant Bible has 66 books: 39 in the Old Testament and 27 in the New. The books called the Apocrypha or deuterocanonical books, including Tobit, Judith, Wisdom, Sirach, Baruch and 1 and 2 Maccabees, are not part of the 66-book canon we hold. Scripture closes with a warning not to add to God's words (Revelation 22:18), and Deuteronomy 4:2 says the same. Those books are historically interesting, but we test the canon by Scripture itself.",
-                "Revelation 22:18", "Deuteronomy 4:2"));
+                "The Protestant Bible has 66 books: 39 in the Old Testament and 27 in the New. The Apocrypha and "
+                + "deuterocanonical books, such as Tobit, Judith, Wisdom, Sirach, Baruch and 1 and 2 Maccabees, are not "
+                + "part of the 66-book canon we hold. The reasons are historical as well as biblical. The Old Testament "
+                + "was received by the Jewish community to which God entrusted His oracles (Romans 3:2), and Jesus "
+                + "pointed to the Law, the Prophets and the Psalms as the Scriptures that testify of Him (Luke 24:44). "
+                + "Those books can be read for history, but we test the canon by Scripture itself.",
+                "Romans 3:2", "Luke 24:44"));
 
         r.add(new Route("greeting-only",
                 "^(?:hi|hello|hey|good morning|good afternoon|good evening|habari|hujambo)(?:[ ,!.]+(?:good morning|good afternoon|good evening|there|friend))?[ !.]*$",
-                "Good morning! Welcome. I can help with the Bible, prayer, church information and the faith questions you bring. What would you like to know? We can start with a short passage: 'This is the day which the LORD hath made; we will rejoice and be glad in it' (Psalms 118:24).",
-                "Psalms 118:24", "Psalms 118:24"));
+                "Good morning! Welcome. I can help with the Bible, prayer, church information and the faith questions you bring. What would you like to know? We can start with a short passage: 'This is the day which the LORD hath made; we will rejoice and be glad in it' (Psalms 118:24)."));
 
         r.add(new Route("campuses-unverified",
                 "campus|campuses",
-                "I do not have a verified list of Perazim campuses in this guide, so I cannot confirm them. The approved channels for this are the church office and the church's own published information in the app. Please contact the church office for the current campuses and service times.",
-                "Psalms 118:24", "Psalms 118:24"));
+                "I do not have a verified list of Perazim campuses in this guide, so I cannot confirm them. The approved channels for this are the church office and the church's own published information in the app. Please contact the church office for the current campuses and service times."));
 
         r.add(new Route("giving-options-app",
                 "giving options|ways to give|how to give|giving in the app|options in the app",
-                "Giving options are shown in the app's giving section, and the church publishes its giving channels. Gifts should go only through published channels, such as M-Pesa Paybill, and you can confirm the current details with the church office. Please never give money to a person who asks for it privately.",
-                "Psalms 118:24", "Psalms 118:24"));
+                "Giving options are shown in the app's giving section, and the church publishes its giving channels. Gifts should go only through published channels, such as M-Pesa Paybill, and you can confirm the current details with the church office. Please never give money to a person who asks for it privately."));
 
         r.add(new Route("god-not-a-man",
                 "god was once a man|god was a man|once a man|became god|become god",
-                "Scripture says plainly: 'God is not a man, that he should lie' (Numbers 23:19). God is not a man who became God. We test every teaching about God by Scripture alone, and we do not accept a later teaching that adds to what God has revealed.",
-                "Numbers 23:19", "Malachi 3:6"));
+                "Scripture is clear that God is not a man who could become God. Before Him no god was formed, and "
+                + "after Him there will be none (Isaiah 43:10). He is the first and the last, and there is no God "
+                + "beside Him (Isaiah 44:6–8). He is God from everlasting to everlasting (Psalms 90:2). We test every "
+                + "teaching about God by Scripture alone, and we do not accept a later teaching that adds to what God "
+                + "has revealed.",
+                "Isaiah 43:10", "Psalms 90:2"));
 
         r.add(new Route("archangel-michael-jesus",
                 "archangel|jude 9|jesus is michael|jesus is the archangel",
@@ -518,8 +565,13 @@ public final class ApprovedRoutes {
 
         r.add(new Route("jesus-is-the-father",
                 "jesus is the father|jesus the father|is jesus the father",
-                "Scripture distinguishes the Father and the Son while confessing one God. Jesus said: 'my Father is greater than I' (John 14:28), and He also said: 'I and my Father are one' (John 10:30). The Church confesses one God, with the Father, the Son and the Holy Spirit, as the Nicene Creed of 381 expresses it. Please test this with your pastor and the Bible passages in context.",
-                "John 14:28", "John 10:30"));
+                "Scripture distinguishes the Father and the Son while confessing one God. At the baptism of Jesus the "
+                + "Father spoke from heaven, the Son was baptised, and the Holy Spirit descended, so the three persons "
+                + "are seen together (Matthew 3:16–17). Jesus said that He and the Father are one (John 10:30). That "
+                + "oneness is the unity of the one God, not the erasing of the distinction between the Father and the "
+                + "Son. The Church confesses one God, Father, Son and Holy Spirit, as the Nicene Creed of 381 expresses "
+                + "it. Please test this with your pastor and the Bible passages in context.",
+                "Matthew 3:17", "John 10:30"));
 
         r.add(new Route("trinity-not-pagan",
                 "trinity.{0,60}pagan|pagan.{0,60}trinity|invented by the church|trinity .{0,30}invented",
@@ -553,33 +605,42 @@ public final class ApprovedRoutes {
 
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",
-                "I'm sorry, this is very hard news. Please see a doctor or clinic soon for care and treatment, and they can explain your "
-                + "health and how to protect the people you love. You do not have to decide alone. Please talk with your pastor or a trusted church "
-                + "leader, and with a counsellor, about how and when to tell your family. Scripture calls us to honesty and to care for one "
-                + "another in love (Ephesians 4:15; Ephesians 5:25).",
+                "I'm sorry, this is very hard news. Please see a doctor or clinic soon for care and treatment. Your "
+                + "health and your privacy matter. No one should pressure you to tell your whole family in order to "
+                + "prove your honesty. Whether and when to tell others is your decision, and a qualified healthcare "
+                + "professional or counsellor can help you plan a safe and appropriate disclosure, especially where "
+                + "another person's health may be affected. Please talk with your pastor or a trusted church leader as "
+                + "well. Scripture calls us to honesty and to care for one another in love (Ephesians 4:15; Ephesians "
+                + "5:25).",
                 "Ephesians 4:15", "Ephesians 5:25"));
 
         r.add(new Route("depression-and-faith",
                 "depress",
-                "Scripture does not teach that depression is simply a lack of faith. Elijah felt deep despair, and God cared for him "
-                + "(1 Kings 19:4–8). The psalmist wrote honestly about his sorrow, and he still called on God (Psalms 42:5). Please talk with a "
-                + "doctor or clinic about how you are feeling, and with your pastor or a trusted church leader. You are not alone in this.",
+                "Scripture does not teach that depression is simply a lack of faith. Elijah felt deep despair, and "
+                + "God cared for him (1 Kings 19:4–8). The psalmist wrote honestly about his sorrow, and he still "
+                + "called on God (Psalms 42:5). Please talk with a doctor or clinic about how you are feeling, and with "
+                + "your pastor or a trusted church leader. You are not alone in this. If you ever think about ending "
+                + "your life, reach out to someone right away and call 999 or 112 now.",
                 "1 Kings 19:4", "Psalms 42:5"));
 
         r.add(new Route("unanswered-prayer-and-faith",
                 "hasn't answered|hasn't answered me|not answered|haven't answered|feel like a failure|feel like i am a failure|seems so strong|hayajibiwi|hajanijibu|hajajibu|maombi yangu",
-                "God hears your prayers, and waiting is not the same as being forgotten. The Lord is near to those who call on Him "
-                + "(Psalms 145:18). Your faith is not measured by how strong other people seem, because God's grace is sufficient for you "
-                + "(2 Corinthians 12:9). Keep bringing your requests to God in prayer, and talk with your pastor, your cell leader or a "
-                + "trusted church leader about how you are feeling.",
+                "God hears your prayers, and waiting is not the same as being forgotten. The Lord is near to those "
+                + "who call on Him (Psalms 145:18). The Bible does not promise that God will give the particular answer "
+                + "we ask for, or on our timetable, but His grace is sufficient for you (2 Corinthians 12:9). Keep "
+                + "bringing your requests to God in prayer, and talk with your pastor, your cell leader or a trusted "
+                + "church leader about how you are feeling.",
                 "Psalms 145:18", "2 Corinthians 12:9"));
 
         r.add(new Route("witchcraft-fear-swahili",
                 "nimerogwa|rogwa|nimeroga|uchawi|mchawi",
-                "I'm sorry you are so worried. Scripture teaches that Jesus has power over all evil, and that the one who is in us is "
-                + "greater than the one who is in the world (Colossians 2:15; 1 John 4:4). Pray in the name of Jesus, and tell a trusted "
-                + "pastor or church leader what has been happening. If the fear is affecting your health or your sleep, please see a doctor "
-                + "or clinic too. I can answer in English first.",
+                "I'm sorry you are so worried. Scripture teaches that Jesus has power over all evil, and that the one "
+                + "who is in us is greater than the one who is in the world (Colossians 2:15; 1 John 4:4). I cannot "
+                + "tell you that anyone has bewitched you. An illness, money trouble, a bad dream or family trouble "
+                + "does not prove witchcraft. Please do not pay anyone for deliverance, and do not accuse a neighbour "
+                + "or relative because of fear. Pray in the name of Jesus, and tell a trusted pastor or church leader "
+                + "what has been happening. If the fear is affecting your health or your sleep, please see a doctor or "
+                + "clinic too. I can answer in English first.",
                 "Colossians 2:15", "1 John 4:4"));
 
         r.add(new Route("explain-again",
@@ -593,11 +654,13 @@ public final class ApprovedRoutes {
         // (Tacitus, Ignatius, Justin, Augustine). Approved status: coordinator, pending Levi's final check.
         r.add(new Route("dream-warning",
                 "dream|dreamt|dreamed|i saw in a vision|a vision (?:that|of)",
-                "A dream is not a sure sign from God, and no dream can tell us what will happen to a person. Scripture tells us to test "
-                + "every spirit and every claim against the Word of God (1 John 4:1; 1 Thessalonians 5:20–21). We do not fear dreams, and we "
-                + "do not treat them as settled truth. If a dream troubles you, bring it to the Lord in prayer, ask the Holy Spirit for peace, "
-                + "and talk with your pastor or a trusted church leader. Please do not act on a dream about someone's death, or make a "
-                + "decision about anyone's life because of it.",
+                "Scripture does record God speaking through dreams in some cases, so we do not dismiss dreams "
+                + "altogether. But a dream is never automatically a sure sign from God, and no dream can tell us what "
+                + "will happen to a person. Every dream claim must be tested by the Word of God and by the fruit of the "
+                + "message. Scripture tells us to test every spirit and every claim (1 John 4:1; 1 Thessalonians "
+                + "5:20–21). Please do not act on a dream about someone's death, or make a decision about anyone's life "
+                + "because of it. Bring the dream to the Lord in prayer, and talk with your pastor or a trusted church "
+                + "leader.",
                 "1 John 4:1", "1 Thessalonians 5:20"));
 
         r.add(new Route("asking-for-miracles",

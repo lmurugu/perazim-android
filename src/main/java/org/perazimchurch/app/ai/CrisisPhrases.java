@@ -32,6 +32,11 @@ public final class CrisisPhrases {
             "nataka kujidhuru|kujidhuru|najidhuru|nitajidhuru|" +
             "kujiumiza|nikijiumiza|kukomesha maisha|kukomesha maumivu|"+
             "sitaki kuishi|sina sababu ya kuishi|nimechoka kuishi|nataka kujimaliza|ntajimaliza|" +
+            // Approved by Levi as a native Kiswahili speaker, 2026-11-25 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy6mZdLtfvqKyZG6SZVRvYUj).
+            // Status APPROVED_LEVI for the five phrases above and these four variants. Tiers are recorded in
+            // ai-eval checklist: "nimechoka na maisha" is a compassionate safety check, the others are urgent.
+            // Variants added here only strengthen detection; no phrase was removed.
+            "nina mawazo ya kujiua|nataka kujitoa uhai|nimefikiria kujiua|nina mpango wa kujiua|" +
             // Swahili: a person is hurting, threatening or abusing the speaker.
             "ananipiga|ananinyanyasa|ananitishia|ananiua)\\b", Pattern.CASE_INSENSITIVE);
 }
