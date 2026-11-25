@@ -647,8 +647,9 @@ public final class ApprovedRoutes {
                 "Ephesians 2:8", "Ephesians 2:9"));
 
         r.add(new Route("spirit-and-sin",
-                "holy spirit.{0,80}(?:still sin|sin)|(?:still sin|why do (?:they|we|christians) sin).{0,80}spirit|spirit.{0,40}still sin",
-                "Scripture teaches that the Holy Spirit lives in every believer, and that the Spirit is at work to make us like Christ. "
+                "^(?!.*(?:baptis|baptiz|tongue|tounge|tognue)).*holy spi+r(?:it|t).{0,80}sin",
+                "Spirit baptism is an experience distinct from conversion. Tongues are normal and desirable, but they are not the only evidence of Spirit baptism. "
+                + "Scripture teaches that the Holy Spirit lives in every believer, and that the Spirit is at work to make us like Christ. "
                 + "Even so, believers still struggle with sin, because the flesh and the Spirit are in conflict (Galatians 5:17). The answer "
                 + "is not to deny the struggle, but to walk in the Spirit and to put sin to death by His power (Romans 8:13). When we sin, "
                 + "we confess it to God, and He is faithful and just to forgive us (1 John 1:9). Please talk with your pastor if you are "
@@ -713,7 +714,7 @@ public final class ApprovedRoutes {
                 "Psalms 14:1", "Psalms 19:1"));
 
         r.add(new Route("someone-else-on-cross",
-                "someone else (?:die|died|was crucified|on the cross)|not crucified|was not crucified|another (?:man )?died|died in his place|did someone else",
+                "someone else (?:die|died|was crucified|on the cross)|some say.{0,30}not crucified|some say.{0,30}someone else|another (?:man )?died|died in his place|did someone else",
                 "The Bible teaches that Jesus was crucified and died for our sins. Paul wrote that Christ died for our sins according to the "
                 + "Scriptures (1 Corinthians 15:3), and that the Gospel centres on Christ crucified (1 Corinthians 1:23). The death and "
                 + "resurrection of Jesus are at the heart of the Gospel. Some groups teach that someone else died in His place, and we test "
