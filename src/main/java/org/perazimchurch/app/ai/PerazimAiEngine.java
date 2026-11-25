@@ -113,6 +113,14 @@ public class PerazimAiEngine {
         String q = rawQuery.trim().toLowerCase(Locale.US);
 
         // 0. CRISIS & PASTORAL CARE INTERVENTION
+        // Two-step check first: vague exhaustion gets the warm check; crisis wording, or a yes or plan after it, gets the full response.
+        SoftSafety.Verdict safety = SoftSafety.judge(rawQuery);
+        if (safety == SoftSafety.Verdict.CRISIS) {
+            return handleCrisisQuery();
+        }
+        if (safety == SoftSafety.Verdict.SOFT_CHECK) {
+            return softSafetyCheckResponse();
+        }
         if (isCrisisQuery(q)) {
             return handleCrisisQuery();
         }
@@ -218,6 +226,11 @@ public class PerazimAiEngine {
 
     private AiResponse handleCrisisQuery() {
         return crisisResponse();
+    }
+
+    /** The warm safety check for vague exhaustion. It carries the same verified numbers as the full response. */
+    static AiResponse softSafetyCheckResponse() {
+        return AiResponse.plainText(SoftSafety.checkText(), Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
     public static AiResponse crisisResponse() {

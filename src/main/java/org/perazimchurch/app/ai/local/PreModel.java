@@ -4,6 +4,7 @@ import android.content.Context;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.perazimchurch.app.ai.PerazimAiEngine;
+import org.perazimchurch.app.ai.SoftSafety;
 import org.perazimchurch.app.ai.library.ApprovedRoutes;
 import org.perazimchurch.app.ai.library.DoctrineLibrary;
 import org.perazimchurch.app.ai.library.KjvVerseText;
@@ -43,6 +44,14 @@ public final class PreModel {
 
     /** The decision for a question, or null when it may go to the model. */
     public static Decision decide(Context c, String question) {
+        // Two-step check for vague exhaustion. Judged once per message; a repeat of the same message gives the same verdict.
+        SoftSafety.Verdict safety = SoftSafety.judge(question);
+        if (safety == SoftSafety.Verdict.CRISIS) {
+            return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
+        }
+        if (safety == SoftSafety.Verdict.SOFT_CHECK) {
+            return new Decision("routed:soft-safety-check", SoftSafety.checkText());
+        }
         if (PerazimAiEngine.isCrisisQuery(question)) {
             return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
         }

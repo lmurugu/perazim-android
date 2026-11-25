@@ -37,6 +37,7 @@ import org.perazimchurch.app.ai.appcontext.AppContextReader;
 import org.perazimchurch.app.ai.appcontext.AppContextRouter;
 import org.perazimchurch.app.ai.local.ModelDownloadService;
 import org.perazimchurch.app.ai.PerazimAiEngine;
+import org.perazimchurch.app.ai.SoftSafety;
 import org.perazimchurch.app.ai.remote.AiPreferences;
 import org.perazimchurch.app.ai.remote.AiRelayClient;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
@@ -431,6 +432,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     else if (which == appActivityIndex) toggleAppActivity();
                     else {
                         localHistory.clear();
+                        SoftSafety.reset();
                         messagesContainer.removeAllViews();
                         displayAiMessage(AiResponse.plainText("Conversation cleared. What would you like to discuss?", null), "Perazim Guide");
                     }
@@ -579,6 +581,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     @Override public void dismiss() {
         if (localRequest) OnDeviceAi.cancel();
         localHistory.clear();
+        SoftSafety.reset();
         super.dismiss();
     }
 
@@ -745,9 +748,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         // Safety routing is mode-independent: selecting Qwen or cloud mode must not
         // bypass the deterministic immediate-support response.
-        if (PerazimAiEngine.isCrisisQuery(query)) {
-            localHistory.clear();
-            displayAiMessage(aiEngine.processQuery(query), "Safety guidance · on-device");
+        // Two-step check: a vague exhaustion phrase gets the warm check; crisis wording or a yes or plan after it gets the full response.
+        SoftSafety.Verdict safety = SoftSafety.judge(query);
+        if (safety != SoftSafety.Verdict.NONE) {
+            if (safety == SoftSafety.Verdict.CRISIS) localHistory.clear();
+            displayAiMessage(aiEngine.processQuery(query),
+                    safety == SoftSafety.Verdict.CRISIS ? "Safety guidance · on-device" : "Safety check · on-device");
             return;
         }
 
