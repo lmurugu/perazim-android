@@ -154,7 +154,9 @@ public class PerazimAiEngine {
         if (safety == SoftSafety.Verdict.SOFT_CHECK) {
             return softSafetyCheckResponse();
         }
-        if (isCrisisQuery(q) && !"general-topic".equals(safetyRoute(rawQuery))) {
+        // Legacy keyword check: only when the safety routing above gave no route (Levi, 2026-11-25). Domestic-violence theology
+        // and other violence-topic wording without a speaker's risk never get the suicide-plan reply here.
+        if (isLegacyCrisisKeyword(rawQuery)) {
             return handleCrisisQuery();
         }
         if (isOverdoseQuery(rawQuery)) {
@@ -817,6 +819,16 @@ public class PerazimAiEngine {
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
+    /**
+     * The legacy keyword crisis check. It applies to any crisis-keyword wording except a violence-topic route
+     * (domestic-violence theology, for example) or a general question (Levi, 2026-11-25).
+     */
+    public static boolean isLegacyCrisisKeyword(@Nullable String query) {
+        if (!isCrisisQuery(query)) return false;
+        String route = safetyRoute(query);
+        return !"topic-violence".equals(route) && !"general-topic".equals(route);
+    }
+
     public static boolean isCrisisQuery(@Nullable String query) {
         if (query == null) return false;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
@@ -1075,7 +1087,7 @@ public class PerazimAiEngine {
         if (query == null || query.trim().isEmpty()) return null;
         AiResponse safetyFirst = safetyFirstResponse(query);
         if (safetyFirst != null) return safetyFirst;
-        if (isCrisisQuery(query) && !"general-topic".equals(safetyRoute(query))) return crisisResponse();
+        if (isLegacyCrisisKeyword(query)) return crisisResponse();
         if (isSensitivePastoralDisclosure(query)) return sensitivePastoralResponse();
         if (isHumanDecisionQuery(query)) return humanDecisionResponse();
         if (isOutOfScopeForModel(query)) return boundaryResponseFor(query);

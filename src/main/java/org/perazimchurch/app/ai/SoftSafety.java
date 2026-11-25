@@ -65,7 +65,9 @@ public final class SoftSafety {
             pending = false;
             return Verdict.NONE;
         }
-        if (PerazimAiEngine.isCrisisQuery(q)) {
+        // Legacy keyword check: only when the safety routing gave no route (Levi, 2026-11-25). Domestic-violence theology and
+        // other violence-topic wording without a speaker's risk are not a suicide crisis here.
+        if (PerazimAiEngine.isLegacyCrisisKeyword(q)) {
             pending = false;
             return Verdict.CRISIS;
         }

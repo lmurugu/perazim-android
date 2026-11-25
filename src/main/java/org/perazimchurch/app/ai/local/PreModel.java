@@ -27,10 +27,17 @@ public final class PreModel {
     public static final class Decision {
         public final String status;
         public final String answer;
+        /** The full reply with its buttons, when the route has one. Null means a plain-text answer. */
+        public final org.perazimchurch.app.ai.AiResponse response;
 
         Decision(String status, String answer) {
+            this(status, answer, null);
+        }
+
+        Decision(String status, String answer, org.perazimchurch.app.ai.AiResponse response) {
             this.status = status;
             this.answer = answer;
+            this.response = response;
         }
     }
 
@@ -77,7 +84,8 @@ public final class PreModel {
         }
         String route = PerazimAiEngine.preModelRoute(question);
         if (route != null) {
-            return new Decision("routed:" + route, PerazimAiEngine.preModelResponse(route, question).getMessageText());
+            org.perazimchurch.app.ai.AiResponse routed = PerazimAiEngine.preModelResponse(route, question);
+            return new Decision("routed:" + route, routed.getMessageText(), routed);
         }
         // Matthew Henry, only when a member asks for him by name: Scripture first, then his labelled excerpt (Tier 3).
         String henry = org.perazimchurch.app.ai.reference.ReferenceGuide.namedHenry(c, question, KjvVerseText.load(c));

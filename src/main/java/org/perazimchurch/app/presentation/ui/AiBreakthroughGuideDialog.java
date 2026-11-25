@@ -45,6 +45,7 @@ import org.perazimchurch.app.ai.remote.ConversationHistory;
 import org.perazimchurch.app.ai.local.OfflineKnowledgeStore;
 import org.perazimchurch.app.ai.local.OfflineScriptureLookup;
 import org.perazimchurch.app.ai.local.OnDeviceAi;
+import org.perazimchurch.app.ai.local.GuideTurnRouter;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.R;
@@ -767,31 +768,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
         // 1. Render User Message Bubble
         displayUserMessage(query);
 
-        if (safetyFirst != null) {
-            localHistory.clear();
-            displayAiMessage(safetyFirst, "Safety guidance · on-device");
-            return;
-        }
-        SoftSafety.Verdict safety = SoftSafety.judge(query);
-        if (safety != SoftSafety.Verdict.NONE) {
-            if (safety == SoftSafety.Verdict.CRISIS) localHistory.clear();
-            displayAiMessage(aiEngine.processQuery(query),
-                    safety == SoftSafety.Verdict.CRISIS ? "Safety guidance · on-device" : "Safety check · on-device");
-            return;
-        }
-
-        // Scope, referral and human-authority checks run before the model-installed check, so an off-topic
-        // question is refused even when no model is installed.
-        AiResponse builtIn = PerazimAiEngine.builtInAppAnswer(query);
-        if (builtIn != null) {
-            localHistory.clear();
-            displayAiMessage(builtIn, "Perazim Guide · built-in");
-            return;
-        }
-        AiResponse deterministic = PerazimAiEngine.deterministicModelRefusal(query);
-        if (deterministic != null) {
-            localHistory.clear();
-            displayAiMessage(deterministic, "Perazim Guide · built-in");
+        // One routing order for every message: safety, the vague-exhaustion check, built-in answers, then the approved
+        // routes (GuideTurnRouter). The evaluation uses the same order, so the phone and the evaluation cannot drift apart.
+        GuideTurnRouter.Turn turn = GuideTurnRouter.route(activity, aiEngine, query);
+        if (turn.response != null) {
+            if (turn.clearHistory) localHistory.clear();
+            displayAiMessage(turn.response, turn.badge);
             return;
         }
 
