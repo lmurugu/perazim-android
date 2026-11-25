@@ -606,6 +606,46 @@ public final class ApprovedRoutes {
                 + "If you are asking whether you are right with God, bring that question to Jesus in prayer, and talk with your pastor.",
                 "Romans 3:24", "Romans 5:1", "Galatians 2:16", "Ephesians 2:8", "Titus 2:11"));
 
+        r.add(new Route("headship-submission-marriage",
+                "headship|head of (?:the )?(?:house|home|household|family)|submit to (?:my|your|his|her) husband|wives? (?:must )?submit|who (?:should )?(?:make|has) the final (?:say|decision)",
+                "Scripture calls husbands to lead their wives with sacrificial love, and calls wives to respect and submit to their husbands in the Lord. Both remain under Christ and are called to mutual submission in reverence for Him (Ephesians 5:21–25; Colossians 3:18–19). The husband has a distinct responsibility to lead, and he is accountable before God for how he exercises it. His headship is servant leadership, shown through protection, provision, care and sacrificial love, never through domination. He must take his wife's counsel seriously. His headship does not make him infallible or give him permission to sin, abuse, coerce or override his wife's conscience. The wife remains personally accountable to God, and she is never required to obey a sinful instruction or to endure danger in the name of submission (Acts 5:29). Where a couple cannot agree after prayer and honest discussion, they should seek pastoral counsel rather than a contest for control. If anyone is being harmed, safety comes first. This answer concerns marriage only; the church has not settled the question of women's ministry roles.",
+                "Ephesians 5:21", "Ephesians 5:25", "Colossians 3:18", "Colossians 3:19", "Acts 5:29"));
+
+        r.add(new Route("khat-discouraged",
+                "miraa|khat|muguka",
+                "Scripture does not name khat, and the church does not say that every use is the same as drunkenness. The church discourages khat use as a pastoral application of biblical principles: self-control, stewardship of the body, and not being mastered by anything (1 Corinthians 6:12; 1 Corinthians 6:19–20; Galatians 5:22–23). These are pastoral and prudential applications, not a direct prohibition of a named plant. Habitual use can carry health, self-control, money and family risks. Please do not judge or shame anyone who uses it. If you or someone you know is struggling to stop, NACADA's free 24-hour helpline, 1192, offers verified support. Please talk with your pastor or a trusted church leader as well.",
+                "1 Corinthians 6:12", "1 Corinthians 6:19", "Galatians 5:22"));
+
+        r.add(new Route("family-planning-married",
+                "family planning|contracept|birth control|condom|spacing (?:of )?children",
+                "Children are a blessing from God (Psalm 127:3–5), but Scripture does not prescribe a fixed number of children for every couple. For married couples, responsible family planning is a matter of shared marital conscience and stewardship. The couple may consider it in light of health, responsibilities, circumstances and their ability to care for children. Scripture does not name condoms, so this is a matter for the couple's shared conscience. Neither spouse may coerce the other into contraception or a permanent procedure, and any medical procedure needs free and informed consent. The church's position excludes methods intended to end an established pregnancy, and it does not treat every contraceptive method as abortion. I cannot choose a method or decide medical eligibility, so please talk with a qualified health provider or nurse at a clinic about the options for your body and situation. For HIV prevention, speak with a health worker as well.",
+                "Psalms 127:3"));
+
+        r.add(new Route("god-still-loves-me",
+                "mungu bado ananipenda|does god (?:still )?love me|god still loves me|is god still with me|sijui kama mungu",
+                "I am sorry you are feeling this way. God's love does not depend on how well we have done. Scripture says that nothing can separate us from the love of God in Christ Jesus our Lord (Romans 8:38–39). The LORD says that he has loved his people with an everlasting love (Jeremiah 31:3), and God shows his love toward us because Christ died for us while we were still sinners (Romans 5:8). Please talk with your pastor or a trusted church leader soon, and tell them what you have told me. You do not have to carry this alone.",
+                "Romans 8:38", "Romans 8:39", "Jeremiah 31:3", "Romans 5:8"));
+
+        r.add(new Route("anger-at-brother",
+                "angry (?:at|with) (?:my|a|the|someone|him|her|them)|been (?:so )?angry (?:at|with)|bitter (?:against|towards|toward|at)",
+                "Anger can be a real feeling, but Scripture warns us not to let it grow into bitterness or to hold onto it: be angry, and do not sin, and do not let the sun go down on your wrath (Ephesians 4:26). Jesus taught us to be reconciled to a brother who has something against us (Matthew 5:23–24), and to forgive as the Lord forgave us (Colossians 3:13). Please bring the anger to God honestly in prayer, and ask him to show you the next step, whether that is forgiveness, a conversation or an apology. Talk with your pastor or a trusted leader if the conflict is hard to resolve, and seek help if the anger affects your sleep, health or safety.",
+                "Ephesians 4:26", "Matthew 5:23", "Colossians 3:13"));
+
+        r.add(new Route("god-forgives-everyone",
+                "god forgives (?:everyone|everybody|all)|if god forgives|everyone is forgiven|everybody is forgiven",
+                "God's forgiveness is real and full for everyone who repents and trusts in Jesus Christ (Acts 3:19; 1 John 1:9). Scripture does not teach that every person is forgiven apart from faith and repentance. Jesus said that our forgiveness from the Father is connected to our forgiving others (Matthew 6:14–15), and that the one who does not believe the Son remains under the wrath of God (John 3:36). God is both merciful and just: he forgives the repentant, and he judges those who refuse Christ (Romans 2:5). We do not judge any particular person's standing before God.",
+                "Acts 3:19", "1 John 1:9", "Matthew 6:14", "John 3:36", "Romans 2:5"));
+
+        r.add(new Route("healing-as-proof",
+                "(?:healing|miracle)s? .{0,80}(?:proof|prove|evidence)|(?:proof|evidence) .{0,60}(?:healing|miracle)",
+                "A healing you see in a video is not, by itself, proof that God is working through a particular preacher. Scripture warns that false signs and wonders can deceive people (Matthew 24:24; 2 Thessalonians 2:9). We do not judge any individual's standing before God, but we can test what is taught and claimed by the Word of God (1 John 4:1). We do believe that God can heal, and that the prayer of faith may be offered for the sick (James 5:14–15). Please do not give money to anyone because of a video. Talk with your pastor or a trusted church leader before you decide, and give thanks with anyone who is truly healed.",
+                "Matthew 24:24", "2 Thessalonians 2:9", "1 John 4:1", "James 5:14"));
+
+        r.add(new Route("muslim-neighbours",
+                "jirani zangu ni waislamu|waislamu|muslim neighbou?rs?|neighbou?rs? (?:are|is) muslim|muslims? (?:next door|in my street|living)",
+                "Christians are called to love their neighbours, whatever their faith. Jesus said that the second great commandment is to love your neighbour as yourself (Luke 10:27), and he showed what that love looks like in the parable of the good Samaritan (Luke 10:37). Peace in your street comes from honest, kind and respectful living: greet your neighbours, help them in practical needs, keep your promises, and do not join in mocking or insulting them. Be ready to give an account of the hope you have, with gentleness and respect (1 Peter 3:15). Do not judge any Muslim person's standing before God; that belongs to God alone. If a specific conflict or threat arises, speak with your pastor, and report any violence to the police on 999 or 112.",
+                "Luke 10:27", "Luke 10:37", "1 Peter 3:15"));
+
         r.add(new Route("god-changes-mind",
                 "does god change|god change (?:his|her|its) mind|did god repent|god repent|god regret",
                 "Scripture teaches that God does not lie or become unfaithful. He is unchanging in character and faithful to his promises (Numbers 23:19; Malachi 3:6). Yet Scripture also says that God relented from the judgment he had announced against Nineveh when the people turned from their evil way (Jonah 3:10). Jeremiah 18:7–10 explains that God's announcements of judgment and blessing relate to how people respond to him. When Scripture says that God repented or relented, it does not mean that he confessed sin or became morally unreliable. It describes his response to people while he remains faithful and righteous. We should take both kinds of biblical statements seriously.",

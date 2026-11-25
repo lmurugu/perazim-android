@@ -307,6 +307,8 @@ public final class PreModel {
         Pattern.compile("\\bgod is (?:near|far|absent|silent|not here)\\b|\\bnear me\\b|feel (?:god|his presence|god's presence)|far from god|\\bforsak\\w*|\\babandon\\w*", Pattern.CASE_INSENSITIVE),
         // Afterlife: KJV passages on the topic (Scripture is the source; no other teaching is added).
         Pattern.compile("afterlife|after death|life after death|hereafter", Pattern.CASE_INSENSITIVE),
+        // The Holy Spirit as Comforter: KJV passages on the topic (the approved source; Nave's list is not bundled).
+        Pattern.compile("comforter|holy spirit as comfort", Pattern.CASE_INSENSITIVE),
     };
     private static final Pattern TOPIC_EXCLUDE = Pattern.compile(
             "\\bhiv\\b|\\barvs?\\b|antiretro|condom|contracept|unforgivable|blasphem|atonement|divorc|remarr|medic|doctor|hospital|tablets?|\\bpills?\\b|\\bdrugs?\\b|clinic|\\bnurse|"
@@ -326,6 +328,7 @@ public final class PreModel {
         {"Exodus 9:12", "Romans 9:18"},
         {"Psalms 34:18", "Hebrews 13:5"},
         {"John 11:25", "2 Corinthians 5:8", "Hebrews 9:27"},
+        {"John 14:16", "John 14:26", "John 15:26", "John 16:7"},
     };
 
     /** The phrase a question asks about: a quoted phrase. Null when there is none. */

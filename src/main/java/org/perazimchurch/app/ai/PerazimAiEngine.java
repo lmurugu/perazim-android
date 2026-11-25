@@ -360,7 +360,7 @@ public class PerazimAiEngine {
 
     public static AiResponse manipulationResponse() {
         return AiResponse.plainText(
-                "You do not have to pay anyone to protect your children or to remove a curse. Money given out of fear or pressure is not required, and no leader can make a child die by withholding a gift. Scripture is the test for any word or experience, because the Holy Spirit never contradicts the Word. Don't act on fear, and don't set Scripture aside. Please discern what you heard with mature believers, and talk with a trusted church leader or the Bishop before you give or decide anything.",
+                "You do not have to pay anyone to protect your children or to remove a curse. Money given out of fear or pressure is not required. A warning that a child will die unless you pay is pressure, not the truth of God, and Christ has power over every curse. Scripture is the test for any word or experience, because the Holy Spirit never contradicts the Word. Don't act on fear, and don't set Scripture aside. Please discern what you heard with mature believers, and talk with a trusted church leader or the Bishop before you give or decide anything.",
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
