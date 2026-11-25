@@ -333,11 +333,49 @@ public final class ApprovedRoutes {
                 + "it, and we do not treat each of his opinions as Perazim doctrine.",
                 "Psalms 42:1", "Psalms 42:2"));
 
+        r.add(new Route("witch-harm-swahili",
+                "nichome|kuchoma|kumdhuru|nimdhuru|kuwaua|nikuue|kumuua",
+                "Please do not burn a neighbour's house or hurt anyone. That would harm innocent people, and it is not what Jesus teaches "
+                + "(Matthew 5:44; Romans 12:19). If you feel in danger, or someone is threatening you, call 999 or 112 now, or go to the nearest "
+                + "police station. Please tell a trusted pastor or church leader today.",
+                "Matthew 5:44", "Romans 12:19"));
+
+        r.add(new Route("sickness-not-punishment",
+                "\\bcurse\\b.{0,40}(?:sickness|sick|illness|disease|hiv)|(?:sickness|sick|illness|disease|hiv).{0,40}(?:punish|curse)|punishment for sin",
+                "Scripture does not teach that every sickness is a curse or a punishment for a particular sin. When the disciples asked whether "
+                + "a man's blindness came from his sin or his parents' sin, Jesus answered that the works of God would be shown in him "
+                + "(John 9:2–3). We should not blame sick people. Please see a doctor or clinic for the illness, and talk with your pastor or a "
+                + "trusted church leader about any fear or shame you may be carrying.",
+                "John 9:2", "John 9:3"));
+
+        r.add(new Route("medication-and-faith",
+                "antidepress|medication|medicine|tablets",
+                "I cannot judge your medicine from Scripture alone, and I cannot say what is a sin for you personally. Please talk with your "
+                + "doctor about your medicine and ask them to explain what it does. Do not stop or start a medicine without your doctor. Pray, "
+                + "and talk with your pastor or a trusted church leader too. Scripture calls us to seek wise counsel (Proverbs 11:14; "
+                + "Proverbs 15:22).",
+                "Proverbs 11:14", "Proverbs 15:22"));
+
+        r.add(new Route("cancer-treatment-and-faith",
+                "chemo|cancer|surgery|doctors? (?:say|says|said)",
+                "Please do not stop your treatment without speaking to your doctors first. Trusting God and seeking medical care are not "
+                + "opposed; Jesus Himself said that the sick need a physician (Luke 5:31). Talk with your doctor, your family and your pastor "
+                + "together, and pray for wisdom and peace as you decide.",
+                "Luke 5:31", "Proverbs 11:14"));
+
+        r.add(new Route("obedience-and-the-bible",
+                "pastor says.{0,80}(?:obey|question)|questioning (?:him|the pastor|my pastor) is questioning god|questioning him is questioning god|obey him even when",
+                "Asking questions is not the same as rebellion. Scripture calls us to honour leaders who serve God faithfully (Hebrews 13:17). "
+                + "Leaders serve under Christ and under the Word of God, so when a teaching goes against the Bible we must obey God rather "
+                + "than men (Acts 5:29). Test what your leaders say by the Scriptures, as the Bereans did (Acts 17:11). Please talk this through "
+                + "with a trusted church leader, and read the passage yourself.",
+                "Hebrews 13:17", "Acts 5:29"));
+
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",
                 "I'm sorry, this is very hard news. Please see a doctor or clinic soon for care and treatment, and they can explain your "
-                + "health and how to protect your wife. You do not have to decide alone. Please talk with your pastor or a trusted church "
-                + "leader, and with a counsellor, about how and when to tell your wife. Scripture calls us to honesty and to care for one "
+                + "health and how to protect the people you love. You do not have to decide alone. Please talk with your pastor or a trusted church "
+                + "leader, and with a counsellor, about how and when to tell your family. Scripture calls us to honesty and to care for one "
                 + "another in love (Ephesians 4:15; Ephesians 5:25).",
                 "Ephesians 4:15", "Ephesians 5:25"));
 
