@@ -62,7 +62,7 @@ final class PreSigningEvidence {
             int colon = head.indexOf(':');
             if (d.optString("sourceId", "").equals("hitchcock-bible-names") && colon > 0) {
                 String word = head.substring(0, colon).toLowerCase(Locale.ROOT);
-                if (containsWord(question.toLowerCase(Locale.ROOT), word)) score += 10;
+                if (properNames(question).contains(word)) score += 10;
             }
             if (score >= 3) scored.add(new double[] {score, i});
         }
@@ -77,6 +77,18 @@ final class PreSigningEvidence {
             item.put("location", d.optString("location", ""));
             item.put("text", d.getString("text"));
             out.put(item);
+        }
+        return out;
+    }
+
+    /** Capitalised names in the question, lowercased. "So", "On" and "No" in ordinary sentences are not names. */
+    static Set<String> properNames(String question) {
+        Set<String> out = new HashSet<>();
+        if (question == null) return out;
+        for (String w : question.split("[^\\p{L}\\p{N}]+")) {
+            if (w.length() < 4 || !Character.isUpperCase(w.charAt(0))) continue;
+            String lower = w.toLowerCase(Locale.ROOT);
+            if (!STOP.contains(lower)) out.add(lower);
         }
         return out;
     }

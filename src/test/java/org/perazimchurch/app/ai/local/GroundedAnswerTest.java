@@ -82,4 +82,14 @@ public class GroundedAnswerTest {
     public void noEvidenceGivesNoGroundedAnswer() {
         assertNull(GroundedAnswer.finalAnswer("What is grace?", "Grace is unmerited favour.", new JSONArray()));
     }
+
+    /** FW-041 and VC-041: a framing sentence may not add a denial the evidence and question do not state. */
+    @Test
+    public void framingDenialNotInEvidenceIsRejected() throws Exception {
+        JSONArray ev = evidence("Jesus: savior; deliverer", "Hitchcock's Bible Names Dictionary", "Jesus");
+        assertFalse(GroundedAnswer.accepts("The early Church did not believe Jesus was God.",
+                "Did the early Church believe Jesus was God?", ev));
+        assertTrue(GroundedAnswer.accepts("Jesus: savior; deliverer.",
+                "Did the early Church believe Jesus was God?", ev));
+    }
 }

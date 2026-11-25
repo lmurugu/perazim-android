@@ -53,7 +53,7 @@ public final class ReferenceGuide {
                 List<ReferenceHit> hits = new ArrayList<>();
                 int verse = ReferenceKeys.parseReference(question);
                 if (verse > 0) hits.addAll(index.crossReferences(verse, approvals, 2));
-                for (String word : words(question)) {
+                for (String word : properNames(question)) {
                     if (hits.size() >= MAX_REFERENCE_ITEMS) break;
                     if (CREED_HEADWORD.equals(word)) continue;
                     hits.addAll(index.dictionary(word, approvals, 1));
@@ -87,6 +87,22 @@ public final class ReferenceGuide {
             String word = raw.toLowerCase(Locale.ROOT);
             if (word.length() < 4 || STOP.contains(word)) continue;
             if (!out.contains(word)) out.add(capitalise(word));
+            if (out.size() >= MAX_WORDS) break;
+        }
+        return out;
+    }
+
+    /**
+     * Capitalised names in the question, for dictionary lookup. Only a word the user capitalised counts, so "so",
+     * "on" and "no" in ordinary sentences never match a dictionary name. Question words and short words are skipped.
+     */
+    static List<String> properNames(String question) {
+        List<String> out = new ArrayList<>();
+        for (String raw : question.split("[^\\p{L}]+")) {
+            if (raw.length() < 4 || !Character.isUpperCase(raw.charAt(0))) continue;
+            String word = capitalise(raw.toLowerCase(Locale.ROOT));
+            if (STOP.contains(word.toLowerCase(Locale.ROOT)) || out.contains(word)) continue;
+            out.add(word);
             if (out.size() >= MAX_WORDS) break;
         }
         return out;

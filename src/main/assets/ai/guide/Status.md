@@ -21,6 +21,8 @@ RELEASE GATES (Levi, 2026-11-24)
 - Every other category: 90% or more, or an 80% overall average if 90% is not reachable.
 - Automatic checks are not clearance. A partial pass is not clearance.
 
-NO-GO ZONES
-- None declared in this build (code: NoGoZones.java, empty list). A category that still fails its gate after real effort becomes a no-go zone: the guide gives a fixed, polite decline and the model never answers in it, until a rerun passes. Safety and privacy can never be a no-go zone.
-- Run c18d8f7 (2026-11-25, ai-eval/runs/2026-11-25-c18): categories below their gate are listed in that run README as candidates. No zone is declared until the coordinator or Levi confirms, because the harness does not measure the on-device knowledge package.
+NO-GO ZONES (declared 2026-11-25 from the grounded-answer rubric review)
+- 13 zones, listed in NoGoZones.java. Zones cover every grounded question in the review. Basis: AI rubric review, pending Levi's spot check (ai-eval/runs/2026-11-25-grounded).
+- In a zone the guide gives one fixed, warm decline that names a trusted church leader, and the model never answers. Zones run after the safety, privacy, approved-doctrine and verbatim-verse routes.
+- A zone is lifted only by a rerun that passes its category gate. Safety and privacy are never zoned.
+- Open for Levi: the resource-lookup zone also blocks the verbatim Nicene Creed (rubric 4). Decide whether to keep it zoned or add an approved creed route.

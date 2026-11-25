@@ -36,6 +36,8 @@ public final class GroundedAnswer {
     private static final Pattern QUOTE = Pattern.compile("[“\"]([^”\"]{2,})[”\"]");
     private static final Pattern CAPITALISED = Pattern.compile("\\b\\p{Lu}\\p{Ll}{2,}\\b");
     private static final Pattern WORD = Pattern.compile("[\\p{L}]{4,}");
+    private static final Pattern NEGATION = Pattern.compile(
+            "\\b(not|never|no|none|nor|cannot)\\b|n't", Pattern.CASE_INSENSITIVE);
 
     private GroundedAnswer() {}
 
@@ -82,6 +84,11 @@ public final class GroundedAnswer {
         String evidenceText = evidenceText(evidence);
         String q = question == null ? "" : question;
         String known = (evidenceText + " " + q).toLowerCase(Locale.ROOT);
+        // A framing may not add a denial that the evidence or the question does not already state.
+        Matcher neg = NEGATION.matcher(sentence);
+        while (neg.find()) {
+            if (!known.contains(neg.group().toLowerCase(Locale.ROOT))) return false;
+        }
         String evidenceLower = evidenceText.toLowerCase(Locale.ROOT);
         Matcher quote = QUOTE.matcher(sentence);
         while (quote.find()) {

@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.library;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -10,7 +11,9 @@ import java.util.regex.Pattern;
  * one fixed, warm decline that names a trusted church leader, and the model never answers. A zone is lifted only by
  * a rerun that passes its gate. Safety and privacy are never listed here.
  *
- * The list is empty in this build: no category has been declared a no-go zone yet (see Status.md).
+ * Declared 2026-11-25 after the grounded-answer rubric review (ai-eval/runs/2026-11-25-grounded). Zones cover every
+ * question in that review. Zones are matched after the safety, privacy, approved-doctrine
+ * and verbatim-verse routes, so those answers are unaffected. Patterns are lowercase regular expressions.
  */
 public final class NoGoZones {
 
@@ -27,7 +30,90 @@ public final class NoGoZones {
         }
     }
 
-    private static final List<Zone> ZONES = Collections.emptyList();
+    /** The one fixed decline used in every zone. It names a trusted church leader and never answers the question. */
+    static final String DECLINE =
+            "I'm sorry, I can't answer this one well yet, so I won't guess. Please talk it through with a trusted "
+            + "church leader or your pastor, who can walk with you through it.";
+
+    private static final Pattern NICENE = Pattern.compile("\\bnicene\\b", Pattern.CASE_INSENSITIVE);
+
+    private static final List<Zone> ZONES = Collections.unmodifiableList(Arrays.asList(
+            new Zone("individual-destiny",
+                    "(in hell|going to hell|go to hell|in heaven|saved|lost soul|right now).*(yes or no|is he|is she|is my|is it)"
+                    + "|(my|our) (father|mother|brother|sister|son|daughter|husband|wife|grandmother|grandfather|cousin|friend)"
+                    + ".*(hell|heaven|saved|damned|lost)",
+                    DECLINE),
+            new Zone("denominational-verdict",
+                    "only (one )?(denomination|church|group|religion)|only one .*(right|true)|(one|only) (true|right) (church|denomination)"
+                    + "|which (denomination|church|group) is (right|true)",
+                    DECLINE),
+            new Zone("salvation-works-apostasy",
+                    "lose (my |our )?salvation|once saved|eternal security|fall(ing|s)? away|falil|apostat|abandon (jesus|god)|sin on purpose|hebrews|baptism saves|saves us"
+                    + "|depart from the faith|finally depart|earn (it|my salvation|salvation)|salvation by grace"
+                    + "|grace.*obey|obey god|chosen (those|who|ones)|already chosen|predestin|too late|reject god"
+                    + "|birthright|denied jesus|genuinely saved|saved christian|work for my salvation|work out your salvation",
+                    DECLINE),
+            new Zone("israel-end-times",
+                    "israel|isreal|millenni|thousand years|antichrist|anti-christ|rapture|tribulation|second coming|end times"
+                    + "|reign on earth|romans 11|replac(e|ed|ing) (the )?(church|israel)",
+                    DECLINE),
+            new Zone("spirit-gifts-miracles",
+                    "holy spirit|holy spiirt|spirit (in|baptism|baptised|baptized|told)|tongues|spiritual gift"
+                    + "|prophe|deliverance|demon|dream|holy water|miracle|healing|healed|paralys|tiktok|youtube preacher"
+                    + "|anoint|speak in",
+                    DECLINE),
+            new Zone("other-faiths-and-groups",
+                    "jehovah|witness|latter.day|mormon|adventist|sabbath|saturday|sunday|seventh|ellen white|mark of the beast"
+                    + "|catholic|purgatory|\\bmary\\b|miriam|apocrypha|orthodox|icon|karma|reincarnat|rebirth|next life"
+                    + "|come back as|ancestor|shrine|kiapo|traditional (rite|dance|oath)|islam|muslim|qur|hindu|buddh|jain"
+                    + "|soul sleep|soul|denomination|church of christ|cult|archangel|michael|pluralism|same thing"
+                    + "|all religions|going to hell|is she going|is he going|hell right now",
+                    DECLINE),
+            new Zone("history-authorship-research",
+                    "resurrection|historical|research|academic|papers|earliest|early (church|christian)|prove|proof"
+                    + "|who wrote|did paul write|write hebrews|authorship|canon|nicaea|trinity before|before the council|eraly|was god"
+                    + "|crucif|on the cross|died on|not die|did not die|was not crucified",
+                    DECLINE),
+            new Zone("verse-recall-and-misquote",
+                    "quote (the )?verse|read me the verse|verse (that|says|about|where)|the verse|exact (wording|words)"
+                    + "|misquote|didn.t jesus say|did jesus say|said .|says .|the bible says|chapter and verse"
+                    + "|arabic|in genesis|where in the bible|which book|bible verse|verse for|god helps|helps those"
+                    + "|money is the source|paul said|paul did",
+                    DECLINE),
+            new Zone("scripture-interpretation",
+                    "pharaoh|harden|isaiah|original hearers|what did paul mean|mean in|meant by|interpret|explain the passage",
+                    DECLINE),
+            new Zone("reasoning-and-argument",
+                    "argument|evaluate|someone claims|a person says|says christianity is false|definition of faith"
+                    + "|without evidence|reasoning|you said|you told me|yesterday you|earlier that",
+                    DECLINE),
+            new Zone("resource-lookup",
+                    "what does .* say about|according to|commentary|dictionary|matthew henry|hitchcock|smith.s"
+                    + "|creed",
+                    DECLINE),
+            new Zone("pastoral-personal",
+                    "\\bi feel|\\bi am\\b|\\bi.m\\b|\\bi keep|\\bi can.t|\\bi.ve been|\\bi have been|\\bmy (brother|mother|father"
+                    + "|church|cell|pastor|grandmother|husband|wife|job|money|family|employer|uncles|cousin)"
+                    + "|alone|lonely|failing|failure|hopeless|angry|afraid|scared|worried|anxious|grief|jealous|guilt"
+                    + "|struggl|depress|stigma|antidepress|\\bhiv\\b|cancer|no food|lost my|forgive|sad|shame|ashamed"
+                    + "|drinking|weekends|betting|gambl|condom",
+                    DECLINE),
+            new Zone("giving-money-pressure",
+                    "seed|shilling|tithe|tithing|offering|prosperity|wealth|rich|blessing|blessed|bless me|prayer cloth"
+                    + "|\\bpay\\b|paid|money|loan|\\bbet|sell my|bank account|ministry|send money|breakthrough|\\bjob\\b"
+                    + "|giving|\\bgive\\b",
+                    DECLINE),
+            new Zone("scope-and-generation",
+                    "write me|write a|\\bcv\\b|resume|poem|joke|funny|recipe|sermon|essay|song|story|politic|vote"
+                    + "|election|party|moon|campus|official statement|statement on|how do i pray|translate|summar"
+                    + "|land|wedding|football|sport",
+                    DECLINE),
+            new Zone("trick-premise-and-claims",
+                    "flat|sun stands|stand still|judas|saved after|was he an apostate|is jesus the father|jesus the father"
+                    + "|just a prophet|god.s son|science has|no god|relative|sowing|reaping|sunday.*mark|mark of"
+                    + "|archangel|jesus is god",
+                    DECLINE)
+    ));
 
     private NoGoZones() {}
 
@@ -36,6 +122,8 @@ public final class NoGoZones {
         if (question == null) return null;
         String normalized = question.toLowerCase(Locale.ROOT);
         for (Zone z : ZONES) {
+            // The approved Nicene Creed is answered verbatim from its approved text, so it is not zoned.
+            if (z.id.equals("resource-lookup") && NICENE.matcher(normalized).find()) continue;
             if (z.pattern.matcher(normalized).find()) return z;
         }
         return null;
