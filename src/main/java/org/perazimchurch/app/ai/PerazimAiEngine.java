@@ -737,7 +737,7 @@ public class PerazimAiEngine {
         return isProfessionalMatterQuery(query) ? professionalBoundaryResponse() : outOfScopeResponse();
     }
 
-    /** Church, Bible, faith and app topics the on-phone model may answer. English, Swahili and Sheng. */
+    /** Church, Bible, faith and app topics the on-phone model may answer. Replies are always in English; Swahili and Sheng are recognised as input. */
     private static final Pattern MODEL_IN_SCOPE_TOPIC = Pattern.compile(
             "\\b(?:bible|biblia|scripture|scriptures|verse|verses|aya|chapter|book of|gospel|injili|psalm|psalms|zaburi|proverbs|" +
             "genesis|exodus|romans|corinthians|ephesians|galatians|hebrews|revelation|matthew|luke|john|isaiah|ruth|" +
