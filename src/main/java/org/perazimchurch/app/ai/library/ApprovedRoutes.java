@@ -1214,7 +1214,8 @@ public final class ApprovedRoutes {
     static {
         List<Route> p = new ArrayList<>();
         p.add(new Route("prayer-request-support",
-                "\\b(?:pray with me|pray for me|please pray|pray with us|pray for us|pray for my|can you pray|niombee|nisaidie kuomba|nipe maombi|naomba maombi|tuombe|ombea)\\b",
+                "^(?!.*\\b(?:saints?|mediat\\w*|deliver\\w*|exorcis\\w*|demons?|husband|wife|doesn'?t|does not|don'?t|won'?t)\\b)"
+                + "[\\s\\S]*?\\b(?:pray with me|pray for me|please pray|pray with us|pray for us|pray for my|can you pray|niombee|nisaidie kuomba|nipe maombi|naomba maombi|tuombe|ombea)\\b",
                 "I'd be glad to pray with you. Here is a short prayer you can make your own: Lord, you know every fear I carry. "
                 + "Give me peace in this situation, and show me the next right step. Amen. For a court date or other legal matter, "
                 + "please also speak with a lawyer or a legal aid office. I can pray with you about the fear.",
@@ -1229,8 +1230,9 @@ public final class ApprovedRoutes {
                 + "adviser. If the hopelessness becomes overwhelming, or you start thinking about ending your life, call 999 or 112 now.",
                 "Philippians 4:19", "Psalms 55:22"));
         p.add(new Route("far-from-god-support",
-                "\\bfar from god\\b|\\b(?:don'?t|do not) feel (?:god|his|the lord)\\b|\\bgod (?:feels|seems) (?:far|silent|distant)\\b|"
-                + "\\bgod (?:is )?(?:not )?near\\b",
+                "^(?!.*\\b(?:died|death|dead|grief|grieving|funeral|mourning|bereav\\w*|passed away)\\b)"
+                + "(?=.*\\b(?:far from god|(?:don'?t|do not) feel (?:god|his|the lord)|god (?:feels|seems) (?:far|silent|distant)|"
+                + "god (?:is )?(?:not )?near)\\b)",
                 "It is painful when God feels far away. Feelings do not decide what is true. God has promised to be near to those who "
                 + "call on him, and many faithful believers have felt this same distance. Keep praying honestly, read a short psalm "
                 + "each day, and share this with a trusted pastor or friend who can walk with you.",

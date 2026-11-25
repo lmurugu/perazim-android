@@ -127,7 +127,7 @@ public final class NoGoZones {
                     + "|anoint|speak in",
                     DECLINE),
             new Zone("other-faiths-and-groups",
-                    "jehovah|witness|latter.day|mormon|adventist|seventh.day|saturday (?:worship|church|sabbath)|keep the sabbath|sabbath (?:keeping|must|is required)|sunday (?:worship|law)|ellen white|mark of the beast"
+                    "jehovah|witness|latter.day|mormon|adventist|sabbath|saturday|sunday|seventh|ellen white|mark of the beast"
                     + "|catholic|purgatory|\\bmary\\b|miriam|apocrypha|orthodox|icon|karma|reincarnat|rebirth|next life"
                     + "|come back as|ancestor|shrine|kiapo|traditional (rite|dance|oath)|islam|allah|muslim|qur|hindu|buddh|jain"
                     + "|soul sleep|soul|denomination|church of christ|cult|archangel|michael|pluralism|same thing"

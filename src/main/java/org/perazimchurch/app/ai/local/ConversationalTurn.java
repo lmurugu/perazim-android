@@ -119,7 +119,6 @@ public final class ConversationalTurn {
         if (question == null) return null;
         String q = question.trim().toLowerCase(Locale.ROOT).replace('’', '\'').replaceAll("\\s+", " ");
         if (q.isEmpty() || q.length() > 160) return null;
-        if (GREETING.matcher(q).find()) return next(0, "routed:conversational-greeting", GREETINGS);
         if (ACKNOWLEDGE.matcher(q).find()) return next(6, "routed:conversational-acknowledge", ACKNOWLEDGE_REPLIES);
         if (HELP_REQUEST.matcher(q).find()) return next(7, "routed:conversational-help", HELP_REPLIES);
         if (FOLLOW_UP.matcher(q).find()) return next(8, "routed:conversational-follow-up", FOLLOW_UP_REPLIES);
