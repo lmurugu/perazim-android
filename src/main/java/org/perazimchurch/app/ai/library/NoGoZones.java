@@ -54,7 +54,7 @@ public final class NoGoZones {
     }
 
     public static final String DESTINY_DECLINE = "Only God knows people's hearts and their final destiny, so I will not pronounce on anyone's eternal state. "
-            + "I am not authorised to declare whether any person is saved. "
+            + "I am not authorised to pronounce on anyone's salvation. "
             + "If you are asking about your own salvation, come to Jesus in faith and trust Him as Lord (Romans 10:9–10). "
             + "Please talk this through with a trusted church leader or your pastor, who can walk with you through it.";
 
