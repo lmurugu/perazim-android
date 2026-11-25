@@ -14,7 +14,7 @@ public class ScopeBeforeInstallTest {
     @Test public void offTopicQuestionIsRefusedWithoutModel() {
         AiResponse r = PerazimAiEngine.deterministicModelRefusal("Which stock should I buy?");
         assertNotNull("off-topic question must be refused before any model check", r);
-        assertEquals("I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
+        assertEquals("I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI) and Christian faith, so I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
                 r.getMessageText());
     }
 

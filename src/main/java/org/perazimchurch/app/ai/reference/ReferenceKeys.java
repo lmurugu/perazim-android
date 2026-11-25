@@ -60,6 +60,21 @@ public final class ReferenceKeys {
         alias(60, "1 pet", "1pet", "first peter");
         alias(62, "1 jn", "1jn", "1 john", "first john");
         alias(66, "rev", "revelations", "revelation");
+        // Swahili book names (Biblia Takatifu). Canonical numbers as in BOOK_NAMES.
+        alias(1, "mwanzo"); alias(2, "kutoka"); alias(3, "walawi"); alias(4, "hesabu"); alias(5, "kumbukumbu");
+        alias(6, "yoshua"); alias(7, "waamuzi"); alias(8, "ruthu"); alias(9, "1 samweli"); alias(10, "2 samweli");
+        alias(11, "1 wafalme"); alias(12, "2 wafalme"); alias(13, "1 mambo ya nyakati"); alias(14, "2 mambo ya nyakati");
+        alias(15, "ezra"); alias(16, "nehemia"); alias(17, "esta"); alias(18, "ayubu"); alias(19, "zaburi");
+        alias(20, "mithali"); alias(21, "mhubiri"); alias(22, "wimbo ulio bora"); alias(23, "isaya"); alias(24, "yeremia");
+        alias(25, "maombolezo"); alias(26, "ezekieli"); alias(27, "danieli"); alias(28, "hosea"); alias(29, "yoeli");
+        alias(30, "amosi"); alias(31, "obadia"); alias(32, "yona"); alias(33, "mika"); alias(34, "nahumu");
+        alias(35, "habakuki"); alias(36, "sefania"); alias(37, "hagai"); alias(38, "zekaria"); alias(39, "malaki");
+        alias(40, "mathayo"); alias(41, "marko"); alias(42, "luka"); alias(43, "yohana"); alias(44, "matendo");
+        alias(45, "warumi"); alias(46, "1 wakorintho"); alias(47, "2 wakorintho"); alias(48, "wagalatia"); alias(49, "waefeso");
+        alias(50, "wafilipi"); alias(51, "wakolosai"); alias(52, "1 wathesalonike"); alias(53, "2 wathesalonike");
+        alias(54, "1 timotheo"); alias(55, "2 timotheo"); alias(56, "tito"); alias(57, "filemoni"); alias(58, "waebrania");
+        alias(59, "yakobo"); alias(60, "1 petro"); alias(61, "2 petro"); alias(62, "1 yohana"); alias(63, "2 yohana");
+        alias(64, "3 yohana"); alias(65, "yuda"); alias(66, "ufunuo");
     }
 
     private static final Pattern CHAPTER_VERSE = Pattern.compile("(?<![\\p{L}\\p{N}])(\\d{1,3}):(\\d{1,3})(?!\\d)");

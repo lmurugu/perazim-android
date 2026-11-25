@@ -583,6 +583,16 @@ public final class ApprovedRoutes {
                 "Scripture does not identify Sunday as the mark of the beast, and I cannot verify that claim from the text. The mark in Revelation 13 is not named as Sunday in the text. Paul wrote: 'Let no man therefore judge you' (Colossians 2:16), and 'Let every man be fully persuaded in his own mind' (Romans 14:5). We test this teaching by Scripture alone.",
                 "Colossians 2:16", "Romans 14:5"));
 
+        r.add(new Route("isaiah-53-context",
+                "isaiah 53|isaya 53",
+                "Isaiah 53 is one of the Servant Songs in Isaiah. The prophet spoke to a people in exile, who needed to know that the LORD had not forgotten them. The chapter describes a servant who is despised and rejected, and who suffers for the sins of others (Isaiah 53:3–5). Scripture does not name the servant in the chapter itself. The New Testament shows the Ethiopian official reading this passage, and Philip explaining it as the good news of Jesus (Acts 8:35). So the original hearers read it as God's promise of a servant who would bear the people's sin, and the New Testament shows how it was fulfilled in Jesus. We test every teaching by Scripture alone.",
+                "Isaiah 53:5", "Acts 8:35"));
+
+        r.add(new Route("psalm-137-context",
+                "psalm 137|psalms 137|imprecat\\w*",
+                "Psalm 137 is a lament by exiles in Babylon, who wept by the rivers because they could not sing the LORD's song in a foreign land (Psalms 137:1–4). Its last verses are hard, and they call for judgement on Babylon (Psalms 137:8–9). Read in context, these verses are a cry to God about real suffering and a longing for justice, and they are not a private plan for revenge. Scripture also teaches that vengeance belongs to the LORD (Romans 12:19), and that the people of God are to love their enemies (Matthew 5:44). We read the Psalms as prayers to God, and we do not copy every feeling into action.",
+                "Psalms 137:1", "Romans 12:19"));
+
         r.add(new Route("grace-meaning",
                 "grace mean|meaning of grace|maana ya neema|what is grace",
                 "Grace is God's unearned favour toward sinners. Scripture says that we are saved by grace through faith, and that this is not of ourselves: it is the gift of God (Ephesians 2:8–9). Paul also says that we are justified freely by his grace, through the redemption that is in Christ Jesus (Romans 3:24). Because grace is not earned, it leads to gratitude and to a holy life (Titus 2:11–12). We test every teaching by Scripture alone.",

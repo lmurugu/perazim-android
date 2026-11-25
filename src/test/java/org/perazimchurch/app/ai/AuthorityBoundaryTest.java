@@ -30,7 +30,7 @@ public class AuthorityBoundaryTest {
         assertTrue(PerazimAiEngine.isProfessionalMatterQuery("Should I sue my landlord?"));
         assertTrue(PerazimAiEngine.isProfessionalMatterQuery("Which shares should I buy?"));
         assertFalse(PerazimAiEngine.isProfessionalMatterQuery("How do I pray for healing?"));
-        assertEquals("I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
+        assertEquals("I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI) and Christian faith, so I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
                 PerazimAiEngine.boundaryResponseFor("What medication should I take?").getMessageText());
     }
 

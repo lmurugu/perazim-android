@@ -30,7 +30,23 @@ public final class ScriptureReferenceNormalizer {
     private static final String[][] ALIASES = {
             {"psalm", "Psalms"}, {"song of songs", "Song of Solomon"}, {"songs", "Song of Solomon"},
             {"revelations", "Revelation"}, {"mathew", "Matthew"}, {"matt", "Matthew"}, {"phillipians", "Philippians"},
-            {"ecclesiasties", "Ecclesiastes"}, {"jn", "John"}, {"1jn", "1 John"}, {"2jn", "2 John"}, {"3jn", "3 John"}
+            {"ecclesiasties", "Ecclesiastes"}, {"jn", "John"}, {"1jn", "1 John"}, {"2jn", "2 John"}, {"3jn", "3 John"},
+            // Swahili book names (Biblia Takatifu, Union Version): Mwanzo, Zaburi, Yohana and the rest.
+            {"mwanzo", "Genesis"}, {"kutoka", "Exodus"}, {"walawi", "Leviticus"}, {"hesabu", "Numbers"},
+            {"kumbukumbu", "Deuteronomy"}, {"yoshua", "Joshua"}, {"waamuzi", "Judges"}, {"ruthu", "Ruth"},
+            {"1 samweli", "1 Samuel"}, {"2 samweli", "2 Samuel"}, {"1 wafalme", "1 Kings"}, {"2 wafalme", "2 Kings"},
+            {"ezra", "Ezra"}, {"nehemia", "Nehemiah"}, {"esta", "Esther"}, {"ayubu", "Job"}, {"zaburi", "Psalms"},
+            {"mithali", "Proverbs"}, {"mhubiri", "Ecclesiastes"}, {"wimbo ulio bora", "Song of Solomon"},
+            {"isaya", "Isaiah"}, {"yeremia", "Jeremiah"}, {"maombolezo", "Lamentations"}, {"ezekieli", "Ezekiel"},
+            {"danieli", "Daniel"}, {"hosea", "Hosea"}, {"yoeli", "Joel"}, {"amosi", "Amos"}, {"obadia", "Obadiah"},
+            {"yona", "Jonah"}, {"mika", "Micah"}, {"nahumu", "Nahum"}, {"habakuki", "Habakkuk"}, {"sefania", "Zephaniah"},
+            {"hagai", "Haggai"}, {"zekaria", "Zechariah"}, {"malaki", "Malachi"}, {"mathayo", "Matthew"}, {"marko", "Mark"},
+            {"luka", "Luke"}, {"yohana", "John"}, {"matendo", "Acts"}, {"warumi", "Romans"}, {"1 wakorintho", "1 Corinthians"},
+            {"2 wakorintho", "2 Corinthians"}, {"wagalatia", "Galatians"}, {"waefeso", "Ephesians"}, {"wafilipi", "Philippians"},
+            {"wakolosai", "Colossians"}, {"1 wathesalonike", "1 Thessalonians"}, {"2 wathesalonike", "2 Thessalonians"},
+            {"1 timotheo", "1 Timothy"}, {"2 timotheo", "2 Timothy"}, {"tito", "Titus"}, {"filemoni", "Philemon"},
+            {"waebrania", "Hebrews"}, {"yakobo", "James"}, {"1 petro", "1 Peter"}, {"2 petro", "2 Peter"},
+            {"1 yohana", "1 John"}, {"2 yohana", "2 John"}, {"3 yohana", "3 John"}, {"yuda", "Jude"}, {"ufunuo", "Revelation"}
     };
 
     private static final Pattern REFERENCE = Pattern.compile(

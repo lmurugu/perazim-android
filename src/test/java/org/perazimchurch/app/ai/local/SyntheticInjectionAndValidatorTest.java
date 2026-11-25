@@ -48,7 +48,7 @@ public class SyntheticInjectionAndValidatorTest {
                 "You can see your streak on the home screen.",
                 "The available church documents do not establish an official position on this question.",
                 "Please speak with the Bishop or an appropriate person about this decision.",
-                "I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
+                "I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI) and Christian faith, so I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
                 "Scripture is the highest authority; this is a developing interpretation, not an official position.",
                 "I cannot verify that from the approved sources.",
                 "Psalm 23 describes God as a shepherd who provides for his people."

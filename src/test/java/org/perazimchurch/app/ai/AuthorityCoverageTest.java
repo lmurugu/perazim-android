@@ -23,7 +23,7 @@ public class AuthorityCoverageTest {
                 // 4. Acknowledges missing or conflicting church information
                 "The available sources contain conflicting information, so the church office must confirm it.",
                 // 5. Medical, legal and financial referral
-                "I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
+                "I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI) and Christian faith, so I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
                 // 6. Biblical teaching on salvation without a personal judgement
                 "Romans 10:9 teaches that confessing Jesus as Lord and believing in His resurrection brings salvation. Whether that applies to any particular person is for God alone to judge.",
                 // Negative control for the official-status rule

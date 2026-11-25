@@ -668,7 +668,7 @@ public class PerazimAiEngine {
     @NonNull
     public static AiResponse professionalBoundaryResponse() {
         return AiResponse.plainText(
-                "I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
+                "I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI) and Christian faith, so I am not authorised to provide medical, legal or financial advice. Please consult a suitably qualified professional.",
                 Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
@@ -824,6 +824,11 @@ public class PerazimAiEngine {
     private static final Pattern MODEL_IN_SCOPE_TOPIC = Pattern.compile(
             "\\b(?:bible|biblia|scripture|scriptures|verse|verses|aya|chapter|book of|gospel|injili|psalm|psalms|zaburi|proverbs|" +
             "genesis|exodus|romans|corinthians|ephesians|galatians|hebrews|revelation|matthew|luke|john|isaiah|ruth|" +
+            // Swahili book names for the scope gate.
+            "mwanzo|kutoka|walawi|hesabu|kumbukumbu|yoshua|waamuzi|ruthu|samweli|wafalme|mambo ya nyakati|nehemia|esta|" +
+            "ayubu|mithali|mhubiri|wimbo ulio bora|isaya|yeremia|maombolezo|ezekieli|danieli|yoeli|amosi|obadia|yona|mika|" +
+            "nahumu|habakuki|sefania|hagai|zekaria|malaki|mathayo|marko|luka|yohana|matendo|warumi|wakorintho|wagalatia|" +
+            "waefeso|wafilipi|wakolosai|wathesalonike|timotheo|tito|filemoni|waebrania|yakobo|petro|yuda|ufunuo|" +
             "david|goliath|moses|paul|peter|abraham|noah|daniel|elijah|jonah|job|joseph|jacob|samuel|solomon|esther|timothy|titus|philippians|thessalonians|lazarus|mary|martha|bethlehem|" +
             "warumi|korintho|wakorintho|waefeso|wagalatia|waebrania|ufunuo|mathayo|yesu|jesus|christ|god|mungu|lord|holy spirit|roho mtakatifu|mtakatifu|roho|spirit|trinity|commandments?|amri|" +
             "prayer|prayers|pray|praying|maombi|sala|devotional|devotion|faith|imani|grace|neema|mercy|forgiveness|parable|sabbath|" +
