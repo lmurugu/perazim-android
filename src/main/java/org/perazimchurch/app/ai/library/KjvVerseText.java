@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,8 +51,8 @@ public final class KjvVerseText {
     /** Loads the bundled full KJV once. Returns an empty table if the files cannot be read. */
     public static synchronized KjvVerseText load(Context context) {
         if (cached != null) return cached;
-        try (InputStream raw = context.getAssets().open(KJV_TSV)) {
-            cached = fromTsv(new GZIPInputStream(raw), read(context, MANIFEST));
+        try (InputStream tsv = org.perazimchurch.app.data.local.seeder.BibleAssets.openText(context, KJV_TSV)) {
+            cached = fromTsv(tsv, read(context, MANIFEST));
         } catch (Exception e) {
             cached = empty();
         }
@@ -62,8 +61,8 @@ public final class KjvVerseText {
 
     /** Parses the same files from the source tree, for the JVM tests and the evaluation harness. */
     public static KjvVerseText fromFiles(java.io.File tsvGz, java.io.File manifest) throws IOException, JSONException {
-        try (InputStream in = new java.io.FileInputStream(tsvGz)) {
-            return fromTsv(new GZIPInputStream(in), new String(java.nio.file.Files.readAllBytes(manifest.toPath()),
+        try (InputStream in = new java.util.zip.GZIPInputStream(new java.io.FileInputStream(tsvGz))) {
+            return fromTsv(in, new String(java.nio.file.Files.readAllBytes(manifest.toPath()),
                     StandardCharsets.UTF_8));
         }
     }
