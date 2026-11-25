@@ -13,7 +13,7 @@ public class GuideDocsRouterTest {
     @Test
     public void bundledOperatingFilesLoadWithVersionCoreAndPlaybooks() throws Exception {
         GuideDocs docs = GuideTestSupport.docs();
-        assertEquals("1.0.0", docs.version());
+        assertEquals("1.2.0", docs.version());
         assertTrue(docs.core().startsWith("RULES (locked):"));
         assertFalse("markers must not reach the prompt", docs.core().contains("CORE:"));
         assertEquals(11, docs.index().size());
