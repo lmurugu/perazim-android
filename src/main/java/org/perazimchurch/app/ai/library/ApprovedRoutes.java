@@ -265,22 +265,12 @@ public final class ApprovedRoutes {
 
         r.add(new Route("matthew-7-21-lord-lord",
                 "not everyone who (?:saith|says|calls).{0,40}lord|lord,? lord|calls? (?:me|him|jesus|the lord) lord",
-                "Jesus says that not everyone who calls Him Lord will enter the kingdom of heaven, but the one who does the will of His "
-                + "Father in heaven (Matthew 7:21). Many will say 'Lord, Lord' and be turned away, because He never knew them (Matthew 7:22–23). "
-                + "Calling Him Lord is not enough. Jesus asks: 'why call ye me, Lord, Lord, and do not the things which I say?' (Luke 6:46).\n\n"
-                + "This does not mean that we earn salvation. Faith in Christ is what saves, and true faith is shown in obedience that comes "
-                + "from it (Ephesians 2:8–10). We do not judge any person's standing before God. Test yourself and every profession by the "
-                + "words of Christ, and talk with a trusted church leader or pastor if you are unsure.",
+                "Jesus says: 'Not every one that saith unto me, Lord, Lord, shall enter into the kingdom of heaven; but he that doeth the will of my Father which is in heaven' (Matthew 7:21). Calling Him Lord is not enough. He asks: 'And why call ye me, Lord, Lord, and do not the things which I say?' (Luke 6:46). Faith in Christ is what saves: 'For by grace are ye saved through faith' (Ephesians 2:8). We do not judge any person's standing before God. Test yourself and every profession by the words of Christ, and talk with a trusted church leader or pastor if you are unsure.",
                 "Matthew 7:21", "Luke 6:46"));
 
         r.add(new Route("pharaoh-heart",
                 "pharaoh|pharoah",
-                "The Bible teaches two truths side by side, and we hold both. Pharaoh hardened his own heart again and again (Exodus 8:15). "
-                + "God also hardened Pharaoh's heart, and He told Pharaoh that He had raised him up to show His power and to make His name "
-                + "known throughout the earth (Exodus 9:12, 16; Romans 9:17–18).\n\n"
-                + "Scripture does not make God the author of sin. Pharaoh was responsible for refusing God's word, and God's purpose was "
-                + "carried out through that refusal. We do not claim to explain every mystery. Paul answers the question with a call to "
-                + "humility before God (Romans 9:20). Human responsibility and God's sovereignty are both taught in Scripture (Philippians 2:12–13).",
+                "The Bible holds two truths side by side, and we hold both. Pharaoh 'hardened his heart' himself (Exodus 8:15), and God told Pharaoh: 'Even for this same purpose have I raised thee up' (Romans 9:17). Scripture does not make God the author of sin, and we do not claim to explain every mystery. Paul answers the question with a call to humility: 'Nay but, O man, who art thou that repliest against God?' (Romans 9:20).",
                 "Exodus 8:15", "Romans 9:17"));
 
         r.add(new Route("agape-and-philia",
@@ -340,10 +330,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("sickness-not-punishment",
                 "\\bcurse\\b.{0,40}(?:sickness|sick|illness|disease|hiv)|(?:sickness|sick|illness|disease|hiv).{0,40}(?:punish|curse)|punishment for sin",
-                "Scripture does not teach that every sickness is a curse or a punishment for a particular sin. When the disciples asked whether "
-                + "a man's blindness came from his sin or his parents' sin, Jesus answered that the works of God would be shown in him "
-                + "(John 9:2–3). We should not blame sick people. Please see a doctor or clinic for the illness, and talk with your pastor or a "
-                + "trusted church leader about any fear or shame you may be carrying.",
+                "Scripture does not teach that every sickness is a curse or a punishment for a particular sin. When the disciples asked about a man born blind, Jesus answered: 'Neither hath this man sinned, nor his parents: but that the works of God should be made manifest in him' (John 9:3). We should not blame sick people. Please see a doctor or clinic for the illness, and talk with your pastor or a trusted church leader about any fear or shame you may be carrying.",
                 "John 9:2", "John 9:3"));
 
         r.add(new Route("medication-and-faith",
@@ -414,7 +401,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("governance-accountability",
                 "uwazi wa fedha|hakuna uwazi|financial transparency|fedha",
-                "Scripture calls church leaders to handle money honestly: 'providing for honest things, not only in the sight of the Lord, but in the sight of men' (2 Corinthians 8:20–21). It is right to ask for clear, open accounts of church money. Please raise this in writing with your pastor, the church office or a trusted church leader, and ask for a report. I cannot judge any individual, but honest money handling is part of faithful leadership.",
+                "Scripture calls church leaders to handle money honestly: 'Providing for honest things, not only in the sight of the Lord, but also in the sight of men' (2 Corinthians 8:20–21). It is right to ask for clear, open accounts of church money. Please raise this in writing with your pastor, the church office or a trusted church leader, and ask for a report. I cannot judge any individual, but honest money handling is part of faithful leadership.",
                 "2 Corinthians 8:20", "2 Corinthians 8:21"));
 
         r.add(new Route("remove-pastor",
