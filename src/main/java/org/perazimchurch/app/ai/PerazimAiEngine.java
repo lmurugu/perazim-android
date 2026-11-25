@@ -309,7 +309,7 @@ public class PerazimAiEngine {
     /** Overdose or poisoning: an emergency now, whatever the symptoms. */
     private static final Pattern OVERDOSE_PATTERN = Pattern.compile(
             "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison)|" +
-            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:my|the) (?:tablets|pills)|" +
+            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:of )?(?:my|the) (?:\\w+ )?(?:tablets|pills)|drank (?:some |a bottle of |a packet of )?(?:rat )?poison|nimekunywa sumu|" +
             // Swallowed medicine with any short description in between ("swallowed a packet of tablets an hour ago"), and Swahili "nimemeza vidonge".
             "swallowed (?:\\w+\\s+){0,4}?(?:tablets|pills|capsules|poison|medicine)|nimemeza (?:\\w+\\s+){0,3}?(?:vidonge|sumu))\\b", Pattern.CASE_INSENSITIVE);
 
@@ -496,10 +496,33 @@ public class PerazimAiEngine {
     private static final Pattern SELLING_CUE = Pattern.compile(
             "\\b(?:sell|selling|sells|deal|dealing|traffick\\w*|smuggl\\w*|supply|supplying)\\b", Pattern.CASE_INSENSITIVE);
 
+    /** A child or young person named with a substance and an ongoing-use cue in the same sentence (KE-044, 2026-11-25). */
+    private static final Pattern CHILD_SUBSTANCE_NOUN = Pattern.compile(
+            "\\b(?:kijana|vijana|mtoto|watoto|mwanangu|wanangu|my (?:son|daughter|child|children|kid|kids|teen|teenager)|our (?:son|daughter|child|children|kids?))\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern SUBSTANCE_CUE = Pattern.compile(
+            "\\b(?:bangi|pombe|bhang|cannabis|weed|drugs?|dawa za kulevya|alcohol|heroin|cocaine|kuvuta|mirungi|gongo|changaa)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern ONGOING_USE_CUE = Pattern.compile(
+            "\\b(?:kila (?:siku|usiku)|every (?:day|night)|daily|nightly|anatumia|wanatumia|anakunywa|anavuta|uses|using|smokes|smoking|drinks|"
+            + "addict\\w*|amezoea|hooked|can'?t stop|cannot stop)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** True when one sentence names a child, a substance and ongoing use, so the question is about a child's safety. */
+    public static boolean isChildSubstanceUse(@Nullable String query) {
+        if (query == null) return false;
+        for (String sentence : query.split("[.?!]+")) {
+            if (CHILD_SUBSTANCE_NOUN.matcher(sentence).find() && SUBSTANCE_CUE.matcher(sentence).find() && ONGOING_USE_CUE.matcher(sentence).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isDrugSafetyQuery(@Nullable String query) {
         if (query == null) return false;
         String withoutMiraa = MIRAA_CUE.matcher(query).replaceAll(" ");
-        return DRUG_CUE.matcher(withoutMiraa).find() || (DRUG_CUE.matcher(query).find() && SELLING_CUE.matcher(query).find());
+        return DRUG_CUE.matcher(withoutMiraa).find() || (DRUG_CUE.matcher(query).find() && SELLING_CUE.matcher(query).find())
+                || isChildSubstanceUse(query);
     }
 
     /** Requests to search the live web or current news. Declined before the Bible cues (see preModelRoute). */
@@ -903,7 +926,46 @@ public class PerazimAiEngine {
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
         return CRISIS_PATTERN.matcher(normalized).find() || CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find()
                 || SELF_HARM_TYPO_PATTERN.matcher(normalized).find() || isMeansAndDistress(normalized)
-                || SELF_HARM_INTENT.matcher(normalized).find() || SELF_HARM_GENERAL.matcher(normalized).find();
+                || SELF_HARM_INTENT.matcher(normalized).find() || SELF_HARM_GENERAL.matcher(normalized).find()
+                || isFirstPersonRiskSentence(normalized);
+    }
+
+    /** A sentence with the speaker in it (I, my, mimi, nataka, nimeamua, ...). */
+    private static final Pattern FIRST_PERSON_MARK = Pattern.compile(
+            "\\b(?:i|me|my|myself|mimi|nina|sina|nataka|sitaki|nimeamua|nimeshika|nimekunywa|nimemeza|nakaribia|naeza|nimechoka|nafikiria|najiua|nitajiua|nitakufa)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Words that name self-harm, suicide, or not wanting to live. Strong on their own, with a first-person sentence. */
+    private static final Pattern STRONG_RISK_TERM = Pattern.compile(
+            "\\b(?:kill myself|hurt myself|suicid\\w*|kujiua|jiua|kujiumiza|jiumiza|hang myself|not be here|won'?t be around|not coming back|" +
+            "disappear\\w*|ku-?end|ku-?exit|exit dunia|step off|jump(?:ing)? (?:off|from)|want to die|going to die|nataka kufa|nitakufa|nimeamua kufa|" +
+            "sitaki kuishi|sitaki kuendelea|sina sababu ya kuishi|sababu ya kuendelea|no reason to (?:live|go on)|not want to live|" +
+            "can'?t go on|cannot go on|goodbye letter|barua ya kuaga|kuaga|mzigo|burden to|pain to (?:end|stop)|end forever|" +
+            "never wake up|not wake up|nobody would miss|no one would miss|nobody would notice|no one would notice|" +
+            "better off without me|sioni maana ya maisha|sina maana ya kuishi|maisha hayana maana|no meaning in (?:my )?life|" +
+            "nafikiria kufa|kufikiria kufa|" +
+            // Self-injury, in the speaker's own words (burning, cutting, bleeding): a general category, not one sentence.
+            "cutting (?:my |the )?(?:arms?|wrists?|skin|self|myself|legs?)|burn\\w* my (?:skin|arms?|self)|" +
+            "nimejikata|kujikata|kujichoma|kujikeketa|damu inatoka|blood (?:is )?(?:coming|running|everywhere)|" +
+            // Ending, goodbye and absence as a general category: no way out, tired of living, leaving for good, being gone.
+            "no way out|can'?t see any way|stopped trying to|" +
+            "want (?:it|the whole thing|everything) to be over|for good|goodbye|kwaheri|naaga|nisingekuwepo|bila mimi|" +
+            "ningependa kufa|kufa tu|waking up tomorrow|happier if i|better off without|familia yangu.{0,30}bila|disappear)\\b", Pattern.CASE_INSENSITIVE);
+    /** Means of harm: only with a danger context in the same sentence, so "I take my pills" stays benign. */
+    private static final Pattern MEANS_TERM = Pattern.compile(
+            "\\b(?:rope|noose|kamba|razor|blade|knife|kisu|poison|sumu|pills|tablets|vidonge|bridge|ledge|roof|balcony|gun)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DANGER_CONTEXT = Pattern.compile(
+            "\\b(?:ready|in my hand|nimeshika|tonight|tonite|usiku huu|leo|today|decided|nimeamua|bought|wondering|sitting|standing|climb\\w*|" +
+            "stop this time|sat there|swallowed|took all|all my|sleeping pills|vingi|stop|finish|end)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** True when one sentence has the speaker and a strong self-harm term, or a means with danger context. */
+    public static boolean isFirstPersonRiskSentence(@Nullable String query) {
+        if (query == null) return false;
+        for (String sentence : query.split("[.?!;]+")) {
+            if (!FIRST_PERSON_MARK.matcher(sentence).find()) continue;
+            if (STRONG_RISK_TERM.matcher(sentence).find()) return true;
+            if (MEANS_TERM.matcher(sentence).find() && DANGER_CONTEXT.matcher(sentence).find()) return true;
+        }
+        return false;
     }
 
     /** Conservative pre-model route for personal pastoral disclosures; not a risk diagnosis. */
