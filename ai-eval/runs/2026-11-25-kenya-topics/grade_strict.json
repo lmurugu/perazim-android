@@ -1,0 +1,210 @@
+{
+  "total": 885,
+  "passed": 470,
+  "by_category": {
+    "pastoral_struggle": [
+      34,
+      45
+    ],
+    "scripture_exegesis": [
+      25,
+      42
+    ],
+    "soteriology_apostasy": [
+      7,
+      32
+    ],
+    "holy_spirit_pentecostal": [
+      13,
+      26
+    ],
+    "israel_church_eschatology": [
+      7,
+      24
+    ],
+    "historical_apologetics": [
+      0,
+      24
+    ],
+    "church_authority_boundaries": [
+      13,
+      21
+    ],
+    "role_boundaries_refusal": [
+      9,
+      24
+    ],
+    "safety_crisis_safeguarding": [
+      62,
+      62
+    ],
+    "privacy_confidentiality": [
+      36,
+      36
+    ],
+    "language_pastoral_tone": [
+      15,
+      27
+    ],
+    "biblical_accuracy_hallucination": [
+      21,
+      26
+    ],
+    "general_intelligence_scope": [
+      46,
+      61
+    ],
+    "contradiction_consistency": [
+      2,
+      17
+    ],
+    "denominational_fairness": [
+      3,
+      16
+    ],
+    "spiritual_manipulation": [
+      15,
+      24
+    ],
+    "research_source_verification": [
+      12,
+      18
+    ],
+    "reasoning_critical_analysis": [
+      0,
+      18
+    ],
+    "memory_continuity_privacy": [
+      5,
+      5
+    ],
+    "tool_use_execution": [
+      22,
+      32
+    ],
+    "resource_use": [
+      14,
+      31
+    ],
+    "trick_premise": [
+      1,
+      6
+    ],
+    "trick_fake_verse": [
+      0,
+      5
+    ],
+    "trick_misquote": [
+      3,
+      5
+    ],
+    "drift": [
+      1,
+      21
+    ],
+    "proof_text": [
+      7,
+      18
+    ],
+    "catholic_orthodox": [
+      1,
+      10
+    ],
+    "cult_group": [
+      0,
+      8
+    ],
+    "pastoral": [
+      5,
+      7
+    ],
+    "privacy": [
+      3,
+      3
+    ],
+    "human_decision": [
+      0,
+      2
+    ],
+    "governance": [
+      0,
+      6
+    ],
+    "impersonation": [
+      3,
+      5
+    ],
+    "scope": [
+      9,
+      13
+    ],
+    "multi_turn": [
+      0,
+      4
+    ],
+    "variant": [
+      0,
+      6
+    ],
+    "ke_witchcraft_curses": [
+      9,
+      14
+    ],
+    "ke_prosperity_seed_tithing": [
+      6,
+      14
+    ],
+    "ke_false_prophets_miracles": [
+      3,
+      10
+    ],
+    "ke_deliverance_demons": [
+      5,
+      8
+    ],
+    "ke_culture_rites": [
+      4,
+      13
+    ],
+    "ke_marriage_family": [
+      9,
+      12
+    ],
+    "ke_economics_debt_betting": [
+      9,
+      12
+    ],
+    "ke_alcohol_drugs": [
+      6,
+      8
+    ],
+    "ke_mental_health_stigma": [
+      8,
+      10
+    ],
+    "ke_health_hiv_medicine": [
+      5,
+      10
+    ],
+    "ke_church_governance_abuse": [
+      4,
+      10
+    ],
+    "ke_sabbath_sda": [
+      1,
+      8
+    ],
+    "ke_islam_coast": [
+      2,
+      8
+    ],
+    "ke_elections_tribe": [
+      1,
+      6
+    ],
+    "ke_language_tone": [
+      4,
+      12
+    ]
+  }
+}

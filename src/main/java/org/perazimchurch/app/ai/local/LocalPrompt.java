@@ -144,6 +144,8 @@ public final class LocalPrompt {
         t = t.replaceFirst("(?i)^it'?s important to remember that\\s*", "");
         t = t.replaceAll("(?i)\\s*how can i assist you( today)?\\??[.!]?", "");
         t = t.replaceFirst("(?i)^i'?m here to assist you with any questions or concerns you may have\\.?\\s*", "");
+        // Removing a stock opener can leave a leading comma or dash (EX-097): drop it so the reply starts cleanly.
+        t = t.replaceFirst("^[\\s,;:.\\-\u2013\u2014)\\]]+", "");
         if (t.isEmpty()) return text.trim();
         return Character.toUpperCase(t.charAt(0)) + t.substring(1);
     }

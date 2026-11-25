@@ -18,20 +18,30 @@
    "description": "Doctrine status register. Topic status only (APPROVED, UNDER_REVIEW, UNDECIDED, DRAFT_PENDING_LEVI). Fail-closed.",
    "files": [
     {
+     "path": "doctrine/entries.json",
+     "sha256": "f1aa4293486b457ddb3ffa62ec135ecbfdd72377375e821f1f59aaf010b04279",
+     "bytes": 8336
+    },
+    {
      "path": "doctrine/positions.json",
-     "sha256": "f2129206430334a7d28db19aa967a212b40db8714212ba0967663c8b61c69b3c",
-     "bytes": 4085
+     "sha256": "10d222027ed6c69dc135bc97a2dec96d966611fb290b8d0f5c37476280fc59b3",
+     "bytes": 9205
     }
    ]
   },
   {
    "part": "kenya",
-   "description": "Kenyan contacts with their verification status, as recorded by Levi.",
+   "description": "Kenyan contacts with their verification status, as recorded by Levi, and constitutional summaries with citations (DRAFT_PENDING_LEVI).",
    "files": [
     {
      "path": "kenya/crisis-contacts.json",
-     "sha256": "2b72ffc04bcc0b129336d1a336d83aca9a7e4245ce7a8ee52e9ab7628673123e",
-     "bytes": 1971
+     "sha256": "ad5418be934ba97e03448524ab1bb49a052a964765a0f7d4b604e3fd46159be6",
+     "bytes": 3365
+    },
+    {
+     "path": "kenya/legal-summaries.json",
+     "sha256": "bce15e8be18c82b4600647ff41db2ed755f82b49a4a857e1b4995c2262353283",
+     "bytes": 3194
     }
    ]
   },
@@ -43,6 +53,38 @@
      "path": "sources/register.json",
      "sha256": "f523efece92ef2f2c9af9fe9459de973f54df753d591dc4879d104a35064713f",
      "bytes": 12709
+    }
+   ]
+  },
+  {
+   "part": "pastoral",
+   "description": "Kenyan pastoral-support topics. Verse text from the bundled KJV only. DRAFT_PENDING_LEVI. Fail-closed.",
+   "files": [
+    {
+     "path": "pastoral/kenya-topics.json",
+     "sha256": "e39f372f9d5bee2f59457964f5d088c88724f9eb1479e916bf2e8502830e64e1",
+     "bytes": 12462
+    }
+   ]
+  },
+  {
+   "part": "creeds",
+   "description": "Creed and confession texts awaiting approval: Apostles' Creed and the Westminster Confession (historical, not a Perazim position). DRAFT_PENDING_LEVI. Not read by any loader until Levi approves them.",
+   "files": [
+    {
+     "path": "creeds/SOURCE.md",
+     "sha256": "ce214f0715bdacac0c16b59cd89bec03b615d74c9aee38959e6735550ad1ada5",
+     "bytes": 1807
+    },
+    {
+     "path": "creeds/apostles-creed.txt",
+     "sha256": "605d40a40ed8280d20573c3436db88cd186dc4d92b6a9b360405b33c9d8ef583",
+     "bytes": 647
+    },
+    {
+     "path": "creeds/westminster-confession-1647.txt",
+     "sha256": "6293d363d85e90eaf6c3db432c4c403f023450c36bf244bc8f6bc563da08bd12",
+     "bytes": 66925
     }
    ]
   }

@@ -14,3 +14,15 @@ KNOWN LIMITS
 - Memory is per device and per install. Nothing is uploaded. Clearing app data erases it.
 - Online Gemini answers are not covered by this guide's self-learning.
 - Verse and chapter checks use the standard chapter counts of the 66 books. Verse-number checks need the Bible database.
+
+RELEASE GATES (Levi, 2026-11-24)
+- Safety and privacy: 100% pass, zero critical failures. Never a no-go zone.
+- Doctrine, interpretation and verse search: 98% or more, with zero fabricated Scripture.
+- Every other category: 90% or more, or an 80% overall average if 90% is not reachable.
+- Automatic checks are not clearance. A partial pass is not clearance.
+
+NO-GO ZONES (declared 2026-11-25 from the grounded-answer rubric review)
+- 13 zones, listed in NoGoZones.java. Zones cover every grounded question in the review. Basis: AI rubric review, pending Levi's spot check (ai-eval/runs/2026-11-25-grounded).
+- In a zone the guide gives one fixed, warm decline that names a trusted church leader, and the model never answers. Zones run after the safety, privacy, approved-doctrine and verbatim-verse routes.
+- A zone is lifted only by a rerun that passes its category gate. Safety and privacy are never zoned.
+- Open for Levi: the resource-lookup zone also blocks the verbatim Nicene Creed (rubric 4). Decide whether to keep it zoned or add an approved creed route.

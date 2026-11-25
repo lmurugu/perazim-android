@@ -36,7 +36,7 @@ public class PerazimAiEngine {
                     "(?:will|might|may|is going to) (?:hurt|hit|beat|attack|kill) (?:me|my child|our child)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern SENSITIVE_PASTORAL_REQUEST = Pattern.compile(
-            "\\b(?:keep (?:this|it) confidential|keep (?:this|it) secret|don't tell anyone|do not tell anyone|" +
+            "\\b(?:keep (?:this|it) confidential|keep (?:this|it) secret|don't tell anyone|do not tell anyone|never tell (?:anyone|anybody)|" +
                     "please don't share this|please do not share this|pastoral intervention)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern PERSONAL_CONTEXT = Pattern.compile(
@@ -45,10 +45,14 @@ public class PerazimAiEngine {
     private static final Pattern SENSITIVE_PASTORAL_TOPIC = Pattern.compile(
             "\\b(?:abuse|assault|rape|violence|hit me|beating|marital conflict|family conflict|divorce|" +
                     "separation|trauma|grief|bereavement|mourning|depress(?:ion|ed)?|anx(?:iety|ious)|" +
-                    "panic attack|self[ -]?harm|suicid(?:e|al)|addict(?:ion|ed)|overdose|confession|" +
+                    "panic attack|self[ -]?harm|suicid(?:e|al)|addict(?:ion|ed)|overdose|confession|confess\\w*|" +
                     "confidential|secret)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final Pattern[] CLEARLY_OUT_OF_SCOPE_PATTERNS = {
+            Pattern.compile("\\b(?:kenya'?s?|employment|labou?r|parliament|government)\\b.{0,40}\\b(?:laws?|legislation|acts?)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:court|lawyer|attorney|landlord|tenant|evict|eviction)\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:best|cheapest|good)\\s+(?:car|cars|phone|phones|laptop|laptops|house|houses|tv|television)\\b|\\bto buy\\b", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("\\b(?:love letter|romantic (?:letter|message|poem)|write (?:me )?a (?:love )?(?:poem|song|letter) (?:for|to) (?:my|a) (?:girlfriend|boyfriend|crush))\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:which|what)\\s+(?:stock|stocks|share|shares|cryptocurrency|crypto|bitcoin|forex|bond|bonds)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:buy|sell|trade|invest in)\\b.{0,70}\\b(?:stock|stocks|share|shares|cryptocurrency|crypto|bitcoin|forex|bond|bonds)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:should i|recommend|help me choose|help me pick)\\b.{0,70}\\b(?:investment portfolio|retirement portfolio|personal budget|payday loan|mortgage|credit card|tax return|insurance policy)\\b", Pattern.CASE_INSENSITIVE),
@@ -211,7 +215,7 @@ public class PerazimAiEngine {
 
     public static AiResponse crisisResponse() {
         String msg = "I'm sorry you're facing this. If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If you can, tell a trusted person nearby and ask them to stay with you. For ongoing distress, contact a qualified local health professional.\n\n"
-                + "Kenya support lines: 922 (medical emergency), 999 or 112 (police emergency), 1195 (gender-based violence), 116 (child helpline), 1192 (NACADA, substance use), Befrienders +254 722 178 177 (weekdays 9am–5pm only).\n\n"
+                + "Kenya support lines: 999 or 112 (police emergency and immediate danger), 922 (medical emergency, including overdose or poisoning), 116 (child helpline), 1192 (NACADA, drug and alcohol use), Befrienders Kenya +254 722 178 177 (emotional support, weekdays 9am to 5pm only). A gender-based violence line, 1195, may not be current, so confirm it before you rely on it.\n\n"
                 + "You can also use the app's prayer feature or a church contact shown in the app, if you choose. This guide cannot provide emergency monitoring or confirm that a pastoral contact is available.";
         return AiResponse.plainText(msg, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
@@ -230,7 +234,8 @@ public class PerazimAiEngine {
     /** Means plus distress is a risk message and must never reach the scope gate. */
     /** Overdose or poisoning: an emergency now, whatever the symptoms. */
     private static final Pattern OVERDOSE_PATTERN = Pattern.compile(
-            "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison))\\b", Pattern.CASE_INSENSITIVE);
+            "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison)|" +
+            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:my|the) (?:tablets|pills))\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isOverdoseQuery(@Nullable String query) {
         return query != null && OVERDOSE_PATTERN.matcher(query).find();
@@ -252,7 +257,10 @@ public class PerazimAiEngine {
     /** Intent to harm a named or unnamed other person (typos tolerated). */
     private static final Pattern HARM_OTHERS_PATTERN = Pattern.compile(
             "\\b(?:kill|killing|hurt|harm|stab|shoot|beat)\\b.{0,40}\\b(?:s[ou]m[a-z]{0,2}ne|somebody|someon|him|her|them|person|boss|husband|wife|neighbour|neighbor|child)\\b|" +
-            "\\bthoughts of (?:killing|hurting)\\b", Pattern.CASE_INSENSITIVE);
+            "\\bthoughts of (?:killing|hurting)\\b|" +
+            // Extortion with private photos (Kenya set): police and 999/112 wording, not a scope refusal.
+            "threats? to (?:post|share|send|leak) (?:my |his |her |their )?(?:private|intimate|nude|naked) (?:photos?|pictures?|videos?|images?)|" +
+            "\\bunless i pay (?:him|her|them|you)\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isHarmToOthersQuery(@Nullable String query) {
         if (query == null) return false;
@@ -267,15 +275,142 @@ public class PerazimAiEngine {
         return AiResponse.plainText(msg, Arrays.asList("📖 Open the Bible"));
     }
 
-    /** Requests for other people's private data or conversations are refused before the model runs. */
-    private static final Pattern OTHER_PERSON_DATA_PATTERN = Pattern.compile(
-            "\\b(?:members?|someone|everyone|another|other people'?s?|congregation|pastor'?s|last person|other users?|previous user|another user)\\b.{0,60}" +
-            "\\b(?:private|counsell?ing|conversations?|chats?|password|phone number|address|records?|messages?|donations?|give the most|asked the ai|asked)\\b|" +
-            "\\b(?:show|give|tell|list|reveal)\\b.{0,20}\\b(?:every|all)\\b.{0,30}\\b(?:member|members|conversations?|counsell?ing)\\b", Pattern.CASE_INSENSITIVE);
+    /** Abuse, threats and child-safety disclosures: fixed safeguarding wording before the model. */
+    private static final Pattern SAFEGUARDING_PATTERN = Pattern.compile(
+            "\\b(?:abused|abusing|abuse|sexually (?:abused|assaulted|molested)|molest\\w*|raped|rape|beats? me|beat me|" +
+            "hits? me|hitting me|threatened to kill me|threatens to kill me|going to kill me|" +
+            "touch(?:ing|ed)? (?:my |the )?(?:child|children|kids?|boy|girl|them) (?:inappropriately|sexually)|" +
+            "inappropriately touch\\w*|touching (?:them|my child|my kids?|children) inappropriately|" +
+            "church worker has been touching|church worker touch\\w*|forced me to|" +
+            "(?:touch\\w*|fondl\\w*|grop\\w*|molest\\w*|abus\\w*) (?:my |our |the |a )?(?:\\w+ )?" +
+            "(?:daughter|son|child|children|kids?|boy|girl|baby|toddler|teen\\w*|minor|student|pupil)|" +
+            "(?:pastor|priest|teacher|youth leader|church leader|deacon|elder|church worker) (?:has |have )?" +
+            "(?:touched|molested|abused|raped|fondled)|" +
+            // Kenya-set safeguarding wording: beatings, forced child marriage, grooming gifts, locked-in children, sex for money.
+            "beats? (?:me|her|him|them|my \\w+)|beating (?:me|her|him|them)|assaults? (?:me|her|him|them)|" +
+            "forced into marriage|forced to marry|forcing (?:her|him|them|my \\w+) (?:into )?marriage|" +
+            "married (?:at|aged) (?:1[0-7]|[0-9])\\b|" +
+            "(?:daughter|son|child|children|kids?|boy|girl|baby|toddler|\\d{1,2}[- ]year[- ]old)\\b.{0,80}?\\b(?:secret|private) (?:gifts?|messages?|photos?|pictures?)|" +
+            "locked (?:in|inside) (?:a |the )?(?:room|house|cupboard|bedroom)|" +
+            "money for sex|paid for sex|sex for (?:money|food|favou?rs|jobs?)|trade sex|" +
+            // Child-abuse disclosures from the Kenya sets: secrecy instructions, a relative sleeping in the child's room, Swahili wording.
+            "keep (?:our|the|this|my) secret|keep it a secret|(?:told|tells|telling) me not to tell|" +
+            "not to tell (?:mummy|mama|mom|mum|dad|daddy|my parents|anyone)|don'?t tell (?:mummy|mama|mom|mum|dad|daddy|my parents|anyone)|" +
+            "sleeps in my room|vitendo vibaya|unyanyasaji|amebakwa|kubakwa|kumbaka)\\b", Pattern.CASE_INSENSITIVE);
 
+    public static boolean isSafeguardingDisclosure(@Nullable String query) {
+        return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
+    }
+
+    public static AiResponse safeguardingResponse() {
+        return AiResponse.plainText(
+                "I'm sorry this is happening to you or to someone you care about. If anyone is in immediate danger, call 999 or 112 now, or go to the nearest police station or hospital. If a child may be at risk, call the Childline Kenya helpline on 116. Tell a trusted adult who can keep you or the child safe. This guide cannot investigate, promise confidentiality, or act for you. Please also contact the church office or a trusted leader about safeguarding, and do not wait for an app reply.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
+    /**
+     * Requests for other people's private data, or for the guide's own chat or recording records, are refused
+     * before the model runs. A claimed role (pastor, leader, admin) grants nothing: the same refusal applies.
+     */
+    private static final Pattern PRIVACY_DATA_VERB = Pattern.compile(
+            "\\b(?:show|give|tell|list|reveal|check|find|send|forward|access|look ?up|what is|what's|" +
+            "log ?in|log into|who|what did|what does|what has|what was|how much|the address|the phone|" +
+            "the password)\\b", Pattern.CASE_INSENSITIVE);
+    /** Strong signals that a request is for personal records, even when it also asks for prayer or support. */
+    private static final Pattern PRIVACY_STRONG = Pattern.compile(
+            "\\b(?:password|phone number|address|records?|counsell?ing|conversations?|chats?|contact list|contacts|" +
+            "account|login|log in|said about me|wrote about me|asked the ai|ask the ai|asked the guide|" +
+            "hiv status|hiv test|hiv result|donations?|gave|give the most)\\b", Pattern.CASE_INSENSITIVE);
+    /** Pastoral support wording (prayer, advice, comfort). A support request is not a data request unless it is strong. */
+    private static final Pattern PRIVACY_SUPPORT_GUARD = Pattern.compile(
+            "\\b(?:pray (?:for|with)|how (?:do|can|should|to)|what should i|advise me|encourage|comfort|support)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern PRIVACY_PERSONAL_DATA = Pattern.compile(
+            "\\b(?:phone|number|address|password|email|records?|counsell?ing|counsel|conversations?|conv\\w*|chats?|messages?|personal|" +
+            "confession|prayer requests?|donations?|donated|gave|give the most|giving|money|hiv|health|medical|diagnos\\w*|" +
+            "contact list|contacts|account|login|log in|private|secret|said about me|wrote about me|asked the ai|" +
+            "ask the ai|asked the guide|asked the ai|posted|history)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PRIVACY_THIRD_PARTY = Pattern.compile(
+            "\\b(?:members?|memb\\w*|mem\\w*b\\w*|someone|somebody|anyone|everyone|another|other (?:members?|people|users?|person)|last \\w+|pes\\w+|" +
+            "other user|another user|people|person|persons?|pastor|pastors?|wife|husband|sister|brother|friend|" +
+            "neighbou?r|family|group|leaders?|elders?|deacons?|youth|last person|previous user|congregation|" +
+            "parent|colleague|mother|father|children|child|boss|employer|pastor's|member's|church member)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Asks what the guide, or any system, holds about the person, records them, or deletes their chat history. */
+    private static final Pattern PRIVACY_MEMORY_OR_RECORD = Pattern.compile(
+            "\\b(?:what|anything) (?:do|did|can|could) you (?:remember|recall|know|keep)\\b|" +
+            "\\bam i being (?:recorded|monitored|watched|tracked|spied)\\b|" +
+            "\\bare you (?:recording|monitoring|tracking|watching)\\b|" +
+            "\\bis (?:this|the chat|the conversation|our chat) (?:being )?(?:recorded|monitored|tracked)\\b|" +
+            "\\bwhat the guide remembers\\b|\\bwhat (?:it|you|the guide|this guide) (?:remember|rmeember|rememeber|rember|remeber|rmember|remembers|rmeembers|remembr)s?\\b|" +
+            "\\bremind me (?:of|what)\\b|\\bwhat have we talked about\\b|\\bour last (?:session|conversation|chat)\\b|" +
+            "\\bwhat (?:did|do) you (?:remember|recall|know) (?:about|of)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PRIVACY_DELETE_HISTORY = Pattern.compile(
+            "\\b(?:delete|erase|clear|wipe|remove|forget)\\s+(?:all\\s+)?(?:my|our|this|the)\\s+" +
+            "(?:conversation|conv\\w*|chat|chats|messages|memory|notes)(?:\\s+(?:history|hist\\w*))?\\b|" +
+            "\\b(?:delete|erase|clear|wipe)\\s+(?:all\\s+)?(?:my\\s+)?(?:conversation|chat)\\s+history\\b|" +
+            "\\b(?:delete|erase|clear|wipe)\\s+(?:my|our|this)\\s+history\\b", Pattern.CASE_INSENSITIVE);
+
+    /** Another person's private information, chats, counselling, health, contact or account details. */
+    private static final Pattern PRIVACY_EXPLICIT = Pattern.compile(
+            "\\bread (?:my |her |his |their |the |our )?(?:\\w+'?s )?(?:phone|messages|texts|chats|whatsapp|emails?|inbox|dms?)\\b|" +
+            "\\b(?:wife|husband|partner|spouse|girlfriend|boyfriend|friend|brother|sister)'?s? (?:phone|messages|texts|chats|whatsapp)\\b|" +
+            "\\b(?:phone number|namba ya simu|contact details|address|home address) (?:of|for) (?:pastor|a member|the member|members?|someone|somebody|my pastor|the pastor|elder|deacon|\\w+ in \\w+)\\b|" +
+            "\\b(?:list|tell me which|which|orodha ya|majina ya)\\b.{0,40}\\b(?:members?|youth group|wanachama|congregation)\\b|" +
+            "\\bmembers? .{0,60}\\b(?:struggling|pornography|addiction|debt|hiv|pregnan\\w*)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isPrivacyDataRequest(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return false;
+        String normalized = query.replace('\u2019', '\'').replaceAll("\\s+", " ");
+        // Explicit shapes from the Kenya sets: reading someone's phone or messages, a member's number, a member list.
+        if (PRIVACY_EXPLICIT.matcher(normalized).find()) return true;
+        if (!PRIVACY_DATA_VERB.matcher(normalized).find()
+                || !PRIVACY_PERSONAL_DATA.matcher(normalized).find()
+                || !PRIVACY_THIRD_PARTY.matcher(normalized).find()) return false;
+        return !PRIVACY_SUPPORT_GUARD.matcher(normalized).find() || PRIVACY_STRONG.matcher(normalized).find();
+    }
+
+    public static boolean isDeleteHistoryRequest(@Nullable String query) {
+        return query != null && PRIVACY_DELETE_HISTORY.matcher(query).find();
+    }
+
+    public static boolean isMemoryOrRecordingQuestion(@Nullable String query) {
+        return query != null && PRIVACY_MEMORY_OR_RECORD.matcher(query).find();
+    }
+
+    /** Every privacy route: other people's data, the guide's memory or recording questions, and chat deletion. */
     public static boolean isOtherPersonDataRequest(@Nullable String query) {
-        if (query == null) return false;
-        return OTHER_PERSON_DATA_PATTERN.matcher(query).find();
+        return isPrivacyDataRequest(query) || isDeleteHistoryRequest(query) || isMemoryOrRecordingQuestion(query);
+    }
+
+    /** Fixed privacy wording. Says what is refused and the real procedure, and never invents a contact. */
+    public static AiResponse privacyResponse() {
+        return AiResponse.plainText(
+                "This is a privacy matter. I cannot share, search for or act on another person's private information. That includes their conversations, counselling, health details, phone number, address, password, giving or prayer requests. A claimed role, such as pastor or leader, does not change this. For a pastoral matter, please contact the church office or your pastor through the usual channel.",
+                Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
+    }
+
+    /** The app's real procedure for clearing this chat and for removing the guide's notes on this phone. */
+    public static AiResponse deleteHistoryResponse() {
+        return AiResponse.plainText(
+                "I cannot delete records kept by the church, and I cannot see other systems. To clear this conversation, open Choose your guide and tap Clear this conversation. To remove what the guide has learned about you on this phone, open What the guide remembers and tap Forget everything. Nothing is uploaded, and the app's Bible and help content stay as they are.",
+                Arrays.asList("📖 Read Scripture", "🏛️ Church information"));
+    }
+
+    /** Recording and memory questions: the guide's notes stay on this phone. It cannot confirm other systems. */
+    public static AiResponse memoryResponse() {
+        return AiResponse.plainText(
+                "Your guide notes stay on this phone, and nothing is uploaded. You can review them under Choose your guide, then What the guide remembers, and tap Forget everything to remove them. I cannot see or share other people's chats, and I cannot confirm whether any other system records you. For a privacy concern, please contact the church office.",
+                Arrays.asList("🏛️ Church information", "📖 Read Scripture"));
+    }
+
+    /** Pre-model privacy route (null when the question is not a privacy request). */
+    @Nullable
+    public static AiResponse privacyRouteResponse(@Nullable String query) {
+        if (isDeleteHistoryRequest(query)) return deleteHistoryResponse();
+        if (isMemoryOrRecordingQuestion(query)) return memoryResponse();
+        if (isPrivacyDataRequest(query)) return privacyResponse();
+        return null;
     }
 
     public static boolean isCrisisQuery(@Nullable String query) {
@@ -454,6 +589,38 @@ public class PerazimAiEngine {
     }
 
     /**
+     * The single ordered pre-model route, shared by the app and the evaluation harness. Returns the route name, or
+     * null when the question may go on to the model. Order: crisis, overdose, harm to others, sensitive pastoral,
+     * human decision, privacy and out-of-scope.
+     */
+    @Nullable
+    public static String preModelRoute(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return "scope-refusal";
+        if (isCrisisQuery(query)) return "crisis";
+        if (isOverdoseQuery(query)) return "overdose";
+        if (isHarmToOthersQuery(query)) return "harm-to-others";
+        if (isSafeguardingDisclosure(query)) return "safeguarding";
+        if (isSensitivePastoralDisclosure(query)) return "sensitive";
+        if (isHumanDecisionQuery(query)) return "human-decision";
+        if (isOutOfScopeForModel(query)) return "scope-refusal";
+        return null;
+    }
+
+    /** The fixed response for a route name from {@link #preModelRoute}. */
+    @NonNull
+    public static AiResponse preModelResponse(@NonNull String route, @Nullable String query) {
+        switch (route) {
+            case "crisis": return crisisResponse();
+            case "overdose": return overdoseResponse();
+            case "harm-to-others": return harmToOthersResponse();
+            case "safeguarding": return safeguardingResponse();
+            case "sensitive": return sensitivePastoralResponse();
+            case "human-decision": return humanDecisionResponse();
+            default: return boundaryResponseFor(query);
+        }
+    }
+
+    /**
      * Deterministic refusal or referral that must run before any model check, so it holds whether or not the
      * on-phone model is installed. Returns null when the question may go to the model.
      */
@@ -470,6 +637,8 @@ public class PerazimAiEngine {
     /** Chooses the boundary wording: professional referral for medical, legal and financial matters, church referral otherwise. */
     @NonNull
     public static AiResponse boundaryResponseFor(@Nullable String query) {
+        AiResponse privacy = privacyRouteResponse(query);
+        if (privacy != null) return privacy;
         return isProfessionalMatterQuery(query) ? professionalBoundaryResponse() : outOfScopeResponse();
     }
 

@@ -5,7 +5,6 @@ import static org.junit.Assume.assumeTrue;
 import androidx.test.core.app.ApplicationProvider;
 
 import org.perazimchurch.app.ai.PerazimAiEngine;
-import org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer;
 
 import android.content.Context;
 
@@ -165,26 +164,30 @@ public class EvalPipelineTest {
                 String q = kase.getString("prompt");
                 String status;
                 String answer;
-                if (PerazimAiEngine.isCrisisQuery(q)) {
-                    status = "routed:crisis";
-                    answer = PerazimAiEngine.crisisResponse().getMessageText();
-                } else if (PerazimAiEngine.isHarmToOthersQuery(q)) {
-                    status = "routed:harm-to-others";
-                    answer = PerazimAiEngine.harmToOthersResponse().getMessageText();
-                } else if (PerazimAiEngine.isSensitivePastoralDisclosure(q)) {
-                    status = "routed:sensitive";
-                    answer = PerazimAiEngine.sensitivePastoralResponse().getMessageText();
-                } else if (PerazimAiEngine.isOutOfScopeForModel(q)) {
-                    status = "routed:scope-refusal";
-                    answer = PerazimAiEngine.boundaryResponseFor(q).getMessageText();
+                PreModel.Decision decided = PreModel.decide(c, q);
+                if (decided != null) {
+                    status = decided.status;
+                    answer = decided.answer;
                 } else {
-                    JSONArray evidence = kjvEvidence(q);
-                    String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
-                    long t0 = System.currentTimeMillis();
-                    String raw = runLlama(llama, modelPath, prompt, 128);
-                    status = "model:" + (evidence.length() > 0 ? "kjv-evidence" : "no-evidence")
-                            + ":" + (System.currentTimeMillis() - t0) + "ms";
-                    answer = LocalPrompt.stripStockPhrases(raw);
+                    // PRE-SIGNING ESTIMATE: evidence from the unsigned package built from the approved library files.
+                    JSONArray evidence = PreSigningEvidence.retrieve(q);
+                    if (evidence.length() == 0) {
+                        // Production OnDeviceAi.ask throws here before the model runs, so the model is never called without evidence.
+                        status = "refused:no-verified-source";
+                        answer = "No verified approved source supports this question.";
+                    } else {
+                        String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
+                        long t0 = System.currentTimeMillis();
+                        String raw = runLlama(llama, modelPath, prompt, 128);
+                        String modelText = LocalPrompt.stripStockPhrases(raw);
+                        String grounded = GroundedAnswer.finalAnswer(q, modelText, evidence);
+                        String body = GroundedAnswer.body(evidence);
+                        status = (grounded != null && grounded.equals(body) ? "grounded:evidence-only" : "grounded:model-framing")
+                                + ":" + (System.currentTimeMillis() - t0) + "ms";
+                        answer = grounded == null ? body : grounded;
+                        // Keep the raw model text for the record, separate from the answer.
+                        status = status + "|raw:" + modelText.replace('\n', ' ').substring(0, Math.min(160, modelText.length()));
+                    }
                 }
                 JSONObject row = new JSONObject();
                 row.put("id", kase.getString("id"));

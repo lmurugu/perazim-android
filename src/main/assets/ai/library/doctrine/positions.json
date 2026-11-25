@@ -1,111 +1,214 @@
 {
-  "_comment": "Doctrine status register for the guide knowledge library. Topic status only: this file holds no position text. Statuses: APPROVED (Levi has approved the position), UNDER_REVIEW (Levi's developing or working view, marked as under review), UNDECIDED (no position; the guide explains the question and says no position is set), DRAFT_PENDING_LEVI (drafted content waiting for Levi; fail-closed, never shown). Only Levi approves positions (sole approver, 2026-11-23). Until a topic is APPROVED the guide must not state a position on it. Source of each status: the decision named in basis.",
-  "approver": "Levi (sole final theological approver for the app and AI, 2026-11-23)",
-  "topics": [
-    {
-      "id": "canon-66-books",
-      "topic": "Biblical canon (66 books)",
-      "status": "DRAFT_PENDING_LEVI",
-      "basis": "Recorded as the default canon in the apologetics review, 2026-11-24. Levi has not yet signed it off as a position",
-      "contentFile": null
-    },
-    {
-      "id": "nicene-chalcedonian-orthodoxy",
-      "topic": "Nicene and Chalcedonian orthodoxy (Trinity, two natures of Christ)",
-      "status": "APPROVED",
-      "basis": "Established orthodoxy recorded as settled by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "penal-substitution",
-      "topic": "Penal substitution in the atonement",
-      "status": "APPROVED",
-      "basis": "Levi: a major Reformation formulation, not the sole account of the atonement, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "apostasy-assurance",
-      "topic": "Apostasy and assurance of salvation",
-      "status": "UNDER_REVIEW",
-      "basis": "Levi's developing view: a genuinely saved person can freely and finally depart. Assurance is taught; no individual verdicts, 2026-11-23 and 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "unconditional-election",
-      "topic": "Unconditional election",
-      "status": "UNDER_REVIEW",
-      "basis": "Working view under review by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "pre-trib-premillennialism",
-      "topic": "Pre-tribulation premillennialism and the future turning of national Israel",
-      "status": "UNDER_REVIEW",
-      "basis": "Working view under review by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "women-in-ministry",
-      "topic": "Women in ministry",
-      "status": "UNDECIDED",
-      "basis": "Levi's answer 3D: explain the question, no position, 2026-11-23",
-      "contentFile": null
-    },
-    {
-      "id": "divorce-remarriage",
-      "topic": "Divorce and remarriage",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "tithing",
-      "topic": "Tithing",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "alcohol",
-      "topic": "Alcohol",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "healing-in-atonement",
-      "topic": "Healing in the atonement",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "evolution-age-of-earth",
-      "topic": "Evolution and the age of the earth",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "sexuality",
-      "topic": "Sexuality",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "inerrancy-formulation",
-      "topic": "Inerrancy formulation",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    },
-    {
-      "id": "final-punishment",
-      "topic": "Final punishment",
-      "status": "UNDECIDED",
-      "basis": "Not yet approved by Levi, 2026-11-24",
-      "contentFile": null
-    }
-  ]
+ "_comment": "Doctrine status register for the guide knowledge library. Statuses: APPROVED, UNDER_REVIEW, UNDECIDED, DRAFT_PENDING_LEVI. Each topic has a 'draft' block with wording drawn only from Levi's recorded decisions. Drafts are DRAFT_PENDING_LEVI and fail-closed: the guide shows only what has status APPROVED. contentFile stays null until Levi approves. Only Levi approves positions.",
+ "approver": "Levi (sole final theological approver for the app and AI, 2026-11-23)",
+ "topics": [
+  {
+   "id": "canon-66-books",
+   "topic": "Biblical canon (66 books)",
+   "status": "DRAFT_PENDING_LEVI",
+   "basis": "Recorded as the default canon in the apologetics review, 2026-11-24. Levi has not yet signed it off as a position",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "The Bible contains 66 books: 39 in the Old Testament and 27 in the New. This is the default canon recorded for the guide. Levi has not yet signed it off.",
+    "basis": "Apologetics review, 2026-11-24"
+   }
+  },
+  {
+   "id": "nicene-chalcedonian-orthodoxy",
+   "topic": "Nicene and Chalcedonian orthodoxy (Trinity, two natures of Christ)",
+   "status": "APPROVED",
+   "basis": "Established orthodoxy recorded as settled by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "The guide states the Nicene and Chalcedonian formulations of Trinity and the person of Christ as established orthodoxy. Levi's wording: established orthodoxy.",
+    "basis": "Apologetics review, 2026-11-24"
+   }
+  },
+  {
+   "id": "penal-substitution",
+   "topic": "Penal substitution in the atonement",
+   "status": "APPROVED",
+   "basis": "Levi: a major Reformation formulation, not the sole account of the atonement, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Penal substitution is presented as a major Reformation formulation of the atonement, not the sole account. Levi's wording: a major Reformation formulation, not the sole account.",
+    "basis": "Apologetics review, 2026-11-24"
+   }
+  },
+  {
+   "id": "apostasy-assurance",
+   "topic": "Apostasy and assurance of salvation",
+   "status": "UNDER_REVIEW",
+   "basis": "Levi's developing view: a genuinely saved person can freely and finally depart. Assurance is taught; no individual verdicts, 2026-11-23 and 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Perazim's developing view, under review: a genuinely saved person can freely and finally depart. The guide also teaches assurance of salvation and gives no verdict on any individual. Levi's wording: developing view, marked under review, with assurance and no individual verdicts.",
+    "basis": "Levi, 2026-11-23 and 2026-11-24"
+   }
+  },
+  {
+   "id": "unconditional-election",
+   "topic": "Unconditional election",
+   "status": "UNDER_REVIEW",
+   "basis": "Working view under review by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Working view under review: unconditional election. Other positions are described fairly and labelled as alternatives. No alternative text is written yet.",
+    "basis": "Levi, 2026-11-24"
+   }
+  },
+  {
+   "id": "pre-trib-premillennialism",
+   "topic": "Pre-tribulation premillennialism and the future turning of national Israel",
+   "status": "UNDER_REVIEW",
+   "basis": "Working view under review by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "Working view under review: pre-tribulation premillennialism, with the future turning of national Israel. Other positions are described fairly and labelled as alternatives. No alternative text is written yet.",
+    "basis": "Levi, 2026-11-24"
+   }
+  },
+  {
+   "id": "women-in-ministry",
+   "topic": "Women in ministry",
+   "status": "UNDECIDED",
+   "basis": "Levi's answer 3D: explain the question, no position, 2026-11-23",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "divorce-remarriage",
+   "topic": "Divorce and remarriage",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "tithing",
+   "topic": "Tithing",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi. Levi's 2026-11-24 decision on prosperity says tithing stays UNDECIDED.",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "alcohol",
+   "topic": "Alcohol",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "healing-in-atonement",
+   "topic": "Healing in the atonement",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "evolution-age-of-earth",
+   "topic": "Evolution and the age of the earth",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "sexuality",
+   "topic": "Sexuality",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "inerrancy-formulation",
+   "topic": "Inerrancy formulation",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "final-punishment",
+   "topic": "Final punishment",
+   "status": "UNDECIDED",
+   "basis": "Not yet approved by Levi, 2026-11-24",
+   "contentFile": null,
+   "draft": {
+    "status": "DRAFT_PENDING_LEVI",
+    "wording": "No position is set. The guide explains the question, describes the main views fairly, and does not state a position.",
+    "basis": "Levi, 2026-11-23 (answer 3D for women in ministry; undecided for the rest)"
+   }
+  },
+  {
+   "id": "holy-spirit-baptism",
+   "topic": "Baptism in the Holy Spirit and tongues",
+   "status": "APPROVED_LEVI",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
+  },
+  {
+   "id": "prosperity-and-giving",
+   "topic": "Prosperity teaching, giving and seed offerings",
+   "status": "APPROVED_LEVI",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
+  },
+  {
+   "id": "polygamy",
+   "topic": "Polygamy and families already in polygamous marriages",
+   "status": "APPROVED_LEVI",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
+  },
+  {
+   "id": "dowry",
+   "topic": "Dowry and bride wealth",
+   "status": "APPROVED_LEVI",
+   "basis": "Approved by Levi as written on 2026-11-24 (message cmsg_01TZR4y8Vg1KsGsVuQZmh5wy2YWVA7cCXDvZt9UHALpV1m). Full entry in doctrine/entries.json",
+   "contentFile": null
+  }
+ ]
 }
