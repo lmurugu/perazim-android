@@ -125,4 +125,10 @@ public class CrisisContextTest {
         assertTrue(response, response.contains("safe for you to do so"));
         assertTrue(response, response.contains("Do not put yourself or anyone else in danger"));
     }
+
+    @Test
+    public void thirdPartySuicideWithHelpQuestionStaysThirdParty() {
+        route("crisis-third-party", "My brother texted me, 'I'm ending my life tonight'. What should I do?");
+    }
+
 }

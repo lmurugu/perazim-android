@@ -720,7 +720,9 @@ public class PerazimAiEngine {
 
     /** True when the suicidal words are about someone else: no first-person words outside a quotation, and a third person named. */
     static boolean isThirdPartyFraming(String n) {
-        String outside = n.replaceAll("\"[^\"]*\"", " ").replaceAll("(?:^|[\\s,])'.*'\\s*$", " ");
+        String outside = n.replaceAll("\"[^\"]*\"", " ").replaceAll("(?:^|[\\s,])'.*?'(?=[\\s.,!?]|$)", " ").replaceAll("(?:^|[\\s,])'.*'\\s*$", " ")
+                // The reporter's own help-seeking words ("what should I do") are not a first-person statement of risk.
+                .replaceAll("(?i)\\b(?:what|how) (?:should|do|can|must|would) i (?:do|help|say|tell|respond|handle)\\b", " ");
         if (FIRST_PERSON_OUTSIDE_QUOTES.matcher(outside).find()) return false;
         return THIRD_PERSON_MARKER.matcher(outside).find();
     }
