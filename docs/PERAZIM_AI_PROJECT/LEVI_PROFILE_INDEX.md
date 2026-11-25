@@ -24,6 +24,8 @@ Before doing work that changes theology, doctrine, AI answers, source retrieval,
 6. [AI_EVALUATION_STATUS_2026-11-25_ROUND10.md](AI_EVALUATION_STATUS_2026-11-25_ROUND10.md) — latest reported 886-case evaluation snapshot.
 8. The current doctrine register, approved doctrine entries, relevant source register and actual source code being changed.
 
+8. [AI_EVALUATION_STATUS_2026-11-25_ROUND11_INTERIM.md](AI_EVALUATION_STATUS_2026-11-25_ROUND11_INTERIM.md) — round 11 interim score; full run metadata and category table still requested.
+
 ## Authority and precedence
 
 Apply the following order:
