@@ -64,8 +64,8 @@
     "authorityClass": "UNDER_REVIEW",
     "version": "positions",
     "location": "unconditional-election",
-    "text": "This is a developing view, under review, and not yet a settled church position. Working view under review: unconditional election. Other positions are described fairly and labelled as alternatives. No alternative text is written yet.",
-    "contentHash": "f126cb8c0118230d1e38106c601963f833a1c2826897f14fee0eeb000a1a606c",
+    "text": "This is a developing view, under review, and not yet a settled church position. Working view under review: unconditional election. It is presented as our interpretation of Scripture, not a settled church doctrine, and no catalogue of competing views is given.",
+    "contentHash": "4be035f803d39491cb73756aa0cd0099d8fa3ceb8bea9116455972e22cfd9236",
     "approvalReference": "doctrine unconditional-election UNDER_REVIEW"
    },
    {
@@ -74,8 +74,8 @@
     "authorityClass": "UNDER_REVIEW",
     "version": "positions",
     "location": "pre-trib-premillennialism",
-    "text": "This is a developing view, under review, and not yet a settled church position. Working view under review: pre-tribulation premillennialism, with the future turning of national Israel. Other positions are described fairly and labelled as alternatives. No alternative text is written yet.",
-    "contentHash": "bf0052e85fc0e1ea393ae72526312604e104e7ddfc268fa64609a84666aea160",
+    "text": "This is a developing view, under review, and not yet a settled church position. Working view under review: pre-tribulation premillennialism, with the future turning of national Israel. It is presented as our interpretation of Scripture, not a settled church doctrine, and no catalogue of competing views is given.",
+    "contentHash": "261ce0e8f178a3fdf7500a67392da43e839e35bf8cbab36767d6fb3e3d15f5fb",
     "approvalReference": "doctrine pre-trib-premillennialism UNDER_REVIEW"
    },
    {
@@ -26689,7 +26689,7 @@
     "approvalReference": "approvals.json hitchcock-bible-names (coordinator 2026-11-23, factual)"
    }
   ],
-  "contentDigest": "b72374a1c2bdb2aa634690b58fb1338bdc651eee5b70b738e515bb6d214fb75d"
+  "contentDigest": "bd9257b19f142bf212e0f8ac3c38d7122de4eff6609c2e80cff08fc7357ff67f"
  },
  "signingKeyId": "PENDING_LEVI_PACKAGE_KEY",
  "signature": ""
