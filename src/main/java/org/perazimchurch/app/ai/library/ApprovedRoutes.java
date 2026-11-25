@@ -167,6 +167,14 @@ public final class ApprovedRoutes {
                 + "We test every claim about Jesus against Scripture, and this is what the Bible teaches.",
                 "John 1:1", "John 10:30"));
 
+        r.add(new Route("nicene-creed-spirit",
+                "nicene.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}nicene|creed.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}creed",
+                "Yes. The Nicene-Constantinopolitan Creed of 381 speaks of the Holy Spirit. It confesses the Holy Spirit as the Lord "
+                + "and giver of life, who proceeds from the Father, who is worshipped and glorified together with the Father and the "
+                + "Son, and who spoke through the prophets. We hold this creed as established Christian orthodoxy, and we test every "
+                + "creed by Scripture.",
+                "John 15:26", "2 Peter 1:21"));
+
         ROUTES = Collections.unmodifiableList(r);
     }
 

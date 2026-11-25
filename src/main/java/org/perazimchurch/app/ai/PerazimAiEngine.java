@@ -742,7 +742,7 @@ public class PerazimAiEngine {
             "\\b(?:bible|biblia|scripture|scriptures|verse|verses|aya|chapter|book of|gospel|injili|psalm|psalms|zaburi|proverbs|" +
             "genesis|exodus|romans|corinthians|ephesians|galatians|hebrews|revelation|matthew|luke|john|isaiah|ruth|" +
             "david|goliath|moses|paul|peter|abraham|noah|daniel|elijah|jonah|job|joseph|jacob|samuel|solomon|esther|timothy|titus|philippians|thessalonians|lazarus|mary|martha|bethlehem|" +
-            "warumi|korintho|wakorintho|waefeso|wagalatia|waebrania|ufunuo|mathayo|yesu|jesus|christ|god|mungu|lord|holy spirit|spirit|trinity|commandments?|amri|" +
+            "warumi|korintho|wakorintho|waefeso|wagalatia|waebrania|ufunuo|mathayo|yesu|jesus|christ|god|mungu|lord|holy spirit|roho mtakatifu|mtakatifu|roho|spirit|trinity|commandments?|amri|" +
             "prayer|prayers|pray|praying|maombi|sala|devotional|devotion|faith|imani|grace|neema|mercy|forgiveness|parable|sabbath|" +
             "commission|baptism|tithe|tithing|offering|offerings|sadaka|paybill|church|kanisa|perazim|bishop|ministry|" +
             "cell group|fellowship|testimony|worship|hymn|hymns|hymnal|nyimbo|wimbo|sermon|sermons|livestream|sunday|" +
