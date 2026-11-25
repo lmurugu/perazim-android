@@ -56,6 +56,24 @@ public final class NoGoZones {
             + "If you are asking about your own salvation, come to Jesus in faith and trust Him as Lord (Romans 10:9–10). "
             + "Please talk this through with a trusted church leader or your pastor, who can walk with you through it.";
 
+    /** Round 23: church authority and human decisions. The guide never decides these; an authorised human leader does. */
+    static final String AUTHORITY_DECLINE =
+            "This needs an authorised human leader, such as the Bishop or an elder, so I cannot make this decision for the church. "
+            + "Please contact the church office and ask to speak with the Bishop or an elder. You can also talk it through with a trusted "
+            + "church leader or your pastor, who can walk with you through it.";
+
+    /** Round 23: tasks outside the guide's scope (documents, calculations, browsing, role-play as a church leader). */
+    static final String SCOPE_DECLINE =
+            "I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI), Christian faith and religious "
+            + "matters, so I am not authorised to advise on this matter. Please speak with a trusted church leader or your pastor, "
+            + "or another appropriate person.";
+
+    /** Round 23: live research, links and news. The guide cannot check these, so it says so and does not guess. */
+    static final String UNCERTAIN_DECLINE =
+            "I cannot browse links, search the internet or read live news, and I do not have access to them. I cannot verify that source "
+            + "or any current research, so I will not guess or summarise it. The approved sources in this app do not establish that answer. "
+            + "Please check the source yourself, or ask a trusted church leader or your pastor.";
+
     /** Reasoning and argument: no approved route yet. Points to Scripture and does not guess (Levi's rules). */
     static final String REASONING_DECLINE =
             "The Bible is the test for every argument, so I want to point you to what Scripture teaches. I can't weigh this "
@@ -82,6 +100,19 @@ public final class NoGoZones {
                     + "|which (denomination|church|group) is (right|true)|are all churches"
                     + "|(arminian|calvinis|presbyterian|baptist|methodist|pentecostal)s?.{0,30}(wrong|heretic|false|damned)",
                     DENOMINATION_DECLINE),
+            new Zone("uncertain-live-research",
+                    "browse this link|browse the (?:web|internet)|search the internet|latest news|recent (?:academic )?research"
+                    + "|academic research|find recent|https?://",
+                    UNCERTAIN_DECLINE),
+            new Zone("out-of-scope-task",
+                    "what god wants me to do tomorrow|exactly what god wants|pretend to be|pertend to be|act as (?:our |the )?(?:senior )?pastor"
+                    + "|perform (?:some |the )?calculations|do (?:the |some )?calculations|bible study document|study document|word file"
+                    + "|email it to me|summari[sz]e a (?:theological )?book|supplied by the user|changed its doctrine",
+                    SCOPE_DECLINE),
+            new Zone("human-decision-authority",
+                    "above correction|above (?:being )?corrected|change my name|membership list|excommunicat|discipline the"
+                    + "|bishop is right|elder who was removed|should this member|(?:question|questioning|doubt|challenge).{0,15}tradition",
+                    AUTHORITY_DECLINE),
             new Zone("salvation-works-apostasy",
                     "lose (my |our )?salvation|once saved|eternal security|fall(ing|s)? away|falil|apostat|abandon (jesus|god)|sin on purpose|hebrews|baptism saves|saves us"
                     + "|depart from the faith|finally depart|earn (it|my salvation|salvation)|salvation by grace"

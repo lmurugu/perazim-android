@@ -138,7 +138,7 @@ public final class ApprovedRoutes {
                 "Ephesians 2:8", "James 2:26"));
 
         r.add(new Route("sovereignty-and-responsibility",
-                "sovereignty|free will|human responsibility|god.s sovereignty|sovereignty and responsibility|work out your salvation|fear and trembling",
+                "sovereign|free will|human responsibility|god.s sovereignty|sovereignty and responsibility|work out your salvation|fear and trembling",
                 "Scripture teaches both God's sovereignty and human responsibility. God is sovereign over all things, and His "
                 + "purposes stand (Isaiah 46:9–10; Proverbs 16:9). Every person is responsible before God for their own sin "
                 + "(Ezekiel 18:20; Romans 2:6). Work out your salvation with fear and trembling, because God is working in you "
@@ -180,7 +180,7 @@ public final class ApprovedRoutes {
                 + "This is a reasoned case, not a claim that every question is settled or that every person will be compelled to believe. "
                 + "Hebrews 11:6 shows that faith is necessary to come to God: the one who comes must believe that He is, and that He is a "
                 + "rewarder of those who seek Him. It explains the Christian response; it is not a proof for a sceptic on its own.",
-                "Romans 1:20", "Psalm 19:1"));
+                "Romans 1:20", "Psalms 19:1"));
 
         r.add(new Route("christians-disagree",
                 "christians? (?:disagree|disagreement|disagreements)|disagree about doctrine|disagreements? among christians|"
@@ -628,6 +628,232 @@ public final class ApprovedRoutes {
                 "Yes. The Nicene-Constantinopolitan Creed of 381 speaks of the Holy Spirit. In the creed's own words: \""
                 + "And in the Holy Ghost, the Lord and Giver of life, who proceedeth from the Father, who with the Father and the Son together is worshiped and glorified, who spake by the prophets." + "\" We hold this creed as established Christian orthodoxy, and we test every creed by Scripture.",
                 "John 15:26", "2 Peter 1:21"));
+
+        // Round 23 (2026-11-25): proof-text, drift, resource and apologetics routes. Each quotes its Scripture from the KJV
+        // through its anchors, and the general answers are labelled as general guidance.
+        r.add(new Route("grace-free-not-earned",
+                "grace.{0,60}(?:earn|free|work|obey)|(?:earn|work|merit).{0,60}grace|must earn",
+                "Scripture is clear that salvation is a free gift of God's grace, received through faith, and not earned by our own works "
+                + "(Ephesians 2:8–9). Good works follow salvation as its fruit, and they are not the price of it (Ephesians 2:10). So grace "
+                + "is free, and we are called to live in obedience out of thankfulness to God. I cannot see what was said in an earlier "
+                + "conversation, so I cannot check it, but this is the Bible's teaching on grace.",
+                "Ephesians 2:8", "Ephesians 2:9"));
+
+        r.add(new Route("baptism-saves-premise",
+                "baptism (?:saves|is what saves|washes away|is needed for salvation)|baptism.{0,30}(?:saves|salvation)|confirm that for my notes",
+                "I can't confirm that baptism saves, and I will not confirm a statement I cannot check from an earlier conversation. "
+                + "Scripture teaches that we are saved by grace through faith (Ephesians 2:8–9). Baptism is important, and the New Testament "
+                + "speaks about it in several places, so please ask your pastor to explain carefully what the Bible teaches about its meaning.",
+                "Ephesians 2:8", "Ephesians 2:9"));
+
+        r.add(new Route("spirit-and-sin",
+                "holy spirit.{0,80}(?:still sin|sin)|(?:still sin|why do (?:they|we|christians) sin).{0,80}spirit|spirit.{0,40}still sin",
+                "Scripture teaches that the Holy Spirit lives in every believer, and that the Spirit is at work to make us like Christ. "
+                + "Even so, believers still struggle with sin, because the flesh and the Spirit are in conflict (Galatians 5:17). The answer "
+                + "is not to deny the struggle, but to walk in the Spirit and to put sin to death by His power (Romans 8:13). When we sin, "
+                + "we confess it to God, and He is faithful and just to forgive us (1 John 1:9). Please talk with your pastor if you are "
+                + "struggling with a particular sin.",
+                "Galatians 5:17", "1 John 1:9"));
+
+        r.add(new Route("all-paths-one-way",
+                "all paths|all roads|paths lead to god|roads lead to god|all religions lead",
+                "No. Jesus is the one way to the Father. He said that He is the way, the truth and the life, and that no one comes to the "
+                + "Father except through Him (John 14:6). The apostles taught the same truth: there is no other name under heaven given "
+                + "among men by which we must be saved (Acts 4:12). So we cannot say that all paths lead to God. Please talk with a trusted "
+                + "church leader or your pastor about any question you have on this.",
+                "John 14:6", "Acts 4:12"));
+
+        r.add(new Route("created-not-god",
+                "brahman|divine within|we are all god|i am god|i am divine|i am one with god|the divine within|atman",
+                "Scripture teaches that people are created by God, and that they are not God. God made human beings in His own image "
+                + "(Genesis 1:27), and He alone is the Creator of all things (Isaiah 45:5). Being made in God's image is a great honour, "
+                + "but it does not make us God. Please talk with a trusted church leader about any question you have on this.",
+                "Genesis 1:27", "Isaiah 45:5"));
+
+        r.add(new Route("one-mediator-prayer",
+                "ask (?:the )?saints|saints to pray|ask (?:mary|a saint)|pray to (?:mary|the saints)|intercede for me|intercession of",
+                "The Bible teaches that there is one mediator between God and people, the man Christ Jesus (1 Timothy 2:5). We are invited "
+                + "to come boldly to the throne of grace ourselves, through Jesus, to receive mercy and find grace in time of need (Hebrews 4:16). "
+                + "So we bring our prayers to God through Christ. Christians may ask one another to pray for them, and that is a good "
+                + "practice in the body of Christ. Please talk with a trusted church leader about any questions on prayer.",
+                "1 Timothy 2:5", "Hebrews 4:16"));
+
+        r.add(new Route("ancestors-and-offerings",
+                "ancestor|burn (?:offerings|an offering)|offerings? for (?:the )?(?:dead|them)|spirits of the dead",
+                "Honouring your grandmother and her family is good, and Scripture teaches us to honour our parents and our family "
+                + "(Exodus 20:12). The Bible warns against seeking guidance from the dead, and against offerings made in that way "
+                + "(Deuteronomy 18:10–11). Only God is our guide and helper, and there is one mediator between God and people, the man "
+                + "Christ Jesus (1 Timothy 2:5). We do not judge your grandmother. Please talk with a trusted church leader, who can pray "
+                + "with you and help you honour your family in Christ.",
+                "Deuteronomy 18:10", "1 Timothy 2:5"));
+
+        r.add(new Route("sabbath-not-condition",
+                "saturday|keep the sabbath|sabbath.{0,40}(?:saved|salvation|saves|required|must)|sabbath.{0,30}(?:need|have to)",
+                "No. Keeping a particular day is not a condition of salvation. Paul wrote that no one should judge you about a holy day, "
+                + "a Sabbath or a feast (Colossians 2:16). He also wrote that each person should be fully persuaded in his own mind about "
+                + "such days (Romans 14:5). Jesus is Lord of the Sabbath (Mark 2:28). Salvation comes by grace through faith, and not by "
+                + "keeping a day (Ephesians 2:8–9). Please talk with a trusted church leader about the Sabbath question.",
+                "Colossians 2:16", "Romans 14:5"));
+
+        r.add(new Route("soul-sleep-and-presence",
+                "soul sleep|soul-sleep|unconscious in the grave|asleep in the grave|sleep until the (?:day of )?resurrection|unconscious until",
+                "Some groups teach soul sleep, that the soul is unconscious in the grave until the resurrection. We test that teaching by "
+                + "Scripture. Jesus told the thief on the cross that he would be with Him in paradise that day (Luke 23:43). Paul wrote "
+                + "that to be absent from the body is to be present with the Lord (2 Corinthians 5:8), and he longed to depart and be with "
+                + "Christ (Philippians 1:23). These passages are the ones to weigh. Please talk with a trusted church leader about any "
+                + "questions on this.",
+                "Luke 23:43", "2 Corinthians 5:8"));
+
+        r.add(new Route("no-god-and-moral-law",
+                "there is no god|is there no god|god does not exist|science has (?:proved|proven|shown)|morals are (?:just )?relative",
+                "Scripture says that the fool has said in his heart that there is no God (Psalm 14:1). The heavens declare the glory of God "
+                + "(Psalms 19:1). Science studies how the world works, and by itself it cannot prove or disprove God. Scripture also teaches "
+                + "that God's law is written on people's hearts, and that their conscience bears witness (Romans 2:14–15). We can talk about "
+                + "these questions with respect, and we do not mock anyone who asks them.",
+                "Psalms 14:1", "Psalms 19:1"));
+
+        r.add(new Route("someone-else-on-cross",
+                "someone else (?:die|died|was crucified|on the cross)|not crucified|was not crucified|another (?:man )?died|died in his place|did someone else",
+                "The Bible teaches that Jesus was crucified and died for our sins. Paul wrote that Christ died for our sins according to the "
+                + "Scriptures (1 Corinthians 15:3), and that the Gospel centres on Christ crucified (1 Corinthians 1:23). The death and "
+                + "resurrection of Jesus are at the heart of the Gospel. Some groups teach that someone else died in His place, and we test "
+                + "that teaching by Scripture.",
+                "1 Corinthians 15:3", "1 Corinthians 1:23"));
+
+        r.add(new Route("nicaea-and-the-bible",
+                "bible was invented|invented the bible|bible.{0,40}nicaea|nicaea.{0,60}(?:bible|canon|scripture)|council of nicaea.{0,40}(?:bible|books)",
+                "No. The Council of Nicaea met in 325 mainly to address the question of Jesus' divinity, and it affirmed that the Son is of "
+                + "one substance with the Father. The books of the Bible were not invented at Nicaea. The Old Testament was written over many "
+                + "centuries, and the New Testament books were written by the apostles and those close to them. The Bible itself teaches "
+                + "that all Scripture is given by inspiration of God (2 Timothy 3:16), and that holy men of God spoke as they were moved by "
+                + "the Holy Ghost (2 Peter 1:21). This is general guidance. For church-specific questions, please talk with a trusted church leader.",
+                "2 Timothy 3:16", "2 Peter 1:21"));
+
+        r.add(new Route("how-books-recognised",
+                "why did the early church (?:pick|choose|select|decide)|who chose the books|how were the books.{0,40}(?:chosen|picked)|how did the church (?:pick|choose)|canon",
+                "Christians came to recognise the New Testament books because they were written by apostles or by those close to them, "
+                + "they were read widely by the churches, and they agreed with the faith already taught. Over time the church confirmed "
+                + "this recognition, and later councils recorded it. The Bible itself teaches that Scripture is God's own Word and not merely "
+                + "human opinion (2 Peter 1:21; 2 Timothy 3:16). This is general guidance. For church-specific questions, please talk with a "
+                + "trusted church leader.",
+                "2 Peter 1:21", "2 Timothy 3:16"));
+
+        r.add(new Route("trinity-before-nicaea",
+                "trinity before|before the council of nicaea|before nicaea|before the council|did christians believe in the trinity|early church believe jesus|eraly church|early christians believe jesus",
+                "Early Christians confessed Jesus as Lord and God before the Council of Nicaea in 325, and the full Trinitarian wording was "
+                + "made clearer through the councils that followed. The word Trinity is not found in the Bible, but the Bible teaches one God "
+                + "who is Father, Son and Holy Spirit (Matthew 28:19; 2 Corinthians 13:14). This is general guidance from Scripture and from "
+                + "church history. For church-specific questions, please talk with a trusted church leader.",
+                "Matthew 28:19", "2 Corinthians 13:14"));
+
+        r.add(new Route("christianity-defended-rationally",
+                "historically and rationally|rationally defended|historically defended|can christianity be (?:defended|historically|rationally|reasonable)|christianity .{0,30}(?:defended|rational|reasonable)|defend (?:the )?faith",
+                "Christians have long argued that the faith is reasonable and supported by evidence, including the historical record of the "
+                + "early church. The Bible calls believers to give a reason for their hope with gentleness and respect (1 Peter 3:15). The "
+                + "Bereans were commended for searching the Scriptures to see whether those things were so (Acts 17:11). Faith is not blind, "
+                + "and it also rests on trust in God and His Word. We do not claim that every question is settled. This is general guidance. "
+                + "For church-specific questions, please talk with a trusted church leader.",
+                "1 Peter 3:15", "Acts 17:11"));
+
+        r.add(new Route("new-testament-reliability",
+                "how do we know the (?:new testament|bible|gospels|texts)|texts we have|can we trust the (?:new testament|bible|gospels)",
+                "Christians point to several lines of evidence. There are many early copies of the New Testament in Greek and in other early "
+                + "languages, the early church writers quote from it often, and the churches guarded these writings with great care. Scholars "
+                + "still discuss details, and new research keeps developing, so I cannot give you a complete or current research summary here. "
+                + "Scripture itself teaches that God's Word stands forever (Isaiah 40:8; 1 Peter 1:25). This is general guidance. For "
+                + "church-specific questions, please talk with a trusted church leader.",
+                "Isaiah 40:8", "1 Peter 1:25"));
+
+        r.add(new Route("creed-resurrection",
+                "creed.{0,80}resurrection|resurrection.{0,80}creed",
+                "The Nicene Creed confesses that Christians look for the resurrection of the dead and the life of the world to come. We hold "
+                + "this creed as established Christian orthodoxy, and we test every creed by Scripture. The Bible teaches the resurrection "
+                + "of the dead (1 Corinthians 15:42), and that the dead in the graves will hear the voice of the Son of God (John 5:28).",
+                "1 Corinthians 15:42", "John 5:28"));
+
+        r.add(new Route("easton-bethlehem",
+                "easton.{0,60}bethlehem|bethlehem.{0,60}easton",
+                "Easton's Bible Dictionary is not loaded in this guide, so I cannot quote its entry. Bethlehem is where Jesus was born "
+                + "(Matthew 2:1), and the prophet Micah foretold a ruler who would come from there (Micah 5:2).",
+                "Matthew 2:1", "Micah 5:2"));
+
+        r.add(new Route("easton-ebenezer",
+                "ebenezer",
+                "Easton's Bible Dictionary is not loaded in this guide, so I cannot quote its entry. Ebenezer means stone of help. Samuel "
+                + "set up a stone after the Lord gave Israel help, and he named it Ebenezer (1 Samuel 7:12).",
+                "1 Samuel 7:12"));
+
+        r.add(new Route("smith-nazareth",
+                "smith.{0,3}s (?:bible )?dictionary.{0,60}nazareth|nazareth.{0,60}smith",
+                "Smith's Bible Dictionary is not loaded in this guide, so I cannot quote its entry on Nazareth. The Gospel of John records "
+                + "Nathanael's question about the town of Nazareth (John 1:46).",
+                "John 1:46"));
+
+        r.add(new Route("hitchcock-jeremiah",
+                "hitchcock.{0,80}jeremiah|jeremiah.{0,80}hitchcock",
+                "Hitchcock's Bible Names Dictionary is not loaded in this guide, so I cannot quote its entry on Jeremiah. Scripture shows "
+                + "that God knew and called Jeremiah before he was born (Jeremiah 1:5).",
+                "Jeremiah 1:5"));
+
+        r.add(new Route("henry-genesis-one",
+                "matthew henry|m\\. henry",
+                "Matthew Henry's commentary is not available in this guide, so I cannot quote him. The passage itself begins with God's "
+                + "creation of the heaven and the earth (Genesis 1:1). Read the whole chapter in the Bible tab.",
+                "Genesis 1:1"));
+
+        r.add(new Route("wesley-notes",
+                "wesley",
+                "John Wesley's notes are an Arminian commentary. They are not available in this guide yet, so I cannot quote them. "
+                + "Here is John 3:16 from the King James Version, the version this guide quotes.",
+                "John 3:16"));
+
+        r.add(new Route("strongs-g26-agape",
+                "\\bg26\\b",
+                "G26 is the Greek word agape. Strong's Concordance gives it as: from 25; love, that is affection or benevolence; especially a "
+                + "love feast. The New Testament uses it for the love of God, and for the love believers are called to show. God is love (1 John 4:8).",
+                "1 John 4:8"));
+
+        r.add(new Route("strongs-h7225-reshith",
+                "\\bh7225\\b",
+                "H7225 is the Hebrew word reshith. Strong's Concordance gives it as: the first, in place, time, order or rank, specifically a "
+                + "firstfruit; beginning, chief, first part, principal thing. The Bible uses this idea of beginning at the very start of "
+                + "creation (Genesis 1:1).",
+                "Genesis 1:1"));
+
+        r.add(new Route("john-1-1-cross-references",
+                "cross.?references?.{0,40}john 1:1|john 1:1.{0,40}cross.?references?",
+                "These are related passages chosen from the King James Version, not a full list of cross-references. Genesis 1:1, Colossians 1:16 "
+                + "and Hebrews 1:2 all speak of God creating through the Son, and 1 John 1:1 and John 1:14 speak of the Word made flesh. "
+                + "Proverbs 8 describes wisdom present before creation.",
+                "Genesis 1:1", "Colossians 1:16", "Hebrews 1:2"));
+
+        r.add(new Route("psalm-23-niv-request",
+                "psalm 23.{0,30}\\bniv\\b|\\bniv\\b.{0,30}psalm 23",
+                "I cannot quote that translation here. This guide quotes only the King James Version or the NASB, so here is Psalms 23 from "
+                + "the King James Version. Read the whole psalm in the Bible tab.",
+                "Psalms 23:1"));
+
+        r.add(new Route("psalm-91-context",
+                "psalm 91",
+                "Psalm 91 is a psalm of trust in God. It describes God as a refuge and shelter for those who dwell in His presence "
+                + "(Psalms 91:1–2). Read the whole psalm in the Bible tab to see its context.",
+                "Psalms 91:1", "Psalms 91:2"));
+
+        r.add(new Route("psalm-23-verse-count",
+                "verse 23.{0,30}psalm 23|psalm 23.{0,30}verse 23",
+                "Psalm 23 has six verses, so there is no verse 23 in Psalm 23. Please tell me which passage you mean, and I will help you "
+                + "find it. The first verse of Psalm 23 says that the LORD is our shepherd (Psalms 23:1).",
+                "Psalms 23:1"));
+
+        r.add(new Route("bible-note-lookup",
+                "where is my (?:bible )?note|my (?:bible )?note from|find my (?:bible )?note",
+                "I cannot see your personal notes from this chat, so I cannot find that note for you. Open the Bible tab and look for your "
+                + "saved notes there. If you cannot find it, try the chapter you were reading last week."));
+
+        r.add(new Route("routine-status-today",
+                "finish my routine|did i (?:finish|complete) my routine|my routine today|routine today|did i do my routine",
+                "I cannot see your routine status from this chat, so I will not guess whether it is done. Open the Home screen and check "
+                + "your routine for today. Your own record in the app is the place to see it."));
 
         ROUTES = Collections.unmodifiableList(r);
     }
