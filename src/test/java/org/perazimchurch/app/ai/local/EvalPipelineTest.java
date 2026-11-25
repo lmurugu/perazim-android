@@ -169,7 +169,8 @@ public class EvalPipelineTest {
                     status = decided.status;
                     answer = decided.answer;
                 } else {
-                    JSONArray evidence = kjvEvidence(q);
+                    // PRE-SIGNING ESTIMATE: evidence from the unsigned package built from the approved library files.
+                    JSONArray evidence = PreSigningEvidence.retrieve(q);
                     if (evidence.length() == 0) {
                         // Production OnDeviceAi.ask throws here before the model runs, so the model is never called without evidence.
                         status = "refused:no-verified-source";
@@ -178,7 +179,7 @@ public class EvalPipelineTest {
                         String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
                         long t0 = System.currentTimeMillis();
                         String raw = runLlama(llama, modelPath, prompt, 128);
-                        status = "model:kjv-evidence:" + (System.currentTimeMillis() - t0) + "ms";
+                        status = "model:pre-signing-evidence:" + (System.currentTimeMillis() - t0) + "ms";
                         answer = LocalPrompt.stripStockPhrases(raw);
                     }
                 }
