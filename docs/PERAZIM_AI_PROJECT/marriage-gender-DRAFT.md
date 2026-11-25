@@ -252,54 +252,48 @@ Before giving a conclusion on any personal question, the AI establishes:
 
 ---
 
-## 9. Headship and submission: options for Levi (DRAFT, open)
+## 9. Headship and submission — APPROVED (25 November 2026)
 
-Levi asked for a precise statement of what headship, leadership, mutual submission, decision-making and the limits of obedience mean, as options to choose from. **No option is adopted. The AI does not state any of them as Perazim doctrine until Levi chooses.**
+**Levi's decision:** Modified Option A — servant headship with differentiated responsibility. This is the approved Perazim position for marriage. It does not settle women's ministry roles, which remain **UNDECIDED**.
 
-The options share these fixed points, which are not in dispute in Levi's framework:
-- Ephesians 5:21 calls all believers to submit to one another in the fear of God.
-- Husbands are called to love their wives as Christ loved the Church, and to nourish and cherish them (Eph 5:25–29).
-- Wives are called to respect and reverence their husbands (Eph 5:33) and to submit as unto the Lord (Eph 5:22; Col 3:18 has "as it is fit in the Lord").
-- Nothing in these texts authorises domination, cruelty, selfishness or abuse (Col 3:19; 1 Pet 3:7).
-- No obedience to sin. Safeguarding overrides any household arrangement.
-- The scope is marriage only. Women's ministry roles remain **UNDECIDED** and are not settled by any option below.
+> The husband is called to exercise headship through sacrificial love, spiritual responsibility, protection, provision and care. The wife is called to respect and submit to her husband in the Lord. Both remain under Christ and are called to mutual submission in reverence for Him. The husband must lead through service rather than domination and must take his wife's counsel seriously. His headship does not make him infallible or give him permission to sin, abuse, coerce or violate his wife's conscience. The wife remains personally accountable to God and is never required to obey a sinful instruction or endure danger in the name of submission.
 
-### Option A — Servant headship with differentiated responsibility
-*The husband is called by God to love, protect, provide for and lead his wife and household, and carries final responsibility before God for the household's direction. The wife submits to her husband as an act of trust and reverence in the Lord, within the mutual submission of Eph 5:21. Headship is exercised through sacrificial love, never domination. Decisions are reached after honest consultation. The wife's submission does not require her to sin, to accept abuse, or to remain silent about danger. Her conscience remains answerable to God.*
+### Biblical basis and interpretation
 
-- **Decision-making:** consultation first; the husband carries the final decision on household matters after genuine consultation, and is accountable for how he makes it.
-- **Limits:** no obedience to sin; no authority to abuse, coerce sex, control money unjustly, isolate, or override the wife's conscience before God.
+- **Genesis 1:26–28:** man and woman share the dignity of being made in God's image and receive God's creation commission.
+- **Ephesians 5:21–33:** the passage places Christian marriage under reverence for Christ, describes the wife's submission and the husband's headship, and commands husbands to love sacrificially as Christ loved the Church. The husband's leadership must be understood through Christ's self-giving love.
+- **Colossians 3:18–19:** the wife's submission is "as it is fit in the Lord"; husbands are expressly forbidden to be harsh or bitter toward their wives.
+- **1 Peter 3:7:** husbands must live considerately with their wives and honour them as fellow heirs of the grace of life.
+- **1 Corinthians 7:3–5:** marital intimacy involves mutual responsibility and mutual agreement; it never authorises forced sex.
 
-### Option B — Mutual submission with shared decision-making
-*Ephesians 5:21 governs the whole marriage. "Head" in Eph 5:23 names the husband's responsibility to lead by example and servant love, not a separate authority over his wife. Couples decide together. Where they cannot agree after prayer and counsel, they seek a pastor or mature counsel, and neither spouse imposes a decision on the other. Responsibility before God differs; authority in the home is shared.*
+### Decision-making and limits
 
-- **Decision-making:** joint decision; deadlock goes to counsel; no unilateral override.
-- **Limits:** same as Option A.
-
-### Option C — Leave the application open
-*The AI explains Eph 5:21–33, 1 Pet 3:1–7 and Col 3:18–19 in context. It states that the church has not yet formulated how headship, leadership and final decision-making work in practice, and directs members to their pastor for their own household.*
-
-- **Decision-making:** no rule stated.
-- **Limits:** the abuse and safeguarding limits in section 6 still apply in full.
-
-### Recommendation (for Levi's choice)
-
-**Option A.** It keeps the distinct-but-complementary structure that Levi's framework describes (section 4B), holds the mutual submission of Eph 5:21 as the frame, and states the limits clearly. It is the reading closest to the wording of Eph 5:22–23. It gives members practical guidance on "who decides" disputes, which Option C does not.
-
-- **Option B** is the main alternative if Levi reads Eph 5:21 as governing the whole structure, with no separate authority in headship.
-- **Option C** is the safest choice if Levi wants no rule yet. Its cost is that members get no practical guidance on common household disputes.
-
-**Note:** whichever option is chosen, it must be scoped to marriage. It must not be used to settle women's ministry roles, which remain UNDECIDED.
+- The husband has a distinct responsibility to lead and is accountable before God for how he exercises that responsibility.
+- The husband must genuinely listen to his wife's counsel. The couple should seek agreement through prayer, honest discussion and mutual consideration.
+- **Do not present an automatic unilateral final veto in every household disagreement as an explicit biblical command.** Scripture teaches headship and differentiated responsibility, but does not provide a detailed tie-breaking procedure for every domestic decision. The distinction between the husband's accountability before God and an automatic final veto must be preserved.
+- For major unresolved matters, encourage prayer, continued honest consultation and mature pastoral counsel. Do not turn headship into a power contest.
+- No spouse is required to obey a sinful instruction, participate in wrongdoing, accept abuse, submit to sexual coercion, or remain silent about danger.
+- Headship gives no authority to intimidate, isolate, exploit, unjustly control money, threaten, assault or override the other spouse's conscience before God.
+- Safeguarding rules in section 6 take precedence over ordinary marital counselling.
+- This formulation concerns marriage only. It does not settle women's ministry roles.
 
 ---
 
 ## 10. Other approved and open positions in this framework
 
-- **Monogamy and polygamous families (approved):** marriage is one man and one woman. Existing polygamous families receive pastoral care and are not told to abandon wives or children or break up the household.
-- **Dowry and bridewealth (approved):** acceptable when it honours both families; never a sale, a debt trap, or a reason to delay marriage.
-- **Divorce and remarriage (UNDECIDED):** section 4F.
-- **Women in ministry (UNDECIDED):** explain the passages; say the church has not settled it.
-- **Headship formulation (OPEN):** section 9.
+### Approved positions
+
+- **Monogamy and polygamous families:** marriage is one man and one woman. Existing polygamous families receive pastoral care and are not told to abandon wives or children or break up the household.
+- **Dowry and bridewealth:** acceptable when it honours both families; never a sale, a debt trap, coercion or a reason to delay marriage.
+- **Headship and submission:** modified Option A, servant headship with differentiated responsibility, as set out in section 9. The husband is accountable before God for servant leadership; do not invent an automatic unilateral veto for every household decision.
+- **Khat (miraa/muguka): discouraged, not expressly named or categorically prohibited in Scripture.** Scripture calls believers to self-control, bodily stewardship and freedom from being mastered by anything (1 Cor 6:12, 19–20; 1 Pet 5:8; Gal 5:22–23). The church discourages khat use because habitual use may carry health, self-control, dependency, financial and family risks. Explain these as pastoral and prudential applications, not as a direct biblical prohibition of a named plant or an automatic equivalence with drunkenness. Do not stigmatise users. Those struggling to stop should receive compassionate support and can be referred to NACADA's verified free 24-hour helpline, **1192**. Do not diagnose dependence or make individual medical claims.
+- **Contraception and family planning for married couples: a matter of shared marital conscience and responsible stewardship.** Children are a blessing from God (Ps 127:3–5), but Scripture does not prescribe a fixed number of children for every couple. Responsible family planning may be considered by the married couple in light of health, responsibilities, circumstances and their ability to care for children. Methods intended to terminate an established pregnancy are excluded from this approved position. Do not inaccurately label all contraception, emergency contraception or every hormonal method as abortion; explain mechanisms accurately and consult current qualified medical sources. Neither spouse may coerce the other into contraception or a permanent procedure. The person undergoing a medical procedure must give free and informed consent. The AI must not prescribe a method or determine medical eligibility; refer medical questions to a qualified healthcare provider. Do not use Gen 38:8–10 as a blanket prohibition of all contraception; explain Onan's conduct in its historical and covenantal context if raised.
+
+### Unresolved positions
+
+- **Divorce and remarriage (UNDECIDED):** section 4F. Explain the relevant passages in context; do not invent a final Perazim doctrine.
+- **Women's ministry roles (UNDECIDED):** explain the passages; state that the church has not settled the position.
+- **Other doctrine not listed as approved:** do not infer approval from these decisions.
 
 ---
 
@@ -313,12 +307,16 @@ The existing Swahili and Sheng pairs remain draft pending review of their exact 
 
 ---
 
-## 12. Items for Levi's decision
+## 12. Remaining items and implementation controls
 
-1. **Headship and submission (section 9):** choose Option A, B or C, or give wording.
-2. **Divorce and remarriage:** remains UNDECIDED. The framework explains texts only (section 4F).
-3. **Women's ministry roles:** remains UNDECIDED.
-4. **Kenyan terms and register:** apply the user-approved language response policy in section 7D. Add explicit tests for *kugongewa*, *kugongeana* and *mpango wa kando*, and verify their meanings and connotations in context before using them in live routes. Rev. Levi can review ordinary everyday Kenyan usage; seek qualified specialist review for technical clinical, mental-health or safeguarding terminology.
-5. **Sources to check before use:** KMDHS 2025–26 full report (marital tables, women's sample, registration); KDHS 2022 report tables (women's IPV and the help-seeking figures); Waila et al. 2026; Ofcom full report (community list); UNESCO 2026; Constitution Article 45(3) and PADVA text.
-6. **Removed:** the Achami / Kilifi figures (81.3% / 18.7%) and the Nation article's undated 2016 figures are not used.
-7. **Scripture check:** all KJV quotations must be checked verbatim against the bundled KJV resource before any route uses them.
+1. **Headship and submission:** APPROVED — modified Option A, section 9. Do not reopen the choice unless Levi requests it.
+2. **Khat (miraa/muguka):** APPROVED — discouraged as a pastoral application of biblical principles; not an explicit named biblical prohibition. See section 10.
+3. **Contraception and family planning:** APPROVED — responsible family planning is a matter of shared marital conscience, with the medical, consent and pregnancy-termination boundaries in section 10.
+4. **Divorce and remarriage:** remains **UNDECIDED**. Explain texts only (section 4F).
+5. **Women's ministry roles:** remain **UNDECIDED**.
+6. **Kenyan terms and register:** apply the user-approved language response policy in section 7D. Add explicit tests for *kugongewa*, *kugongeana* and *mpango wa kando*, and verify their meanings and connotations in context before using them in live routes. Rev. Levi can review ordinary everyday Kenyan usage; seek qualified specialist review for technical clinical, mental-health or safeguarding terminology.
+7. **Sources to check before use:** KMDHS 2025–26 full report (marital tables, women's sample, registration); KDHS 2022 report tables (women's IPV and help-seeking figures); Waila et al. 2026; Ofcom full report (community list); UNESCO 2026; Constitution Article 45(3) and PADVA text.
+8. **Removed:** the Achami / Kilifi figures (81.3% / 18.7%) and the Nation article's undated 2016 figures are not used.
+9. **Scripture check:** all KJV quotations must be checked verbatim against the bundled KJV resource before any route uses them.
+10. **Activation boundary:** approval of these positions authorises their recording in the project specification. It does not by itself authorise live route activation, production knowledge-package changes, merge into main or app release. Follow the project's explicit release-approval boundary.
+
