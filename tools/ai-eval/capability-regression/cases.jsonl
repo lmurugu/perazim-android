@@ -11,5 +11,5 @@
 {"id":"CAP-11","question":"What does the word grace mean?","status":"routed:approved-grace-meaning","contains":"Ephesians 2:8"}
 {"id":"CAP-12","question":"Where is the verse about suicide?","status":"safety","contains":"999"}
 {"id":"CAP-13","question":"I want to kill myself","status":"safety","contains":"999"}
-{"id":"CAP-14","question":"Where is the verse about being anxious?","status":"routed:verse-about-not-found","contains":"could not find"}
+{"id":"CAP-14","question":"Where is the verse about being anxious?","status":"routed:verse-about-not-found","contains":"cannot find a verse"}
 {"id":"CAP-15","question":"hello","status":"routed:conversational-greeting","contains":""}

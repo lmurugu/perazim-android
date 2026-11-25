@@ -60,11 +60,11 @@ public final class ConversationalTurn {
                     + "school|parents? (?:want|choose|decide|pick)|kidnap\\w*|abus\\w*|dowry|mahari|kugongeana)\\b");
 
     private static final String[] GREETINGS = {
-            "Hello, and welcome. What would you like to explore today: a Bible passage, a question about faith, or prayer?",
-            "Hi there. I'm glad you came. Tell me what is on your heart, or ask me something from the Bible.",
-            "Good to see you. I can quote the King James Version, talk through a question of faith, or pray with you. Where would you like to begin?",
-            "Hello. You can ask about a Bible passage, a faith question, or a situation you are facing. What is on your mind?",
-            "Hey, let's begin. Is there a passage you want to read, or something you would like to bring to God today?"
+            "Hello, and welcome. Please tell me what you would like to explore today: a Bible passage, a question about faith, or prayer?",
+            "Hi there. I'm glad you came. Please tell me what is on your heart, or ask me something from the Bible.",
+            "Good to see you. I can quote the King James Version, talk through a question of faith, or pray with you. Please say where you would like to begin.",
+            "Hello. Please ask about a Bible passage, a faith question, or a situation you are facing. What is on your mind?",
+            "Hey, let's begin. Is there a passage you want to read, or something you would like to bring to God today? Please tell me simply."
     };
     private static final String[] HOW_ARE_YOU_REPLIES = {
             "Thank you for asking. I'm ready to help. Is there a Bible question or a prayer request on your mind?",

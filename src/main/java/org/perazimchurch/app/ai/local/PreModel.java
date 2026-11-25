@@ -487,10 +487,13 @@ public final class PreModel {
             found = verses.findAllWordsRanked(words, 3);
         }
         if (found.isEmpty()) {
-            return new Decision("routed:verse-about-not-found", "I could not find a verse in the King James Version that has "
+            return new Decision("routed:verse-about-not-found", "I cannot find a verse in the King James Version that has "
                     + "all of these words together: " + subject + ". Try a shorter phrase, or read the Bible tab.");
         }
-        StringBuilder out = new StringBuilder("From the King James Version (KJV), verses with " + subject + ":\n");
+        String lead = q.contains("brief") || q.contains("short") || q.contains("simple")
+                ? "Here is a brief answer from the King James Version (KJV), verses with " + subject + ":\n"
+                : "From the King James Version (KJV), verses with " + subject + ":\n";
+        StringBuilder out = new StringBuilder(lead);
         for (KjvVerseText.Found f : found) out.append('\n').append(f.label).append(": \u201c").append(f.text).append('\u201d');
         return new Decision("routed:verse-about-kjv", out + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
     }
