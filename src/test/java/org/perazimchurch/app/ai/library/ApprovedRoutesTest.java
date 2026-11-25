@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.library;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -21,6 +22,14 @@ public class ApprovedRoutesTest {
 
     private static ApprovedRoutes.Answer route(String question) throws Exception {
         return ApprovedRoutes.answerFor(question, kjv());
+    }
+
+    @Test
+    public void clergyGeneralDepressionQuestionGoesToTheApprovedDepressionRoute() throws Exception {
+        ApprovedRoutes.Answer a = route("Clergy in our area are dying by suicide. How can a pastor be depressed if he has God?");
+        assertNotNull(a);
+        assertEquals("depression-and-faith", a.routeId);
+        assertTrue(a.text.contains("999 or 112"));
     }
 
     @Test

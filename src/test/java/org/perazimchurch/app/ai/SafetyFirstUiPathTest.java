@@ -115,6 +115,7 @@ public class SafetyFirstUiPathTest {
         String route = PerazimAiEngine.preModelRoute(q);
         assertFalse(q + " -> " + route, route != null && route.startsWith("crisis"));
         assertEquals(SoftSafety.Verdict.NONE, SoftSafety.judge(q));
+        assertFalse(PerazimAiEngine.isSensitivePastoralDisclosure(q));
     }
 
     @Test

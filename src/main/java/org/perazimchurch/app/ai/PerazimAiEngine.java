@@ -830,6 +830,9 @@ public class PerazimAiEngine {
         // A question about what someone else says (e.g. "Our pastor says depression is a lack of faith. Is that true?") is a
         // doctrine question, not a personal disclosure, so it goes to the approved routes.
         if (SAYS_CLAIM_QUESTION.matcher(query).find() && !FIRST_PERSON_CONTEXT.matcher(query).find()) return false;
+        // KB-047 (2026-11-25): a general question about suicide or depression among clergy or a group ("Clergy in our area...")
+        // has no speaker disclosure and no named person, so it goes to the approved depression route, not the sensitive reply.
+        if ("general-topic".equals(safetyRoute(query))) return false;
         // Added 2026-11-25 (MG-S15): a factual question about a spouse's conduct ("Is that adultery?") goes to the approved
         // infidelity route. A speaker who discloses their own distress, fear or danger still goes to the sensitive route.
         if (FACTUAL_INFIDELITY_QUESTION.matcher(query).find() && !PERSONAL_DISTRESS.matcher(query).find()) return false;
