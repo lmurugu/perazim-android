@@ -1,6 +1,6 @@
 # Marriage and family responses, round 39c, for human review
 
-Status: NOT human-approved. These are automatically generated outputs from code commit 3e7c199 (round 39c). The automatic grader passing does not approve any route for production. Levi reviews every answer below before any marriage route goes live.
+Status: NOT human-approved. These are automatically generated outputs from code commit 2fc39a9 (round 39c, final). The automatic grader passing does not approve any route for production. Levi reviews every answer below before any marriage route goes live.
 
 Round 39c changes that affect these answers: abuse and violence disclosures route to safeguarding (MG-S20 and MG-S23 now route to violence-safeguarding and ask about immediate danger, not a suicide plan); the 1195 "may not be current" warning is removed; new marriage routes for men's rights, sweeping abuse claims, marriage readiness, parental separation, cohabitation, submission, decisions, illness and intimacy, infertility, sin and spouse, neglect and infidelity, the kugongeana term, khat in the household, forced procedure consent and obey-in-marriage; the singleness route anchor is fixed to Psalms 139:14.
 
