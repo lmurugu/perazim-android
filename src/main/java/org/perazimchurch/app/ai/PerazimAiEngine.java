@@ -439,8 +439,15 @@ public class PerazimAiEngine {
     private static final Pattern DRUG_CUE = Pattern.compile(
             "\\b(?:drugs?|bhang|cannabis|marijuana|weed|miraa|heroin|cocaine|narcotics?|addict(?:ion|ed)?)\\b", Pattern.CASE_INSENSITIVE);
 
+    /** Miraa, khat and muguka questions go to the approved khat route unless they describe selling or trafficking. */
+    private static final Pattern MIRAA_CUE = Pattern.compile("\\b(?:miraa|khat|muguka)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern SELLING_CUE = Pattern.compile(
+            "\\b(?:sell|selling|sells|deal|dealing|traffick\\w*|smuggl\\w*|supply|supplying)\\b", Pattern.CASE_INSENSITIVE);
+
     public static boolean isDrugSafetyQuery(@Nullable String query) {
-        return query != null && DRUG_CUE.matcher(query).find();
+        if (query == null) return false;
+        String withoutMiraa = MIRAA_CUE.matcher(query).replaceAll(" ");
+        return DRUG_CUE.matcher(withoutMiraa).find() || (DRUG_CUE.matcher(query).find() && SELLING_CUE.matcher(query).find());
     }
 
     /** Scripture-topic words that are in scope even though they are not in the general cue list. */
