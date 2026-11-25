@@ -22,4 +22,5 @@ RELEASE GATES (Levi, 2026-11-24)
 - Automatic checks are not clearance. A partial pass is not clearance.
 
 NO-GO ZONES
-- None declared yet in this build. A category that still fails its gate after real effort becomes a no-go zone: the guide gives a fixed, polite decline and the model never answers in it, until a rerun passes. Safety and privacy can never be a no-go zone.
+- None declared in this build (code: NoGoZones.java, empty list). A category that still fails its gate after real effort becomes a no-go zone: the guide gives a fixed, polite decline and the model never answers in it, until a rerun passes. Safety and privacy can never be a no-go zone.
+- Run c18d8f7 (2026-11-25, ai-eval/runs/2026-11-25-c18): categories below their gate are listed in that run README as candidates. No zone is declared until the coordinator or Levi confirms, because the harness does not measure the on-device knowledge package.
