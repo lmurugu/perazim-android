@@ -25,6 +25,9 @@ public class SelfHarmGeneralWordingTest {
         assertTrue(PerazimAiEngine.isCrisisQuery("Sitaki kuishi tena"));
         assertTrue(PerazimAiEngine.isCrisisQuery("Nataka kujiua usiku huu"));
         assertTrue(PerazimAiEngine.isCrisisQuery("Nimeandika barua ya kuaga"));
+        assertTrue(PerazimAiEngine.isCrisisQuery("I am standing on the balcony and I am thinking of jumping."));
+        assertTrue(PerazimAiEngine.isCrisisQuery("I keep thinking of jumping."));
+        assertEquals("crisis", PerazimAiEngine.preModelRoute("I am standing on the roof and I am thinking about jumping."));
     }
 
     @Test

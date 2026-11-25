@@ -886,6 +886,8 @@ public class PerazimAiEngine {
             "\\bi\\s+(?:do not|don'?t)\\s+want\\s+to\\s+be\\s+(?:a\\s+)?burden\\b|\\bi\\s+(?:am|'m)\\s+(?:only\\s+|just\\s+)?(?:a\\s+)?burden\\s+(?:to|on)\\b|" +
             "\\bnobody (?:would|will) miss me\\b|\\bno ?one (?:would|will) miss me\\b|\\bbetter off without me\\b|" +
             "\\b(?:going to|about to|thinking (?:of|about)|want to|plan to)\\s+jump(?:ing)?\\s+(?:off|from|in front)\\b|\\bi\\s+(?:am|'m)\\s+jumping\\s+off\\b|\\bjumping off\\b|" +
+            // First-person "thinking of jumping" with nothing after it, and standing on a balcony, roof or ledge (KB-090).
+            "\\bi\\b[^.?!]{0,20}?\\bthinking\\s+(?:of|about)\\s+jump(?:ing)?\\b|\\bi\\s+(?:am|'m)\\s+standing\\s+on\\s+the\\s+(?:balcony|roof|ledge)\\b|" +
             "\\bi\\s+(?:have|'ve)\\s+decided\\s+to\\s+(?:die|end|kill)\\b|\\bsuicide note\\b|\\bgoodbye letter\\b|\\bletter of goodbye\\b|" +
             "\\b(?:hang|hanging)\\s+myself\\b|\\bnoose\\b|\\bi\\s+(?:have|got)\\s+the\\s+(?:rope|pills|tablets|gun|knife|poison)\\b|" +
             "\\b(?:rope|noose|pills|tablets|poison)\\s+(?:is\\s+|are\\s+)?ready\\b|" +
