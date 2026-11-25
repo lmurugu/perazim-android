@@ -21,6 +21,13 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: gradle
+      - name: Cache Maven jars (Robolectric android-all)
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: build.gradle
       - name: Unit tests and debug build
         run: ./gradlew testDebugUnitTest assembleDebug --no-daemon
       - name: Upload debug APK
@@ -41,6 +48,13 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: gradle
+      - name: Cache Maven jars (Robolectric android-all)
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: build.gradle
       - name: Render main tabs in dark and light mode
         run: ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon
       - name: Upload screenshots
