@@ -8,6 +8,8 @@ import org.perazimchurch.app.ai.library.DoctrineLibrary;
 import org.perazimchurch.app.ai.library.KjvVerseText;
 import org.perazimchurch.app.ai.library.NoGoZones;
 import org.perazimchurch.app.ai.library.ScriptureRangeTable;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The one ordered answer path that runs before any model call. The app and the evaluation harness both use this, so
@@ -60,10 +62,13 @@ public final class PreModel {
         }
         String doctrine = DoctrineLibrary.load(c).answerFor(question);
         if (doctrine != null) return new Decision("routed:doctrine-approved", doctrine);
+        KjvVerseText verses = KjvVerseText.load(c);
         if (table != null) {
-            Decision verse = verseDecision(table, KjvVerseText.load(c), question);
+            Decision verse = verseDecision(table, verses, question);
             if (verse != null) return verse;
         }
+        Decision search = verseSearchDecision(verses, question);
+        if (search != null) return search;
         NoGoZones.Zone zone = NoGoZones.match(question);
         if (zone != null) return new Decision("routed:no-go:" + zone.id, zone.decline);
         return null;
@@ -104,6 +109,83 @@ public final class PreModel {
                 : "";
         return new Decision("routed:verse-kjv", notice + "From the King James Version (KJV), " + ref.label + ":\n\n" + out
                 + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
+    }
+
+    /** A quoted phrase of at least three words, the phrase after "the Bible says", or null. */
+    private static final Pattern QUOTED_PHRASE = Pattern.compile("[\"'\u2018\u201c]([^\"'\u2019\u201d]{8,160})[\"'\u2019\u201d]");
+    private static final Pattern BIBLE_SAYS = Pattern.compile(
+            "\\bbible (?:says|say|teaches) (?:that )?(.{8,160}?)\\s*(?:right|correct|true|isn't it|is that right)?\\s*[?.!]*\\s*$",
+            Pattern.CASE_INSENSITIVE);
+
+    /** Topics with a verse the King James Version gives for them, verbatim from the bundled text. */
+    static final Pattern[] TOPIC_PATTERNS = {
+        Pattern.compile("love of money|money is the (?:root|source)|root of all evil", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("pharaoh.*heart|heart of pharaoh", Pattern.CASE_INSENSITIVE),
+    };
+    private static final Pattern TOPIC_REF = Pattern.compile("^(.+) (\\d+):(\\d+)$");
+    static final String[][] TOPIC_REFS = {
+        {"1 Timothy 6:10"},
+        {"Exodus 9:12", "Romans 9:18"},
+    };
+
+    /** The phrase a question asks about: a quoted phrase, or the words after "the Bible says". Null when none. */
+    static String searchedPhrase(String question) {
+        if (question == null) return null;
+        Matcher quoted = QUOTED_PHRASE.matcher(question);
+        if (quoted.find()) return quoted.group(1).trim();
+        Matcher says = BIBLE_SAYS.matcher(question);
+        if (says.find()) return says.group(1).trim();
+        return null;
+    }
+
+    /**
+     * Verbatim KJV for a phrase the user quotes or attributes to the Bible, and for the few topics with a fixed verse.
+     * A phrase that is not in the KJV is said so plainly, never quoted from memory. Returns null when neither applies.
+     */
+    static Decision verseSearchDecision(KjvVerseText verses, String question) {
+        if (verses == null || question == null) return null;
+        String phrase = searchedPhrase(question);
+        if (phrase != null) {
+            List<KjvVerseText.Found> found = verses.findPhrase(phrase, 3);
+            if (!found.isEmpty()) {
+                StringBuilder out = new StringBuilder("From the King James Version (KJV):\n");
+                for (KjvVerseText.Found f : found) out.append('\n').append(f.label).append(": \u201c").append(f.text).append('\u201d');
+                return new Decision("routed:verse-phrase-kjv", out + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
+            }
+        }
+        String topic = topicVerses(verses, question);
+        if (topic != null) {
+            String prefix = phrase == null ? "" : "The King James Version does not contain the exact wording in your question. ";
+            return new Decision(phrase == null ? "routed:verse-topic-kjv" : "routed:verse-topic-kjv-corrected",
+                    prefix + "The King James Version speaks to this in:\n\n" + topic
+                    + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
+        }
+        if (phrase != null) {
+            return new Decision("routed:verse-phrase-not-found", "I can't find that wording in the King James Version, "
+                    + "so I won't quote it. Please check the wording, or ask a church leader.");
+        }
+        return null;
+    }
+
+    private static String topicVerses(KjvVerseText verses, String question) {
+        String normalized = question.toLowerCase(Locale.ROOT).replace('\u2019', '\'');
+        for (int t = 0; t < TOPIC_PATTERNS.length; t++) {
+            if (!TOPIC_PATTERNS[t].matcher(normalized).find()) continue;
+            StringBuilder out = new StringBuilder();
+            for (String ref : TOPIC_REFS[t]) {
+                Matcher m = TOPIC_REF.matcher(ref);
+                if (!m.find()) continue;
+                int book = verses.bookNumber(m.group(1));
+                int chapter = Integer.parseInt(m.group(2));
+                int verse = Integer.parseInt(m.group(3));
+                String text = verses.verse(book, chapter, verse);
+                if (text == null) continue;
+                if (out.length() > 0) out.append("\n\n");
+                out.append(ref).append(": \u201c").append(text).append('\u201d');
+            }
+            if (out.length() > 0) return out.toString();
+        }
+        return null;
     }
 
     /** A parsed reference: book, chapter, first and last verse, and whether the KJV has it. */

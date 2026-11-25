@@ -6,7 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.json.JSONArray;
@@ -22,8 +25,21 @@ public final class KjvVerseText {
     static final String KJV_TSV = "bible/text/KJV.tsv.gz";
     static final String MANIFEST = "bible/kjv_manifest.json";
 
-    private final Map<String, String> verses = new HashMap<>();
+    /** In canonical order, as the file is read. */
+    private final Map<String, String> verses = new LinkedHashMap<>();
     private final Map<String, Integer> bookNumbers = new HashMap<>();
+    private final Map<Integer, String> bookNames = new HashMap<>();
+
+    /** One verse found by a phrase search: its reference label and its verbatim text. */
+    public static final class Found {
+        public final String label;
+        public final String text;
+
+        Found(String label, String text) {
+            this.label = label;
+            this.text = text;
+        }
+    }
 
     private KjvVerseText() {}
 
@@ -34,6 +50,7 @@ public final class KjvVerseText {
         for (int i = 0; i < books.length(); i++) {
             JSONObject b = books.getJSONObject(i);
             out.bookNumbers.put(b.getString("name").toLowerCase(Locale.ROOT), b.getInt("bookNumber"));
+            out.bookNames.put(b.getInt("bookNumber"), b.getString("name"));
         }
         try (BufferedReader in = new BufferedReader(new InputStreamReader(tsv, StandardCharsets.UTF_8))) {
             String line;
@@ -80,6 +97,30 @@ public final class KjvVerseText {
         if (name == null) return -1;
         Integer n = bookNumbers.get(name.toLowerCase(Locale.ROOT));
         return n == null ? -1 : n;
+    }
+
+    /**
+     * Verses whose text contains the phrase, in canonical order, with their verbatim KJV text. Words are compared
+     * ignoring case and punctuation. Returns an empty list when the phrase is blank or not in the file.
+     */
+    public List<Found> findPhrase(String phrase, int limit) {
+        List<Found> out = new ArrayList<>();
+        String needle = normalise(phrase);
+        if (needle.trim().isEmpty() || limit <= 0) return out;
+        for (Map.Entry<String, String> e : verses.entrySet()) {
+            if (!normalise(e.getValue()).contains(needle)) continue;
+            String[] k = e.getKey().split(":");
+            String book = bookNames.get(Integer.parseInt(k[0]));
+            out.add(new Found((book == null ? k[0] : book) + " " + k[1] + ":" + k[2], e.getValue()));
+            if (out.size() >= limit) break;
+        }
+        return out;
+    }
+
+    /** Lowercase words separated by single spaces, with a space at each end, so phrases match whole words only. */
+    static String normalise(String text) {
+        if (text == null) return " ";
+        return " " + text.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]+", " ").trim() + " ";
     }
 
     /** The verse text as written in the file, or null when the verse is not in the file. */
