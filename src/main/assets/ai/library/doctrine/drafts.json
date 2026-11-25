@@ -273,6 +273,372 @@
       "approval": {
         "pending": "Levi"
       }
+    },
+    {
+      "id": "holy-spirit-person",
+      "topic": "The Holy Spirit is a person",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "holy (?:spirit|ghost)|comforter|is the spirit a person",
+      "view": "The Holy Spirit is a divine person, fully God, who teaches, guides and can be grieved and lied to (John 14:26; Acts 5:3-4). Scripture names the Spirit with the Father and the Son in the baptismal command (Matthew 28:19).",
+      "verses": [
+        {
+          "ref": "John 14:26",
+          "text": "But the Comforter, which is the Holy Ghost, whom the Father will send in my name, he shall teach you all things, and bring all things to your remembrance, whatsoever I have said unto you."
+        },
+        {
+          "ref": "Acts 5:3",
+          "text": "But Peter said, Ananias, why hath Satan filled thine heart to lie to the Holy Ghost, and to keep back part of the price of the land?"
+        },
+        {
+          "ref": "Acts 5:4",
+          "text": "Whiles it remained, was it not thine own? and after it was sold, was it not in thine own power? why hast thou conceived this thing in thine heart? thou hast not lied unto men, but unto God."
+        },
+        {
+          "ref": "Matthew 28:19",
+          "text": "Go ye therefore, and teach all nations, baptizing them in the name of the Father, and of the Son, and of the Holy Ghost:"
+        }
+      ]
+    },
+    {
+      "id": "jesus-eternal-creator",
+      "topic": "Jesus is eternal and the Creator",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "eternal|from everlasting|from the beginning|before abraham|created|creator|pre-?exist|firstborn|was there before|always existed|had a beginning",
+      "view": "Scripture shows that Christ is eternal and that all things were made by Him: His goings forth are from everlasting (Micah 5:2), He existed before Abraham (John 8:58), and by Him all things were created (Colossians 1:16).",
+      "verses": [
+        {
+          "ref": "Micah 5:2",
+          "text": "But thou, Beth-lehem Ephratah, though thou be little among the thousands of Judah, yet out of thee shall he come forth unto me that is to be ruler in Israel; whose goings forth have been from of old, from everlasting."
+        },
+        {
+          "ref": "John 8:58",
+          "text": "Jesus said unto them, Verily, verily, I say unto you, Before Abraham was, I am."
+        },
+        {
+          "ref": "Colossians 1:16",
+          "text": "For by him were all things created, that are in heaven, and that are in earth, visible and invisible, whether they be thrones, or dominions, or principalities, or powers: all things were created by him, and for him:"
+        }
+      ]
+    },
+    {
+      "id": "salvation-by-grace-not-works",
+      "topic": "Salvation is by grace, not by good works",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "good works|works|earn|heaven|saved|salvation|get to heaven|go to heaven",
+      "view": "We are saved by grace through faith, not by our own works, and good works are the fruit of salvation, not its price (Ephesians 2:8-9; Ephesians 2:10).",
+      "verses": [
+        {
+          "ref": "Ephesians 2:8",
+          "text": "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God:"
+        },
+        {
+          "ref": "Ephesians 2:9",
+          "text": "Not of works, lest any man should boast."
+        },
+        {
+          "ref": "Ephesians 2:10",
+          "text": "For we are his workmanship, created in Christ Jesus unto good works, which God hath before ordained that we should walk in them."
+        }
+      ]
+    },
+    {
+      "id": "return-of-christ",
+      "topic": "The return of Christ",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "return|second coming|come back|coming of|come again|when will jesus|parousia|will jesus come",
+      "view": "Scripture teaches that Jesus will return bodily and visibly, in the same manner in which He went up (Acts 1:11). The Lord himself will descend from heaven with a shout (1 Thessalonians 4:16). No one knows the day or the hour (Matthew 24:36).",
+      "verses": [
+        {
+          "ref": "Acts 1:11",
+          "text": "Which also said, Ye men of Galilee, why stand ye gazing up into heaven? this same Jesus, which is taken up from you into heaven, shall so come in like manner as ye have seen him go into heaven."
+        },
+        {
+          "ref": "1 Thessalonians 4:16",
+          "text": "For the Lord himself shall descend from heaven with a shout, with the voice of the archangel, and with the trump of God: and the dead in Christ shall rise first:"
+        },
+        {
+          "ref": "Matthew 24:36",
+          "text": "But of that day and hour knoweth no man, no, not the angels of heaven, but my Father only."
+        }
+      ]
+    },
+    {
+      "id": "resurrection-of-christ",
+      "topic": "The resurrection of Christ",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "resurrect|rose again|rise from the dead|raised|dead rise|empty tomb|risen",
+      "view": "Christ died for our sins according to the Scriptures, was buried, and rose again the third day according to the Scriptures (1 Corinthians 15:3-4). The resurrection is the foundation of our faith (1 Corinthians 15:14).",
+      "verses": [
+        {
+          "ref": "1 Corinthians 15:3",
+          "text": "For I delivered unto you first of all that which I also received, how that Christ died for our sins according to the scriptures;"
+        },
+        {
+          "ref": "1 Corinthians 15:4",
+          "text": "And that he was buried, and that he rose again the third day according to the scriptures:"
+        },
+        {
+          "ref": "1 Corinthians 15:14",
+          "text": "And if Christ be not risen, then is our preaching vain, and your faith is also vain."
+        }
+      ]
+    },
+    {
+      "id": "prayer-to-jesus-and-the-father",
+      "topic": "Prayer is made to the Father through the Son, and to Christ",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "pray to jesus|prayer to jesus|worship jesus|pray to the father|who should i pray|pray to god|praying to jesus|pray to christ",
+      "view": "Scripture gives examples of prayer addressed to the Lord Jesus, as Stephen prayed (Acts 7:59). Jesus taught us to ask the Father in His name, and promised to answer when we ask in His name (John 14:13-14). Prayer is made to God in Christ's name.",
+      "verses": [
+        {
+          "ref": "Acts 7:59",
+          "text": "And they stoned Stephen, calling upon God, and saying, Lord Jesus, receive my spirit."
+        },
+        {
+          "ref": "John 14:13",
+          "text": "And whatsoever ye shall ask in my name, that will I do, that the Father may be glorified in the Son."
+        },
+        {
+          "ref": "John 14:14",
+          "text": "If ye shall ask any thing in my name, I will do it."
+        }
+      ]
+    },
+    {
+      "id": "angels-ministering-spirits",
+      "topic": "Angels serve God and those who inherit salvation",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "\\bangels?\\b|guardian|ministering spirit",
+      "view": "Scripture says the angels are ministering spirits sent to serve those who inherit salvation (Hebrews 1:14), and that God gives His angels charge over those who trust Him (Psalms 91:11). Scripture does not say that each person has a personal guardian angel, so we do not teach that.",
+      "verses": [
+        {
+          "ref": "Hebrews 1:14",
+          "text": "Are they not all ministering spirits, sent forth to minister for them who shall be heirs of salvation?"
+        },
+        {
+          "ref": "Psalms 91:11",
+          "text": "For he shall give his angels charge over thee, to keep thee in all thy ways."
+        }
+      ]
+    },
+    {
+      "id": "fasting",
+      "topic": "Fasting",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "\\bfast(?:s|ing|ed)?\\b",
+      "view": "Jesus taught that when His followers fast, it should be done in secret, not to be seen by others (Matthew 6:16-18). He also said that His disciples would fast when the bridegroom is taken from them (Matthew 9:15). Fasting is a discipline of prayer and humility, not a way to obtain blessing.",
+      "verses": [
+        {
+          "ref": "Matthew 6:16",
+          "text": "Moreover when ye fast, be not, as the hypocrites, of a sad countenance: for they disfigure their faces, that they may appear unto men to fast. Verily I say unto you, They have their reward."
+        },
+        {
+          "ref": "Matthew 6:17",
+          "text": "But thou, when thou fastest, anoint thine head, and wash thy face;"
+        },
+        {
+          "ref": "Matthew 6:18",
+          "text": "That thou appear not unto men to fast, but unto thy Father which is in secret: and thy Father, which seeth in secret, shall reward thee openly."
+        },
+        {
+          "ref": "Matthew 9:15",
+          "text": "And Jesus said unto them, Can the children of the bridechamber mourn, as long as the bridegroom is with them? but the days will come, when the bridegroom shall be taken from them, and then shall they fast."
+        }
+      ]
+    },
+    {
+      "id": "demons-and-spiritual-warfare",
+      "topic": "Demons and spiritual warfare",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "demon|demons|demonic|evil spirit|devil|oppress|possess|deliverance|set free",
+      "view": "Scripture teaches that believers wrestle against spiritual forces of evil (Ephesians 6:12). Resist the devil and he will flee from you (James 4:7). Jesus gave His disciples authority over the enemy (Luke 10:19). A believer's protection is in Christ and His Word, and any claim about a particular person is to be tested by Scripture and talked over with the pastor.",
+      "verses": [
+        {
+          "ref": "Ephesians 6:12",
+          "text": "For we wrestle not against flesh and blood, but against principalities, against powers, against the rulers of the darkness of this world, against spiritual wickedness in high places."
+        },
+        {
+          "ref": "James 4:7",
+          "text": "Submit yourselves therefore to God. Resist the devil, and he will flee from you."
+        },
+        {
+          "ref": "Luke 10:19",
+          "text": "Behold, I give unto you power to tread on serpents and scorpions, and over all the power of the enemy: and nothing shall by any means hurt you."
+        }
+      ]
+    },
+    {
+      "id": "persecution",
+      "topic": "Persecution and the Christian response",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "persecut|suffer for|government persecutes|oppress|suffering for the faith|blessed are the persecuted",
+      "view": "Jesus blesses those who are persecuted for righteousness' sake (Matthew 5:10), and all who live godly in Christ Jesus shall suffer persecution (2 Timothy 3:12). Scripture teaches believers to pray for those in authority (1 Timothy 2:1-2) and to keep faithful under pressure.",
+      "verses": [
+        {
+          "ref": "Matthew 5:10",
+          "text": "Blessed are they which are persecuted for righteousness’ sake: for theirs is the kingdom of heaven."
+        },
+        {
+          "ref": "2 Timothy 3:12",
+          "text": "Yea, and all that will live godly in Christ Jesus shall suffer persecution."
+        }
+      ]
+    },
+    {
+      "id": "born-again",
+      "topic": "Born again",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "born again|new birth|born of the spirit|regenerat|born from above",
+      "view": "Jesus said that unless a man is born again, he cannot see the kingdom of God (John 3:3). We are born again not of corruptible seed, but of incorruptible, by the word of God, which lives and abides (1 Peter 1:23).",
+      "verses": [
+        {
+          "ref": "John 3:3",
+          "text": "Jesus answered and said unto him, Verily, verily, I say unto thee, Except a man be born again, he cannot see the kingdom of God."
+        },
+        {
+          "ref": "1 Peter 1:23",
+          "text": "Being born again, not of corruptible seed, but of incorruptible, by the word of God, which liveth and abideth for ever."
+        }
+      ]
+    },
+    {
+      "id": "election",
+      "topic": "Election (under review)",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "election|elect|predestin|chosen before|chosen before the foundation|before the foundation of the world",
+      "view": "Scripture teaches that God chose His people in Christ before the foundation of the world (Ephesians 1:4), and that those whom He predestined He also called and glorified (Romans 8:29-30). The church's view on the details is under review and is not a settled Perazim doctrine.",
+      "verses": [
+        {
+          "ref": "Ephesians 1:4",
+          "text": "According as he hath chosen us in him before the foundation of the world, that we should be holy and without blame before him in love:"
+        },
+        {
+          "ref": "Romans 8:29",
+          "text": "For whom he did foreknow, he also did predestinate to be conformed to the image of his Son, that he might be the firstborn among many brethren."
+        },
+        {
+          "ref": "Romans 8:30",
+          "text": "Moreover whom he did predestinate, them he also called: and whom he called, them he also justified: and whom he justified, them he also glorified."
+        }
+      ]
+    },
+    {
+      "id": "millennium-reign",
+      "topic": "The thousand-year reign (under review)",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "millennium|thousand years|thousand-year|1000 years|reign on earth|reign with christ|thousand year",
+      "view": "Revelation 20 describes those who reign with Christ for a thousand years (Revelation 20:4), and blessed and holy is the one who has part in the first resurrection (Revelation 20:6). The timing and details of this reign are under review, and our view is not a settled Perazim doctrine.",
+      "verses": [
+        {
+          "ref": "Revelation 20:4",
+          "text": "And I saw thrones, and they sat upon them, and judgment was given unto them: and I saw the souls of them that were beheaded for the witness of Jesus, and for the word of God, and which had not worshipped the beast, neither his image, neither had received his mark upon their foreheads, or in their hands; and they lived and reigned with Christ a thousand years."
+        },
+        {
+          "ref": "Revelation 20:6",
+          "text": "Blessed and holy is he that hath part in the first resurrection: on such the second death hath no power, but they shall be priests of God and of Christ, and shall reign with him a thousand years."
+        }
+      ]
+    },
+    {
+      "id": "creed-1662-wording",
+      "topic": "The Nicene Creed (381) and the 1662 wording",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "creed|nicene creed|apostles' creed|apostles creed|the creed",
+      "view": "The Nicene Creed of 381 confesses the Son as \"very God of very God, begotten, not made, being of one substance with the Father\" (1662 Book of Common Prayer wording, public domain). It agrees with Scripture that the Word was God and that all things were made through Him (John 1:1; John 1:3).",
+      "verses": [
+        {
+          "ref": "John 1:1",
+          "text": "In the beginning was the Word, and the Word was with God, and the Word was God."
+        },
+        {
+          "ref": "John 1:3",
+          "text": "All things were made by him; and without him was not any thing made that was made."
+        }
+      ]
+    },
+    {
+      "id": "scripture-inspired",
+      "topic": "Scripture is inspired by God",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "inspired|inspiration|reliab|infallib|inerran|bible is true|trustworthy|word of god is true|how do we know the bible",
+      "view": "All Scripture is given by inspiration of God, and is profitable for doctrine (2 Timothy 3:16). Holy men of God spake as they were moved by the Holy Ghost (2 Peter 1:21). The church's formulation of inerrancy is under review and is not a settled Perazim doctrine.",
+      "verses": [
+        {
+          "ref": "2 Timothy 3:16",
+          "text": "All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness:"
+        },
+        {
+          "ref": "2 Peter 1:21",
+          "text": "For the prophecy came not in old time by the will of man: but holy men of God spake as they were moved by the Holy Ghost."
+        }
+      ]
+    },
+    {
+      "id": "hebrews-letter-authorship",
+      "topic": "The letter to the Hebrews",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "hebrews|letter to the hebrews|who wrote hebrews|author of hebrews",
+      "view": "The letter to the Hebrews does not name its author in the text. It is part of the 66-book Scripture we hold, and it teaches that God spoke in His Son (Hebrews 1:1-2). The letter calls itself a word of exhortation (Hebrews 13:22). We do not claim a named author, and the question is not a teaching matter.",
+      "verses": [
+        {
+          "ref": "Hebrews 1:1",
+          "text": "God, who at sundry times and in divers manners spake in time past unto the fathers by the prophets,"
+        },
+        {
+          "ref": "Hebrews 1:2",
+          "text": "Hath in these last days spoken unto us by his Son, whom he hath appointed heir of all things, by whom also he made the worlds;"
+        },
+        {
+          "ref": "Hebrews 13:22",
+          "text": "And I beseech you, brethren, suffer the word of exhortation: for I have written a letter unto you in few words."
+        }
+      ]
+    },
+    {
+      "id": "worry-and-trust",
+      "topic": "Worry and trusting God",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "worry|worrying|worried|anxious|anxiety|take no thought|trust god about money",
+      "view": "Jesus taught us not to take thought for our lives, what we will eat or drink (Matthew 6:25), and not to worry about tomorrow (Matthew 6:34). Peter tells believers to cast all their care on God, for He cares for us (1 Peter 5:7). Bring every need to God in prayer with thanksgiving (Philippians 4:6).",
+      "verses": [
+        {
+          "ref": "Matthew 6:25",
+          "text": "Therefore I say unto you, Take no thought for your life, what ye shall eat, or what ye shall drink; nor yet for your body, what ye shall put on. Is not the life more than meat, and the body than raiment?"
+        },
+        {
+          "ref": "Matthew 6:34",
+          "text": "Take therefore no thought for the morrow: for the morrow shall take thought for the things of itself. Sufficient unto the day is the evil thereof."
+        },
+        {
+          "ref": "1 Peter 5:7",
+          "text": "Casting all your care upon him; for he careth for you."
+        },
+        {
+          "ref": "Philippians 4:6",
+          "text": "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God."
+        }
+      ]
+    },
+    {
+      "id": "anger-and-lament",
+      "topic": "Honest prayer, anger and lament",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "angry at god|anger at god|angry with god|complain|lament|why did god|why god|forsaken",
+      "view": "Scripture gives us honest prayer. The psalmist asked how long God would forget him (Psalms 13:1), and Jesus cried, My God, my God, why hast thou forsaken me? (Psalms 22:1; Matthew 27:46). Bring your anger and questions to God in prayer, and talk them through with a pastor who knows you.",
+      "verses": [
+        {
+          "ref": "Psalms 13:1",
+          "text": "How long wilt thou forget me, O LORD? for ever? how long wilt thou hide thy face from me?"
+        },
+        {
+          "ref": "Psalms 22:1",
+          "text": "My God, my God, why hast thou forsaken me? why art thou so far from helping me, and from the words of my roaring?"
+        },
+        {
+          "ref": "Matthew 27:46",
+          "text": "And about the ninth hour Jesus cried with a loud voice, saying, Eli, Eli, lama sabachthani? that is to say, My God, my God, why hast thou forsaken me?"
+        }
+      ]
     }
   ]
 }
