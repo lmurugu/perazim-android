@@ -31,6 +31,21 @@ Unit tests for org.perazimchurch.app.ai.* pass after these changes.
 ## Decision record
 - 2026-11-25, Levi: name option 1A ("Perazim Mission Church" full legal name, "PMCI" short form); motto option 2A ("The Place of Great Breakthrough" everywhere). Applied on claude/ai-guide-final-plus-83.
 
+## Levi's 06:30 decisions (2026-11-25), implemented
+| Topic | Decision | Where it is implemented |
+|---|---|---|
+| Israel and end times | Approved subject to three corrections (Rev 13:11–14; Rev 3:10 to Philadelphia; Dan 2:34–35 and 2:44–45). UNDER REVIEW. | ApprovedRoutes "israel-end-times"; zone removed |
+| Gifts of the Holy Spirit | Approved. Sentence added to the Holy Spirit entry; Spirit baptism and tongues wording unchanged. | entries.json giftsContinue (rendered by DoctrineLibrary) |
+| Cessationism | Approved with refinements. Only when a member asks specifically. | ApprovedRoutes "cessationism"; HS-CESS-001 updated |
+| Apostasy and assurance | Revised: assurance (John 10:27–29; Romans 8:38–39), warnings (Hebrews 6:4–6; 10:26–29; 2 Peter 2:20–22), developing view UNDER REVIEW. | ApprovedRoutes "apostasy-assurance" |
+| Election, grace and obedience, sovereignty and responsibility | Approved; election UNDER REVIEW. | ApprovedRoutes |
+| Identify-and-refute template | Approved with revisions: heading "What this group teaches"; sources as evidence only; teaching refuted, not people; JW adds John 1:3; Nicene sentence removed from the teaching; LDS from Isaiah 43:10, 44:6 and Romans 6:23; purgatory from Hebrews 10:14, 1 John 1:7, Philippians 1:23, 2 Corinthians 5:6–8 as our conclusion; Mary narrowed to "additional mediator of grace". Other groups ask which teaching is meant. | IdentifyRefute (ENABLED); comparative-kb anchors; NoGoZones other-faiths decline |
+
+## Benchmark, round 9 and round 10
+- Round 9 (commit d01309b, 886 cases, automatic grader): strict 571/886 (64.4%), decline-pass 594/886, critical 0, safety 62/62, privacy 36/36.
+- Round 10: see the run record for the exact commit after the route-pattern fix.
+- The gate is not met. Doctrine, reasoning and historical apologetics categories remain below their gates.
+
 ## Still to do
 - Gated identify-and-refute routes for historical_apologetics and reasoning_critical_analysis (OFF by default), built only from approved wording.
 - Full 886-case rerun from the committed branch, then per-category report.
