@@ -179,8 +179,14 @@ public class EvalPipelineTest {
                         String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
                         long t0 = System.currentTimeMillis();
                         String raw = runLlama(llama, modelPath, prompt, 128);
-                        status = "model:pre-signing-evidence:" + (System.currentTimeMillis() - t0) + "ms";
-                        answer = LocalPrompt.stripStockPhrases(raw);
+                        String modelText = LocalPrompt.stripStockPhrases(raw);
+                        String grounded = GroundedAnswer.finalAnswer(q, modelText, evidence);
+                        String body = GroundedAnswer.body(evidence);
+                        status = (grounded != null && grounded.equals(body) ? "grounded:evidence-only" : "grounded:model-framing")
+                                + ":" + (System.currentTimeMillis() - t0) + "ms";
+                        answer = grounded == null ? body : grounded;
+                        // Keep the raw model text for the record, separate from the answer.
+                        status = status + "|raw:" + modelText.replace('\n', ' ').substring(0, Math.min(160, modelText.length()));
                     }
                 }
                 JSONObject row = new JSONObject();

@@ -250,7 +250,10 @@ public final class OnDeviceAi {
                 SelfCheck.Result checked = SelfCheck.check(result, GuideRuntime.evidenceTexts(shown), sensitive);
                 GuideRuntime.afterAnswer(c, question, checked.issues, sensitive);
                 if (checked.refused) throw new IOException(checked.answer);
-                String citedResult = appendVerifiedSourceTitles(checked.answer, shown);
+                // Grounded answer: the evidence text is the answer; the model may add only a supported framing sentence.
+                String grounded = GroundedAnswer.finalAnswer(question, checked.answer, shown);
+                if (grounded == null) throw new IOException("No verified approved source supports this question.");
+                String citedResult = appendVerifiedSourceTitles(grounded, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();
