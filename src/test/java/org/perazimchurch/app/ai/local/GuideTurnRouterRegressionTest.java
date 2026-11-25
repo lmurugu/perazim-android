@@ -119,4 +119,14 @@ public class GuideTurnRouterRegressionTest {
             assertFalse(followUp + " -> " + text, text.contains("Miriam"));
         }
     }
+
+    /** A doctrine question the model cannot answer gets verified Scripture and the "fuller explanation" note, never a bare refusal. */
+    @Test
+    public void unansweredDoctrineQuestionGetsScriptureOnlyReply() {
+        String reply = OwnKnowledge.scriptureOnlyReply(context, "What is purgatory and does the Bible teach it?");
+        assertNotNull(reply);
+        assertTrue(reply, reply.contains("fuller explanation is being prepared"));
+        assertTrue(reply, reply.contains("Hebrews 9:27") || reply.contains("1 John 1:7"));
+        assertFalse(reply, reply.contains("verified approved source"));
+    }
 }

@@ -217,6 +217,34 @@ final class OwnKnowledge {
         }
     }
 
+    /** Prefix on the Scripture-only reply: it quotes verses and says the fuller explanation is still being prepared (2026-11-25). */
+    static final String SCRIPTURE_ONLY_LEAD = "I don't have a fully checked explanation of this yet, so I won't guess. "
+            + "These are the Scripture passages most relevant to your question (King James Version):\n";
+    static final String SCRIPTURE_ONLY_TAIL = "\nA fuller explanation is being prepared. Please talk it through with your pastor in the meantime.";
+
+    /**
+     * A Scripture-only reply for a Christian doctrine question the model could not answer: the most relevant KJV passages, at
+     * least two, verbatim, and no teaching claim. Null when fewer than two passages are found.
+     */
+    static String scriptureOnlyReply(Context c, String question) {
+        try {
+            KjvVerseText kv = KjvVerseText.load(c);
+            java.util.List<Draft> draftList = loadDrafts(c);
+            java.util.List<String> verses = new ArrayList<>();
+            for (String passage : passagesFor(kv, question, draftList)) {
+                if (passage.startsWith("Library draft")) continue;
+                if (!verses.contains(passage)) verses.add(passage);
+                if (verses.size() == 3) break;
+            }
+            if (verses.size() < 2) return null;
+            StringBuilder out = new StringBuilder(SCRIPTURE_ONLY_LEAD);
+            for (String verse : verses) out.append(verse).append("\n");
+            return out.toString().trim() + SCRIPTURE_ONLY_TAIL;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     static ScriptureRangeTable loadTable(Context c) throws Exception {
         try (InputStream in = c.getAssets().open("ai/library/scripture/kjv-verse-counts.json")) {
             return ScriptureRangeTable.fromJson(new String(IoCompat.readAll(in), StandardCharsets.UTF_8));

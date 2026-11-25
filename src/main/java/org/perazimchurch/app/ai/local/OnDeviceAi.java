@@ -197,7 +197,10 @@ public final class OnDeviceAi {
                 if (evidence.length() == 0) {
                     // No approved excerpt: an in-scope, non-sensitive faith question may be answered from the model's own
                     // knowledge, accepted only by the KJV, reference and official-claim checks in OwnKnowledge (Levi, 2026-11-25).
-                    String own = OwnKnowledge.tryAnswer(c, question);
+                    String checkedOwn = OwnKnowledge.tryAnswer(c, question);
+                    // A doctrine question with no checked answer gets the Scripture-only reply, not the no-source line (2026-11-25).
+                    final String own = checkedOwn != null || !doctrineQuestion ? checkedOwn
+                            : OwnKnowledge.scriptureOnlyReply(c, question);
                     if (own == null) throw new IOException(NO_SOURCE_MESSAGE);
                     MAIN.post(() -> callback.onSuccess(own));
                     return;
