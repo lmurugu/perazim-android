@@ -127,7 +127,7 @@ public final class NoGoZones {
                     + "|anoint|speak in",
                     DECLINE),
             new Zone("other-faiths-and-groups",
-                    "jehovah|witness|latter.day|mormon|adventist|sabbath|saturday|sunday|seventh|ellen white|mark of the beast"
+                    "jehovah|witness|latter.day|mormon|adventist|seventh.day|saturday (?:worship|church|sabbath)|keep the sabbath|sabbath (?:keeping|must|is required)|sunday (?:worship|law)|ellen white|mark of the beast"
                     + "|catholic|purgatory|\\bmary\\b|miriam|apocrypha|orthodox|icon|karma|reincarnat|rebirth|next life"
                     + "|come back as|ancestor|shrine|kiapo|traditional (rite|dance|oath)|islam|allah|muslim|qur|hindu|buddh|jain"
                     + "|soul sleep|soul|denomination|church of christ|cult|archangel|michael|pluralism|same thing"
@@ -138,7 +138,7 @@ public final class NoGoZones {
             new Zone("history-authorship-research",
                     "resurrection|historical|research|academic|papers|earliest|early (church|christian)|prove|proof"
                     + "|who wrote|did paul write|write hebrews|authorship|canon|nicaea|trinity before|before the council|eraly|was god"
-                    + "|crucif|on the cross|died on|not die|did not die|was not crucified",
+                    + "|did not die|was not crucified|didn.t die|did jesus really die",
                     DECLINE),
             new Zone("verse-recall-and-misquote",
                     "quote (the )?verse|read me the verse|verse (that|says|about|where)|the verse|exact (wording|words)"
@@ -154,7 +154,7 @@ public final class NoGoZones {
                     + "|without evidence|reasoning|you said|you told me|yesterday you|earlier that",
                     REASONING_DECLINE),
             new Zone("resource-lookup",
-                    "what does .* say about|according to|commentary|dictionary|matthew henry|hitchcock|smith.s"
+                    "what does (?:matthew henry|wesley|easton|smith|nave|strong|calvin|luther|spurgeon|the church fathers?|the creed|the catechism|the confession|a commentary|the commentary|the dictionary|the lexicon)\\b[^?]* say about|according to|commentary|dictionary|matthew henry|hitchcock|smith.s"
                     + "|creed",
                     DECLINE),
             new Zone("betting-and-gambling",

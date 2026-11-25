@@ -1204,6 +1204,106 @@ public final class ApprovedRoutes {
             "female|women|woman|girls?|\\bfgm\\b|genital|mutilat\\w*|forc\\w*|coerc\\w*|pressur\\w*|abus\\w*|medical|medic\\w*|hospital|clinic|infection|wound|bleeding|doctor|nurse|sex\\w*|hiv",
             Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Pastoral replies that must run before the scope gate (Levi's direction, 2026-11-25: in-scope faith and life topics
+     * get a real reply, not a refusal). Each names its question shapes, quotes KJV, and gives no verdict on any person.
+     * Legal, medical and financial matters are referred on, and a person in danger is sent to 999 or 112.
+     */
+    private static final List<Route> PASTORAL;
+
+    static {
+        List<Route> p = new ArrayList<>();
+        p.add(new Route("prayer-request-support",
+                "\\b(?:pray with me|pray for me|please pray|pray with us|pray for us|pray for my|can you pray|niombee|nisaidie kuomba|nipe maombi|naomba maombi|tuombe|ombea)\\b",
+                "I'd be glad to pray with you. Here is a short prayer you can make your own: Lord, you know every fear I carry. "
+                + "Give me peace in this situation, and show me the next right step. Amen. For a court date or other legal matter, "
+                + "please also speak with a lawyer or a legal aid office. I can pray with you about the fear.",
+                "Philippians 4:6", "Philippians 4:7"));
+        p.add(new Route("job-loss-hopelessness",
+                "(?=[\\s\\S]*\\b(?:lost (?:my|our|the) (?:job|work|business|income)|lost my job|hopeless about (?:money|finances|work|my job)|"
+                + "no money|can'?t pay (?:rent|school fees|bills))\\b)(?=[\\s\\S]*\\b(?:hopeless\\w*|afraid|worried|scared|anxious|"
+                + "depress\\w*|feel\\w*|stress\\w*|lonely)\\b)",
+                "I'm sorry you are carrying this. Losing work and money worries can make the future feel very heavy, and it is "
+                + "understandable to feel hopeless at times. You do not have to carry it alone. Tell a trusted pastor or someone close "
+                + "to you today, and ask them to pray with you. For practical money or legal advice, please speak with a qualified "
+                + "adviser. If the hopelessness becomes overwhelming, or you start thinking about ending your life, call 999 or 112 now.",
+                "Philippians 4:19", "Psalms 55:22"));
+        p.add(new Route("far-from-god-support",
+                "\\bfar from god\\b|\\b(?:don'?t|do not) feel (?:god|his|the lord)\\b|\\bgod (?:feels|seems) (?:far|silent|distant)\\b|"
+                + "\\bgod (?:is )?(?:not )?near\\b",
+                "It is painful when God feels far away. Feelings do not decide what is true. God has promised to be near to those who "
+                + "call on him, and many faithful believers have felt this same distance. Keep praying honestly, read a short psalm "
+                + "each day, and share this with a trusted pastor or friend who can walk with you.",
+                "Psalms 34:18", "Psalms 145:18"));
+        p.add(new Route("hearing-voices-concern",
+                "\\bhears? voices\\b|\\bhearing voices\\b|\\bvoices in (?:his|her|my|their) head\\b",
+                "Hearing voices can be a sign of an illness that needs a doctor. Please see a doctor or clinic as soon as you can, "
+                + "for yourself or for the person you are worried about. Prayer and your church can support them alongside that care, "
+                + "but they do not replace it, and it is not wise to decide alone what the cause is. If anyone talks about harming "
+                + "themselves or someone else, call 999 or 112 now.",
+                "Matthew 9:12", "Psalms 147:3"));
+        p.add(new Route("child-spiritual-concern",
+                "(?=[\\s\\S]*\\b(?:mtoto|mwanangu|mwana|my child|my son|my daughter|my kid|child|son|daughter)\\b)"
+                + "(?=[\\s\\S]*\\b(?:pepo|demon|demons|evil spirit|roho mbaya|lugha ya ajabu|strange language|speaks in a strange|"
+                + "talks in a strange)\\b)",
+                "I'm sorry you are worried about your child. Talking in a strange language while asleep can have medical or sleep "
+                + "causes, so please take your child to a doctor or clinic and tell them what happens at night. Please do not shame or "
+                + "frighten your child, and do not try to drive out spirits on your own. Talk with your pastor, who can pray with you "
+                + "and help you test what you are seeing. If your child is hurt, or cannot be woken, call 999 or 112 now.",
+                "1 John 4:1", "1 Thessalonians 5:21"));
+        p.add(new Route("sabbath-bible-topic",
+                "^what does the bible (?:say|teach) about (?:the )?sabbath[ ?.!]*$",
+                "The fourth commandment asks God's people to remember the Sabbath and keep it holy. The New Testament teaches that "
+                + "no one should be judged about a holy day or a Sabbath, because a believer's standing before God rests on Christ and "
+                + "not on keeping a particular day.",
+                "Exodus 20:8", "Colossians 2:16"));
+        p.add(new Route("faith-bible-topic",
+                "^what does the bible (?:say|teach) about faith[ ?.!]*$",
+                "The Bible describes faith as being sure of what we hope for and certain of what we do not see. Faith grows as we "
+                + "hear God's word.",
+                "Hebrews 11:1", "Romans 10:17"));
+        p.add(new Route("why-jesus-died",
+                "^why did jesus (?:have to )?die(?: on the cross)?[ ?.!]*$",
+                "The Bible teaches that Christ died for our sins according to the Scriptures, and that God shows his love for us in "
+                + "this: while we were still sinners, Christ died for us. He then rose again on the third day.",
+                "1 Corinthians 15:3", "Romans 5:8"));
+        p.add(new Route("who-is-jesus",
+                "^(?:who is (?:jesus|jesus christ|christ)|who was jesus)[ ?.!]*$",
+                "The Bible teaches that Jesus is the eternal Son of God, fully God and fully man. He was with God from the beginning, "
+                + "became flesh to live among us, died for our sins, and rose again on the third day.",
+                "John 1:1", "John 1:14", "Colossians 2:9"));
+        p.add(new Route("grace-plain",
+                "^(?:tell me about|what is|what's|explain|define) (?:the )?grace[ ?.!]*$",
+                "Grace is God's undeserved favour. We do not earn it by our good works. God gives it freely through Jesus Christ, "
+                + "and it is received by faith. Grace saves us, and it also teaches us to live godly lives.",
+                "Ephesians 2:8", "Titus 2:11"));
+        p.add(new Route("prayer-bible-topic",
+                "^what does the bible (?:say|teach) about prayer[ ?.!]*$",
+                "The Bible calls us to bring everything to God in prayer, with thanksgiving, and to keep praying without giving up.",
+                "Philippians 4:6", "1 Thessalonians 5:17"));
+        PASTORAL = Collections.unmodifiableList(p);
+    }
+
+    /**
+     * The pastoral reply for a question, or null when no pastoral route names it or a quoted anchor cannot be verified.
+     * Runs before the scope gate. Safety wording is handled by the caller first.
+     */
+    public static Answer pastoralAnswerFor(String question, KjvVerseText kjv) {
+        if (question == null || kjv == null) return null;
+        String q = question.toLowerCase(Locale.ROOT).replace('\u2019', '\'').replaceAll("\\s+", " ").trim();
+        for (Route route : PASTORAL) {
+            if (!route.match.matcher(q).find()) continue;
+            StringBuilder quoted = new StringBuilder();
+            for (String anchor : route.quotes) {
+                String line = IdentifyRefute.verseLine(anchor, kjv);
+                if (line == null) return null;
+                quoted.append(line).append("\n");
+            }
+            return new Answer(route.id, route.body + "\n\nScripture:\n" + quoted.toString().trim());
+        }
+        return null;
+    }
+
     public static Answer answerFor(String question, KjvVerseText kjv) {
         if (question == null || kjv == null) return null;
         String q = question.toLowerCase(Locale.ROOT).replace('’', '\'');

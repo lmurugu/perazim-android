@@ -51,6 +51,9 @@ public final class GuideTurnRouter {
         if (safety == SoftSafety.Verdict.SOFT_CHECK) {
             return new Turn("soft-check", engine.processQuery(query), "Safety check · on-device", false);
         }
+        // Greetings, thanks, goodbyes and "what can you do" get the varied conversational replies, not the built-in intro.
+        ConversationalTurn.Reply chat = ConversationalTurn.reply(query);
+        if (chat != null) return new Turn(chat.status, AiResponse.plainText(chat.text, null), "Perazim Guide · built-in", true);
         AiResponse builtIn = PerazimAiEngine.builtInAppAnswer(query);
         if (builtIn != null) {
             return new Turn("built-in", builtIn, "Perazim Guide · built-in", true);

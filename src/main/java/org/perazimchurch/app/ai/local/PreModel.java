@@ -64,6 +64,17 @@ public final class PreModel {
         if (PerazimAiEngine.isCrisisQuery(question) && PerazimAiEngine.safetyRoute(question) == null) {
             return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
         }
+        // Greetings, thanks, goodbyes, capability and complaint replies, and the first line of a marriage conversation.
+        // These come after the safety checks above, so they never hide a crisis or abuse disclosure.
+        ConversationalTurn.Reply chat = ConversationalTurn.reply(question);
+        if (chat != null) return new Decision(chat.status, chat.text);
+        // Pastoral replies (prayer, far from God, job loss, a child or a voice-hearing worry) run before the scope gate, but
+        // never over a safety route. Legal, medical and money matters are referred on inside the reply itself.
+        if (PerazimAiEngine.safetyRoute(question) == null && !PerazimAiEngine.isSafeguardingDisclosure(question)
+                && !PerazimAiEngine.isHarmToOthersQuery(question) && !PerazimAiEngine.isOverdoseQuery(question)) {
+            ApprovedRoutes.Answer pastoral = ApprovedRoutes.pastoralAnswerFor(question, KjvVerseText.load(c));
+            if (pastoral != null) return new Decision("routed:approved-" + pastoral.routeId, pastoral.text);
+        }
         ScriptureRangeTable table = null;
         try {
             table = ScriptureRangeTable.fromJson(read(c, "ai/library/scripture/kjv-verse-counts.json"));
