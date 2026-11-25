@@ -162,13 +162,24 @@ public final class DoctrineLibrary {
                 out.append("This is a developing view, under review, and not yet a settled church position. ");
                 out.append(t.view.isEmpty()
                         ? t.name + " is under review by the church's leadership."
-                        : t.view);
+                        : withoutPlaceholders(t.view));
                 break;
             default:
                 out.append("The guide has not settled a position on ").append(t.name.toLowerCase(Locale.ROOT))
                         .append(", so I will not state one. Please speak with your pastor or a church leader about it.");
         }
         return out.toString();
+    }
+
+    /**
+     * Drops internal placeholder sentences from approved wording. The alternative views for these topics are not yet
+     * written, so the sentences that promise them are removed rather than shown to members.
+     */
+    static String withoutPlaceholders(String view) {
+        return view.replace("Other positions are described fairly and labelled as alternatives.", "")
+                .replace("No alternative text is written yet.", "")
+                .replaceAll("\\s{2,}", " ")
+                .trim();
     }
 
     private static java.util.regex.Pattern pattern(String id) {
