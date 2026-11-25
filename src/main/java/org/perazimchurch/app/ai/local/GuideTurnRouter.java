@@ -61,11 +61,11 @@ public final class GuideTurnRouter {
         String grounding;
         boolean requireSupport;
         String status = routed.status == null ? "" : routed.status;
-        if ("routed:approved-greeting-only".equals(status)) {
-            grounding = ConversationalTurn.FACT_SHEET
-                    + "\nThe member greeted the guide. Greet them warmly in one or two sentences, name two things you can do (for example finding a verse or searching a word), and ask what they would like.";
-            requireSupport = false;
-        } else if (status.startsWith("routed:conversational-")) {
+        // Greetings keep their approved wording: the model's composed greeting was generic and did not name what the guide can do.
+        if ("routed:approved-greeting-only".equals(status) || "routed:conversational-greeting".equals(status)) {
+            return routed;
+        }
+        if (status.startsWith("routed:conversational-")) {
             grounding = ConversationalTurn.groundingFor(status);
             requireSupport = false;
         } else if (COMPOSABLE_PASTORAL.contains(status)) {

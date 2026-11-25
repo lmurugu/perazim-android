@@ -1000,7 +1000,9 @@ public final class ApprovedRoutes {
         // Baptism position (Levi, 2026-11-25, Option A): believer's baptism by full immersion after personal faith; obedience and
         // public witness; does not save; infants dedicated, not baptised. WORDING FOR LEVI'S REVIEW before release.
         r.add(new Route("baptism-believers",
-                "^(?!.*(?:spirit baptism|baptism (?:in|with) the (?:holy )?spirit|baptised? in the holy spirit)).*"
+                // Comparisons of churches and denominations are left to the fair-description route, not answered as our teaching.
+                "^(?!.*(?:spirit baptism|baptism (?:in|with) the (?:holy )?spirit|baptised? in the holy spirit|churches|church that|"
+                + "denomination|unbiblical|only one|right about|which church)).*"
                 + "(?:\\bbaptis|\\bbaptiz|\\bchristen|\\bbabies\\b)",
                 "Our church teaches believer's baptism. Baptism is for those who have personally come to faith in Jesus Christ, and it is done by "
                 + "full immersion in water (Acts 8:38). The Lord commanded it (Matthew 28:19), and those who gladly received the word were "

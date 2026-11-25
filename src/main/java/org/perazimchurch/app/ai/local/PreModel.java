@@ -474,6 +474,10 @@ public final class PreModel {
 
     private static final Pattern WORD_QUOTED = Pattern.compile("['\u2018\u2019\u201c\u201d\"]([a-z]{2,})['\u2018\u2019\u201c\u201d\"]");
     private static final Pattern WORD_AFTER = Pattern.compile("\\bword\\s+([a-z]{2,})\\b");
+    /** Resource, commentary and file requests: never answered by the scope lookup bypass. */
+    private static final Pattern RESOURCE_ASK = Pattern.compile(
+            "cross-?references?|commentar|\\bnotes?\\b|dictionary|easton|wesley|matthew henry|\\bstrong|interlinear|lexicon|greek|hebrew|"
+            + "spreadsheet|upload|calculate", Pattern.CASE_INSENSITIVE);
     /** Web and current-information words: an unquoted "search for current information" is not a Bible word search. */
     private static final Pattern WEB_SCOPE = Pattern.compile(
             "\\b(?:internet|online|google|website|web|news|latest|information|info|current events|weather|prices?|today|facebook|youtube|whatsapp|tiktok)\\b");
@@ -619,6 +623,8 @@ public final class PreModel {
      * a verse-about or word search. Each one returns only when the KJV itself gives the answer.
      */
     static Decision scopeLookup(Context c, ScriptureRangeTable table, String question) {
+        // Cross-references, commentaries, dictionaries and uploaded files have their own routes and refusals: they are not bypassed.
+        if (RESOURCE_ASK.matcher(question).find()) return null;
         KjvVerseText kv = KjvVerseText.load(c);
         Decision found = table == null ? null : verseDecision(table, kv, question);
         if (found == null) found = phraseFirstDecision(kv, question);
