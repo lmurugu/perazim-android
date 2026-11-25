@@ -186,7 +186,8 @@ public class EvalPipelineTest {
                         // No approved excerpt: an in-scope, non-sensitive faith question may get an own-knowledge answer that passes
                         // OwnKnowledge.accept (round 49). Otherwise the honest no-source reply, as production gives.
                         String own = OwnKnowledge.tryAnswer(c, q);
-                        String scriptureOnly = own == null && PreModel.scriptureDoctrineQuestion(q)
+                        // Matches production (OnDeviceAi): general faith questions get the same Scripture-only fallback (2026-11-25).
+                        String scriptureOnly = own == null && (PreModel.scriptureDoctrineQuestion(q) || PreModel.generalFaithQuestion(q))
                                 ? OwnKnowledge.scriptureOnlyReply(c, q) : null;
                         if (own != null) {
                             status = "own-knowledge:accepted";

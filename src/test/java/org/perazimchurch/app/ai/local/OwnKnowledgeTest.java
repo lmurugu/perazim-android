@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.local;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -52,6 +53,28 @@ public class OwnKnowledgeTest {
         assertNull("an official-position claim", OwnKnowledge.accept("The official Perazim position is that every believer must "
                 + "pay a fixed amount of money to the church, as the Bible requires in this matter.", kv, table));
         assertNull("too short", OwnKnowledge.accept("Yes, God loves you.", kv, table));
+    }
+
+    /** The gap log reads literal statuses, not reply text (coordinator, 2026-11-25). */
+    @Test
+    public void literalStatusesForNoSourceAndScriptureOnly() {
+        assertEquals("refusal status", "refused:no-verified-source", ReplyStatus.of(OnDeviceAi.NO_SOURCE_MESSAGE));
+        assertEquals("scripture-only status", "scripture-only",
+                ReplyStatus.of(OwnKnowledge.SCRIPTURE_ONLY_LEAD + "John 1:1 (King James Version): x\nA fuller explanation is being prepared."));
+        assertNull("an ordinary answer has no literal fallback status", ReplyStatus.of("The Lord is my shepherd."));
+    }
+
+    /**
+     * Chat-path regression (coordinator, 2026-11-25): an unquoted English word search must return the KJV concordance, not the
+     * no-source reply. The phone answered "Where is the word grace found?" with the refusal after the early-return fix was missing.
+     */
+    @Test
+    public void unquotedWordSearchGetsConcordanceNotRefusal() {
+        Context c = ApplicationProvider.getApplicationContext();
+        PreModel.Decision d = PreModel.decide(c, "Where is the word grace found?");
+        assertNotNull("word search must not fall through to the no-source reply", d);
+        assertTrue("status was " + d.status, d.status.startsWith("routed:word-search"));
+        assertTrue(d.answer.contains("grace"));
     }
 
     /**
