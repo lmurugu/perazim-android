@@ -111,6 +111,12 @@ public final class PreModel {
         }
         NoGoZones.Zone zone = NoGoZones.match(question);
         if (zone != null) return new Decision("routed:no-go:" + zone.id, zone.decline);
+        // "That verse" with no book, chapter and verse in the question: ask which one is meant rather than guess.
+        // This runs after the zones, so a zone decline always keeps its priority.
+        if (VERSE_POINTER.matcher(question).find() && (table == null || reference(table, question) == null)) {
+            return new Decision("routed:verse-clarify", "Which verse do you mean? Please give the book, chapter and verse, "
+                    + "and I will quote it from the King James Version (KJV).");
+        }
         return null;
     }
 
@@ -144,6 +150,9 @@ public final class PreModel {
         return easton == null ? null : new Decision("routed:dictionary-easton", easton);
     }
 
+    /** A pointer to a verse given earlier ("that verse"), which the single-question path cannot resolve. */
+    private static final Pattern VERSE_POINTER = Pattern.compile(
+            "\\b(?:that|this|the|previous|last) (?:verse|passage)\\b", Pattern.CASE_INSENSITIVE);
     /** Christian traditions a member may name together, for example in "Are Pentecostals less biblical than Presbyterians?". */
     private static final Pattern TRADITION_NAME = Pattern.compile(
             "\\b(pentecostal|presbyterian|baptist|methodist|anglican|lutheran|adventist|assemblies of god|reformed|orthodox)s?\\b",
@@ -263,6 +272,8 @@ public final class PreModel {
         Pattern.compile("\\bafraid\\b|\\bscared\\b|\\bfear\\b|\\bdismayed\\b", Pattern.CASE_INSENSITIVE),
         Pattern.compile("cheerful giv|generous giv|offering to (?:the )?(?:church|god)|giving to (?:the )?church", Pattern.CASE_INSENSITIVE),
         Pattern.compile("pharaoh.*heart|heart of pharaoh", Pattern.CASE_INSENSITIVE),
+        // Feeling that God is far off: the KJV promises of his presence (Psalm 34:18, Hebrews 13:5).
+        Pattern.compile("\\bgod is (?:near|far|absent|silent|not here)\\b|\\bnear me\\b|feel (?:god|his presence|god's presence)|far from god|\\bforsak\\w*|\\babandon\\w*", Pattern.CASE_INSENSITIVE),
     };
     private static final Pattern TOPIC_EXCLUDE = Pattern.compile(
             "\\bhiv\\b|\\barvs?\\b|antiretro|condom|contracept|unforgivable|blasphem|atonement|divorc|remarr|medic|doctor|hospital|tablets?|\\bpills?\\b|\\bdrugs?\\b|clinic|\\bnurse|"
@@ -280,6 +291,7 @@ public final class PreModel {
         {"Isaiah 41:10", "2 Timothy 1:7", "Philippians 4:6"},
         {"2 Corinthians 9:7", "Acts 20:35"},
         {"Exodus 9:12", "Romans 9:18"},
+        {"Psalms 34:18", "Hebrews 13:5"},
     };
 
     /** The phrase a question asks about: a quoted phrase. Null when there is none. */

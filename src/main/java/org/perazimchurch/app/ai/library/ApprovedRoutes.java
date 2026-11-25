@@ -387,7 +387,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("saying-helps-themselves",
                 "helps those who help themselves|god helps those",
-                "I cannot find that saying in the Bible, and Scripture does not teach that God helps those who help themselves. The Bible teaches that we are saved by grace through faith, not by our own works (Ephesians 2:8–9). Proverbs 3:5–6 calls us to trust the LORD with all our heart.",
+                "I cannot find that saying in the Bible, and Scripture does not say that God helps those who help themselves. The Bible teaches that we are saved by grace through faith, not by our own works (Ephesians 2:8–9). Proverbs 3:5–6 calls us to trust the LORD with all our heart.",
                 "Ephesians 2:8", "Proverbs 3:5"));
 
         r.add(new Route("joshua-sun-appearance",
@@ -585,43 +585,43 @@ public final class ApprovedRoutes {
 
         r.add(new Route("isaiah-53-context",
                 "isaiah 53|isaya 53",
-                "Isaiah 53 is one of the Servant Songs in Isaiah. The prophet spoke to a people in exile, who needed to know that the LORD had not forgotten them. The chapter describes a servant who is despised and rejected, and who suffers for the sins of others (Isaiah 53:3–5). Scripture does not name the servant in the chapter itself. The New Testament shows the Ethiopian official reading this passage, and Philip explaining it as the good news of Jesus (Acts 8:35). So the original hearers read it as God's promise of a servant who would bear the people's sin, and the New Testament shows how it was fulfilled in Jesus. We test every teaching by Scripture alone.",
-                "Isaiah 53:5", "Acts 8:35"));
+                "Isaiah 53 is one of the Servant Songs in Isaiah. The chapter describes a servant who is despised and rejected, who suffers, bears the sins of others, and is vindicated by God (Isaiah 52:13–53:12). Isaiah 40–55 speaks to a people in exile, to whom the LORD comforts his people and promises restoration. The chapter does not name the servant. In Acts 8:26–35, Philip explains this passage to the Ethiopian official and proclaims Jesus, and 1 Peter 2:24 applies the servant's suffering to Christ's bearing of our sins. So the New Testament identifies Jesus as the one who fulfils the servant's suffering for sin. We read the chapter in its Old Testament setting and in the light of its New Testament fulfilment.",
+                "Isaiah 53:5", "Acts 8:35", "1 Peter 2:24"));
 
         r.add(new Route("psalm-137-context",
                 "psalm 137|psalms 137|imprecat\\w*",
-                "Psalm 137 is a lament by exiles in Babylon, who wept by the rivers because they could not sing the LORD's song in a foreign land (Psalms 137:1–4). Its last verses are hard, and they call for judgement on Babylon (Psalms 137:8–9). Read in context, these verses are a cry to God about real suffering and a longing for justice, and they are not a private plan for revenge. Scripture also teaches that vengeance belongs to the LORD (Romans 12:19), and that the people of God are to love their enemies (Matthew 5:44). We read the Psalms as prayers to God, and we do not copy every feeling into action.",
-                "Psalms 137:1", "Romans 12:19"));
+                "Psalm 137 is a communal lament from Israelites living in exile in Babylon. They remember Jerusalem, grieve their displacement, and struggle with the demand to sing the LORD's song in a foreign land. In verses 7–9, they cry out for judgment against Edom and Babylon. The final verse expresses a terrible desire for violent retribution. It records the depth of their anguish; it is not a command for Christians to take revenge. The New Testament teaches us to leave vengeance to God and to love our enemies (Romans 12:19; Matthew 5:44). We can bring pain, anger, and longing for justice honestly before God without turning them into personal violence.",
+                "Psalms 137:1", "Romans 12:19", "Matthew 5:44"));
 
         r.add(new Route("grace-meaning",
                 "grace mean|meaning of grace|maana ya neema|what is grace",
-                "Grace is God's unearned favour toward sinners. Scripture says that we are saved by grace through faith, and that this is not of ourselves: it is the gift of God (Ephesians 2:8–9). Paul also says that we are justified freely by his grace, through the redemption that is in Christ Jesus (Romans 3:24). Because grace is not earned, it leads to gratitude and to a holy life (Titus 2:11–12). We test every teaching by Scripture alone.",
-                "Ephesians 2:8", "Romans 3:24"));
+                "Grace is God's unearned favour toward sinners. Scripture says that we are saved by grace through faith, and that this is not of ourselves: it is the gift of God (Ephesians 2:8–9). Paul also says that we are justified freely by his grace, through the redemption that is in Christ Jesus (Romans 3:24). Because grace is not earned, it leads to gratitude and a changed life. We are saved by grace through faith, not by works; yet we are created in Christ Jesus for good works (Ephesians 2:8–10). God's grace also teaches us to reject ungodliness and live self-controlled, upright and godly lives (Titus 2:11–12).",
+                "Ephesians 2:8", "Romans 3:24", "Ephesians 2:10"));
 
         r.add(new Route("god-changes-mind",
                 "does god change|god change (?:his|her|its) mind|did god repent|god repent|god regret",
-                "Scripture says that God is not a man, that he should lie, or repent as a man does (Numbers 23:19). The LORD says of himself: 'I am the LORD, I change not' (Malachi 3:6). Scripture also uses human language, as when the LORD 'repented' of the evil he had said he would do to Nineveh when the people turned from their evil way (Jonah 3:10). That shows God's response to people, while his character and purposes stay the same. We test every teaching by Scripture alone.",
-                "Numbers 23:19", "Malachi 3:6"));
+                "Scripture teaches that God does not lie or become unfaithful. He is unchanging in character and faithful to his promises (Numbers 23:19; Malachi 3:6). Yet Scripture also says that God relented from the judgment he had announced against Nineveh when the people turned from their evil way (Jonah 3:10). Jeremiah 18:7–10 explains that God's announcements of judgment and blessing relate to how people respond to him. When Scripture says that God repented or relented, it does not mean that he confessed sin or became morally unreliable. It describes his response to people while he remains faithful and righteous. We should take both kinds of biblical statements seriously.",
+                "Numbers 23:19", "Malachi 3:6", "Jonah 3:10", "Jeremiah 18:7"));
 
         r.add(new Route("psalm-23-context",
                 "psalm 23 (?:in context|explain|meaning|flow|context)|explain psalm 23|psalm 23 in context",
-                "Psalm 23 is David's psalm about the LORD as shepherd. It moves from the LORD's care for his flock (verses 1–3), to his presence in the valley of the shadow of death (verse 4), to his table and his goodness in the house of the LORD (verses 5–6). The comfort comes from the LORD's faithfulness to his people, not from an easy life. Read in context, the psalm is about trust in the LORD in danger as well as in peace.",
-                "Psalms 23:1", "Psalms 23:4"));
+                "Psalm 23 is David's psalm about the LORD as shepherd. It moves from the LORD's care for his flock (verses 1–3), to his presence in the valley of the shadow of death (verse 4), to his table and his goodness in the house of the LORD (verses 5–6). The comfort comes from the LORD's faithfulness to his people, not from an easy life. Read in context, the psalm is about trust in the LORD in danger as well as in peace. The psalm is a whole: the shepherd who leads (verses 1–3) is the one who walks with his people through the valley (verse 4) and prepares a table in the presence of enemies (verse 5), and his goodness and mercy follow them all their days (verse 6).",
+                "Psalms 23:1", "Psalms 23:4", "Psalms 23:6"));
 
         r.add(new Route("christian-science",
                 "christian science|mary baker eddy|science and health",
-                "Christian Science is not the Bible-centred Christian faith. Its founder, Mary Baker Eddy, wrote Science and Health, which teaches that sickness and matter are unreal and that Christ's resurrection was a spiritual awakening rather than a bodily rising. Scripture says that the risen Jesus showed his hands and feet to his disciples and said that a spirit does not have flesh and bones as he has (Luke 24:39). Scripture also says that he was raised on the third day according to the Scriptures (1 Corinthians 15:4). We test every teaching by Scripture alone.",
-                "Luke 24:39", "1 Corinthians 15:4"));
+                "Christian Science is not the Bible-centred Christian faith. Its own book, Science and Health with Key to the Scriptures by Mary Baker Eddy, teaches that matter, sickness and death are unreal, and it understands Christ's resurrection in spiritual terms. Scripture says that the risen Jesus showed his hands and feet to his disciples and said that a spirit does not have flesh and bones as he has (Luke 24:39). Scripture also says that he was raised on the third day according to the Scriptures (1 Corinthians 15:4), and that if Christ is not raised, our preaching and your faith are empty (1 Corinthians 15:14).",
+                "Luke 24:39", "1 Corinthians 15:4", "1 Corinthians 15:14"));
 
         r.add(new Route("oneness-trinity",
-                "oneness pentecostal|oneness teaching|are oneness|jesus only",
-                "The Bible-centred Christian position is that there is one God (Deuteronomy 6:4), and that the Father, the Son and the Holy Spirit are named together in baptism (Matthew 28:19). The Oneness teaching that God is only one person, who appears as Father, Son and Spirit in turn, is not the Trinitarian faith the church confesses. Scripture speaks of the Son praying to the Father (John 17:1), which shows the Father and the Son as distinct persons. We test every teaching by Scripture alone.",
-                "Deuteronomy 6:4", "Matthew 28:19"));
+                "oneness pentecostal|oneness teaching|are oneness|jesus only baptism|baptism in (?:the )?name of jesus only",
+                "The Bible-centred Christian position is that there is one God (Deuteronomy 6:4), and that the Father, the Son and the Holy Spirit are named together in baptism (Matthew 28:19). Oneness teaching holds that God is one person who is revealed in different roles, titles or manifestations, as Father, Son and Holy Spirit, rather than as three distinct persons. Scripture shows the Father and the Son as distinct: the Son prays to the Father (John 17:1–5), and the voice of the Father speaks from heaven when the Son is baptised, with the Spirit descending (Matthew 3:16–17). The Trinitarian faith the church confesses holds one God in three persons (2 Corinthians 13:14).",
+                "Deuteronomy 6:4", "Matthew 28:19", "Matthew 3:16", "John 17:1", "2 Corinthians 13:14"));
 
         r.add(new Route("circumcision-custom",
                 "circumci[sz]",
-                "Circumcision was a sign of the covenant in the Old Testament (Genesis 17:10). In the New Testament, neither circumcision nor uncircumcision avails anything in Christ, but faith which works by love (Galatians 5:6). Whether a family follows the custom is a matter of conscience, and no one should judge another about it (Romans 14:5). Please talk it through with your pastor.",
-                "Genesis 17:10", "Galatians 5:6"));
+                "Circumcision of males was the sign of God's covenant with Abraham and his descendants (Genesis 17:10–11). At Jerusalem, the apostles and elders did not lay circumcision on Gentile believers (Acts 15:19–29). Paul taught that neither circumcision nor uncircumcision counts for anything, but faith working through love (Galatians 5:6), and that each should remain in the calling in which he was called (1 Corinthians 7:19). No one should make circumcision a condition for belonging to Christ or to the church (Galatians 5:2–6). This answer is about male circumcision as a family custom. Whether a family follows that custom is a matter of conscience. Please talk it through with your pastor.",
+                "Genesis 17:10", "Galatians 5:6", "1 Corinthians 7:19"));
 
         r.add(new Route("sabbath-to-sunday",
                 "change the sabbath|changed the sabbath|sabbath to sunday|sunday as a sign",
@@ -970,11 +970,18 @@ public final class ApprovedRoutes {
     private ApprovedRoutes() {}
 
     /** The route answer for a question, or null when no route names it or a quoted anchor cannot be verified. */
+    /** Questions the male-custom circumcision route must not answer: female cutting, coercion, abuse and medical matters. */
+    private static final Pattern CIRCUMCISION_EXCLUDE = Pattern.compile(
+            "female|women|woman|girls?|\\bfgm\\b|genital|mutilat\\w*|forc\\w*|coerc\\w*|pressur\\w*|abus\\w*|medical|medic\\w*|hospital|clinic|infection|wound|bleeding|doctor|nurse|sex\\w*|hiv",
+            Pattern.CASE_INSENSITIVE);
+
     public static Answer answerFor(String question, KjvVerseText kjv) {
         if (question == null || kjv == null) return null;
         String q = question.toLowerCase(Locale.ROOT).replace('’', '\'');
         for (Route route : ROUTES) {
             if (!route.match.matcher(q).find()) continue;
+            // Female genital cutting, coercion and medical questions are not the male custom: they go to other routes.
+            if ("circumcision-custom".equals(route.id) && CIRCUMCISION_EXCLUDE.matcher(q).find()) continue;
             StringBuilder quoted = new StringBuilder();
             for (String anchor : route.quotes) {
                 String line = IdentifyRefute.verseLine(anchor, kjv);

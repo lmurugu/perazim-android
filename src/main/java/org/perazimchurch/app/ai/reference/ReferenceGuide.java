@@ -101,7 +101,7 @@ public final class ReferenceGuide {
                 if (wesley == null || wesley.text == null || wesley.text.trim().isEmpty()) return null;
                 String note = verseNote(wesley.text, verse);
                 return "John Wesley on " + headword + ", public domain (CCEL). It is his own view, an Arminian commentary, "
-                        + "not the Perazim position, and Scripture is the test.\n\n"
+                        + "not the Perazim position. You may disagree with him, and Scripture is the test.\n\n"
                         + "Scripture:\n" + headword + ":" + verse + ": “" + scripture + "”\n\n"
                         + "Wesley's note: " + excerpt(note);
             } finally {

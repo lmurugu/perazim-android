@@ -77,7 +77,7 @@ public final class DoctrineLibrary {
     static {
         MATCH.put("holy-spirit-baptism", "holy spirit|holy ghost|tongues|tognue|tounge|speaking in tongues|spirit baptism|baptism in the spirit|pentecostal");
         MATCH.put("prosperity-and-giving", "prosperity|prosperity gospel|seed offering|seed faith|sow a seed|giving seed|plant (?:a |an )?seed|mbegu|ukitoa pesa|utapata gari|poor because|poor people are poor|do not give enough|don't give enough|health and wealth");
-        MATCH.put("polygamy", "polygamy|polygamous|polygamist|multiple wives|more than one wife|second wife|many wives");
+        MATCH.put("polygamy", "polygamy|polygamous|polygamist|multiple wives|more than one wife|second wife|many wives|two wives|two wife|several wives|marry two|marry more than one");
         MATCH.put("dowry", "dowry|bride price|bride wealth|lobola|roora|ruracio|mahari");
         MATCH.put("apostasy-assurance", "lose (?:their|his|her|my|your)? ?salvation|lose salvation|once saved always saved|eternal security|apostasy|apostate|fall away|backslid|assurance of salvation");
         MATCH.put("unconditional-election", "unconditional election|predestin|calvinis|elect of god|chosen before the foundation");

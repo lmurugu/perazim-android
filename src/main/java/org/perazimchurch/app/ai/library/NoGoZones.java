@@ -191,7 +191,7 @@ public final class NoGoZones {
             new Zone("giving-money-pressure",
                     "seed|shilling|tithe|tithing|offering|prosperity|wealth|rich|blessing|blessed|bless me|prayer cloth"
                     + "|\\bpay\\b|paid|money|loan|\\bbet|sell my|bank account|ministry|send money|breakthrough|\\bjob\\b"
-                    + "|giving|\\bgive\\b",
+                    + "|giving|\\bgive (?:me )?(?:money|cash|shillings|a seed|an offering|tithe|to the church)\\b",
                     DECLINE),
             new Zone("scope-and-generation",
                     "write me|write a|\\bcv\\b|resume|poem|joke|funny|recipe|sermon|essay|song|story|politic|vote"

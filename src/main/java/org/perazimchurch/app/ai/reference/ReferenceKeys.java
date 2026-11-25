@@ -74,7 +74,7 @@ public final class ReferenceKeys {
         alias(50, "wafilipi"); alias(51, "wakolosai"); alias(52, "1 wathesalonike"); alias(53, "2 wathesalonike");
         alias(54, "1 timotheo"); alias(55, "2 timotheo"); alias(56, "tito"); alias(57, "filemoni"); alias(58, "waebrania");
         alias(59, "yakobo"); alias(60, "1 petro"); alias(61, "2 petro"); alias(62, "1 yohana"); alias(63, "2 yohana");
-        alias(64, "3 yohana"); alias(65, "yuda"); alias(66, "ufunuo");
+        alias(64, "3 yohana"); alias(66, "ufunuo");
     }
 
     private static final Pattern CHAPTER_VERSE = Pattern.compile("(?<![\\p{L}\\p{N}])(\\d{1,3}):(\\d{1,3})(?!\\d)");

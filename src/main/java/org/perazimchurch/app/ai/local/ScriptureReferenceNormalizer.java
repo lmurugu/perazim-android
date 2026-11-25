@@ -46,7 +46,7 @@ public final class ScriptureReferenceNormalizer {
             {"wakolosai", "Colossians"}, {"1 wathesalonike", "1 Thessalonians"}, {"2 wathesalonike", "2 Thessalonians"},
             {"1 timotheo", "1 Timothy"}, {"2 timotheo", "2 Timothy"}, {"tito", "Titus"}, {"filemoni", "Philemon"},
             {"waebrania", "Hebrews"}, {"yakobo", "James"}, {"1 petro", "1 Peter"}, {"2 petro", "2 Peter"},
-            {"1 yohana", "1 John"}, {"2 yohana", "2 John"}, {"3 yohana", "3 John"}, {"yuda", "Jude"}, {"ufunuo", "Revelation"}
+            {"1 yohana", "1 John"}, {"2 yohana", "2 John"}, {"3 yohana", "3 John"}, {"ufunuo", "Revelation"}
     };
 
     private static final Pattern REFERENCE = Pattern.compile(
