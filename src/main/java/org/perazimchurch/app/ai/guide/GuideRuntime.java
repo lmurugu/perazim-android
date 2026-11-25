@@ -65,6 +65,7 @@ public final class GuideRuntime {
     public static void forget(Context context) {
         GuideMemory m = memory(context);
         if (m != null) m.forgetAll();
+        org.perazimchurch.app.ai.gaps.GapLog.clear(context);
     }
 
     /** The bundled skill index (trigger rows and playbook names). Empty when the guide files cannot be read. */

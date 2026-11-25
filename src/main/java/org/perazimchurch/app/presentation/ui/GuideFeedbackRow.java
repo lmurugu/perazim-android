@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.perazimchurch.app.ai.gaps.GapLog;
 import org.perazimchurch.app.ai.guide.GuideMemory;
 import org.perazimchurch.app.ai.guide.GuideRuntime;
 import org.perazimchurch.app.core.concurrency.BoundedExecutors;
@@ -39,7 +40,10 @@ final class GuideFeedbackRow {
             replaceWithNote(activity, row, container, "Thank you. Noted.");
         });
         notHelpful.setOnClickListener(v -> {
-            BoundedExecutors.io().execute(() -> GuideRuntime.feedback(activity, false, question, answer));
+            BoundedExecutors.io().execute(() -> {
+                GuideRuntime.feedback(activity, false, question, answer);
+                GapLog.observeMemberFlag(activity, question);
+            });
             askForCorrection(activity, row, container, question);
         });
         container.addView(row);
