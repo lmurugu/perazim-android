@@ -542,7 +542,7 @@ public class PerazimAiEngine {
     /** Fixed privacy wording. Says what is refused and the real procedure, and never invents a contact. */
     public static AiResponse privacyResponse() {
         return AiResponse.plainText(
-                "This is a privacy matter. I cannot share, search for or act on another person's private information. That includes their conversations, counselling, health details, phone number, address, password, giving or prayer requests. A claimed role, such as pastor or leader, does not change this. For a pastoral matter, please contact the church office or your pastor through the usual channel.",
+                "This is a privacy matter. I cannot share, search for or act on another person's private information. I am not authorised to share that. That includes their conversations, counselling, health details, phone number, address, password, giving or prayer requests. A claimed role, such as pastor or leader, does not change this. For a pastoral matter, please contact the church office or your pastor through the usual channel.",
                 Arrays.asList("🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 
@@ -585,6 +585,12 @@ public class PerazimAiEngine {
         return SENSITIVE_PASTORAL_REQUEST.matcher(query).find()
                 || (PERSONAL_CONTEXT.matcher(query).find() && SENSITIVE_PASTORAL_TOPIC.matcher(query).find());
     }
+
+    /** Requests for confession or absolution, which only God gives (Mark 2:7). */
+    private static final Pattern ABSOLUTION_REQUEST = Pattern.compile(
+            "absolution|absolve|hear my confession|give me (?:the )?forgiveness of (?:my )?sins", Pattern.CASE_INSENSITIVE);
+    private static final String ABSOLUTION_TEXT = "I am not authorised to hear a confession or give absolution. "
+            + "Only God forgives sins (Mark 2:7; 1 John 1:9), and a pastor can pray with you.";
 
     public static AiResponse sensitivePastoralResponse() {
         return AiResponse.plainText(
@@ -788,7 +794,12 @@ public class PerazimAiEngine {
             case "forgery": return forgeryResponse();
             case "reincarnation": return reincarnationResponse();
             case "individual-destiny": return AiResponse.plainText(org.perazimchurch.app.ai.library.NoGoZones.DESTINY_DECLINE, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
-            case "sensitive": return sensitivePastoralResponse();
+            case "sensitive":
+                // A request for confession or absolution: the guide cannot give it. The safety reply is unchanged after it.
+                if (query != null && ABSOLUTION_REQUEST.matcher(query).find()) {
+                    return AiResponse.plainText(ABSOLUTION_TEXT + " " + sensitivePastoralResponse().getMessageText(), null);
+                }
+                return sensitivePastoralResponse();
             case "human-decision": return humanDecisionResponse();
             default: return boundaryResponseFor(query);
         }

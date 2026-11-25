@@ -28,8 +28,7 @@ public final class IdentifyRefute {
      */
     public static final boolean ENABLED = true;
 
-    static final String CLOSING = "We do not judge any person's eternal destiny. Test every teaching by Scripture, as the Bereans did, "
-            + "and talk with a trusted church leader or your pastor.";
+    static final String CLOSING = "We do not judge any person's eternal destiny. Please talk with a trusted church leader or your pastor.";
 
     /** Sentences that describe the guide or its method rather than the group's teaching. */
     private static final Pattern META = Pattern.compile(

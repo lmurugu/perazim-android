@@ -163,8 +163,7 @@ public final class ApprovedRoutes {
                 "just a prophet|not god.s son|jesus is god|is jesus god|deity of christ|jesus (?:is|was) (?:only|just) a (?:prophet|man)",
                 "Scripture teaches that Jesus is God the Son, not merely a prophet. The Word was God, and the Word was made flesh "
                 + "(John 1:1, 14). Jesus said that He and the Father are one (John 10:30). The Nicene and Chalcedonian statements, "
-                + "which we hold as established Christian orthodoxy, confess Jesus as the eternal Son of God, truly God and truly man.\n\n"
-                + "We test every claim about Jesus against Scripture, and this is what the Bible teaches.",
+                + "which we hold as established Christian orthodoxy, confess Jesus as the eternal Son of God, truly God and truly man.",
                 "John 1:1", "John 10:30"));
 
         r.add(new Route("first-gospel-preacher",
@@ -553,9 +552,7 @@ public final class ApprovedRoutes {
                 "god was once a man|god was a man|once a man|became god|become god",
                 "Scripture is clear that God is not a man who could become God. Before Him no god was formed, and "
                 + "after Him there will be none (Isaiah 43:10). He is the first and the last, and there is no God "
-                + "beside Him (Isaiah 44:6–8). He is God from everlasting to everlasting (Psalms 90:2). We test every "
-                + "teaching about God by Scripture alone, and we do not accept a later teaching that adds to what God "
-                + "has revealed.",
+                + "beside Him (Isaiah 44:6–8). He is God from everlasting to everlasting (Psalms 90:2).",
                 "Isaiah 43:10", "Psalms 90:2"));
 
         r.add(new Route("archangel-michael-jesus",
@@ -886,7 +883,7 @@ public final class ApprovedRoutes {
         r.add(new Route("creed-resurrection",
                 "creed.{0,80}resurrection|resurrection.{0,80}creed",
                 "The Nicene Creed confesses that Christians look for the resurrection of the dead and the life of the world to come. We hold "
-                + "this creed as established Christian orthodoxy, and we test every creed by Scripture. The Bible teaches the resurrection "
+                + "this creed as established Christian orthodoxy. The Bible teaches the resurrection "
                 + "of the dead (1 Corinthians 15:42), and that the dead in the graves will hear the voice of the Son of God (John 5:28).",
                 "1 Corinthians 15:42", "John 5:28"));
 

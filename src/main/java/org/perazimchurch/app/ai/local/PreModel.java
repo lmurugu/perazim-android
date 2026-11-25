@@ -105,6 +105,9 @@ public final class PreModel {
         }
         Decision search = verseSearchDecision(verses, question);
         if (search != null) return search;
+        // A sermon written for a member, and a claim to act as a church officer: outside the guide's role, declined before the zones.
+        if (SERMON_REQUEST.matcher(question).find()) return new Decision("routed:role-sermon", ROLE_SERMON_TEXT);
+        if (ACT_AS_OFFICER.matcher(question).find()) return new Decision("routed:role-officer", ROLE_OFFICER_TEXT);
         // Two named Christian traditions compared as a whole: fair description and no ranking, labelled as views.
         if (comparesTraditions(question)) {
             return new Decision("routed:denominational-fair", DENOMINATIONAL_FAIR_TEXT);
@@ -162,13 +165,28 @@ public final class PreModel {
             "\\bforc\\w*|threat\\w*|beat\\w*|rape\\w*|abus\\w*|sexual\\w*|kill\\w*|harm\\w*|hurt\\w*|\\bfgm\\b|female|girls?|genital|mutilat\\w*",
             Pattern.CASE_INSENSITIVE);
 
+    /** A full sermon requested (outlines for members are not covered here). */
+    private static final Pattern SERMON_REQUEST = Pattern.compile(
+            "\\b(?:write|draft|prepare|give me|make|compose|create)\\b(?!.{0,20}outline).{0,30}\\b(?:sermon|seromn|homily)\\b", Pattern.CASE_INSENSITIVE);
+    /** A claim to act as a church officer or to confirm a payment. */
+    private static final Pattern ACT_AS_OFFICER = Pattern.compile(
+            "\\b(?:act|acting|pretend|be) (?:as|like) (?:the |our |a |an )?(?:church )?(?:treasurer|pastor|bishop|elder|secretary|chairman|church office)\\b|confirm (?:that )?my (?:tithe|offering|payment|giving|seed)", Pattern.CASE_INSENSITIVE);
+    private static final String ROLE_SERMON_TEXT = "I am designed specifically to assist with Christian faith and the Bible, so I am not authorised to write a sermon for you. "
+            + "I can help you study a passage in its context, and your pastor can help you prepare a sermon.";
+    private static final String ROLE_OFFICER_TEXT = "I am designed specifically to assist with Christian faith and the Bible, so I am not authorised to act as a church officer or to confirm any payment. "
+            + "Please ask the church office or the treasurer directly.";
+
     /** A pointer to a verse given earlier ("that verse"), which the single-question path cannot resolve. */
     private static final Pattern VERSE_POINTER = Pattern.compile(
             "\\b(?:that|this|the|previous|last) (?:verse|passage)\\b", Pattern.CASE_INSENSITIVE);
     /** Christian traditions a member may name together, for example in "Are Pentecostals less biblical than Presbyterians?". */
     private static final Pattern TRADITION_NAME = Pattern.compile(
-            "\\b(pentecostal|presbyterian|baptist|methodist|anglican|lutheran|adventist|assemblies of god|reformed|orthodox)s?\\b",
+            "\\b(pentecostal|presbyterian|baptist|methodist|anglican|lutheran|adventist|assemblies of god|reformed)s?\\b",
             Pattern.CASE_INSENSITIVE);
+    /** Groups outside the Protestant, Pentecostal and Evangelical families. They are never put on equal footing with them here. */
+    private static final Pattern NON_PROTESTANT = Pattern.compile(
+            "\\b(catholic|catholics|roman|orthodox|mormon|mormons|latter-day|lds|jehovah|witness|witnesses|oneness|" +
+            "christian science|unitarian|islam|muslim|hindu|buddhist|sikh|jew|jews)\\b", Pattern.CASE_INSENSITIVE);
     /** Comparative or ranking wording (including common misspellings such as "bibilcal"). */
     private static final Pattern COMPARATIVE_WORD = Pattern.compile(
             "\\b(?:less|more|better|worse|bib\\w*|true|real|right|wrong|correct|saved|than|versus|vs\\.?|or)\\b",
@@ -183,6 +201,7 @@ public final class PreModel {
         Matcher m = TRADITION_NAME.matcher(question);
         java.util.Set<String> names = new java.util.HashSet<>();
         while (m.find()) names.add(m.group(1).toLowerCase(Locale.ROOT));
+        if (NON_PROTESTANT.matcher(question).find()) return false;
         return names.size() >= 2 && COMPARATIVE_WORD.matcher(question).find();
     }
 

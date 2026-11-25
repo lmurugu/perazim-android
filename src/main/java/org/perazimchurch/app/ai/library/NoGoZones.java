@@ -54,6 +54,7 @@ public final class NoGoZones {
     }
 
     public static final String DESTINY_DECLINE = "Only God knows people's hearts and their final destiny, so I will not pronounce on anyone's eternal state. "
+            + "I am not authorised to declare whether any person is saved. "
             + "If you are asking about your own salvation, come to Jesus in faith and trust Him as Lord (Romans 10:9–10). "
             + "Please talk this through with a trusted church leader or your pastor, who can walk with you through it.";
 
@@ -84,7 +85,7 @@ public final class NoGoZones {
     /** Denominations and groups ranked against each other: no verdict, and no single church has the whole truth. */
     static final String DENOMINATION_DECLINE =
             "No single church or denomination has a monopoly on the truth. Christians of different traditions hold some different "
-            + "views, and I won't rank churches or groups. Test every teaching by Scripture, and talk with a trusted church leader "
+            + "views, and I won't rank churches or groups. Each teaching can be checked against Scripture with a trusted church leader "
             + "or your pastor.";
 
     private static final Pattern NICENE = Pattern.compile("\\bnicene\\b", Pattern.CASE_INSENSITIVE);
@@ -128,7 +129,7 @@ public final class NoGoZones {
             new Zone("other-faiths-and-groups",
                     "jehovah|witness|latter.day|mormon|adventist|sabbath|saturday|sunday|seventh|ellen white|mark of the beast"
                     + "|catholic|purgatory|\\bmary\\b|miriam|apocrypha|orthodox|icon|karma|reincarnat|rebirth|next life"
-                    + "|come back as|ancestor|shrine|kiapo|traditional (rite|dance|oath)|islam|muslim|qur|hindu|buddh|jain"
+                    + "|come back as|ancestor|shrine|kiapo|traditional (rite|dance|oath)|islam|allah|muslim|qur|hindu|buddh|jain"
                     + "|soul sleep|soul|denomination|church of christ|cult|archangel|michael|pluralism|same thing"
                     + "|all religions|going to hell|is she going|is he going|hell right now"
                     + "|all paths|all roads|law of attraction|universal energy|higher self|new age|brahman|saints|ancestors|soul sleep"
