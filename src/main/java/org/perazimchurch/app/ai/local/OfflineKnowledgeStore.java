@@ -410,7 +410,10 @@ public final class OfflineKnowledgeStore {
     @NonNull
     public static String knowledgeStatus(Context context, Map<String, String> trustedKeys,
                                          String appVersion, long nowMillis) {
-        if (trustedKeys == null || trustedKeys.isEmpty()) return "trusted knowledge key unavailable";
+        if (trustedKeys == null || trustedKeys.isEmpty()) {
+            return "validation".equals(BuildConfig.BUILD_TYPE)
+                    ? "Approved library + KJV (no signed package)" : "trusted knowledge key unavailable";
+        }
         try {
             VerifiedPackage installed = read(context, trustedKeys, appVersion, nowMillis);
             if (installed == null) {

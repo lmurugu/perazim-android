@@ -684,12 +684,6 @@ public class PerazimAiEngine {
     /** The speaker's own situation, or a real person they are describing. */
     private static final Pattern SPEAKER_SITUATION = Pattern.compile(
             "\\b(?:i|i'm|i am|i've|i'll|me|my|our|us|we)\\b", Pattern.CASE_INSENSITIVE);
-    private static final Pattern FIRST_PERSON_OUTSIDE_QUOTES = Pattern.compile(
-            "\\b(?:i|i'm|i am|i will|i'll|i'd|i feel|i want|i have|mimi|nina|nataka|nimechoka|ninapigwa|ninaogopa)\\b|\\bmy life\\b|\\bmaisha yangu\\b", Pattern.CASE_INSENSITIVE);
-    private static final Pattern THIRD_PERSON_MARKER = Pattern.compile(
-            "\\b(?:he|she|they|his|her|their|friend|brother|sister|husband|wife|son|daughter|texted|messaged|someone)\\b",
-            Pattern.CASE_INSENSITIVE);
-
     /**
      * Routes crisis, abuse and violence wording to separate responses (Levi's review on PR 83, 2026-11-25).
      * Returns "crisis", "crisis-third-party", "crisis-denial", "crisis-literary", "crisis-and-violence",
@@ -734,13 +728,42 @@ public class PerazimAiEngine {
         return "real";
     }
 
-    /** True when the suicidal words are about someone else: no first-person words outside a quotation, and a third person named. */
+    /**
+     * Reported speech: "texted me ...", "told me ...", "says ...", "ameniambia ...", up to the end of the sentence.
+     * "I told ..." is not reported speech, because the reporter is speaking about themselves.
+     */
+    private static final Pattern REPORTED_SPEECH = Pattern.compile(
+            "(?<![Ii] )\\b(?:texted|messaged|wrote|told|sent|posted|called|ameniambia|ananiambia|ananitumia|aliniandikia|aliniambia|"
+                    + "anasema|alisema|amesema|says|said|saying)\\b[^.!?\\n]*",
+            Pattern.CASE_INSENSITIVE);
+    /** Help-seeking questions such as "what should I do" name the reporter but do not state their own risk. */
+    private static final Pattern HELP_SEEKING = Pattern.compile(
+            "\\b(?:what|how|should|do|can|must|would|shall|may|where|when|who)\\s+i\\b", Pattern.CASE_INSENSITIVE);
+    /** Any statement by the reporter about themselves, including "Im", "I am", "me" and Swahili forms. */
+    private static final Pattern SELF_STATEMENT = Pattern.compile(
+            "\\bi\\b|\\bim\\b|\\bme\\b|\\bmy life\\b|\\bmyself\\b|\\bmimi\\b|\\bnina\\b|\\bnataka\\b|\\bnimechoka\\b|\\bmaisha yangu\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** The person at risk is someone else: a named relation, a third-person pronoun, or a Swahili third-person form. */
+    private static final Pattern OTHER_PERSON = Pattern.compile(
+            "\\b(?:he|she|they|him|her|his|their|them|someone|friend|brother|sister|son|daughter|husband|wife|mum|mom|dad|father|mother|"
+                    + "kaka|dada|rafiki|mume|mke|mtoto|anasema|anajiua|atajiua|anataka|atataka|ananiambia|ananitumia)\\b|"
+                    + "\\b\\w+ yangu\\b|\\b\\w+ wangu\\b",
+            Pattern.CASE_INSENSITIVE);
+
+    /**
+     * True when the suicidal words are about someone else. Default rule: a named or pronoun-marked other person is the subject,
+     * or the words are reported, and the reporter says nothing about their own risk. Quotes, reported speech, help-seeking
+     * questions and punctuation or spelling variants (Im, I'm, I’m, I am) are all handled.
+     */
     static boolean isThirdPartyFraming(String n) {
-        String outside = n.replaceAll("\"[^\"]*\"", " ").replaceAll("(?:^|[\\s,])'.*?'(?=[\\s.,!?]|$)", " ").replaceAll("(?:^|[\\s,])'.*'\\s*$", " ")
-                // The reporter's own help-seeking words ("what should I do") are not a first-person statement of risk.
-                .replaceAll("(?i)\\b(?:what|how) (?:should|do|can|must|would) i (?:do|help|say|tell|respond|handle)\\b", " ");
-        if (FIRST_PERSON_OUTSIDE_QUOTES.matcher(outside).find()) return false;
-        return THIRD_PERSON_MARKER.matcher(outside).find();
+        String s = n.replace('“', '"').replace('”', '"').replace('‘', '\'').replace('’', '\'');
+        s = s.replaceAll("\"[^\"]*\"", " ");
+        s = s.replaceAll("(?:^|[\\s,(])'.*?'(?=[\\s.,!?)]|$)", " ");
+        boolean reported = REPORTED_SPEECH.matcher(s).find();
+        s = REPORTED_SPEECH.matcher(s).replaceAll(" ");
+        s = HELP_SEEKING.matcher(s).replaceAll(" ");
+        if (SELF_STATEMENT.matcher(s).find()) return false;
+        return reported || OTHER_PERSON.matcher(s).find();
     }
 
     public static AiResponse violenceSafeguardingResponse() {

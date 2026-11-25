@@ -37,6 +37,7 @@ public final class CrisisPhrases {
             // Status APPROVED_LEVI for the five phrases above and these four variants. Tiers are recorded in
             // ai-eval checklist: "nimechoka na maisha" is a compassionate safety check, the others are urgent.
             // Variants added here only strengthen detection; no phrase was removed.
+            "atajiua|anajiua|watajiua|atajiue|anajiue|anataka kufa|atataka kufa|wanataka kufa|"+
             "nina mawazo ya kujiua|nataka kujitoa uhai|nimefikiria kujiua|nina mpango wa kujiua|" +
             // Added 2026-11-25 from the Kenya set (KE-092): "it is better that I die", "my children would be better without me". Levi to review this crisis-list addition.
             "bora nife|watakuwa bora bila mimi|bora bila mimi|" +
