@@ -98,7 +98,9 @@ public final class ApprovedRoutes {
 
         r.add(new Route("apostasy-assurance",
                 "lose (?:my |our |their |his |her |your )?salvation|once saved|eternal security|apostas|apostate|fall(?:ing|s)? away"
-                        + "|finally depart|depart from (?:christ|the faith)|backslid|assurance of salvation|can a (?:christian|believer) (?:lose|fall)",
+                        + "|finally depart|depart from (?:christ|the faith)|backslid|assurance of salvation|can a (?:christian|believer) (?:lose|fall)"
+                        + "|abandon (?:jesus|christ|god|him)|genuinely saved|unsaved|never saved|was i saved|am i (?:really )?saved|keep sinning"
+                        + "|turn (?:away|back) from (?:christ|jesus|god)|reject (?:god|christ|jesus)|birthright",
                 "We hold the assurance that believers have in Christ together with the seriousness of the warnings in Scripture. "
                 + "The view below is our developing view, under review. It is not a settled Perazim doctrine.\n\n"
                 + "Assurance: no outside power can snatch Christ's sheep out of His hand (John 10:27–29). Nothing in creation can "
@@ -108,11 +110,13 @@ public final class ApprovedRoutes {
                 + "2 Peter 2:20–22 are serious warnings against turning back from Christ after knowing the truth.\n\n"
                 + "Our developing view, under review: a genuinely saved person can freely and finally abandon Christ. This is not "
                 + "a settled formula that says \"once saved, always saved\", and we do not say that anyone who falls away was never "
-                + "saved. " + NO_VERDICT + " Hold fast to Christ, keep close to the church, and talk with your pastor if you are struggling.",
+                + "saved. " + NO_VERDICT + " If you are asking about your own salvation, come to Jesus in faith and trust Him as Lord "
+                + "(Romans 10:9–10). Hold fast to Christ, keep close to the church, and talk with your pastor if you are struggling.",
                 "John 10:28", "Hebrews 6:4"));
 
         r.add(new Route("unconditional-election",
-                "unconditional election|predestin|calvinis|elect of god|chosen before the foundation",
+                "unconditional election|predestin|calvinis|elect of god|chosen before the foundation|already chosen|has chosen"
+                        + "|chosen (?:those|who|ones|people|his people)|if god has chosen",
                 "Our working interpretation, under review, is unconditional election. We understand that God chose His people in "
                 + "Christ before the foundation of the world, and that His choosing does not depend on anything good in us "
                 + "(Ephesians 1:4–5; Romans 9:11–16). This is not a fully settled Perazim doctrine.\n\n"
@@ -123,7 +127,8 @@ public final class ApprovedRoutes {
 
         r.add(new Route("grace-and-obedience",
                 "grace and (?:obedience|works)|obedience and grace|works and grace|faith and works|faith without works"
-                        + "|saved by grace|grace (?:or|vs\\.?|versus) (?:works|obedience)",
+                        + "|saved by grace|salvation is by grace|by grace.{0,40}obey|grace.{0,40}\\bobey"
+                        + "|why (?:should|must|do|did) (?:christians|we|believers|i) obey|obey god|grace (?:or|vs\\.?|versus) (?:works|obedience)",
                 "Scripture says we are saved by grace, through faith, and not by our own works (Ephesians 2:8–9). We are created "
                 + "in Christ for good works, which God prepared beforehand (Ephesians 2:10). Grace teaches us to deny ungodliness "
                 + "and to live soberly and righteously (Titus 2:11–12). Faith without works is dead (James 2:17, 26).\n\n"

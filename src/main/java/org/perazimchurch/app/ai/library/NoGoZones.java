@@ -38,7 +38,8 @@ public final class NoGoZones {
 
     /** Other faiths and groups: no general description. Ask which specific teaching is meant (Levi, 2026-11-25). */
     static final String OTHER_GROUP_DECLINE =
-            "I can examine a specific teaching of a church or group against Scripture. Which teaching do you have in mind? "
+            "I can't verify a general claim like that. I can examine a specific teaching of a church or group against Scripture, "
+            + "so which teaching do you have in mind? "
             + "Please talk it through with a trusted church leader or your pastor, who can help you test it by the Bible.";
 
     /** No verdict on any individual: only God knows hearts and final destiny. Warm, with the way of faith for the asker. */
