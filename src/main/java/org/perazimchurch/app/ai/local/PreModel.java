@@ -10,6 +10,8 @@ import org.perazimchurch.app.ai.library.DoctrineLibrary;
 import org.perazimchurch.app.ai.library.KjvVerseText;
 import org.perazimchurch.app.ai.library.NoGoZones;
 import org.perazimchurch.app.ai.library.ScriptureRangeTable;
+import org.perazimchurch.app.data.interlinear.StrongsStore;
+import org.perazimchurch.app.domain.model.StrongsEntry;
 import java.util.List;
 import java.util.Locale;
 
@@ -66,6 +68,13 @@ public final class PreModel {
             Decision missing = missingReference(table, question);
             if (missing != null) return missing;
         }
+        // Strong's numbers and Easton's dictionary: answered from the bundled, approved texts, never from memory.
+        Decision lexicon = lexiconDecision(c, question);
+        if (lexicon != null) return lexicon;
+        // Whether the member finished their routine: the guide cannot see their record from here.
+        if (ROUTINE_STATUS.matcher(question).find()) {
+            return new Decision("routed:app-status-unavailable", ROUTINE_STATUS_TEXT);
+        }
         String route = PerazimAiEngine.preModelRoute(question);
         if (route != null) {
             return new Decision("routed:" + route, PerazimAiEngine.preModelResponse(route, question).getMessageText());
@@ -92,9 +101,47 @@ public final class PreModel {
         }
         Decision search = verseSearchDecision(verses, question);
         if (search != null) return search;
+        // An ESV, NIV or NKJV request without a verse number gets the translation policy, not a no-go decline.
+        if (OTHER_TRANSLATION.matcher(question).find()) {
+            return new Decision("routed:translation-policy", PerazimAiEngine.translationPolicyResponse().getMessageText());
+        }
         NoGoZones.Zone zone = NoGoZones.match(question);
         if (zone != null) return new Decision("routed:no-go:" + zone.id, zone.decline);
         return null;
+    }
+
+    /** A Strong's number named with its language ("Greek word G26"), or a question about Easton's dictionary. Null otherwise. */
+    private static final Pattern STRONGS_NAMED = Pattern.compile(
+            "\\b(?:greek|hebrew)\\s+(?:word\\s+)?([GH]\\d{1,4})\\b|\\b([GH]\\d{1,4})\\b\\s+(?:in\\s+)?(?:greek|hebrew|strong)",
+            Pattern.CASE_INSENSITIVE);
+    /** A member asking whether they finished their routine or streak. The guide cannot see that record from here. */
+    private static final Pattern ROUTINE_STATUS = Pattern.compile(
+            "\\b(?:did|have) i\\b.{0,40}\\b(?:finish|finished|complete|completed|done|do)\\b.{0,40}\\b(?:routine|routines|streak)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final String ROUTINE_STATUS_TEXT = "I can't see your routine status from here, so I won't say whether you "
+            + "finished it today. Open Home to check today's routine.";
+
+    /** The bundled Strong's entry for a number named in the question, or Easton's entry for a named word, or null. */
+    static Decision lexiconDecision(Context c, String question) {
+        Matcher m = STRONGS_NAMED.matcher(question);
+        if (m.find()) {
+            String code = (m.group(1) != null ? m.group(1) : m.group(2)).toUpperCase(Locale.ROOT);
+            StrongsEntry entry = StrongsStore.getEntry(c, code);
+            if (entry == null) {
+                return new Decision("routed:strongs-not-found", "I can't find " + code + " in the Strong's table bundled with the app, "
+                        + "so I won't define it from memory. Please check the number in the Bible tab.");
+            }
+            String original = nz(entry.getOriginal()).isEmpty() ? "" : " (" + entry.getOriginal().trim() + ")";
+            return new Decision("routed:strongs-lexicon", "Strong's " + code + original + ": " + nz(entry.getTransliteration())
+                    + ".\n\nStrong's definition: " + nz(entry.getDefinition())
+                    + "\n\nFrom Strong's Exhaustive Concordance (public domain), bundled with the app.");
+        }
+        String easton = org.perazimchurch.app.ai.reference.ReferenceGuide.namedEaston(c, question);
+        return easton == null ? null : new Decision("routed:dictionary-easton", easton);
+    }
+
+    private static String nz(String s) {
+        return s == null ? "" : s.trim();
     }
 
     /** Identify-and-refute answer for an approved false-doctrine topic, or null. Used only while the gate is on. */

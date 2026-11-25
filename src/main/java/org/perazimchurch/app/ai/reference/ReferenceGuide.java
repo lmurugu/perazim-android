@@ -113,6 +113,39 @@ public final class ReferenceGuide {
         }
     }
 
+    /** Easton's Bible Dictionary for a name the member asks about with "Easton" (public domain). Null when not asked, not found or not approved. */
+    public static String namedEaston(Context context, String question) {
+        try {
+            if (context == null || question == null || !question.toLowerCase(Locale.ROOT).contains("easton")) return null;
+            java.util.regex.Matcher m = EASTON_NAME.matcher(question);
+            if (!m.find()) return null;
+            String name = m.group(1);
+            ReferenceApprovals approvals = approvals(context);
+            if (approvals.isEmpty() || !approvals.isApproved(EASTON_SOURCE)) return null;
+            ReferenceIndex index = ReferenceIndex.open(context);
+            if (index == null) return null;
+            try {
+                for (ReferenceHit hit : index.dictionary(name, approvals, 10)) {
+                    if (EASTON_SOURCE.equals(hit.sourceId) && hit.text != null && !hit.text.trim().isEmpty()) {
+                        return "Easton's Bible Dictionary, public domain (CCEL). " + hit.headword + ": " + excerpt(hit.text);
+                    }
+                }
+                return null;
+            } finally {
+                index.close();
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Easton entry skipped", e);
+            return null;
+        }
+    }
+
+    /** Easton's source id in the reference database. */
+    static final String EASTON_SOURCE = "easton-bible-dictionary";
+    /** The name a question gives after "about", "on", "of", "for" or "is", capitalised as a name. */
+    private static final java.util.regex.Pattern EASTON_NAME = java.util.regex.Pattern.compile(
+            "\\b(?:about|on|of|for|is)\\s+([A-Z][\\p{L}'-]+)");
+
     /** Wesley's note on one verse, found by its verse number at the start of a note. The chapter's opening note otherwise. */
     static String verseNote(String chapterText, int verse) {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?:^|\\s)" + verse + "\\. ").matcher(chapterText);

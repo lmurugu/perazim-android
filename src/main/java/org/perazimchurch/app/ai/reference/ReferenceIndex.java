@@ -118,7 +118,7 @@ public final class ReferenceIndex {
         args.add(String.valueOf(limit));
         String sql = "SELECT e.source_id, e.headword, e.body, s.title, s.author, s.licence, s.theology_tag "
                 + "FROM entries e JOIN sources s ON s.source_id = e.source_id "
-                + "WHERE e.headword = ? COLLATE NOCASE AND e.source_id IN (" + in + ") "
+                + "WHERE REPLACE(e.headword, '-', '') = REPLACE(?, '-', '') COLLATE NOCASE AND e.source_id IN (" + in + ") "
                 + order + " LIMIT ?";
         try (Cursor c = db.rawQuery(sql, args.toArray(new String[0]))) {
             while (c.moveToNext()) {
