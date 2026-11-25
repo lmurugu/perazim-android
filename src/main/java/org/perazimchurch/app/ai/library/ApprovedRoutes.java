@@ -358,7 +358,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("cancer-treatment-and-faith",
                 "chemo|cancer|surgery|doctors? (?:say|says|said)",
-                "Please do not stop your treatment without speaking to your doctors first. Trusting God and seeking medical care are not "
+                "Please keep following your doctors' plan until you have spoken with them. Trusting God and seeking medical care are not "
                 + "opposed; Jesus Himself said that the sick need a physician (Luke 5:31). Talk with your doctor, your family and your pastor "
                 + "together, and pray for wisdom and peace as you decide.",
                 "Luke 5:31", "Proverbs 11:14"));
@@ -370,6 +370,29 @@ public final class ApprovedRoutes {
                 + "than men (Acts 5:29). Test what your leaders say by the Scriptures, as the Bereans did (Acts 17:11). Please talk this through "
                 + "with a trusted church leader, and read the passage yourself.",
                 "Hebrews 13:17", "Acts 5:29"));
+
+        r.add(new Route("claims-to-test",
+                "tiktok|youtube|manabii|nabii|paralys|job within|sent by god|sent from god|prophet says|preacher .{0,60}(?:seed|job|money)",
+                "I cannot verify this claim from a video or a message, so I am not certain it is true. Scripture tells us to test every "
+                + "teacher and every prophecy by the Word of God, because false teachers and false signs can deceive people (Matthew 7:15; "
+                + "Deuteronomy 18:22). Do not send money to get a blessing or a job. Only God knows hearts and judges them, so I will not "
+                + "pronounce on this person. Please talk with your pastor or a trusted church leader before you act, and see a doctor or "
+                + "clinic for any illness.",
+                "Matthew 7:15", "Deuteronomy 18:22"));
+
+        r.add(new Route("gold-dust-signs",
+                "gold dust|oil coming out|visible sign|sign from god",
+                "Scripture warns against seeking signs for their own sake, and against false signs and wonders (Matthew 12:39; "
+                + "2 Thessalonians 2:9–10). I cannot confirm that a claimed sign comes from God. Test every sign by the Word of God, and talk "
+                + "with a trusted church leader before you accept it.",
+                "Matthew 12:39", "2 Thessalonians 2:9"));
+
+        r.add(new Route("sick-has-demon-swahili",
+                "ana pepo|kila mgonjwa",
+                "I cannot confirm that every sick person has a demon. Scripture does not teach that every sickness is a punishment for sin "
+                + "or a demon (John 9:2–3). Please see a doctor or clinic, and talk with a trusted church leader before you accept this teaching. "
+                + "I can answer in English first.",
+                "John 9:2", "John 9:3"));
 
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",
