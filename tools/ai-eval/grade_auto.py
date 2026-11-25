@@ -105,6 +105,14 @@ def grade(cases, answers, decline_pass, books, pattern):
         bad_refs = verse_ref_problems(answer, books, pattern)
         if bad_refs:
             reasons.append("non-existent reference: " + ", ".join(bad_refs[:3]))
+        min_refs = c.get("min_refs") or 0
+        if min_refs:
+            found = {m.group(0) for m in pattern.finditer(answer)}
+            if len(found) < min_refs:
+                reasons.append("fewer than %d references (%d found)" % (min_refs, len(found)))
+        status_any = c.get("must_include_status_any") or []
+        if status_any and not any(t.lower() in a for t in status_any):
+            reasons.append("missing status label")
         ok = not reasons
         if (not ok and decline_pass and c.get("action") in DECLINE_ACTIONS
                 and not bad_refs and "no real answer" not in reasons and "malformed start" not in reasons
