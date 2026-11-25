@@ -223,7 +223,7 @@ public final class OnDeviceAi {
                     rawAnswer = runModelProcess(c, built.prompt, CitationGrammar.build(shown, answerLimit), 128);
                 }
                 String result = LocalPrompt.stripStockPhrases(
-                        rawAnswer.replace("<|im_end|>", "").replace("<|endoftext|>", "").trim());
+                        ModelOutput.stripEndMarkers(rawAnswer));
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
                 if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
                         || (PerazimAiEngine.claimsOfficialStatus(result)

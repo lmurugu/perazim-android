@@ -131,7 +131,7 @@ public final class ConversationComposer {
      */
     public static String verify(String raw, String question, String approvedText, boolean requireSupport) {
         if (raw == null) return null;
-        String cleaned = raw.replace("<|im_end|>", "").replace("<|endoftext|>", "").replaceAll("\\s+", " ").trim();
+        String cleaned = ModelOutput.stripEndMarkers(raw).replaceAll("\\s+", " ").trim();
         if (cleaned.isEmpty()) return null;
         String support = ((approvedText == null ? "" : approvedText) + " " + (question == null ? "" : question))
                 .toLowerCase(Locale.ROOT);

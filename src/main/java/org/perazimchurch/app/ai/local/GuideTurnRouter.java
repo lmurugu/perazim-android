@@ -62,8 +62,10 @@ public final class GuideTurnRouter {
         String grounding;
         boolean requireSupport;
         String status = routed.status == null ? "" : routed.status;
-        // Greetings keep their approved wording: the model's composed greeting was generic and did not name what the guide can do.
-        if ("routed:approved-greeting-only".equals(status) || "routed:conversational-greeting".equals(status)) {
+        // Greetings and the capability reply keep their approved wording: the model's composed greeting was generic, and the
+        // composed capability reply was cut short with a raw end marker on the phone (Levi, 2026-11-25).
+        if ("routed:approved-greeting-only".equals(status) || "routed:conversational-greeting".equals(status)
+                || "routed:conversational-capability".equals(status)) {
             return routed;
         }
         if (status.startsWith("routed:conversational-")) {

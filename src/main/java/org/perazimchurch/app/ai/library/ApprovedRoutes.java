@@ -1012,6 +1012,14 @@ public final class ApprovedRoutes {
                 + "to the Lord (Mark 10:13–16). Please talk with your pastor if you would like to understand this more.",
                 "Matthew 28:19", "Romans 6:4", "Acts 8:38", "Ephesians 2:8", "Mark 10:13"));
 
+        // Swahili "neno ... God" with no other cue (Levi, 2026-11-25). Two KJV passages about the Word and God, quoted from the
+        // bundled table. DRAFT wording for Levi's review: the Swahili needs a native check.
+        r.add(new Route("neno-god-word",
+                "^(?=.*\\bneno\\b)(?=.*\\bgod\\b).*",
+                "These two King James Version verses speak about God's Word (neno). Ikiwa ulimaanisha neno au mstari mwingine, "
+                + "tafadhali niambie kitabu, sura na mstari, au weka neno kwenye alama za nukuu ili nilitafute katika KJV.",
+                "John 1:1", "John 1:14"));
+
         // Round 48 (2026-11-25), drafted for Levi's review: pastoral and safety-adjacent answers that name no individual's destiny.
         r.add(new Route("tell-me-if-saved",
                 "(?:tell me|whether i am|if i am|am i) (?:now |really |truly )?(?:saved|going to heaven|a true christian|a real believer)"

@@ -77,7 +77,7 @@ final class OwnKnowledge {
      */
     static String accept(String raw, KjvVerseText kv, ScriptureRangeTable table) {
         if (raw == null || kv == null || table == null) return null;
-        String text = raw.replace("<|im_end|>", "").replace("<|endoftext|>", "").trim();
+        String text = ModelOutput.stripEndMarkers(raw);
         if (text.isEmpty()) return null;
         int words = text.split("\\s+").length;
         if (words < 10 || words > 110) return null;
