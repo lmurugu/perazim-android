@@ -157,6 +157,16 @@ public class EvalPipelineTest {
         String outPath = System.getenv("PERAZIM_EVAL_OUT2");
         assumeTrue(casesPath != null && modelPath != null && llama != null && outPath != null);
         Context c = ApplicationProvider.getApplicationContext();
+        // Round 49: the own-knowledge path (OwnKnowledge) calls the model through the same test seam as the app's checks.
+        final String llamaFinal = llama;
+        final String modelFinal = modelPath;
+        OnDeviceAi.testRunner = (p, g, n) -> {
+            try {
+                return runLlama(llamaFinal, modelFinal, p, n);
+            } catch (Exception e) {
+                throw new java.io.IOException(e);
+            }
+        };
         List<String> lines = Files.readAllLines(new File(casesPath).toPath(), StandardCharsets.UTF_8);
         try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(outPath), StandardCharsets.UTF_8)) {
             for (String line : lines) {
@@ -173,9 +183,16 @@ public class EvalPipelineTest {
                     // PRE-SIGNING ESTIMATE: evidence from the unsigned package built from the approved library files.
                     JSONArray evidence = PreSigningEvidence.retrieve(q);
                     if (evidence.length() == 0) {
-                        // Production OnDeviceAi.ask throws here before the model runs, so the model is never called without evidence.
-                        status = "refused:no-verified-source";
-                        answer = OnDeviceAi.NO_SOURCE_MESSAGE;
+                        // No approved excerpt: an in-scope, non-sensitive faith question may get an own-knowledge answer that passes
+                        // OwnKnowledge.accept (round 49). Otherwise the honest no-source reply, as production gives.
+                        String own = OwnKnowledge.tryAnswer(c, q);
+                        if (own != null) {
+                            status = "own-knowledge:accepted";
+                            answer = own;
+                        } else {
+                            status = "refused:no-verified-source";
+                            answer = OnDeviceAi.NO_SOURCE_MESSAGE;
+                        }
                     } else {
                         String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
                         long t0 = System.currentTimeMillis();

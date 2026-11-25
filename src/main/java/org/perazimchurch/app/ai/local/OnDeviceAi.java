@@ -191,7 +191,14 @@ public final class OnDeviceAi {
                 evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
                 // Drift: a question that uses another faith's idea gets at least two KJV passages plus a false-doctrine note to refute from Scripture; never a credible source (no-op otherwise).
                 evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
-                if (evidence.length() == 0) throw new IOException(NO_SOURCE_MESSAGE);
+                if (evidence.length() == 0) {
+                    // No approved excerpt: an in-scope, non-sensitive faith question may be answered from the model's own
+                    // knowledge, accepted only by the KJV, reference and official-claim checks in OwnKnowledge (Levi, 2026-11-25).
+                    String own = OwnKnowledge.tryAnswer(c, question);
+                    if (own == null) throw new IOException(NO_SOURCE_MESSAGE);
+                    MAIN.post(() -> callback.onSuccess(own));
+                    return;
+                }
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
                 // Locked rules, one playbook, style and learned notes (guide memory is optional and bounded).
                 String guideText = GuideRuntime.contextFor(c, question).text;
