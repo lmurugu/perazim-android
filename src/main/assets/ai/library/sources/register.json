@@ -390,7 +390,7 @@
    "title": "Strong's Greek and Hebrew dictionary (already bundled)",
    "author": null,
    "category": null,
-   "licence": "Greek: Strong's 1890 text is public domain (coordinator, 2026-11-25); the OpenScriptures corrected file header quotes GPL 3.0 and MIT, so the owner must still confirm before release. Attribute OpenScriptures. Hebrew: CC BY 4.0 (Open Scriptures Hebrew Bible Project). 2026-11-25: the shipped strongs.tsv.gz holds only plain fields (code, transliteration, definition text); no OpenScriptures markup, header or code is shipped. Switch to STEPBible TBESG (CC BY 4.0) is blocked: the STEPBible-Data repository is not accessible from this session (add_repo would be needed). Coordinator decision needed before release.",
+   "licence": "Greek: Strong's 1890 text is public domain (coordinator, 2026-11-25); the OpenScriptures corrected file header quotes GPL 3.0 and MIT, so the owner must still confirm before release. Attribute OpenScriptures. Hebrew: CC BY 4.0 (Open Scriptures Hebrew Bible Project). 2026-11-25: the shipped strongs.tsv.gz holds only plain fields (code, transliteration, definition text); no OpenScriptures markup, header or code is shipped. Switch to STEPBible TBESG (CC BY 4.0) is blocked: the STEPBible-Data repository is not accessible from this session (add_repo would be needed). Coordinator decision 2026-11-25: plain-field file accepted (public-domain text, no OpenScriptures markup shipped). Item closed.",
    "licenceUrl": null,
    "sourceUrl": null,
    "theologyTag": null,

@@ -42,6 +42,9 @@ public class PerazimAiEngine {
     private static final Pattern PERSONAL_CONTEXT = Pattern.compile(
             "\\b(?:i am|i'm|i feel|i felt|i have been|i was|my|our|we|my friend|someone close to me)\\b",
             Pattern.CASE_INSENSITIVE);
+    /** General doctrine questions about falling away or the unforgivable sin: answered by the approved route, not the destiny decline. */
+    private static final Pattern PERSEVERANCE_QUESTION = Pattern.compile(
+            "keep sinning|never saved|lose (?:our |my |their )?(?:salvation|place in heaven)|salvaiton|salvtion|unforgivable|on purpose|fall(?:s|ing)? away|apostat|aposttae|judas|peter denied", Pattern.CASE_INSENSITIVE);
     private static final Pattern SAYS_CLAIM_QUESTION = Pattern.compile(
             "\\b(?:pastor|preacher|church|bishop|elder|leader|someone) says\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern FIRST_PERSON_CONTEXT = Pattern.compile(
@@ -423,7 +426,7 @@ public class PerazimAiEngine {
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
             + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene)\\b|"
-            + "rogw|uchawi|mchawi|nimeroga|manabii|nabii|tiktok|youtube|gold dust|visible sign|false teacher|on tv|on television|preacher i saw|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
+            + "rogw|uchawi|mchawi|nimeroga|manabii|nabii|tiktok|youtube|gold dust|visible sign|false teacher|on tv|on television|preacher i saw|judas|keep sinning|unforgivable|place in heaven|salvaiton|salvtion|sin on purpose|aposttae|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
 
     public static AiResponse drugSafetyResponse() {
         return AiResponse.plainText(
@@ -741,7 +744,7 @@ public class PerazimAiEngine {
         if (isTranslationPolicyQuery(query)) return "translation-policy";
         if (isForgeryQuery(query)) return "forgery";
         if (isReincarnationQuery(query)) return "reincarnation";
-        if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query)) return "individual-destiny";
+        if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query) && !PERSEVERANCE_QUESTION.matcher(query).find()) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
         if (BIBLE_TOPIC_CUE.matcher(query).find()) return null;

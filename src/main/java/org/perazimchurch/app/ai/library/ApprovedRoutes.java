@@ -97,7 +97,7 @@ public final class ApprovedRoutes {
                 "1 Corinthians 14:1", "Acts 2:39"));
 
         r.add(new Route("apostasy-assurance",
-                "lose (?:my |our |their |his |her |your )?salvation|once saved|eternal security|apostas|apostate|fall(?:ing|s)? away"
+                "lose (?:my |our |their |his |her |your )?salvation|lose (?:our |my |their )?place in heaven|salvaiton|salvtion|once saved|eternal security|apostas|apostate|aposttae|aposttate|fall(?:ing|s)? away|unforgivable|sin on purpose|keep sinning|never saved|peter denied|judas"
                         + "|finally depart|depart from (?:christ|the faith)|backslid|assurance of salvation|can a (?:christian|believer) (?:lose|fall)"
                         + "|abandon (?:jesus|christ|god|him)|genuinely saved|unsaved|never saved|was i saved|am i (?:really )?saved|keep sinning"
                         + "|turn (?:away|back) from (?:christ|jesus|god)|reject (?:god|christ|jesus)|birthright",
@@ -485,6 +485,41 @@ public final class ApprovedRoutes {
                 + "office, and the Bishop's process is the right route. Please speak with the church office or your pastor about your interest in "
                 + "serving. Scripture shows that church leaders are chosen with care and prayer (Acts 6:3), so bring your desire to God in prayer too.",
                 "Acts 6:3", "1 Timothy 3:10"));
+
+        r.add(new Route("pope-head-of-church",
+                "pope|papal|papacy|vicar of christ",
+                "Scripture names Christ as the head of the Church (Ephesians 1:22; Colossians 1:18). We do not accept an earthly head over the whole Church. Roman Catholic teaching gives the Pope that role, and we test that claim by Scripture alone, not by tradition or office.",
+                "Ephesians 1:22", "Colossians 1:18"));
+
+        r.add(new Route("icons-scripture",
+                "icon|icons|orthodox teaching on icons",
+                "Scripture forbids making and worshipping images for worship: 'Thou shalt not make unto thee any graven image' (Exodus 20:4), which is the second commandment. God is spirit, and they that worship Him must worship Him in spirit and in truth (John 4:24). We do not use images in worship, and we test any teaching on icons by Scripture alone.",
+                "Exodus 20:4", "John 4:24"));
+
+        r.add(new Route("eastern-church-judge",
+                "eastern church|eastern orthodox|orthodox church|better than the protestant|better than the catholic",
+                "We do not rank churches or judge which is better before God. Only Christ, the head of the Church, judges (Colossians 1:18). The right question is whether a teaching agrees with Scripture, and the Bereans tested what they heard by the Scriptures (Acts 17:11). Please talk this through with a trusted church leader.",
+                "Colossians 1:18", "Acts 17:11"));
+
+        r.add(new Route("apocrypha-books",
+                "apocrypha|deuterocanon|catholic bible|more books|tobit|maccabees|sirach|judith|baruch",
+                "The Protestant Bible has 66 books: 39 in the Old Testament and 27 in the New. The books called the Apocrypha or deuterocanonical books, including Tobit, Judith, Wisdom, Sirach, Baruch and 1 and 2 Maccabees, are not part of the 66-book canon we hold. Scripture closes with a warning not to add to God's words (Revelation 22:18), and Deuteronomy 4:2 says the same. Those books are historically interesting, but we test the canon by Scripture itself.",
+                "Revelation 22:18", "Deuteronomy 4:2"));
+
+        r.add(new Route("greeting-only",
+                "^(?:hi|hello|hey|good morning|good afternoon|good evening|habari|hujambo)(?:[ ,!.]+(?:good morning|good afternoon|good evening|there|friend))?[ !.]*$",
+                "Good morning! Welcome. I can help with the Bible, prayer, church information and the faith questions you bring. What would you like to know? We can start with a short passage: 'This is the day which the LORD hath made; we will rejoice and be glad in it' (Psalms 118:24).",
+                "Psalms 118:24", "Psalms 118:24"));
+
+        r.add(new Route("campuses-unverified",
+                "campus|campuses",
+                "I do not have a verified list of Perazim campuses in this guide, so I cannot confirm them. The approved channels for this are the church office and the church's own published information in the app. Please contact the church office for the current campuses and service times.",
+                "Psalms 118:24", "Psalms 118:24"));
+
+        r.add(new Route("giving-options-app",
+                "giving options|ways to give|how to give|giving in the app|options in the app",
+                "Giving options are shown in the app's giving section, and the church publishes its giving channels. Gifts should go only through published channels, such as M-Pesa Paybill, and you can confirm the current details with the church office. Please never give money to a person who asks for it privately.",
+                "Psalms 118:24", "Psalms 118:24"));
 
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",
