@@ -17,6 +17,7 @@ public class CrisisPhrasesTest {
         assertTrue(hit("I don't see the point of lviing anymore."));
         assertTrue(hit("my friend just texted me that she wants to die tonight"));
         assertTrue(hit("Ni sawa kama nikijiumiza mwenyewe? Nataka tu kukomesha maumivu."));
+        assertTrue(hit("Ni bora nife tu, watoto wangu watakuwa bora bila mimi."));
     }
 
     @Test

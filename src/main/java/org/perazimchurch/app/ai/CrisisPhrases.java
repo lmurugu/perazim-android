@@ -37,6 +37,8 @@ public final class CrisisPhrases {
             // ai-eval checklist: "nimechoka na maisha" is a compassionate safety check, the others are urgent.
             // Variants added here only strengthen detection; no phrase was removed.
             "nina mawazo ya kujiua|nataka kujitoa uhai|nimefikiria kujiua|nina mpango wa kujiua|" +
+            // Added 2026-11-25 from the Kenya set (KE-092): "it is better that I die", "my children would be better without me". Levi to review this crisis-list addition.
+            "bora nife|watakuwa bora bila mimi|bora bila mimi|" +
             // Swahili: a person is hurting, threatening or abusing the speaker.
             "ananipiga|ananinyanyasa|ananitishia|ananiua)\\b", Pattern.CASE_INSENSITIVE);
 }
