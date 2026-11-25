@@ -27,7 +27,7 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
-          cache-dependency-path: build.gradle
+          cache-dependency-path: settings.gradle
       - name: Unit tests and debug build
         run: ./gradlew testDebugUnitTest assembleDebug --no-daemon
       - name: Upload debug APK
@@ -54,7 +54,7 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
-          cache-dependency-path: build.gradle
+          cache-dependency-path: settings.gradle
       - name: Render main tabs in dark and light mode
         run: ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon
       - name: Upload screenshots
