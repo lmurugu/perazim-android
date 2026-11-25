@@ -231,15 +231,27 @@ public final class ApprovedRoutes {
                 + "truth can be shown in a laboratory.",
                 "Hebrews 11:1", "John 20:31"));
 
+        r.add(new Route("demon-possession",
+                "(?:possess|possessed|possession|possessing).{0,40}demon|demon.{0,40}(?:possess|possession)|"
+                + "(?:christian|believer|saved).{0,40}demon|demonized|demon.possessed",
+                "We will not make a categorical declaration that a Christian can or cannot be demon-possessed. Scripture does not give "
+                + "us a single formula for every modern claim. What Scripture clearly says is that believers must resist the devil and "
+                + "stand firm in the faith, and that they can trust in Christ's power and in the protection of the One who keeps His "
+                + "sheep (James 4:7; 1 Peter 5:8-9).\n\n"
+                + "We do not diagnose anyone as demon-possessed. If you are worried about yourself or someone else, please talk with your "
+                + "pastor or a trusted church leader, and see a doctor if there are any health concerns.",
+                "James 4:7", "1 Peter 5:8-9"));
+
         r.add(new Route("prophets-today",
                 "prophets? (?:still|today|operating|exist)|are there (?:still )?prophets|prophecy today|prophesy today|"
                 + "still prophe|prophets in the church|gift of prophecy",
                 "We believe the gift of prophecy continues in the Church today. It is given by the Holy Spirit to strengthen, encourage "
                 + "and comfort the Church (1 Corinthians 14:3). Believers are not to despise prophecies, but to test everything and hold "
                 + "fast what is good (1 Thessalonians 5:21). In the gathered church, prophetic messages are weighed and judged (1 Corinthians 14:29).\n\n"
-                + "A prophecy can never overrule, add to or correct Scripture. Not everyone who calls himself a prophet is exercising the "
-                + "gift, and we do not name any contemporary person as a prophet without an authorised, evidence-based church decision. "
-                + "Not every Christian is called to prophesy.",
+                + "Having the gift is different from recognising a particular person as a prophet. A prophecy can never overrule, add to "
+                + "or correct Scripture. Not everyone who calls himself a prophet is exercising the gift, and we do not name any "
+                + "contemporary person as a prophet without an authorised, evidence-based church decision. Not every Christian is "
+                + "called to prophesy.",
                 "1 Corinthians 14:3", "1 Thessalonians 5:21"));
 
         r.add(new Route("healing-and-faith",
