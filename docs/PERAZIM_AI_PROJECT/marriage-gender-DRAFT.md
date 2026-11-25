@@ -299,7 +299,7 @@ Before giving a conclusion on any personal question, the AI establishes:
 
 ## 11. Test set
 
-Test set: 40 situations, each with a husband version and a wife version (80 cases). Half the situations (even numbers) form the blind half. Full case list in the JSONL files. Each pair shares a `pair_id` so the same standard can be checked across both genders.
+Test set: 46 situations, each with a husband version and a wife version (92 cases). Odd-numbered situations are the open half (46 cases); even-numbered situations are the blind half (46 cases). The set covers the approved headship position, the approved khat and family-planning positions, the English-first language policy, and the explicit slang tests for *kugongewa*, *kugongeana* and *mpango wa kando*. Full case list in the JSONL files. Each pair shares a `pair_id` so the same standard can be checked across both genders.
 
 Coverage: submission demands; men opting out; feminism and equality; accountability; infidelity (including Swahili and Sheng phrasing); betrayal; abuse in both directions; children and parents; singles; infertility; in-laws; polygamous households; illness; dowry; provision; manipulative requests; suicidal despair in marriage.
 
