@@ -115,10 +115,6 @@ public final class PreModel {
     // An opening quote is not inside a word (so "I've" and "can't" do not open one), and a closing quote is not followed by a letter.
     private static final Pattern QUOTED_PHRASE = Pattern.compile(
             "(?<!\\p{L})[\"'\u2018\u201c]([^\"'\u2019\u201d]{8,160}?)[\"'\u2019\u201d](?!\\p{L})");
-    private static final Pattern BIBLE_SAYS = Pattern.compile(
-            "\\bbible (?:says|say|teaches) (?:that )?(.{8,160}?)\\s*(?:right|correct|true|isn't it|is that right)?\\s*[?.!]*\\s*$",
-            Pattern.CASE_INSENSITIVE);
-
     /** Topics with a verse the King James Version gives for them, verbatim from the bundled text. */
     static final Pattern[] TOPIC_PATTERNS = {
         Pattern.compile("love of money|money is the (?:root|source)|root of all evil", Pattern.CASE_INSENSITIVE),
@@ -130,18 +126,18 @@ public final class PreModel {
         {"Exodus 9:12", "Romans 9:18"},
     };
 
-    /** The phrase a question asks about: a quoted phrase, or the words after "the Bible says". Null when none. */
+    /** The phrase a question asks about: a quoted phrase. Null when there is none. */
     static String searchedPhrase(String question) {
         if (question == null) return null;
         Matcher quoted = QUOTED_PHRASE.matcher(question);
         if (quoted.find()) return quoted.group(1).trim();
-        Matcher says = BIBLE_SAYS.matcher(question);
-        if (says.find()) return says.group(1).trim();
+        // Only a quoted wording is searched. "The Bible says ..." without quotation marks is too often a question
+        // about a topic, not a phrase, so it is left to the topic route and the zones.
         return null;
     }
 
     /**
-     * Verbatim KJV for a phrase the user quotes or attributes to the Bible, and for the few topics with a fixed verse.
+     * Verbatim KJV for a phrase the user quotes, and for the few topics with a fixed verse.
      * A phrase that is not in the KJV is said so plainly, never quoted from memory. Returns null when neither applies.
      */
     static Decision verseSearchDecision(KjvVerseText verses, String question) {

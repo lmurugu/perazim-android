@@ -43,12 +43,11 @@ public class PreModelVerseSearchTest {
         assertTrue(d.answer.contains("I can't find that wording in the King James Version"));
     }
 
-    /** ST-148: an attributed saying not in the KJV is also refused without a quote. */
+    /** ST-148: an unquoted "the Bible says" saying is left to the topic route and the zones, not searched. */
     @Test
-    public void attributedSayingNotInKjvIsRefused() throws Exception {
-        PreModel.Decision d = PreModel.verseSearchDecision(kjv(),
-                "lol the bible says cleanliness is next to godliness right");
-        assertEquals("routed:verse-phrase-not-found", d.status);
+    public void unquotedBibleSayingIsNotSearched() throws Exception {
+        assertNull(PreModel.verseSearchDecision(kjv(),
+                "lol the bible says cleanliness is next to godliness right"));
     }
 
     /** A wording that is in the KJV is quoted with its reference. */
