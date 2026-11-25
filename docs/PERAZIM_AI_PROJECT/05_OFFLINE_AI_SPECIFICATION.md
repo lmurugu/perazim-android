@@ -1,11 +1,11 @@
-# PERAZIM MISSIONS CHURCH INTERNATIONAL
+# PERAZIM MISSION CHURCH (PMCI)
 # AI PROJECT
 
 ## Document 05: Offline AI Specification
 
 **Document number:** 05  
 **Document status:** Technical and functional specification  
-**Project:** Perazim Missions Church International AI Assistant  
+**Project:** Perazim Mission Church (PMCI) AI Assistant  
 **Primary model:** Existing Qwen2.5 0.5B Instruct GGUF  
 **Inference runtime:** Existing packaged ARM64 llama.cpp implementation  
 **Local storage:** Android Room / SQLite  

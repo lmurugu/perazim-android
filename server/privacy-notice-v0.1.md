@@ -1,18 +1,18 @@
 <!-- Faithful text rendition of the supplied working draft. Draft status and placeholders are preserved. -->
 
 
-PERAZIM MISSIONS CHURCH INTERNATIONAL
+PERAZIM MISSION CHURCH (PMCI)
 # Perazim App — Privacy Notice for Users
 
 KENYA  |  VERSION 0.1  |  DRAFT FOR REVIEW
 
 ## Before you register
 
-This notice explains how Perazim Missions Church International (PMCI) handles information when you create or use a Perazim account. Read it together with the PMCI Data Protection and Privacy Policy at [policy URL / in-app location].
+This notice explains how Perazim Mission Church (PMCI) handles information when you create or use a Perazim account. Read it together with the PMCI Data Protection and Privacy Policy at [policy URL / in-app location].
 
 ## Who operates the app
 
-Perazim is operated by [exact registered legal name of PMCI]. Privacy contact: [email] | [telephone] | [postal/physical address].
+Perazim is operated by Perazim Mission Church. Privacy contact: [email] | [telephone] | [postal/physical address].
 
 ## Information used
 

@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines how Perazim Missions Church International will manage application registration, church membership verification, administrative authority, and permission assignments within the AI system.
+This document defines how Perazim Mission Church (PMCI) will manage application registration, church membership verification, administrative authority, and permission assignments within the AI system.
 
 The objective is to ensure that the AI and related application services recognise only properly verified membership, enforce permissions consistently, and preserve the distinction between technical administration and ecclesiastical authority.
 
@@ -28,7 +28,7 @@ The system must maintain three independent concepts.
 
 Registration means that a person has created an application account.
 
-A registered account does not automatically establish that the person is a member of Perazim Missions Church International.
+A registered account does not automatically establish that the person is a member of Perazim Mission Church (PMCI).
 
 Registration provides an application identity, not church membership verification.
 

@@ -787,7 +787,7 @@ public class PerazimAiEngine {
     @NonNull
     public static AiResponse outOfScopeResponse() {
         return AiResponse.plainText(
-                "I am designed specifically to assist with matters relating to Perazim Missions Church International, Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with a trusted church leader or an appropriate person.",
+                "I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI), Christian faith and religious matters, so I am not authorised to advise on this matter. Please speak with a trusted church leader or an appropriate person.",
                 Arrays.asList("📖 Read Scripture", "🏛️ Church information", "🙏 Prayer and fellowship"));
     }
 

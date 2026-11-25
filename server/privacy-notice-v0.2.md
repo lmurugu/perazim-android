@@ -1,6 +1,6 @@
 <!-- Draft factual rendition for institutional and professional review. Not published. -->
 
-PERAZIM MISSIONS CHURCH INTERNATIONAL
+PERAZIM MISSION CHURCH (PMCI)
 # Perazim App — Privacy Notice for Users
 
 KENYA | VERSION 0.2 | DRAFT FOR REVIEW — NOT PUBLISHED
@@ -11,7 +11,7 @@ This draft describes information currently handled by the Perazim app. Registrat
 
 ## Who operates the app
 
-Perazim is operated by [exact registered legal name of PMCI]. Privacy contact: [email] | [telephone] | [postal/physical address]. These details must be completed before publication.
+Perazim is operated by Perazim Mission Church. Privacy contact: [email] | [telephone] | [postal/physical address]. These details must be completed before publication.
 
 ## Information the app handles
 

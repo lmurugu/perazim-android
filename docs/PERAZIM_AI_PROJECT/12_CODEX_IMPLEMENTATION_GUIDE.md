@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines how Codex must inspect, plan, implement, test, document, and report changes for the Perazim Missions Church International AI project.
+This document defines how Codex must inspect, plan, implement, test, document, and report changes for the Perazim Mission Church (PMCI) AI project.
 
 Codex is the software implementation agent. It is responsible for translating the approved project specifications into working software within the existing repository.
 

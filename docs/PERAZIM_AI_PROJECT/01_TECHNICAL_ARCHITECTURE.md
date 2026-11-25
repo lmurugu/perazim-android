@@ -1,11 +1,11 @@
-# PERAZIM MISSIONS CHURCH INTERNATIONAL
+# PERAZIM MISSION CHURCH (PMCI)
 # AI PROJECT
 
 ## Document 01: Technical Architecture and System Integration
 
 **Document number:** 01  
 **Document status:** Foundational technical specification  
-**Project:** Perazim Missions Church International AI Assistant  
+**Project:** Perazim Mission Church (PMCI) AI Assistant  
 **Target platform:** Existing native Android application  
 **Implementation agent:** OpenAI Codex  
 **Specification authority:** Project owner  

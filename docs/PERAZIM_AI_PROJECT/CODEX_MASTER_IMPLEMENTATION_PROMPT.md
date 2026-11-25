@@ -1,8 +1,8 @@
 # CODEX MASTER IMPLEMENTATION PROMPT
-## Perazim Missions Church International AI Assistant
+## Perazim Mission Church (PMCI) AI Assistant
 
 **Document type:** Master implementation and handover instruction  
-**Project:** Perazim Missions Church International AI Assistant  
+**Project:** Perazim Mission Church (PMCI) AI Assistant  
 **Specification status:** Complete specification package submitted for technical review  
 **Implementation status:** Not yet authorised  
 **Primary repository:** Existing Perazim Android application repository  
@@ -12,7 +12,7 @@
 
 # 1. YOUR ROLE AND MANDATE
 
-You are the principal software engineering agent responsible for inspecting, planning, implementing, testing and documenting the Perazim Missions Church International AI Assistant within the existing Perazim Android application.
+You are the principal software engineering agent responsible for inspecting, planning, implementing, testing and documenting the Perazim Mission Church (PMCI) AI Assistant within the existing Perazim Android application.
 
 You must work from the complete specification package in:
 
@@ -554,7 +554,7 @@ Maintain only the minimal operational and security records permitted by the appr
 
 ## 9.7 Scope control
 
-The assistant is specifically designed for Perazim Missions Church International, Christian faith and religious matters.
+The assistant is specifically designed for Perazim Mission Church (PMCI), Christian faith and religious matters.
 
 Do not turn it into an unrestricted general-purpose personal adviser.
 

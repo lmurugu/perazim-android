@@ -13,8 +13,8 @@ Unit tests for org.perazimchurch.app.ai.* pass after these changes.
 ## Conflicts found, not resolved silently
 | # | Conflict | Where | Status |
 |---|---|---|---|
-| 1 | Institutional name: "Perazim Mission Church" in app UI, ChurchConfig, SECURITY.md, ProfileUiBinder; "Perazim Missions Church International" (PMCI) in the profile header, privacy notices v0.1/v0.2, AuthDialog, and the AI system prompt and scope line | app code and docs | ESCALATE to Levi. Not changed. |
-| 2 | Motto: "The Place of Great Breakthrough" (2 Samuel 5:20) in OnboardingDialog and ProfileUiBinder; "A place where everybody is somebody, and no body is a nobody." in ProfileUiBinder (about screen). Sheet key church_motto | app code | ESCALATE to Levi. Not changed. |
+| 1 | RESOLVED by Levi (1A, 2026-11-25): full legal name "Perazim Mission Church", short form "PMCI". Applied in the AI prompt and scope line, privacy notices, legal drafts, and the spec documents. Dated identity records are kept as history. Was: Institutional name: "Perazim Mission Church" in app UI, ChurchConfig, SECURITY.md, ProfileUiBinder; "Perazim Missions Church International" (PMCI) in the profile header, privacy notices v0.1/v0.2, AuthDialog, and the AI system prompt and scope line | app code and docs | Done. |
+| 2 | RESOLVED by Levi (2A, 2026-11-25): "The Place of Great Breakthrough" everywhere. Onboarding, About and home greeting now show this motto; the "everybody is somebody" slogan is removed from live screens. Was: Motto: "The Place of Great Breakthrough" (2 Samuel 5:20) in OnboardingDialog and ProfileUiBinder; "A place where everybody is somebody, and no body is a nobody." in ProfileUiBinder (about screen). Sheet key church_motto | app code | Done. |
 | 3 | Evaluation snapshot (AI_EVALUATION_STATUS_2026-11-25) reports strict 492/886 and decline-pass 521/886 at 3abe4b8. The latest local round 8 on fe95e57 scores strict 509 and decline-pass 537 with stricter expectations. | evaluation records | Report must be regenerated from the tested commit before any gate claim. |
 | 4 | Status.md said the test set had 532 cases; the set is 886 (including HS-CESS-001). | guide/Status.md | Fixed in this pass. |
 | 5 | Early Christian writings (Ante-Nicene, NPNF) were removed by SOURCE_RESTRICTION, then allowed as Tier 2 by the later policy. Adding them to active answering material needs Levi's approval (AUTONOMOUS §4). | library/sources | Not added. Nicene-Constantinopolitan Creed stays as the approved creed. ESCALATE before adding any Father. |
@@ -27,6 +27,9 @@ Unit tests for org.perazimchurch.app.ai.* pass after these changes.
 | 12 | Engine trigger "swahili bible" and chip "Read Swahili Bible" refer to the Bible reader's Swahili text (Bible reader keeps its translations). Not an AI answer language. | PerazimAiEngine | No change needed; noted. |
 | 13 | Divorce, tithing, alcohol, women's ministry, healing, evolution and age of the earth, sexuality, inerrancy wording, final punishment remain UNDECIDED. Routes must say the church has not settled the point. | doctrine register | Checked by DoctrineLibraryTest. Alcohol route still to be checked case by case. |
 | 14 | Canon: 66-book canon is DRAFT_PENDING_LEVI. Canon as an entry was removed; it must not be stated as approved. | doctrine register | Consistent. |
+
+## Decision record
+- 2026-11-25, Levi: name option 1A ("Perazim Mission Church" full legal name, "PMCI" short form); motto option 2A ("The Place of Great Breakthrough" everywhere). Applied on claude/ai-guide-final-plus-83.
 
 ## Still to do
 - Gated identify-and-refute routes for historical_apologetics and reasoning_critical_analysis (OFF by default), built only from approved wording.

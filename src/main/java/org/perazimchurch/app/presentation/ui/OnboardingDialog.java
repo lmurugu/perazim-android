@@ -135,7 +135,7 @@ public class OnboardingDialog extends Dialog {
         headerBox.addView(tvScriptureRef);
 
         TextView tvSlogan = new TextView(getContext());
-        tvSlogan.setText("“A place where everybody is somebody, and nobody is a nobody.”");
+        tvSlogan.setText("“The Place of Great Breakthrough”");
         tvSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
         tvSlogan.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
         tvSlogan.setGravity(Gravity.CENTER);

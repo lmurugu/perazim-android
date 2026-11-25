@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines the Python-based supporting toolkit for the Perazim Missions Church International AI project.
+This document defines the Python-based supporting toolkit for the Perazim Mission Church (PMCI) AI project.
 
 The toolkit will assist with the preparation, validation, processing, evaluation and packaging of approved AI knowledge.
 

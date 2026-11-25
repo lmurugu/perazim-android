@@ -1,11 +1,11 @@
-# PERAZIM MISSIONS CHURCH INTERNATIONAL
+# PERAZIM MISSION CHURCH (PMCI)
 # AI PROJECT
 
 ## Document 04: Knowledge Architecture and Management System
 
 **Document number:** 04  
 **Document status:** Foundational data and knowledge management specification  
-**Project:** Perazim Missions Church International AI Assistant  
+**Project:** Perazim Mission Church (PMCI) AI Assistant  
 **Applies to:** Offline Qwen, Online Gemini and the knowledge administration system  
 **Pilot technical administrator:** Project owner  
 **Related documents:**
@@ -90,7 +90,7 @@ These collections provide a logical classification. Codex may implement them thr
 
 ## 3.1 Collection A: Church Identity and Institutional Information
 
-This collection contains information about Perazim Missions Church International.
+This collection contains information about Perazim Mission Church (PMCI).
 
 Examples include:
 

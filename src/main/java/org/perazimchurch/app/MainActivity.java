@@ -916,7 +916,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         content.addView(tvChurchHeader);
 
         TextView tvSubGreeting = new TextView(this);
-        tvSubGreeting.setText("“The Place of Great Breakthrough”\n“A place where everybody is somebody, and no body is a nobody”\nPerazim Mission Church · Embu Headquarters");
+        tvSubGreeting.setText("“The Place of Great Breakthrough”\nPerazim Mission Church · Embu Headquarters");
         tvSubGreeting.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvSubGreeting.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         tvSubGreeting.setTextColor(COLOR_PRIMARY_PURPLE);
@@ -1644,7 +1644,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
                         + "“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.”\n\n"
                         + "— *2 Samuel 5:20*\n\n"
                         + "PERAZIM MISSION CHURCH — “The Place of Great Breakthrough”\n"
-                        + "“A place where everybody is somebody, and no body is a nobody”\n\n"
+                        + "“The Place of Great Breakthrough”\n\n"
                         + "Presiding Bishop Dr. David Mutweri · Embu, Kenya\n"
                         + "📞 Phone: " + ChurchConfig.PASTORAL_PHONE_DISPLAY + "\n"
                         + "✉️ Church: info@perazimchurch.org\n"
@@ -2232,7 +2232,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         identityCard.addView(tvMotto);
 
         TextView tvSlogan = new TextView(this);
-        tvSlogan.setText("Slogan: “A place where everybody is somebody, and no body is a nobody”");
+        tvSlogan.setText("Motto: “The Place of Great Breakthrough”");
         tvSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         tvSlogan.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
         tvSlogan.setTextColor(COLOR_TEXT_DARK());
@@ -2667,7 +2667,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         churchCard.addView(tvChurchMotto);
 
         TextView tvChurchSlogan = new TextView(this);
-        tvChurchSlogan.setText("“A place where everybody is somebody, and no body is a nobody”");
+        tvChurchSlogan.setText("“The Place of Great Breakthrough”");
         tvChurchSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         tvChurchSlogan.setTextColor(COLOR_TEXT_MUTED());
         tvChurchSlogan.setPadding(0, 0, 0, dp(8));
@@ -2851,7 +2851,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
         try {
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             String shareBody = "✨ *Join Perazim Mission Church — The Place of Great Breakthrough!* ✨\n\n"
-                    + "“A place where everybody is somebody, and no body is a nobody”\n\n"
+                    + "“The Place of Great Breakthrough”\n\n"
                     + "Fellowship with us:\n"
                     + "🏛️ Headquarters: Perazim Mission Church, Embu, Kenya\n"
                     + "👤 Presiding Bishop: Bishop Dr. David Mutweri\n"

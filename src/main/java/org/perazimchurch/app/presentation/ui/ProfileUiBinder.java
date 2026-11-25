@@ -856,7 +856,7 @@ public class ProfileUiBinder {
         body.setPadding(dp(20), dp(16), dp(20), dp(20));
 
         TextView tvMotto = new TextView(context);
-        tvMotto.setText("“A place where everybody is somebody, and no body is a nobody.”");
+        tvMotto.setText("“The Place of Great Breakthrough”");
         tvMotto.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         tvMotto.setTypeface(Typeface.SERIF, Typeface.ITALIC);
         tvMotto.setTextColor(PerazimTheme.COLOR_ORANGE_SOFT);

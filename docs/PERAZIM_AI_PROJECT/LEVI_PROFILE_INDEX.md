@@ -1,7 +1,7 @@
 # Levi's Profile and Decision Authority
 
 **Owner:** Rev. Levi  
-**Project:** Perazim Missions Church International AI assistant  
+**Project:** Perazim Mission Church (PMCI) AI assistant  
 **Created:** 25 November 2026  
 **Status:** Internal project reference. Not itself a public doctrinal statement or app runtime content.
 

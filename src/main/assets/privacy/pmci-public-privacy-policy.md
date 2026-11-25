@@ -1,18 +1,18 @@
 <!-- Faithful text rendition of the supplied working draft. Draft status and placeholders are preserved. -->
 
 
-PERAZIM MISSIONS CHURCH INTERNATIONAL
+PERAZIM MISSION CHURCH (PMCI)
 # PMCI Data Protection and Privacy Policy
 
 KENYA  |  VERSION 0.1  |  DRAFT FOR REVIEW
 
 ## 1. Status and application
 
-DRAFT FOR REVIEW. This policy describes how Perazim Missions Church International (PMCI) proposes to collect, use, store, disclose, retain and protect personal data in its church administration and digital services, including the Perazim application. It applies to members, visitors, applicants, parents/guardians, volunteers, employees, ministry workers and other people whose information PMCI processes. This policy becomes effective only after formal approval and publication.
+DRAFT FOR REVIEW. This policy describes how Perazim Mission Church (PMCI) proposes to collect, use, store, disclose, retain and protect personal data in its church administration and digital services, including the Perazim application. It applies to members, visitors, applicants, parents/guardians, volunteers, employees, ministry workers and other people whose information PMCI processes. This policy becomes effective only after formal approval and publication.
 
 ## 2. Who is responsible
 
-Data controller: [Insert exact registered legal name of PMCI]. Address: [insert]. Privacy contact: [insert dedicated email and telephone]. Responsible officer: [insert title/name]. ODPC registration: [insert registration number or status]. PMCI must verify its registration obligations and complete any required registration before operational processing.
+Data controller: Perazim Mission Church. Address: [insert]. Privacy contact: [insert dedicated email and telephone]. Responsible officer: [insert title/name]. ODPC registration: [insert registration number or status]. PMCI must verify its registration obligations and complete any required registration before operational processing.
 
 ## 3. Personal data PMCI may process
 

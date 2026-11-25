@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines the target API responsibilities, database structures, entity relationships, data contracts, and migration requirements for the Perazim Missions Church International AI system.
+This document defines the target API responsibilities, database structures, entity relationships, data contracts, and migration requirements for the Perazim Mission Church (PMCI) AI system.
 
 It covers:
 
