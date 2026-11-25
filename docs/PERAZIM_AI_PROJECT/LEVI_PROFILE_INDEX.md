@@ -20,8 +20,11 @@ Before doing work that changes theology, doctrine, AI answers, source retrieval,
 3. [AUTONOMOUS_EXECUTION_AND_ESCALATION.md](AUTONOMOUS_EXECUTION_AND_ESCALATION.md) — what agents may do independently and when to escalate.
 4. [ISRAEL_CHURCH_AND_END_TIMES_POSITION.md](ISRAEL_CHURCH_AND_END_TIMES_POSITION.md) — Israel/Church relationship and developing eschatology.
 5. [LEVI_REVIEW_DECISIONS_2026-11-25_APOLOGETICS_AND_IDENTIFY_REFUTE.md](LEVI_REVIEW_DECISIONS_2026-11-25_APOLOGETICS_AND_IDENTIFY_REFUTE.md) — batch review of apologetics outlines and identify-and-refute template.
+6. [LEVI_REVIEW_DECISIONS_2026-11-25_ROUND11_SCRIPTURE_OUTLINES.md](LEVI_REVIEW_DECISIONS_2026-11-25_ROUND11_SCRIPTURE_OUTLINES.md) — decisions on deliverance, prophecy, healing and reasoning outlines.
 6. [AI_EVALUATION_STATUS_2026-11-25_ROUND10.md](AI_EVALUATION_STATUS_2026-11-25_ROUND10.md) — latest reported 886-case evaluation snapshot.
-7. The current doctrine register, approved doctrine entries, relevant source register and actual source code being changed.
+8. The current doctrine register, approved doctrine entries, relevant source register and actual source code being changed.
+
+8. [AI_EVALUATION_STATUS_2026-11-25_ROUND11_INTERIM.md](AI_EVALUATION_STATUS_2026-11-25_ROUND11_INTERIM.md) — round 11 interim score; full run metadata and category table still requested.
 
 ## Authority and precedence
 
