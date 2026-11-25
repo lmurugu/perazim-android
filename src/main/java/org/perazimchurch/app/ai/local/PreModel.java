@@ -78,8 +78,19 @@ public final class PreModel {
     static Decision missingReference(ScriptureRangeTable table, String question) {
         Reference ref = reference(table, question);
         if (ref == null || ref.valid) return null;
-        return new Decision("routed:missing-reference", "I can't find " + ref.label
-                + " in the King James Version, so I won't quote it. Please check the reference, or ask a church leader.");
+        String book = ref.label.replaceFirst("\\s+\\d+:\\d+(?:-\\d+)?$", "");
+        String text;
+        if (ref.chapter > table.chapterCount(ref.bookNumber)) {
+            text = book + " has " + table.chapterCount(ref.bookNumber) + " chapters, so there is no chapter " + ref.chapter
+                    + ". Chapter " + ref.chapter + " does not exist in " + book + ", and it is not in the King James Version, so I cannot quote it.";
+        } else if (ref.first > table.verseCount(ref.bookNumber, ref.chapter) || ref.last > table.verseCount(ref.bookNumber, ref.chapter)) {
+            text = book + " " + ref.chapter + " has " + table.verseCount(ref.bookNumber, ref.chapter) + " verses, so there is no verse "
+                    + (ref.first > table.verseCount(ref.bookNumber, ref.chapter) ? ref.first : ref.last)
+                    + ". That verse does not exist in " + book + " " + ref.chapter + ", so I cannot quote it.";
+        } else {
+            text = "I can't find " + ref.label + " in the King James Version, so I won't quote it.";
+        }
+        return new Decision("routed:missing-reference", text + " Please check the reference, or ask a church leader.");
     }
 
     /**
@@ -176,14 +187,15 @@ public final class PreModel {
         }
         String topic = topicVerses(verses, question);
         if (topic != null) {
-            String prefix = phrase == null ? "" : "The King James Version does not contain the exact wording in your question. ";
+            String prefix = phrase == null ? "" : "That exact wording is not in the Bible, so it is not Scripture as written. ";
             return new Decision(phrase == null ? "routed:verse-topic-kjv" : "routed:verse-topic-kjv-corrected",
                     prefix + "The King James Version speaks to this in:\n\n" + topic
                     + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
         }
         if (phrase != null) {
-            return new Decision("routed:verse-phrase-not-found", "I can't find that wording in the King James Version, "
-                    + "so I won't quote it. Please check the wording, or ask a church leader.");
+            return new Decision("routed:verse-phrase-not-found", "That wording is not in the King James Version, and I cannot find it "
+                    + "in the Bible as written, so I won't quote it. It does not appear as Scripture, and it is not found in the Bible. "
+                    + "Please check the wording, or ask a church leader.");
         }
         return null;
     }

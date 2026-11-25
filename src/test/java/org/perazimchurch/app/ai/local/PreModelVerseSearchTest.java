@@ -21,7 +21,7 @@ public class PreModelVerseSearchTest {
         PreModel.Decision d = PreModel.verseSearchDecision(kjv(),
                 "Paul said 'money is the source of all evil' right?");
         assertEquals("routed:verse-topic-kjv-corrected", d.status);
-        assertTrue(d.answer.contains("does not contain the exact wording"));
+        assertTrue(d.answer.contains("is not in the Bible, so it is not Scripture as written"));
         assertTrue(d.answer.contains("1 Timothy 6:10: “For the love of money is the root of all evil"));
     }
 
@@ -40,7 +40,7 @@ public class PreModelVerseSearchTest {
         PreModel.Decision d = PreModel.verseSearchDecision(kjv(),
                 "Read me the verse that says 'God helps the one who waits' in Genesis");
         assertEquals("routed:verse-phrase-not-found", d.status);
-        assertTrue(d.answer.contains("I can't find that wording in the King James Version"));
+        assertTrue(d.answer.contains("That wording is not in the King James Version"));
     }
 
     /** ST-148: an unquoted "the Bible says" saying is left to the topic route and the zones, not searched. */

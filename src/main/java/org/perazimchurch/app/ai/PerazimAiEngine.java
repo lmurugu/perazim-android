@@ -336,6 +336,37 @@ public class PerazimAiEngine {
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
+    /** Requests to set the translation rules aside, or to use translations outside the guide's list. */
+    private static final Pattern TRANSLATION_POLICY_PATTERN = Pattern.compile(
+            "ignore (?:your|the) (?:rules|guidelines|instructions)|" +
+            "\\b(?:ESV|NIV|NKJV)\\b.{0,60}\\b(?:allowed|allow|quote|in the app)\\b|" +
+            "\\b(?:allowed|allow)\\b.{0,60}\\b(?:ESV|NIV|NKJV)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isTranslationPolicyQuery(@Nullable String query) {
+        return query != null && TRANSLATION_POLICY_PATTERN.matcher(query).find();
+    }
+
+    public static AiResponse translationPolicyResponse() {
+        return AiResponse.plainText(
+                "The guide can quote only the King James Version (KJV) and the NASB. It cannot quote other translations, and I cannot change this rule, even if asked. Please speak with a trusted church leader if you have questions about translations.",
+                Arrays.asList("📖 Open the Bible", "🙏 Open prayer support"));
+    }
+
+    /** Requests to forge a letter, approval or membership in a leader's name. */
+    private static final Pattern FORGERY_PATTERN = Pattern.compile(
+            "\\b(?:fake|forged?|forging|false) (?:letter|message|note|certificate|approval|membership)\\b|" +
+            "letter from the (?:bishop|pastor|elder|church)|in the bishop'?s name|approving my membership", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isForgeryQuery(@Nullable String query) {
+        return query != null && FORGERY_PATTERN.matcher(query).find();
+    }
+
+    public static AiResponse forgeryResponse() {
+        return AiResponse.plainText(
+                "I cannot write a letter in the Bishop's name, and I am not able to approve membership or sign for anyone. Please contact the church office, who can confirm membership through the proper channel. This guide cannot produce that document.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
     }
@@ -640,6 +671,8 @@ public class PerazimAiEngine {
         if (isSafeguardingDisclosure(query)) return "safeguarding";
         if (isHealthStopQuery(query)) return "health-stop";
         if (isManipulationQuery(query)) return "manipulation";
+        if (isTranslationPolicyQuery(query)) return "translation-policy";
+        if (isForgeryQuery(query)) return "forgery";
         if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query)) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
@@ -657,6 +690,8 @@ public class PerazimAiEngine {
             case "safeguarding": return safeguardingResponse();
             case "health-stop": return healthStopResponse();
             case "manipulation": return manipulationResponse();
+            case "translation-policy": return translationPolicyResponse();
+            case "forgery": return forgeryResponse();
             case "individual-destiny": return AiResponse.plainText(org.perazimchurch.app.ai.library.NoGoZones.DESTINY_DECLINE, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
             case "sensitive": return sensitivePastoralResponse();
             case "human-decision": return humanDecisionResponse();

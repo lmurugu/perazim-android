@@ -34,7 +34,7 @@ public class PreModelTest {
         PreModel.Decision d = PreModel.missingReference(table, "What does Ezekiel 50:4 say?");
         assertNotNull(d);
         assertEquals("routed:missing-reference", d.status);
-        assertTrue(d.answer.contains("can't find Ezekiel 50:4"));
+        assertTrue(d.answer.contains("there is no chapter 50"));
         assertTrue(d.answer.contains("King James Version"));
     }
 
