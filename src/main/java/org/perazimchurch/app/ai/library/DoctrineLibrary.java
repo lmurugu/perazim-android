@@ -112,8 +112,13 @@ public final class DoctrineLibrary {
                     verseLines.add(verse.getString("ref") + " (King James Version): “" + verse.getString("text") + "”");
                 }
             }
+            // The approved view, then any approved sentence that belongs with it (for example the gifts-continue
+            // sentence, Levi 2026-11-25). Spirit baptism stays first.
+            String view = e.getString("perazimView");
+            String extra = e.optString("giftsContinue", "");
+            if (!extra.isEmpty()) view = view + " " + extra;
             topics.add(new Topic(id, e.getString("topic"), "APPROVED_LEVI", pattern(id),
-                    e.getString("perazimView"), others, verseLines, e.optString("noVerdict", "")));
+                    view, others, verseLines, e.optString("noVerdict", "")));
         }
         JSONArray positions = new JSONObject(positionsJson).getJSONArray("topics");
         for (int i = 0; i < positions.length(); i++) {

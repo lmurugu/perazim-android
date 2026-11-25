@@ -36,6 +36,11 @@ public final class NoGoZones {
             "I'm sorry, I can't answer this one well yet, so I won't guess. Please talk it through with a trusted "
             + "church leader or your pastor, who can walk with you through it.";
 
+    /** Other faiths and groups: no general description. Ask which specific teaching is meant (Levi, 2026-11-25). */
+    static final String OTHER_GROUP_DECLINE =
+            "I can examine a specific teaching of a church or group against Scripture. Which teaching do you have in mind? "
+            + "Please talk it through with a trusted church leader or your pastor, who can help you test it by the Bible.";
+
     /** No verdict on any individual: only God knows hearts and final destiny. Warm, with the way of faith for the asker. */
     /** True when the question asks for a verdict on an individual's eternal state. */
     public static boolean matchesDestinyZone(@Nullable String query) {
@@ -69,10 +74,6 @@ public final class NoGoZones {
                     + "|grace.*obey|obey god|chosen (those|who|ones)|already chosen|predestin|too late|reject god"
                     + "|birthright|denied jesus|genuinely saved|saved christian|work for my salvation|work out your salvation",
                     DECLINE),
-            new Zone("israel-end-times",
-                    "israel|isreal|millenni|thousand years|antichrist|anti-christ|rapture|tribulation|second coming|end times"
-                    + "|reign on earth|romans 11|replac(e|ed|ing) (the )?(church|israel)",
-                    DECLINE),
             new Zone("spirit-gifts-miracles",
                     "holy spirit|holy spiirt|spirit (in|baptism|baptised|baptized|told)|tongues|spiritual gift"
                     + "|prophe|deliverance|demon|dream|holy water|miracle|healing|healed|paralys|tiktok|youtube preacher"
@@ -84,7 +85,7 @@ public final class NoGoZones {
                     + "|come back as|ancestor|shrine|kiapo|traditional (rite|dance|oath)|islam|muslim|qur|hindu|buddh|jain"
                     + "|soul sleep|soul|denomination|church of christ|cult|archangel|michael|pluralism|same thing"
                     + "|all religions|going to hell|is she going|is he going|hell right now",
-                    DECLINE),
+                    OTHER_GROUP_DECLINE),
             new Zone("history-authorship-research",
                     "resurrection|historical|research|academic|papers|earliest|early (church|christian)|prove|proof"
                     + "|who wrote|did paul write|write hebrews|authorship|canon|nicaea|trinity before|before the council|eraly|was god"

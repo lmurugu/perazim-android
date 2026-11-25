@@ -17,12 +17,16 @@ import java.util.regex.Pattern;
  * removed. The biblical answer is given from at least two anchor passages, quoted word for word from the bundled KJV.
  * Nothing here judges an individual's eternal destiny.
  *
- * GATE: {@link #ENABLED} stays false until Levi approves the template (ai-eval/drafts/identify-refute-template-DRAFT.md).
- * While it is false, the other-faiths no-go zone keeps declining, and this class is only used by tests.
+ * GATE: {@link #ENABLED} is on since Levi approved the template with revisions (2026-11-25). The heading is "What this
+ * group teaches"; the group's own material is evidence of its position only; the teaching is refuted, not the people.
  */
 public final class IdentifyRefute {
 
-    public static final boolean ENABLED = false;
+    /**
+     * ON (Levi, 2026-11-25): the template is approved with revisions. Each topic below is answered only if its
+     * approved entry, anchors and tests pass; the other-faiths zone declines every other group.
+     */
+    public static final boolean ENABLED = true;
 
     static final String CLOSING = "We do not judge any person's eternal destiny. Test every teaching by Scripture, as the Bereans did, "
             + "and talk with a trusted church leader or your pastor.";
@@ -30,7 +34,7 @@ public final class IdentifyRefute {
     /** Sentences that describe the guide or its method rather than the group's teaching. */
     private static final Pattern META = Pattern.compile(
             "\\b(guide|perazim|this guide|protestant reading|reformed readers?|checked here|both arguments|does not decide|"
-                    + "leaves perazim|the guide's)\\b", Pattern.CASE_INSENSITIVE);
+                    + "leaves perazim|the guide's|nicene|historic christianity)\\b", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern SENTENCE_END = Pattern.compile("(?<=[.!?])\\s+(?=[A-Z'‘“])");
     private static final Pattern ANCHOR = Pattern.compile("^(.+?)\\s+(\\d+):(\\d+)(?:-(\\d+))?$");
@@ -38,14 +42,19 @@ public final class IdentifyRefute {
     /** Topic keywords mapped to an approved entry id and the name used in the answer. */
     private static final String[][] TOPICS = {
             {"jehovah|witness", "jesus_created", "Jehovah's Witnesses",
-                    "Scripture says the Word was God and that all things were made by Him, so the Son is not a created being (John 1:1; Colossians 1:16)."},
+                    "Scripture says the Word was God, that all things were made through Him, and that He is worshipped by the angels, so the Son is not a created being (John 1:1, 3; Colossians 1:16; Hebrews 1:6)."},
             {"latter.day|mormon|lds", "eternal_progression", "the Latter-day Saint church",
-                    "Scripture says there is one God, before and after whom none was formed, and that eternal life is God's gift, not a prize earned by exaltation (Isaiah 43:10; Romans 6:23)."},
+                    "Scripture says there is one God, before and after whom none was formed (Isaiah 43:10; Isaiah 44:6), and that eternal life is God's gift through Jesus Christ, not something we earn (Romans 6:23). The atoning death of Christ is the ground of our acceptance with God."},
             {"purgatory", "purgatory", "the Catholic Church",
-                    "Scripture says the blood of Christ cleanses us from all sin, and that to be absent from the body is to be present with the Lord (1 John 1:7; 2 Corinthians 5:8)."},
+                    "Our biblical conclusion is that Christ offered one sacrifice for sins for ever, so that the blood of Christ cleanses us from all sin (Hebrews 10:14; 1 John 1:7). To depart and be with Christ is far better, and to be absent from the body is to be present with the Lord (Philippians 1:23; 2 Corinthians 5:6–8)."},
             {"\\bmary\\b|mariology|mother of god", "mary_mediator", "the Catholic Church",
-                    "Scripture names Christ as the one mediator between God and people, and says there is no other name by which we must be saved (1 Timothy 2:5; Acts 4:12)."},
+                    "Scripture names Christ as the one mediator between God and people (1 Timothy 2:5), who is able to save completely those who come to God through Him (Hebrews 7:25), and says there is no other name by which we must be saved (Acts 4:12). We do not deny that Christians may pray for one another (1 Timothy 2:1), but Christ alone is the mediator of grace."},
     };
+    /** Topic-specific teaching line, used where the approved summary is wider than the question (Levi, 2026-11-25). */
+    private static final java.util.Map<String, String> TEACHING_OVERRIDE = new java.util.HashMap<>();
+    static {
+        TEACHING_OVERRIDE.put("mary_mediator", "Catholic teaching presents Mary as an additional mediator of grace, alongside Christ. The Catechism uses the title Mediatrix for her.");
+    }
     private IdentifyRefute() {}
 
     /** The approved entry id for a question about one of the topics above, or null. */
@@ -71,7 +80,8 @@ public final class IdentifyRefute {
         if (!topic[1].equals(entry.optString("id"))) return null;
         if (!"FALSE_DOCTRINE_EXAMPLE".equals(entry.optString("classification"))) return null;
         if (!"APPROVED_LEVI".equals(entry.optString("status"))) return null;
-        String teaching = teachingFrom(entry.optString("summary"));
+        String teaching = TEACHING_OVERRIDE.containsKey(entry.optString("id"))
+                ? TEACHING_OVERRIDE.get(entry.optString("id")) : teachingFrom(entry.optString("summary"));
         if (teaching.isEmpty()) return null;
         List<String> verses = new ArrayList<>();
         JSONArray anchors = entry.optJSONArray("anchors");
@@ -83,7 +93,7 @@ public final class IdentifyRefute {
         }
         if (verses.size() < 2) return null;
         StringBuilder out = new StringBuilder();
-        out.append("What ").append(topic[2]).append(" teaches, in its own words: ").append(teaching).append("\n\n");
+        out.append("What this group teaches: ").append(teaching).append("\n\n");
         out.append("What Scripture says:\n");
         for (String v : verses) out.append(v).append("\n");
         out.append("\nOur biblical answer: ").append(topic[3]).append("\n\n").append(CLOSING);

@@ -33,9 +33,12 @@ public class IdentifyRefuteTest {
     public void jehovahsWitnessAnswerIdentifiesTeachingAndQuotesKjv() throws Exception {
         String answer = IdentifyRefute.answerFor("Are Jehovah's Witnesses real Christians?", entry("jesus_created"), kjv());
         assertNotNull(answer);
-        assertTrue(answer.startsWith("What Jehovah's Witnesses teaches, in its own words:"));
+        assertTrue(answer.startsWith("What this group teaches:"));
+        assertFalse(answer.contains("in its own words"));
+        assertFalse(answer.contains("Nicene"));
         assertTrue(answer.contains("John 1:1: “In the beginning was the Word"));
         assertTrue(answer.contains("Colossians 1:16:"));
+        assertTrue(answer.contains("John 1:3:"));
         assertTrue(answer.contains(IdentifyRefute.CLOSING));
     }
 
@@ -82,8 +85,9 @@ public class IdentifyRefuteTest {
     }
 
     @Test
-    public void gateIsOffUntilLeviApproves() {
-        assertFalse(IdentifyRefute.ENABLED);
+    public void gateIsOnSinceLeviApprovedTheRevisedTemplate() {
+        // Levi, 2026-11-25: approved with revisions (heading, sources as evidence only, refute the teaching not people).
+        assertTrue(IdentifyRefute.ENABLED);
     }
 
     @Test

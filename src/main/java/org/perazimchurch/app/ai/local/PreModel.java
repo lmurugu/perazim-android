@@ -4,6 +4,7 @@ import android.content.Context;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.perazimchurch.app.ai.PerazimAiEngine;
+import org.perazimchurch.app.ai.library.ApprovedRoutes;
 import org.perazimchurch.app.ai.library.DoctrineLibrary;
 import org.perazimchurch.app.ai.library.KjvVerseText;
 import org.perazimchurch.app.ai.library.NoGoZones;
@@ -60,6 +61,9 @@ public final class PreModel {
         if (route != null) {
             return new Decision("routed:" + route, PerazimAiEngine.preModelResponse(route, question).getMessageText());
         }
+        // Approved routes written from Levi's decisions of 2026-11-25 (Israel, cessationism, apostasy, election, grace, sovereignty).
+        ApprovedRoutes.Answer approved = ApprovedRoutes.answerFor(question, KjvVerseText.load(c));
+        if (approved != null) return new Decision("routed:approved-" + approved.routeId, approved.text);
         String doctrine = DoctrineLibrary.load(c).answerFor(question);
         if (doctrine != null) return new Decision("routed:doctrine-approved", doctrine);
         if (org.perazimchurch.app.ai.library.IdentifyRefute.ENABLED) {
