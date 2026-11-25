@@ -497,7 +497,7 @@ public class PerazimAiEngine {
 
     /** Scripture-topic words that are in scope even though they are not in the general cue list. */
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
-            "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
+            "\\b(?:word search|search for|search the bible|count the word|how many times|angels?|archangel|agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
             + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene|miraa|khat|muguka|uzazi wa mpango|waislamu|jirani zangu|muslim neighbou?rs?|kugongewa|kugongeana|nimegongewa|tukigongeana|mpango wa kando)\\b|"
             + "\\b(?:parents? (?:are )?separat\\w*|come.we.stay|cohabit\\w*|cannot conceive|can'?t conceive|infertil\\w*|afford (?:the |a )?wedding|chronic illness|disabled|disability|cannot afford|can'?t afford)\\b|"
             // Added 2026-11-25 for the marriage and family set (Levi's sections 4-8): these are in scope for the approved routes.

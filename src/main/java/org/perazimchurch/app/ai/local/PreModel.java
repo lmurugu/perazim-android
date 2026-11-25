@@ -110,6 +110,9 @@ public final class PreModel {
         if (SAFEGUARD_TOPIC.matcher(question).find() && SAFEGUARD_COERCION.matcher(question).find()) {
             return new Decision("routed:safeguarding", PerazimAiEngine.preModelResponse("safeguarding", question).getMessageText());
         }
+        // A quoted phrase the member asks to find is searched in the KJV before any approved route (Levi, 2026-11-25).
+        Decision phrase = phraseFirstDecision(KjvVerseText.load(c), question);
+        if (phrase != null) return phrase;
         ApprovedRoutes.Answer approved = ApprovedRoutes.answerFor(question, KjvVerseText.load(c));
         if (approved != null) return new Decision("routed:approved-" + approved.routeId, approved.text);
         String doctrine = DoctrineLibrary.load(c).answerFor(question);
@@ -122,6 +125,8 @@ public final class PreModel {
         if (table != null) {
             Decision verse = verseDecision(table, verses, question);
             if (verse != null) return verse;
+            Decision chapter = chapterDecision(table, verses, question);
+            if (chapter != null) return chapter;
         }
         Decision search = verseSearchDecision(verses, question);
         if (search != null) return search;
@@ -362,6 +367,65 @@ public final class PreModel {
         return null;
     }
 
+    /** A book and chapter with no verse ("Psalm 23", "Jude 3"): the first verses of the chapter, verbatim. */
+    static Decision chapterDecision(ScriptureRangeTable table, KjvVerseText verses, String question) {
+        if (table == null || verses == null || question == null) return null;
+        String[] bc = ScriptureReferenceNormalizer.bookAndChapter(normalisedQuestion(question));
+        if (bc == null) return null;
+        int bookNumber = table.bookNumber(bc[0]);
+        if (bookNumber <= 0) return null;
+        int chapter = Integer.parseInt(bc[1]);
+        if (!table.isValid(bookNumber, chapter, 1)) {
+            // A one-chapter book: the number is the verse, as in "Jude 3".
+            return table.isValid(bookNumber, 1, chapter) ? verseDecision(table, verses, bc[0] + " 1:" + chapter) : null;
+        }
+        int count = table.verseCount(bookNumber, chapter);
+        int shown = Math.min(MAX_VERSES, count);
+        Decision d = verseDecision(table, verses, bc[0] + " " + chapter + ":1-" + shown);
+        if (d == null || !"routed:verse-kjv".equals(d.status) || count <= shown) return d;
+        return new Decision(d.status, d.answer + "\n\n" + bc[0] + " " + chapter + " has " + count + " verses. These are verses 1 to "
+                + shown + ". Read the rest in the Bible tab.");
+    }
+
+    /** A quoted phrase the member asks to find, when the KJV holds it. Null otherwise, so the other routes decide. */
+    static Decision phraseFirstDecision(KjvVerseText verses, String question) {
+        if (verses == null || question == null) return null;
+        String q = normalisedQuestion(question);
+        if (!PHRASE_FIND_INTENT.matcher(q).find()) return null;
+        String phrase = searchedPhrase(q);
+        if (phrase == null) {
+            Matcher unquoted = UNQUOTED_PHRASE.matcher(q);
+            if (unquoted.find()) phrase = unquoted.group(1).trim();
+        }
+        if (phrase == null) {
+            // "Where is Jesus wept", "who said faith without works": the words after the lead-in, when the KJV holds them.
+            Matcher lead = LEAD_IN_PHRASE.matcher(q);
+            if (lead.find() && !LEAD_IN_OTHER.matcher(lead.group(1)).find()) phrase = lead.group(1).trim();
+        }
+        if (phrase == null || phrase.split("\\s+").length < 2) return null;
+        List<KjvVerseText.Found> found = verses.findPhrase(phrase, 3);
+        if (found.isEmpty()) return null;
+        StringBuilder out = new StringBuilder("From the King James Version (KJV):\n");
+        for (KjvVerseText.Found f : found) out.append('\n').append(f.label).append(": \u201c").append(f.text).append('\u201d');
+        return new Decision("routed:verse-phrase-kjv", out + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
+    }
+
+    private static final Pattern PHRASE_FIND_INTENT = Pattern.compile(
+            "\\b(?:find|search|where|who said|which book|which verse|show|look up|locate|read)\\b|\\bphrase\\b");
+    /** "find the phrase faith without works" (no quotation marks): the words after the word phrase. */
+    private static final Pattern UNQUOTED_PHRASE = Pattern.compile("\\bphrase\\s+(?:of\\s+)?([a-z' ]{3,80}?)[?.!]*$");
+    private static final Pattern LEAD_IN_PHRASE = Pattern.compile(
+            "^(?:where is|where in the bible is|where does the bible say|who said|who says|find|search for|locate|look up)\\s+(.+?)[?.!]*$");
+    /** Lead-in objects that are not wording: verses, words, passages, references and questions about a topic. */
+    private static final Pattern LEAD_IN_OTHER = Pattern.compile(
+            "^(?:the |a |an |any |this |that )?(?:verse|verses|word|words|passage|passages|book|chapter|scripture|scriptures|topic|thing|one)\\b"
+                    + "|\\d|\\b(?:psalm|psalms|john|romans|genesis)\\b\\s*$");
+    private static final Pattern VERSE_SAYS = Pattern.compile(
+            "\\b(?:verses?|passages?|scriptures?)\\s+(?:says?|saying|that says|that reads|that states|that tells|that declares|that mentions)\\s+(.+?)[?.!]*$");
+    /** "search for angel" or "count angel": the word after the search or count words, when no quotation marks are used. */
+    private static final Pattern WORD_SEARCH_WORD = Pattern.compile(
+            "\\b(?:word search|search for|search|count)\\s*:?\\s+(?:the\\s+)?(?:word\\s+)?([a-z]{2,})\\b");
+
     /**
      * Verbatim KJV for a phrase the user quotes, and for the few topics with a fixed verse.
      * A phrase that is not in the KJV is said so plainly, never quoted from memory. Returns null when neither applies.
@@ -401,7 +465,7 @@ public final class PreModel {
     private static final Pattern WORD_QUOTED = Pattern.compile("['\u2018\u2019\u201c\u201d\"]([a-z]{2,})['\u2018\u2019\u201c\u201d\"]");
     private static final Pattern WORD_AFTER = Pattern.compile("\\bword\\s+([a-z]{2,})\\b");
     private static final Pattern WORD_SEARCH_INTENT = Pattern.compile(
-            "\\b(?:where|find|search|look up|locate|how many times|appears?|occurs?|mentioned|which verses?)\\b");
+            "\\b(?:where|find|search|look up|locate|how many times|how often|number of times|count|word search|appears?|occurs?|mentioned|which verses?)\\b");
     private static final Pattern WORD_MEANING = Pattern.compile("\\b(?:mean|means|meaning|define|definition|translate|greek|hebrew)\\b");
     private static final Pattern BOOK_SCOPE = Pattern.compile(
             "\\b(?:in|within|from)\\s+(?:the\\s+)?(?:book\\s+of\\s+)?((?:[1-3]\\s+)?[a-z]+(?:\\s+[a-z]+)?)\\s*[?.!]*$");
@@ -432,7 +496,11 @@ public final class PreModel {
         if (quoted.find()) word = quoted.group(1);
         if (word == null) {
             Matcher after = WORD_AFTER.matcher(q);
-            if (after.find()) word = after.group(1);
+            if (after.find() && !SEARCH_STOP.contains(after.group(1))) word = after.group(1);
+        }
+        if (word == null) {
+            Matcher searched = WORD_SEARCH_WORD.matcher(q);
+            if (searched.find()) word = searched.group(1);
         }
         if (word == null || SEARCH_STOP.contains(word)) return null;
         int book = -1;
@@ -471,7 +539,17 @@ public final class PreModel {
         String q = normalisedQuestion(question);
         if (q.length() > 160 || TOPIC_EXCLUDE.matcher(q).find()) return null;
         Matcher m = VERSE_ABOUT.matcher(q);
-        if (!m.find()) return null;
+        if (!m.find()) {
+            m = VERSE_SAYS.matcher(q);
+            if (!m.find()) return null;
+            String said = m.group(1).trim();
+            List<KjvVerseText.Found> exact = verses.findPhrase(said, 3);
+            if (!exact.isEmpty()) {
+                StringBuilder quoted = new StringBuilder("From the King James Version (KJV):\n");
+                for (KjvVerseText.Found f : exact) quoted.append('\n').append(f.label).append(": \u201c").append(f.text).append('\u201d');
+                return new Decision("routed:verse-phrase-kjv", quoted + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
+            }
+        }
         List<String> words = new ArrayList<>();
         for (String token : m.group(1).split("[^a-z]+")) {
             if (token.length() >= 3 && !SEARCH_STOP.contains(token) && !words.contains(token) && verses.bookNumber(token) < 0) {

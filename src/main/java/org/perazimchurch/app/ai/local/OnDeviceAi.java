@@ -198,7 +198,11 @@ public final class OnDeviceAi {
                 LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence, guideText);
                 // Only excerpts the model actually saw may be cited, verified, or titled.
                 JSONArray shown = built.shownEvidence;
-                if (shown.length() == 0) throw new IOException("The question is too long for the on-device model. Ask a shorter question.");
+                if (shown.length() == 0) {
+                    // Only a long question is "too long". A short one with no fitting excerpt gets the honest no-source reply.
+                    throw new IOException(question.length() < 120 ? NO_SOURCE_MESSAGE
+                            : "The question is too long for the on-device model. Ask a shorter question.");
+                }
                 if (!isInstalled(c)) throw new IOException("Download the on-device model first.");
                 // Uses the cached verification; a full 491 MB digest runs only when the file changed.
                 if (!isModelVerified(c)) throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");

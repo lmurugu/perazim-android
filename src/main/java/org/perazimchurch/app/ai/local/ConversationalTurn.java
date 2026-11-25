@@ -60,11 +60,11 @@ public final class ConversationalTurn {
                     + "school|parents? (?:want|choose|decide|pick)|kidnap\\w*|abus\\w*|dowry|mahari|kugongeana)\\b");
 
     private static final String[] GREETINGS = {
-            "Hello, and welcome. Please tell me what you would like to explore today: a Bible passage, a question about faith, or prayer?",
-            "Hi there. I'm glad you came. Please tell me what is on your heart, or ask me something from the Bible.",
-            "Good to see you. I can quote the King James Version, talk through a question of faith, or pray with you. Please say where you would like to begin.",
-            "Hello. Please ask about a Bible passage, a faith question, or a situation you are facing. What is on your mind?",
-            "Hey, let's begin. Is there a passage you want to read, or something you would like to bring to God today? Please tell me simply."
+            "Hello, and welcome. I can find a Bible verse for you, search a word in the King James Version, answer a question of faith, or pray with you. What would you like today?",
+            "Hi there, I'm glad you came. I can look up a verse or a phrase, count how often a word appears in the Bible, or talk through a question of faith. What is on your heart?",
+            "Good to see you. I can quote verses word for word from the King James Version, search a word, explain the approved teaching on common questions, or pray with you. Where would you like to begin?",
+            "Hello. You can ask me for a verse such as John 3:16, search a word such as 'grace', ask a Bible or doctrine question, or bring me a prayer. What is on your mind?",
+            "Hey, let's begin. I can find a passage, search a word, or help you with a question of faith or a prayer. Tell me what you need, and please keep it simple."
     };
     private static final String[] HOW_ARE_YOU_REPLIES = {
             "Thank you for asking. I'm ready to help. Is there a Bible question or a prayer request on your mind?",
@@ -81,10 +81,11 @@ public final class ConversationalTurn {
             "Take care, and may the Lord keep you. Come back whenever you need Scripture or prayer.",
             "Kwaheri, and God bless you. Come back anytime you want to read or pray together."
     };
-    private static final String CAPABILITY_REPLY = "I can quote Bible passages from the King James Version, explain what the approved "
-            + "church teaching says on common questions, help you with a prayer or a reflection, and show you how to use the app. "
-            + "I can't give medical, legal or financial advice, decide church discipline, or act for church leaders. "
-            + "If you are in danger right now, call 999 or 112.";
+    private static final String CAPABILITY_REPLY = "I'm glad you asked. I can find a Bible verse for you and quote it word for word from the "
+            + "King James Version: try John 3:16, Psalm 23, or a phrase like 'Jesus wept'. I can search a single word and tell you how often "
+            + "it appears, for example how many times 'faith' appears in Romans. I can explain what the approved church teaching says on "
+            + "common questions, and I can pray with you or help you through something hard. I can't give medical, legal or financial "
+            + "advice, or decide church discipline. If you are in danger right now, call 999 or 112.";
     private static final String[] META_REPLIES = {
             "You're right, my last reply did not help. Tell me in a few words what you need, such as a Bible passage, a prayer, or help with a situation, and I'll answer that directly.",
             "Sorry about that. Let me try again. Would a verse, an explanation, or a prayer help you most?"
@@ -138,9 +139,11 @@ public final class ConversationalTurn {
 
     /** Approved facts every composed conversational reply may draw on. The model words them; it adds no claims. */
     static final String FACT_SHEET = "You are Perazim Guide, the digital assistant of Perazim Mission Church (PMCI). "
-            + "You can quote Bible passages from the King James Version, explain the approved church teaching on common "
-            + "questions, help with a prayer or a reflection, and show how to use the app. You cannot give medical, legal or "
-            + "financial advice, decide church discipline, or act for church leaders. If someone is in danger, they should call 999 or 112.";
+            + "You can find Bible verses and quote them word for word from the King James Version, for example John 3:16, Psalm 23, "
+            + "or a phrase such as 'Jesus wept'. You can search a single word and say how often it appears and where, for example "
+            + "how many times 'faith' appears in Romans. You can explain what the approved church teaching says on common questions, "
+            + "and you can pray with a member or support them through a hard situation. You cannot give medical, legal or financial "
+            + "advice, decide church discipline, or act for church leaders. If someone is in danger, they should call 999 or 112.";
 
     /**
      * The approved grounding for a composed reply to a conversational route, or null when the route is not composed.
@@ -150,7 +153,7 @@ public final class ConversationalTurn {
         if (status == null) return null;
         switch (status) {
             case "routed:conversational-greeting":
-                return FACT_SHEET + "\nThe member greeted the guide. Greet them warmly and ask what they would like help with.";
+                return FACT_SHEET + "\nThe member greeted the guide. Greet them warmly in one or two sentences, name two things you can do (for example finding a verse or searching a word), and ask what they would like.";
             case "routed:conversational-acknowledge":
                 return FACT_SHEET + "\nThe member acknowledged the last reply. Reply briefly and invite the next question.";
             case "routed:conversational-help":

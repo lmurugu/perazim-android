@@ -77,15 +77,62 @@ public final class ScriptureReferenceNormalizer {
         String verse = m.group(3);
 
         String[] words = rawName.toLowerCase(Locale.ROOT).trim().split("\\s+");
-        // Try the trailing words first, so "Show me John 3 16" resolves to John.
+        // An exact book name wins over fuzzy matching: "Show me Revelation 22:21" must not read "merevelation" as a near miss.
         for (int start = 0; start < words.length; start++) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = start; i < words.length; i++) sb.append(words[i]);
-            Result r = matchName(sb.toString(), chapter, verse);
+            String compact = compact(words, start);
+            String exact = exactBook(compact);
+            if (exact != null) return result(exact, chapter, verse);
+        }
+        // Then the trailing words, so "Show me John 3 16" resolves to John.
+        for (int start = 0; start < words.length; start++) {
+            Result r = matchName(compact(words, start), chapter, verse);
             if (r != null) return r;
         }
         return null;
     }
+
+    private static String compact(String[] words, int start) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = start; i < words.length; i++) sb.append(words[i]);
+        return sb.toString();
+    }
+
+    /** The canonical book name when the compact text is exactly an alias or a book name, else null. */
+    private static String exactBook(String compact) {
+        for (String[] alias : ALIASES) {
+            if (alias[0].replace(" ", "").equals(compact)) return alias[1];
+        }
+        for (String book : BOOKS) {
+            if (book.toLowerCase(Locale.ROOT).replace(" ", "").equals(compact)) return book;
+        }
+        return null;
+    }
+
+    /**
+     * A book and chapter with no verse, such as "Psalm 23" or "Jude 3" (for a one-chapter book the number is the verse).
+     * Returns the canonical book and the chapter number as the two entries, or null when no book is named.
+     */
+    public static String[] bookAndChapter(String question) {
+        if (question == null || question.length() > 80) return null;
+        Matcher m = BOOK_CHAPTER.matcher(question);
+        if (!m.find()) return null;
+        String rawName = m.group(1).trim();
+        String[] words = rawName.toLowerCase(Locale.ROOT).trim().split("\\s+");
+        for (int start = 0; start < words.length; start++) {
+            String exact = exactBook(compact(words, start));
+            if (exact != null) return new String[] {exact, m.group(2)};
+        }
+        for (int start = 0; start < words.length; start++) {
+            Result r = matchName(compact(words, start), "1", "1");
+            if (r != null && r.confident && r.normalized != null) {
+                return new String[] {r.normalized.substring(0, r.normalized.length() - " 1:1".length()), m.group(2)};
+            }
+        }
+        return null;
+    }
+
+    private static final Pattern BOOK_CHAPTER = Pattern.compile(
+            "(?i)(?<![\\p{L}\\p{N}])((?:[1-3]\\s*)?[\\p{L}]+(?:\\s+[\\p{L}]+){0,2})\\s*(\\d{1,3})(?![\\d:.\\-])");
 
     private static Result matchName(String compact, String chapter, String verse) {
         for (String[] alias : ALIASES) {

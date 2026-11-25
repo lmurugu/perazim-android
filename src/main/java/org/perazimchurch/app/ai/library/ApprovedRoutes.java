@@ -574,6 +574,14 @@ public final class ApprovedRoutes {
                 + "it. Please test this with your pastor and the Bible passages in context.",
                 "Matthew 3:17", "John 10:30"));
 
+        r.add(new Route("trinity-in-the-bible",
+                "is the trinity (?:in|taught in|found in|biblical|in the bible)|trinity in the bible|what is the trinity|"
+                + "do (?:you|christians) believe in the trinity|is god a trinity|bible teach the trinity|does the bible teach the trinity",
+                "The word Trinity is not found in the Bible, but the Bible teaches that there is one God (Deuteronomy 6:4), and that "
+                + "the Father, the Son and the Holy Spirit are each named as God and together named in baptism (Matthew 28:19; 2 Corinthians 13:14). "
+                + "The Church confesses this as one God in three persons. This is general guidance from Scripture; read the passages in the Bible tab.",
+                "Deuteronomy 6:4", "Matthew 28:19"));
+
         r.add(new Route("trinity-not-pagan",
                 "trinity.{0,60}pagan|pagan.{0,60}trinity|invented by the church|trinity .{0,30}invented",
                 "The Trinity is not a pagan idea. It is taught in the Scripture quoted below: 'Hear, O Israel: The LORD our God is one LORD' (Deuteronomy 6:4), and 'baptizing them in the name of the Father, and of the Son, and of the Holy Ghost' (Matthew 28:19). The word Trinity is a later summary of this teaching, not a new god.",
@@ -720,6 +728,16 @@ public final class ApprovedRoutes {
                 "controls? (?:all )?(?:the )?money|(?:won'?t|will not|doesn'?t|does not) let me (?:work|go out|leave|see)|not let me work|kunizuia kufanya kazi|ananizuia",
                 "What you describe is control, and in some cases it is abuse. Controlling all the money, or stopping a spouse from working, can be economic abuse, and it is not the godly marriage that Scripture describes. Scripture calls husbands to love and care for their wives as their own bodies (Ephesians 5:28–29), and calls spouses to honour one another. Nobody has to stay in danger or submit to control to keep the peace. If you are in danger right now, call 999 or 112 now. Please tell a trusted adult or a church leader who can keep you safe, and contact the church office about safeguarding. Do not confront the spouse alone, and do not go into joint counselling while there is threat or control; speak with a safe person first. This guide cannot investigate, promise confidentiality or act for you, so do not wait for an app reply in an emergency. The Lord is a refuge for the oppressed (Psalm 9:9), and you are not alone.",
                 "Ephesians 5:28", "Ephesians 5:29", "Psalms 9:9"));
+
+        r.add(new Route("women-ministry-undecided",
+                "women (?:preach|preaching|pastor|pastors|pastoring|teach|teaching|elders?|bishops?|ordained|ordination)|"
+                + "women in (?:ministry|leadership|the pulpit)|(?:can|may|should) (?:a |the )?women (?:preach|lead|pastor|teach|be ordained)|"
+                + "women'?s ordination|woman (?:preach|pastor)",
+                "The church has not settled a single position on women in ministry, so I will not give a yes or no on whether a woman may preach, "
+                + "teach or lead in the church. Christians read these passages in different ways, and the question is still under review. "
+                + "Two passages people often discuss are 1 Corinthians 14:34 and 1 Timothy 2:12, and Galatians 3:28 speaks of equality in Christ. "
+                + "Talk it through with your pastor, and read the passages in their context in the Bible tab.",
+                "1 Corinthians 14:34", "1 Timothy 2:12"));
 
         r.add(new Route("divorce-remarriage-undecided",
                 "divorc\\w*|remarr\\w*|should i leave|leave (?:him|her)|tell me yes or no",
@@ -1254,7 +1272,7 @@ public final class ApprovedRoutes {
                 + "and help you test what you are seeing. If your child is hurt, or cannot be woken, call 999 or 112 now.",
                 "1 John 4:1", "1 Thessalonians 5:21"));
         p.add(new Route("sabbath-bible-topic",
-                "^what does the bible (?:say|teach) about (?:the )?sabbath[ ?.!]*$",
+                "^what (?:does|do) the bible (?:say|teach)(?: about| on)? (?:the )?sabbath[ ?.!]*$|^what is the bible'?s? teaching (?:on|about) (?:the )?sabbath[ ?.!]*$|^what (?:does|do) (?:the )?(?:bible|scripture) say (?:about|on) (?:the )?sabbath[ ?.!]*$",
                 "The fourth commandment asks God's people to remember the Sabbath and keep it holy. The New Testament teaches that "
                 + "no one should be judged about a holy day or a Sabbath, because a believer's standing before God rests on Christ and "
                 + "not on keeping a particular day.",

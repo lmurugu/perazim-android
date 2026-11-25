@@ -63,7 +63,7 @@ public final class GuideTurnRouter {
         String status = routed.status == null ? "" : routed.status;
         if ("routed:approved-greeting-only".equals(status)) {
             grounding = ConversationalTurn.FACT_SHEET
-                    + "\nThe member greeted the guide. Greet them warmly and ask what they would like help with.";
+                    + "\nThe member greeted the guide. Greet them warmly in one or two sentences, name two things you can do (for example finding a verse or searching a word), and ask what they would like.";
             requireSupport = false;
         } else if (status.startsWith("routed:conversational-")) {
             grounding = ConversationalTurn.groundingFor(status);
