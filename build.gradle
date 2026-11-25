@@ -79,7 +79,7 @@ android {
     // Validation builds get versionCode 14 (above v13, 2026-11-25) so they install over versionCode 8 builds without a downgrade.
     applicationVariants.all { variant ->
         if (variant.buildType.name == "validation") {
-            variant.outputs.each { output -> output.versionCodeOverride = 14 }
+            variant.outputs.each { output -> output.versionCodeOverride = 15 }
         }
     }
     signingConfigs {

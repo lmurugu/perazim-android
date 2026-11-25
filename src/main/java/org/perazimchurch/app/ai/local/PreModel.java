@@ -436,7 +436,7 @@ public final class PreModel {
 
     private static String read(Context c, String path) throws java.io.IOException {
         try (java.io.InputStream in = c.getAssets().open(path)) {
-            return new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            return new String(org.perazimchurch.app.ai.IoCompat.readAll(in), java.nio.charset.StandardCharsets.UTF_8);
         }
     }
 }
