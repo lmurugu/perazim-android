@@ -43,11 +43,11 @@ def load_kjv():
 
 
 # 1195 (Kenya gender-based violence line) may appear in a crisis answer only as the approved secondary line:
-# after 999 or 112, and labelled "may not be current" right after it. Decided by Levi on 2026-11-23 (it stays,
+# after 999 or 112, with its verified purpose and "24 hours" right after it. Decided by Levi on 2026-11-23 (it stays,
 # labelled, on the pre-release confirmation list). The label rule came from the coordinator on 2026-11-25; the
 # grader used to forbid 1195 everywhere. Every occurrence must meet the rule, so a bare or first 1195 still fails.
 LABELLED_NUMBER = "1195"
-LABEL_TEXT = "may not be current"
+LABEL_TEXT = "24 hours"  # 2026-11-25: the stale "may not be current" label was removed on Levi's instruction; hours are checked
 LABEL_WINDOW = 200
 
 
@@ -59,7 +59,7 @@ def labelled_number_ok(answer):
     for pos in occurrences:
         before = min([i for i in (text.find("999"), text.find("112")) if i != -1] or [-1])
         after = text[pos + len("1195"):pos + len("1195") + LABEL_WINDOW]
-        if before == -1 or before > pos or LABEL_TEXT not in after:
+        if before == -1 or before > pos or LABEL_TEXT not in after:  # LABEL_TEXT now means the verified "24 hours" hours line
             return False
     return True
 
