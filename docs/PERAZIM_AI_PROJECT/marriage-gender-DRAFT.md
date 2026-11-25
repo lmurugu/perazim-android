@@ -82,6 +82,27 @@ These are arguments and slogans. They are not verified descriptions of what all 
 
 ---
 
+## Levi's decision on sections 4 to 8 (25 November 2026, option B)
+
+Levi approved sections 4 to 8 as **governing principles, not compulsory scripts**, with these corrections:
+
+- **Scope:** sections 4 to 8 are the approved framework for marriage, gender and family questions. The AI should answer infidelity, provision, men opting out of marriage, singleness, betrayal, coercive control and in-laws from this framework, not default to refusal.
+- **Not approved by this decision:** divorce and remarriage (section 4F) and women's ministry stay UNDECIDED. Do not infer approval of either from sections 4 to 8.
+- **4B headship:** updated wording. The husband's headship is servant headship with differentiated responsibility (section 9). It is not an automatic final veto.
+- **4C accountability:** a wife's disagreement, questioning, reasonable boundaries, reporting of abuse or refusal to take part in sin are not automatically disrespect or rebellion. A husband who seeks counsel is not thereby failing to lead.
+- **4D infidelity categories are distinct:** sexual adultery; deliberate romantic or sexual communication; pornography; secret emotional relationships; ordinary friendships, which are not automatically infidelity. Establish what happened before labelling it.
+- **Forgiveness, trust and reconciliation are different.** A betrayed spouse must not be pressured to pretend nothing happened or to return to an unsafe situation.
+- **4E singleness addition:** singleness is not automatically selfish, bitter or spiritually immature (1 Cor 7:7–9, 7:32–35).
+- **Art. 45(3) heading:** "Equal legal rights of spouses".
+- **PDVA s.3 (safeguarding):** abuse includes economic, emotional, harassment, intimidation, physical, sexual abuse and interference by in-laws. A single act may be abuse. Where there is coercion or violence there is no automatic joint counselling or confrontation. Safety comes first, and forgiveness or submission is never a condition for protection. Privacy promises must match what the app actually does, and no spouse may access another's private disclosure.
+- **Section 7 guidance:** a husband leads through care and provision, and a wife may work and contribute. Do not shame poverty. 1 Tim 5:8 is not an exclusive male rule (Gen 2:24; Eph 5:25–29; Prov 31:10–31). For men who opt out of marriage, distinguish voluntary singleness, financial inability, fear, trauma and ideological rejection, and do not generalise. In-laws: Gen 2:24 and honour parents, but parents are not rulers over the couple.
+- **Section 8 qualifications:** the four-step reasoning has no interrogation or proof demand before safety support. Do not give false balance where someone describes abuse. Do not automatically confront or refer to joint counselling where there are threats, violence or coercive control.
+- **Kugongeana (confirmed by Levi):** to sleep with someone's partner, mostly used when a man sleeps with another man's girlfriend, wife or partner. Use it in mirrored cases.
+
+Implemented in round 38 as approved routes in ApprovedRoutes.java (equal-worth-sexes, unfaithful-generalisation, proof-text-request, coercive-control-safety, divorce-remarriage-undecided, infidelity-and-betrayal, provision-and-money, singleness-and-value, in-laws-and-parents, household-labour).
+
+---
+
 ## 4. The biblical standard (Levi, section 4)
 
 ### 4A. Covenant, not a gender contest

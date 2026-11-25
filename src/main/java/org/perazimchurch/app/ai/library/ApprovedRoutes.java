@@ -619,14 +619,14 @@ public final class ApprovedRoutes {
                 "Romans 3:23", "Romans 3:10", "Hebrews 13:4", "Ephesians 5:25"));
 
         r.add(new Route("proof-text-request",
-                "(?:give|list|find|show|quote|send) (?:me )?.{0,40}verses? .{0,40}(?:proving|to prove|that prove)|verses? (?:proving|to prove|that prove)",
+                "(?=.*\\b(?:wife|husband|wives|husbands|spouse|marriage|mke|mume)\\b)(?:(?:give|list|find|show|quote|send) (?:me )?.{0,40}verses? .{0,40}(?:proving|to prove|that prove)|verses? (?:proving|to prove|that prove))",
                 "I will not give a list of verses chosen to prove one side of a marriage argument. A verse pulled out of its context can be used to hurt a spouse, and Scripture warns against twisting the Word of God (2 Peter 3:16). The Bible teaches husbands and wives to submit to one another in the fear of God (Ephesians 5:21). It calls husbands to love their wives as Christ loved the church (Ephesians 5:25), and it tells husbands not to be bitter against their wives (Colossians 3:19). Scripture does not teach that a husband may demand that his wife obey everything he says. Wives are not called to obey a sinful instruction (Acts 5:29). If you want to understand what the Bible teaches about marriage, read these passages in their context with your pastor, and pray together about how each of you can love and serve the other.",
                 "Ephesians 5:21", "Ephesians 5:25", "Colossians 3:19", "Acts 5:29"));
 
         r.add(new Route("coercive-control-safety",
-                "controls? (?:all )?(?:the )?money|(?:won'?t|will not|doesn'?t|does not) let me (?:work|go out|leave|see|decide)|not let me work|kunizuia kufanya kazi|ananizuia",
+                "controls? (?:all )?(?:the )?money|(?:won'?t|will not|doesn'?t|does not) let me (?:work|go out|leave|see)|not let me work|kunizuia kufanya kazi|ananizuia",
                 "What you describe is control, and in some cases it is abuse. Controlling all the money, or stopping a spouse from working, can be economic abuse, and it is not the godly marriage that Scripture describes. Scripture calls husbands to love and care for their wives as their own bodies (Ephesians 5:28–29), and calls spouses to honour one another. Nobody has to stay in danger or submit to control to keep the peace. If you are in danger right now, call 999 or 112 now. Please tell a trusted adult or a church leader who can keep you safe, and contact the church office about safeguarding. Do not confront the spouse alone, and do not go into joint counselling while there is threat or control; speak with a safe person first. This guide cannot investigate, promise confidentiality or act for you, so do not wait for an app reply in an emergency. The Lord is a refuge for the oppressed (Psalm 9:9), and you are not alone.",
-                "Ephesians 5:28", "Ephesians 5:29", "Psalm 9:9"));
+                "Ephesians 5:28", "Ephesians 5:29", "Psalms 9:9"));
 
         r.add(new Route("divorce-remarriage-undecided",
                 "divorc\\w*|remarr\\w*|should i leave|leave (?:him|her)|tell me yes or no",
