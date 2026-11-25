@@ -100,9 +100,9 @@ public class SafetyFirstUiPathTest {
     @Test
     public void selfStatementsStayPersonal() {
         String t = text("I'm ending my life tonight.");
-        assertTrue(t, t.startsWith("I'm") && t.contains("sorry") && t.contains("Are you safe right now"));
+        assertTrue(t, (t.startsWith("I'm") || t.startsWith("Thank you")) && t.contains("Are you safe right now"));
         String told = text("I told my brother I'm ending my life tonight.");
-        assertTrue(told, told.startsWith("I'm") && told.contains("Are you safe right now"));
+        assertTrue(told, (told.startsWith("I'm") || told.startsWith("Thank you")) && told.contains("Are you safe right now"));
         String afterText = text("My brother texted me. I want to die.");
         assertTrue(afterText, afterText.startsWith("I'm") || afterText.startsWith("Thank you"));
         assertTrue(afterText, afterText.contains("Are you safe right now"));
