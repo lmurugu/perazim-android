@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.perazimchurch.app.ai.IoCompat;
@@ -62,13 +63,52 @@ final class OwnKnowledge {
             "\\b(?:scientific|science|theor(?:y|ies)|evolution|causes of|assignment|essay|business plan|mathematics|artificial intelligence|"
             + "football|election|economy|economics|unemployment|latest developments|news|spreadsheet|cv|resume)\\b", Pattern.CASE_INSENSITIVE);
 
+    /** Passages offered to the model for one question (retrieval-first, Levi 2026-11-25). */
+    static final int PASSAGE_LIMIT = 6;
+
+    /** Words that describe the question rather than its topic, so they never choose a passage. */
+    private static final java.util.Set<String> TOPIC_STOP = new java.util.HashSet<>(java.util.Arrays.asList(
+            "what", "does", "bible", "teach", "teaches", "about", "explain", "tell", "please", "should", "would", "could",
+            "believe", "christian", "christians", "church", "question", "means", "mean", "with", "from", "this", "that",
+            "have", "your", "their", "there", "which", "when", "where", "whether", "they", "them", "were", "been"));
+
+    /**
+     * King James Version passages whose words best match the question, best first, each as "label: text". Empty when the
+     * question has no topic word or nothing matches. Only verbatim bundled KJV text is returned.
+     */
+    static java.util.List<String> passagesFor(KjvVerseText kv, String question) {
+        java.util.List<String> out = new ArrayList<>();
+        if (kv == null || question == null) return out;
+        java.util.List<String> words = new ArrayList<>();
+        for (String w : question.toLowerCase(Locale.ROOT).split("[^\\p{L}]+")) {
+            if (w.length() >= 4 && !TOPIC_STOP.contains(w) && !words.contains(w)) words.add(w);
+        }
+        if (words.isEmpty()) return out;
+        for (KjvVerseText.Found f : kv.findAllWordsRanked(words, PASSAGE_LIMIT)) {
+            out.add(f.label + ": " + f.text);
+        }
+        return out;
+    }
+
     /** The user turn for a question with no approved excerpt. The system rules are the same ones the grounded answers use. */
     static String prompt(String question) {
+        return prompt(question, Collections.<String>emptyList());
+    }
+
+    /** As {@link #prompt(String)}, with the retrieved King James Version passages the answer may quote from. */
+    static String prompt(String question, java.util.List<String> passages) {
         LocalPrompt.Built base = LocalPrompt.buildBounded(question, Collections.emptyList(), new org.json.JSONArray(), "");
         String system = base.prompt.substring(0, base.prompt.indexOf("<|im_end|>"));
-        return system + "<|im_end|>\n<|im_start|>user\nNo approved excerpt matches this question. Answer from your own knowledge of "
-                + "Scripture in two to five plain English sentences. Quote only King James Version wording you are certain of, and cite "
-                + "only references you are certain exist. If you are not sure, say so briefly and point to the Bible tab and the pastor.\n"
+        StringBuilder passageBlock = new StringBuilder();
+        if (passages != null && !passages.isEmpty()) {
+            passageBlock.append("King James Version passages that may help (quote only these, word for word, and cite only these):\n");
+            for (String passage : passages) passageBlock.append(passage).append("\n");
+        } else {
+            passageBlock.append("No approved excerpt matches this question.\n");
+        }
+        return system + "<|im_end|>\n<|im_start|>user\n" + passageBlock
+                + "Answer from Scripture in two to five plain English sentences. Quote only King James Version wording you are certain of, "
+                + "and cite only references you are certain exist. If you are not sure, say so briefly and point to the Bible tab and the pastor.\n"
                 + "USER QUESTION:\n" + question.trim() + "<|im_end|>\n<|im_start|>assistant\n";
     }
 
@@ -115,12 +155,13 @@ final class OwnKnowledge {
         try {
             ScriptureRangeTable table = loadTable(c);
             KjvVerseText kv = KjvVerseText.load(c);
+            String built = prompt(question, passagesFor(kv, question));
             String raw;
             if (OnDeviceAi.testRunner != null) {
-                raw = OnDeviceAi.testRunner.generate(prompt(question), null, 160);
+                raw = OnDeviceAi.testRunner.generate(built, null, 160);
             } else {
                 if (!OnDeviceAi.runtimeAvailable(c) || !OnDeviceAi.isInstalled(c) || !OnDeviceAi.isModelVerified(c)) return null;
-                raw = OnDeviceAi.runModelProcess(c, prompt(question), null, 160);
+                raw = OnDeviceAi.runModelProcess(c, built, null, 160);
             }
             return accept(raw, kv, table);
         } catch (Exception e) {
