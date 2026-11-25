@@ -305,6 +305,9 @@ public final class PreModel {
         Pattern.compile("pharaoh.*heart|heart of pharaoh", Pattern.CASE_INSENSITIVE),
         // Feeling that God is far off: the KJV promises of his presence (Psalm 34:18, Hebrews 13:5).
         Pattern.compile("\\bgod is (?:near|far|absent|silent|not here)\\b|\\bnear me\\b|feel (?:god|his presence|god's presence)|far from god|\\bforsak\\w*|\\babandon\\w*", Pattern.CASE_INSENSITIVE),
+        // Afterlife and justification: KJV passages on the topic (Scripture is the source; no other teaching is added).
+        Pattern.compile("afterlife|after death|life after death|hereafter", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("\\bjustif\\w*", Pattern.CASE_INSENSITIVE),
     };
     private static final Pattern TOPIC_EXCLUDE = Pattern.compile(
             "\\bhiv\\b|\\barvs?\\b|antiretro|condom|contracept|unforgivable|blasphem|atonement|divorc|remarr|medic|doctor|hospital|tablets?|\\bpills?\\b|\\bdrugs?\\b|clinic|\\bnurse|"
@@ -323,6 +326,8 @@ public final class PreModel {
         {"2 Corinthians 9:7", "Acts 20:35"},
         {"Exodus 9:12", "Romans 9:18"},
         {"Psalms 34:18", "Hebrews 13:5"},
+        {"John 11:25", "2 Corinthians 5:8", "Hebrews 9:27"},
+        {"Romans 3:24", "Romans 5:1", "Galatians 2:16"},
     };
 
     /** The phrase a question asks about: a quoted phrase. Null when there is none. */
