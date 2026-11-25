@@ -117,6 +117,12 @@ public final class GuideTurnRouter {
         q = Pattern.compile("\\b(?:baptsim|bapstism|baptisim|baptsm)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("baptism");
         q = Pattern.compile("\\b(?:sabath|sabbeth)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("sabbath");
         q = Pattern.compile("\\b(?:trinty|trinitty)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("trinity");
+        // Common words in pastoral and general faith questions (round 49 gap fill, coordinator-approved).
+        q = Pattern.compile("\\btihnk\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("think");
+        q = Pattern.compile("\\btmies\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("times");
+        q = Pattern.compile("\\bepxlain\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("explain");
+        q = Pattern.compile("\\bapepars\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("appears");
+        q = Pattern.compile("\\bsvaed\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("saved");
         return q;
     }
 
