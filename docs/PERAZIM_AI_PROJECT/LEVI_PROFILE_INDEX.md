@@ -19,7 +19,7 @@ Before doing work that changes theology, doctrine, AI answers, source retrieval,
 2. [BIBLICAL_AUTHORITY_AND_SOURCE_POLICY.md](BIBLICAL_AUTHORITY_AND_SOURCE_POLICY.md) — Bible-first source hierarchy and retrieval rules.
 3. [AUTONOMOUS_EXECUTION_AND_ESCALATION.md](AUTONOMOUS_EXECUTION_AND_ESCALATION.md) — what agents may do independently and when to escalate.
 4. [ISRAEL_CHURCH_AND_END_TIMES_POSITION.md](ISRAEL_CHURCH_AND_END_TIMES_POSITION.md) — Israel/Church relationship and developing eschatology.
-5. The current doctrine register, approved doctrine entries, relevant source register and actual source code being changed.
+6. The current doctrine register, approved doctrine entries, relevant source register and actual source code being changed.
 
 ## Authority and precedence
 

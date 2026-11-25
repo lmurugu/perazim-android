@@ -56,7 +56,7 @@ Levi's decision is required before:
 - Resolving a genuine conflict between clear, current instructions where date, explicitness and scope do not settle it.
 - Adding a new creed, Church Father, confession or specialist theological source to active answering material where its eligibility or alignment has not been established.
 - Making a material doctrinal claim based on a primary source that could not be accessed or checked.
-- Establishing official church identity, leadership, governance, membership, discipline or finance policy from conflicting records.
+- Establishing official church identity, leadership, governance, membership, discipline or finance policy from conflicting records. In particular, older records and local app documentation contain inconsistent Perazim institutional names and motto/mission wording; do not silently combine them or select one as official without the authorised leadership decision.
 - Giving final approval to a member-facing doctrinal answer where Levi explicitly reserved review.
 - Removing or bypassing safety, safeguarding, privacy, crisis or abuse protections.
 - Merging PRs, merging into main, releasing production builds, enabling production model flags, activating production retrieval or transferring content to a live model.

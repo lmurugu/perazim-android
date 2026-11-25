@@ -59,6 +59,7 @@ Passages relevant to the position include:
 - Revelation 19:11–16 — Christ appears as the victorious King.
 - Revelation 20:1–6 — Satan is bound and the saints reign with Christ for a thousand years. This is where the thousand-year period is stated explicitly.
 - Zechariah 14:4, 9 — the Lord's intervention and His kingship over all the earth.
+- Daniel 2:34–35, 44–45 — the stone that strikes the image and becomes a great mountain, understood by Levi as pointing to the future, visible kingdom of God on earth.
 - Isaiah 11:1–10 — the righteous ruler from Jesse's line and the character of His reign.
 
 Do not claim that every detail appears in every passage. Revelation 20 explicitly gives the thousand years; the other passages are used to explain the Messiah's righteous earthly reign. State this as Levi's working interpretation, not an uncontested formulation accepted by all Christians.
