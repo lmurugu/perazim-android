@@ -79,8 +79,11 @@ public final class KjvVerseText {
     /** Parses the same files from the source tree, for the JVM tests and the evaluation harness. */
     public static KjvVerseText fromFiles(java.io.File tsvGz, java.io.File manifest) throws IOException, JSONException {
         try (InputStream in = new java.util.zip.GZIPInputStream(new java.io.FileInputStream(tsvGz))) {
-            return fromTsv(in, new String(java.nio.file.Files.readAllBytes(manifest.toPath()),
-                    StandardCharsets.UTF_8));
+            byte[] manifestBytes;
+            try (InputStream m = new java.io.FileInputStream(manifest)) {
+                manifestBytes = org.perazimchurch.app.ai.IoCompat.readAll(m);
+            }
+            return fromTsv(in, new String(manifestBytes, StandardCharsets.UTF_8));
         }
     }
 
