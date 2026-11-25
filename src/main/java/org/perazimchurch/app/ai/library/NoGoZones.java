@@ -110,7 +110,8 @@ public final class NoGoZones {
                     + "it out alone, and your questions are welcome there. If your thoughts ever turn to ending your life, "
                     + "reach out to someone right away."),
             new Zone("grief-and-loss",
-                    "grief|grieving|passed away|funeral|died|death of|since my (mother|father|husband|wife|child|son"
+                    "grief|grieving|passed away|funeral|death of|someone died|my (mother|father|husband|wife|child|son"
+                    + "|daughter|brother|sister|friend) (died|passed)|since my (mother|father|husband|wife|child|son"
                     + "|daughter|brother|sister|friend)",
                     "I'm so sorry about your loss. I can't answer this one well, so I won't guess, but you don't have to "
                     + "carry it alone. Please talk with a trusted church leader or your pastor, who can sit with you and pray. "

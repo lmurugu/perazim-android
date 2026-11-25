@@ -112,7 +112,9 @@ public final class PreModel {
     }
 
     /** A quoted phrase of at least three words, the phrase after "the Bible says", or null. */
-    private static final Pattern QUOTED_PHRASE = Pattern.compile("[\"'\u2018\u201c]([^\"'\u2019\u201d]{8,160})[\"'\u2019\u201d]");
+    // An opening quote is not inside a word (so "I've" and "can't" do not open one), and a closing quote is not followed by a letter.
+    private static final Pattern QUOTED_PHRASE = Pattern.compile(
+            "(?<!\\p{L})[\"'\u2018\u201c]([^\"'\u2019\u201d]{8,160}?)[\"'\u2019\u201d](?!\\p{L})");
     private static final Pattern BIBLE_SAYS = Pattern.compile(
             "\\bbible (?:says|say|teaches) (?:that )?(.{8,160}?)\\s*(?:right|correct|true|isn't it|is that right)?\\s*[?.!]*\\s*$",
             Pattern.CASE_INSENSITIVE);

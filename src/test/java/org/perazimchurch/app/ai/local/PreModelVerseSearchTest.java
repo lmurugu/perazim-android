@@ -63,4 +63,11 @@ public class PreModelVerseSearchTest {
     public void questionsWithoutAPhraseOrTopicAreNotHandled() throws Exception {
         assertNull(PreModel.verseSearchDecision(kjv(), "What is the Perazim Mission Church address?"));
     }
+
+    /** An apostrophe inside a word ("I've", "can't") is not a quotation, so ordinary messages are not searched. */
+    @Test
+    public void apostrophesInOrdinaryMessagesAreNotQuotations() throws Exception {
+        assertNull(PreModel.verseSearchDecision(kjv(),
+                "I've been so angry at my brother for months and I can't stop thinking about it."));
+    }
 }
