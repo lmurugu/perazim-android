@@ -68,9 +68,9 @@ When escalating, ask one focused question. State the exact unresolved decision, 
 
 ### Israel and the end times
 
-The position is UNDER REVIEW. Agents may correct and improve drafts to match Levi's documented position. They may not mark the topic approved or activate it until Levi approves the exact final member-facing text.
+The underlying end-times theology is UNDER REVIEW. Levi approved the third revised member-facing answer on 25 November subject to three specific corrections. The coordinator reports those corrections implemented, the route active in the AI branch and the no-go zone lifted. Preserve the distinction: the corrected answer route is approved for AI-branch evaluation; the detailed theological framework remains under review and is not thereby settled doctrine.
 
-A message saying "the draft is ready" is not approval. An evaluation case passing or failing is not theological approval. Keep the no-go zone until explicit approval.
+A message saying "the draft is ready" is not approval. An evaluation case passing or failing is not theological approval. If source verification or regression tests show that the served answer differs from Levi's approved text, correct it and report the difference. Production release remains a separate owner decision.
 
 ### Holy Spirit and cessationism
 
