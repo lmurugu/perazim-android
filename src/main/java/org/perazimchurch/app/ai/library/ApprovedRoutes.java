@@ -583,6 +583,21 @@ public final class ApprovedRoutes {
                 "Scripture does not identify Sunday as the mark of the beast, and I cannot verify that claim from the text. The mark in Revelation 13 is not named as Sunday in the text. Paul wrote: 'Let no man therefore judge you' (Colossians 2:16), and 'Let every man be fully persuaded in his own mind' (Romans 14:5). We test this teaching by Scripture alone.",
                 "Colossians 2:16", "Romans 14:5"));
 
+        r.add(new Route("grace-meaning",
+                "grace mean|meaning of grace|maana ya neema|what is grace",
+                "Grace is God's unearned favour toward sinners. Scripture says that we are saved by grace through faith, and that this is not of ourselves: it is the gift of God (Ephesians 2:8–9). Paul also says that we are justified freely by his grace, through the redemption that is in Christ Jesus (Romans 3:24). Because grace is not earned, it leads to gratitude and to a holy life (Titus 2:11–12). We test every teaching by Scripture alone.",
+                "Ephesians 2:8", "Romans 3:24"));
+
+        r.add(new Route("god-changes-mind",
+                "does god change|god change (?:his|her|its) mind|did god repent|god repent|god regret",
+                "Scripture says that God is not a man, that he should lie, or repent as a man does (Numbers 23:19). The LORD says of himself: 'I am the LORD, I change not' (Malachi 3:6). Scripture also uses human language, as when the LORD 'repented' of the evil he had said he would do to Nineveh when the people turned from their evil way (Jonah 3:10). That shows God's response to people, while his character and purposes stay the same. We test every teaching by Scripture alone.",
+                "Numbers 23:19", "Malachi 3:6"));
+
+        r.add(new Route("psalm-23-context",
+                "psalm 23 (?:in context|explain|meaning|flow|context)|explain psalm 23|psalm 23 in context",
+                "Psalm 23 is David's psalm about the LORD as shepherd. It moves from the LORD's care for his flock (verses 1–3), to his presence in the valley of the shadow of death (verse 4), to his table and his goodness in the house of the LORD (verses 5–6). The comfort comes from the LORD's faithfulness to his people, not from an easy life. Read in context, the psalm is about trust in the LORD in danger as well as in peace.",
+                "Psalms 23:1", "Psalms 23:4"));
+
         r.add(new Route("christian-science",
                 "christian science|mary baker eddy|science and health",
                 "Christian Science is not the Bible-centred Christian faith. Its founder, Mary Baker Eddy, wrote Science and Health, which teaches that sickness and matter are unreal and that Christ's resurrection was a spiritual awakening rather than a bodily rising. Scripture says that the risen Jesus showed his hands and feet to his disciples and said that a spirit does not have flesh and bones as he has (Luke 24:39). Scripture also says that he was raised on the third day according to the Scriptures (1 Corinthians 15:4). We test every teaching by Scripture alone.",

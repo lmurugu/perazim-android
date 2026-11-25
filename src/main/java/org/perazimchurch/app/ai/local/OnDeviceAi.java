@@ -25,8 +25,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Executes the packaged official llama.cpp ARM64 binary locally. Inference never opens a socket. */
 public final class OnDeviceAi {
     /** Shown when no approved source supports a question. Warm and specific, so the member knows what to do next. */
-    static final String NO_SOURCE_MESSAGE = "No verified approved source supports this question yet, so I will not guess. "
-            + "Please ask a simpler, more specific question, or speak with your pastor or a trusted church leader.";
+    static final String NO_SOURCE_MESSAGE = "I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI) and Christian faith. "
+            + "I do not have a verified approved source for this question, so I am not authorised to advise on it and will not guess. "
+            + "Please ask a simpler, more specific question about the Bible or faith, or speak with your pastor or a trusted church leader.";
     public static final String MODEL_NAME = "Qwen2.5 0.5B Instruct · Q4_K_M";
     public static final long MODEL_BYTES = 491400032L;
     private static final String MODEL_SHA = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db";

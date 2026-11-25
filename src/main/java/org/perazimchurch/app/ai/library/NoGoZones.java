@@ -38,8 +38,8 @@ public final class NoGoZones {
 
     /** Other faiths and groups: no general description. Ask which specific teaching is meant (Levi, 2026-11-25). */
     static final String OTHER_GROUP_DECLINE =
-            "I can't verify a general claim like that. I can examine a specific teaching of a church or group against Scripture, "
-            + "so which teaching do you have in mind? "
+            "I can't verify a general claim like that. I am designed specifically to assist with Christian faith and the Bible, so I am not authorised to compare religions in general. "
+            + "I can examine a specific teaching of a church or group against Scripture, so which teaching do you have in mind? "
             + "Please talk it through with a trusted church leader or your pastor, who can help you test it by the Bible.";
 
     /** No verdict on any individual: only God knows hearts and final destiny. Warm, with the way of faith for the asker. */
@@ -69,7 +69,7 @@ public final class NoGoZones {
             + "or another appropriate person.";
 
     /** Round 23: live research, links and news. The guide cannot check these, so it says so and does not guess. */
-    static final String UNCERTAIN_DECLINE =
+    public static final String UNCERTAIN_DECLINE =
             "I cannot browse links, search the internet or read live news, and I do not have access to them. I cannot verify that source "
             + "or any current research, so I will not guess or summarise it. The approved sources in this app do not establish that answer. "
             + "Please check the source yourself, or ask a trusted church leader or your pastor.";

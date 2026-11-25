@@ -55,7 +55,15 @@ public class PerazimAiEngine {
                     "panic attack|self[ -]?harm|suicid(?:e|al)|addict(?:ion|ed)|overdose|confession|confess\\w*|" +
                     "confidential|secret)\\b",
             Pattern.CASE_INSENSITIVE);
+    /** Requests the guide cannot meet from inside the app: browsing, live news, recent research, or a link to open. */
+    private static final Pattern LIVE_RESEARCH_PATTERN = Pattern.compile(
+            "https?://|\\bbrowse\\b|\\bsearch the (?:internet|web)\\b|\\blive news\\b|\\blatest news\\b|\\bacademic research\\b|" +
+            "\\brecent (?:research|studies|papers|news)\\b|\\bfind (?:me )?(?:recent )?(?:research|studies|papers)\\b|\\bgoogle\\b",
+            Pattern.CASE_INSENSITIVE);
+
     private static final Pattern[] CLEARLY_OUT_OF_SCOPE_PATTERNS = {
+            // Job applications and CVs are not something the guide writes.
+            Pattern.compile("\\b(?:write|draft|help me (?:write|prepare)|prepare)\\b.{0,30}\\b(?:cv|curriculum vitae|resume|cover letter)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:kenya'?s?|employment|labou?r|parliament|government)\\b.{0,40}\\b(?:laws?|legislation|acts?)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:court|lawyer|attorney|landlord|tenant|evict|eviction)\\b", Pattern.CASE_INSENSITIVE),
             Pattern.compile("\\b(?:best|cheapest|good)\\s+(?:car|cars|phone|phones|laptop|laptops|house|houses|tv|television)\\b|\\bto buy\\b", Pattern.CASE_INSENSITIVE),
@@ -805,6 +813,10 @@ public class PerazimAiEngine {
     public static AiResponse boundaryResponseFor(@Nullable String query) {
         AiResponse privacy = privacyRouteResponse(query);
         if (privacy != null) return privacy;
+        // Live research, links and news: say plainly that the guide cannot browse or verify them.
+        if (query != null && LIVE_RESEARCH_PATTERN.matcher(query).find()) {
+            return AiResponse.plainText(org.perazimchurch.app.ai.library.NoGoZones.UNCERTAIN_DECLINE, null);
+        }
         return isProfessionalMatterQuery(query) ? professionalBoundaryResponse() : outOfScopeResponse();
     }
 
