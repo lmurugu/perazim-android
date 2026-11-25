@@ -19,8 +19,8 @@
    "files": [
     {
      "path": "doctrine/entries.json",
-     "sha256": "f1aa4293486b457ddb3ffa62ec135ecbfdd72377375e821f1f59aaf010b04279",
-     "bytes": 8336
+     "sha256": "c4ddb8cfb2540bddf3d00f1488eef09c814e30e389e6852c01979be9a58cb368",
+     "bytes": 7900
     },
     {
      "path": "doctrine/positions.json",

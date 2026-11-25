@@ -50,8 +50,10 @@ public class DoctrineLibraryTest {
         String answer = library.answerFor("What do other Christians believe about tongues? Do some churches disagree?");
         assertNotNull(answer);
         assertTrue(answer.startsWith("Spirit baptism is an experience distinct from conversion."));
-        assertTrue(answer.contains("Other Christian views, to be weighed against Scripture"));
-        assertTrue(answer.contains("Cessationist view"));
+        // Levi's rule (coordinator decision 2026-11-25): no neutral list of other views in approved answers.
+        assertFalse(answer.contains("Other Christian views"));
+        assertFalse(answer.contains("Cessationist view"));
+        assertTrue(answer.contains("Scripture:"));
     }
 
     @Test
