@@ -150,11 +150,18 @@ public final class OnDeviceAi {
         WORK.execute(() -> {
             Process process = null;
             try {
+                // Validation builds never ship a synthetic knowledge package (build check: assertNoSyntheticKnowledge).
+                // If a bundled package is absent or not installable, answers continue from the approved library and
+                // KJV text, which is what the benchmark evaluated.
                 if ("validation".equals(BuildConfig.BUILD_TYPE)
                         && OfflineKnowledgeStore.read(c, trustedKeys, BuildConfig.VERSION_NAME,
                         System.currentTimeMillis()) == null) {
-                    OfflineKnowledgeStore.installBundledValidationPackage(c, BuildConfig.VERSION_NAME,
-                            System.currentTimeMillis());
+                    try {
+                        OfflineKnowledgeStore.installBundledValidationPackage(c, BuildConfig.VERSION_NAME,
+                                System.currentTimeMillis());
+                    } catch (Exception ignored) {
+                        // No bundled package: continue without knowledge-store evidence.
+                    }
                 }
                 String evidenceQuery = evidenceQuery(question, history);
                 JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,

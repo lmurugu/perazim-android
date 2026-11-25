@@ -76,10 +76,10 @@ android {
         buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "false"
         buildConfigField "String", "API_BASE_URL", "\"\""
     }
-    // Validation builds get versionCode 16 (above the laptop v15, 2026-11-25) so they install over versionCode 8 builds without a downgrade.
+    // Validation builds get versionCode 17 (above the laptop v15 and v16, 2026-11-25) so they install over versionCode 8 builds without a downgrade.
     applicationVariants.all { variant ->
         if (variant.buildType.name == "validation") {
-            variant.outputs.each { output -> output.versionCodeOverride = 16 }
+            variant.outputs.each { output -> output.versionCodeOverride = 17 }
         }
     }
     signingConfigs {
@@ -194,4 +194,33 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.room:room-testing:2.6.1'
     androidTestImplementation 'androidx.work:work-testing:2.9.1'
+}
+
+// Fail any validation build whose assets carry the synthetic test knowledge package (SYNTHETIC_TEST, the
+// "lighthouse" fixture). Validation sideloads must bundle only the approved library, never test fixtures.
+tasks.register('assertNoSyntheticKnowledgeInValidation') {
+    group = 'verification'
+    description = 'Fail if validation assets contain the SYNTHETIC_TEST knowledge package'
+    doLast {
+        def markers = ['SYNTHETIC_TEST', 'synthetic-device-package', 'synthetic-control-key', 'synthetic-device-key']
+        def roots = [file('src/main/assets'), file('src/validation/assets')]
+        def hits = []
+        roots.each { root ->
+            if (root.exists()) {
+                fileTree(root).matching { include '**/*.json'; include '**/*.txt' }.files.each { f ->
+                    def text = f.getText('UTF-8')
+                    markers.each { m -> if (text.contains(m)) hits << "${f.path} contains ${m}" }
+                }
+            }
+        }
+        if (hits) {
+            throw new GradleException('Synthetic knowledge package found in app assets: ' + hits.join('; '))
+        }
+    }
+}
+
+tasks.configureEach { task ->
+    if (task.name == 'mergeValidationAssets') {
+        task.dependsOn 'assertNoSyntheticKnowledgeInValidation'
+    }
 }
