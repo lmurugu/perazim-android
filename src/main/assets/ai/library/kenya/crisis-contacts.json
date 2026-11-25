@@ -31,12 +31,12 @@
    "numbers": [
     "1195"
    ],
-   "hours": "Not recorded",
+   "hours": "Open 24 hours (National GBV Helpline page checked 2026-11-25)",
    "status": "UNCONFIRMED_CURRENT",
-   "use": "Violence in the home or relationships. Confirm before relying on it",
+   "use": "Violence in the home or relationships. Gender-based violence counselling and referral",
    "approvedByLevi": "2026-11-23",
    "reviewNote": "Conflict to resolve. The research thread (2026-11-24) found only a 2020 report and says do not use this number until it is confirmed. Levi approved it as UNCONFIRMED_CURRENT on 2026-11-23. Levi to decide: keep or remove.",
-   "displayRule": "Secondary line only. Show it after 999 and 112, labelled 'may not be current'. Never show it as the only number. Decision kept from Levi, 2026-11-23. Confirmation required before release."
+   "displayRule": "Show with its purpose: gender-based violence counselling and referral, open 24 hours. Do not add a currency warning to this line. Show 999 or 112 first when someone is in immediate danger."
   },
   {
    "id": "child-116",

@@ -35,8 +35,8 @@
    "files": [
     {
      "path": "kenya/crisis-contacts.json",
-     "sha256": "ad5418be934ba97e03448524ab1bb49a052a964765a0f7d4b604e3fd46159be6",
-     "bytes": 3365
+     "sha256": "b132cd791f9673d2c8c49e779f6389e335046782e34248afa3fef706252e3c88",
+     "bytes": 3433
     },
     {
      "path": "kenya/legal-summaries.json",
@@ -62,8 +62,8 @@
    "files": [
     {
      "path": "pastoral/kenya-topics.json",
-     "sha256": "e39f372f9d5bee2f59457964f5d088c88724f9eb1479e916bf2e8502830e64e1",
-     "bytes": 12462
+     "sha256": "21b5538ece3a95e4f72d1064407674249bd1e7f7912c33c1c7a3e3d3a786da9a",
+     "bytes": 12478
     }
    ]
   },

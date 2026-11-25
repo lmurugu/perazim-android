@@ -29,6 +29,7 @@ public class PerazimAiEngine {
 
     private static final Pattern CRISIS_PATTERN = CrisisPhrases.PATTERN;
     private static final Pattern CRISIS_DISCLOSURE_PATTERN = Pattern.compile(
+            "\\b(?:ananipiga|ananinyanyasa|ananitishia|ananiua|ananibaka|kunipiga|ninapigwa|ninanyanyaswa)\\b|" +
             "\\b(?:(?:my|our) (?:husband|wife|spouse|partner|boyfriend|girlfriend|parent|father|mother|caregiver) " +
                     "(?:hits?|beats?|beating|struck|choked|attacked|threatened) (?:me|us|my child|our child)|" +
                     "(?:hit|hits|hitting|beat|beats|beating|struck|choked|choking|attacked|threatened) (?:me|us|my child|our child))\\b|" +
@@ -250,7 +251,7 @@ public class PerazimAiEngine {
     }
 
     public static AiResponse crisisResponse() {
-        String msg = "I'm sorry you're facing this. Are you safe right now, and do you have a plan or a way to end your life tonight? If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If someone else is at risk, do not leave them alone. If you can, tell a trusted person nearby and ask them to stay with you. For ongoing distress, contact a qualified local health professional.\n\n"
+        String msg = "I'm sorry you're facing this. Are you safe right now, and do you have a plan or a way to end your life tonight? If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If someone else is at risk and it is safe for you to do so, stay with them, or ask a trusted person to stay with them. Do not put yourself or anyone else in danger to do this. For ongoing distress, contact a qualified local health professional.\n\n"
                 + "Kenya helplines, by purpose:\n"
                 + "- Police emergency and immediate danger: 999 or 112.\n"
                 + "- SHA 922 Lifeline, to reach an ambulance for urgent medical emergencies, including overdose or poisoning.\n"
@@ -468,6 +469,7 @@ public class PerazimAiEngine {
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
             + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene|miraa|khat|muguka|uzazi wa mpango|waislamu|jirani zangu|muslim neighbou?rs?|kugongewa|kugongeana|nimegongewa|tukigongeana|mpango wa kando)\\b|"
+            + "\\b(?:parents? (?:are )?separat\\w*|come.we.stay|cohabit\\w*|cannot conceive|can'?t conceive|infertil\\w*|afford (?:the |a )?wedding|chronic illness|disabled|disability|cannot afford|can'?t afford)\\b|"
             // Added 2026-11-25 for the marriage and family set (Levi's sections 4-8): these are in scope for the approved routes.
             + "\\b(?:marry|married|marriage|singl\\w*|ndoa|trap|mume|mke|wanaume|wanawake|mchumba|mahari|familia|ananisaliti|kusaliti|"
             + "ujumbe wa kimapenzi|mama yangu|mama mkwe|mother-in-law|in-laws?|mkwe|hafanyi|anafanya kila kitu|kazi za nyumbani|chores|housework|"
@@ -659,6 +661,7 @@ public class PerazimAiEngine {
     /** Violence and abuse wording. Matched in the speaker's own situation only; a general question about abuse is a topic. */
     private static final Pattern VIOLENCE_TERMS = Pattern.compile(
             "\\b(?:domestic violence|physically abused|sexual assault|sexually assaulted|abus\\w*|beats? me|beating me|hits? me|" +
+                    "ananipiga|ananinyanyasa|ananitishia|ananiua|ananibaka|kunipiga|ninapigwa|ninanyanyaswa|" +
                     "hitting me|struck me|choked me|attacked me|threat\\w* (?:to )?(?:kill |hurt |harm )?me|rape\\w*|molest\\w*|" +
                     "locked (?:me|us) (?:in|up)|forced me|(?:immediate|imminent) danger|going to kill (?:me|us))\\b",
             Pattern.CASE_INSENSITIVE);
@@ -666,7 +669,7 @@ public class PerazimAiEngine {
     private static final Pattern SPEAKER_SITUATION = Pattern.compile(
             "\\b(?:i|i'm|i am|i've|i'll|me|my|our|us|we)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern FIRST_PERSON_OUTSIDE_QUOTES = Pattern.compile(
-            "\\b(?:i|i'm|i am|i will|i'll|i'd|i feel|i want|i have)\\b|\\bmy life\\b", Pattern.CASE_INSENSITIVE);
+            "\\b(?:i|i'm|i am|i will|i'll|i'd|i feel|i want|i have|mimi|nina|nataka|nimechoka|ninapigwa|ninaogopa)\\b|\\bmy life\\b|\\bmaisha yangu\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern THIRD_PERSON_MARKER = Pattern.compile(
             "\\b(?:he|she|they|his|her|their|friend|brother|sister|husband|wife|son|daughter|texted|messaged|someone)\\b",
             Pattern.CASE_INSENSITIVE);
