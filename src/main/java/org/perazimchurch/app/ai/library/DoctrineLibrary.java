@@ -104,6 +104,8 @@ public final class DoctrineLibrary {
             List<String> others = strings(e.optJSONArray("otherViews"));
             List<String> verseLines = new ArrayList<>();
             JSONArray verses = e.optJSONArray("verses");
+            // Multi-passage rule (Levi, 2026-11-25): a doctrine rests on at least two passages. Fail closed.
+            if (verses == null || verses.length() < 2) continue;
             if (verses != null) {
                 for (int v = 0; v < Math.min(verses.length(), 3); v++) {
                     JSONObject verse = verses.getJSONObject(v);

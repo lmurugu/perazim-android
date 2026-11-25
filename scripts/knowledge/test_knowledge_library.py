@@ -75,13 +75,14 @@ if __name__ == "__main__":
     unittest.main()
 
 
-REMOVED_SOURCE_IDS = {"ante-nicene-fathers", "npnf", "comparative-kb-1.0.0", "comparative-kb-1.5.22"}
-REMOVED_OTHER_FAITH_TERMS = ("Catechism", "Qur'an", "Council of Trent", "Hindu", "Buddhis", "Latter-day Saint",
-                             "Jehovah's Witness", "Seventh-day Adventist", "Christian Science")
+
+OTHER_FAITH_TERMS = ("Catechism", "Qur'an", "Council of Trent", "Hindu", "Buddhis", "Latter-day Saint",
+                     "Jehovah's Witness", "Seventh-day Adventist", "Christian Science")
 
 
-class RemovedSourcesTest(unittest.TestCase):
-    """Sources removed 2026-11-25 must not come back into the register, the package or the reference build."""
+class ClassifiedSourcesTest(unittest.TestCase):
+    """Levi, 2026-11-25: Bible first; creeds and early fathers only where they agree with Bible-centred Protestant,
+    Pentecostal and Evangelical teaching; other faiths and groups are false-doctrine examples, never citable sources."""
 
     ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 
@@ -89,29 +90,36 @@ class RemovedSourcesTest(unittest.TestCase):
         with open(os.path.join(self.ROOT, rel), encoding="utf-8") as f:
             return f.read()
 
-    def test_removed_candidates_are_gone_from_the_source_list(self):
+    def test_church_fathers_are_tier_two_candidates(self):
         sources = json.loads(self._read("scripts/reference/sources.json"))
-        listed = {c.get("id") for c in sources.get("candidates", []) + sources.get("sources", [])}
-        self.assertEqual(listed & REMOVED_SOURCE_IDS, set())
+        tiers = {c.get("id"): c.get("tier") for c in sources.get("candidates", [])}
+        self.assertEqual(tiers.get("ante-nicene-fathers"), "TIER_2_CONDITIONAL")
+        self.assertEqual(tiers.get("npnf"), "TIER_2_CONDITIONAL")
 
-    def test_removals_are_recorded_with_reasons(self):
-        sources = json.loads(self._read("scripts/reference/sources.json"))
-        recorded = {r["id"]: r["reason"] for r in sources.get("removed", [])}
-        for source_id in REMOVED_SOURCE_IDS:
-            self.assertIn(source_id, recorded)
-            self.assertTrue(recorded[source_id].strip())
+    def test_fathers_and_other_faith_material_are_not_approved(self):
+        approvals = json.loads(self._read("src/main/assets/reference/approvals.json"))["approvedSourceIds"]
+        for source_id in ("ante-nicene-fathers", "npnf", "comparative-kb-1.5.22"):
+            self.assertNotIn(source_id, approvals)
 
-    def test_register_carries_the_removals(self):
+    def test_register_lists_only_approved_or_candidate_sources(self):
         register = json.loads(self._read("src/main/assets/ai/library/sources/register.json"))
-        self.assertEqual({r["id"] for r in register["removedSources"]}, REMOVED_SOURCE_IDS)
-        self.assertEqual(set(s["id"] for s in register["sources"]) & REMOVED_SOURCE_IDS, set())
+        approved = {s["id"] for s in register["sources"] if s["status"] == "APPROVED_FOR_GUIDE"}
+        self.assertTrue({"smith-bible-dictionary", "creed-nicene-constantinopolitan-381"} <= approved)
 
-    def test_unsigned_package_has_no_other_faith_documents(self):
-        text = self._read("ai-eval/knowledge-package-unsigned/package.unsigned.json")
-        self.assertNotIn("comparative", text)
-        for term in REMOVED_OTHER_FAITH_TERMS:
-            self.assertFalse(term in text, "package still mentions " + term)
+    def test_comparative_entries_are_classified_and_at_least_two_passages(self):
+        kb = json.loads(self._read("src/main/assets/ai/guide/comparative/comparative-kb.json"))
+        for e in kb["entries"]:
+            self.assertIn(e["classification"], ("FALSE_DOCTRINE_EXAMPLE", "POLICY_RULE"))
+            self.assertGreaterEqual(len(set(e["anchors"])), 2, e["id"])
 
-    def test_comparative_source_file_is_not_present(self):
-        self.assertFalse(os.path.exists(os.path.join(self.ROOT, "ai-eval/knowledge-package-unsigned/source/comparative-kb-1.5.22.json")))
-        self.assertFalse(os.path.exists(os.path.join(self.ROOT, "src/main/assets/ai/guide/comparative/comparative-kb.json")))
+    def test_package_marks_other_faith_material_as_false_doctrine_examples_only(self):
+        package = json.loads(self._read("ai-eval/knowledge-package-unsigned/package.unsigned.json"))["payload"]
+        for d in package["documents"]:
+            if d["sourceId"].startswith("comparative-"):
+                self.assertEqual(d["authorityClass"], "FALSE_DOCTRINE_EXAMPLE", d["sourceId"])
+        text = json.dumps(package)
+        for doc in package["documents"]:
+            if doc["authorityClass"] != "FALSE_DOCTRINE_EXAMPLE":
+                for term in OTHER_FAITH_TERMS:
+                    self.assertFalse(term in doc["text"], doc["sourceId"] + " mentions " + term)
+        self.assertIn("comparative-", text)

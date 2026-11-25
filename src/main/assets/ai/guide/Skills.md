@@ -1,6 +1,6 @@
 # Skills.md: playbooks, self-learning, self-heal and self-improve (locked)
 
-Version 1.3.0 (2026-11-25: doctrine and drift playbooks changed to Bible-only answers). The loader matches each question against the triggers below. It loads at most one playbook, plus lessons and the user style line, inside the 900-character budget.
+Version 1.4.0 (2026-11-25: source order, two-passage rule and false-doctrine drift playbook). The loader matches each question against the triggers below. It loads at most one playbook, plus lessons and the user style line, inside the 900-character budget.
 
 ## Skill index
 | id | triggers | playbook |

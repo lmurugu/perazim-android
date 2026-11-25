@@ -1,5 +1,5 @@
 {
-  "_comment": "Register of reference sources for the on-phone guide. Every item is PENDING Levi's approval (see docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md). Presence here is not approval: the app only uses sources listed in src/main/assets/reference/approvals.json. Since 2026-11-25 only Bible-centred Protestant, Pentecostal and Evangelical sources, Bible texts and the ecumenical Nicene Creed may be used as answering or resource material. Sources removed for another position are listed under 'removed' with the reason.",
+  "_comment": "Register of reference sources for the on-phone guide. Every item is PENDING Levi's approval (see docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md). Presence here is not approval: the app only uses sources listed in src/main/assets/reference/approvals.json. Source order (Levi, 2026-11-25): Tier 1 Bible (KJV/NASB), always first. Tier 2 creeds and early Church Fathers only where they agree with Bible-centred Protestant, Pentecostal and Evangelical teaching. Tier 3 Bible-centred Protestant, Pentecostal and Evangelical teaching and books. Other groups (Roman Catholic, LDS, Jehovah's Witness, Qur'an and similar) are FALSE_DOCTRINE_EXAMPLE material, never sources.",
   "sources": [
     {
       "id": "openbible-xrefs",
@@ -415,32 +415,29 @@
       "status": "BUNDLED_LICENCE_OPEN_NOT_USED_BY_AI",
       "theology": "NONE",
       "note": "Owner must confirm the Greek licence. Word-study lookup belongs to the other thread."
-    }
-  ],
-  "removed": [
+    },
     {
       "id": "ante-nicene-fathers",
       "title": "Ante-Nicene Fathers (Roberts-Donaldson / Schaff ed.)",
-      "date": "2026-11-25",
-      "reason": "Removed by Levi's instruction of 2026-11-25: collections of early Christian writings used by Catholic and Orthodox churches as teaching sources. Not a Bible-centred Protestant, Pentecostal or Evangelical source, so it may not be answering or resource material."
+      "licence": "Public domain (CCEL)",
+      "url": "https://www.ccel.org/ccel/s/schaff/anf01/cache/anf01.txt",
+      "status": "CANDIDATE_TIER2_EXTRACTION_PENDING",
+      "theology": "Early church; views mixed and pre-date later doctrine",
+      "note": "Ten volumes; large; optional.",
+      "tier": "TIER_2_CONDITIONAL",
+      "tierNote": "Tier 2: a creed or early Church Father used only where the passage agrees with a Bible-centred Protestant, Pentecostal or Evangelical position. Passages must be tagged and filtered; nothing that contradicts that position. Extraction pending; not loaded."
     },
     {
       "id": "npnf",
       "title": "Nicene and Post-Nicene Fathers (Schaff ed.)",
-      "date": "2026-11-25",
-      "reason": "Removed by Levi's instruction of 2026-11-25: collection of patristic writings shared with Catholic and Orthodox teaching, not a Bible-centred Protestant, Pentecostal or Evangelical source."
-    },
-    {
-      "id": "comparative-kb-1.0.0",
-      "title": "Perazim comparative knowledge base, version 1.0.0 (27 entries)",
-      "date": "2026-11-25",
-      "reason": "Removed by Levi's instruction of 2026-11-25. Descriptions of other faiths, churches and groups (Catholic, Orthodox, Hindu, Buddhist, Islamic, LDS, JW, Adventist, Christian Science, New Age, secular and African traditional). Their KJV anchors were kept as Bible references in assets/ai/guide/drift/scripture-anchors.json."
-    },
-    {
-      "id": "comparative-kb-1.5.22",
-      "title": "Perazim comparative knowledge base, version 1.5.22 (PR 76, 27 entries, APPROVED_LEVI)",
-      "date": "2026-11-25",
-      "reason": "Removed by Levi's instruction of 2026-11-25 (same reason). Approved entries were not a Protestant source: their summaries and origins describe other traditions from Catholic, Orthodox, Islamic and other sources. Only the approved anchors survive, as Bible references, in scripture-anchors.json."
+      "licence": "Public domain (CCEL)",
+      "url": "https://www.ccel.org/ccel/s/schaff/npnf101/cache/npnf101.txt",
+      "status": "CANDIDATE_TIER2_EXTRACTION_PENDING",
+      "theology": "Post-Nicene; mixed",
+      "note": "Large; optional.",
+      "tier": "TIER_2_CONDITIONAL",
+      "tierNote": "Tier 2: a creed or early Church Father used only where the passage agrees with a Bible-centred Protestant, Pentecostal or Evangelical position. Passages must be tagged and filtered; nothing that contradicts that position. Extraction pending; not loaded."
     }
-  ]
+  ],
+  "removed": []
 }

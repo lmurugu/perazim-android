@@ -396,32 +396,31 @@
    "theologyTag": null,
    "tier": "candidate",
    "status": "CANDIDATE_NOT_APPROVED"
-  }
- ],
- "removedSources": [
+  },
   {
    "id": "ante-nicene-fathers",
    "title": "Ante-Nicene Fathers (Roberts-Donaldson / Schaff ed.)",
-   "date": "2026-11-25",
-   "reason": "Removed by Levi's instruction of 2026-11-25: collections of early Christian writings used by Catholic and Orthodox churches as teaching sources. Not a Bible-centred Protestant, Pentecostal or Evangelical source, so it may not be answering or resource material."
+   "author": null,
+   "category": null,
+   "licence": "Public domain (CCEL)",
+   "licenceUrl": null,
+   "sourceUrl": null,
+   "theologyTag": null,
+   "tier": "candidate",
+   "status": "CANDIDATE_NOT_APPROVED"
   },
   {
    "id": "npnf",
    "title": "Nicene and Post-Nicene Fathers (Schaff ed.)",
-   "date": "2026-11-25",
-   "reason": "Removed by Levi's instruction of 2026-11-25: collection of patristic writings shared with Catholic and Orthodox teaching, not a Bible-centred Protestant, Pentecostal or Evangelical source."
-  },
-  {
-   "id": "comparative-kb-1.0.0",
-   "title": "Perazim comparative knowledge base, version 1.0.0 (27 entries)",
-   "date": "2026-11-25",
-   "reason": "Removed by Levi's instruction of 2026-11-25. Descriptions of other faiths, churches and groups (Catholic, Orthodox, Hindu, Buddhist, Islamic, LDS, JW, Adventist, Christian Science, New Age, secular and African traditional). Their KJV anchors were kept as Bible references in assets/ai/guide/drift/scripture-anchors.json."
-  },
-  {
-   "id": "comparative-kb-1.5.22",
-   "title": "Perazim comparative knowledge base, version 1.5.22 (PR 76, 27 entries, APPROVED_LEVI)",
-   "date": "2026-11-25",
-   "reason": "Removed by Levi's instruction of 2026-11-25 (same reason). Approved entries were not a Protestant source: their summaries and origins describe other traditions from Catholic, Orthodox, Islamic and other sources. Only the approved anchors survive, as Bible references, in scripture-anchors.json."
+   "author": null,
+   "category": null,
+   "licence": "Public domain (CCEL)",
+   "licenceUrl": null,
+   "sourceUrl": null,
+   "theologyTag": null,
+   "tier": "candidate",
+   "status": "CANDIDATE_NOT_APPROVED"
   }
- ]
+ ],
+ "removedSources": []
 }

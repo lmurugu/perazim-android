@@ -2,7 +2,9 @@
 
 **Instruction (Levi, 2026-11-25):** the app's Christian teaching must come from a Bible-centred Protestant, Pentecostal and Evangelical position. Other religious or Christian traditions must not be presented as equally valid alternatives. Remove every source the AI can use as answering or resource material that does not come from that position. Answers must use everyday language a church member can follow.
 
-**Decision applied on this branch:** sources that describe other faiths, churches or groups are removed. Bible text, Bible-centred Protestant, Pentecostal and Evangelical reference material and the ecumenical Nicene Creed remain. Levi's approved doctrine positions are unchanged in substance.
+**Update (Levi's answer, 2026-11-25, supersedes the removal below):** other faiths, churches and groups are kept only as false-doctrine examples, to be refuted from Scripture and never credible sources. The comparative knowledge base 1.5.22 is restored for that purpose. Creeds and early Church Fathers are Tier 2, used only where they agree with the Protestant, Pentecostal and Evangelical position. Every doctrine needs two Scripture passages. Coordinator decisions: Wesley's Notes kept, labelled Protestant (2A); Westminster Confession stays unloaded (3A); Schaff vol. III and the group-question policy stay out of answering material for now.
+
+**Original decision (historical):** sources that describe other faiths, churches or groups were removed. Bible text, Bible-centred Protestant, Pentecostal and Evangelical reference material and the ecumenical Nicene Creed remain. Levi's approved doctrine positions are unchanged in substance.
 
 ## KEEP / REMOVE / BORDERLINE
 
