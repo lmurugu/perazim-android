@@ -131,6 +131,11 @@ public final class PreModel {
         Pattern.compile("cheerful giv|generous giv|offering to (?:the )?(?:church|god)|giving to (?:the )?church", Pattern.CASE_INSENSITIVE),
         Pattern.compile("pharaoh.*heart|heart of pharaoh", Pattern.CASE_INSENSITIVE),
     };
+    private static final Pattern TOPIC_EXCLUDE = Pattern.compile(
+            "\\bhiv\\b|\\barvs?\\b|antiretro|medic|doctor|hospital|tablets?|\\bpills?\\b|\\bdrugs?\\b|clinic|\\bnurse|"
+            + "stop taking|prayer cloth|\\btest(?:ed|s)?\\b|accus|bewitch|\\bmy (?:son|daughter|child|mother|father|aunt|uncle|"
+            + "family|husband|wife|mother-in-law|grandmother|grandfather|cousin|brother|sister)\\b|\\bverse that proves|pay for|\\bpay\\b",
+            Pattern.CASE_INSENSITIVE);
     private static final Pattern TOPIC_REF = Pattern.compile("^(.+) (\\d+):(\\d+)$");
     static final String[][] TOPIC_REFS = {
         {"1 Timothy 6:10", "Ecclesiastes 5:10", "Hebrews 13:5"},
@@ -185,6 +190,9 @@ public final class PreModel {
 
     private static String topicVerses(KjvVerseText verses, String question) {
         String normalized = question.toLowerCase(Locale.ROOT).replace('\u2019', '\'');
+        // Medical, accusation and personal-affliction messages are not answered with a verse. They go to the zones, which
+        // keep the pointer to a doctor, a church leader or a pastor.
+        if (TOPIC_EXCLUDE.matcher(normalized).find()) return null;
         for (int t = 0; t < TOPIC_PATTERNS.length; t++) {
             if (!TOPIC_PATTERNS[t].matcher(normalized).find()) continue;
             StringBuilder out = new StringBuilder();
