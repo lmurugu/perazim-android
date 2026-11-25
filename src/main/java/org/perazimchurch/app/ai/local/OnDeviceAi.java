@@ -164,8 +164,11 @@ public final class OnDeviceAi {
                     }
                 }
                 String evidenceQuery = evidenceQuery(question, history);
-                JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,
-                        System.currentTimeMillis(), evidenceQuery);
+                // A Christian doctrine question is answered from Scripture and the library, never from a name or word dictionary:
+                // no stored or reference dictionary evidence (the Hitchcock "Mary" entry, 2026-11-25).
+                boolean doctrineQuestion = PreModel.scriptureDoctrineQuestion(question);
+                JSONArray evidence = doctrineQuestion ? new JSONArray() : OfflineKnowledgeStore.retrieve(c, trustedKeys,
+                        BuildConfig.VERSION_NAME, System.currentTimeMillis(), evidenceQuery);
                 // Word study by Strong's number (G26, H7225): answer from the bundled entry, never generate it.
                 java.util.regex.Matcher strongsMatch = java.util.regex.Pattern.compile("\\b([GH]\\d{1,4})\\b").matcher(question);
                 if (strongsMatch.find()) {
@@ -188,7 +191,7 @@ public final class OnDeviceAi {
                     return;
                 }
                 // Approved reference items (dictionary and cross-references). A no-op until Levi approves a source.
-                evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
+                if (!doctrineQuestion) evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
                 // Drift: a question that uses another faith's idea gets at least two KJV passages plus a false-doctrine note to refute from Scripture; never a credible source (no-op otherwise).
                 evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
                 if (evidence.length() == 0) {

@@ -30,7 +30,9 @@ final class OwnKnowledge {
     private static final Pattern FAITH_CONTEXT = Pattern.compile(
             "\\b(?:bible|biblia|scripture|scriptures|verse|verses|god|lord|jesus|christ|christian|christians|church|kanisa|pastor|"
             + "prayer|pray|faith|gospel|holy spirit|salvation|saved|sin|sins|baptism|baptise|baptize|heaven|hell|doctrine|theology|"
-            + "sabbath|worship|ministry|bishop|tithe|tithing|mungu|sala|neno|yesu|mchungaji)\\b", Pattern.CASE_INSENSITIVE);
+            + "sabbath|worship|ministry|bishop|tithe|tithing|mungu|sala|neno|yesu|mchungaji|purgatory|mary|saint|saints|pope|"
+            + "justification|justified|sola|scripture|scriptures|communion|supper|canon|indulgence|indulgences|nicaea|nicene|"
+            + "creed|mediator|intercession|grace|sin|confession|confess|eucharist)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern OTHER_TRANSLATION = Pattern.compile("\\b(?:ESV|NIV|NKJV|NLT)\\b");
     /** Any wording that presents an answer as the church's official, approved or decided position. */
     private static final Pattern OFFICIAL_CLAIM = Pattern.compile(
@@ -76,9 +78,17 @@ final class OwnKnowledge {
      * King James Version passages whose words best match the question, best first, each as "label: text". Empty when the
      * question has no topic word or nothing matches. Only verbatim bundled KJV text is returned.
      */
-    static java.util.List<String> passagesFor(KjvVerseText kv, String question) {
+    static java.util.List<String> passagesFor(KjvVerseText kv, String question, java.util.List<Draft> drafts) {
         java.util.List<String> out = new ArrayList<>();
         if (kv == null || question == null) return out;
+        // Library drafts for this topic come first: their wording is retrieval material for the model, never shown as approved.
+        if (drafts != null) {
+            for (Draft d : drafts) {
+                if (!d.match.matcher(question).find()) continue;
+                out.add("Library draft for review (not an approved position): " + d.view);
+                out.addAll(d.lines);
+            }
+        }
         java.util.List<String> words = new ArrayList<>();
         for (String w : question.toLowerCase(Locale.ROOT).split("[^\\p{L}]+")) {
             if (w.length() >= 4 && !TOPIC_STOP.contains(w) && !words.contains(w)) words.add(w);
@@ -149,13 +159,51 @@ final class OwnKnowledge {
         return LABEL + text;
     }
 
+    /** One draft library entry: the view, its KJV passage lines, and the words that choose it. */
+    static final class Draft {
+        final Pattern match;
+        final String view;
+        final java.util.List<String> lines;
+        Draft(Pattern match, String view, java.util.List<String> lines) {
+            this.match = match;
+            this.view = view;
+            this.lines = lines;
+        }
+    }
+
+    private static java.util.List<Draft> drafts;
+
+    /** The draft entries in assets/ai/library/doctrine/drafts.json, read once. Empty when the file cannot be read. */
+    static synchronized java.util.List<Draft> loadDrafts(Context c) {
+        if (drafts != null) return drafts;
+        java.util.List<Draft> out = new ArrayList<>();
+        try (InputStream in = c.getAssets().open("ai/library/doctrine/drafts.json")) {
+            org.json.JSONArray entries = new org.json.JSONObject(new String(IoCompat.readAll(in), StandardCharsets.UTF_8))
+                    .getJSONArray("entries");
+            for (int i = 0; i < entries.length(); i++) {
+                org.json.JSONObject e = entries.getJSONObject(i);
+                java.util.List<String> lines = new ArrayList<>();
+                org.json.JSONArray verses = e.getJSONArray("verses");
+                for (int v = 0; v < verses.length(); v++) {
+                    org.json.JSONObject verse = verses.getJSONObject(v);
+                    lines.add(verse.getString("ref") + " (King James Version): " + verse.getString("text"));
+                }
+                out.add(new Draft(Pattern.compile(e.getString("match"), Pattern.CASE_INSENSITIVE), e.getString("view"), lines));
+            }
+        } catch (Exception e) {
+            out = new ArrayList<>();
+        }
+        drafts = out;
+        return drafts;
+    }
+
     /** The accepted own-knowledge answer for this question, or null. Never throws. */
     static String tryAnswer(Context c, String question) {
         if (!allowed(question)) return null;
         try {
             ScriptureRangeTable table = loadTable(c);
             KjvVerseText kv = KjvVerseText.load(c);
-            String built = prompt(question, passagesFor(kv, question));
+            String built = prompt(question, passagesFor(kv, question, loadDrafts(c)));
             String raw;
             if (OnDeviceAi.testRunner != null) {
                 raw = OnDeviceAi.testRunner.generate(built, null, 160);

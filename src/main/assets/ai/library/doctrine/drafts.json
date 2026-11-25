@@ -1,0 +1,278 @@
+{
+  "status": "DRAFT_PENDING_LEVI",
+  "note": "Draft library entries for Levi's review (coordinator, 2026-11-25). Not served as approved doctrine. Used only as retrieval passages for the model, which must still pass the KJV checks. Each entry rests on at least two KJV passages, quoted from the bundled text.",
+  "entries": [
+    {
+      "id": "mary-honour-not-worship",
+      "topic": "Mary, honour and worship",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "mary|virgin mary|theotokos|worship mary|pray to mary|prayer to mary",
+      "view": "Scripture honours Mary as the mother of our Lord and blessed among women (Luke 1:42). She is not to be worshipped or prayed to as a mediator: Christ is the one mediator, and worship belongs to God alone (1 Timothy 2:5; Matthew 4:10). Mary herself needed a Saviour (Luke 1:46-47).",
+      "verses": [
+        {
+          "ref": "Luke 1:47",
+          "text": "And my spirit hath rejoiced in God my Saviour."
+        },
+        {
+          "ref": "1 Timothy 2:5",
+          "text": "For there is one God, and one mediator between God and men, the man Christ Jesus;"
+        },
+        {
+          "ref": "Matthew 4:10",
+          "text": "Then saith Jesus unto him, Get thee hence, Satan: for it is written, Thou shalt worship the Lord thy God, and him only shalt thou serve."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "purgatory-not-taught",
+      "topic": "Purgatory",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "purgatory|purgatorial",
+      "view": "Scripture does not teach purgatory. Each person dies once and then faces judgment (Hebrews 9:27), and the blood of Christ cleanses from all sin (1 John 1:7). Forgiveness is received by faith in Christ, not earned by suffering after death. Catholic teaching describes purgatory as a final purification; we test that teaching by Scripture and do not accept it.",
+      "verses": [
+        {
+          "ref": "Hebrews 9:27",
+          "text": "And as it is appointed unto men once to die, but after this the judgment:"
+        },
+        {
+          "ref": "1 John 1:7",
+          "text": "But if we walk in the light, as he is in the light, we have fellowship one with another, and the blood of Jesus Christ his Son cleanseth us from all sin."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "saints-intercession",
+      "topic": "Saints and intercession",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "saint|saints|intercession|intercede|intercessor|pray to the saints|ask the saints",
+      "view": "Christ alone is the mediator, and He always lives to make intercession for us (1 Timothy 2:5; Hebrews 7:25). Believers who have gone before are honoured as witnesses of faith (Hebrews 12:1), but Scripture does not teach that we pray to saints. Our prayers are offered to God through Christ.",
+      "verses": [
+        {
+          "ref": "1 Timothy 2:5",
+          "text": "For there is one God, and one mediator between God and men, the man Christ Jesus;"
+        },
+        {
+          "ref": "Hebrews 7:25",
+          "text": "Wherefore he is able also to save them to the uttermost that come unto God by him, seeing he ever liveth to make intercession for them."
+        },
+        {
+          "ref": "Hebrews 12:1",
+          "text": "Wherefore seeing we also are compassed about with so great a cloud of witnesses, let us lay aside every weight, and the sin which doth so easily beset us, and let us run with patience the race that is set before us,"
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "justification-by-faith",
+      "topic": "Justification by faith",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "justif|justified|right with god|made right|right standing|faith alone|sola fide|works save",
+      "view": "We are justified, made right with God, by grace through faith in Christ (Romans 3:28; Ephesians 2:8-9). Good works are the fruit of faith, prepared by God for us to walk in, not the price of salvation (Ephesians 2:10).",
+      "verses": [
+        {
+          "ref": "Romans 3:28",
+          "text": "Therefore we conclude that a man is justified by faith without the deeds of the law."
+        },
+        {
+          "ref": "Ephesians 2:8-9",
+          "text": "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast."
+        },
+        {
+          "ref": "Ephesians 2:10",
+          "text": "For we are his workmanship, created in Christ Jesus unto good works, which God hath before ordained that we should walk in them."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "sola-scriptura",
+      "topic": "Scripture as final authority",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "sola scriptura|scripture alone|bible alone|final authority|authority of scripture|authority of the bible|tradition",
+      "view": "Scripture is God-breathed and is the final authority for faith and life (2 Timothy 3:16-17). Church teachers, creeds and traditions are tested by it, as the Bereans searched the Scriptures to test Paul's teaching (Acts 17:11).",
+      "verses": [
+        {
+          "ref": "2 Timothy 3:16",
+          "text": "All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness:"
+        },
+        {
+          "ref": "Acts 17:11",
+          "text": "These were more noble than those in Thessalonica, in that they received the word with all readiness of mind, and searched the scriptures daily, whether those things were so."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "lords-supper",
+      "topic": "The Lord's Supper",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "lord'?s supper|communion|the supper|eucharist|mass|bread and wine|wine and bread",
+      "view": "The Lord's Supper is a remembrance of Christ's death, proclaimed until He comes (1 Corinthians 11:24-26), and a sharing in His body and blood by faith (1 Corinthians 10:16). Christians differ on how Christ is present in the supper. Scripture's language is remembrance and fellowship, and the guide does not claim that the bread and wine change in substance.",
+      "verses": [
+        {
+          "ref": "1 Corinthians 11:24-26",
+          "text": "And when he had given thanks, he brake it, and said, Take, eat: this is my body, which is broken for you: this do in remembrance of me. After the same manner also he took the cup, when he had supped, saying, This cup is the new testament in my blood: this do ye, as oft as ye drink it, in remembrance of me. For as often as ye eat this bread, and drink this cup, ye do shew the Lord’s death till he come."
+        },
+        {
+          "ref": "1 Corinthians 10:16",
+          "text": "The cup of blessing which we bless, is it not the communion of the blood of Christ? The bread which we break, is it not the communion of the body of Christ?"
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "original-sin",
+      "topic": "Original sin",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "original sin|born sinful|born in sin|sinful nature|inherited sin",
+      "view": "All people are born in sin and need a Saviour (Psalm 51:5; Romans 5:12). Through the obedience of Christ, many are made righteous and receive life (Romans 5:18-19).",
+      "verses": [
+        {
+          "ref": "Psalm 51:5",
+          "text": "Behold, I was shapen in iniquity; and in sin did my mother conceive me."
+        },
+        {
+          "ref": "Romans 5:12",
+          "text": "Wherefore, as by one man sin entered into the world, and death by sin; and so death passed upon all men, for that all have sinned:"
+        },
+        {
+          "ref": "Romans 5:18-19",
+          "text": "Therefore as by the offence of one judgment came upon all men to condemnation; even so by the righteousness of one the free gift came upon all men unto justification of life. For as by one man’s disobedience many were made sinners, so by the obedience of one shall many be made righteous."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "grace-alone",
+      "topic": "Grace",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "grace|unmerited|undeserved|favour of god|favor of god",
+      "view": "Grace is God's undeserved favour, given through Christ and not earned by works (Ephesians 2:8; Romans 11:6). The same grace trains believers to live godly lives (Titus 2:11-12).",
+      "verses": [
+        {
+          "ref": "Ephesians 2:8",
+          "text": "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God:"
+        },
+        {
+          "ref": "Romans 11:6",
+          "text": "And if by grace, then is it no more of works: otherwise grace is no more grace. But if it be of works, then is it no more grace: otherwise work is no more work."
+        },
+        {
+          "ref": "Titus 2:11-12",
+          "text": "For the grace of God that bringeth salvation hath appeared to all men, Teaching us that, denying ungodliness and worldly lusts, we should live soberly, righteously, and godly, in this present world;"
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "hell-final-punishment-review",
+      "topic": "Hell and final judgment",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "hell|judgment|judgement|eternal punishment|lake of fire|everlasting punishment",
+      "view": "Scripture teaches that judgment is real and that those who reject Christ face the lake of fire (Revelation 20:15; Matthew 25:46). Christians hold different views on the nature of final punishment, and the guide does not settle that question. Judgment belongs to God, and no one should claim to know any particular person's end. The call is to repent and believe (Acts 17:30-31).",
+      "verses": [
+        {
+          "ref": "Revelation 20:15",
+          "text": "And whosoever was not found written in the book of life was cast into the lake of fire."
+        },
+        {
+          "ref": "Matthew 25:46",
+          "text": "And these shall go away into everlasting punishment: but the righteous into life eternal."
+        },
+        {
+          "ref": "Acts 17:30-31",
+          "text": "And the times of this ignorance God winked at; but now commandeth all men every where to repent: Because he hath appointed a day, in the which he will judge the world in righteousness by that man whom he hath ordained; whereof he hath given assurance unto all men, in that he hath raised him from the dead."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "canon-66-books",
+      "topic": "The Bible's 66 books",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "canon|66 books|sixty-six|books of the bible|apocrypha|deuterocanon",
+      "view": "The Protestant and Evangelical default is the 66-book canon. The books are received as God's inspired Word, because Scripture is God-breathed and the Spirit moved the holy men who wrote it (2 Timothy 3:16; 2 Peter 1:21). Christians differ on the apocryphal books, and the guide does not rank them.",
+      "verses": [
+        {
+          "ref": "2 Timothy 3:16",
+          "text": "All scripture is given by inspiration of God, and is profitable for doctrine, for reproof, for correction, for instruction in righteousness:"
+        },
+        {
+          "ref": "2 Peter 1:21",
+          "text": "For the prophecy came not in old time by the will of man: but holy men of God spake as they were moved by the Holy Ghost."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "confession-indulgences",
+      "topic": "Confession and indulgences",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "confession|confess|indulgence|indulgences|priest forgive|absolution",
+      "view": "Confess your sins to God, who is faithful to forgive through Christ (1 John 1:9), and confess your faults to one another and pray for one another when that is needed (James 5:16). Forgiveness is a gift of God that cannot be bought (Acts 8:20; Ephesians 2:8-9), so the guide does not accept indulgences.",
+      "verses": [
+        {
+          "ref": "1 John 1:9",
+          "text": "If we confess our sins, he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness."
+        },
+        {
+          "ref": "James 5:16",
+          "text": "Confess your faults one to another, and pray one for another, that ye may be healed. The effectual fervent prayer of a righteous man availeth much."
+        },
+        {
+          "ref": "Acts 8:20",
+          "text": "But Peter said unto him, Thy money perish with thee, because thou hast thought that the gift of God may be purchased with money."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    },
+    {
+      "id": "nicaea-deity-of-christ",
+      "topic": "The Council of Nicaea and the deity of Christ",
+      "status": "DRAFT_PENDING_LEVI",
+      "match": "nicaea|nicene|council of nicaea|deity|divinity of christ|is jesus god|jesus is god|son of god|of one being|arius|arian",
+      "view": "The Council of Nicaea (AD 325) affirmed what Scripture teaches: the Son is eternal God, of one being with the Father, and not a created being (John 1:1; Colossians 1:15-17). Protestants and Evangelicals accept the teaching of Nicaea where it agrees with Scripture. The full text of the Nicene Creed is not yet in the library; it must be added from a licence-clear source before it is quoted.",
+      "verses": [
+        {
+          "ref": "John 1:1",
+          "text": "In the beginning was the Word, and the Word was with God, and the Word was God."
+        },
+        {
+          "ref": "John 1:14",
+          "text": "And the Word was made flesh, and dwelt among us, (and we beheld his glory, the glory as of the only begotten of the Father,) full of grace and truth."
+        },
+        {
+          "ref": "Colossians 1:15-17",
+          "text": "Who is the image of the invisible God, the firstborn of every creature: For by him were all things created, that are in heaven, and that are in earth, visible and invisible, whether they be thrones, or dominions, or principalities, or powers: all things were created by him, and for him: And he is before all things, and by him all things consist."
+        }
+      ],
+      "approval": {
+        "pending": "Levi"
+      }
+    }
+  ]
+}

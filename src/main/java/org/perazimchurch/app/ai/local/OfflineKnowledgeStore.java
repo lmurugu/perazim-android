@@ -1063,8 +1063,23 @@ public final class OfflineKnowledgeStore {
                 if (chars >= 3600) break;
             }
         }
+        // A doctrine question is answered from Scripture and the approved doctrine, never from a name or word dictionary
+        // (the Hitchcock "Mary" entry was added by the scripture top-up, 2026-11-25).
+        if (PreModel.scriptureDoctrineQuestion(question)) {
+            JSONArray kept = new JSONArray();
+            for (int i = 0; i < selected.length(); i++) {
+                JSONObject e = selected.getJSONObject(i);
+                String id = e.optString("sourceId") + " " + e.optString("title");
+                if (!DICTIONARY_SOURCE.matcher(id).find()) kept.put(e);
+            }
+            return kept;
+        }
         return selected;
     }
+
+    /** Reference dictionaries and lexicons: word and name entries, not doctrine. */
+    private static final java.util.regex.Pattern DICTIONARY_SOURCE = java.util.regex.Pattern.compile(
+            "hitchcock|easton|strong|dictionary|lexicon|concordance|names", java.util.regex.Pattern.CASE_INSENSITIVE);
 
     static boolean isUnderspecifiedReferenceQuestion(String question) {
         if (question == null || question.trim().isEmpty()) return false;

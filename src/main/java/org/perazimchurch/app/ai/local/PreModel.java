@@ -128,7 +128,7 @@ public final class PreModel {
         if (approved != null) return new Decision("routed:approved-" + approved.routeId, approved.text);
         String doctrine = DoctrineLibrary.load(c).answerFor(question);
         if (doctrine != null) return new Decision("routed:doctrine-approved", doctrine);
-        if (org.perazimchurch.app.ai.library.IdentifyRefute.ENABLED) {
+        if (org.perazimchurch.app.ai.library.IdentifyRefute.ENABLED && !scriptureDoctrineQuestion(question)) {
             String refute = identifyRefute(c, question);
             if (refute != null) return new Decision("routed:identify-refute", refute);
         }
@@ -153,7 +153,11 @@ public final class PreModel {
             return new Decision("routed:translation-policy", PerazimAiEngine.translationPolicyResponse().getMessageText());
         }
         NoGoZones.Zone zone = NoGoZones.match(question);
-        if (zone != null) return new Decision("routed:no-go:" + zone.id, zone.decline);
+        // Christian doctrine asked as what the Bible or our teaching says, with no other group named, is answered from Scripture
+        // and the library, not declined as an other-faiths or research question (coordinator, 2026-11-25).
+        boolean scriptureOnly = zone != null && scriptureDoctrineQuestion(question)
+                && ("other-faiths-and-groups".equals(zone.id) || "history-authorship-research".equals(zone.id));
+        if (zone != null && !scriptureOnly) return new Decision("routed:no-go:" + zone.id, zone.decline);
         // "That verse" with no book, chapter and verse in the question: ask which one is meant rather than guess.
         // This runs after the zones, so a zone decline always keeps its priority.
         if (VERSE_POINTER.matcher(question).find() && (table == null || reference(table, question) == null)) {
@@ -173,6 +177,20 @@ public final class PreModel {
             Pattern.CASE_INSENSITIVE);
     private static final String ROUTINE_STATUS_TEXT = "I can't see your routine status from here, so I won't say whether you "
             + "finished it today. Open Home to check today's routine.";
+
+    /** Christian doctrine words (Mary, purgatory, saints, justification and so on). */
+    private static final Pattern SCRIPTURE_DOCTRINE = Pattern.compile(
+            "\\b(?:mary|purgatory|saints?|intercession|intercede|pope|justif\\w*|sola scriptura|lord'?s supper|communion|original sin|"
+            + "hell|canon|indulgences?|confess\\w*|nicaea|nicene|grace|eucharist|immaculate conception|assumption of mary)\\b", Pattern.CASE_INSENSITIVE);
+    /** Other groups and faiths named in the question: their description goes to the fair-description and refutation routes. */
+    private static final Pattern NAMES_OTHER_GROUP = Pattern.compile(
+            "\\b(?:catholics?|mormons?|latter-day saints?|jehovah|witness(?:es)?|muslims?|islam|hindus?|buddhists?|orthodox|"
+            + "adventists?|sabbath|saturday|new age|karma|jains?)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** True for a Christian doctrine question that names no other group. */
+    static boolean scriptureDoctrineQuestion(String question) {
+        return question != null && SCRIPTURE_DOCTRINE.matcher(question).find() && !NAMES_OTHER_GROUP.matcher(question).find();
+    }
 
     /** The bundled Strong's entry for a number named in the question, or Easton's entry for a named word, or null. */
     static Decision lexiconDecision(Context c, String question) {

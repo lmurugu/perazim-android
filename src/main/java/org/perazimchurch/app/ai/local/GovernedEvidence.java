@@ -36,6 +36,10 @@ final class GovernedEvidence {
             "through", "too", "under", "until", "very", "what", "when", "where", "which", "while",
             "verse", "verses", "who", "with", "would", "you", "your"));
 
+    /** Reference dictionaries and lexicons: word and name entries, not doctrine. */
+    private static final java.util.regex.Pattern DICTIONARY_SOURCE = java.util.regex.Pattern.compile(
+            "hitchcock|easton|strong|dictionary|lexicon|concordance|names", java.util.regex.Pattern.CASE_INSENSITIVE);
+
     private GovernedEvidence() {}
 
     /**
@@ -56,6 +60,15 @@ final class GovernedEvidence {
             for (int i = 0; i < documents.length(); i++) {
                 JSONObject evidence = evidenceFor(documents.getJSONObject(i), withdrawnKeys, bySource, ambiguous, question);
                 if (evidence != null) candidates.add(evidence);
+            }
+        }
+        // A doctrine question is answered from Scripture and the approved doctrine, never from a name or word dictionary
+        // (a Hitchcock name entry answered "Mary" and a dictionary gave a wrong Nicaea date on the held-out run, 2026-11-25).
+        if (PreModel.scriptureDoctrineQuestion(question)) {
+            java.util.Iterator<JSONObject> dropped = candidates.iterator();
+            while (dropped.hasNext()) {
+                JSONObject e = dropped.next();
+                if (DICTIONARY_SOURCE.matcher(e.optString("sourceId") + " " + e.optString("title")).find()) dropped.remove();
             }
         }
         candidates.sort((left, right) -> {

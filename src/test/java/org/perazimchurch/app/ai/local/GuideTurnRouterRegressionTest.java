@@ -99,4 +99,24 @@ public class GuideTurnRouterRegressionTest {
         assertNotNull(composed);
         assertFalse(composed, composed.contains("end of text"));
     }
+
+    /** Levi's phone follow-up (2026-11-25): the refusal must not come back for Mary and immaculate conception, in any wording. */
+    @Test
+    public void marysPositionAndImmaculateConceptionAreNotDeclinedAsOtherFaiths() {
+        List<ConversationHistory.Turn> history = new ArrayList<>();
+        history.add(new ConversationHistory.Turn("user", "What does the Bible teach about baptism?"));
+        history.add(new ConversationHistory.Turn("assistant", "Our church teaches believer's baptism."));
+        String[] followUps = {
+                "what of immaculate conception and the position of Mary?",
+                "What of the Immaculate Conception?",
+                "What is the position of Mary?",
+        };
+        for (String followUp : followUps) {
+            GuideTurnRouter.Turn turn = GuideTurnRouter.respond(context, engine, followUp, history);
+            String text = turn.response == null ? "" : turn.response.getMessageText();
+            assertFalse(followUp + " -> " + turn.status, turn.status.startsWith("routed:no-go:other-faiths"));
+            assertFalse(followUp + " -> " + text, text.contains("authorised to compare"));
+            assertFalse(followUp + " -> " + text, text.contains("Miriam"));
+        }
+    }
 }
