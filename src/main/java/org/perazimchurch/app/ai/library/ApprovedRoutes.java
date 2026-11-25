@@ -617,7 +617,7 @@ public final class ApprovedRoutes {
                 "1 Corinthians 6:12", "1 Corinthians 6:19", "Galatians 5:22"));
 
         r.add(new Route("family-planning-married",
-                "family planning|contracept|birth control|condom|spacing (?:of )?children",
+                "family planning|contracept|birth control|condom|spacing (?:of )?children|uzazi wa mpango",
                 "Children are a blessing from God (Psalm 127:3–5), but Scripture does not prescribe a fixed number of children for every couple. For married couples, responsible family planning is a matter of shared marital conscience and stewardship. The couple may consider it in light of health, responsibilities, circumstances and their ability to care for children. Scripture does not name condoms, so this is a matter for the couple's shared conscience. Neither spouse may coerce the other into contraception or a permanent procedure, and any medical procedure needs free and informed consent. The church's position excludes methods intended to end an established pregnancy, and it does not treat every contraceptive method as abortion. I cannot choose a method or decide medical eligibility, so please talk with a qualified health provider or nurse at a clinic about the options for your body and situation. For HIV prevention, speak with a health worker as well.",
                 "Psalms 127:3"));
 
@@ -630,6 +630,11 @@ public final class ApprovedRoutes {
                 "angry (?:at|with) (?:my|a|the|someone|him|her|them)|been (?:so )?angry (?:at|with)|bitter (?:against|towards|toward|at)",
                 "Anger can be a real feeling, but Scripture warns us not to let it grow into bitterness or to hold onto it: be angry, and do not sin, and do not let the sun go down on your wrath (Ephesians 4:26). Jesus taught us to be reconciled to a brother who has something against us (Matthew 5:23–24), and to forgive as the Lord forgave us (Colossians 3:13). Please bring the anger to God honestly in prayer, and ask him to show you the next step, whether that is forgiveness, a conversation or an apology. Talk with your pastor or a trusted leader if the conflict is hard to resolve, and seek help if the anger affects your sleep, health or safety.",
                 "Ephesians 4:26", "Matthew 5:23", "Colossians 3:13"));
+
+        r.add(new Route("forgiving-others",
+                "forgiv\\w* (?:my|a|the|someone|him|her|them|brother|sister|friend|spouse|husband|wife)|forgive (?:my|a|the)|kumsamehe|kusamehe|msamehe",
+                "Scripture calls us to forgive others as God in Christ has forgiven us (Ephesians 4:32; Colossians 3:13). Jesus taught that our forgiveness is connected to forgiving others (Matthew 6:14–15). Forgiveness does not mean pretending that the harm did not happen, and it does not require you to stay in danger. If you have been harmed, your safety and the help of a trusted leader come first. Please pray about it, and talk with your pastor if this is hard.",
+                "Ephesians 4:32", "Colossians 3:13", "Matthew 6:14", "Matthew 6:15"));
 
         r.add(new Route("god-forgives-everyone",
                 "god forgives (?:everyone|everybody|all)|if god forgives|everyone is forgiven|everybody is forgiven",
