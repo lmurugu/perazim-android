@@ -22,6 +22,63 @@ import java.util.Set;
  */
 public final class ReferenceGuide {
 
+    /** Largest excerpt of Henry's text returned in an answer. Excerpts are cut at a sentence end. */
+    static final int MAX_HENRY_EXCERPT = 700;
+
+    /**
+     * Matthew Henry's commentary for a chapter the member names with his name (Tier 3, public domain). The verse's
+     * Scripture comes first, from the bundled KJV, then a short excerpt labelled as Henry's own view. Returns null when
+     * the question does not name Henry, names no passage, or Henry is not approved or not in the database.
+     */
+    public static String namedHenry(Context context, String question, org.perazimchurch.app.ai.library.KjvVerseText kjv) {
+        try {
+            if (context == null || question == null || kjv == null) return null;
+            String q = question.toLowerCase(Locale.ROOT);
+            if (!q.contains("matthew henry") && !q.contains("m. henry")) return null;
+            int key = ReferenceKeys.parseReference(question);
+            if (key <= 0) return null;
+            ReferenceApprovals approvals = approvals(context);
+            if (approvals.isEmpty() || !approvals.isApproved(ReferenceIndex.HENRY_SOURCE)) return null;
+            int book = key / 1_000_000;
+            int chapter = (key / 1000) % 1000;
+            int verse = Math.max(1, key % 1000);
+            String scripture = kjv.verse(book, chapter, verse);
+            if (scripture == null || scripture.isEmpty()) return null;
+            ReferenceIndex index = ReferenceIndex.open(context);
+            if (index == null) return null;
+            try {
+                String headword = ReferenceKeys.chapterHeadword(key);
+                ReferenceHit henry = null;
+                for (ReferenceHit hit : index.commentaries(headword, approvals, 60)) {
+                    if (ReferenceIndex.HENRY_SOURCE.equals(hit.sourceId)) {
+                        henry = hit;
+                        break;
+                    }
+                }
+                if (henry == null || henry.text == null || henry.text.trim().isEmpty()) return null;
+                return "Matthew Henry on " + headword + ", public domain (CCEL). It is his own view, not the Perazim "
+                        + "position, and Scripture is the test.\n\n"
+                        + "Scripture:\n" + headword + ":" + verse + ": “" + scripture + "”\n\n"
+                        + "Henry on this chapter: " + excerpt(henry.text);
+            } finally {
+                index.close();
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Henry excerpt skipped", e);
+            return null;
+        }
+    }
+
+    /** The start of a commentary body, cut at a sentence end where one is near the limit. */
+    static String excerpt(String body) {
+        String t = body.replaceAll("\\s+", " ").trim();
+        if (t.length() <= MAX_HENRY_EXCERPT) return t;
+        String cut = t.substring(0, MAX_HENRY_EXCERPT);
+        int stop = cut.lastIndexOf(". ");
+        if (stop > MAX_HENRY_EXCERPT / 2) cut = cut.substring(0, stop + 1);
+        return cut.trim() + " …";
+    }
+
     private static final String TAG = "ReferenceGuide";
     static final int MAX_REFERENCE_ITEMS = 2;
     /** One commentary excerpt at most. It is added last, after the governed position and the factual references. */

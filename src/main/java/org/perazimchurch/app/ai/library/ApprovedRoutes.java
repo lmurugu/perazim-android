@@ -796,15 +796,19 @@ public final class ApprovedRoutes {
                 + "that God knew and called Jeremiah before he was born (Jeremiah 1:5).",
                 "Jeremiah 1:5"));
 
-        r.add(new Route("henry-genesis-one",
+
+        // Fail-closed fallback for Matthew Henry: used only when the commentary database cannot be opened for the question.
+        r.add(new Route("henry-fallback",
                 "matthew henry|m\\. henry",
-                "Matthew Henry's commentary is not available in this guide, so I cannot quote him. The passage itself begins with God's "
-                + "creation of the heaven and the earth (Genesis 1:1). Read the whole chapter in the Bible tab.",
+                "Matthew Henry's commentary is not available right now, so I cannot quote him here. The passage itself begins with God's "
+                + "creation of the heaven and the earth (Genesis 1:1). Read the chapter in the Bible tab, and talk with a trusted church "
+                + "leader or your pastor.",
                 "Genesis 1:1"));
 
         r.add(new Route("wesley-notes",
                 "wesley",
-                "John Wesley's notes are an Arminian commentary. They are not available in this guide yet, so I cannot quote them. "
+                "John Wesley's notes are an Arminian commentary. They are in the guide's library, but they are not yet arranged by "
+                + "chapter, so I cannot quote them for a passage yet. Scripture is the test. "
                 + "Here is John 3:16 from the King James Version, the version this guide quotes.",
                 "John 3:16"));
 
