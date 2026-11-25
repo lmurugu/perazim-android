@@ -266,30 +266,6 @@
    "status": "CANDIDATE_NOT_APPROVED"
   },
   {
-   "id": "ante-nicene-fathers",
-   "title": "Ante-Nicene Fathers (Roberts-Donaldson / Schaff ed.)",
-   "author": null,
-   "category": null,
-   "licence": "Public domain (CCEL)",
-   "licenceUrl": null,
-   "sourceUrl": null,
-   "theologyTag": null,
-   "tier": "candidate",
-   "status": "CANDIDATE_NOT_APPROVED"
-  },
-  {
-   "id": "npnf",
-   "title": "Nicene and Post-Nicene Fathers (Schaff ed.)",
-   "author": null,
-   "category": null,
-   "licence": "Public domain (CCEL)",
-   "licenceUrl": null,
-   "sourceUrl": null,
-   "theologyTag": null,
-   "tier": "candidate",
-   "status": "CANDIDATE_NOT_APPROVED"
-  },
-  {
    "id": "schaff-creeds-vol3",
    "title": "Schaff, The Creeds of Christendom, vol. III (Evangelical Protestant creeds with translations)",
    "author": null,
@@ -420,6 +396,31 @@
    "theologyTag": null,
    "tier": "candidate",
    "status": "CANDIDATE_NOT_APPROVED"
+  },
+  {
+   "id": "ante-nicene-fathers",
+   "title": "Ante-Nicene Fathers (Roberts-Donaldson / Schaff ed.)",
+   "author": null,
+   "category": null,
+   "licence": "Public domain (CCEL)",
+   "licenceUrl": null,
+   "sourceUrl": null,
+   "theologyTag": null,
+   "tier": "candidate",
+   "status": "CANDIDATE_NOT_APPROVED"
+  },
+  {
+   "id": "npnf",
+   "title": "Nicene and Post-Nicene Fathers (Schaff ed.)",
+   "author": null,
+   "category": null,
+   "licence": "Public domain (CCEL)",
+   "licenceUrl": null,
+   "sourceUrl": null,
+   "theologyTag": null,
+   "tier": "candidate",
+   "status": "CANDIDATE_NOT_APPROVED"
   }
- ]
+ ],
+ "removedSources": []
 }

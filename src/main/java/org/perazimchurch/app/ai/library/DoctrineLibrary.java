@@ -16,8 +16,9 @@ import org.json.JSONObject;
  * Approved doctrine wording for the guide, read from the library's own files.
  *
  * <ul>
- *   <li>APPROVED_LEVI entries (entries.json) are shown as written: the Perazim view first, then the other views,
- *       then the KJV verses from the entry, then the no-verdict line.</li>
+ *   <li>APPROVED_LEVI entries (entries.json) are shown as written: the Bible-based Perazim view first, then the KJV
+ *       verses from the entry, then the no-verdict line. The other Christian views are added only when the question
+ *       asks about them (see OTHER_VIEWS_CUE), and they are labelled as views to be weighed against Scripture.</li>
  *   <li>UNDER_REVIEW positions (positions.json) are shown as a developing view, labelled as under review.</li>
  *   <li>UNDECIDED positions are explained without a position.</li>
  *   <li>Anything else (APPROVED without wording, DRAFT_PENDING_LEVI) is never shown here; the question goes on
@@ -30,6 +31,13 @@ public final class DoctrineLibrary {
     private static final Pattern DOCTRINAL_CUE = Pattern.compile(
             "\\b(?:is it|is|are|should|can|may|position|view|views|teach|taught|biblical|biblically|permitted|allowed|" +
             "does the (?:church|bible|guide)|what does the (?:church|guide|bible|perazim)|what is the (?:church|guide|perazim)|church (?:position|teaching))\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Question shapes that ask for other views. Only then are the other Christian views added to an approved answer. */
+    private static final Pattern OTHER_VIEWS_CUE = Pattern.compile(
+            "\\b(?:other (?:christian |christians'? |people's |views?|positions?|opinions?|interpretations?|side)|" +
+            "(?:what|which) (?:do|does|did) (?:others|other christians|some christians|some churches|some people)|" +
+            "other churches|other denominations|some christians|some churches|disagree\\w*|debate|" +
+            "alternative|another view|cessationis\\w*|continuationis\\w*)\\b",
             Pattern.CASE_INSENSITIVE);
     private static final String ENTRIES = "ai/library/doctrine/entries.json";
     private static final String POSITIONS = "ai/library/doctrine/positions.json";
@@ -96,6 +104,8 @@ public final class DoctrineLibrary {
             List<String> others = strings(e.optJSONArray("otherViews"));
             List<String> verseLines = new ArrayList<>();
             JSONArray verses = e.optJSONArray("verses");
+            // Multi-passage rule (Levi, 2026-11-25): a doctrine rests on at least two passages. Fail closed.
+            if (verses == null || verses.length() < 2) continue;
             if (verses != null) {
                 for (int v = 0; v < Math.min(verses.length(), 3); v++) {
                     JSONObject verse = verses.getJSONObject(v);
@@ -140,18 +150,19 @@ public final class DoctrineLibrary {
             if (!t.match.matcher(normalized).find()) continue;
             // An undecided topic in a personal or pastoral message is not a doctrine question: let the model answer.
             if ("UNDECIDED".equals(t.status) && !DOCTRINAL_CUE.matcher(normalized).find()) continue;
-            return render(t);
+            return render(t, OTHER_VIEWS_CUE.matcher(normalized).find());
         }
         return null;
     }
 
-    private static String render(Topic t) {
+    private static String render(Topic t, boolean asksForOtherViews) {
         StringBuilder out = new StringBuilder();
         switch (t.status) {
             case "APPROVED_LEVI":
                 out.append(t.view);
-                if (!t.otherViews.isEmpty()) {
-                    out.append("\n\nOther Christian views: ").append(String.join(" ", t.otherViews));
+                if (asksForOtherViews && !t.otherViews.isEmpty()) {
+                    out.append("\n\nOther Christian views, to be weighed against Scripture: ")
+                            .append(String.join(" ", t.otherViews));
                 }
                 if (!t.verseLines.isEmpty()) {
                     out.append("\n\nScripture: ").append(String.join(" ", t.verseLines));

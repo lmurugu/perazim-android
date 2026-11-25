@@ -94,3 +94,7 @@ Nothing has been written from memory. Each remaining creed needs a clean source 
 3. Decide on share-alike text (Swahili 2019 under CC BY-SA 4.0). Parked for now.
 4. Confirm the Strong's Greek licence (section D), which is MIT with attribution by coordinator decision and not yet re-verified upstream.
 5. Approve the confessions and creeds once they are transcribed and checked (section E).
+
+## Update 2026-11-25: removals
+
+Sources removed for teaching outside a Bible-centred Protestant, Pentecostal and Evangelical position: Ante-Nicene Fathers and Nicene and Post-Nicene Fathers (candidates), the comparative knowledge base (both versions) and the Qur'an paraphrase. Reasons and remaining decisions: docs/PERAZIM_AI_PROJECT/SOURCE_RESTRICTION_2026-11-25.md. The register records each removal under `removedSources`.

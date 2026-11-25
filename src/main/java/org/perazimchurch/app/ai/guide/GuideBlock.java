@@ -9,7 +9,7 @@ import java.util.List;
  * then the user's style, then learned style notes. The whole block never exceeds the budget.
  */
 public final class GuideBlock {
-    public static final int BUDGET_CHARS = 1000;
+    public static final int BUDGET_CHARS = 1200;
     static final int PLAYBOOK_CAP = 160;
     static final int STYLE_CAP = 80;
     static final int NOTE_CAP = 160;
