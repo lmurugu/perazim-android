@@ -101,7 +101,7 @@ Levi's working direction is that Jewish and Gentile believers are united in Chri
 
 Levi leans strongly toward a pre-tribulation and premillennial understanding. His working view includes Christ coming for His Church before the tribulation, a future turning of national Israel to Jesus near the end of the tribulation, and Christ's future physical reign on earth for a thousand years. He believes God's land promises to Israel have not been cancelled, while acknowledging the historical fulfilment recorded in Joshua.
 
-The full formulation remains **UNDER REVIEW**. The third revised end-times draft was reported ready for final review on 25 November, but the accompanying evaluation status still lists it as awaiting Levi's approval. Do not mark it approved or activate the topic without Levi's explicit approval of the exact text.
+The detailed theological framework remains **UNDER REVIEW**. Levi approved the third revised member-facing answer on 25 November subject to adding Revelation 13:11–14 for the beast's deception; clarifying that Revelation 3:10 was addressed to Philadelphia and that applying it to the wider Church is an interpretation; and including Daniel 2:34–35, 44–45 in the millennium section. The coordinator subsequently reported these changes implemented, the answer active in the AI branch and the no-go zone lifted. Treat that as approval of the corrected answer route in the AI branch, not as making every end-times detail settled Perazim doctrine or authorising production release. Keep the underlying theological position UNDER REVIEW.
 
 See [ISRAEL_CHURCH_AND_END_TIMES_POSITION.md](ISRAEL_CHURCH_AND_END_TIMES_POSITION.md) for the detailed working position and Scripture anchors.
 

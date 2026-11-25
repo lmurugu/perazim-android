@@ -2,8 +2,8 @@
 
 **Owner:** Rev. Levi  
 **Last consolidated:** 25 November 2026  
-**Status:** UNDER REVIEW — not a settled Perazim doctrinal statement. Levi approved the third draft on 2026-11-25 subject to three corrections, which are now made: Revelation 13:11–14 for the deception; Revelation 3:10 addressed to Philadelphia, with its application to the tribulation as working interpretation; Daniel 2:34–35 and 2:44–45 in the millennium section as our interpretation. It is integrated as the route "israel-end-times" in ApprovedRoutes. It stays UNDER REVIEW.  
-**Purpose:** Help agents draft consistently without repeatedly asking Levi to restate his position. The exact member-facing Israel/end-times answer remains subject to Levi's final approval.
+**Status:** UNDER REVIEW — not a settled Perazim doctrinal statement. The third member-facing answer was approved by Levi on 25 November subject to three corrections; the coordinator reports that these were made and the route was activated in the AI branch with the no-go zone lifted. This is approval of that answer route, not a declaration that every end-times detail is settled doctrine. The underlying position remains UNDER REVIEW.  
+**Purpose:** Help agents draft consistently without repeatedly asking Levi to restate his position.
 
 ## 1. The relationship between Israel and the Church
 

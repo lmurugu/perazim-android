@@ -19,7 +19,9 @@ Before doing work that changes theology, doctrine, AI answers, source retrieval,
 2. [BIBLICAL_AUTHORITY_AND_SOURCE_POLICY.md](BIBLICAL_AUTHORITY_AND_SOURCE_POLICY.md) — Bible-first source hierarchy and retrieval rules.
 3. [AUTONOMOUS_EXECUTION_AND_ESCALATION.md](AUTONOMOUS_EXECUTION_AND_ESCALATION.md) — what agents may do independently and when to escalate.
 4. [ISRAEL_CHURCH_AND_END_TIMES_POSITION.md](ISRAEL_CHURCH_AND_END_TIMES_POSITION.md) — Israel/Church relationship and developing eschatology.
-6. The current doctrine register, approved doctrine entries, relevant source register and actual source code being changed.
+5. [LEVI_REVIEW_DECISIONS_2026-11-25_APOLOGETICS_AND_IDENTIFY_REFUTE.md](LEVI_REVIEW_DECISIONS_2026-11-25_APOLOGETICS_AND_IDENTIFY_REFUTE.md) — batch review of apologetics outlines and identify-and-refute template.
+6. [AI_EVALUATION_STATUS_2026-11-25_ROUND10.md](AI_EVALUATION_STATUS_2026-11-25_ROUND10.md) — latest reported 886-case evaluation snapshot.
+7. The current doctrine register, approved doctrine entries, relevant source register and actual source code being changed.
 
 ## Authority and precedence
 
