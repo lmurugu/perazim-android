@@ -44,3 +44,11 @@ Unchanged in round 23: all other categories (see the decline-pass output for the
 - language_pastoral_tone 15/27, pastoral_struggle 34/45, scripture_exegesis 31/42, general_intelligence_scope 51/61, governance 2/6, cult_group 5/8, denominational_fairness 12/16, ke_culture_rites 9/13, ke_marriage_family 9/12, ke_sabbath_sda 6/8, ke_health_hiv_medicine 8/10, ke_mental_health_stigma 8/10, research_source_verification 13/18, resource_use 27/31.
 - Release gates are not met. No merge or release without Levi's explicit approval.
 - Rubric re-sample not done for any round since round 15.
+
+## Follow-up (2026-11-25): Matthew Henry
+
+- Code commit: 74b11d987fc6d5b9222f371858e4ca8156459b85
+- Decline-pass 793/886 and strict 774/886, the same as the round 23 record, with zero regressions and zero critical failures.
+- Henry's commentary (all six CCEL volumes, public domain, approved) is already in assets/reference/reference-commentaries.db.gz (16.4 MB, bundled before this round). No new asset was added, so the app size change is 0 bytes.
+- The Henry answer path (ReferenceGuide.namedHenry) needs an Android database, so the host evaluation cannot show it. ST-013 uses the fail-closed fallback here. The on-device answer still needs checking on the phone.
+- Wesley's notes are in the same database but are keyed by part ("Notes on ... part N"), not by chapter. A passage answer needs a part-to-chapter map first, so Wesley still declines by passage.
