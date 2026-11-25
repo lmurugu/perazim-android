@@ -134,7 +134,7 @@ public class AiRegressionCasesTest {
             assertNotNull(id + " must be routed before the model", route);
             assertFalse(id + " must not get the scope refusal", "scope-refusal".equals(route));
         }
-        for (String id : new String[] {"FW-060", "FW-063", "EX-077", "VC-061", "VT-192"}) {
+        for (String id : new String[] {"FW-060", "FW-063", "EX-077", "VC-061", "VT-192", "EX-079"}) {
             assertEquals(id + " is a safeguarding disclosure", "safeguarding",
                     PerazimAiEngine.preModelRoute(prompt(cases, id)));
         }

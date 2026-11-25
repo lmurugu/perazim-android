@@ -124,26 +124,14 @@ public final class OnDeviceAi {
     public static void ask(Context context, String question, List<ConversationHistory.Turn> history,
                            Map<String, String> trustedKeys, Callback callback) {
         Context c = context.getApplicationContext();
-        if (PerazimAiEngine.isCrisisQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
-            return;
-        }
-        String missingReference = missingReferenceMessage(c, question);
-        if (missingReference != null) {
-            MAIN.post(() -> callback.onError(missingReference));
-            return;
-        }
-        // One ordered pre-model route (overdose, harm to others, sensitive, human decision, privacy, scope).
-        String route = PerazimAiEngine.preModelRoute(question);
-        if (route != null) {
-            final String routed = PerazimAiEngine.preModelResponse(route, question).getMessageText();
-            MAIN.post(() -> callback.onError(routed));
-            return;
-        }
-        // Approved doctrine wording (Levi's entries), developing views under review, and undecided topics.
-        String doctrine = org.perazimchurch.app.ai.library.DoctrineLibrary.load(c).answerFor(question);
-        if (doctrine != null) {
-            MAIN.post(() -> callback.onSuccess(doctrine));
+        // One ordered decision before any model call: crisis, missing reference, pre-model route, approved doctrine,
+        // verbatim verse, no-go zone. The evaluation harness calls the same method.
+        PreModel.Decision decided = PreModel.decide(c, question);
+        if (decided != null) {
+            final String answer = decided.answer;
+            boolean approvedAnswer = "routed:doctrine-approved".equals(decided.status) || "routed:verse-kjv".equals(decided.status);
+            if (approvedAnswer) MAIN.post(() -> callback.onSuccess(answer));
+            else MAIN.post(() -> callback.onError(answer));
             return;
         }
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
@@ -443,24 +431,4 @@ public final class OnDeviceAi {
         return true;
     }
 
-    /** Says a confidently parsed reference does not exist in the KJV, instead of quoting or generating text. */
-    static String missingReferenceMessage(Context c, String question) {
-        org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer.Result ref = ScriptureReferenceNormalizer.normalize(question);
-        if (ref == null || !ref.confident || ref.normalized == null) return null;
-        java.util.regex.Matcher m = java.util.regex.Pattern.compile("^(.+) (\\d+):(\\d+)$").matcher(ref.normalized);
-        if (!m.find()) return null;
-        try {
-            String json;
-            try (InputStream in = c.getAssets().open("ai/library/scripture/kjv-verse-counts.json")) {
-                json = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            }
-            org.perazimchurch.app.ai.library.ScriptureRangeTable table = org.perazimchurch.app.ai.library.ScriptureRangeTable.fromJson(json);
-            int book = table.bookNumber(m.group(1));
-            if (book <= 0) return null;
-            if (table.isValid(book, Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)))) return null;
-        } catch (Exception ignored) {
-            return null;
-        }
-        return "I can't find " + ref.normalized + " in the King James Version, so I won't quote it. Please check the reference, or ask a church leader.";
-    }
 }

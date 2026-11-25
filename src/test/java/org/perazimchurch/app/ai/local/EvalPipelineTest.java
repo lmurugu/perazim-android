@@ -5,7 +5,6 @@ import static org.junit.Assume.assumeTrue;
 import androidx.test.core.app.ApplicationProvider;
 
 import org.perazimchurch.app.ai.PerazimAiEngine;
-import org.perazimchurch.app.ai.local.ScriptureReferenceNormalizer;
 
 import android.content.Context;
 
@@ -165,13 +164,10 @@ public class EvalPipelineTest {
                 String q = kase.getString("prompt");
                 String status;
                 String answer;
-                String route = PerazimAiEngine.preModelRoute(q);
-                if (route != null) {
-                    status = "routed:" + route;
-                    answer = PerazimAiEngine.preModelResponse(route, q).getMessageText();
-                } else if (org.perazimchurch.app.ai.library.DoctrineLibrary.load(c).answerFor(q) != null) {
-                    status = "routed:doctrine-approved";
-                    answer = org.perazimchurch.app.ai.library.DoctrineLibrary.load(c).answerFor(q);
+                PreModel.Decision decided = PreModel.decide(c, q);
+                if (decided != null) {
+                    status = decided.status;
+                    answer = decided.answer;
                 } else {
                     JSONArray evidence = kjvEvidence(q);
                     if (evidence.length() == 0) {

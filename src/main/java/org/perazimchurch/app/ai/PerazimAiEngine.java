@@ -278,7 +278,11 @@ public class PerazimAiEngine {
             "hits? me|hitting me|threatened to kill me|threatens to kill me|going to kill me|" +
             "touch(?:ing|ed)? (?:my |the )?(?:child|children|kids?|boy|girl|them) (?:inappropriately|sexually)|" +
             "inappropriately touch\\w*|touching (?:them|my child|my kids?|children) inappropriately|" +
-            "church worker has been touching|church worker touch\\w*|forced me to)\\b", Pattern.CASE_INSENSITIVE);
+            "church worker has been touching|church worker touch\\w*|forced me to|" +
+            "(?:touch\\w*|fondl\\w*|grop\\w*|molest\\w*|abus\\w*) (?:my |our |the |a )?(?:\\w+ )?" +
+            "(?:daughter|son|child|children|kids?|boy|girl|baby|toddler|teen\\w*|minor|student|pupil)|" +
+            "(?:pastor|priest|teacher|youth leader|church leader|deacon|elder|church worker) (?:has |have )?" +
+            "(?:touched|molested|abused|raped|fondled))\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
