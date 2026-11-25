@@ -5,6 +5,7 @@ import static org.junit.Assume.assumeTrue;
 import androidx.test.core.app.ApplicationProvider;
 
 import org.perazimchurch.app.ai.PerazimAiEngine;
+import org.perazimchurch.app.ai.SoftSafety;
 
 import android.content.Context;
 
@@ -200,6 +201,85 @@ public class EvalPipelineTest {
                 out.write(row.toString() + "\n");
                 out.flush();
             }
+        }
+    }
+
+    /**
+     * Conversational set through the phone's own path (GuideTurnRouter.respond, the same call the guide dialog makes), with
+     * the laptop llama-completion as the real model. A turn with no fixed or composed answer uses the option-2 evidence path
+     * from runOption2. Laptop only; labelled "full-path-laptop-model".
+     */
+    @Test
+    public void runConversational() throws Exception {
+        String casesPath = System.getenv("PERAZIM_CONV_CASES");
+        String modelPath = System.getenv("PERAZIM_EVAL_MODEL");
+        String llama = System.getenv("PERAZIM_EVAL_LLAMA");
+        String outPath = System.getenv("PERAZIM_CONV_OUT");
+        assumeTrue(casesPath != null && modelPath != null && llama != null && outPath != null);
+        Context c = ApplicationProvider.getApplicationContext();
+        OnDeviceAi.testRunner = (prompt, grammar, limit) -> {
+            try {
+                return runLlama(llama, modelPath, prompt, limit);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new java.io.IOException(e);
+            } catch (java.io.IOException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new java.io.IOException(e);
+            }
+        };
+        List<String> lines = Files.readAllLines(new File(casesPath).toPath(), StandardCharsets.UTF_8);
+        try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(outPath), StandardCharsets.UTF_8)) {
+            for (String line : lines) {
+                if (line.trim().isEmpty()) continue;
+                JSONObject kase = new JSONObject(line);
+                SoftSafety.reset();
+                PerazimAiEngine engine = new PerazimAiEngine(c);
+                org.perazimchurch.app.ai.remote.ConversationHistory history = new org.perazimchurch.app.ai.remote.ConversationHistory();
+                JSONArray turns = kase.getJSONArray("turns");
+                for (int index = 0; index < turns.length(); index++) {
+                    String q = turns.getString(index);
+                    String status;
+                    String answer;
+                    long t0 = System.currentTimeMillis();
+                    GuideTurnRouter.Turn turn = GuideTurnRouter.respond(c, engine, q, history.snapshot());
+                    if (turn.response != null) {
+                        status = turn.status;
+                        answer = turn.response.getMessageText();
+                        if (turn.clearHistory) history.clear();
+                        else if (status.startsWith(GuideTurnRouter.COMPOSED_PREFIX)) history.addExchange(q, answer);
+                    } else {
+                        JSONArray evidence = PreSigningEvidence.retrieve(q);
+                        if (evidence.length() == 0) {
+                            status = "refused:no-verified-source";
+                            answer = OnDeviceAi.NO_SOURCE_MESSAGE;
+                        } else {
+                            String prompt = LocalPrompt.build(q, history.snapshot(), evidence);
+                            String modelText = LocalPrompt.stripStockPhrases(runLlama(llama, modelPath, prompt, 128));
+                            String grounded = GroundedAnswer.finalAnswer(q, modelText, evidence);
+                            answer = grounded == null ? GroundedAnswer.body(evidence) : grounded;
+                            status = "evidence:" + (grounded == null ? "body" : "model-framing");
+                        }
+                        history.addExchange(q, answer);
+                    }
+                    JSONObject row = new JSONObject();
+                    row.put("id", kase.getString("id"));
+                    row.put("category", kase.getString("category"));
+                    row.put("turn", index + 1);
+                    row.put("prompt", q);
+                    row.put("status", status);
+                    row.put("composed", status.startsWith(GuideTurnRouter.COMPOSED_PREFIX));
+                    row.put("ms", System.currentTimeMillis() - t0);
+                    row.put("answer", answer);
+                    row.put("mode", "full-path-laptop-model");
+                    out.write(row.toString() + "\n");
+                    out.flush();
+                }
+            }
+        } finally {
+            OnDeviceAi.testRunner = null;
+            SoftAndroidKeyStore.uninstall();
         }
     }
 

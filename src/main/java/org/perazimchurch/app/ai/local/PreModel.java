@@ -12,6 +12,7 @@ import org.perazimchurch.app.ai.library.NoGoZones;
 import org.perazimchurch.app.ai.library.ScriptureRangeTable;
 import org.perazimchurch.app.data.interlinear.StrongsStore;
 import org.perazimchurch.app.domain.model.StrongsEntry;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -376,6 +377,8 @@ public final class PreModel {
                 return new Decision("routed:verse-phrase-kjv", out + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
             }
         }
+        Decision word = wordSearchDecision(verses, question);
+        if (word != null) return word;
         String topic = topicVerses(verses, question);
         if (topic != null) {
             String prefix = phrase == null ? "" : "That exact wording is not in the Bible, so it is not Scripture as written. ";
@@ -383,12 +386,113 @@ public final class PreModel {
                     prefix + "The King James Version speaks to this in:\n\n" + topic
                     + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
         }
+        if (phrase == null) {
+            Decision about = verseAboutDecision(verses, question);
+            if (about != null) return about;
+        }
         if (phrase != null) {
             return new Decision("routed:verse-phrase-not-found", "That wording is not in the King James Version, and I cannot find it "
                     + "in the Bible as written, so I won't quote it. It does not appear as Scripture, and it is not found in the Bible. "
                     + "Please check the wording, or ask a church leader.");
         }
         return null;
+    }
+
+    private static final Pattern WORD_QUOTED = Pattern.compile("['\u2018\u2019\u201c\u201d\"]([a-z]{2,})['\u2018\u2019\u201c\u201d\"]");
+    private static final Pattern WORD_AFTER = Pattern.compile("\\bword\\s+([a-z]{2,})\\b");
+    private static final Pattern WORD_SEARCH_INTENT = Pattern.compile(
+            "\\b(?:where|find|search|look up|locate|how many times|appears?|occurs?|mentioned|which verses?)\\b");
+    private static final Pattern WORD_MEANING = Pattern.compile("\\b(?:mean|means|meaning|define|definition|translate|greek|hebrew)\\b");
+    private static final Pattern BOOK_SCOPE = Pattern.compile(
+            "\\b(?:in|within|from)\\s+(?:the\\s+)?(?:book\\s+of\\s+)?((?:[1-3]\\s+)?[a-z]+(?:\\s+[a-z]+)?)\\s*[?.!]*$");
+    private static final Pattern VERSE_ABOUT = Pattern.compile(
+            "\\b(?:verses?|passages?|scriptures?)\\s+(?:about|on|for|concerning|regarding|that (?:talks?|speaks?|says?|teaches?|mentions?) about|on the topic of)\\s+(.+?)[?.!]*$");
+    /** Words that carry no meaning for a search, so a search for "the Lord being my shepherd" looks for "lord" and "shepherd". */
+    private static final java.util.Set<String> SEARCH_STOP = new java.util.HashSet<>(java.util.Arrays.asList(
+            "the", "and", "for", "with", "that", "this", "from", "into", "about", "being", "are", "was", "were", "have",
+            "has", "had", "does", "not", "your", "our", "his", "her", "its", "their", "them", "they", "you", "all", "any",
+            "bible", "verse", "verses", "passage", "passages", "scripture", "scriptures", "word", "words", "book", "chapter",
+            "says", "say", "said", "find", "where", "what", "which", "show", "give", "tell", "want", "need", "feel", "when",
+            "how", "who", "whom", "why", "much", "many", "times", "appear", "appears", "occur", "occurs", "mentioned",
+            "locate", "search", "look", "there", "here", "will", "shall", "would", "could", "should", "can", "may", "might",
+            "must", "upon", "unto", "onto", "within", "without", "over", "under", "more", "most", "some", "such", "very"));
+
+    private static String normalisedQuestion(String question) {
+        return question.toLowerCase(Locale.ROOT).replace('\u2019', '\'').replaceAll("\\s+", " ").trim();
+    }
+
+    /** "Where is the word 'grace' found?", "How many times does faith appear in Romans?". Counts and lists the exact word. */
+    static Decision wordSearchDecision(KjvVerseText verses, String question) {
+        if (verses == null || question == null) return null;
+        String q = normalisedQuestion(question);
+        if (q.length() > 140 || WORD_MEANING.matcher(q).find() || !WORD_SEARCH_INTENT.matcher(q).find()) return null;
+        if (TOPIC_EXCLUDE.matcher(q).find()) return null;
+        String word = null;
+        Matcher quoted = WORD_QUOTED.matcher(q);
+        if (quoted.find()) word = quoted.group(1);
+        if (word == null) {
+            Matcher after = WORD_AFTER.matcher(q);
+            if (after.find()) word = after.group(1);
+        }
+        if (word == null || SEARCH_STOP.contains(word)) return null;
+        int book = -1;
+        String scope = "the Bible";
+        Matcher scoped = BOOK_SCOPE.matcher(q);
+        if (scoped.find()) {
+            int n = verses.bookNumber(scoped.group(1).trim());
+            if (n >= 0) {
+                book = n;
+                scope = verses.bookName(n);
+            }
+        }
+        KjvVerseText.WordHits hits = verses.wordHits(word, book, 25);
+        if (hits.occurrences == 0) {
+            return new Decision("routed:word-search-none", "The exact word \u201c" + word + "\u201d does not appear in "
+                    + (book < 0 ? "the King James Version" : scope + " in the King James Version")
+                    + ". Check the spelling, or try a related word.");
+        }
+        StringBuilder refs = new StringBuilder();
+        for (KjvVerseText.Found f : hits.verses) {
+            if (refs.length() > 0) refs.append(", ");
+            refs.append(f.label);
+        }
+        String where = book < 0 ? "the Bible" : scope;
+        StringBuilder out = new StringBuilder("The exact word \u201c" + word + "\u201d appears " + hits.occurrences
+                + (hits.occurrences == 1 ? " time" : " times") + " in " + hits.verseCount
+                + (hits.verseCount == 1 ? " verse" : " verses") + " of " + where + " (King James Version).\n\nReferences: " + refs);
+        if (hits.verseCount > hits.verses.size()) out.append(", and ").append(hits.verseCount - hits.verses.size()).append(" more");
+        out.append(".\n\nRead them in their context. The Bible tab shows the whole chapter.");
+        return new Decision("routed:word-search-kjv", out.toString());
+    }
+
+    /** "The verse about the Lord being my shepherd": verbatim KJV verses that hold the subject's words. */
+    static Decision verseAboutDecision(KjvVerseText verses, String question) {
+        if (verses == null || question == null) return null;
+        String q = normalisedQuestion(question);
+        if (q.length() > 160 || TOPIC_EXCLUDE.matcher(q).find()) return null;
+        Matcher m = VERSE_ABOUT.matcher(q);
+        if (!m.find()) return null;
+        List<String> words = new ArrayList<>();
+        for (String token : m.group(1).split("[^a-z]+")) {
+            if (token.length() >= 3 && !SEARCH_STOP.contains(token) && !words.contains(token) && verses.bookNumber(token) < 0) {
+                words.add(token);
+            }
+        }
+        if (words.isEmpty()) return null;
+        String subject = String.join(" ", words);
+        List<KjvVerseText.Found> found;
+        if (words.size() == 1) {
+            found = verses.findAllWordsRanked(words, 3);
+        } else {
+            found = verses.findAllWordsRanked(words, 3);
+        }
+        if (found.isEmpty()) {
+            return new Decision("routed:verse-about-not-found", "I could not find a verse in the King James Version that has "
+                    + "all of these words together: " + subject + ". Try a shorter phrase, or read the Bible tab.");
+        }
+        StringBuilder out = new StringBuilder("From the King James Version (KJV), verses with " + subject + ":\n");
+        for (KjvVerseText.Found f : found) out.append('\n').append(f.label).append(": \u201c").append(f.text).append('\u201d');
+        return new Decision("routed:verse-about-kjv", out + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
     }
 
     private static String topicVerses(KjvVerseText verses, String question) {

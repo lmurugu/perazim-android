@@ -1,0 +1,15 @@
+{"id":"CAP-01","question":"Where is 'Jesus wept'?","status":"routed:verse-phrase-kjv","contains":"John 11:35"}
+{"id":"CAP-02","question":"Where is the verse about the Lord being my shepherd?","status":"routed:verse-about-kjv","contains":"Psalms 23:1"}
+{"id":"CAP-03","question":"Where is the word 'grace' found?","status":"routed:word-search-kjv","contains":"appears 170 times"}
+{"id":"CAP-04","question":"How many times does 'faith' appear in Romans?","status":"routed:word-search-kjv","contains":"appears 39 times in 34 verses of Romans"}
+{"id":"CAP-05","question":"Where does the Bible say 'the Lord is my shepherd'?","status":"routed:verse-phrase-kjv","contains":"Psalms 23:1"}
+{"id":"CAP-06","question":"Show me John 3:16","status":"routed:verse-kjv","contains":"John 3:16"}
+{"id":"CAP-07","question":"Where is the word love in the Bible?","status":"routed:word-search-kjv","contains":"of the Bible"}
+{"id":"CAP-08","question":"Find the word 'mercy' in the Bible","status":"routed:word-search-kjv","contains":"mercy"}
+{"id":"CAP-09","question":"How many times does 'zzyzx' appear in the Bible?","status":"routed:word-search-none","contains":"does not appear"}
+{"id":"CAP-10","question":"Where is the verse about love?","status":"routed:verse-about-kjv","contains":"love"}
+{"id":"CAP-11","question":"What does the word grace mean?","status":"routed:approved-grace-meaning","contains":"Ephesians 2:8"}
+{"id":"CAP-12","question":"Where is the verse about suicide?","status":"safety","contains":"999"}
+{"id":"CAP-13","question":"I want to kill myself","status":"safety","contains":"999"}
+{"id":"CAP-14","question":"Where is the verse about being anxious?","status":"routed:verse-about-not-found","contains":"could not find"}
+{"id":"CAP-15","question":"hello","status":"routed:conversational-greeting","contains":""}

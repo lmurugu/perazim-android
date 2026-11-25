@@ -769,14 +769,32 @@ public class AiBreakthroughGuideDialog extends Dialog {
         displayUserMessage(query);
 
         // One routing order for every message: safety, the vague-exhaustion check, built-in answers, then the approved
-        // routes (GuideTurnRouter). The evaluation uses the same order, so the phone and the evaluation cannot drift apart.
-        GuideTurnRouter.Turn turn = GuideTurnRouter.route(activity, aiEngine, query);
-        if (turn.response != null) {
-            if (turn.clearHistory) localHistory.clear();
-            displayAiMessage(turn.response, turn.badge);
-            return;
-        }
+        // routes and the composed conversational replies (GuideTurnRouter.respond). The evaluation calls the same method.
+        // The routing can run the on-phone model, so it runs off the UI thread and the reply is posted back.
+        final View routing = showTypingIndicator();
+        beginRequest();
+        btnSend.setEnabled(false);
+        org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
+            GuideTurnRouter.Turn turn = GuideTurnRouter.respond(activity, aiEngine, query, localHistory.snapshot());
+            activity.runOnUiThread(() -> {
+                removeTypingIndicator(routing);
+                finishInFlight();
+                if (!isShowing()) return;
+                if (turn.response != null) {
+                    if (turn.clearHistory) localHistory.clear();
+                    else if (turn.status != null && turn.status.startsWith(GuideTurnRouter.COMPOSED_PREFIX)) {
+                        localHistory.addExchange(query, turn.response.getMessageText());
+                    }
+                    displayAiMessage(turn.response, turn.badge);
+                    return;
+                }
+                continueAfterRoute(query);
+            });
+        });
+    }
 
+    /** The app-context, on-phone model, offline Bible and online paths, reached when no fixed or composed reply answered. */
+    private void continueAfterRoute(String query) {
         // Questions about the member's own app use (games, notes, sermons, community, routine) are answered from
         // compact facts on this phone. Crisis and scope checks above have already run.
         AppContextRouter.Route appRoute = needsSafetyPath(query) ? null : AppContextRouter.route(query);

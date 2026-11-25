@@ -203,47 +203,13 @@ public final class OnDeviceAi {
                 // Uses the cached verification; a full 491 MB digest runs only when the file changed.
                 if (!isModelVerified(c)) throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
                 if (cancelled) throw new IOException("Generation cancelled.");
-                String dir = c.getApplicationInfo().nativeLibraryDir;
                 int answerLimit = LocalPrompt.requiresStructuredBiblicalAnswer(question) ? 280 : 120;
                 String rawAnswer;
                 if (testRunner != null) {
                     // Test-only seam: production never sets testRunner, so this branch is unreachable in the app.
                     rawAnswer = testRunner.generate(built.prompt, CitationGrammar.build(shown, answerLimit), answerLimit);
                 } else {
-                    ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
-                            "-m", modelFile(c).getAbsolutePath(), "-p", built.prompt,
-                            "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
-                            "--grammar", CitationGrammar.build(shown, answerLimit),
-                            "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
-                    builder.environment().put("LD_LIBRARY_PATH", dir);
-                    process = builder.start(); active = process;
-                    if (cancelled) throw new IOException("Generation cancelled.");
-                    final Process running = process;
-                    Thread stderrDrain = new Thread(() -> {
-                        try (InputStream errors = running.getErrorStream()) {
-                            byte[] discard = new byte[4096];
-                            while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
-                        } catch (IOException ignored) { }
-                    }, "perazim-ai-stderr");
-                    stderrDrain.setDaemon(true);
-                    stderrDrain.start();
-                    ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-                    java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
-                    ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
-                    StringBuilder answer = new StringBuilder();
-                    try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
-                        char[] buffer = new char[512]; int count;
-                        while ((count = reader.read(buffer)) != -1) {
-                            int available = 16000 - answer.length();
-                            if (available > 0) answer.append(buffer, 0, Math.min(available, count));
-                        }
-                        process.waitFor();
-                    } finally { deadline.cancel(false); timer.shutdownNow(); }
-                    int exit = process.exitValue();
-                    if (cancelled) throw new IOException("Generation cancelled.");
-                    if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
-                    if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
-                    rawAnswer = answer.toString();
+                    rawAnswer = runModelProcess(c, built.prompt, CitationGrammar.build(shown, answerLimit), 128);
                 }
                 String result = LocalPrompt.stripStockPhrases(
                         rawAnswer.replace("<|im_end|>", "").replace("<|endoftext|>", "").trim());
@@ -272,6 +238,85 @@ public final class OnDeviceAi {
             }
             finally { if (process != null) terminate(process); active = null; busy.set(false); }
         });
+    }
+
+    /**
+     * Runs the packaged llama.cpp binary once and returns its reply text. The caller owns the prompt and the checks.
+     * {@code grammar} may be null (free composition) or the citation grammar (grounded answers).
+     */
+    static String runModelProcess(Context c, String prompt, String grammar, int tokens) throws IOException {
+        String dir = c.getApplicationInfo().nativeLibraryDir;
+        java.util.List<String> args = new java.util.ArrayList<>(java.util.Arrays.asList(
+                new File(dir, "libperazim_llama.so").getAbsolutePath(), "-m", modelFile(c).getAbsolutePath(), "-p", prompt,
+                "-c", "2048", "-n", String.valueOf(tokens), "-t", "3", "--seed", "42", "--temp", "0.2"));
+        if (grammar != null) { args.add("--grammar"); args.add(grammar); }
+        args.addAll(java.util.Arrays.asList("--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup"));
+        ProcessBuilder builder = new ProcessBuilder(args);
+        builder.environment().put("LD_LIBRARY_PATH", dir);
+        Process process = builder.start(); active = process;
+        if (cancelled) { terminate(process); throw new IOException("Generation cancelled."); }
+        final Process running = process;
+        try {
+            Thread stderrDrain = new Thread(() -> {
+                try (InputStream errors = running.getErrorStream()) {
+                    byte[] discard = new byte[4096];
+                    while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
+                } catch (IOException ignored) { }
+            }, "perazim-ai-stderr");
+            stderrDrain.setDaemon(true);
+            stderrDrain.start();
+            ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+            java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
+            ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
+            StringBuilder answer = new StringBuilder();
+            try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
+                char[] buffer = new char[512]; int count;
+                while ((count = reader.read(buffer)) != -1) {
+                    int available = 16000 - answer.length();
+                    if (available > 0) answer.append(buffer, 0, Math.min(available, count));
+                }
+                process.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Generation interrupted.", e);
+            } finally { deadline.cancel(false); timer.shutdownNow(); }
+            int exit = process.exitValue();
+            if (cancelled) throw new IOException("Generation cancelled.");
+            if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
+            if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
+            return answer.toString();
+        } finally {
+            terminate(process);
+            active = null;
+        }
+    }
+
+    /**
+     * Free composition for conversational and approved pastoral replies (no citation grammar). The caller verifies every
+     * sentence and falls back to fixed approved text when this returns null. Crisis, safeguarding and doctrine never call it.
+     */
+    public static String composeText(Context context, String prompt, int maxTokens) {
+        Context c = context.getApplicationContext();
+        if (!BuildConfig.OFFLINE_QWEN_ENABLED) return null;
+        if (testRunner != null) {
+            // Test-only seam: production never sets testRunner.
+            try { return testRunner.generate(prompt, null, maxTokens); } catch (IOException e) { return null; }
+        }
+        if (!runtimeAvailable(c) || !isInstalled(c)) return null;
+        if (!busy.compareAndSet(false, true)) return null;
+        try {
+            if (cancelled) return null;
+            try {
+                if (!isModelVerified(c)) return null;
+            } catch (Exception e) {
+                return null;
+            }
+            return runModelProcess(c, prompt, null, maxTokens);
+        } catch (IOException e) {
+            return null;
+        } finally {
+            busy.set(false);
+        }
     }
 
     private static String evidenceQuery(String question, List<ConversationHistory.Turn> history) {

@@ -119,6 +119,7 @@ public final class ConversationalTurn {
         if (question == null) return null;
         String q = question.trim().toLowerCase(Locale.ROOT).replace('’', '\'').replaceAll("\\s+", " ");
         if (q.isEmpty() || q.length() > 160) return null;
+        if (GREETING.matcher(q).find()) return next(0, "routed:conversational-greeting", GREETINGS);
         if (ACKNOWLEDGE.matcher(q).find()) return next(6, "routed:conversational-acknowledge", ACKNOWLEDGE_REPLIES);
         if (HELP_REQUEST.matcher(q).find()) return next(7, "routed:conversational-help", HELP_REPLIES);
         if (FOLLOW_UP.matcher(q).find()) return next(8, "routed:conversational-follow-up", FOLLOW_UP_REPLIES);
@@ -133,6 +134,42 @@ public final class ConversationalTurn {
             return next(5, "routed:conversational-marriage-intent", MARRIAGE_REPLIES);
         }
         return null;
+    }
+
+    /** Approved facts every composed conversational reply may draw on. The model words them; it adds no claims. */
+    static final String FACT_SHEET = "You are Perazim Guide, the digital assistant of Perazim Mission Church (PMCI). "
+            + "You can quote Bible passages from the King James Version, explain the approved church teaching on common "
+            + "questions, help with a prayer or a reflection, and show how to use the app. You cannot give medical, legal or "
+            + "financial advice, decide church discipline, or act for church leaders. If someone is in danger, they should call 999 or 112.";
+
+    /**
+     * The approved grounding for a composed reply to a conversational route, or null when the route is not composed.
+     * The fixed wordings above are not used as output; the model composes from this material.
+     */
+    static String groundingFor(String status) {
+        if (status == null) return null;
+        switch (status) {
+            case "routed:conversational-greeting":
+                return FACT_SHEET + "\nThe member greeted the guide. Greet them warmly and ask what they would like help with.";
+            case "routed:conversational-acknowledge":
+                return FACT_SHEET + "\nThe member acknowledged the last reply. Reply briefly and invite the next question.";
+            case "routed:conversational-help":
+                return FACT_SHEET + "\nThe member asked for help without saying what with. Ask whether they need a Bible passage, a prayer, or help with a situation.";
+            case "routed:conversational-follow-up":
+                return FACT_SHEET + "\nThe member asked for more. Ask which part they want to go deeper into.";
+            case "routed:conversational-how-are-you":
+                return FACT_SHEET + "\nThe member asked how the guide is. Say briefly that you are ready to help, and invite a question.";
+            case "routed:conversational-thanks":
+                return FACT_SHEET + "\nThe member thanked the guide. Reply warmly and offer further help.";
+            case "routed:conversational-goodbye":
+                return FACT_SHEET + "\nThe member is leaving. Say goodbye warmly and invite them back.";
+            case "routed:conversational-meta":
+                return FACT_SHEET + "\nThe member says the last reply missed the point or repeated itself. Apologise briefly and ask them to say in a few words what they need.";
+            case "routed:conversational-capability":
+                return FACT_SHEET + "\nThe member asked what the guide can do. Explain it in plain words.";
+            default:
+                return null;
+        }
     }
 
     private static Reply next(int slot, String status, String[] options) {

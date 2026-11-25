@@ -120,6 +120,88 @@ public final class KjvVerseText {
         return out;
     }
 
+    /** Verses that contain every one of the words as whole words (ignoring case), in canonical order, up to limit. */
+    public List<Found> findAllWords(List<String> words, int limit) {
+        List<Found> out = new ArrayList<>();
+        if (words == null || words.isEmpty() || limit <= 0) return out;
+        for (Map.Entry<String, String> e : verses.entrySet()) {
+            java.util.Set<String> tokens = new java.util.HashSet<>(java.util.Arrays.asList(normalise(e.getValue()).trim().split(" ")));
+            boolean all = true;
+            for (String w : words) if (!tokens.contains(w.toLowerCase(Locale.ROOT))) { all = false; break; }
+            if (!all) continue;
+            out.add(labelled(e));
+            if (out.size() >= limit) break;
+        }
+        return out;
+    }
+
+    /**
+     * Verses that contain every one of the words, shortest first, so a short verse that names the subject ranks above a long
+     * one that happens to contain the same words. Returns at most limit verses, with verbatim KJV text.
+     */
+    public List<Found> findAllWordsRanked(List<String> words, int limit) {
+        List<Map.Entry<String, String>> matches = new ArrayList<>();
+        if (words == null || words.isEmpty() || limit <= 0) return new ArrayList<>();
+        for (Map.Entry<String, String> e : verses.entrySet()) {
+            java.util.Set<String> tokens = new java.util.HashSet<>(java.util.Arrays.asList(normalise(e.getValue()).trim().split(" ")));
+            boolean all = true;
+            for (String w : words) if (!tokens.contains(w.toLowerCase(Locale.ROOT))) { all = false; break; }
+            if (all) matches.add(e);
+        }
+        matches.sort((a, b) -> Integer.compare(a.getValue().length(), b.getValue().length()));
+        List<Found> out = new ArrayList<>();
+        for (Map.Entry<String, String> e : matches) {
+            if (out.size() >= limit) break;
+            out.add(labelled(e));
+        }
+        return out;
+    }
+
+    /** The canonical book name for a book number, or an empty string. */
+    public String bookName(int bookNumber) {
+        String name = bookNames.get(bookNumber);
+        return name == null ? "" : name;
+    }
+
+    /** Exact-word occurrences (ignoring case and punctuation) in the whole Bible, or in one book when bookNumber >= 0. */
+    public WordHits wordHits(String word, int bookNumber, int listLimit) {
+        String target = word == null ? "" : word.toLowerCase(Locale.ROOT);
+        int occurrences = 0;
+        int verseCount = 0;
+        List<Found> listed = new ArrayList<>();
+        if (target.isEmpty()) return new WordHits(0, 0, listed);
+        for (Map.Entry<String, String> e : verses.entrySet()) {
+            String[] k = e.getKey().split(":");
+            if (bookNumber >= 0 && Integer.parseInt(k[0]) != bookNumber) continue;
+            int n = 0;
+            for (String token : normalise(e.getValue()).trim().split(" ")) if (token.equals(target)) n++;
+            if (n == 0) continue;
+            occurrences += n;
+            verseCount++;
+            if (listed.size() < listLimit) listed.add(labelled(e));
+        }
+        return new WordHits(occurrences, verseCount, listed);
+    }
+
+    /** The occurrence count, the number of verses, and the first verses in canonical order. */
+    public static final class WordHits {
+        public final int occurrences;
+        public final int verseCount;
+        public final List<Found> verses;
+
+        WordHits(int occurrences, int verseCount, List<Found> verses) {
+            this.occurrences = occurrences;
+            this.verseCount = verseCount;
+            this.verses = verses;
+        }
+    }
+
+    private Found labelled(Map.Entry<String, String> e) {
+        String[] k = e.getKey().split(":");
+        String book = bookNames.get(Integer.parseInt(k[0]));
+        return new Found((book == null ? k[0] : book) + " " + k[1] + ":" + k[2], e.getValue());
+    }
+
     /** Lowercase words separated by single spaces, with a space at each end, so phrases match whole words only. */
     static String normalise(String text) {
         if (text == null) return " ";
