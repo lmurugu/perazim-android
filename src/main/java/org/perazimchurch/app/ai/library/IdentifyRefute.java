@@ -64,6 +64,8 @@ public final class IdentifyRefute {
 
     private static String[] topicFor(String question) {
         if (question == null) return null;
+        // The Book of Mormon is a different question; the approved LDS answer covers exaltation (not answered here).
+        if (Pattern.compile("book of mormon", Pattern.CASE_INSENSITIVE).matcher(question).find()) return null;
         for (String[] t : TOPICS) {
             if (Pattern.compile(t[0], Pattern.CASE_INSENSITIVE).matcher(question).find()) return t;
         }

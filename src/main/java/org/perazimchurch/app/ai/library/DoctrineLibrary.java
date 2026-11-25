@@ -39,6 +39,10 @@ public final class DoctrineLibrary {
             "other churches|other denominations|some christians|some churches|disagree\\w*|debate|" +
             "alternative|another view|cessationis\\w*|continuationis\\w*)\\b",
             Pattern.CASE_INSENSITIVE);
+    /** First-person or personal distress wording: not a request for a Perazim position on an undecided topic. */
+    private static final Pattern PERSONAL_CUE = Pattern.compile(
+            "\\b(?:i|i'm|im|me|my|help|husband|wife|mother|father|daughter|son)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern CREED_CUE = Pattern.compile("\\b(?:creed|creeds|nicene|council)\\b", Pattern.CASE_INSENSITIVE);
     private static final String ENTRIES = "ai/library/doctrine/entries.json";
     private static final String POSITIONS = "ai/library/doctrine/positions.json";
     private static DoctrineLibrary loaded;
@@ -151,10 +155,13 @@ public final class DoctrineLibrary {
     public String answerFor(String question) {
         if (question == null || question.trim().isEmpty()) return null;
         String normalized = question.toLowerCase(Locale.ROOT).replace('’', '\'');
+        // A question about a creed is a resource question, not doctrine (Levi's creed rules are separate).
+        if (CREED_CUE.matcher(normalized).find()) return null;
         for (Topic t : topics) {
             if (!t.match.matcher(normalized).find()) continue;
             // An undecided topic in a personal or pastoral message is not a doctrine question: let the model answer.
-            if ("UNDECIDED".equals(t.status) && !DOCTRINAL_CUE.matcher(normalized).find()) continue;
+            if ("UNDECIDED".equals(t.status) && (PERSONAL_CUE.matcher(normalized).find()
+                    || !DOCTRINAL_CUE.matcher(normalized).find())) continue;
             return render(t, OTHER_VIEWS_CUE.matcher(normalized).find());
         }
         return null;

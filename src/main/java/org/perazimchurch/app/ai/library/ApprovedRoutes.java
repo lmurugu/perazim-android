@@ -115,7 +115,7 @@ public final class ApprovedRoutes {
                 "John 10:28", "Hebrews 6:4"));
 
         r.add(new Route("unconditional-election",
-                "unconditional election|predestin|calvinis|elect of god|chosen before the foundation|already chosen|has chosen"
+                "unconditional election|predestin|elect of god|chosen before the foundation|already chosen|has chosen"
                         + "|chosen (?:those|who|ones|people|his people)|if god has chosen",
                 "Our working interpretation, under review, is unconditional election. We understand that God chose His people in "
                 + "Christ before the foundation of the world, and that His choosing does not depend on anything good in us "
@@ -128,6 +128,7 @@ public final class ApprovedRoutes {
         r.add(new Route("grace-and-obedience",
                 "grace and (?:obedience|works)|obedience and grace|works and grace|faith and works|faith without works"
                         + "|saved by grace|salvation is by grace|by grace.{0,40}obey|grace.{0,40}\\bobey"
+                        + "|work for (?:my |our )?salvation|earn (?:my |our )?salvation|after all we can do"
                         + "|why (?:should|must|do|did) (?:christians|we|believers|i) obey|obey god|grace (?:or|vs\\.?|versus) (?:works|obedience)",
                 "Scripture says we are saved by grace, through faith, and not by our own works (Ephesians 2:8–9). We are created "
                 + "in Christ for good works, which God prepared beforehand (Ephesians 2:10). Grace teaches us to deny ungodliness "
@@ -137,7 +138,7 @@ public final class ApprovedRoutes {
                 "Ephesians 2:8", "James 2:26"));
 
         r.add(new Route("sovereignty-and-responsibility",
-                "sovereignty|free will|human responsibility|god.s sovereignty|sovereignty and responsibility",
+                "sovereignty|free will|human responsibility|god.s sovereignty|sovereignty and responsibility|work out your salvation|fear and trembling",
                 "Scripture teaches both God's sovereignty and human responsibility. God is sovereign over all things, and His "
                 + "purposes stand (Isaiah 46:9–10; Proverbs 16:9). Every person is responsible before God for their own sin "
                 + "(Ezekiel 18:20; Romans 2:6). Work out your salvation with fear and trembling, because God is working in you "
@@ -146,6 +147,25 @@ public final class ApprovedRoutes {
                 + "Arminian system onto the answer. We do not use God's sovereignty to excuse sin. Take responsibility for your "
                 + "choices before God, and trust Him with what you cannot understand.",
                 "Ezekiel 18:20", "Philippians 2:12"));
+
+        r.add(new Route("spiritual-claims-tested",
+                "prophecy|prophesied|prophetic word|word from the lord|word from god|god told me|spirit told me|dream from god|vision from god",
+                "Spiritual claims must be tested by Scripture. No dream, prophecy, vision or experience can overrule the Bible, "
+                + "and no one's word about your future replaces what God has said in His Word. Test the spirits, and hold fast to "
+                + "what is good (1 John 4:1; Deuteronomy 18:22; 1 Thessalonians 5:19–21).\n\n"
+                + "We believe the gifts of the Holy Spirit continue to operate in the Church today, and the Spirit gives them as He "
+                + "wills (1 Corinthians 12:7–11). Scripture also warns that the love of money is a root of evil (1 Timothy 6:10). "
+                + "If someone gives you a word about money, your future or a big decision, weigh it by the Bible and talk with your "
+                + "pastor before you act on it. " + NO_VERDICT,
+                "1 John 4:1", "Deuteronomy 18:22"));
+
+        r.add(new Route("christ-deity",
+                "just a prophet|not god.s son|jesus is god|is jesus god|deity of christ|jesus (?:is|was) (?:only|just) a (?:prophet|man)",
+                "Scripture teaches that Jesus is God the Son, not merely a prophet. The Word was God, and the Word was made flesh "
+                + "(John 1:1, 14). Jesus said that He and the Father are one (John 10:30). The Nicene and Chalcedonian statements, "
+                + "which we hold as established Christian orthodoxy, confess Jesus as the eternal Son of God, truly God and truly man.\n\n"
+                + "We test every claim about Jesus against Scripture, and this is what the Bible teaches.",
+                "John 1:1", "John 10:30"));
 
         ROUTES = Collections.unmodifiableList(r);
     }

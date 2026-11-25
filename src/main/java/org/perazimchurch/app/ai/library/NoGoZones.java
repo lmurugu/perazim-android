@@ -56,6 +56,18 @@ public final class NoGoZones {
             + "If you are asking about your own salvation, come to Jesus in faith and trust Him as Lord (Romans 10:9–10). "
             + "Please talk this through with a trusted church leader or your pastor, who can walk with you through it.";
 
+    /** Reasoning and argument: no approved route yet. Points to Scripture and does not guess (Levi's rules). */
+    static final String REASONING_DECLINE =
+            "The Bible is the test for every argument, so I want to point you to what Scripture teaches. I can't weigh this "
+            + "argument well yet, so I won't guess. Please talk it through with a trusted church leader or your pastor, who can "
+            + "take you through the Bible's answer.";
+
+    /** Denominations and groups ranked against each other: no verdict, and no single church has the whole truth. */
+    static final String DENOMINATION_DECLINE =
+            "No single church or denomination has a monopoly on the truth. Christians of different traditions hold some different "
+            + "views, and I won't rank churches or groups. Test every teaching by Scripture, and talk with a trusted church leader "
+            + "or your pastor.";
+
     private static final Pattern NICENE = Pattern.compile("\\bnicene\\b", Pattern.CASE_INSENSITIVE);
 
     private static final List<Zone> ZONES = Collections.unmodifiableList(Arrays.asList(
@@ -67,8 +79,9 @@ public final class NoGoZones {
                     DESTINY_DECLINE),
             new Zone("denominational-verdict",
                     "only (one )?(denomination|church|group|religion)|only one .*(right|true)|(one|only) (true|right) (church|denomination)"
-                    + "|which (denomination|church|group) is (right|true)",
-                    DECLINE),
+                    + "|which (denomination|church|group) is (right|true)|are all churches"
+                    + "|(arminian|calvinis|presbyterian|baptist|methodist|pentecostal)s?.{0,30}(wrong|heretic|false|damned)",
+                    DENOMINATION_DECLINE),
             new Zone("salvation-works-apostasy",
                     "lose (my |our )?salvation|once saved|eternal security|fall(ing|s)? away|falil|apostat|abandon (jesus|god)|sin on purpose|hebrews|baptism saves|saves us"
                     + "|depart from the faith|finally depart|earn (it|my salvation|salvation)|salvation by grace"
@@ -85,7 +98,9 @@ public final class NoGoZones {
                     + "|catholic|purgatory|\\bmary\\b|miriam|apocrypha|orthodox|icon|karma|reincarnat|rebirth|next life"
                     + "|come back as|ancestor|shrine|kiapo|traditional (rite|dance|oath)|islam|muslim|qur|hindu|buddh|jain"
                     + "|soul sleep|soul|denomination|church of christ|cult|archangel|michael|pluralism|same thing"
-                    + "|all religions|going to hell|is she going|is he going|hell right now",
+                    + "|all religions|going to hell|is she going|is he going|hell right now"
+                    + "|all paths|all roads|law of attraction|universal energy|higher self|new age|brahman|saints|ancestors|soul sleep"
+                    + "|saturday|sabbath|one way to god",
                     OTHER_GROUP_DECLINE),
             new Zone("history-authorship-research",
                     "resurrection|historical|research|academic|papers|earliest|early (church|christian)|prove|proof"
@@ -104,7 +119,7 @@ public final class NoGoZones {
             new Zone("reasoning-and-argument",
                     "argument|evaluate|someone claims|a person says|says christianity is false|definition of faith"
                     + "|without evidence|reasoning|you said|you told me|yesterday you|earlier that",
-                    DECLINE),
+                    REASONING_DECLINE),
             new Zone("resource-lookup",
                     "what does .* say about|according to|commentary|dictionary|matthew henry|hitchcock|smith.s"
                     + "|creed",
