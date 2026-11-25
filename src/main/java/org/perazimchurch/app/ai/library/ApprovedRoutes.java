@@ -606,6 +606,11 @@ public final class ApprovedRoutes {
                 + "If you are asking whether you are right with God, bring that question to Jesus in prayer, and talk with your pastor.",
                 "Romans 3:24", "Romans 5:1", "Galatians 2:16", "Ephesians 2:8", "Titus 2:11"));
 
+        r.add(new Route("holy-spirit-comforter",
+                "comforter|holy spirit as comfort",
+                "Jesus promised that the Father would send another Comforter, the Holy Spirit, who abides with believers forever (John 14:16). The Spirit teaches believers and brings to their remembrance what Jesus said (John 14:26). He testifies of Jesus (John 15:26), and Jesus said that it is expedient for his disciples that he go away, because the Comforter will not come unto them unless he goes (John 16:7). Scripture presents the Spirit as the Comforter who strengthens and guides God's people.",
+                "John 14:16", "John 14:26", "John 15:26", "John 16:7"));
+
         r.add(new Route("headship-submission-marriage",
                 "headship|head of (?:the )?(?:house|home|household|family)|submit to (?:my|your|his|her) husband|wives? (?:must )?submit|who (?:should )?(?:make|has) the final (?:say|decision)",
                 "Scripture calls husbands to lead their wives with sacrificial love, and calls wives to respect and submit to their husbands in the Lord. Both remain under Christ and are called to mutual submission in reverence for Him (Ephesians 5:21–25; Colossians 3:18–19). The husband has a distinct responsibility to lead, and he is accountable before God for how he exercises it. His headship is servant leadership, shown through protection, provision, care and sacrificial love, never through domination. He must take his wife's counsel seriously. His headship does not make him infallible or give him permission to sin, abuse, coerce or override his wife's conscience. The wife remains personally accountable to God, and she is never required to obey a sinful instruction or to endure danger in the name of submission (Acts 5:29). Where a couple cannot agree after prayer and honest discussion, they should seek pastoral counsel rather than a contest for control. If anyone is being harmed, safety comes first. This answer concerns marriage only; the church has not settled the question of women's ministry roles.",
