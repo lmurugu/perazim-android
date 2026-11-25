@@ -401,7 +401,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("saying-helps-themselves",
                 "helps those who help themselves|god helps those",
-                "That saying is not in the Bible, and Scripture does not teach that God helps those who help themselves. The Bible teaches that we are saved by grace through faith, not by our own works (Ephesians 2:8–9). Proverbs 3:5–6 calls us to trust the LORD with all our heart.",
+                "I cannot find that saying in the Bible, and Scripture does not teach that God helps those who help themselves. The Bible teaches that we are saved by grace through faith, not by our own works (Ephesians 2:8–9). Proverbs 3:5–6 calls us to trust the LORD with all our heart.",
                 "Ephesians 2:8", "Proverbs 3:5"));
 
         r.add(new Route("joshua-sun-appearance",
@@ -478,6 +478,13 @@ public final class ApprovedRoutes {
                 "ardhi|nitoe ardhi|give my land|sell my land|land to the church",
                 "Please do not sign away land or family property because someone promises a blessing. Scripture warns about greed and about pressure to give in a hurry (Proverbs 22:3; 1 Timothy 6:10). Talk with a lawyer, and with a trusted church leader or counsel from your family, before you sign anything, and take the time you need.",
                 "Proverbs 22:3", "1 Timothy 6:10"));
+
+        r.add(new Route("leadership-appointment",
+                "approve me|join the leadership|join (?:the )?church leadership|leadership team|allowed to join",
+                "I cannot approve anyone for church leadership. Leadership appointments are decided by the church's leaders through the church "
+                + "office, and the Bishop's process is the right route. Please speak with the church office or your pastor about your interest in "
+                + "serving. Scripture shows that church leaders are chosen with care and prayer (Acts 6:3), so bring your desire to God in prayer too.",
+                "Acts 6:3", "1 Timothy 3:10"));
 
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",

@@ -6,3 +6,5 @@ Greek (G): openscriptures/strongs greek/strongsgreek.dat (Strong's 1890 text, pu
 Hebrew (H): openscriptures/HebrewLexicon HebrewStrong.xml, CC BY 4.0. Attribution: Open
   Scriptures Hebrew Bible Project. The Strong's Hebrew text is public domain.
 Converted by scripts/bible/build_strongs.py. Greek entries: about 5,549 of 5,624 parsed.
+
+2026-11-25: The shipped file holds plain fields only (code, transliteration, definition text). No OpenScriptures markup, header or code is shipped. Switch to STEPBible TBESG (CC BY 4.0) is blocked in this session because the STEPBible-Data repository is not accessible. Coordinator to decide before release.
