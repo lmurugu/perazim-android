@@ -257,7 +257,10 @@ public class PerazimAiEngine {
     /** Intent to harm a named or unnamed other person (typos tolerated). */
     private static final Pattern HARM_OTHERS_PATTERN = Pattern.compile(
             "\\b(?:kill|killing|hurt|harm|stab|shoot|beat)\\b.{0,40}\\b(?:s[ou]m[a-z]{0,2}ne|somebody|someon|him|her|them|person|boss|husband|wife|neighbour|neighbor|child)\\b|" +
-            "\\bthoughts of (?:killing|hurting)\\b", Pattern.CASE_INSENSITIVE);
+            "\\bthoughts of (?:killing|hurting)\\b|" +
+            // Extortion with private photos (Kenya set): police and 999/112 wording, not a scope refusal.
+            "threats? to (?:post|share|send|leak) (?:my |his |her |their )?(?:private|intimate|nude|naked) (?:photos?|pictures?|videos?|images?)|" +
+            "\\bunless i pay (?:him|her|them|you)\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isHarmToOthersQuery(@Nullable String query) {
         if (query == null) return false;
@@ -282,7 +285,14 @@ public class PerazimAiEngine {
             "(?:touch\\w*|fondl\\w*|grop\\w*|molest\\w*|abus\\w*) (?:my |our |the |a )?(?:\\w+ )?" +
             "(?:daughter|son|child|children|kids?|boy|girl|baby|toddler|teen\\w*|minor|student|pupil)|" +
             "(?:pastor|priest|teacher|youth leader|church leader|deacon|elder|church worker) (?:has |have )?" +
-            "(?:touched|molested|abused|raped|fondled))\\b", Pattern.CASE_INSENSITIVE);
+            "(?:touched|molested|abused|raped|fondled)|" +
+            // Kenya-set safeguarding wording: beatings, forced child marriage, grooming gifts, locked-in children, sex for money.
+            "beats? (?:me|her|him|them|my \\w+)|beating (?:me|her|him|them)|assaults? (?:me|her|him|them)|" +
+            "forced into marriage|forced to marry|forcing (?:her|him|them|my \\w+) (?:into )?marriage|" +
+            "married (?:at|aged) (?:1[0-7]|[0-9])\\b|" +
+            "(?:daughter|son|child|children|kids?|boy|girl|baby|toddler|\\d{1,2}[- ]year[- ]old)\\b.{0,80}?\\b(?:secret|private) (?:gifts?|messages?|photos?|pictures?)|" +
+            "locked (?:in|inside) (?:a |the )?(?:room|house|cupboard|bedroom)|" +
+            "money for sex|paid for sex|sex for (?:money|food|favou?rs|jobs?)|trade sex)\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();

@@ -15,6 +15,9 @@ public final class CrisisPhrases {
             "end it all|can't go on|cannot go on|not worth living|sexual assault|" +
             // Approved by Levi on 2026-11-23: suicidal wording that was missed.
             "don'?t see the point of (?:living|lviing|life|going on)|see the point of (?:living|lviing)|wants? to die|" +
+            // Added 2026-11-25 from the Kenya sets (Levi to review this crisis-list addition): hopelessness and giving things away.
+            "nothing to live for|no reason to live|gave (?:his|her|my|their) (?:things|belongings|possessions) away|" +
+            "won'?t be here (?:next|any)|will not be here (?:next|any)|" +
             "kill (?:herself|himself|themselves)|" +
             "domestic violence|physically abused|(?:going to|plan to|want to) (?:kill|shoot|stab) (?:someone|him|her|them)|" +
             "(?:immediate|imminent) danger|" +
