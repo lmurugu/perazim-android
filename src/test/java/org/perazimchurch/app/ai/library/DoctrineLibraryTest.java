@@ -37,6 +37,31 @@ public class DoctrineLibraryTest {
     }
 
     @Test
+    public void approvedAnswerLeadsWithTheBibleViewAndHidesOtherViewsByDefault() {
+        String answer = library.answerFor("What is the Holy Spirit baptism and speaking in tongues?");
+        assertNotNull(answer);
+        assertFalse(answer.contains("Other Christian views"));
+        assertFalse(answer.contains("Cessationist view"));
+        assertFalse(answer.contains("Classical Pentecostal view"));
+    }
+
+    @Test
+    public void otherViewsAreAddedOnlyWhenTheQuestionAsksForThem() {
+        String answer = library.answerFor("What do other Christians believe about tongues? Do some churches disagree?");
+        assertNotNull(answer);
+        assertTrue(answer.startsWith("Spirit baptism is an experience distinct from conversion."));
+        assertTrue(answer.contains("Other Christian views, to be weighed against Scripture"));
+        assertTrue(answer.contains("Cessationist view"));
+    }
+
+    @Test
+    public void plainPerazimViewQuestionDoesNotAddOtherViews() {
+        String answer = library.answerFor("What is your view on the Holy Spirit and tongues?");
+        assertNotNull(answer);
+        assertFalse(answer.contains("Other Christian views"));
+    }
+
+    @Test
     public void approvedPolygamyEntryIsShown() {
         String answer = library.answerFor("Is polygamy allowed for a family in a polygamous marriage?");
         assertNotNull(answer);

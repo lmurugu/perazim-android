@@ -1,10 +1,11 @@
 # Status.md: Perazim Guide
 
-- Guide version: 1.0.0 (2026-11-23). Operating files: Agents 1.0.0, Skills 1.2.0, Status 1.1.0.
+- Guide version: 1.0.0 (2026-11-23), operating files updated 2026-11-25. Operating files: Agents 1.1.0, Skills 1.3.0, Status 1.2.0.
 - Model: Qwen2.5 0.5B Instruct, Q4_K_M, 491,400,032 bytes. Pinned in OnDeviceAi.java with its SHA-256.
 - Knowledge package: read from the signed package at runtime (assets/ai/knowledge/package.json, signed with the owner's offline key).
 - Test set: ai-eval/perazim-guide/cases.jsonl (532 cases) and ai-eval/perazim-guide/cases-stress-2026-11-23.jsonl (150 trick-question cases). Results are recorded by the laptop benchmark thread, not here.
-- Drift detection (1.2.0): comparative knowledge in assets/ai/guide/comparative/. Draft, pending Levi's review.
+- Drift detection: Bible references only (assets/ai/guide/drift/scripture-anchors.json, Levi-approved anchors). The comparative knowledge base describing other faiths was removed on 2026-11-25 on Levi's instruction.
+- Sources: Bible text (KJV for quotations) and Bible-centred Protestant, Pentecostal and Evangelical material only. See docs/PERAZIM_AI_PROJECT/SOURCE_RESTRICTION_2026-11-25.md.
 - Feature flags: OFFLINE_QWEN_ENABLED is true only in debug and validation builds. Release stays off until the owner's gates pass.
 
 KNOWN LIMITS

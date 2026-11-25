@@ -178,7 +178,7 @@ public final class OnDeviceAi {
                 }
                 // Approved reference items (dictionary and cross-references). A no-op until Levi approves a source.
                 evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
-                // Drift: a question that uses another faith's idea gets KJV passages and a comparative note (no-op otherwise).
+                // Drift: a question that uses another faith's idea gets KJV passages only, no description of that faith (no-op otherwise).
                 evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
                 if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");

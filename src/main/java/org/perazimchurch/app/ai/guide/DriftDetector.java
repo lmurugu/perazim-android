@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * Deterministic drift detection: notices when a question uses a concept from another faith, a heterodox group, or
  * a teaching outside Scripture, so the guide can answer gently from Scripture. Pure Java (no Android types) so the
- * rules run in host tests. Every concept id here must exist in assets/ai/guide/comparative/comparative-kb.json.
+ * rules run in host tests. Every concept id here must have an entry in assets/ai/guide/drift/scripture-anchors.json (Bible references only).
  *
  * A hit only adds evidence and a playbook; it never blocks a question. Crisis and safety checks run first.
  */
@@ -72,7 +72,7 @@ public final class DriftDetector {
 
     private DriftDetector() {}
 
-    /** Every concept id this detector can report. The comparative knowledge base must contain each one. */
+    /** Every concept id this detector can report. The scripture-anchors file must contain each one. */
     public static List<String> conceptIds() {
         return CONCEPT_IDS;
     }
