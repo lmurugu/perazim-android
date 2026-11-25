@@ -84,8 +84,8 @@ public final class NoGoZones {
 
     /** Denominations and groups ranked against each other: no verdict, and no single church has the whole truth. */
     static final String DENOMINATION_DECLINE =
-            "No single church or denomination has a monopoly on the truth. Christians of different traditions hold some different "
-            + "views, and I won't rank churches or groups. Each teaching can be checked against Scripture with a trusted church leader "
+            "Christians of different traditions hold some different views on questions like this, and I won't rank churches or groups "
+            + "or judge any person's standing before God. Each teaching can be checked against Scripture with a trusted church leader "
             + "or your pastor.";
 
     private static final Pattern NICENE = Pattern.compile("\\bnicene\\b", Pattern.CASE_INSENSITIVE);
