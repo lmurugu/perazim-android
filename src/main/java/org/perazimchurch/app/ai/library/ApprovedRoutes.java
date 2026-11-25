@@ -605,7 +605,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("psalm-23-context",
                 "psalm 23 (?:in context|explain|meaning|flow|context)|explain psalm 23|psalm 23 in context",
-                "Psalm 23 is David's psalm about the LORD as shepherd. It moves from the LORD's care for his flock (verses 1–3), to his presence in the valley of the shadow of death (verse 4), to his table and his goodness in the house of the LORD (verses 5–6). The comfort comes from the LORD's faithfulness to his people, not from an easy life. Read in context, the psalm is about trust in the LORD in danger as well as in peace. The psalm is a whole: the shepherd who leads (verses 1–3) is the one who walks with his people through the valley (verse 4) and prepares a table in the presence of enemies (verse 5), and his goodness and mercy follow them all their days (verse 6).",
+                "Psalm 23 is David's psalm about the LORD as shepherd. It moves from the LORD's care for his flock (verses 1–3), to his presence in the valley of the shadow of death (verse 4), to his table and his goodness in the house of the LORD (verses 5–6). The comfort comes from the LORD's faithfulness to his people, not from an easy life. Read in context, the psalm is about trust in the LORD in danger as well as in peace. The LORD's care does not mean David has no enemies or danger. The LORD protects him in the valley and provides for him even in the presence of his enemies. The psalm's confidence rests in God's faithful presence, not in the absence of hardship.",
                 "Psalms 23:1", "Psalms 23:4", "Psalms 23:6"));
 
         r.add(new Route("christian-science",
@@ -617,6 +617,21 @@ public final class ApprovedRoutes {
                 "oneness pentecostal|oneness teaching|are oneness|jesus only baptism|baptism in (?:the )?name of jesus only",
                 "The Bible-centred Christian position is that there is one God (Deuteronomy 6:4), and that the Father, the Son and the Holy Spirit are named together in baptism (Matthew 28:19). Oneness teaching holds that God is one person who is revealed in different roles, titles or manifestations, as Father, Son and Holy Spirit, rather than as three distinct persons. Scripture shows the Father and the Son as distinct: the Son prays to the Father (John 17:1–5), and the voice of the Father speaks from heaven when the Son is baptised, with the Spirit descending (Matthew 3:16–17). The Trinitarian faith the church confesses holds one God in three persons (2 Corinthians 13:14).",
                 "Deuteronomy 6:4", "Matthew 28:19", "Matthew 3:16", "John 17:1", "2 Corinthians 13:14"));
+
+        r.add(new Route("ruracio-response",
+                "ruracio|roora|mahari|lobola|dowry|bride price|bride wealth",
+                "Ruracio is not automatically sinful. The Bible records occasions when gifts were given to a bride's family, such as in the account of Rebekah (Genesis 24:50–53), but that passage does not establish a compulsory dowry rule for every Christian family. The custom may be followed when it honours both families and the couple. It must not turn a woman into something being bought, become coercive, or demand an amount that traps the couple in unmanageable debt or indefinitely delays their marriage. Proverbs 22:7 warns that the borrower becomes servant to the lender. The couple should discuss the expectations openly and freely with both families. They should not be shamed, threatened or forced into debt to satisfy family demands. Seek pastoral help where the pressure becomes difficult to resolve.",
+                "Genesis 24:50", "Proverbs 22:7"));
+
+        r.add(new Route("funeral-house-cleansing",
+                "clean\\w*.{0,40}(?:house|home).{0,60}funeral|funeral.{0,80}(?:clean|cleans|cleansing|spirits?)|spirits?.{0,60}funeral|after (?:a |the )?funeral.{0,60}(?:spirit|cleans|cleansing)",
+                "There is nothing wrong with cleaning a house after a funeral for ordinary cleanliness or practical reasons. However, Scripture does not command Christians to perform a cleansing ritual to drive spirits away. Deuteronomy 18:10–12 warns against seeking spiritual power through forbidden practices, including consulting the dead. Christians put their hope in Jesus Christ, who died and rose again, and therefore do not grieve as people without hope (1 Thessalonians 4:13–14). You can remember the person who died, pray, and receive support from your family and church without believing that a special cleansing ceremony is required. Speak with your pastor if fear about spirits is troubling you.",
+                "Deuteronomy 18:10", "1 Thessalonians 4:13"));
+
+        r.add(new Route("widow-inheritance",
+                "widow.{0,80}(?:inherit\\w*|levirat\\w*|marry|marriage|brother-in-law|husband's brother|husband’s brother)|(?:inherit\\w*|levirat\\w*).{0,60}widow",
+                "Deuteronomy 25:5–10 describes a specific law given to ancient Israel. Where brothers lived together and one died without a son, the surviving brother had a responsibility concerning the widow and the preservation of the deceased brother's family line. This was a particular provision within Israel's covenant law, not a general command that Christians must inherit widows or that a widow belongs to her husband's family. Scripture calls God's people to honour and care for widows (James 1:27; 1 Timothy 5:3). A widow is not property. No one has the right to force her into marriage or sexual relations. She must be free to make decisions about her own future without threats, coercion or shame. If she chooses to marry, that decision should be freely made and guided by biblical and civil requirements. If anyone is pressuring or threatening her, her safety must come first, and she should seek help from trusted people and appropriate authorities.",
+                "Deuteronomy 25:5", "James 1:27", "1 Timothy 5:3"));
 
         r.add(new Route("circumcision-custom",
                 "circumci[sz]",

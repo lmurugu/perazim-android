@@ -86,6 +86,10 @@ public final class PreModel {
         String wesley = org.perazimchurch.app.ai.reference.ReferenceGuide.namedWesley(c, question, KjvVerseText.load(c));
         if (wesley != null) return new Decision("routed:commentary-wesley", wesley);
         // Approved routes written from Levi's decisions of 2026-11-25 (Israel, cessationism, apostasy, election, grace, sovereignty).
+        // Coercion, threats, abuse or female cutting in these topics go to the safeguarding response, never to a teaching answer.
+        if (SAFEGUARD_TOPIC.matcher(question).find() && SAFEGUARD_COERCION.matcher(question).find()) {
+            return new Decision("routed:safeguarding", PerazimAiEngine.preModelResponse("safeguarding", question).getMessageText());
+        }
         ApprovedRoutes.Answer approved = ApprovedRoutes.answerFor(question, KjvVerseText.load(c));
         if (approved != null) return new Decision("routed:approved-" + approved.routeId, approved.text);
         String doctrine = DoctrineLibrary.load(c).answerFor(question);
@@ -149,6 +153,14 @@ public final class PreModel {
         String easton = org.perazimchurch.app.ai.reference.ReferenceGuide.namedEaston(c, question);
         return easton == null ? null : new Decision("routed:dictionary-easton", easton);
     }
+
+    /** Topics whose approved answers must never be given to someone describing coercion or abuse. */
+    private static final Pattern SAFEGUARD_TOPIC = Pattern.compile(
+            "widow|inherit|levirat|circumci|ruracio|roora|mahari|lobola|dowry|bride price|funeral", Pattern.CASE_INSENSITIVE);
+    /** Coercion, threats, abuse, or female cutting wording within those topics. */
+    private static final Pattern SAFEGUARD_COERCION = Pattern.compile(
+            "\\bforc\\w*|threat\\w*|beat\\w*|rape\\w*|abus\\w*|sexual\\w*|kill\\w*|harm\\w*|hurt\\w*|\\bfgm\\b|female|girls?|genital|mutilat\\w*",
+            Pattern.CASE_INSENSITIVE);
 
     /** A pointer to a verse given earlier ("that verse"), which the single-question path cannot resolve. */
     private static final Pattern VERSE_POINTER = Pattern.compile(
