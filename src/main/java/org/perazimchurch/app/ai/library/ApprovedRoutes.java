@@ -169,7 +169,8 @@ public final class ApprovedRoutes {
 
         r.add(new Route("first-gospel-preacher",
                 "first (?:person|one|man|preacher).{0,40}(?:preach|gospel)|who (?:was )?the first .{0,30}(?:preach|gospel)",
-                "Scripture records Jesus preaching the gospel of the kingdom of God as He began His public ministry (Mark 1:14–15). "
+                "I cannot name one first preacher with certainty, and I do not have an established answer from the text. Scripture records "
+                + "Jesus preaching the gospel of the kingdom of God as He began His public ministry (Mark 1:14–15). "
                 + "Before that, an angel brought the shepherds good tidings of great joy (Luke 2:10). The Bible does not give anyone "
                 + "the title \u201cthe first person to preach the gospel\u201d.",
                 "Mark 1:14", "Luke 2:10"));
@@ -520,6 +521,51 @@ public final class ApprovedRoutes {
                 "giving options|ways to give|how to give|giving in the app|options in the app",
                 "Giving options are shown in the app's giving section, and the church publishes its giving channels. Gifts should go only through published channels, such as M-Pesa Paybill, and you can confirm the current details with the church office. Please never give money to a person who asks for it privately.",
                 "Psalms 118:24", "Psalms 118:24"));
+
+        r.add(new Route("god-not-a-man",
+                "god was once a man|god was a man|once a man|became god|become god",
+                "Scripture says plainly: 'God is not a man, that he should lie' (Numbers 23:19). God is not a man who became God. The Bible presents God as eternal and unchanging (Psalms 90:2; Malachi 3:6). We test every teaching about God by Scripture alone, and we do not accept a later teaching that adds to what God has revealed.",
+                "Numbers 23:19", "Malachi 3:6"));
+
+        r.add(new Route("archangel-michael-jesus",
+                "archangel|jude 9|jesus is michael|jesus is the archangel",
+                "Scripture does not say that Jesus is the archangel Michael. Jude 9 mentions the archangel Michael, but the verse does not say that he is Christ. Scripture calls Jesus God and Lord (John 1:1), and it teaches that all things were created through Him and for Him (Colossians 1:16). Jesus is greater than the angels (Hebrews 1:4).",
+                "John 1:1", "Hebrews 1:4"));
+
+        r.add(new Route("jesus-is-the-father",
+                "jesus is the father|jesus the father|is jesus the father",
+                "Scripture distinguishes the Father and the Son while confessing one God. Jesus said, 'my Father is greater than I' (John 14:28), and He also said, 'I and my Father are one' (John 10:30). The Church confesses one God, with the Father, the Son and the Holy Spirit, as the Nicene Creed of 381 expresses it. Please test this with your pastor and the Bible passages in context.",
+                "John 14:28", "John 10:30"));
+
+        r.add(new Route("trinity-not-pagan",
+                "trinity.{0,60}pagan|pagan.{0,60}trinity|invented by the church|trinity .{0,30}invented",
+                "The Trinity is not a pagan idea. It is taught in Scripture: there is one God (Deuteronomy 6:4), the Father, the Son and the Holy Spirit are named together in baptism (Matthew 28:19), and the Word who was God became flesh (John 1:1, 14). The word Trinity is a later summary of this teaching, not a new god.",
+                "Deuteronomy 6:4", "Matthew 28:19"));
+
+        r.add(new Route("sunday-mark-beast",
+                "sunday.{0,40}mark|mark of the beast|ellen white",
+                "Scripture does not identify Sunday as the mark of the beast. Revelation 13 speaks of a mark and of the beast's power, but the text does not name Sunday. Paul says that no one should judge us about a day, and that each should be fully convinced in his own mind (Colossians 2:16; Romans 14:5). We test this teaching by Scripture alone.",
+                "Colossians 2:16", "Romans 14:5"));
+
+        r.add(new Route("sabbath-to-sunday",
+                "change the sabbath|changed the sabbath|sabbath to sunday|sunday as a sign",
+                "The Bible does not say that Jesus changed the Sabbath to Sunday. Jesus said that He is the Lord of the Sabbath (Mark 2:28). The first day of the week is the day the women came to the tomb and found that Jesus had risen (Mark 16:2), and Acts 20:7 records the disciples gathering on that day. Scripture does not record a command to change the Sabbath.",
+                "Mark 2:28", "Mark 16:2"));
+
+        r.add(new Route("quran-paraphrase",
+                "qur.?an|quran|koran",
+                "I do not quote the Qur'an here. This guide paraphrases what Islam teaches, and it does not quote the Qur'an. Islamic teaching rejects the Trinity and denies that Jesus is God. Scripture answers this directly: Jesus is God and Lord (John 1:1; John 20:28). Please test any claim against the Bible, and talk with your pastor.",
+                "John 1:1", "John 20:28"));
+
+        r.add(new Route("arabic-text-request",
+                "arabic|jesus did not die|not dying on the cross",
+                "I do not quote the Qur'an or give Arabic text here. This guide paraphrases Islamic teaching. Islam teaches that Jesus did not die on the cross. Scripture answers this: Jesus died and rose again (1 Corinthians 15:3–4). Please test the claim by the Bible, and talk with your pastor or a trusted church leader.",
+                "1 Corinthians 15:3", "1 Corinthians 15:4"));
+
+        r.add(new Route("muhammad-prophet-claim",
+                "muhammad|mohammed|mohamed",
+                "I can examine this claim against Scripture. Scripture points us to Christ, the final Word of God, who spoke to us by His Son (Hebrews 1:1–2). He is the way, the truth and the life, and no one comes to the Father except through Him (John 14:6). We test every teaching by the Bible, and the Bible says we are to test the spirits (1 John 4:1). We do not judge any individual's standing before God.",
+                "Hebrews 1:1", "John 14:6"));
 
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",
