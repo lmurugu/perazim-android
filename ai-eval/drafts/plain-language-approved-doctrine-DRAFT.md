@@ -42,7 +42,7 @@ Levi's standing rule (2026-11-25): teaching comes only from a Bible-centred Prot
 
 **What we believe.** Dowry is an acceptable custom when it honours both families. It must never become selling a person, a debt trap, or a reason to delay marriage.
 
-**Scripture.** Genesis 2:24; Exodus 22:16; Proverbs 18:22; 1 Peter 3:7.
+**Scripture.** Exodus 22:16; Proverbs 18:22. [to decide: Levi to confirm these references fit the custom; none of them names dowry directly.]
 
 **Other views, briefly.** Some see dowry as a covenant honouring both families. Others see the risk that it makes a person into a price, creates debt, or delays marriage. Our view keeps the first and guards against the second. [to decide: confirm]
 
