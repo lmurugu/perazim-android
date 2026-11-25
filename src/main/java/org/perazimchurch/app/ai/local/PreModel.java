@@ -54,7 +54,7 @@ public final class PreModel {
         if (safety == SoftSafety.Verdict.SOFT_CHECK) {
             return new Decision("routed:soft-safety-check", SoftSafety.checkText());
         }
-        if (PerazimAiEngine.isCrisisQuery(question)) {
+        if (PerazimAiEngine.isCrisisQuery(question) && PerazimAiEngine.crisisContextRoute(question) == null) {
             return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
         }
         ScriptureRangeTable table = null;

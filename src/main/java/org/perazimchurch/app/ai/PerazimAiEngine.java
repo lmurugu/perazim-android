@@ -250,7 +250,7 @@ public class PerazimAiEngine {
     }
 
     public static AiResponse crisisResponse() {
-        String msg = "I'm sorry you're facing this. If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If you can, tell a trusted person nearby and ask them to stay with you. For ongoing distress, contact a qualified local health professional.\n\n"
+        String msg = "I'm sorry you're facing this. Are you safe right now, and do you have a plan or a way to end your life tonight? If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If someone else is at risk, do not leave them alone. If you can, tell a trusted person nearby and ask them to stay with you. For ongoing distress, contact a qualified local health professional.\n\n"
                 + "Kenya support lines: 999 or 112 (police emergency and immediate danger), 922 (medical emergency, including overdose or poisoning), 116 (child helpline), 1192 (NACADA, drug and alcohol use), Befrienders Kenya +254 722 178 177 (emotional support, weekdays 9am to 5pm only). A gender-based violence line, 1195, may not be current, so confirm it before you rely on it.\n\n"
                 + "You can also use the app's prayer feature or a church contact shown in the app, if you choose. This guide cannot provide emergency monitoring or confirm that a pastoral contact is available.";
         return AiResponse.plainText(msg, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
@@ -591,6 +591,65 @@ public class PerazimAiEngine {
         return null;
     }
 
+    /** A negation just before a crisis phrase, e.g. "I'm not thinking of ending my life" (Levi, 2026-11-25). */
+    private static final Pattern NEGATED_BEFORE = Pattern.compile(
+            "\\b(?:not|never|no longer|don'?t|do not|am not|i'm not|im not|won'?t)\\b[^.?!,;]{0,30}$", Pattern.CASE_INSENSITIVE);
+    /** Words that mark a poem, story, phrase or meaning question. */
+    private static final Pattern LITERARY_CONTEXT = Pattern.compile(
+            "\\b(?:poem|poetry|novel|story|stories|character|song|lyrics|book|film|movie|play|meaning|phrase|quote|quoted|essay|exam)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Signs that a real person is involved, so the phrase is a real warning rather than a literary question. */
+    private static final Pattern REAL_PERSON_CONTEXT = Pattern.compile(
+            "\\b(?:my|our) (?:friend|brother|sister|husband|wife|son|daughter|mother|father|mum|dad|child|neighbou?r|colleague|pastor|boyfriend|girlfriend|cousin|uncle|aunt|relative|student|classmate)\\b|" +
+                    "\\b(?:texted|messaged|told me|said to me|wrote to me|called me|he texted|she texted|he said|she said)\\b|" +
+                    "\\b(?:i|i'm|i am|i will|i'll|tonight|today|right now)\\b", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Context for crisis wording (Levi's decision, 2026-11-25). Returns "crisis-denial" when every crisis phrase is negated,
+     * or "crisis-literary" for a poem, story or meaning question with no real person involved. Returns null for everything
+     * else, which keeps the full crisis response. A real warning, even one quoted from a text message, is never literary.
+     */
+    @Nullable
+    public static String crisisContextRoute(@Nullable String query) {
+        if (query == null) return null;
+        String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
+        if (CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find() || SELF_HARM_TYPO_PATTERN.matcher(normalized).find()
+                || isMeansAndDistress(normalized)) {
+            return null;
+        }
+        java.util.regex.Matcher m = CRISIS_PATTERN.matcher(normalized);
+        boolean any = false;
+        boolean allNegated = true;
+        while (m.find()) {
+            any = true;
+            if (!NEGATED_BEFORE.matcher(normalized.substring(0, m.start())).find()) allNegated = false;
+        }
+        if (!any) return null;
+        if (allNegated) return "crisis-denial";
+        if (LITERARY_CONTEXT.matcher(normalized).find() && !REAL_PERSON_CONTEXT.matcher(normalized).find()) {
+            return "crisis-literary";
+        }
+        return null;
+    }
+
+    public static AiResponse crisisDenialResponse() {
+        return AiResponse.plainText(
+                "Thank you for telling me that you are not thinking of ending your life. I want to check gently: are you safe right now? "
+                + "If thoughts of ending your life come back, or you feel hopeless, please tell a trusted person now. If you may be in danger, call 999 or 112 now. "
+                + "For emotional support you can call Befrienders Kenya on +254 722 178 177, which is open on weekdays from 9am to 5pm. "
+                + "You can also talk with your pastor or a trusted church leader.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
+    public static AiResponse crisisLiteraryResponse() {
+        return AiResponse.plainText(
+                "This sounds like a question about a poem, a novel or a character, so I will explain the phrase. In stories, 'ending my life' "
+                + "usually means that a character is thinking about suicide, and writers treat that theme with care. If someone in your own life "
+                + "has said this to you, tell me, and I will give you the urgent steps for helping them. If you are feeling this way yourself, "
+                + "please tell a trusted person now, and call 999 or 112 if you may be in danger.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
     public static boolean isCrisisQuery(@Nullable String query) {
         if (query == null) return false;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
@@ -786,6 +845,8 @@ public class PerazimAiEngine {
     @Nullable
     public static String preModelRoute(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return "scope-refusal";
+        String crisisContext = crisisContextRoute(query);
+        if (crisisContext != null) return crisisContext;
         if (isCrisisQuery(query)) return "crisis";
         if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
@@ -809,6 +870,8 @@ public class PerazimAiEngine {
     public static AiResponse preModelResponse(@NonNull String route, @Nullable String query) {
         switch (route) {
             case "crisis": return crisisResponse();
+            case "crisis-denial": return crisisDenialResponse();
+            case "crisis-literary": return crisisLiteraryResponse();
             case "overdose": return overdoseResponse();
             case "harm-to-others": return harmToOthersResponse();
             case "safeguarding": return safeguardingResponse(query);
