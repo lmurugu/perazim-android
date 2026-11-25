@@ -10,7 +10,8 @@ public final class CrisisPhrases {
     private CrisisPhrases() {}
 
     public static final Pattern PATTERN = Pattern.compile(
-            "\\b(suicid(?:e|al)|kill myself|end my life|want to die|better off dead|" +
+            // Added 2026-11-25 (MG-S24, "I'm thinking of ending my life"): ending-life wording. Levi to review this addition.
+            "\\b(suicid(?:e|al)|kill myself|end my life|ending (?:my|his|her|their|our) life|end (?:his|her|their) life|want to die|better off dead|" +
             "self[ -]?harm|hurt myself|harm myself|cutting myself|unalive myself|" +
             "end it all|can't go on|cannot go on|not worth living|sexual assault|" +
             // Approved by Levi on 2026-11-23: suicidal wording that was missed.

@@ -49,6 +49,14 @@ public class PerazimAiEngine {
             "\\b(?:pastor|preacher|church|bishop|elder|leader|someone) says\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern FIRST_PERSON_CONTEXT = Pattern.compile(
             "\\b(?:i|i'm|i am|i feel|i felt|i have|i was|my|me)\\b", Pattern.CASE_INSENSITIVE);
+    /** A factual question such as "Is that adultery?" about a spouse's conduct (Added 2026-11-25). */
+    private static final Pattern FACTUAL_INFIDELITY_QUESTION = Pattern.compile(
+            "\\bis (?:that|this|it|he|she|what (?:he|she|they) (?:is )?doing) (?:adultery|cheating|infidelity|unfaithful|a sin|wrong)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Personal distress, fear or danger in the speaker's own words (Added 2026-11-25). */
+    private static final Pattern PERSONAL_DISTRESS = Pattern.compile(
+            "\\b(?:i|i'm|i am|i feel|i felt|me|myself|suicid\\w*|abuse\\w*|hit|beat\\w*|threat\\w*|afraid|scared|harm\\w*|kill\\w*|" +
+                    "depress\\w*|anx\\w*|hurt\\w*|forc\\w*)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern SENSITIVE_PASTORAL_TOPIC = Pattern.compile(
             "\\b(?:abuse|assault|rape|violence|hit me|beating|marital conflict|family conflict|divorce|" +
                     "separation|trauma|grief|bereavement|mourning|depress(?:ion|ed)?|anx(?:iety|ious)|" +
@@ -454,6 +462,13 @@ public class PerazimAiEngine {
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
             + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene|miraa|khat|muguka|uzazi wa mpango|waislamu|jirani zangu|muslim neighbou?rs?|kugongewa|kugongeana|nimegongewa|tukigongeana|mpango wa kando)\\b|"
+            // Added 2026-11-25 for the marriage and family set (Levi's sections 4-8): these are in scope for the approved routes.
+            + "\\b(?:marry|married|marriage|singl\\w*|ndoa|trap|mume|mke|wanaume|wanawake|mchumba|mahari|familia|ananisaliti|kusaliti|"
+            + "ujumbe wa kimapenzi|mama yangu|mama mkwe|mother-in-law|in-laws?|mkwe|hafanyi|anafanya kila kitu|kazi za nyumbani|chores|housework|"
+            + "household|cheat\\w*|cheated|revenge|final word|manipulative|inferior|superior|feminis\\w*|sexis\\w*|controls? (?:all )?(?:the )?money|"
+            + "won'?t let me (?:work|decide)|obey everything|must obey|proving|unfaithful\\w*|adulter\\w*|affair|divorc\\w*|remarr\\w*|50/50|"
+            + "split (?:of )?(?:every|the) bill|earns more|makes more|sleeping with|sleep with|bro|sis|ruracio|roora|lobola|dowry|bride|"
+            + "vasectomy|injection|sterili[sz]\\w*|contracept\\w*|forces? me|mother|father|dad|mum|mama|baba|waislamu|sisi)\\b|"
             + "rogw|uchawi|mchawi|nimeroga|manabii|nabii|tiktok|youtube|gold dust|visible sign|false teacher|on tv|on television|preacher i saw|judas|keep sinning|unforgivable|place in heaven|salvaiton|salvtion|sin on purpose|aposttae|icons?|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
 
     public static AiResponse drugSafetyResponse() {
@@ -589,6 +604,9 @@ public class PerazimAiEngine {
         // A question about what someone else says (e.g. "Our pastor says depression is a lack of faith. Is that true?") is a
         // doctrine question, not a personal disclosure, so it goes to the approved routes.
         if (SAYS_CLAIM_QUESTION.matcher(query).find() && !FIRST_PERSON_CONTEXT.matcher(query).find()) return false;
+        // Added 2026-11-25 (MG-S15): a factual question about a spouse's conduct ("Is that adultery?") goes to the approved
+        // infidelity route. A speaker who discloses their own distress, fear or danger still goes to the sensitive route.
+        if (FACTUAL_INFIDELITY_QUESTION.matcher(query).find() && !PERSONAL_DISTRESS.matcher(query).find()) return false;
         return SENSITIVE_PASTORAL_REQUEST.matcher(query).find()
                 || (PERSONAL_CONTEXT.matcher(query).find() && SENSITIVE_PASTORAL_TOPIC.matcher(query).find());
     }

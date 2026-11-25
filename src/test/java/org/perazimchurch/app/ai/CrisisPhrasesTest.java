@@ -21,6 +21,12 @@ public class CrisisPhrasesTest {
     }
 
     @Test
+    public void endingLifeWordingIsCrisis() {
+        assertTrue(hit("I'm thinking of ending my life because my wife left."));
+        assertTrue(hit("He is ending his life tonight."));
+    }
+
+    @Test
     public void ordinaryUsesAreNotCrisis() {
         assertFalse(hit("I don't see the point of this sermon."));
         assertFalse(hit("What does Psalm 23 1 say?"));
