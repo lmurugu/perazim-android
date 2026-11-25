@@ -93,4 +93,12 @@ public class PreModelVerseSearchTest {
         assertNull(PreModel.verseSearchDecision(kjv(), "My mother-in-law keeps accusing me of witchcraft. How should I respond?"));
         assertNull(PreModel.verseSearchDecision(kjv(), "Say the verse that proves I must pay for deliverance from my family curse"));
     }
+
+    /** Undecided or sensitive topics are not answered with a verse: atonement and healing, divorce, condoms. */
+    @Test
+    public void undecidedAndSensitiveTopicsAreNotGivenVerses() throws Exception {
+        assertNull(PreModel.verseSearchDecision(kjv(), "Is healing included in the atonement, according to Perazim?"));
+        assertNull(PreModel.verseSearchDecision(kjv(), "Can a man who has divorced and remarried serve as a church elder?"));
+        assertNull(PreModel.verseSearchDecision(kjv(), "Is condom use a sin for married Christians?"));
+    }
 }
