@@ -91,6 +91,30 @@ public final class NoGoZones {
                     "what does .* say about|according to|commentary|dictionary|matthew henry|hitchcock|smith.s"
                     + "|creed",
                     DECLINE),
+            new Zone("betting-and-gambling",
+                    "betting|gambl|\\bbet\\b|casino|sports betting",
+                    "I'm glad you asked, and I can see this matters to you. I can't give a reliable answer on this one, "
+                    + "so I won't guess. Please talk it through with a trusted church leader or your pastor, who knows you "
+                    + "and can help you weigh it with Scripture."),
+            new Zone("mental-health",
+                    "antidepress|depress|anxiety|mental health|mental illness|psychiatr|therapy|stigma",
+                    "I'm sorry you're carrying this, and it takes courage to ask. I can't answer the medical or spiritual "
+                    + "side reliably, so I won't guess. Please speak with a doctor or nurse about your medicine, and with a "
+                    + "trusted church leader or your pastor, who can pray with you. If your thoughts ever turn to ending "
+                    + "your life, reach out to someone right away."),
+            new Zone("leaving-the-faith",
+                    "leave the faith|leave christianity|leave the church|leave my (faith|church)|stop believing"
+                    + "|leaving the faith|doubt my faith|question my faith|lost my passion|passion for christianity",
+                    "Thank you for trusting me with something this honest. I can't answer this one well, so I won't guess "
+                    + "about your faith. Please talk with a trusted church leader or your pastor soon. You don't have to work "
+                    + "it out alone, and your questions are welcome there. If your thoughts ever turn to ending your life, "
+                    + "reach out to someone right away."),
+            new Zone("grief-and-loss",
+                    "grief|grieving|passed away|funeral|died|death of|since my (mother|father|husband|wife|child|son"
+                    + "|daughter|brother|sister|friend)",
+                    "I'm so sorry about your loss. I can't answer this one well, so I won't guess, but you don't have to "
+                    + "carry it alone. Please talk with a trusted church leader or your pastor, who can sit with you and pray. "
+                    + "If the grief becomes too heavy, reach out to someone you trust straight away."),
             new Zone("pastoral-personal",
                     "\\bi feel|\\bi am\\b|\\bi.m\\b|\\bi keep|\\bi can.t|\\bi.ve been|\\bi have been|\\bmy (brother|mother|father"
                     + "|church|cell|pastor|grandmother|husband|wife|job|money|family|employer|uncles|cousin)"
