@@ -174,12 +174,17 @@ public class EvalPipelineTest {
                     answer = org.perazimchurch.app.ai.library.DoctrineLibrary.load(c).answerFor(q);
                 } else {
                     JSONArray evidence = kjvEvidence(q);
-                    String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
-                    long t0 = System.currentTimeMillis();
-                    String raw = runLlama(llama, modelPath, prompt, 128);
-                    status = "model:" + (evidence.length() > 0 ? "kjv-evidence" : "no-evidence")
-                            + ":" + (System.currentTimeMillis() - t0) + "ms";
-                    answer = LocalPrompt.stripStockPhrases(raw);
+                    if (evidence.length() == 0) {
+                        // Production OnDeviceAi.ask throws here before the model runs, so the model is never called without evidence.
+                        status = "refused:no-verified-source";
+                        answer = "No verified approved source supports this question.";
+                    } else {
+                        String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
+                        long t0 = System.currentTimeMillis();
+                        String raw = runLlama(llama, modelPath, prompt, 128);
+                        status = "model:kjv-evidence:" + (System.currentTimeMillis() - t0) + "ms";
+                        answer = LocalPrompt.stripStockPhrases(raw);
+                    }
                 }
                 JSONObject row = new JSONObject();
                 row.put("id", kase.getString("id"));
