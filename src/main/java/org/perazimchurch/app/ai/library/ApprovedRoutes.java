@@ -92,8 +92,7 @@ public final class ApprovedRoutes {
                 + "Our reading, working interpretation and under review, is that this refers to the Lord's return and to full "
                 + "knowledge. We do not claim that the passage explicitly names the time as Christ's return, and we do not claim "
                 + "that this is the only possible reading.\n\n"
-                + "We do not call cessationists heretics, false Christians or unsaved because they disagree. Test every word and "
-                + "experience by Scripture, desire the gifts that build up the Church, and seek love above all.",
+                + "We do not call cessationists heretics, false Christians or unsaved because they disagree. Desire the gifts that build up the Church, and seek love above all.",
                 "1 Corinthians 14:1", "Acts 2:39"));
 
         r.add(new Route("apostasy-assurance",
@@ -533,7 +532,7 @@ public final class ApprovedRoutes {
                 + "part of the 66-book canon we hold. The reasons are historical as well as biblical. The Old Testament "
                 + "was received by the Jewish community to which God entrusted His oracles (Romans 3:2), and Jesus "
                 + "pointed to the Law, the Prophets and the Psalms as the Scriptures that testify of Him (Luke 24:44). "
-                + "Those books can be read for history, but we test the canon by Scripture itself.",
+                + "Those books can be read for history.",
                 "Romans 3:2", "Luke 24:44"));
 
         r.add(new Route("greeting-only",
@@ -594,6 +593,18 @@ public final class ApprovedRoutes {
                 "grace mean|meaning of grace|maana ya neema|what is grace",
                 "Grace is God's unearned favour toward sinners. Scripture says that we are saved by grace through faith, and that this is not of ourselves: it is the gift of God (Ephesians 2:8–9). Paul also says that we are justified freely by his grace, through the redemption that is in Christ Jesus (Romans 3:24). Because grace is not earned, it leads to gratitude and a changed life. We are saved by grace through faith, not by works; yet we are created in Christ Jesus for good works (Ephesians 2:8–10). God's grace also teaches us to reject ungodliness and live self-controlled, upright and godly lives (Titus 2:11–12).",
                 "Ephesians 2:8", "Romans 3:24", "Ephesians 2:10"));
+
+        r.add(new Route("justification-by-faith",
+                "\\bjustif\\w*|justified by",
+                "Justification is the good news that God declares a sinner righteous in his sight. We cannot earn it, because it is a gift of his grace. "
+                + "Paul writes that we are justified freely by his grace, through the redemption that is in Christ Jesus (Romans 3:24). "
+                + "Because we have been justified by faith, we have peace with God through our Lord Jesus Christ (Romans 5:1). "
+                + "Paul is clear that a person is not justified by the works of the law, but by faith in Jesus Christ (Galatians 2:16). "
+                + "We are saved by grace through faith, and this is not of ourselves: it is the gift of God (Ephesians 2:8–9). "
+                + "We are created in Christ Jesus for good works, which flow from being saved, not as a way of earning it (Ephesians 2:10). "
+                + "God's grace also teaches us to live self-controlled, upright and godly lives (Titus 2:11–12). "
+                + "If you are asking whether you are right with God, bring that question to Jesus in prayer, and talk with your pastor.",
+                "Romans 3:24", "Romans 5:1", "Galatians 2:16", "Ephesians 2:8", "Titus 2:11"));
 
         r.add(new Route("god-changes-mind",
                 "does god change|god change (?:his|her|its) mind|did god repent|god repent|god regret",
@@ -818,8 +829,8 @@ public final class ApprovedRoutes {
 
         r.add(new Route("soul-sleep-and-presence",
                 "soul sleep|soul-sleep|unconscious in the grave|asleep in the grave|sleep until the (?:day of )?resurrection|unconscious until",
-                "Some groups teach soul sleep, that the soul is unconscious in the grave until the resurrection. We test that teaching by "
-                + "Scripture. Jesus told the thief on the cross that he would be with Him in paradise that day (Luke 23:43). Paul wrote "
+                "Some groups teach soul sleep, that the soul is unconscious in the grave until the resurrection. "
+                + "Jesus told the thief on the cross that he would be with Him in paradise that day (Luke 23:43). Paul wrote "
                 + "that to be absent from the body is to be present with the Lord (2 Corinthians 5:8), and he longed to depart and be with "
                 + "Christ (Philippians 1:23). These passages are the ones to weigh. Please talk with a trusted church leader about any "
                 + "questions on this.",
@@ -837,8 +848,7 @@ public final class ApprovedRoutes {
                 "someone else (?:die|died|was crucified|on the cross)|some say.{0,30}not crucified|some say.{0,30}someone else|another (?:man )?died|died in his place|did someone else",
                 "The Bible teaches that Jesus was crucified and died for our sins. Paul wrote that Christ died for our sins according to the "
                 + "Scriptures (1 Corinthians 15:3), and that the Gospel centres on Christ crucified (1 Corinthians 1:23). The death and "
-                + "resurrection of Jesus are at the heart of the Gospel. Some groups teach that someone else died in His place, and we test "
-                + "that teaching by Scripture.",
+                + "resurrection of Jesus are at the heart of the Gospel. Some groups teach that someone else died in His place.",
                 "1 Corinthians 15:3", "1 Corinthians 1:23"));
 
         r.add(new Route("nicaea-and-the-bible",

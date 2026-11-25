@@ -78,7 +78,7 @@ public final class NoGoZones {
 
     /** Reasoning and argument: no approved route yet. Points to Scripture and does not guess (Levi's rules). */
     static final String REASONING_DECLINE =
-            "The Bible is the test for every argument, so I want to point you to what Scripture teaches. I can't weigh this "
+            "I want to point you to what Scripture teaches. I can't weigh this "
             + "argument well yet, so I won't guess. Please talk it through with a trusted church leader or your pastor, who can "
             + "take you through the Bible's answer.";
 
