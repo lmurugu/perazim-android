@@ -230,7 +230,7 @@ Levi asked for a precise statement of what headship, leadership, mutual submissi
 The options share these fixed points, which are not in dispute in Levi's framework:
 - Ephesians 5:21 calls all believers to submit to one another in the fear of God.
 - Husbands are called to love their wives as Christ loved the Church, and to nourish and cherish them (Eph 5:25–29).
-- Wives are called to respect and reverence their husbands (Eph 5:33) and to submit as to the Lord (Eph 5:22; Col 3:18).
+- Wives are called to respect and reverence their husbands (Eph 5:33) and to submit as unto the Lord (Eph 5:22; Col 3:18 has "as it is fit in the Lord").
 - Nothing in these texts authorises domination, cruelty, selfishness or abuse (Col 3:19; 1 Pet 3:7).
 - No obedience to sin. Safeguarding overrides any household arrangement.
 - The scope is marriage only. Women's ministry roles remain **UNDECIDED** and are not settled by any option below.
