@@ -888,7 +888,9 @@ public final class ApprovedRoutes {
                 + "God cared for him (1 Kings 19:4–8). The psalmist wrote honestly about his sorrow, and he still "
                 + "called on God (Psalms 42:5). Please talk with a doctor or clinic about how you are feeling, and with "
                 + "your pastor or a trusted church leader. You are not alone in this. If you ever think about ending "
-                + "your life, reach out to someone right away and call 999 or 112 now.",
+                + "your life, reach out to someone right away and call 999 or 112 now. "
+                + "If you or someone you know is at risk right now, call 999 or 112. Befrienders Kenya (+254 722 178 177) "
+                + "offers support on weekdays from 9am to 5pm, but it is not an emergency service.",
                 "1 Kings 19:4", "Psalms 42:5"));
 
         r.add(new Route("unanswered-prayer-and-faith",

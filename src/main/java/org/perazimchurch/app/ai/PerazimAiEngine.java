@@ -131,7 +131,7 @@ public class PerazimAiEngine {
     public static AiResponse safetyFirstResponse(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return null;
         String route = safetyRoute(query);
-        if (route == null || "topic-violence".equals(route)) return null;
+        if (route == null || "topic-violence".equals(route) || "general-topic".equals(route)) return null;
         return preModelResponse(route, query);
     }
 
@@ -154,7 +154,7 @@ public class PerazimAiEngine {
         if (safety == SoftSafety.Verdict.SOFT_CHECK) {
             return softSafetyCheckResponse();
         }
-        if (isCrisisQuery(q)) {
+        if (isCrisisQuery(q) && !"general-topic".equals(safetyRoute(rawQuery))) {
             return handleCrisisQuery();
         }
         if (isOverdoseQuery(rawQuery)) {
@@ -701,6 +701,7 @@ public class PerazimAiEngine {
         if (!violence) {
             if ("none".equals(kind)) return null;
             if ("topic".equals(kind)) return "topic-violence";
+            if ("real".equals(kind) && isGeneralSuicideQuestion(n)) return "general-topic";
             if ("real".equals(kind)) return isThirdPartyFraming(n) ? "crisis-third-party" : "crisis";
             return "crisis-" + kind; // crisis-denial or crisis-literary
         }
@@ -726,6 +727,24 @@ public class PerazimAiEngine {
         if (allNegated) return "denial";
         if (LITERARY_CONTEXT.matcher(n).find() && !REAL_PERSON_CONTEXT.matcher(n).find()) return "literary";
         return "real";
+    }
+
+    private static final Pattern GENERAL_SUBJECT = Pattern.compile(
+            "\\b(?:clergy|pastors?|church leaders?|elders?|leaders|youth|teenagers?|young people|students|believers|christians|"
+                    + "people|men|women|members|communities|society|many)\\b|\\bin our (?:area|church|community)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern NAMED_RELATION = Pattern.compile(
+            "\\bmy\\b|\\b\\w+ yangu\\b|\\b\\w+ wangu\\b", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * A general or educational question about suicide or depression among clergy or groups: no reporter statement,
+     * no reported speech, no named relation. Levi's rule: a general mention is not a crisis. It gets the approved pastoral answer.
+     */
+    static boolean isGeneralSuicideQuestion(String n) {
+        return !SELF_STATEMENT.matcher(n).find()
+                && !REPORTED_SPEECH.matcher(n).find()
+                && !NAMED_RELATION.matcher(n).find()
+                && GENERAL_SUBJECT.matcher(n).find();
     }
 
     /**
@@ -994,7 +1013,7 @@ public class PerazimAiEngine {
     public static String preModelRoute(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return "scope-refusal";
         String safety = safetyRoute(query);
-        if (safety != null && !"topic-violence".equals(safety)) return safety;
+        if (safety != null && !"topic-violence".equals(safety) && !"general-topic".equals(safety)) return safety;
         if (safety == null && isCrisisQuery(query)) return "crisis";
         if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
@@ -1053,7 +1072,7 @@ public class PerazimAiEngine {
         if (query == null || query.trim().isEmpty()) return null;
         AiResponse safetyFirst = safetyFirstResponse(query);
         if (safetyFirst != null) return safetyFirst;
-        if (isCrisisQuery(query)) return crisisResponse();
+        if (isCrisisQuery(query) && !"general-topic".equals(safetyRoute(query))) return crisisResponse();
         if (isSensitivePastoralDisclosure(query)) return sensitivePastoralResponse();
         if (isHumanDecisionQuery(query)) return humanDecisionResponse();
         if (isOutOfScopeForModel(query)) return boundaryResponseFor(query);

@@ -61,6 +61,10 @@ public final class SoftSafety {
     }
 
     private static Verdict step(String q) {
+        if ("general-topic".equals(PerazimAiEngine.safetyRoute(q))) {
+            pending = false;
+            return Verdict.NONE;
+        }
         if (PerazimAiEngine.isCrisisQuery(q)) {
             pending = false;
             return Verdict.CRISIS;

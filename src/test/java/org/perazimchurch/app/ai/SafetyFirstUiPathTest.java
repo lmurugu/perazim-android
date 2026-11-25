@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -104,5 +105,21 @@ public class SafetyFirstUiPathTest {
         assertTrue(told, told.startsWith("I'm sorry you're facing this."));
         String afterText = text("My brother texted me. I want to die.");
         assertTrue(afterText, afterText.startsWith("I'm sorry you're facing this."));
+    }
+
+    @Test
+    public void generalClergySuicideQuestionIsNotACrisis() {
+        String q = "Clergy in our area are dying by suicide. How can a pastor be depressed if he has God?";
+        assertNull(PerazimAiEngine.safetyFirstResponse(q));
+        assertEquals("general-topic", PerazimAiEngine.safetyRoute(q));
+        String route = PerazimAiEngine.preModelRoute(q);
+        assertFalse(q + " -> " + route, route != null && route.startsWith("crisis"));
+        assertEquals(SoftSafety.Verdict.NONE, SoftSafety.judge(q));
+    }
+
+    @Test
+    public void namedRelationStillGetsThirdPartyNotGeneral() {
+        String q = "My brother hinted he will not be here next week and he gave his things away.";
+        assertEquals("crisis-third-party", PerazimAiEngine.safetyRoute(q));
     }
 }

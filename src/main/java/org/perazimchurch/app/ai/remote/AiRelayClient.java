@@ -34,7 +34,7 @@ public final class AiRelayClient {
             MAIN.post(() -> callback.onError(safetyFirst.getMessageText()));
             return;
         }
-        if (PerazimAiEngine.isCrisisQuery(question)) {
+        if (PerazimAiEngine.isCrisisQuery(question) && !"general-topic".equals(PerazimAiEngine.safetyRoute(question))) {
             MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
             return;
         }
