@@ -78,6 +78,10 @@ Teach the continuing operation of spiritual gifts as Levi's stated position. Do 
 
 A specific cessationist question can be answered from Scripture. Do not label cessationists as heretics or unsaved. If a particular wording has been reserved for Levi's approval, keep that wording pending while improving the rest of the answer and route.
 
+### Round 11 Scripture outlines
+
+Follow [LEVI_REVIEW_DECISIONS_2026-11-25_ROUND11_SCRIPTURE_OUTLINES.md](LEVI_REVIEW_DECISIONS_2026-11-25_ROUND11_SCRIPTURE_OUTLINES.md). Do not ask Levi to repeat these decisions. The believer-possession question remains UNDECIDED; prophecy continues as a gift but individual claims and any claimed prophetic office require discernment; Christians should pray for the sick without teaching that faith guarantees healing, while healing in the atonement remains UNDECIDED; do not invent an exhaustive list of essential doctrines; the formal inerrancy formulation remains UNDECIDED while Scripture retains its supreme authority. The problem-of-evil outline is an apologetic explanation, not an UNDER REVIEW doctrine.
+
 ### Source policy
 
 The newer source policy supersedes older blanket-removal or blanket-decline rules. Another group's official source may be consulted only to identify its own claim; it is never a Christian doctrinal authority. Creeds and patristic writings may be used only after biblical review.
