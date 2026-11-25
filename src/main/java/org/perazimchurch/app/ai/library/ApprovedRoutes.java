@@ -607,7 +607,7 @@ public final class ApprovedRoutes {
                 "Romans 3:24", "Romans 5:1", "Galatians 2:16", "Ephesians 2:8", "Titus 2:11"));
 
         r.add(new Route("marriage-term-clarify",
-                "kugongewa|kugongeana|mpango wa kando",
+                "gongew|gongean|mpango wa kando",
                 "I do not want to guess what this phrase means, so please tell me in a sentence what it means to you, and I will answer that situation. Whatever the situation, Scripture calls husband and wife to honour marriage and to keep it undefiled (Hebrews 13:4), and to love one another earnestly (1 Peter 4:8). If a secret relationship outside the marriage is involved, faithfulness and honesty are required of both spouses. If anyone is being harmed or threatened, safety comes first. Please talk with your pastor or a trusted church leader about this, and ask them to walk with you and your spouse.",
                 "Hebrews 13:4", "1 Peter 4:8"));
 
