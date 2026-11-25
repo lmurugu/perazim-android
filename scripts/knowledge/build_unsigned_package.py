@@ -6,15 +6,17 @@ signature is missing: signingKeyId is PENDING and signature is empty, so the pro
 it on his laptop (see ai-eval/knowledge-package-unsigned/SIGNING.md).
 
 Inputs (approved material only):
-  - src/main/assets/ai/library/doctrine/entries.json      APPROVED_LEVI entries (Perazim view and other views, verses)
+  - src/main/assets/ai/library/doctrine/entries.json      APPROVED_LEVI entries (Perazim view and verses; other views are
+                                                          shown only when asked, so they are not in the package)
   - src/main/assets/ai/library/doctrine/positions.json    UNDER_REVIEW developing views (labelled) and UNDECIDED topics
                                                           (explained without a position). DRAFT_PENDING_LEVI is skipped.
-  - ai-eval/knowledge-package-unsigned/source/comparative-kb-1.5.22.json   APPROVED_LEVI entries only (PR 76, d052d7c)
   - scripts/reference/creeds/nicene-constantinopolitan-381.txt           approved by Levi 2026-11-23
   - scripts/reference/sources.json + src/main/assets/reference/reference.db.gz, entries of Hitchcock's Bible Names
     (approved factual source). Smith, Easton and Nave's are excluded: the 2 MB package limit cannot hold them.
 Excluded on purpose: Henry and Wesley commentaries (optional download, not in the default package), cross-references and
-places (not model-facing text), the apostles' and Westminster creeds (not approved).
+places (not model-facing text), the apostles' and Westminster creeds (not approved). Removed 2026-11-25: the comparative
+knowledge base (descriptions of other faiths and churches). Only Bible-centred Protestant, Pentecostal and Evangelical
+material and the ecumenical Nicene Creed may be model-facing.
 
 Output: ai-eval/knowledge-package-unsigned/package.unsigned.json and a summary to stdout.
 """
@@ -63,8 +65,6 @@ def doctrine_docs():
         if e.get("status") != "APPROVED_LEVI":
             continue
         parts = [e["perazimView"]]
-        if e.get("otherViews"):
-            parts.append("Other Christian views: " + " ".join(e["otherViews"]))
         for v in (e.get("verses") or [])[:3]:
             parts.append(f'{v["ref"]} (King James Version): "{v["text"]}"')
         if e.get("noVerdict"):
@@ -86,20 +86,6 @@ def doctrine_docs():
                     + ", so it will not state one. Please speak with your pastor or a church leader about it.")
             docs.append(doc("doctrine-" + p["id"], p["topic"], "positions", p["id"], text,
                             "doctrine " + p["id"] + " UNDECIDED", authority="UNDECIDED"))
-    return docs
-
-
-def comparative_docs():
-    kb = json.loads((OUT_DIR / "source/comparative-kb-1.5.22.json").read_text(encoding="utf-8"))
-    docs = []
-    for e in kb["entries"]:
-        if e.get("status") != "APPROVED_LEVI":
-            continue
-        # Only model-facing fields: summary, origin, scripture (the KB's own rule).
-        text = " ".join(x for x in (e.get("summary"), e.get("origin"), e.get("scripture")) if x)
-        docs.append(doc("comparative-" + e["id"], e["id"].replace("-", " ").title(), kb["version"],
-                        e.get("group", "comparative"), text,
-                        "comparative-kb " + kb["version"] + " APPROVED_LEVI (PR 76, d052d7c)"))
     return docs
 
 
@@ -135,7 +121,7 @@ def hitchcock_docs(limit_bytes=400 * 1024):
 
 
 def build():
-    documents = doctrine_docs() + comparative_docs() + creed_docs() + hitchcock_docs()
+    documents = doctrine_docs() + creed_docs() + hitchcock_docs()
     published = int(PUBLISHED.timestamp() * 1000)
     payload = {
         "format": FORMAT,

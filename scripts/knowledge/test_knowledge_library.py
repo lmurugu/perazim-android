@@ -73,3 +73,45 @@ class DoctrineEntriesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+REMOVED_SOURCE_IDS = {"ante-nicene-fathers", "npnf", "comparative-kb-1.0.0", "comparative-kb-1.5.22"}
+REMOVED_OTHER_FAITH_TERMS = ("Catechism", "Qur'an", "Council of Trent", "Hindu", "Buddhis", "Latter-day Saint",
+                             "Jehovah's Witness", "Seventh-day Adventist", "Christian Science")
+
+
+class RemovedSourcesTest(unittest.TestCase):
+    """Sources removed 2026-11-25 must not come back into the register, the package or the reference build."""
+
+    ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
+
+    def _read(self, rel):
+        with open(os.path.join(self.ROOT, rel), encoding="utf-8") as f:
+            return f.read()
+
+    def test_removed_candidates_are_gone_from_the_source_list(self):
+        sources = json.loads(self._read("scripts/reference/sources.json"))
+        listed = {c.get("id") for c in sources.get("candidates", []) + sources.get("sources", [])}
+        self.assertEqual(listed & REMOVED_SOURCE_IDS, set())
+
+    def test_removals_are_recorded_with_reasons(self):
+        sources = json.loads(self._read("scripts/reference/sources.json"))
+        recorded = {r["id"]: r["reason"] for r in sources.get("removed", [])}
+        for source_id in REMOVED_SOURCE_IDS:
+            self.assertIn(source_id, recorded)
+            self.assertTrue(recorded[source_id].strip())
+
+    def test_register_carries_the_removals(self):
+        register = json.loads(self._read("src/main/assets/ai/library/sources/register.json"))
+        self.assertEqual({r["id"] for r in register["removedSources"]}, REMOVED_SOURCE_IDS)
+        self.assertEqual(set(s["id"] for s in register["sources"]) & REMOVED_SOURCE_IDS, set())
+
+    def test_unsigned_package_has_no_other_faith_documents(self):
+        text = self._read("ai-eval/knowledge-package-unsigned/package.unsigned.json")
+        self.assertNotIn("comparative", text)
+        for term in REMOVED_OTHER_FAITH_TERMS:
+            self.assertFalse(term in text, "package still mentions " + term)
+
+    def test_comparative_source_file_is_not_present(self):
+        self.assertFalse(os.path.exists(os.path.join(self.ROOT, "ai-eval/knowledge-package-unsigned/source/comparative-kb-1.5.22.json")))
+        self.assertFalse(os.path.exists(os.path.join(self.ROOT, "src/main/assets/ai/guide/comparative/comparative-kb.json")))
