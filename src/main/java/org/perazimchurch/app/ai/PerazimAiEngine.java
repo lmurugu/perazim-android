@@ -292,7 +292,11 @@ public class PerazimAiEngine {
             "married (?:at|aged) (?:1[0-7]|[0-9])\\b|" +
             "(?:daughter|son|child|children|kids?|boy|girl|baby|toddler|\\d{1,2}[- ]year[- ]old)\\b.{0,80}?\\b(?:secret|private) (?:gifts?|messages?|photos?|pictures?)|" +
             "locked (?:in|inside) (?:a |the )?(?:room|house|cupboard|bedroom)|" +
-            "money for sex|paid for sex|sex for (?:money|food|favou?rs|jobs?)|trade sex)\\b", Pattern.CASE_INSENSITIVE);
+            "money for sex|paid for sex|sex for (?:money|food|favou?rs|jobs?)|trade sex|" +
+            // Child-abuse disclosures from the Kenya sets: secrecy instructions, a relative sleeping in the child's room, Swahili wording.
+            "keep (?:our|the|this|my) secret|keep it a secret|(?:told|tells|telling) me not to tell|" +
+            "not to tell (?:mummy|mama|mom|mum|dad|daddy|my parents|anyone)|don'?t tell (?:mummy|mama|mom|mum|dad|daddy|my parents|anyone)|" +
+            "sleeps in my room|vitendo vibaya|unyanyasaji|amebakwa|kubakwa|kumbaka)\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();

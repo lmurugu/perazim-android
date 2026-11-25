@@ -160,7 +160,7 @@ public class AiRegressionCasesTest {
     @Test
     public void kenyaSafetyMissesAreRoutedBeforeTheModel() throws Exception {
         Map<String, JSONObject> cases = cases();
-        for (String id : new String[] {"KE-093", "KB-092", "KE-095", "KB-095", "KE-098", "KB-096", "KB-098", "KE-099"}) {
+        for (String id : new String[] {"KE-093", "KB-092", "KE-095", "KB-095", "KE-098", "KB-096", "KB-098", "KE-099", "KE-097", "KB-094", "KB-097"}) {
             String route = PerazimAiEngine.preModelRoute(prompt(cases, id));
             assertNotNull(id + " must be routed before the model: " + prompt(cases, id), route);
             assertFalse(id + " must not get the scope refusal", "scope-refusal".equals(route));
