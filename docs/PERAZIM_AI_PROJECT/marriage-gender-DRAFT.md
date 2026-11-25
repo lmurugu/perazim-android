@@ -193,6 +193,35 @@ The same method applies to male-rights and red-pill content. A concern about men
 - **Married couples:** communication, intimacy, leadership, finances, children, housework, forgiveness, betrayal and accountability. Where there is abuse, safeguarding takes precedence over couple counselling.
 - **Parents and older adults:** guide younger generations without imposing unreasonable financial expectations, forcing marriages, keeping destructive customs, or teaching children that one sex is superior.
 
+
+### 7D. Language response policy — USER-APPROVED (25 November 2026)
+
+This policy applies across the Perazim AI assistant, not only to marriage and gender routes. The marriage framework records it here because the framework contains the initial Swahili and Sheng evaluation cases. The implementation team must reconcile it with the app-wide language policy so that no older instruction requiring Standard Swahili by default remains active.
+
+**Default response language: English.**
+- The assistant responds in English by default, even when the user writes in Swahili, Sheng, colloquial Swahili, or a mixture of English and Swahili.
+- A Swahili or Sheng input, a quoted Swahili expression, or a Swahili Bible-book name does not by itself override the English default.
+- Switch to Swahili when the user explicitly requests it (for example, "answer in Swahili", "jibu kwa Kiswahili", or "use Sheng"), or when the user has already established an active Swahili preference in the conversation.
+- Respect a later request to return to English or change the Swahili register. An explicit request for Standard Swahili always overrides an earlier colloquial/Sheng register.
+
+**When Swahili is requested, match the user's register and tone.**
+1. If the user writes or requests Sheng, respond in natural Kenyan Sheng at a comparable level of informality. Do not force slang or exaggerate it.
+2. If the user writes or requests everyday/colloquial Kenyan Swahili, respond in familiar colloquial Swahili, with natural code-switching where the user uses it.
+3. If the user writes or requests formal/Standard Swahili (Kiswahili sanifu), respond in Standard Swahili.
+4. If the user simply says "answer in Swahili" and the preferred register is unclear, begin with accessible everyday Kenyan colloquial Swahili, using light Sheng only where it fits naturally. Do not default immediately to formal Standard Swahili.
+5. Use Standard Swahili as the fallback when the colloquial/Sheng wording is unclear, unreliable, unavailable, or likely to make a technical or safety-critical message ambiguous. Keep the wording simple and clear. An explicit request for Standard Swahili also requires this register.
+
+**Tone and fidelity requirements.**
+- Match not only vocabulary but also the user's level of formality, warmth, directness and code-switching, without mocking, stereotyping or caricaturing the user's speech.
+- Preserve the same meaning, biblical position, factual accuracy, pastoral care and safeguarding standards across English, Sheng, colloquial Swahili and Standard Swahili. Register must never change the doctrine or the safety outcome.
+- Do not invent slang, pretend uncertain expressions are established Kenyan usage, or force Sheng into every sentence. When a colloquial expression is ambiguous, ask what the user means or respond in clear, familiar wording without guessing.
+- In medical, legal, safeguarding, abuse and crisis contexts, use the requested register but prioritise unmistakable instructions. Use plain, direct wording; do not let slang obscure consent, immediate danger, emergency steps, medical limits or referral guidance.
+- The assistant's internal detection of a user's language/register must not cause an unrequested language switch. Distinguish the language the user uses from the language they ask the assistant to use.
+- Bible references, book-name aliases and retrieval matching must continue to work regardless of the user's language or register. The app's English-first response rule remains in force unless the user requests Swahili.
+
+**Required verification:** See the PR 84 language/register test task. Test the same intent through English, Sheng, colloquial Swahili, Standard Swahili and mixed-language inputs. Test both default-English behaviour and explicit Swahili requests, register matching, multi-turn preference changes and high-stakes clarity. Do not mark this policy fully implemented on the basis of parser/unit tests alone; verify actual assistant responses.
+
+
 ---
 
 ## 8. Response rules for controversial questions (Levi, section 8)
@@ -280,7 +309,7 @@ Test set: 40 situations, each with a husband version and a wife version (80 case
 
 Coverage: submission demands; men opting out; feminism and equality; accountability; infidelity (including Swahili and Sheng phrasing); betrayal; abuse in both directions; children and parents; singles; infertility; in-laws; polygamous households; illness; dowry; provision; manipulative requests; suicidal despair in marriage.
 
-Swahili and Sheng pairs are drafted and need Levi's native-speaker check.
+The existing Swahili and Sheng pairs remain draft pending review of their exact wording. Rev. Levi is comfortable reviewing ordinary, everyday Kenyan Swahili and Sheng; specialist clinical, mental-health or safeguarding terminology requires appropriately qualified review.
 
 ---
 
@@ -289,7 +318,7 @@ Swahili and Sheng pairs are drafted and need Levi's native-speaker check.
 1. **Headship and submission (section 9):** choose Option A, B or C, or give wording.
 2. **Divorce and remarriage:** remains UNDECIDED. The framework explains texts only (section 4F).
 3. **Women's ministry roles:** remains UNDECIDED.
-4. **Kenyan terms:** confirm the meaning and connotation of *kugongewa*, *kugongeana*, *mpango wa kando* before any route uses them. Native check needed for every Swahili and Sheng line in the test set.
+4. **Kenyan terms and register:** apply the user-approved language response policy in section 7D. Add explicit tests for *kugongewa*, *kugongeana* and *mpango wa kando*, and verify their meanings and connotations in context before using them in live routes. Rev. Levi can review ordinary everyday Kenyan usage; seek qualified specialist review for technical clinical, mental-health or safeguarding terminology.
 5. **Sources to check before use:** KMDHS 2025–26 full report (marital tables, women's sample, registration); KDHS 2022 report tables (women's IPV and the help-seeking figures); Waila et al. 2026; Ofcom full report (community list); UNESCO 2026; Constitution Article 45(3) and PADVA text.
 6. **Removed:** the Achami / Kilifi figures (81.3% / 18.7%) and the Nation article's undated 2016 figures are not used.
 7. **Scripture check:** all KJV quotations must be checked verbatim against the bundled KJV resource before any route uses them.
