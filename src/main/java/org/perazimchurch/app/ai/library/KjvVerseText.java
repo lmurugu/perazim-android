@@ -1,58 +1,79 @@
 package org.perazimchurch.app.ai.library;
 
 import android.content.Context;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Verbatim King James Version text from the bundled verse file (assets/bible). Only verses that are in the file are
- * available; a missing verse is reported as missing, never filled in from memory.
+ * Verbatim King James Version text from the full bundled KJV (assets/bible/text/KJV.tsv.gz, 31,102 verses, the same
+ * file the Bible reader and the knowledge library use). A verse that is not in the file is reported as missing,
+ * never filled in from memory.
  */
 public final class KjvVerseText {
+    static final String KJV_TSV = "bible/text/KJV.tsv.gz";
+    static final String MANIFEST = "bible/kjv_manifest.json";
+
     private final Map<String, String> verses = new HashMap<>();
     private final Map<String, Integer> bookNumbers = new HashMap<>();
 
     private KjvVerseText() {}
 
-    /** Parses the verse file and the book manifest. */
-    public static KjvVerseText fromJson(String versesJson, String manifestJson) throws JSONException {
+    /** Parses the TSV (bookNumber, chapter, verse, text per line) and the book manifest. */
+    public static KjvVerseText fromTsv(InputStream tsv, String manifestJson) throws IOException, JSONException {
         KjvVerseText out = new KjvVerseText();
         JSONArray books = new JSONArray(manifestJson);
         for (int i = 0; i < books.length(); i++) {
             JSONObject b = books.getJSONObject(i);
             out.bookNumbers.put(b.getString("name").toLowerCase(Locale.ROOT), b.getInt("bookNumber"));
         }
-        JSONArray verses = new JSONArray(versesJson);
-        for (int i = 0; i < verses.length(); i++) {
-            JSONObject v = verses.getJSONObject(i);
-            out.verses.put(key(v.getInt("bookNumber"), v.getInt("chapterNumber"), v.getInt("verseNumber")),
-                    v.getString("text"));
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(tsv, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                String[] f = line.split("\t", 4);
+                if (f.length < 4) continue;
+                out.verses.put(key(Integer.parseInt(f[0]), Integer.parseInt(f[1]), Integer.parseInt(f[2])), f[3]);
+            }
         }
         return out;
     }
 
     private static KjvVerseText cached;
 
-    /** Loads the bundled files once. Returns an empty table if they cannot be read. */
+    /** Loads the bundled full KJV once. Returns an empty table if the files cannot be read. */
     public static synchronized KjvVerseText load(Context context) {
         if (cached != null) return cached;
-        try {
-            cached = fromJson(read(context, "bible/kjv_verses.json"), read(context, "bible/kjv_manifest.json"));
+        try (InputStream raw = context.getAssets().open(KJV_TSV)) {
+            cached = fromTsv(new GZIPInputStream(raw), read(context, MANIFEST));
         } catch (Exception e) {
-            try {
-                cached = fromJson("[]", "[]");
-            } catch (JSONException impossible) {
-                throw new IllegalStateException(impossible);
-            }
+            cached = empty();
         }
         return cached;
+    }
+
+    /** Parses the same files from the source tree, for the JVM tests and the evaluation harness. */
+    public static KjvVerseText fromFiles(java.io.File tsvGz, java.io.File manifest) throws IOException, JSONException {
+        try (InputStream in = new java.io.FileInputStream(tsvGz)) {
+            return fromTsv(new GZIPInputStream(in), new String(java.nio.file.Files.readAllBytes(manifest.toPath()),
+                    StandardCharsets.UTF_8));
+        }
+    }
+
+    private static KjvVerseText empty() {
+        try {
+            return fromTsv(new java.io.ByteArrayInputStream(new byte[0]), "[]");
+        } catch (Exception impossible) {
+            throw new IllegalStateException(impossible);
+        }
     }
 
     /** The book number for a canonical name, or -1 when the name is not in the manifest. */

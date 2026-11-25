@@ -21,8 +21,8 @@ public class PreModelTest {
     @BeforeClass
     public static void load() throws Exception {
         table = ScriptureRangeTable.fromJson(read("src/main/assets/ai/library/scripture/kjv-verse-counts.json"));
-        verses = KjvVerseText.fromJson(read("src/main/assets/bible/kjv_verses.json"),
-                read("src/main/assets/bible/kjv_manifest.json"));
+        verses = KjvVerseText.fromFiles(new File("src/main/assets/bible/text/KJV.tsv.gz"),
+                new File("src/main/assets/bible/kjv_manifest.json"));
     }
 
     private static String read(String path) throws Exception {
@@ -59,8 +59,18 @@ public class PreModelTest {
     }
 
     @Test
-    public void validVerseMissingFromTheOfflineFileIsNotInvented() {
-        PreModel.Decision d = PreModel.verseDecision(table, verses, "What does 1 Corinthians 13:4 mean?");
+    public void fullKjvHoldsVersesOutsideTheStarterFile() {
+        assertEquals("And the earth was without form, and void; and darkness was upon the face of the deep. "
+                + "And the Spirit of God moved upon the face of the waters.", verses.verse(1, 1, 2));
+        assertNotNull(verses.verse(46, 13, 4));
+    }
+
+    @Test
+    public void validVerseMissingFromTheOfflineFileIsNotInvented() throws Exception {
+        // An empty verse file stands in for a KJV that does not hold the verse: the reference is valid, the text is not there.
+        KjvVerseText empty = KjvVerseText.fromFiles(new File("src/test/resources/empty-kjv.tsv.gz"),
+                new File("src/main/assets/bible/kjv_manifest.json"));
+        PreModel.Decision d = PreModel.verseDecision(table, empty, "What does 1 Corinthians 13:4 mean?");
         assertNotNull(d);
         assertEquals("routed:verse-not-in-offline-text", d.status);
         assertTrue(d.answer.contains("I can't quote 1 Corinthians 13:4 from memory"));
