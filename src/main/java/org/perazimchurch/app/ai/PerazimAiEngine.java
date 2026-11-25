@@ -251,7 +251,13 @@ public class PerazimAiEngine {
 
     public static AiResponse crisisResponse() {
         String msg = "I'm sorry you're facing this. Are you safe right now, and do you have a plan or a way to end your life tonight? If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If someone else is at risk, do not leave them alone. If you can, tell a trusted person nearby and ask them to stay with you. For ongoing distress, contact a qualified local health professional.\n\n"
-                + "Kenya support lines: 999 or 112 (police emergency and immediate danger), 922 (medical emergency, including overdose or poisoning), 116 (child helpline), 1192 (NACADA, drug and alcohol use), Befrienders Kenya +254 722 178 177 (emotional support, weekdays 9am to 5pm only). A gender-based violence line, 1195, may not be current, so confirm it before you rely on it.\n\n"
+                + "Kenya helplines, by purpose:\n"
+                + "- Police emergency and immediate danger: 999 or 112.\n"
+                + "- SHA 922 Lifeline, to reach an ambulance for urgent medical emergencies, including overdose or poisoning.\n"
+                + "- 1195, the National GBV Helpline, for gender-based violence counselling and referral, open 24 hours.\n"
+                + "- 116, the Childline Kenya helpline, for a child at risk.\n"
+                + "- 1192, NACADA, for drug and alcohol use, open 24 hours.\n"
+                + "- Befrienders Kenya +254 722 178 177, for emotional support on weekdays from 9am to 5pm. It is not an emergency service.\n\n"
                 + "You can also use the app's prayer feature or a church contact shown in the app, if you choose. This guide cannot provide emergency monitoring or confirm that a pastoral contact is available.";
         return AiResponse.plainText(msg, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
@@ -438,7 +444,7 @@ public class PerazimAiEngine {
                 + "now, or go to the nearest police station or hospital, and ask for help with what happened. A doctor or clinic can also "
                 + "check your health and help you get support. Please tell a trusted person outside the church, such as a family member "
                 + "or friend, who can stay with you. You do not have to keep silent, and no one should ask you to forgive before you are "
-                + "ready or to stay quiet about it. Gender-based violence line 1195 (may not be current, so confirm it before you rely on it). "
+                + "ready or to stay quiet about it. For gender-based violence counselling and referral, call 1195, the National GBV Helpline, open 24 hours. "
                 + "This guide cannot investigate, promise confidentiality, or act for you.",
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
