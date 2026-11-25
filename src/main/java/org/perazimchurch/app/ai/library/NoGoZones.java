@@ -122,7 +122,7 @@ public final class NoGoZones {
                     + "|birthright|denied jesus|genuinely saved|saved christian|work for my salvation|work out your salvation",
                     DECLINE),
             new Zone("spirit-gifts-miracles",
-                    "holy spirit|holy spiirt|spirit (in|baptism|baptised|baptized|told)|tongues|spiritual gift"
+                    "holy spirit (?:told|said|tells|says|speaks|is telling|led)|spirit (in|baptism|baptised|baptized|told)|tongues|spiritual gift"
                     + "|prophe|deliverance|demon|dream|holy water|miracle|healing|healed|paralys|tiktok|youtube preacher"
                     + "|anoint|speak in",
                     DECLINE),

@@ -53,4 +53,24 @@ public class OwnKnowledgeTest {
                 + "pay a fixed amount of money to the church, as the Bible requires in this matter.", kv, table));
         assertNull("too short", OwnKnowledge.accept("Yes, God loves you.", kv, table));
     }
+
+    /**
+     * Chat-path regression for the phone wordings (coordinator, 2026-11-25). The on-phone fallback must answer from the library
+     * passages, not refuse with the no-source line, and the zones must not decline general faith questions.
+     */
+    @Test
+    public void phoneWordingsGetScriptureAnswersNotRefusals() {
+        Context c = ApplicationProvider.getApplicationContext();
+        String purgatory = OwnKnowledge.scriptureOnlyReply(c, "Does the Bible teach purgatory?");
+        assertNotNull("purgatory wording must get the library's Scripture-only reply", purgatory);
+        assertTrue(purgatory.contains("Hebrews 9:27"));
+        assertNotNull(OwnKnowledge.scriptureOnlyReply(c, "What is purgatory?"));
+        assertTrue(PreModel.scriptureDoctrineQuestion("Does the Bible teach purgatory?"));
+        assertTrue(PreModel.generalFaithQuestion("Is it wrong to be angry at God?"));
+        assertFalse(PreModel.generalFaithQuestion("I am angry at God because my job failed."));
+        assertFalse(PreModel.generalFaithQuestion("Can I send money to the prophet to break a curse?"));
+        PreModel.Decision holySpirit = PreModel.decide(c, "Is the Holy Spirit a person or only a force?");
+        assertTrue("a Holy Spirit question is not a no-go decline",
+                holySpirit == null || !holySpirit.status.startsWith("routed:no-go"));
+    }
 }

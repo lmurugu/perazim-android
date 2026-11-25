@@ -126,9 +126,52 @@ final class OwnKnowledge {
      * Checks a model reply. Returns the labelled answer, or null when any rule fails.
      */
     static String accept(String raw, KjvVerseText kv, ScriptureRangeTable table) {
+        return accept(raw, kv, table, null);
+    }
+
+    /** Words that name no topic: question words and words that appear in nearly every verse. */
+    private static final java.util.Set<String> TOPIC_NEUTRAL = new java.util.HashSet<>(java.util.Arrays.asList(
+            "does", "did", "what", "why", "how", "that", "this", "with", "from", "for", "are", "was", "were", "will",
+            "can", "should", "about", "bible", "scripture", "says", "christian", "christians", "believer", "believers",
+            "people", "there", "their", "they", "them", "your", "you", "have", "into", "when", "which", "who", "whom",
+            "the", "and", "not", "any", "all", "but", "one", "God", "Lord", "Jesus", "Christ", "holy", "spirit", "something",
+            "teach", "teaches", "taught", "answer", "question", "mean", "means", "give", "make", "need", "true"));
+
+    /** True when the reply repeats any run of eight words, the loop the on-device model falls into (2026-11-25). */
+    static boolean repeatsItself(String text) {
+        String[] w = text.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9' ]", " ").trim().split("\\s+");
+        java.util.Set<String> seen = new java.util.HashSet<>();
+        for (int i = 0; i + 8 <= w.length; i++) {
+            if (!seen.add(String.join(" ", java.util.Arrays.copyOfRange(w, i, i + 8)))) return true;
+        }
+        return false;
+    }
+
+    /**
+     * True when at least one cited verse shares a topic word with the question. A verse cited for a question it does not
+     * touch is the wrong passage, so the reply is refused (2026-11-25).
+     */
+    static boolean citesTopicWord(String question, java.util.Collection<String> verseTexts) {
+        java.util.Set<String> topic = new java.util.HashSet<>();
+        for (String word : question.toLowerCase(Locale.ROOT).replaceAll("[^a-z' ]", " ").split("\\s+")) {
+            if (word.length() >= 4 && !TOPIC_NEUTRAL.contains(word)) topic.add(word);
+        }
+        if (topic.isEmpty()) return true;
+        for (String verse : verseTexts) {
+            if (verse == null) continue;
+            String lower = verse.toLowerCase(Locale.ROOT);
+            for (String word : topic) {
+                if (lower.matches("(?s).*\\b" + Pattern.quote(word) + "\\w*\\b.*")) return true;
+            }
+        }
+        return false;
+    }
+
+    static String accept(String raw, KjvVerseText kv, ScriptureRangeTable table, String question) {
         if (raw == null || kv == null || table == null) return null;
         String text = ModelOutput.stripEndMarkers(raw);
         if (text.isEmpty()) return null;
+        if (repeatsItself(text)) return null;
         int words = text.split("\\s+").length;
         if (words < 10 || words > 110) return null;
         if (OTHER_TRANSLATION.matcher(text).find()) return null;
@@ -136,6 +179,7 @@ final class OwnKnowledge {
         if (OFFICIAL_CLAIM.matcher(text).find() || PERSONAL_VERDICT.matcher(text).find()) return null;
         // Any teaching rests on at least two Scripture passages (source rule): fewer than two valid references is not accepted.
         java.util.Set<String> validRefs = new java.util.HashSet<>();
+        java.util.List<String> citedVerses = new ArrayList<>();
         Matcher refs = REFERENCE.matcher(text);
         while (refs.find()) {
             int book = table.bookNumber(refs.group(1).trim());
@@ -148,8 +192,10 @@ final class OwnKnowledge {
                 if (!table.isValid(book, chapter, last) || last < first) return null;
             }
             validRefs.add(book + ":" + chapter + ":" + first);
+            citedVerses.add(kv.verse(book, chapter, first));
         }
         if (validRefs.size() < 2) return null;
+        if (question != null && !citesTopicWord(question, citedVerses)) return null;
         Matcher quoted = QUOTED.matcher(text);
         while (quoted.find()) {
             String passage = quoted.group(1).trim();
@@ -211,7 +257,7 @@ final class OwnKnowledge {
                 if (!OnDeviceAi.runtimeAvailable(c) || !OnDeviceAi.isInstalled(c) || !OnDeviceAi.isModelVerified(c)) return null;
                 raw = OnDeviceAi.runModelProcess(c, built, null, 160);
             }
-            return accept(raw, kv, table);
+            return accept(raw, kv, table, question);
         } catch (Exception e) {
             return null;
         }

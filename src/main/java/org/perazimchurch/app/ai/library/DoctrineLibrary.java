@@ -75,7 +75,8 @@ public final class DoctrineLibrary {
     /** Topic matchers by id. A topic with no matcher is never routed here. */
     private static final java.util.Map<String, String> MATCH = new java.util.HashMap<>();
     static {
-        MATCH.put("holy-spirit-baptism", "holy spirit|holy ghost|tongues|tognue|tounge|speaking in tongues|spirit baptism|baptism in the spirit|pentecostal");
+        // Only baptism, filling and tongues words route here; a bare "holy spirit" question is about who the Spirit is (2026-11-25).
+        MATCH.put("holy-spirit-baptism", "(?:baptism|baptised|baptized|baptise|filled|filling|receive|received) (?:in|with|of|by) (?:the )?(?:holy )?(?:spirit|ghost)|spirit baptism|tongues|tognue|tounge|speaking in tongues|pentecostal");
         MATCH.put("prosperity-and-giving", "prosperity|prosperity gospel|seed offering|seed faith|sow a seed|giving seed|plant (?:a |an )?seed|mbegu|ukitoa pesa|utapata gari|poor because|poor people are poor|do not give enough|don't give enough|health and wealth");
         MATCH.put("polygamy", "polygamy|polygamous|polygamist|multiple wives|more than one wife|second wife|many wives|two wives|two wife|several wives|marry two|marry more than one");
         MATCH.put("dowry", "dowry|bride price|bride wealth|lobola|roora|ruracio|mahari");

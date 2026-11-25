@@ -166,7 +166,7 @@ public final class OnDeviceAi {
                 String evidenceQuery = evidenceQuery(question, history);
                 // A Christian doctrine question is answered from Scripture and the library, never from a name or word dictionary:
                 // no stored or reference dictionary evidence (the Hitchcock "Mary" entry, 2026-11-25).
-                boolean doctrineQuestion = PreModel.scriptureDoctrineQuestion(question);
+                boolean doctrineQuestion = PreModel.scriptureDoctrineQuestion(question) || PreModel.generalFaithQuestion(question);
                 JSONArray evidence = doctrineQuestion ? new JSONArray() : OfflineKnowledgeStore.retrieve(c, trustedKeys,
                         BuildConfig.VERSION_NAME, System.currentTimeMillis(), evidenceQuery);
                 // Word study by Strong's number (G26, H7225): answer from the bundled entry, never generate it.

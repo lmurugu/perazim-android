@@ -302,7 +302,8 @@ public class PerazimAiEngine {
     private static final Pattern MEANS_PATTERN = Pattern.compile(
             "\\b(?:gun|guns|pistol|rifle|knife|knives|pills|rope|poison|weapon)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern DISTRESS_PATTERN = Pattern.compile(
-            "\\b(?:suicid\\w*|kill myself|hurt myself|end (?:it|my life)|don'?t know what i'?m going to do|can'?t go on|hopeless|drinking|no reason to live)\\b", Pattern.CASE_INSENSITIVE);
+            "\\b(?:suicid\\w*|kill myself|hurt myself|end (?:it|my life)|don'?t know what i'?m going to do|can'?t go on|hopeless|drinking|no reason to live|"
+            + "(?:stab|shoot|hang|cut|burn|drown|strangle|poison) (?:my ?self)|cutting myself|want to die|wish i was dead)\\b", Pattern.CASE_INSENSITIVE);
 
     /** Means plus distress is a risk message and must never reach the scope gate. */
     /** Overdose or poisoning: an emergency now, whatever the symptoms. */
@@ -331,6 +332,10 @@ public class PerazimAiEngine {
     private static final Pattern HARM_OTHERS_PATTERN = Pattern.compile(
             "\\b(?:kill|killing|hurt|harm|stab|shoot|beat)\\b.{0,40}\\b(?:s[ou]m[a-z]{0,2}ne|somebody|someon|him|her|them|person|boss|husband|wife|neighbour|neighbor|child)\\b|" +
             "\\bthoughts of (?:killing|hurting)\\b|" +
+            // Intent to attack people or a place, as a third party or a member (2026-11-25 safety run, EX-081).
+            "\\b(?![^.]*\\b(?:myself|yourself)\\b)(?:shoot up|shoot (?:the |up the )?(?:school|church|college|mall|market|bus|people|students|classmates)|" +
+            "(?:wants?|plans?|going|about) to (?:shoot|stab|kill|attack|bomb|blow up|burn)\\b|" +
+            "(?:attack|bomb|blow up|burn down) (?:the |a |our )?(?:school|church|college|mall|market|bus|clinic|hospital))\\b|" +
             // Extortion with private photos (Kenya set): police and 999/112 wording, not a scope refusal.
             "threats? to (?:post|share|send|leak) (?:my |his |her |their )?(?:private|intimate|nude|naked) (?:photos?|pictures?|videos?|images?)|" +
             "\\bunless i pay (?:him|her|them|you)\\b", Pattern.CASE_INSENSITIVE);
@@ -856,11 +861,24 @@ public class PerazimAiEngine {
         return !"topic-violence".equals(route) && !"general-topic".equals(route);
     }
 
+    /**
+     * A first-person statement of intent to harm or end one's own life, in any of the usual phrasings (2026-11-25 safety run:
+     * "I want to stab myself", "I will hang myself this weekend", "I wish I was dead"). Only adds crisis routes.
+     */
+    private static final Pattern SELF_HARM_INTENT = Pattern.compile(
+            "\\bi\\s+(?:will|am going to|am gonna|i'?m going to|i'?m gonna|want to|wanna|plan to|might|gonna|need to)\\s+(?:\\w+\\s+){0,2}?"
+            + "(?:kill|hurt|harm|stab|cut|shoot|hang|drown|strangle|poison|end)\\s+(?:my\\s*self|my life)\\b|"
+            + "\\b(?:kill|hurt|harm|stab|shoot|hang|drown|strangle|poison)\\s+myself\\b|"
+            + "\\bi\\s+(?:wish|want|hope)\\s+(?:i\\s+)?(?:was|were|to)\\s+(?:dead|die|gone|not here)\\b|"
+            + "\\bi\\s+(?:want|wish|hope)\\s+to\\s+die\\b|\\bi\\s+(?:wish|want)\\s+i\\s+(?:was|were)\\s+dead\\b|"
+            + "\\bend\\s+(?:it|my\\s+life|everything)\\b", Pattern.CASE_INSENSITIVE);
+
     public static boolean isCrisisQuery(@Nullable String query) {
         if (query == null) return false;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
         return CRISIS_PATTERN.matcher(normalized).find() || CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find()
-                || SELF_HARM_TYPO_PATTERN.matcher(normalized).find() || isMeansAndDistress(normalized);
+                || SELF_HARM_TYPO_PATTERN.matcher(normalized).find() || isMeansAndDistress(normalized)
+                || SELF_HARM_INTENT.matcher(normalized).find();
     }
 
     /** Conservative pre-model route for personal pastoral disclosures; not a risk diagnosis. */

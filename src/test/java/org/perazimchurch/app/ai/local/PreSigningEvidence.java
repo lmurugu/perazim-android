@@ -45,7 +45,7 @@ final class PreSigningEvidence {
     static JSONArray retrieve(String question) throws Exception {
         JSONArray out = new JSONArray();
         // Matches production (OnDeviceAi): a Christian doctrine question gets no dictionary evidence (2026-11-25).
-        if (PreModel.scriptureDoctrineQuestion(question)) return out;
+        if (PreModel.scriptureDoctrineQuestion(question) || PreModel.generalFaithQuestion(question)) return out;
         Set<String> terms = terms(question);
         if (terms.isEmpty()) return out;
         JSONArray all = documents();

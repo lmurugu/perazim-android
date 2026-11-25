@@ -155,8 +155,9 @@ public final class PreModel {
         NoGoZones.Zone zone = NoGoZones.match(question);
         // Christian doctrine asked as what the Bible or our teaching says, with no other group named, is answered from Scripture
         // and the library, not declined as an other-faiths or research question (coordinator, 2026-11-25).
-        boolean scriptureOnly = zone != null && scriptureDoctrineQuestion(question)
-                && ("other-faiths-and-groups".equals(zone.id) || "history-authorship-research".equals(zone.id));
+        boolean scriptureOnly = zone != null && ((scriptureDoctrineQuestion(question)
+                && ("other-faiths-and-groups".equals(zone.id) || "history-authorship-research".equals(zone.id)))
+                || (generalFaithQuestion(question) && GENERAL_FAITH_BYPASS.contains(zone.id)));
         if (zone != null && !scriptureOnly) return new Decision("routed:no-go:" + zone.id, zone.decline);
         // "That verse" with no book, chapter and verse in the question: ask which one is meant rather than guess.
         // This runs after the zones, so a zone decline always keeps its priority.
@@ -190,6 +191,35 @@ public final class PreModel {
     /** True for a Christian doctrine question that names no other group. */
     static boolean scriptureDoctrineQuestion(String question) {
         return question != null && SCRIPTURE_DOCTRINE.matcher(question).find() && !NAMES_OTHER_GROUP.matcher(question).find();
+    }
+
+    /**
+     * Zones that fire on ordinary words ("angry", "money", "Hebrews") in a general faith question. A general question is
+     * answered from Scripture instead of declined (2026-11-25). Crisis, mental-health, grief, betting, scope and
+     * spirit-gifts zones are never bypassed here.
+     */
+    private static final java.util.Set<String> GENERAL_FAITH_BYPASS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "pastoral-personal", "giving-money-pressure", "salvation-works-apostasy", "history-authorship-research"));
+    private static final Pattern FIRST_PERSON = Pattern.compile("\\b(?:i|i'm|i’m|me|my|mine|myself)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern GENERAL_START = Pattern.compile(
+            "^\\s*(?:what|why|how|is|are|does|do|can|should|must|who|will|did|was|were|when)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FAITH_WORD = Pattern.compile(
+            "\\b(?:bible|scripture|god|jesus|christ|church|spirit|baptis\\w*|communion|lord|salvation|grace|faith|pray\\w*|hell|"
+            + "heaven|sin|saints?|mary|pope|sabbath|tithe\\w*|sunday|angels?|marriage|hebrews|romans|corinthians|letter|epistle|"
+            + "gospel|creed|canon|apocrypha|resurrection|rapture|elders?|women|worship|gifts?|tongues|miracle\\w*|healing|forgiv\\w*|"
+            + "wealth\\w*|prosper\\w*|money|divorce|polygam\\w*|dowry|offering|witch\\w*|eternal|angry|anger|worry|worrying)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Money-pressure, curse and personal-sensitive words: a general question with one of these is not bypassed. */
+    private static final Pattern NOT_GENERAL = Pattern.compile(
+            "curse|breakthrough|\\bseed\\b|demand|\\bsend\\b|\\bsow\\b|pay (?:the |a )?(?:pastor|prophet|bishop|man of god|witch|healer)|"
+            + "depress|hopeless|suicid|kill|self-harm|\\bhiv\\b|cancer|abuse|rape|violence|\\bhit\\b|\\bbeat\\b|drunk|addict|"
+            + "gambl|\\bbet\\b|condom|pregnan|abortion|starv|no food", Pattern.CASE_INSENSITIVE);
+
+    /** A general question about the Christian faith: a faith word, no first-person words, no other group, no pressure words. */
+    static boolean generalFaithQuestion(String question) {
+        return question != null && GENERAL_START.matcher(question).find() && FAITH_WORD.matcher(question).find()
+                && !FIRST_PERSON.matcher(question).find() && !NAMES_OTHER_GROUP.matcher(question).find()
+                && !NOT_GENERAL.matcher(question).find();
     }
 
     /** The bundled Strong's entry for a number named in the question, or Easton's entry for a named word, or null. */
