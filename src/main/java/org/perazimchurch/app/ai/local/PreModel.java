@@ -329,7 +329,8 @@ public final class PreModel {
     static String searchedPhrase(String question) {
         if (question == null) return null;
         Matcher quoted = QUOTED_PHRASE.matcher(question);
-        if (quoted.find()) return quoted.group(1).trim();
+        // A single quoted word (for example a concept such as 'afterlife') is not a phrase to search for.
+        if (quoted.find() && quoted.group(1).trim().contains(" ")) return quoted.group(1).trim();
         // Only a quoted wording is searched. "The Bible says ..." without quotation marks is too often a question
         // about a topic, not a phrase, so it is left to the topic route and the zones.
         return null;

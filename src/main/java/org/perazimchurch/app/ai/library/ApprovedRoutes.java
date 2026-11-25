@@ -505,7 +505,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("pope-head-of-church",
                 "pope|papal|papacy|vicar of christ",
-                "Scripture names Christ as the head of the Church (Ephesians 1:22; Colossians 1:18). We do not accept an earthly head over the whole Church. We test any claim of such a role by Scripture alone, not by tradition or office.",
+                "Scripture names Christ as the head of the Church (Ephesians 1:22; Colossians 1:18). We do not accept an earthly head over the whole Church.",
                 "Ephesians 1:22", "Colossians 1:18"));
 
         r.add(new Route("icons-scripture",
@@ -513,8 +513,8 @@ public final class ApprovedRoutes {
                 "Read together, Exodus 20:4 and Exodus 20:5 forbid making an image to bow down to and worship (Exodus "
                 + "20:4–5). God is spirit, and those who worship Him must worship in spirit and in truth (John 4:24). "
                 + "We reject the veneration of images as a way of worship, and we do not hold that every picture or "
-                + "image is forbidden. We test any teaching on icons by Scripture, and please talk with your pastor "
-                + "about how it applies.",
+                + "image is forbidden. Please talk with your pastor "
+                + "about how this applies.",
                 "Exodus 20:4", "Exodus 20:5"));
 
         r.add(new Route("eastern-church-judge",
