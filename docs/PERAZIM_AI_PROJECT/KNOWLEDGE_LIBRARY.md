@@ -26,7 +26,7 @@ Rule the library enforces: the model only words answers. Facts, verses and posit
 | `assets/reference/reference.db.gz` | `ReferenceIndex` | 5.8 MB gz | Cross-references (OpenBible, CC BY 4.0), places, Smith's, Easton's, Hitchcock's, Nave's Topical, Nicene Creed 381 |
 | `assets/reference/reference-commentaries.db.gz` | `ReferenceIndex` (optional) | 16.4 MB gz | Matthew Henry and Wesley NT notes, labelled by tradition. Approved by Levi (answer A), optional download |
 | `assets/reference/approvals.json` | `ReferenceApprovals` | small | The 9 approved source ids |
-| `assets/ai/guide/comparative/comparative-kb.json` | `DriftDetector` | 29 KB, 27 entries | Comparative drift terms, version 1.0.0 on this base, status DRAFT_PENDING_LEVI. The larger 1.5.22 set is in PR 76, not on this base |
+| `assets/ai/guide/comparative/comparative-kb.json` | `DriftEvidence` | Comparative KB 1.5.22, APPROVED_LEVI, 27 entries. Other faiths and groups are FALSE_DOCTRINE_EXAMPLE only (never citable); answers need at least two KJV passages | Restored 2026-11-25 by Levi's source policy (see SOURCE_RESTRICTION_2026-11-25.md, update section) |
 | `assets/ai/guide/playbooks/*.md` | `GuideDocs` | 3.7 KB total for 11 files | One short playbook per skill |
 | `ai-eval/perazim-guide/cases.jsonl` | Laptop benchmark | 532 cases, 129 scripture references | Eval set |
 | `scripts/reference/sources.json` | Reference builder | 35 rows | Every candidate and approved source, with licence |

@@ -1,5 +1,5 @@
 {
-  "_comment": "Comparative knowledge for the Perazim Guide's drift detection. All 27 entries have been individually reviewed and approved under the owner's explicit delegation to approve claims that are sufficiently supported and consistent with Perazim's theological framework. Only an entry with exact status APPROVED_LEVI can pass the release gate. Only text in summary, origin and scripture is model-facing; internal_note and source records are not sent to the model. Scripture anchors are KJV references retrieved from the bundled KJV database; licensed NASB use follows the app's file-loading rule. Entries are contextual descriptions, not authorities: the model evaluates competing claims under Scripture as supreme authority and Perazim's orthodox Protestant, Evangelical and Pentecostal framework. No verdict is given on an individual's eternal destiny. The exact nature and duration of final punishment remain an unapproved Perazim doctrinal position and are not settled by the conditional-immortality entry.",
+  "_comment": "Comparative knowledge for drift questions, Levi-approved 1.5.22 (APPROVED_LEVI, PR 76). Restored on PR 83 on Levi's 2026-11-25 instruction with a classification per entry. FALSE_DOCTRINE_EXAMPLE entries describe another faith, church or group only so the guide can identify the teaching and refute it from Scripture. They are never a credible source, never citation-eligible, and never presented as valid or as an alternative. POLICY_RULE entries govern how the guide answers. Source order: Bible first (KJV/NASB); creeds and early fathers only where they agree with Bible-centred Protestant, Pentecostal and Evangelical teaching; Protestant, Pentecostal and Evangelical teaching last. Every drift answer rests on at least two Scripture passages from the anchors.",
   "version": "1.5.22",
   "status": "APPROVED_LEVI",
   "entries": [
@@ -81,7 +81,8 @@
           "use": "soteriology section: individual selves covered by nescience in the form of karma, embodied in varieties of bodies, in transmigratory existence",
           "verification": "verified (full text read); academic encyclopedia; second independent source for Hindu karma"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "reincarnation",
@@ -144,7 +145,8 @@
           "use": "soteriology section: 'the river of transmigratory existence' (samsara) for embodied selves",
           "verification": "verified (full text read)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "nirvana_moksha",
@@ -232,7 +234,8 @@
           "use": "soteriology: moksa as highest good; bhakti; prapatti debate in the Srivaishnava schools",
           "verification": "verified (full text read)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "purgatory",
@@ -295,7 +298,8 @@
           "use": "'Beside these two places, for souls separated from their bodies, the Scripture acknowledgeth none.'",
           "verification": "verified (section read; Scripture references omitted)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "saint_prayer",
@@ -382,7 +386,8 @@
           "use": "Explains Christ's unique intercession, Christian intercessory prayer, and Orthodox teaching on prayer for others including the departed",
           "verification": "Official OCA educational text read"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "mary_mediator",
@@ -445,7 +450,8 @@
           "use": "scripture reference",
           "verification": "scripture reference"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "icons_veneration",
@@ -517,7 +523,8 @@
           "use": "Reformed confession says the acceptable way of worshipping the true God is instituted by God himself and limited by his revealed will",
           "verification": "Verified against published confession text; chapter 21.1"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "soul_sleep",
@@ -580,7 +587,8 @@
           "use": "scripture reference",
           "verification": "scripture reference"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "conditional_immortality",
@@ -636,7 +644,8 @@
           "use": "The Catechism states that the punishment of hell is eternal and describes definitive self-exclusion from communion with God",
           "verification": "Official Vatican text; paragraph 1035 checked on 24 November 2026"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "all_paths",
@@ -668,7 +677,8 @@
           "use": "verse wording checked against an online KJV text; the bundled DB is the source for model output",
           "verification": "verified (KJV wording checked)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "divine_self",
@@ -708,7 +718,8 @@
           "use": "section 1: Madhva against Sankara; section 3: Dvaita, five-fold difference (pancabheda), dependence of jiva on Brahman, Visnu's grace",
           "verification": "verified (full text read)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "eternal_progression",
@@ -730,7 +741,8 @@
           "use": "exaltation through the Atonement and obedience; the couplet; the Church's qualifications",
           "verification": "verified (page read)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "works_salvation",
@@ -778,7 +790,8 @@
           "verification": "verified against page text"
         }
       ],
-      "internal_note": "JW official “What Does the Bible Say About Salvation?” states that works prove living faith and cannot earn salvation, and says one who has been saved may lose out if faith is not continued. LDS official Gospel Topics “Salvation” was read on 24 November 2026; it distinguishes salvation from physical death, salvation from sin and eternal life/exaltation, with faith, repentance, baptism, receiving the Holy Ghost, enduring to the end and covenant requirements. “Becoming Like God” was fully checked; the text speaks of exaltation through Christ's Atonement and obedience to gospel laws and ordinances. The model must not reduce LDS teaching to a single “salvation by works” slogan."
+      "internal_note": "JW official “What Does the Bible Say About Salvation?” states that works prove living faith and cannot earn salvation, and says one who has been saved may lose out if faith is not continued. LDS official Gospel Topics “Salvation” was read on 24 November 2026; it distinguishes salvation from physical death, salvation from sin and eternal life/exaltation, with faith, repentance, baptism, receiving the Holy Ghost, enduring to the end and covenant requirements. “Becoming Like God” was fully checked; the text speaks of exaltation through Christ's Atonement and obedience to gospel laws and ordinances. The model must not reduce LDS teaching to a single “salvation by works” slogan.",
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "ancestors",
@@ -882,7 +895,8 @@
           "use": "policy",
           "verification": "internal"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "trinity_denial",
@@ -954,7 +968,8 @@
           "use": "Official JW teaching that Jesus was God's first creation and the only one directly created by God; supports the created-Son component of the JW non-Trinitarian account",
           "verification": "Verified against official page text, paragraph 11, 24 November 2026"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "jesus_created",
@@ -994,7 +1009,8 @@
           "verification": "verified against the approved text in the repository (closes U-C8 for the Son clause; the approved file contains no Holy Spirit clause)"
         }
       ],
-      "internal_note": "Round 2 decision preserved: created-being claim is from Bible Teach paragraph 11, verified in page text. The Michael identification rests on the Michael page only; the Bible Teach book does not identify Michael as Jesus in the text read. Scripture fix: the earlier draft quoted Hebrews 1:5 incompletely ('Unto which of the angels said he at any time, Thou art my Son?'), which dropped 'this day have I begotten thee'; the full KJV wording is now used. 'God commands all the angels' is replaced by Hebrews 1:6 KJV wording. Nicene wording needs the approved copy (see trinity_denial). 1.5.5 integration: Nicene wording checked against the approved text (U-C8 closed)."
+      "internal_note": "Round 2 decision preserved: created-being claim is from Bible Teach paragraph 11, verified in page text. The Michael identification rests on the Michael page only; the Bible Teach book does not identify Michael as Jesus in the text read. Scripture fix: the earlier draft quoted Hebrews 1:5 incompletely ('Unto which of the angels said he at any time, Thou art my Son?'), which dropped 'this day have I begotten thee'; the full KJV wording is now used. 'God commands all the angels' is replaced by Hebrews 1:6 KJV wording. Nicene wording needs the approved copy (see trinity_denial). 1.5.5 integration: Nicene wording checked against the approved text (U-C8 closed).",
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "holy_spirit_force",
@@ -1025,7 +1041,8 @@
           "use": "the holy spirit is not a person and is not part of a Trinity",
           "verification": "verified (page read)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "baptism_for_dead",
@@ -1047,7 +1064,8 @@
           "use": "proxy baptism offered; validity depends on the deceased person accepting; the Church cites 1 Corinthians 15:29",
           "verification": "verified (page read)"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "saturday_sabbath",
@@ -1087,7 +1105,8 @@
           "use": "Sunday as a distinguishing sign in the final test; the document does not settle whether Sunday worship marks a person before the future test",
           "verification": "Earlier source checked, pages 1–14 only; replaced for main model-facing claim by the current official BRI HTML article, read on 24 November 2026."
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "new_age_energy",
@@ -1143,7 +1162,8 @@
           "use": "Author-founded school biography identifies Brennan's energy-field/spiritual-healing work and states that Hands of Light was a Bantam New Age bestseller",
           "verification": "Author-founded school page read; used for biographical and movement-context attribution, not as scientific evidence"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "christian_science",
@@ -1175,7 +1195,8 @@
           "verification": "verified against page text"
         }
       ],
-      "internal_note": "Official Christian Science source checked: “What a Christian Scientist Believes” (religious tenets) and the official FAQ. The earlier long direct quotation of tenet 5 has been replaced with a paraphrase to avoid excessive quotation from a copyrighted source. The entry preserves the factual correction: Christian Science does not simply deny the crucifixion or resurrection; its metaphysical interpretation differs materially from historic Christian bodily-resurrection teaching. The healthcare statement is limited to the official FAQ's statement that members may choose medical care."
+      "internal_note": "Official Christian Science source checked: “What a Christian Scientist Believes” (religious tenets) and the official FAQ. The earlier long direct quotation of tenet 5 has been replaced with a paraphrase to avoid excessive quotation from a copyrighted source. The entry preserves the factual correction: Christian Science does not simply deny the crucifixion or resurrection; its metaphysical interpretation differs materially from historic Christian bodily-resurrection teaching. The healthcare statement is limited to the official FAQ's statement that members may choose medical care.",
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "secular_worldview",
@@ -1214,7 +1235,8 @@
           "verification": "verified against page text. CORRECTED URL: the earlier /humanism/manifesto3/ address returned HTTP 404"
         }
       ],
-      "internal_note": "Corrected the previous reversal of the two agnosticism senses. SEP “Atheism and Agnosticism” (Draper, 2022 substantive revision) defines psychological agnosticism as suspending judgment/believing neither theism nor atheism; epistemological agnosticism concerns whether either position is known or has positive epistemic status. SEP “Naturalism” (Papineau, 2020 substantive revision) distinguishes ontological claims about what exists from methodological claims about scientific inquiry. Humanist Manifesto III remains the primary source for its own ethical statement. Removed unsourced claims about moral relativism and the Psalm 14 insult gloss."
+      "internal_note": "Corrected the previous reversal of the two agnosticism senses. SEP “Atheism and Agnosticism” (Draper, 2022 substantive revision) defines psychological agnosticism as suspending judgment/believing neither theism nor atheism; epistemological agnosticism concerns whether either position is known or has positive epistemic status. SEP “Naturalism” (Papineau, 2020 substantive revision) distinguishes ontological claims about what exists from methodological claims about scientific inquiry. Humanist Manifesto III remains the primary source for its own ethical statement. Removed unsourced claims about moral relativism and the Psalm 14 insult gloss.",
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "islam_no_crucifixion",
@@ -1294,7 +1316,8 @@
           "use": "Cross-check for the son-denial entry",
           "verification": "partly verified (opening sections read); see son-denial entry"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "islam_son_denial",
@@ -1358,7 +1381,8 @@
           "use": "Al-Tabari reads the verse as rejecting the claim that Jesus is God's son, as God does not take a son",
           "verification": "partly verified (opening read in Arabic); edition not identified"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "canon_books",
@@ -1421,7 +1445,8 @@
           "use": "19th-century Orthodox theological handbook lists the Old Testament canon held by the Orthodox Church at that time and the New Testament books",
           "verification": "Section §125 and surrounding text read; historical theological source, not a synodal decree"
         }
-      ]
+      ],
+      "classification": "FALSE_DOCTRINE_EXAMPLE"
     },
     {
       "id": "church_identity_question",
@@ -1443,7 +1468,8 @@
           "use": "policy",
           "verification": "internal"
         }
-      ]
+      ],
+      "classification": "POLICY_RULE"
     },
     {
       "id": "group_question",
@@ -1506,7 +1532,8 @@
           "use": "'Only-begotten Son of God, begotten from the Father before all ages; Light from Light, true God from true God; begotten, not made; of one essence with the Father'; the creed is repeated at every Divine Liturgy",
           "verification": "verified against raw page text (5,294 characters). Parish page of a jurisdiction of the Ecumenical Patriarchate: supports the creed text across a second Orthodox jurisdiction, not a central statement (tier 2)"
         }
-      ]
+      ],
+      "classification": "POLICY_RULE"
     }
   ]
 }

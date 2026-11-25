@@ -1,5 +1,5 @@
 {
-  "_comment": "Register of reference sources for the on-phone guide. Every item is PENDING Levi's approval (see docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md). Presence here is not approval: the app only uses sources listed in src/main/assets/reference/approvals.json.",
+  "_comment": "Register of reference sources for the on-phone guide. Every item is PENDING Levi's approval (see docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md). Presence here is not approval: the app only uses sources listed in src/main/assets/reference/approvals.json. Source order (Levi, 2026-11-25): Tier 1 Bible (KJV/NASB), always first. Tier 2 creeds and early Church Fathers only where they agree with Bible-centred Protestant, Pentecostal and Evangelical teaching. Tier 3 Bible-centred Protestant, Pentecostal and Evangelical teaching and books. Other groups (Roman Catholic, LDS, Jehovah's Witness, Qur'an and similar) are FALSE_DOCTRINE_EXAMPLE material, never sources.",
   "sources": [
     {
       "id": "openbible-xrefs",
@@ -318,24 +318,6 @@
       "note": "Large; optional."
     },
     {
-      "id": "ante-nicene-fathers",
-      "title": "Ante-Nicene Fathers (Roberts-Donaldson / Schaff ed.)",
-      "licence": "Public domain (CCEL)",
-      "url": "https://www.ccel.org/ccel/s/schaff/anf01/cache/anf01.txt",
-      "status": "OPTIONAL_LARGE",
-      "theology": "Early church; views mixed and pre-date later doctrine",
-      "note": "Ten volumes; large; optional."
-    },
-    {
-      "id": "npnf",
-      "title": "Nicene and Post-Nicene Fathers (Schaff ed.)",
-      "licence": "Public domain (CCEL)",
-      "url": "https://www.ccel.org/ccel/s/schaff/npnf101/cache/npnf101.txt",
-      "status": "OPTIONAL_LARGE",
-      "theology": "Post-Nicene; mixed",
-      "note": "Large; optional."
-    },
-    {
       "id": "schaff-creeds-vol3",
       "title": "Schaff, The Creeds of Christendom, vol. III (Evangelical Protestant creeds with translations)",
       "licence": "Public domain (CCEL rights line)",
@@ -433,6 +415,29 @@
       "status": "BUNDLED_LICENCE_OPEN_NOT_USED_BY_AI",
       "theology": "NONE",
       "note": "Owner must confirm the Greek licence. Word-study lookup belongs to the other thread."
+    },
+    {
+      "id": "ante-nicene-fathers",
+      "title": "Ante-Nicene Fathers (Roberts-Donaldson / Schaff ed.)",
+      "licence": "Public domain (CCEL)",
+      "url": "https://www.ccel.org/ccel/s/schaff/anf01/cache/anf01.txt",
+      "status": "CANDIDATE_TIER2_EXTRACTION_PENDING",
+      "theology": "Early church; views mixed and pre-date later doctrine",
+      "note": "Ten volumes; large; optional.",
+      "tier": "TIER_2_CONDITIONAL",
+      "tierNote": "Tier 2: a creed or early Church Father used only where the passage agrees with a Bible-centred Protestant, Pentecostal or Evangelical position. Passages must be tagged and filtered; nothing that contradicts that position. Extraction pending; not loaded."
+    },
+    {
+      "id": "npnf",
+      "title": "Nicene and Post-Nicene Fathers (Schaff ed.)",
+      "licence": "Public domain (CCEL)",
+      "url": "https://www.ccel.org/ccel/s/schaff/npnf101/cache/npnf101.txt",
+      "status": "CANDIDATE_TIER2_EXTRACTION_PENDING",
+      "theology": "Post-Nicene; mixed",
+      "note": "Large; optional.",
+      "tier": "TIER_2_CONDITIONAL",
+      "tierNote": "Tier 2: a creed or early Church Father used only where the passage agrees with a Bible-centred Protestant, Pentecostal or Evangelical position. Passages must be tagged and filtered; nothing that contradicts that position. Extraction pending; not loaded."
     }
-  ]
+  ],
+  "removed": []
 }
