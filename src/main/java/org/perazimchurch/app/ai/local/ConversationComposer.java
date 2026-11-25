@@ -56,6 +56,30 @@ public final class ConversationComposer {
     private static final Pattern SELF_CLAIM = Pattern.compile(
             "\\b(?:i am (?:a |an |the )?(?:pastor|bishop|human|person|counsellor|doctor|priest|levi)|i'?m (?:a |an |the )?(?:pastor|bishop|human|person|counsellor|doctor|priest|levi)|"
                     + "i will pray for you|i'?ll pray for you|i have prayed|i prayed)\\b", Pattern.CASE_INSENSITIVE);
+    /**
+     * Profanity and sexual terms in English, Swahili and Sheng. Any sentence containing one is dropped, for every composed
+     * reply (Levi and the coordinator, 2026-11-25). The fixed approved reply is used instead.
+     */
+    private static final Pattern PROFANITY = Pattern.compile(
+            "\\b(?:fuck\\w*|shit\\w*|bitch\\w*|bastard\\w*|dick\\w*|cock\\w*|pussy|cunt\\w*|whore\\w*|slut\\w*|"
+                    + "asshole\\w*|motherfuck\\w*|porn\\w*|sex\\w*|sexual\\w*|nude\\w*|nudity|penis|vagina\\w*|boob\\w*|"
+                    + "orgasm\\w*|erotic\\w*|nigg\\w*|kuma|fala|malaya|kahaba|mshenzi|punda|makalio|uume|mavi|mkundu|"
+                    + "mbwa|ngono|tako|matiti|kumwamba|kulala na)\\b", Pattern.CASE_INSENSITIVE);
+    /** Swahili and Sheng words. A composed reply to an English question must not use them (language policy: English). */
+    private static final Pattern SWAHILI = Pattern.compile(
+            "\\b(?:asante|karibu|habari|sana|nisaidie|nisaidieni|tafadhali|nataka|unaweza|wewe|yako|yangu|kwa|ndio|hapana|"
+                    + "mungu|bwana|nakupenda|tutaonana|kwaheri|aite|sawa|poa|vipi|mambo|naomba|maombi|sijui|nini|"
+                    + "kwamba|hujambo|sisi|wao|lakini|kwenye|wangu|wako|ninaweza|tuombe)\\b", Pattern.CASE_INSENSITIVE);
+    /** A question that explicitly asks for Swahili. Only then may a composed reply use Swahili. */
+    private static final Pattern ASKS_SWAHILI = Pattern.compile(
+            "\\b(?:in swahili|kiswahili|swahili please|jibu kwa kiswahili|niandikie kwa kiswahili|speak swahili)\\b",
+            Pattern.CASE_INSENSITIVE);
+
+    /** True when the question asks for a Swahili reply. Composed replies are English otherwise. */
+    static boolean asksForSwahili(String question) {
+        return question != null && ASKS_SWAHILI.matcher(question).find();
+    }
+
     private static final Pattern NUMBER = Pattern.compile("\\d");
     private static final Pattern QUOTE = Pattern.compile("[\"“”„«»]");
 
@@ -116,19 +140,25 @@ public final class ConversationComposer {
         for (String sentence : cleaned.split("(?<=[.!?])\\s+")) {
             if (kept.size() >= MAX_SENTENCES) break;
             String s = sentence.trim();
-            if (!passes(s, support, evidenceMode)) continue;
+            if (!passes(s, support, evidenceMode, !asksForSwahili(question))) continue;
             kept.add(s);
         }
         return kept.isEmpty() ? null : String.join(" ", kept);
     }
 
     static boolean passes(String s, String support, boolean evidenceMode) {
+        return passes(s, support, evidenceMode, true);
+    }
+
+    static boolean passes(String s, String support, boolean evidenceMode, boolean englishOnly) {
         if (s.isEmpty() || s.length() > 240) return false;
         int words = s.split("\\s+").length;
         if (words > 45) return false;
         if (words < 3) return false;
         if (NUMBER.matcher(s).find()) return false;
         if (QUOTE.matcher(s).find()) return false;
+        if (PROFANITY.matcher(s).find()) return false;
+        if (englishOnly && SWAHILI.matcher(s).find()) return false;
         if (FORBIDDEN.matcher(s).find()) return false;
         if (SELF_CLAIM.matcher(s).find()) return false;
         if (evidenceMode) {
