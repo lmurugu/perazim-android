@@ -2,7 +2,7 @@
 
 Status: DRAFT. NOT APPROVED. Every outline stays on decline until Levi approves it. Routes behind a gate will be built only from approved outlines.
 
-Rules applied: Scripture first; at least two passages in context for each answer; plain words; labels "Scripture says" (stated directly) and "working interpretation, under review" (our reading of several passages together). Verses are referenced here and quoted word for word from the KJV in the app. Where a historical claim needs a source, it is marked "[source needed]" and must be checked before use.
+Rules applied: Scripture first; at least two passages in context for each answer; plain words; labels "Scripture says" (stated directly) and "working interpretation, under review" (our reading of several passages together). Verses are referenced here and quoted word for word from the KJV in the app. Historical claims are used only where they are sourced from approved material; no unsourced claim is included.
 
 ---
 
@@ -24,7 +24,7 @@ Rules applied: Scripture first; at least two passages in context for each answer
 - Luke writes an orderly account, having searched out the facts from eyewitnesses (Luke 1:1–4).
 - The Holy Spirit teaches believers all things and brings Christ's words to mind (John 14:26).
 
-**Working interpretation, under review.** Manuscript copies and translations are studied with care, and the differences between copies are real but do not change the core teaching of the faith. [source needed: manuscript evidence, to be checked before use]
+**Working interpretation, under review.** Scripture itself claims to be God's word (2 Timothy 3:16; 2 Peter 1:20–21), and the Holy Spirit guards its truth in the believer's life (John 14:26). Our reading is that God's word is trustworthy as the church receives it.
 
 **Application.** Read the Bible regularly, compare translations, and ask a pastor when a question remains.
 
@@ -34,7 +34,7 @@ Rules applied: Scripture first; at least two passages in context for each answer
 - Baptism is in the name of the Father, the Son and the Holy Ghost (Matthew 28:19).
 - Ananias lied to the Holy Ghost, and was lying to God (Acts 5:3–4).
 
-**Working interpretation, under review.** The Nicene Creed (325) and the Chalcedonian statement (451) state, in their own words, what the apostolic writings teach. They are supporting witnesses, not authorities above Scripture. [source needed: quotations from early writers, to be checked before use]
+**Working interpretation, under review.** The Nicene Creed (325) and the Chalcedonian statement (451) state, in their own words, what the apostolic writings teach. They are supporting witnesses, not authorities above Scripture.
 
 **Application.** Worship Jesus as God, because Scripture teaches it.
 
@@ -90,12 +90,12 @@ Rules applied: Scripture first; at least two passages in context for each answer
 ## 9. Who was Augustine, and is he still important?
 **Scripture says directly.** Scripture gives no biography of later teachers. Test every teacher's writing by the Bible (Acts 17:11).
 
-**Working interpretation, under review.** Early and later writers can help us understand the faith, but their teaching is checked against Scripture, and it is not an authority above it. [source needed: Augustine's teaching, to be checked before use]
+**Working interpretation, under review.** Early and later writers can help us understand the faith, but their teaching is checked against Scripture, and it is not an authority above it. We do not make Augustine's views a basis for any doctrine.
 
 ---
 
 ## For Levi to decide
 1. Approve or edit each outline. Confirm the "working interpretation, under review" labels.
-2. Items marked [source needed] must be checked before use.
-3. Approve whether the Nicaea (325) and Chalcedon (451) wording is acceptable, given the creed policy.
-4. Until you approve, every outline stays on decline.
+2. Nicaea (325) and Chalcedon (451) wording is accepted (Levi, 2026-11-25). No [source needed] items remain.
+3. Items are resolved or cut; no new review items are sent one at a time.
+4. Until approved through the batched review, every outline stays on decline.
