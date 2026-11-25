@@ -2710,9 +2710,12 @@ public class BibleReaderDialog extends Dialog {
                 if (ev.getPointerCount() >= 2) {
                     float cx = 0f;
                     float cy = 0f;
+                    // Raw-to-view offset is the same for every pointer, so this matches getRawX(i) on API 24-28.
+                    float offX = ev.getRawX() - ev.getX();
+                    float offY = ev.getRawY() - ev.getY();
                     for (int i = 0; i < ev.getPointerCount(); i++) {
-                        cx += ev.getRawX(i);
-                        cy += ev.getRawY(i);
+                        cx += ev.getX(i) + offX;
+                        cy += ev.getY(i) + offY;
                     }
                     cx /= ev.getPointerCount();
                     cy /= ev.getPointerCount();

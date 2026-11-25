@@ -681,11 +681,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             window.setStatusBarContrastEnforced(false);
             window.setNavigationBarContrastEnforced(false);
         }
-        android.view.WindowInsetsController controller = window.getInsetsController();
-        if (controller != null) {
-            int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                    | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
-            controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+        if (Build.VERSION.SDK_INT >= 30) {
+            android.view.WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                int mask = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                        | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                controller.setSystemBarsAppearance(PerazimTheme.isLight() ? mask : 0, mask);
+            }
+        } else {
+            // Before API 30 the same light status bar icons come from the legacy system UI flag.
+            android.view.View decor = window.getDecorView();
+            int flags = decor.getSystemUiVisibility();
+            int light = android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            decor.setSystemUiVisibility(PerazimTheme.isLight() ? (flags | light) : (flags & ~light));
         }
     }
 
