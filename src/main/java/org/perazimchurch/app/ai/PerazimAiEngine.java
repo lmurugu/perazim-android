@@ -268,8 +268,20 @@ public class PerazimAiEngine {
         return AiResponse.plainText(SoftSafety.checkText(), Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
+    /** Equivalent openers for the crisis reply, so the same message is not answered with one identical sentence each time (Levi, 2026-11-25). The verified numbers and the questions below never change. */
+    private static final String[] CRISIS_OPENERS = {
+            "I'm sorry you're facing this.",
+            "I'm so sorry you are carrying this right now.",
+            "Thank you for telling me. I'm sorry you're facing this."
+    };
+    private static final java.util.concurrent.atomic.AtomicInteger CRISIS_OPENER_TURN = new java.util.concurrent.atomic.AtomicInteger();
+
+    static String crisisOpener() {
+        return CRISIS_OPENERS[Math.floorMod(CRISIS_OPENER_TURN.getAndIncrement(), CRISIS_OPENERS.length)];
+    }
+
     public static AiResponse crisisResponse() {
-        String msg = "I'm sorry you're facing this. Are you safe right now, and do you have a plan or a way to end your life tonight? If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If someone else is at risk and it is safe for you to do so, stay with them, or ask a trusted person to stay with them. Do not put yourself or anyone else in danger to do this. For ongoing distress, contact a qualified local health professional.\n\n"
+        String msg = crisisOpener() + " Are you safe right now, and do you have a plan or a way to end your life tonight? If you or someone else may be in immediate danger, call 999 or 112 now, or go to the nearest hospital. If someone else is at risk and it is safe for you to do so, stay with them, or ask a trusted person to stay with them. Do not put yourself or anyone else in danger to do this. For ongoing distress, contact a qualified local health professional.\n\n"
                 + "Kenya helplines, by purpose:\n"
                 + "- Police emergency and immediate danger: 999 or 112.\n"
                 + "- SHA 922 Lifeline, to reach an ambulance for urgent medical emergencies, including overdose or poisoning.\n"

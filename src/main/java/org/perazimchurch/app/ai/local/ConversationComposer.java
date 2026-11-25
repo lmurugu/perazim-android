@@ -49,7 +49,9 @@ public final class ConversationComposer {
                     + "doctrine|church teaching|god says|god has said|god promises|god wants|the lord says|the lord said|"
                     + "pastor|bishop|levi|mutweri|counsell\\w*|therapist|psychiatr\\w*|doctor|clinic|hospital|medic\\w*|"
                     + "diagnos\\w*|dose|pills?|lawyer|legal|court|loan\\w*|invest\\w*|suicid\\w*|kill\\w*|die|dying|death|dead|"
-                    + "destiny|heaven|hell|saved|salvation|sin|sins|demon\\w*|spirits?)\\b", Pattern.CASE_INSENSITIVE);
+                    + "destiny|heaven|hell|saved|salvation|sin|sins|demon\\w*|spirits?|"
+                    + "ending (?:your|my|their|his|her) (?:own )?life|end (?:your|my|their) life|take (?:your|their) own life|"
+                    + "self[- ]harm\\w*|hurt (?:yourself|themselves)|harm (?:yourself|themselves)|ending it all)\\b", Pattern.CASE_INSENSITIVE);
     /** Claims the guide must never make about itself. */
     private static final Pattern SELF_CLAIM = Pattern.compile(
             "\\b(?:i am (?:a |an |the )?(?:pastor|bishop|human|person|counsellor|doctor|priest|levi)|i'?m (?:a |an |the )?(?:pastor|bishop|human|person|counsellor|doctor|priest|levi)|"
