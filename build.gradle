@@ -76,10 +76,10 @@ android {
         buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "false"
         buildConfigField "String", "API_BASE_URL", "\"\""
     }
-    // Validation builds get versionCode 19 (above v18, 2026-11-25) so they install over versionCode 8 builds without a downgrade.
+    // Validation builds get versionCode 20 (above v19, 2026-11-25) so they install over versionCode 8 builds without a downgrade.
     applicationVariants.all { variant ->
         if (variant.buildType.name == "validation") {
-            variant.outputs.each { output -> output.versionCodeOverride = 19 }
+            variant.outputs.each { output -> output.versionCodeOverride = 20 }
         }
     }
     signingConfigs {

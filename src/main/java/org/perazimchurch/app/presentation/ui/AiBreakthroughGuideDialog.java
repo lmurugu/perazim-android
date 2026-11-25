@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.ai.AiResponse;
+import org.perazimchurch.app.ai.GuideSendGate;
 import org.perazimchurch.app.ai.appcontext.AppContextComposer;
 import org.perazimchurch.app.ai.appcontext.AppContextReader;
 import org.perazimchurch.app.ai.appcontext.AppContextRouter;
@@ -104,6 +105,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private Button btnSend;
     private TextView tvSub;
     private boolean requestInFlight;
+    private long requestStartedAt;
     private final ConversationHistory localHistory = new ConversationHistory();
     private Button btnMode;
     private boolean localRequest;
@@ -693,7 +695,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             return;
         }
         final View indicator = showTypingIndicator();
-        requestInFlight = true;
+        beginRequest();
         btnSend.setEnabled(false);
         final java.util.Set<AppContextRouter.Topic> topics = new java.util.HashSet<>(route.topics);
         org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
@@ -739,17 +741,32 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private void submitQuery(String text) {
-        if (requestInFlight || text == null || text.trim().isEmpty()) return;
+        if (text == null || text.trim().isEmpty()) return;
         final String query = text.trim();
-        etInput.setText("");
-
-        // 1. Render User Message Bubble
-        displayUserMessage(query);
 
         // Safety routing is mode-independent: selecting Qwen or cloud mode must not
         // bypass the deterministic immediate-support response.
         // Two-step check: a vague exhaustion phrase gets the warm check; crisis wording or a yes or plan after it gets the full response.
         AiResponse safetyFirst = PerazimAiEngine.safetyFirstResponse(query);
+
+        // A safety message is never blocked by an earlier request still running (Levi, 2026-11-25). A stuck earlier request
+        // releases after GuideSendGate.STALE_AFTER_MS. Anything else sent while a request runs gets a visible notice and the
+        // words stay in the box, so nothing is silently dropped.
+        if (!GuideSendGate.mayAccept(requestInFlight, requestStartedAt, System.currentTimeMillis(), safetyFirst != null)) {
+            displayAiMessage(AiResponse.plainText(
+                    "I'm still answering your last question. Please wait a moment, then send again.", null), "Perazim Guide · built-in");
+            return;
+        }
+        if (requestInFlight) {
+            // A request that never answered: release the lock so this message can go through.
+            localRequest = false;
+            finishInFlight();
+        }
+        etInput.setText("");
+
+        // 1. Render User Message Bubble
+        displayUserMessage(query);
+
         if (safetyFirst != null) {
             localHistory.clear();
             displayAiMessage(safetyFirst, "Safety guidance · on-device");
@@ -796,7 +813,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 return;
             }
             final View indicator = showTypingIndicator();
-            requestInFlight = true; localRequest = true; btnSend.setEnabled(false);
+            beginRequest(); localRequest = true; btnSend.setEnabled(false);
             if (btnMode != null) btnMode.setText("Stop response");
             OnDeviceAi.ask(activity, query, localHistory.snapshot(), new OnDeviceAi.Callback() {
                 public void onSuccess(String answer) {
@@ -820,7 +837,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 return;
             }
             final View indicator = showTypingIndicator();
-            requestInFlight = true;
+            beginRequest();
             btnSend.setEnabled(false);
             org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
                 AiResponse scripture = OfflineScriptureLookup.answer(activity, query);
@@ -851,7 +868,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
 
         final View typingIndicator = showTypingIndicator();
-        requestInFlight = true;
+        beginRequest();
         btnSend.setEnabled(false);
         AiRelayClient.askQuestion(activity, query, new AiRelayClient.RelayCallback() {
             @Override public void onSuccess(@NonNull String answer, int remaining, boolean generated) {
@@ -869,6 +886,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
                 if (isShowing()) displayAiMessage(AiResponse.plainText(message, null), "Online AI");
             }
         });
+    }
+
+    /** Marks a request as running and records when it started, so a request that never answers cannot lock the chat. */
+    private void beginRequest() {
+        requestInFlight = true;
+        requestStartedAt = System.currentTimeMillis();
     }
 
     private void finishInFlight() {
