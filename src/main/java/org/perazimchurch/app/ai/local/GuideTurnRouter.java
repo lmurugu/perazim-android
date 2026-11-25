@@ -9,6 +9,7 @@ import org.perazimchurch.app.ai.SoftSafety;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * The fixed-answer routing the guide dialog uses for one message, in one order (Levi, 2026-11-25).
@@ -102,9 +103,27 @@ public final class GuideTurnRouter {
             "routed:approved-job-loss-hopelessness",
             "routed:approved-far-from-god-support"));
 
+    /**
+     * Fixes common misspellings of doctrine keywords before routing (Antichrsit, falilng, tognues). Only these explicit
+     * spellings change, so ordinary words such as "failing" or "calling" are left alone.
+     */
+    static String correctDoctrineSpelling(@Nullable String query) {
+        if (query == null) return null;
+        String q = query;
+        q = Pattern.compile("\\bantichr(?!ist\\b)[a-z]*\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("antichrist");
+        q = Pattern.compile("\\bfal(?!ling\\b)[a-z]{0,3}ng\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("falling");
+        q = Pattern.compile("\\b(?:tognues|tounges|tongess|tonges|tongus)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("tongues");
+        q = Pattern.compile("\\b(?:tognue|tounge)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("tongue");
+        q = Pattern.compile("\\b(?:baptsim|bapstism|baptisim|baptsm)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("baptism");
+        q = Pattern.compile("\\b(?:sabath|sabbeth)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("sabbath");
+        q = Pattern.compile("\\b(?:trinty|trinitty)\\b", Pattern.CASE_INSENSITIVE).matcher(q).replaceAll("trinity");
+        return q;
+    }
+
     /** Routes one message. The engine is the one the dialog holds; the context is the app context. */
     @NonNull
     public static Turn route(@NonNull Context c, @NonNull PerazimAiEngine engine, @Nullable String query) {
+        query = correctDoctrineSpelling(query);
         AiResponse safetyFirst = PerazimAiEngine.safetyFirstResponse(query);
         if (safetyFirst != null) {
             return new Turn("safety", safetyFirst, "Safety guidance · on-device", true);

@@ -49,7 +49,7 @@ public final class ApprovedRoutes {
         List<Route> r = new ArrayList<>();
 
         r.add(new Route("israel-end-times",
-                "israel|isreal|millenni|thousand years|antichrist|anti-christ|rapture|tribulation|second coming|end times"
+                "israel|isreal|millenni|thousand years|antichrist|anti-christ|rapture|tribulation|second coming|end times|last days"
                         + "|reign on earth|pre-?trib|premillenni|national israel|romans 11|replac(?:e|ed|ing) (?:the )?(?:church|israel)",
                 "Here is our working position on Israel and the end times. It is under review. It is not a settled "
                 + "Perazim doctrine, and we do not say every Christian must agree with it.\n\n"
@@ -1011,6 +1011,35 @@ public final class ApprovedRoutes {
                 + "by grace through faith (Ephesians 2:8). Infants are not baptised. They are dedicated to God, as parents bring their children "
                 + "to the Lord (Mark 10:13–16). Please talk with your pastor if you would like to understand this more.",
                 "Matthew 28:19", "Romans 6:4", "Acts 8:38", "Ephesians 2:8", "Mark 10:13"));
+
+        // Round 48 (2026-11-25), drafted for Levi's review: pastoral and safety-adjacent answers that name no individual's destiny.
+        r.add(new Route("tell-me-if-saved",
+                "(?:tell me|whether i am|if i am|am i) (?:now |really |truly )?(?:saved|going to heaven|a true christian|a real believer)"
+                        + "|whether i'?m saved",
+                "I cannot tell you whether you are saved, and no one can judge another person's salvation or destiny. Only God knows the heart: "
+                + "\"The Lord knoweth them that are his\" (2 Timothy 2:19). Our assurance rests on what God has promised in Christ, not on a "
+                + "verdict from a person, and John wrote so that you may know you have eternal life (1 John 5:13). Scripture also gives "
+                + "signs of a living faith, such as love for the brothers (1 John 3:14). Please pray, talk with your pastor about your fears, "
+                + "and do not let anyone press you into a quick answer.",
+                "2 Timothy 2:19", "1 John 5:13", "1 John 3:14"));
+
+        r.add(new Route("witch-doctor-curse",
+                "mganga|witch ?doctor|remove (?:a |the |my )?curse|curse (?:that|which) (?:my )?pastor",
+                "Scripture does not send us to witch doctors or diviners for help. Deuteronomy 18:10 warns against those who use divination "
+                + "or consult spirits. Christ has won the victory over every power of darkness, and no curse can overcome those who belong "
+                + "to Him (Colossians 2:15; Luke 10:19). I cannot confirm that any witch doctor can remove a curse, and I will not suggest "
+                + "that anyone can. Please bring this to your pastor and to God in prayer, do not pay anyone for deliverance, and tell a "
+                + "trusted person if you feel threatened.",
+                "Deuteronomy 18:10", "Colossians 2:15", "Luke 10:19"));
+
+        r.add(new Route("chama-theft-referral",
+                "chama.{0,120}(?:cannot pay|can'?t pay|ran away|stole|stolen|missing money|disappear)|treasurer (?:ran away|stole|took|disappeared|has run)"
+                        + "|ran away with (?:the |our |my )?money|stole (?:the |our |my )?money|stolen money",
+                "I'm sorry this has happened. Scripture is clear that stealing and cheating are wrong (Exodus 20:15; Proverbs 11:1). "
+                + "Please keep the records you have, and report the matter to the police. A lawyer can explain how the money might be "
+                + "recovered. Bring it also to a trusted church leader or your pastor, so that the group can deal with it openly and fairly. "
+                + "Please do not try to handle it alone or take revenge, and see a doctor or clinic if the stress affects your health.",
+                "Exodus 20:15", "Proverbs 11:1"));
 
         r.add(new Route("spirit-and-sin",
                 "^(?!.*(?:baptis|baptiz|tongue|tounge|tognue)).*holy spi+r(?:it|t).{0,80}sin",

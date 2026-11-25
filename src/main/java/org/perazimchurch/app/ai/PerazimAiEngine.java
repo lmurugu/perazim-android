@@ -500,10 +500,20 @@ public class PerazimAiEngine {
             "\\bsearch (?:for )?(?:the )?(?:internet|web|google|online|current|latest|recent|today)\\b|\\bcurrent (?:news|information)\\b|\\blatest news\\b",
             Pattern.CASE_INSENSITIVE);
 
+    /** Spreadsheet, file and calculation requests: declined as tool tasks. */
+    private static final Pattern TOOL_TASK_REQUEST = Pattern.compile(
+            "\\b(?:spreadsheet|excel|xlsx|csv|uploaded (?:file|document|photo)|calculate (?:the )?(?:totals?|sums?))\\b",
+            Pattern.CASE_INSENSITIVE);
+
     /** Scripture-topic words that are in scope even though they are not in the general cue list. */
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:word search|search for|search the bible|count the word|how many times|angels?|archangel|agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
             + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene|miraa|khat|muguka|uzazi wa mpango|waislamu|jirani zangu|muslim neighbou?rs?|kugongewa|kugongeana|nimegongewa|tukigongeana|mpango wa kando)\\b|"
+            // Added 2026-11-25 (round 48): end-times, New Testament reliability, Easton and commentary requests, and the
+            // witchcraft and theft requests that have approved routes.
+            + "\\blast days|\\bantichrist|\\btongues?\\b|\\bnew testament\\b|\\breliab\\w* (?:of |in )?(?:the )?(?:texts?|manuscripts?|scriptures?|bible)\\b|"
+            + "\\beaston'?s?\\b|\\bcross-references?\\b|\\bwesley'?s? note|\\bmatthew henry\\b|\\bmganga\\b|\\bwitch ?doctor\\b|"
+            + "\\bremove (?:a |the |my )?curse\\b|\\bchama\\b|\\btreasurer\\b|\\bran away with\\b|"
             + "\\b(?:parents? (?:are )?separat\\w*|come.we.stay|cohabit\\w*|cannot conceive|can'?t conceive|infertil\\w*|afford (?:the |a )?wedding|chronic illness|disabled|disability|cannot afford|can'?t afford)\\b|"
             // Added 2026-11-25 for the marriage and family set (Levi's sections 4-8): these are in scope for the approved routes.
             + "\\b(?:marry|married|marriage|singl\\w*|ndoa|trap|mume|mke|wanaume|wanawake|mchumba|mahari|familia|ananisaliti|kusaliti|"
@@ -1062,6 +1072,8 @@ public class PerazimAiEngine {
         // Live web or current-news searches are declined even though "search for" is a Bible cue (Levi, 2026-11-25).
         // A quoted word is still a KJV word search, so quotation marks keep it in scope.
         if (WEB_SEARCH_REQUEST.matcher(query).find() && !query.contains("'") && !query.contains("\"")) return "scope-refusal";
+        // Spreadsheets, uploaded files and totals are tool tasks the app does not perform (Levi, 2026-11-25).
+        if (TOOL_TASK_REQUEST.matcher(query).find()) return "scope-refusal";
         if (BIBLE_TOPIC_CUE.matcher(query).find()) return null;
         if (isOutOfScopeForModel(query)) return "scope-refusal";
         return null;
