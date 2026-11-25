@@ -60,10 +60,10 @@ public final class ConversationalTurn {
                     + "school|parents? (?:want|choose|decide|pick)|kidnap\\w*|abus\\w*|dowry|mahari|kugongeana)\\b");
 
     private static final String[] GREETINGS = {
-            "Hello, and welcome. I can find a Bible verse for you, search a word in the King James Version, answer a question of faith, or pray with you. What would you like today?",
-            "Hi there, I'm glad you came. I can look up a verse or a phrase, count how often a word appears in the Bible, or talk through a question of faith. What is on your heart?",
-            "Good to see you. I can quote verses word for word from the King James Version, search a word, explain the approved teaching on common questions, or pray with you. Where would you like to begin?",
-            "Hello. You can ask me for a verse such as John 3:16, search a word such as 'grace', ask a Bible or doctrine question, or bring me a prayer. What is on your mind?",
+            "Hello, and welcome. Please tell me briefly what you need. I can find a Bible verse for you, search a word in the King James Version, answer a question of faith, or pray with you.",
+            "Hi there, I'm glad you came. I can look up a verse or a phrase, count how often a word appears in the Bible, or talk through a question of faith. Please tell me what is on your heart.",
+            "Good to see you. I can quote verses word for word from the King James Version, search a word, explain the approved teaching on common questions, or pray with you. Please tell me where you would like to begin.",
+            "Hello. You can ask me for a verse such as John 3:16, search a word such as 'grace', ask a Bible or doctrine question, or bring me a prayer. Please tell me what is on your mind.",
             "Hey, let's begin. I can find a passage, search a word, or help you with a question of faith or a prayer. Tell me what you need, and please keep it simple."
     };
     private static final String[] HOW_ARE_YOU_REPLIES = {

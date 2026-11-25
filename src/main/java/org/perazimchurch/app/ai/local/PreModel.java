@@ -95,10 +95,19 @@ public final class PreModel {
             return new Decision("routed:app-status-unavailable", ROUTINE_STATUS_TEXT);
         }
         String route = PerazimAiEngine.preModelRoute(question);
+        if ("scope-refusal".equals(route)) {
+            // A verified KJV lookup is a Bible question even when the wording has no topic cue (Levi, 2026-11-25): a Scripture
+            // reference with a misspelt book, a quoted phrase the KJV holds, or a Swahili lookup. Anything else is still declined.
+            Decision lookup = scopeLookup(c, table, question);
+            if (lookup != null) return lookup;
+        }
         if (route != null) {
             org.perazimchurch.app.ai.AiResponse routed = PerazimAiEngine.preModelResponse(route, question);
             return new Decision("routed:" + route, routed.getMessageText(), routed);
         }
+        // Everyday Kenyan wording such as "verse ya upendo" or "neno 'grace' liko wapi": read in English, then looked up in the KJV.
+        Decision swahili = scopeLookup(c, table, question);
+        if (swahili != null) return swahili;
         // Matthew Henry, only when a member asks for him by name: Scripture first, then his labelled excerpt (Tier 3).
         String henry = org.perazimchurch.app.ai.reference.ReferenceGuide.namedHenry(c, question, KjvVerseText.load(c));
         if (henry != null) return new Decision("routed:commentary-henry", henry);
@@ -203,7 +212,7 @@ public final class PreModel {
 
     /** A pointer to a verse given earlier ("that verse"), which the single-question path cannot resolve. */
     private static final Pattern VERSE_POINTER = Pattern.compile(
-            "\\b(?:that|this|the|previous|last) (?:verse|passage)\\b", Pattern.CASE_INSENSITIVE);
+            "\\b(?:that|this|the|previous|last|next|other|another) (?:verse|passage)\\b|\\b(?:the )?next one\\b", Pattern.CASE_INSENSITIVE);
     /** Christian traditions a member may name together, for example in "Are Pentecostals less biblical than Presbyterians?". */
     private static final Pattern TRADITION_NAME = Pattern.compile(
             "\\b(pentecostal|presbyterian|baptist|methodist|anglican|lutheran|adventist|assemblies of god|reformed)s?\\b",
@@ -300,6 +309,7 @@ public final class PreModel {
         String notice = OTHER_TRANSLATION.matcher(question).find()
                 ? "I can't quote that translation here. The app holds the King James Version, so here it is in the KJV. "
                 : "";
+        if (ref.corrected) notice = "I read the book name as " + ref.label + ". " + notice;
         // A request for meaning gets the verse and an honest note: the guide only explains what checked material supports.
         String meaning = MEANING_ASK.matcher(question).find()
                 ? "\n\nI can quote the verse, but I can't give its meaning from checked material yet. Read the verses before and "
@@ -464,6 +474,9 @@ public final class PreModel {
 
     private static final Pattern WORD_QUOTED = Pattern.compile("['\u2018\u2019\u201c\u201d\"]([a-z]{2,})['\u2018\u2019\u201c\u201d\"]");
     private static final Pattern WORD_AFTER = Pattern.compile("\\bword\\s+([a-z]{2,})\\b");
+    /** Web and current-information words: an unquoted "search for current information" is not a Bible word search. */
+    private static final Pattern WEB_SCOPE = Pattern.compile(
+            "\\b(?:internet|online|google|website|web|news|latest|information|info|current events|weather|prices?|today|facebook|youtube|whatsapp|tiktok)\\b");
     private static final Pattern WORD_SEARCH_INTENT = Pattern.compile(
             "\\b(?:where|find|search|look up|locate|how many times|how often|number of times|count|word search|appears?|occurs?|mentioned|which verses?)\\b");
     private static final Pattern WORD_MEANING = Pattern.compile("\\b(?:mean|means|meaning|define|definition|translate|greek|hebrew)\\b");
@@ -494,6 +507,7 @@ public final class PreModel {
         String word = null;
         Matcher quoted = WORD_QUOTED.matcher(q);
         if (quoted.find()) word = quoted.group(1);
+        else if (WEB_SCOPE.matcher(q).find()) return null;
         if (word == null) {
             Matcher after = WORD_AFTER.matcher(q);
             if (after.find() && !SEARCH_STOP.contains(after.group(1))) word = after.group(1);
@@ -600,6 +614,32 @@ public final class PreModel {
         return null;
     }
 
+    /**
+     * KJV lookups that run before the scope gate and the topic routes: a reference, a quoted or unquoted phrase the KJV holds,
+     * a verse-about or word search. Each one returns only when the KJV itself gives the answer.
+     */
+    static Decision scopeLookup(Context c, ScriptureRangeTable table, String question) {
+        KjvVerseText kv = KjvVerseText.load(c);
+        Decision found = table == null ? null : verseDecision(table, kv, question);
+        if (found == null) found = phraseFirstDecision(kv, question);
+        if (found != null) return found;
+        String english = englishCues(normalisedQuestion(question));
+        if (english.equals(normalisedQuestion(question))) return null;
+        Decision about = verseAboutDecision(kv, english);
+        return about != null ? about : wordSearchDecision(kv, english);
+    }
+
+    /** Everyday Swahili lookup words read as English, so the same KJV routes answer them. Only applied when a word changes. */
+    static String englishCues(String q) {
+        return q.replaceAll("\\bnisaidie kupata\\b", "find")
+                .replaceAll("\\bverse ya\\b", "verse about")
+                .replaceAll("\\bupendo\\b", "love")
+                .replaceAll("\\bneno\\b", "word")
+                .replaceAll("\\bliko wapi\\b", "where is")
+                .replaceAll("\\bwapi\\b", "where")
+                .replaceAll("\\bkwenye biblia\\b", "in the bible");
+    }
+
     /** A parsed reference: book, chapter, first and last verse, and whether the KJV has it. */
     static final class Reference {
         final int bookNumber;
@@ -608,21 +648,27 @@ public final class PreModel {
         final int last;
         final boolean valid;
         final String label;
+        /** True when the book name was a close misspelling (Mathew for Matthew), read as the nearest book. */
+        final boolean corrected;
 
-        Reference(int bookNumber, int chapter, int first, int last, boolean valid, String label) {
+        Reference(int bookNumber, int chapter, int first, int last, boolean valid, String label, boolean corrected) {
             this.bookNumber = bookNumber;
             this.chapter = chapter;
             this.first = first;
             this.last = last;
             this.valid = valid;
             this.label = label;
+            this.corrected = corrected;
         }
+
     }
 
-    /** Parses a confidently matched reference, or returns null when there is none. */
+    /** Parses a matched reference, or returns null when there is none. A close misspelling of a book name is accepted and flagged. */
     static Reference reference(ScriptureRangeTable table, String question) {
         ScriptureReferenceNormalizer.Result ref = ScriptureReferenceNormalizer.normalize(question);
-        if (ref == null || !ref.confident || ref.normalized == null) return null;
+        if (ref == null || ref.normalized == null) return null;
+        boolean corrected = !ref.confident && ref.clarify != null && ref.clarify.startsWith("Did you mean");
+        if (!ref.confident && !corrected) return null;
         Matcher m = BOOK_CHAPTER_VERSE.matcher(ref.normalized);
         if (!m.find()) return null;
         String book = m.group(1);
@@ -635,7 +681,7 @@ public final class PreModel {
         if (bookNumber <= 0) return null;
         String label = last == first ? ref.normalized : book + " " + chapter + ":" + first + "-" + last;
         boolean valid = last >= first && table.isValid(bookNumber, chapter, first) && table.isValid(bookNumber, chapter, last);
-        return new Reference(bookNumber, chapter, first, last, valid, label);
+        return new Reference(bookNumber, chapter, first, last, valid, label, corrected);
     }
 
     private static String read(Context c, String path) throws java.io.IOException {

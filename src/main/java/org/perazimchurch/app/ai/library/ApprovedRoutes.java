@@ -733,8 +733,8 @@ public final class ApprovedRoutes {
                 "women (?:preach|preaching|pastor|pastors|pastoring|teach|teaching|elders?|bishops?|ordained|ordination)|"
                 + "women in (?:ministry|leadership|the pulpit)|(?:can|may|should) (?:a |the )?women (?:preach|lead|pastor|teach|be ordained)|"
                 + "women'?s ordination|woman (?:preach|pastor)",
-                "The church has not settled a single position on women in ministry, so I will not give a yes or no on whether a woman may preach, "
-                + "teach or lead in the church. Christians read these passages in different ways, and the question is still under review. "
+                "The church has not settled a single position on women in ministry, so this matter is undecided, and I will not give a yes or no on "
+                + "whether a woman may preach, teach or lead in the church. Christians hold different views and read these passages in different ways. "
                 + "Two passages people often discuss are 1 Corinthians 14:34 and 1 Timothy 2:12, and Galatians 3:28 speaks of equality in Christ. "
                 + "Talk it through with your pastor, and read the passages in their context in the Bible tab.",
                 "1 Corinthians 14:34", "1 Timothy 2:12"));
@@ -996,6 +996,19 @@ public final class ApprovedRoutes {
                 + "Scripture teaches that we are saved by grace through faith (Ephesians 2:8–9). Baptism is important, and the New Testament "
                 + "speaks about it in several places, so please ask your pastor to explain carefully what the Bible teaches about its meaning.",
                 "Ephesians 2:8", "Ephesians 2:9"));
+
+        // Baptism position (Levi, 2026-11-25, Option A): believer's baptism by full immersion after personal faith; obedience and
+        // public witness; does not save; infants dedicated, not baptised. WORDING FOR LEVI'S REVIEW before release.
+        r.add(new Route("baptism-believers",
+                "^(?!.*(?:spirit baptism|baptism (?:in|with) the (?:holy )?spirit|baptised? in the holy spirit)).*"
+                + "(?:\\bbaptis|\\bbaptiz|\\bchristen|\\bbabies\\b)",
+                "Our church teaches believer's baptism. Baptism is for those who have personally come to faith in Jesus Christ, and it is done by "
+                + "full immersion in water (Acts 8:38). The Lord commanded it (Matthew 28:19), and those who gladly received the word were "
+                + "baptised (Acts 2:41). Immersion shows that we died with Christ, were buried with Him and were raised to walk in new life "
+                + "(Romans 6:4). Baptism is an act of obedience and a public witness to our faith, but baptism does not save us; we are saved "
+                + "by grace through faith (Ephesians 2:8). Infants are not baptised. They are dedicated to God, as parents bring their children "
+                + "to the Lord (Mark 10:13–16). Please talk with your pastor if you would like to understand this more.",
+                "Matthew 28:19", "Romans 6:4", "Acts 8:38", "Ephesians 2:8", "Mark 10:13"));
 
         r.add(new Route("spirit-and-sin",
                 "^(?!.*(?:baptis|baptiz|tongue|tounge|tognue)).*holy spi+r(?:it|t).{0,80}sin",

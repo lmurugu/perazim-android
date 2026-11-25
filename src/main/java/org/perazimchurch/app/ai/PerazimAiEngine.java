@@ -495,6 +495,11 @@ public class PerazimAiEngine {
         return DRUG_CUE.matcher(withoutMiraa).find() || (DRUG_CUE.matcher(query).find() && SELLING_CUE.matcher(query).find());
     }
 
+    /** Requests to search the live web or current news. Declined before the Bible cues (see preModelRoute). */
+    private static final Pattern WEB_SEARCH_REQUEST = Pattern.compile(
+            "\\bsearch (?:for )?(?:the )?(?:internet|web|google|online|current|latest|recent|today)\\b|\\bcurrent (?:news|information)\\b|\\blatest news\\b",
+            Pattern.CASE_INSENSITIVE);
+
     /** Scripture-topic words that are in scope even though they are not in the general cue list. */
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:word search|search for|search the bible|count the word|how many times|angels?|archangel|agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
@@ -1054,6 +1059,9 @@ public class PerazimAiEngine {
         if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query) && !PERSEVERANCE_QUESTION.matcher(query).find()) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
+        // Live web or current-news searches are declined even though "search for" is a Bible cue (Levi, 2026-11-25).
+        // A quoted word is still a KJV word search, so quotation marks keep it in scope.
+        if (WEB_SEARCH_REQUEST.matcher(query).find() && !query.contains("'") && !query.contains("\"")) return "scope-refusal";
         if (BIBLE_TOPIC_CUE.matcher(query).find()) return null;
         if (isOutOfScopeForModel(query)) return "scope-refusal";
         return null;
