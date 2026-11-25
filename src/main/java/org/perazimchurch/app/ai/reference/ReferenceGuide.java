@@ -69,6 +69,56 @@ public final class ReferenceGuide {
         }
     }
 
+    /**
+     * Wesley's Notes on the New Testament for a chapter the member names with his name (Tier 3, public domain). The verse's
+     * Scripture comes first, from the bundled KJV, then Wesley's note on that verse (or the chapter's opening note when the
+     * verse has none). Returns null when the question does not name Wesley, names no passage, or Wesley is not approved.
+     */
+    public static String namedWesley(Context context, String question, org.perazimchurch.app.ai.library.KjvVerseText kjv) {
+        try {
+            if (context == null || question == null || kjv == null) return null;
+            if (!question.toLowerCase(Locale.ROOT).contains("wesley")) return null;
+            int key = ReferenceKeys.parseReference(question);
+            if (key <= 0) return null;
+            ReferenceApprovals approvals = approvals(context);
+            if (approvals.isEmpty() || !approvals.isApproved(ReferenceIndex.WESLEY_SOURCE)) return null;
+            int book = key / 1_000_000;
+            int chapter = (key / 1000) % 1000;
+            int verse = Math.max(1, key % 1000);
+            String scripture = kjv.verse(book, chapter, verse);
+            if (scripture == null || scripture.isEmpty()) return null;
+            ReferenceIndex index = ReferenceIndex.open(context);
+            if (index == null) return null;
+            try {
+                String headword = ReferenceKeys.chapterHeadword(key);
+                ReferenceHit wesley = null;
+                for (ReferenceHit hit : index.commentaries(headword, approvals, 60)) {
+                    if (ReferenceIndex.WESLEY_SOURCE.equals(hit.sourceId)) {
+                        wesley = hit;
+                        break;
+                    }
+                }
+                if (wesley == null || wesley.text == null || wesley.text.trim().isEmpty()) return null;
+                String note = verseNote(wesley.text, verse);
+                return "John Wesley on " + headword + ", public domain (CCEL). It is his own view, an Arminian commentary, "
+                        + "not the Perazim position, and Scripture is the test.\n\n"
+                        + "Scripture:\n" + headword + ":" + verse + ": “" + scripture + "”\n\n"
+                        + "Wesley's note: " + excerpt(note);
+            } finally {
+                index.close();
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Wesley excerpt skipped", e);
+            return null;
+        }
+    }
+
+    /** Wesley's note on one verse, found by its verse number at the start of a note. The chapter's opening note otherwise. */
+    static String verseNote(String chapterText, int verse) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?:^|\\s)" + verse + "\\. ").matcher(chapterText);
+        return m.find() ? chapterText.substring(m.start()).trim() : chapterText;
+    }
+
     /** The start of a commentary body, cut at a sentence end where one is near the limit. */
     static String excerpt(String body) {
         String t = body.replaceAll("\\s+", " ").trim();

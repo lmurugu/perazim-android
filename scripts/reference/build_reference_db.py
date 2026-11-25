@@ -299,6 +299,14 @@ def ccel_commentary_books(path):
     return entries
 
 
+def ccel_wesley_chapters(path):
+    """Wesley's Notes on the New Testament by chapter (scripts/reference/ccel_wesley_chapters.py). Yields (headword, body)."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    for book in data["books"]:
+        for number, body in sorted(data["chapters"][book].items(), key=lambda kv: int(kv[0])):
+            yield "%s %s" % (book, number), body
+
+
 def ccel_commentary_henry_file(path, state):
     """One Henry volume. `state` carries the current book across the six volume files."""
     lines = ccel_body_lines(path)
@@ -407,6 +415,12 @@ def build(raw_dir, out_path, only=None, tier="default"):
                     conn.execute("INSERT INTO entries(id, source_id, headword, location, body) VALUES (?,?,?,?,?)",
                                  (entry_id, sid, headword, location, chunk))
                     rows += 1
+        elif parser == "ccel_wesley_chapters":
+            for headword, chunk in ccel_wesley_chapters(path):
+                entry_id += 1
+                conn.execute("INSERT INTO entries(id, source_id, headword, location, body) VALUES (?,?,?,?,?)",
+                             (entry_id, sid, headword, headword, chunk))
+                rows += 1
         elif parser == "ccel_commentary_books":
             for headword, chunk in ccel_commentary_books(path):
                 entry_id += 1

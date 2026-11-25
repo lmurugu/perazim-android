@@ -109,4 +109,13 @@ public class DoctrineLibraryTest {
         // Canon and the creeds are DRAFT_PENDING_LEVI: no matcher or status lets them out here.
         assertNull(library.answerFor("How many books are in the Bible?"));
     }
+
+    @Test
+    public void ruracioQuestionGetsTheApprovedDowryPosition() {
+        // KE-029: the approved dowry entry (Levi, 2026-11-24) answers the Kenyan word for dowry, not only "dowry".
+        String answer = library.answerFor("My fiance's family is pressing us to pay ruracio before we marry. Are we sinning if we do?");
+        assertNotNull(answer);
+        assertTrue(answer.contains("acceptable custom"));
+        assertTrue(answer.contains("debt trap"));
+    }
 }

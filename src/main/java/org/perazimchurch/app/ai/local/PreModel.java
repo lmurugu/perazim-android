@@ -73,6 +73,9 @@ public final class PreModel {
         // Matthew Henry, only when a member asks for him by name: Scripture first, then his labelled excerpt (Tier 3).
         String henry = org.perazimchurch.app.ai.reference.ReferenceGuide.namedHenry(c, question, KjvVerseText.load(c));
         if (henry != null) return new Decision("routed:commentary-henry", henry);
+        // John Wesley, only when a member asks for him by name and gives a chapter: Scripture first, then his labelled note.
+        String wesley = org.perazimchurch.app.ai.reference.ReferenceGuide.namedWesley(c, question, KjvVerseText.load(c));
+        if (wesley != null) return new Decision("routed:commentary-wesley", wesley);
         // Approved routes written from Levi's decisions of 2026-11-25 (Israel, cessationism, apostasy, election, grace, sovereignty).
         ApprovedRoutes.Answer approved = ApprovedRoutes.answerFor(question, KjvVerseText.load(c));
         if (approved != null) return new Decision("routed:approved-" + approved.routeId, approved.text);

@@ -910,8 +910,9 @@ public final class ApprovedRoutes {
 
         r.add(new Route("wesley-notes",
                 "wesley",
-                "John Wesley's notes are an Arminian commentary. They are in the guide's library, but they are not yet arranged by "
-                + "chapter, so I cannot quote them for a passage yet. Scripture is the test. "
+                "John Wesley's notes are an Arminian commentary, arranged by chapter in the guide's library. Name a chapter, such as "
+                + "'Wesley on Matthew 9', and I will quote that verse from the King James Version first, then his note on it. "
+                + "Scripture is the test. "
                 + "Here is John 3:16 from the King James Version, the version this guide quotes.",
                 "John 3:16"));
 

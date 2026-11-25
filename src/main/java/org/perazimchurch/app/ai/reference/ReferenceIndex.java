@@ -30,7 +30,8 @@ public final class ReferenceIndex {
     static final String CROSS_REFERENCE_SOURCE = "openbible-xrefs";
     /** Commentaries are in their own database so the factual index stays small. */
     static final String COMMENTARY_ASSET = "reference/reference-commentaries.db.gz";
-    static final String COMMENTARY_UNPACKED = "reference-commentaries-v1.db";
+    /** Bumped when the commentary contents change (round 27: Wesley entries are now by chapter), so the unpacked copy is rebuilt. */
+    static final String COMMENTARY_UNPACKED = "reference-commentaries-v2.db";
     static final String HENRY_SOURCE = "matthew-henry-commentary";
     static final String WESLEY_SOURCE = "wesley-notes-nt";
     static final List<String> COMMENTARY_SOURCES = java.util.Arrays.asList(HENRY_SOURCE, WESLEY_SOURCE);

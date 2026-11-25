@@ -265,3 +265,32 @@ class CreedTest(unittest.TestCase):
             conn.close()
         self.assertTrue(len(rows) >= 2)
         self.assertTrue(rows[0][1].startswith("We believe in one God"))
+
+
+class WesleyChaptersTest(unittest.TestCase):
+    """Wesley's New Testament notes by chapter, from the committed chapter file (scripts/reference/ccel/)."""
+
+    PATH = HERE / "ccel" / "wesley-nt-chapters.json"
+
+    def test_every_book_has_its_chapters_with_no_gaps(self):
+        data = json.loads(self.PATH.read_text(encoding="utf-8"))
+        counts = {book: len(data["chapters"][book]) for book in data["books"]}
+        self.assertEqual(len(data["books"]), 27)
+        self.assertEqual(sum(counts.values()), 260)
+        self.assertEqual(counts["Matthew"], 28)
+        self.assertEqual(counts["Revelation"], 22)
+        for book in data["books"]:
+            self.assertEqual(sorted(int(k) for k in data["chapters"][book]), list(range(1, counts[book] + 1)))
+
+    def test_parser_yields_chapter_headwords_in_order(self):
+        rows = list(b.ccel_wesley_chapters(self.PATH))
+        self.assertEqual(len(rows), 260)
+        self.assertEqual(rows[0][0], "Matthew 1")
+        self.assertIn("Matthew 9", [h for h, _ in rows])
+        for headword, body in rows:
+            self.assertTrue(body.strip(), headword)
+            self.assertNotIn("« Prev", body, headword)
+
+
+if __name__ == "__main__":
+    unittest.main()
