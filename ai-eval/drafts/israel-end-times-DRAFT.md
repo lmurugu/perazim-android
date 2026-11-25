@@ -1,6 +1,6 @@
 # Israel and the end times: third revised DRAFT for Levi's final review
 
-**Status: DRAFT (round 3, after Levi's review of 2026-11-25). Not approved. Not in the app. The no-go zone "israel-end-times" stays in place until Levi approves this text.**
+**Status: APPROVED by Levi on 2026-11-25, subject to the three corrections below (now made). Integrated as the approved route ApprovedRoutes "israel-end-times", labelled UNDER REVIEW. The no-go zone is lifted only after its tests pass.**
 
 **How to read this answer.** Some things are stated plainly in Scripture. Other things are our understanding of several passages read together. Each section marks which is which. Where we are giving our interpretation, the words "working interpretation, under review" appear. Our end-times view is not a settled doctrine, and we do not say that every Christian must accept it.
 
@@ -24,7 +24,7 @@ Verses are referenced here. In the app, each verse is quoted word for word from 
 
 ## 2. The coming of Christ for the Church, before the tribulation
 
-**What Scripture says.** Jesus promises to come back and take His people to be with Him (John 14:1–3). The dead in Christ will be raised, and believers will be changed in a moment (1 Corinthians 15:51–53). The Lord will descend, and believers will be caught up to meet Him (1 Thessalonians 4:13–18). God has not appointed us to wrath (1 Thessalonians 5:9). The church will be kept from the hour of trial that is coming on the whole world (Revelation 3:10). Jesus warns of a time of great distress that will come (Matthew 24:15–22).
+**What Scripture says.** Jesus promises to come back and take His people to be with Him (John 14:1–3). The dead in Christ will be raised, and believers will be changed in a moment (1 Corinthians 15:51–53). The Lord will descend, and believers will be caught up to meet Him (1 Thessalonians 4:13–18). God has not appointed us to wrath (1 Thessalonians 5:9). Jesus warns of a time of great distress that will come (Matthew 24:15–22). Revelation 3:10 was addressed to the church in Philadelphia, and its promise of keeping from the hour of trial that is coming on the whole world is applied to Christ's protection of His Church in the future tribulation as our working interpretation, supported by the other passages above.
 
 **Daniel's seventy weeks, our interpretation.** Daniel 9:24–27 speaks of seventy weeks decreed for the people and the holy city. The phrase "seven-year tribulation" does not appear in the text. Our reading, working interpretation, under review, is that Daniel's final week is a future period of seven years. We understand the time of great distress in Matthew 24:15–22 to fall within that period.
 
@@ -34,7 +34,7 @@ Verses are referenced here. In the app, each verse is quoted word for word from 
 
 **What Scripture says.** Christ returns in power, as King of kings and Lord of lords (Revelation 19:11–16). Satan is bound, and the saints reign with Christ for a thousand years (Revelation 20:1–6). The thousand years are stated explicitly in Revelation 20.
 
-**Our reading, working interpretation, under review.** The other passages help us understand what this earthly reign will be like. Zechariah 14:4 and 14:9 speak of the Lord's feet standing on the Mount of Olives, and of the Lord as King over all the earth. Isaiah 11:1–10 describes a righteous King from the line of Jesse who rules with justice. We understand these passages, taken together, to describe Christ physically reigning on earth after His return. Not every detail comes from every passage. The thousand years are specifically stated only in Revelation 20.
+**Our reading, working interpretation, under review.** The other passages help us understand what this earthly reign will be like. Zechariah 14:4 and 14:9 speak of the Lord's feet standing on the Mount of Olives, and of the Lord as King over all the earth. Isaiah 11:1–10 describes a righteous King from the line of Jesse who rules with justice. Daniel 2:34–35 and 2:44–45 describe the stone that becomes a great mountain and fills the earth, and the kingdom of God that the God of heaven sets up. We understand this, as our interpretation, to connect with Christ's future physical reign on earth. We understand these passages, taken together, to describe Christ physically reigning on earth after His return. Not every detail comes from every passage. The thousand years are specifically stated only in Revelation 20.
 
 ## 4. The future turning of national Israel to Christ
 
@@ -48,7 +48,8 @@ Verses are referenced here. In the app, each verse is quoted word for word from 
 - The antichrist is named, and many antichrists have already come (1 John 2:18).
 - The man of sin opposes God and sets himself above every god (2 Thessalonians 2:3–4).
 - A little horn speaks great words against the Most High and makes war on the saints (Daniel 7:8, 25).
-- A beast is given a mouth speaking great things and blasphemies, and is allowed to make war for a time, and deceives those who dwell on the earth (Revelation 13:1–8).
+- A beast is given a mouth speaking great things and blasphemies, and is allowed to make war for a time (Revelation 13:1–8).
+- A second beast works signs and deceives those who dwell on the earth (Revelation 13:11–14).
 - Jesus said no one knows the day or the hour of His return (Matthew 24:36).
 
 **Our reading, working interpretation, under review.** We understand these passages, read together, to describe a final individual who will oppose Christ and deceive people near the end. How the details connect, and how this fits into the order of events, is our own reading, and we hold it loosely.
@@ -84,7 +85,10 @@ Verses are referenced here. In the app, each verse is quoted word for word from 
 
 ---
 
-## For Levi to decide before final approval (not for members)
+## Levi's decision of 2026-11-25 (record)
+Approved subject to the three corrections above, which are now made: Revelation 13:11–14 added for the deception; Revelation 3:10 addressed to Philadelphia and labelled as working interpretation; Daniel 2:34–35 and 2:44–45 added to the millennium section as our interpretation. No comparisons of other views. Labels kept.
+
+## Earlier questions for Levi (answered)
 
 1. Confirm section 1 now reads "one New Covenant people in Christ", with Jewish believers part of the Church, Gentiles grafted in without becoming ethnic Israelites, and the Church not replacing national Israel.
 2. Confirm section 2 says the phrase "seven-year tribulation" is not in the text, and that the seven-year reading of Daniel 9 is our interpretation.
