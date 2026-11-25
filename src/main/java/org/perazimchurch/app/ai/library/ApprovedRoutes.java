@@ -265,6 +265,73 @@ public final class ApprovedRoutes {
                 + "faith. We pray in faith, and we trust God's wise answer.",
                 "James 5:14", "2 Corinthians 12:9"));
 
+        r.add(new Route("matthew-7-21-lord-lord",
+                "not everyone who (?:saith|says|calls).{0,40}lord|lord,? lord|calls? (?:me|him|jesus|the lord) lord",
+                "Jesus says that not everyone who calls Him Lord will enter the kingdom of heaven, but the one who does the will of His "
+                + "Father in heaven (Matthew 7:21). Many will say 'Lord, Lord' and be turned away, because He never knew them (Matthew 7:22–23). "
+                + "Calling Him Lord is not enough. Jesus asks: 'why call ye me, Lord, Lord, and do not the things which I say?' (Luke 6:46).\n\n"
+                + "This does not mean that we earn salvation. Faith in Christ is what saves, and true faith is shown in obedience that comes "
+                + "from it (Ephesians 2:8–10). We do not judge any person's standing before God. Test yourself and every profession by the "
+                + "words of Christ, and talk with a trusted church leader or pastor if you are unsure.",
+                "Matthew 7:21", "Luke 6:46"));
+
+        r.add(new Route("pharaoh-heart",
+                "pharaoh|pharoah",
+                "The Bible teaches two truths side by side, and we hold both. Pharaoh hardened his own heart again and again (Exodus 8:15). "
+                + "God also hardened Pharaoh's heart, and He told Pharaoh that He had raised him up to show His power and to make His name "
+                + "known throughout the earth (Exodus 9:12, 16; Romans 9:17–18).\n\n"
+                + "Scripture does not make God the author of sin. Pharaoh was responsible for refusing God's word, and God's purpose was "
+                + "carried out through that refusal. We do not claim to explain every mystery. Paul answers the question with a call to "
+                + "humility before God (Romans 9:20). Human responsibility and God's sovereignty are both taught in Scripture (Philippians 2:12–13).",
+                "Exodus 8:15", "Romans 9:17"));
+
+        r.add(new Route("agape-and-philia",
+                "\\bagape\\b|\\bagap\\u0113\\b|\\bphilia\\b|\\bphileo\\b|difference between (?:agape|philia|the greek words? for love)",
+                "The Greek New Testament uses several words for love. Strong's lexicon gives agape (G26) as 'love, i.e. affection or "
+                + "benevolence; specially (plural) a love-feast'. It gives philia (G5373) as 'fondness: friendship'. The verb phileo (G5368) "
+                + "is glossed 'to be a friend to ... have affection for', and Strong's says it denotes personal attachment, 'as a matter of "
+                + "sentiment or feeling'. The verb agapao (G25) is wider, 'embracing especially the judgment and the deliberate assent of "
+                + "the will as a matter of principle, duty and propriety'.\n\n"
+                + "In John 21:15–17 both kinds of love appear in the exchange between Jesus and Peter, and the King James Version translates "
+                + "both as 'love'. The verses in each passage decide the meaning. Strong's glosses are lexicon notes, not Scripture.",
+                "John 21:15", "John 21:17"));
+
+        r.add(new Route("resurrection-evidence",
+                "(?:evidence|proof|prove|historical).{0,40}resurrection|resurrection.{0,40}(?:evidence|historical|proof)|tacitus|"
+                + "did jesus (?:really )?(?:rise|come back to life)",
+                "Scripture gives the earliest testimony that Jesus rose from the dead. Paul received and passed on the message that Christ "
+                + "died, was buried, and rose again the third day according to the Scriptures, and that He appeared to many witnesses "
+                + "(1 Corinthians 15:3–8). If Christ has not been raised, our preaching is empty and our faith is empty (1 Corinthians 15:14).\n\n"
+                + "Outside the Bible, historical evidence is limited, but one hostile non-Christian source confirms the execution. The Roman "
+                + "historian Tacitus wrote, in Annals 15.44 (Church and Brodribb translation): 'Christus, from whom the name had its origin, "
+                + "suffered the extreme penalty during the reign of Tiberius at the hands of one of our procurators, Pontius Pilatus.' That "
+                + "shows that Jesus was executed under Pilate. It does not by itself prove the resurrection. The resurrection rests on the "
+                + "apostolic testimony, which we present as testimony, not as a proof that compels belief.",
+                "1 Corinthians 15:4", "1 Corinthians 15:14"));
+
+        r.add(new Route("early-church-witnesses",
+                "before nicaea|before nicea|pre-nicene|ante-nicene|church fathers?|ignatius|justin martyr|early church (?:believe|teach|taught)",
+                "Scripture is the authority. The early writers are witnesses to what the churches believed. Ignatius, writing early in the "
+                + "second century, calls the Lord 'God existing in flesh' (To the Ephesians 7, Ante-Nicene Fathers, vol. 1). Justin Martyr, "
+                + "writing about the middle of the second century, says that Christians worship 'the Son ... and the prophetic Spirit' "
+                + "(First Apology 6), and that they hold the Son 'in the second place, and the prophetic Spirit in the third' (First Apology 13).\n\n"
+                + "These witnesses show that Christ was worshipped as God and that the Spirit was honoured with the Father and the Son. They do "
+                + "not show that these writers used the later technical language of one substance, as the Nicene Creed of 325 does. The "
+                + "councils did not invent the biblical teaching; they gave more precise wording to defend it.",
+                "John 1:1", "Matthew 28:19"));
+
+        r.add(new Route("augustine-biography",
+                "augustine|augustinus|hippo regius|confessions of st",
+                "Augustine, known in Latin as Augustinus (born 13 November 354 at Tagaste, in Roman North Africa; died 28 August 430 at "
+                + "Hippo Regius, during the Vandal siege), was a Christian bishop and one of the most influential theologians of the Western "
+                + "Church. He was baptised by Ambrose at Milan at Easter 387, was chosen a presbyter at Hippo in 391, and later became bishop "
+                + "there. His Confessions tell the story of his conversion and begin with the line: 'Thou hast made us for Thyself, and our "
+                + "heart is restless till it rests in Thee' (Confessions I.1).\n\n"
+                + "Later Christians, including the Protestant Reformers, read him closely. He lived long before the Reformation and was not a "
+                + "Protestant. His writings are historical witnesses and arguments to be tested by Scripture. They are not authorities above "
+                + "it, and we do not treat each of his opinions as Perazim doctrine.",
+                "Psalm 42:1", "Psalm 42:2"));
+
         r.add(new Route("nicene-creed-spirit",
                 "nicene.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}nicene|creed.{0,60}(spirit|ghost)|(spirit|ghost).{0,60}creed",
                 "Yes. The Nicene-Constantinopolitan Creed of 381 speaks of the Holy Spirit. In the creed's own words: \""

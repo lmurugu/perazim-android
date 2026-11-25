@@ -385,6 +385,45 @@ public class PerazimAiEngine {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
     }
 
+    private static final Pattern CHILD_CUE = Pattern.compile(
+            "\\b(?:child|children|kid|kids|minor|minors|under (?:18|eighteen)|teen|teens|teenager|toddler|baby|babies|nephew|niece|"
+            + "pupil|learner|boy|girl|daughter|son|grandchild|grandson|granddaughter)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** Adult disclosure wording: no child helpline as the lead line, and a trusted adult outside the church. */
+    public static AiResponse safeguardingResponse(@Nullable String query) {
+        if (query != null && CHILD_CUE.matcher(query).find()) return safeguardingResponse();
+        return AiResponse.plainText(
+                "I'm sorry this happened to you. What was done to you is not your fault. If you are in immediate danger, call 999 or 112 "
+                + "now, or go to the nearest police station or hospital, and ask for help with what happened. A doctor or clinic can also "
+                + "check your health and help you get support. Please tell a trusted person outside the church, such as a family member "
+                + "or friend, who can stay with you. You do not have to keep silent, and no one should ask you to forgive before you are "
+                + "ready or to keep it secret. Gender-based violence line 1195 (may not be current, so confirm it before you rely on it). "
+                + "This guide cannot investigate, promise confidentiality, or act for you.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
+    /** Drug-related questions: point to NACADA and the police, never a scope refusal. */
+    private static final Pattern DRUG_CUE = Pattern.compile(
+            "\\b(?:drugs?|bhang|cannabis|marijuana|weed|miraa|heroin|cocaine|narcotics?|addict(?:ion|ed)?)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isDrugSafetyQuery(@Nullable String query) {
+        return query != null && DRUG_CUE.matcher(query).find();
+    }
+
+    /** Scripture-topic words that are in scope even though they are not in the general cue list. */
+    private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
+            "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
+            + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static AiResponse drugSafetyResponse() {
+        return AiResponse.plainText(
+                "Thank you for telling me. If a young person is in danger, call 999 or 112 now. If someone is selling drugs, report it to "
+                + "the police on 999 or 112, or to the nearest police station. For drug or alcohol use, NACADA on 1192 can help. If a child "
+                + "may be at risk, call 116 (Childline Kenya). Please tell a trusted adult outside the situation, who can help you decide "
+                + "what to do next. This guide cannot investigate, act for you, or promise confidentiality.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
     public static AiResponse safeguardingResponse() {
         return AiResponse.plainText(
                 "I'm sorry this is happening to you or to someone you care about. If anyone is in immediate danger, call 999 or 112 now, or go to the nearest police station or hospital. If a child may be at risk, call the Childline Kenya helpline on 116. Tell a trusted adult who can keep you or the child safe. This guide cannot investigate, promise confidentiality, or act for you. Please also contact the church office or a trusted leader about safeguarding, and do not wait for an app reply.",
@@ -683,6 +722,7 @@ public class PerazimAiEngine {
         if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
         if (isSafeguardingDisclosure(query)) return "safeguarding";
+        if (isDrugSafetyQuery(query)) return "drug-safety";
         if (isHealthStopQuery(query)) return "health-stop";
         if (isManipulationQuery(query)) return "manipulation";
         if (isTranslationPolicyQuery(query)) return "translation-policy";
@@ -691,6 +731,7 @@ public class PerazimAiEngine {
         if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query)) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
+        if (BIBLE_TOPIC_CUE.matcher(query).find()) return null;
         if (isOutOfScopeForModel(query)) return "scope-refusal";
         return null;
     }
@@ -702,7 +743,8 @@ public class PerazimAiEngine {
             case "crisis": return crisisResponse();
             case "overdose": return overdoseResponse();
             case "harm-to-others": return harmToOthersResponse();
-            case "safeguarding": return safeguardingResponse();
+            case "safeguarding": return safeguardingResponse(query);
+            case "drug-safety": return drugSafetyResponse();
             case "health-stop": return healthStopResponse();
             case "manipulation": return manipulationResponse();
             case "translation-policy": return translationPolicyResponse();
