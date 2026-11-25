@@ -6,7 +6,7 @@
 - Strict: 871/886 (98.3%). Decline-pass: 874/886 (98.6%). Previous round (2026-11-25-plus83-gate-r37) is the baseline for the regression check.
 - Strict categories below the 90% gate: 1 of 51.
 
-Round 38 marriage repair. Commit 09a9209463678b82c02c20043b817abbb89fe554 (branch claude/ai-guide-final-plus-83, PR 84 not merged, PR 83 draft).
+Round 38 marriage repair. Commit 09a9209463678b82c02c20043b817abbb89fe554 (branch claude/ai-guide-final-plus-83. PR 84 is merged into claude/ai-guide-final-plus-83 at 7b23c5f, not into main. PR 83 is still a draft.).
 
 Changes since round 36/37: approved routes for Levi's sections 4 to 8 (equal worth, unfaithful generalisation, proof-text requests in a marriage context, coercive control with safety first, divorce and remarriage left undecided, infidelity and betrayal with the kugongeana definition, provision, singleness, in-laws, household labour); headship and family planning wording (injection, vasectomy, doctor referral); "ending my life" crisis wording (Levi to review); in-scope marriage cues; factual infidelity questions bypass the sensitive route. A bad verse anchor (Psalm 9:9) that blocked later routes was fixed.
 
