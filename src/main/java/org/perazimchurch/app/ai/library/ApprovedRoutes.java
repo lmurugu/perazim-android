@@ -331,7 +331,7 @@ public final class ApprovedRoutes {
                 + "Later Christians, including the Protestant Reformers, read him closely. He lived long before the Reformation and was not a "
                 + "Protestant. His writings are historical witnesses and arguments to be tested by Scripture. They are not authorities above "
                 + "it, and we do not treat each of his opinions as Perazim doctrine.",
-                "Psalm 42:1", "Psalm 42:2"));
+                "Psalms 42:1", "Psalms 42:2"));
 
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",
@@ -344,17 +344,17 @@ public final class ApprovedRoutes {
         r.add(new Route("depression-and-faith",
                 "depress",
                 "Scripture does not teach that depression is simply a lack of faith. Elijah felt deep despair, and God cared for him "
-                + "(1 Kings 19:4–8). The psalmist wrote honestly about his sorrow, and he still called on God (Psalm 42:5). Please talk with a "
+                + "(1 Kings 19:4–8). The psalmist wrote honestly about his sorrow, and he still called on God (Psalms 42:5). Please talk with a "
                 + "doctor or clinic about how you are feeling, and with your pastor or a trusted church leader. You are not alone in this.",
-                "1 Kings 19:4", "Psalm 42:5"));
+                "1 Kings 19:4", "Psalms 42:5"));
 
         r.add(new Route("unanswered-prayer-and-faith",
                 "hasn't answered|hasn't answered me|not answered|haven't answered|feel like a failure|feel like i am a failure|seems so strong",
                 "God hears your prayers, and waiting is not the same as being forgotten. The Lord is near to those who call on Him "
-                + "(Psalm 145:18). Your faith is not measured by how strong other people seem, because God's grace is sufficient for you "
+                + "(Psalms 145:18). Your faith is not measured by how strong other people seem, because God's grace is sufficient for you "
                 + "(2 Corinthians 12:9). Keep bringing your requests to God in prayer, and talk with your pastor, your cell leader or a "
                 + "trusted church leader about how you are feeling.",
-                "Psalm 145:18", "2 Corinthians 12:9"));
+                "Psalms 145:18", "2 Corinthians 12:9"));
 
         r.add(new Route("witchcraft-fear-swahili",
                 "nimerogwa|rogwa|nimeroga|uchawi|mchawi",

@@ -42,6 +42,10 @@ public class PerazimAiEngine {
     private static final Pattern PERSONAL_CONTEXT = Pattern.compile(
             "\\b(?:i am|i'm|i feel|i felt|i have been|i was|my|our|we|my friend|someone close to me)\\b",
             Pattern.CASE_INSENSITIVE);
+    private static final Pattern SAYS_CLAIM_QUESTION = Pattern.compile(
+            "\\b(?:pastor|preacher|church|bishop|elder|leader|someone) says\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FIRST_PERSON_CONTEXT = Pattern.compile(
+            "\\b(?:i|i'm|i am|i feel|i felt|i have|i was|my|me)\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern SENSITIVE_PASTORAL_TOPIC = Pattern.compile(
             "\\b(?:abuse|assault|rape|violence|hit me|beating|marital conflict|family conflict|divorce|" +
                     "separation|trauma|grief|bereavement|mourning|depress(?:ion|ed)?|anx(?:iety|ious)|" +
@@ -413,7 +417,8 @@ public class PerazimAiEngine {
     /** Scripture-topic words that are in scope even though they are not in the general cue list. */
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
-            + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene)\\b", Pattern.CASE_INSENSITIVE);
+            + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene)\\b|"
+            + "rogw|uchawi|mchawi|nimeroga|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
 
     public static AiResponse drugSafetyResponse() {
         return AiResponse.plainText(
@@ -545,6 +550,9 @@ public class PerazimAiEngine {
     /** Conservative pre-model route for personal pastoral disclosures; not a risk diagnosis. */
     public static boolean isSensitivePastoralDisclosure(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return false;
+        // A question about what someone else says (e.g. "Our pastor says depression is a lack of faith. Is that true?") is a
+        // doctrine question, not a personal disclosure, so it goes to the approved routes.
+        if (SAYS_CLAIM_QUESTION.matcher(query).find() && !FIRST_PERSON_CONTEXT.matcher(query).find()) return false;
         return SENSITIVE_PASTORAL_REQUEST.matcher(query).find()
                 || (PERSONAL_CONTEXT.matcher(query).find() && SENSITIVE_PASTORAL_TOPIC.matcher(query).find());
     }
