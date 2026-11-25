@@ -189,7 +189,8 @@ public final class DoctrineLibrary {
                 break;
             default:
                 out.append("The guide has not settled a position on ").append(t.name.toLowerCase(Locale.ROOT))
-                        .append(", so I will not state one. Please speak with your pastor or a church leader about it.");
+                        .append(". This matter is undecided and not official, so I will not state one. "
+                                + "Please speak with your pastor or a church leader about it.");
         }
         return out.toString();
     }

@@ -539,7 +539,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("greeting-only",
                 "^(?:hi|hello|hey|good morning|good afternoon|good evening|habari|hujambo)(?:[ ,!.]+(?:good morning|good afternoon|good evening|there|friend))?[ !.]*$",
-                "Good morning! Welcome. I can help with the Bible, prayer, church information and the faith questions you bring. What would you like to know? We can start with a short passage: 'This is the day which the LORD hath made; we will rejoice and be glad in it' (Psalms 118:24)."));
+                "Good morning! Welcome. I can help with the Bible, prayer, church information and the faith questions you bring. What would you like to know? Please ask in your own words, and I will keep the answer simple. We can start with a short passage: 'This is the day which the LORD hath made; we will rejoice and be glad in it' (Psalms 118:24)."));
 
         r.add(new Route("campuses-unverified",
                 "campus|campuses",
@@ -580,8 +580,23 @@ public final class ApprovedRoutes {
 
         r.add(new Route("sunday-mark-beast",
                 "sunday.{0,40}mark|mark of the beast|ellen white",
-                "Scripture does not identify Sunday as the mark of the beast. The mark in Revelation 13 is not named as Sunday in the text. Paul wrote: 'Let no man therefore judge you' (Colossians 2:16), and 'Let every man be fully persuaded in his own mind' (Romans 14:5). We test this teaching by Scripture alone.",
+                "Scripture does not identify Sunday as the mark of the beast, and I cannot verify that claim from the text. The mark in Revelation 13 is not named as Sunday in the text. Paul wrote: 'Let no man therefore judge you' (Colossians 2:16), and 'Let every man be fully persuaded in his own mind' (Romans 14:5). We test this teaching by Scripture alone.",
                 "Colossians 2:16", "Romans 14:5"));
+
+        r.add(new Route("christian-science",
+                "christian science|mary baker eddy|science and health",
+                "Christian Science is not the Bible-centred Christian faith. Its founder, Mary Baker Eddy, wrote Science and Health, which teaches that sickness and matter are unreal and that Christ's resurrection was a spiritual awakening rather than a bodily rising. Scripture says that the risen Jesus showed his hands and feet to his disciples and said that a spirit does not have flesh and bones as he has (Luke 24:39). Scripture also says that he was raised on the third day according to the Scriptures (1 Corinthians 15:4). We test every teaching by Scripture alone.",
+                "Luke 24:39", "1 Corinthians 15:4"));
+
+        r.add(new Route("oneness-trinity",
+                "oneness pentecostal|oneness teaching|are oneness|jesus only",
+                "The Bible-centred Christian position is that there is one God (Deuteronomy 6:4), and that the Father, the Son and the Holy Spirit are named together in baptism (Matthew 28:19). The Oneness teaching that God is only one person, who appears as Father, Son and Spirit in turn, is not the Trinitarian faith the church confesses. Scripture speaks of the Son praying to the Father (John 17:1), which shows the Father and the Son as distinct persons. We test every teaching by Scripture alone.",
+                "Deuteronomy 6:4", "Matthew 28:19"));
+
+        r.add(new Route("circumcision-custom",
+                "circumci[sz]",
+                "Circumcision was a sign of the covenant in the Old Testament (Genesis 17:10). In the New Testament, neither circumcision nor uncircumcision avails anything in Christ, but faith which works by love (Galatians 5:6). Whether a family follows the custom is a matter of conscience, and no one should judge another about it (Romans 14:5). Please talk it through with your pastor.",
+                "Genesis 17:10", "Galatians 5:6"));
 
         r.add(new Route("sabbath-to-sunday",
                 "change the sabbath|changed the sabbath|sabbath to sunday|sunday as a sign",
@@ -752,7 +767,7 @@ public final class ApprovedRoutes {
                 "Deuteronomy 18:10", "1 Timothy 2:5"));
 
         r.add(new Route("sabbath-not-condition",
-                "saturday|keep the sabbath|sabbath.{0,40}(?:saved|salvation|saves|required|must)|sabbath.{0,30}(?:need|have to)",
+                "saturday|jumamosi|sabato|keep the sabbath|sabbath.{0,40}(?:saved|salvation|saves|required|must)|sabbath.{0,30}(?:need|have to)",
                 "No. Keeping a particular day is not a condition of salvation. Paul wrote that no one should judge you about a holy day, "
                 + "a Sabbath or a feast (Colossians 2:16). He also wrote that each person should be fully persuaded in his own mind about "
                 + "such days (Romans 14:5). Jesus is Lord of the Sabbath (Mark 2:28). Salvation comes by grace through faith, and not by "

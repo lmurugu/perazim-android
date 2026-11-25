@@ -24,6 +24,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Executes the packaged official llama.cpp ARM64 binary locally. Inference never opens a socket. */
 public final class OnDeviceAi {
+    /** Shown when no approved source supports a question. Warm and specific, so the member knows what to do next. */
+    static final String NO_SOURCE_MESSAGE = "No verified approved source supports this question yet, so I will not guess. "
+            + "Please ask a simpler, more specific question, or speak with your pastor or a trusted church leader.";
     public static final String MODEL_NAME = "Qwen2.5 0.5B Instruct · Q4_K_M";
     public static final long MODEL_BYTES = 491400032L;
     private static final String MODEL_SHA = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db";
@@ -180,7 +183,7 @@ public final class OnDeviceAi {
                 evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
                 // Drift: a question that uses another faith's idea gets at least two KJV passages plus a false-doctrine note to refute from Scripture; never a credible source (no-op otherwise).
                 evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
-                if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
+                if (evidence.length() == 0) throw new IOException(NO_SOURCE_MESSAGE);
                 if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
                 // Locked rules, one playbook, style and learned notes (guide memory is optional and bounded).
                 String guideText = GuideRuntime.contextFor(c, question).text;
@@ -252,7 +255,7 @@ public final class OnDeviceAi {
                 if (checked.refused) throw new IOException(checked.answer);
                 // Grounded answer: the evidence text is the answer; the model may add only a supported framing sentence.
                 String grounded = GroundedAnswer.finalAnswer(question, checked.answer, shown);
-                if (grounded == null) throw new IOException("No verified approved source supports this question.");
+                if (grounded == null) throw new IOException(NO_SOURCE_MESSAGE);
                 String citedResult = appendVerifiedSourceTitles(grounded, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {

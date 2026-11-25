@@ -174,7 +174,7 @@ public class EvalPipelineTest {
                     if (evidence.length() == 0) {
                         // Production OnDeviceAi.ask throws here before the model runs, so the model is never called without evidence.
                         status = "refused:no-verified-source";
-                        answer = "No verified approved source supports this question.";
+                        answer = OnDeviceAi.NO_SOURCE_MESSAGE;
                     } else {
                         String prompt = LocalPrompt.build(q, new ArrayList<>(), evidence);
                         long t0 = System.currentTimeMillis();
