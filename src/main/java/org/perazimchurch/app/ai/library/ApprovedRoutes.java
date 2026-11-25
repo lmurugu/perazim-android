@@ -596,7 +596,7 @@ public final class ApprovedRoutes {
 
         r.add(new Route("justification-by-faith",
                 "\\bjustif\\w*|justified by",
-                "Justification is the good news that God declares a sinner righteous in his sight. We cannot earn it, because it is a gift of his grace. "
+                "Here is a simple, gentle explanation. Justification is the good news that God declares a sinner righteous in his sight. We cannot earn it, because it is a gift of his grace. "
                 + "Paul writes that we are justified freely by his grace, through the redemption that is in Christ Jesus (Romans 3:24). "
                 + "Because we have been justified by faith, we have peace with God through our Lord Jesus Christ (Romans 5:1). "
                 + "Paul is clear that a person is not justified by the works of the law, but by faith in Jesus Christ (Galatians 2:16). "
