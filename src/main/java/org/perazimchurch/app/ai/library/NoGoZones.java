@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.library;
 
+import androidx.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,16 @@ public final class NoGoZones {
             + "church leader or your pastor, who can walk with you through it.";
 
     /** No verdict on any individual: only God knows hearts and final destiny. Warm, with the way of faith for the asker. */
-    private static final String DESTINY_DECLINE = "Only God knows people's hearts and their final destiny, so I will not pronounce on anyone's eternal state. "
+    /** True when the question asks for a verdict on an individual's eternal state. */
+    public static boolean matchesDestinyZone(@Nullable String query) {
+        if (query == null) return false;
+        for (Zone z : ZONES) {
+            if ("individual-destiny".equals(z.id)) return z.pattern.matcher(query).find();
+        }
+        return false;
+    }
+
+    public static final String DESTINY_DECLINE = "Only God knows people's hearts and their final destiny, so I will not pronounce on anyone's eternal state. "
             + "If you are asking about your own salvation, come to Jesus in faith and trust Him as Lord (Romans 10:9–10). "
             + "Please talk this through with a trusted church leader or your pastor, who can walk with you through it.";
 
@@ -45,6 +55,7 @@ public final class NoGoZones {
     private static final List<Zone> ZONES = Collections.unmodifiableList(Arrays.asList(
             new Zone("individual-destiny",
                     "(in hell|going to hell|go to hell|in heaven|saved|lost soul|right now).*(yes or no|is he|is she|is my|is it)"
+                    + "|am i (really )?saved|was (he|she|they|my \\w+|\\w+) (ever )?saved|never believed|going to heaven|go to heaven|see my heart"
                     + "|(my|our) (father|mother|brother|sister|son|daughter|husband|wife|grandmother|grandfather|cousin|friend)"
                     + ".*(hell|heaven|saved|damned|lost)",
                     DESTINY_DECLINE),

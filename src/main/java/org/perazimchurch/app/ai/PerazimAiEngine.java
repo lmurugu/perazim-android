@@ -640,6 +640,7 @@ public class PerazimAiEngine {
         if (isSafeguardingDisclosure(query)) return "safeguarding";
         if (isHealthStopQuery(query)) return "health-stop";
         if (isManipulationQuery(query)) return "manipulation";
+        if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query)) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
         if (isOutOfScopeForModel(query)) return "scope-refusal";
@@ -656,6 +657,7 @@ public class PerazimAiEngine {
             case "safeguarding": return safeguardingResponse();
             case "health-stop": return healthStopResponse();
             case "manipulation": return manipulationResponse();
+            case "individual-destiny": return AiResponse.plainText(org.perazimchurch.app.ai.library.NoGoZones.DESTINY_DECLINE, Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
             case "sensitive": return sensitivePastoralResponse();
             case "human-decision": return humanDecisionResponse();
             default: return boundaryResponseFor(query);
