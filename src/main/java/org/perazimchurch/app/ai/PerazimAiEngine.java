@@ -296,7 +296,29 @@ public class PerazimAiEngine {
             // Child-abuse disclosures from the Kenya sets: secrecy instructions, a relative sleeping in the child's room, Swahili wording.
             "keep (?:our|the|this|my) secret|keep it a secret|(?:told|tells|telling) me not to tell|" +
             "not to tell (?:mummy|mama|mom|mum|dad|daddy|my parents|anyone)|don'?t tell (?:mummy|mama|mom|mum|dad|daddy|my parents|anyone)|" +
-            "sleeps in my room|vitendo vibaya|unyanyasaji|amebakwa|kubakwa|kumbaka)\\b", Pattern.CASE_INSENSITIVE);
+            "sleeps in my room|vitendo vibaya|unyanyasaji|amebakwa|kubakwa|kumbaka|" +
+            // Child safety from the Kenya sets: female genital cutting, night deliverance beatings, a minor pregnant, church secrecy, pastor asking for secret favours.
+            "circumcis\\w* (?:my |our |the |a )?(?:daughter|girl|girls|baby|child|kids?|mtoto|binti|wasichana)|" +
+            "kutahiri (?:mtoto|binti|wasichana)|female genital|genital mutilation|\\bfgm\\b|ukeketaji|kuwakeketa|" +
+            "beat(?:s|ing)? (?:people|children|kids|members|congregants)|" +
+            "\\b(?:1[0-7]|[0-9])[- ]year[- ]old\\b.{0,60}\\bpregnant|pregnant\\b.{0,60}\\b(?:1[0-7]|[0-9])[- ]year[- ]old\\b|" +
+            "\\bis (?:1[0-7])\\b.{0,40}\\bpregnant|" +
+            "(?:church|pastor|leaders?|elders?) (?:wants?|is trying|are trying) to (?:hide|cover up)\\b|" +
+            "(?:pastor|mchungaji)\\b.{0,160}\\b(?:siri|faragha|mbegu)\\b|\\b(?:siri|faragha|mbegu)\\b.{0,160}\\b(?:pastor|mchungaji)\\b)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** Someone stopping insulin or other medicine, or relying on prayer alone instead of treatment: fixed referral before the model. */
+    private static final Pattern HEALTH_STOP_PATTERN = Pattern.compile(
+            "\\b(?:stop|stopping|stopped|skip|skipping|quit|quitting|kuacha|anaacha|anaacha|kukataa)\\b.{0,30}\\b(?:insulin|medicine|medication|tablets?|dawa|arvs?|antiretrovirals?|chemo\\w*)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isHealthStopQuery(@Nullable String query) {
+        return query != null && HEALTH_STOP_PATTERN.matcher(query).find();
+    }
+
+    public static AiResponse healthStopResponse() {
+        return AiResponse.plainText(
+                "Please do not stop insulin or any other medicine without speaking to a doctor or nurse today. If someone is very unwell, confused, or vomiting, call 999 or 112 now, or go to the nearest clinic or hospital. Prayer and the support of the church can go alongside medical care, but not instead of it. Please take this to a doctor or nurse at the nearest clinic, and speak with a trusted church leader who can help you go there.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
 
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
@@ -600,6 +622,7 @@ public class PerazimAiEngine {
         if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
         if (isSafeguardingDisclosure(query)) return "safeguarding";
+        if (isHealthStopQuery(query)) return "health-stop";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
         if (isOutOfScopeForModel(query)) return "scope-refusal";
@@ -614,6 +637,7 @@ public class PerazimAiEngine {
             case "overdose": return overdoseResponse();
             case "harm-to-others": return harmToOthersResponse();
             case "safeguarding": return safeguardingResponse();
+            case "health-stop": return healthStopResponse();
             case "sensitive": return sensitivePastoralResponse();
             case "human-decision": return humanDecisionResponse();
             default: return boundaryResponseFor(query);
