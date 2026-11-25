@@ -19,6 +19,8 @@ public final class CrisisPhrases {
             "nothing to live for|no reason to live|gave (?:his|her|my|their) (?:things|belongings|possessions) away|" +
             "won'?t be here (?:next|any)|will not be here (?:next|any)|" +
             "kill (?:herself|himself|themselves)|" +
+            // Added 2026-11-25 (Swahili, KB-072 and Kenya sets; Levi to review this crisis-list addition): "tired of this life", "want to die", "I do not want to live".
+            "nimechoka na (?:hii )?maisha|nataka kufa|sitaki kuishi|najiua|nitajiua|" +
             "domestic violence|physically abused|(?:going to|plan to|want to) (?:kill|shoot|stab) (?:someone|him|her|them)|" +
             "(?:immediate|imminent) danger|" +
             // Added 2026-11-24 from the evaluation's safety failures (EX-074, EX-082, EX-083): plain suicidal wording.

@@ -76,7 +76,7 @@ public final class DoctrineLibrary {
     private static final java.util.Map<String, String> MATCH = new java.util.HashMap<>();
     static {
         MATCH.put("holy-spirit-baptism", "holy spirit|holy ghost|tongues|tognue|tounge|speaking in tongues|spirit baptism|baptism in the spirit|pentecostal");
-        MATCH.put("prosperity-and-giving", "prosperity|prosperity gospel|seed offering|seed faith|sow a seed|giving seed|plant (?:a |an )?seed|mbegu|health and wealth");
+        MATCH.put("prosperity-and-giving", "prosperity|prosperity gospel|seed offering|seed faith|sow a seed|giving seed|plant (?:a |an )?seed|mbegu|ukitoa pesa|utapata gari|poor because|poor people are poor|do not give enough|don't give enough|health and wealth");
         MATCH.put("polygamy", "polygamy|polygamous|polygamist|multiple wives|more than one wife|second wife|many wives");
         MATCH.put("dowry", "dowry|bride price|bride wealth|lobola|roora");
         MATCH.put("apostasy-assurance", "lose (?:their|his|her|my|your)? ?salvation|lose salvation|once saved always saved|eternal security|apostasy|apostate|fall away|backslid|assurance of salvation");

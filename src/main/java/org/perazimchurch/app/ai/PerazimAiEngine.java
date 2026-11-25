@@ -386,8 +386,13 @@ public class PerazimAiEngine {
     }
 
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
+        if (query != null && HOW_CHURCH_QUESTION.matcher(query).find()) return false;
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
     }
+
+    /** A process question about a church ("how should a church handle...") is not a personal disclosure. */
+    private static final Pattern HOW_CHURCH_QUESTION = Pattern.compile(
+            "(?:how|what) should (?:a|the|our) church", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern CHILD_CUE = Pattern.compile(
             "\\b(?:child|children|kid|kids|minor|minors|under (?:18|eighteen)|teen|teens|teenager|toddler|baby|babies|nephew|niece|"
@@ -418,7 +423,7 @@ public class PerazimAiEngine {
     private static final Pattern BIBLE_TOPIC_CUE = Pattern.compile(
             "\\b(?:agape|agap\\u0113|philia|pharaoh|pharoah|lord,? lord|calls? (?:me|him|jesus|the lord) lord|resurrection|augustine|"
             + "ignatius|justin martyr|tacitus|nicaea|nicea|church fathers?|pre-nicene|ante-nicene)\\b|"
-            + "rogw|uchawi|mchawi|nimeroga|manabii|nabii|tiktok|youtube|gold dust|visible sign|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
+            + "rogw|uchawi|mchawi|nimeroga|manabii|nabii|tiktok|youtube|gold dust|visible sign|false teacher|on tv|on television|preacher i saw|explain (?:it )?(?:differently|again|simply)|(?:don.t|do not|dont|udnerstand|understand) (?:understand|udnerstand)|what do you mean", Pattern.CASE_INSENSITIVE);
 
     public static AiResponse drugSafetyResponse() {
         return AiResponse.plainText(

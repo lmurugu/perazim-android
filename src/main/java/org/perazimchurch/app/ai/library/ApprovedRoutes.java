@@ -394,6 +394,91 @@ public final class ApprovedRoutes {
                 + "I can answer in English first.",
                 "John 9:2", "John 9:3"));
 
+        r.add(new Route("saying-cleanliness",
+                "cleanliness is next to godliness",
+                "The saying 'cleanliness is next to godliness' is not in the Bible, although many people repeat it. Scripture does teach care and good order in the home and church: the virtuous woman 'looketh well to the ways of her household' (Proverbs 31:27), and all things should be done decently and in order (1 Corinthians 14:40). Keeping your house clean is a good work, but it does not earn God's favour.",
+                "Proverbs 31:27", "1 Corinthians 14:40"));
+
+        r.add(new Route("saying-helps-themselves",
+                "helps those who help themselves|god helps those",
+                "That saying is not in the Bible, and Scripture does not teach that God helps those who help themselves. The Bible teaches that we are saved by grace through faith, not by our own works (Ephesians 2:8–9). Proverbs 3:5–6 calls us to trust the LORD with all our heart.",
+                "Ephesians 2:8", "Proverbs 3:5"));
+
+        r.add(new Route("joshua-sun-appearance",
+                "sun stand|sun stood still|sun stands still|earth is flat|flat earth",
+                "Joshua 10:13 describes the sun standing still as it appears to the people, using the language of appearance, and it does not say the earth is flat. Scripture often speaks in ordinary language about what people see (Psalms 19:6). Please test claims about the Bible by reading the passage in its context.",
+                "Joshua 10:13", "Psalms 19:6"));
+
+        r.add(new Route("judas-saved",
+                "judas.{0,30}saved|saved.{0,30}judas",
+                "The Bible does not say that Judas was saved. Matthew 27:5 says that he went and hanged himself after he had betrayed Jesus, and Acts 1:25 says that he went to his own place. We do not judge any individual's final destiny, and Scripture calls each of us to examine ourselves and trust in Christ (2 Corinthians 13:5).",
+                "Matthew 27:5", "Acts 1:25"));
+
+        r.add(new Route("governance-accountability",
+                "uwazi wa fedha|hakuna uwazi|financial transparency|fedha",
+                "Scripture calls church leaders to handle money honestly: 'providing for honest things, not only in the sight of the Lord, but in the sight of men' (2 Corinthians 8:20–21). It is right to ask for clear, open accounts of church money. Please raise this in writing with your pastor, the church office or a trusted church leader, and ask for a report. I cannot judge any individual, but honest money handling is part of faithful leadership.",
+                "2 Corinthians 8:20", "2 Corinthians 8:21"));
+
+        r.add(new Route("remove-pastor",
+                "remove (?:a |the |our )?pastor|dismiss (?:a |the )?pastor|pastor from office|congregation remove|remove .{0,20}from office",
+                "Scripture gives the church a real role in caring for its leaders and in dealing with wrongdoing. Matthew 18:15–16 teaches patient, careful steps with witnesses, and Acts 6:3 shows that church leaders should be men of good report. The church's own constitution and leaders' process decides how this is done, and this guide cannot give a verdict on any leader. Please talk with the church office and a trusted church leader.",
+                "Matthew 18:15", "Acts 6:3"));
+
+        r.add(new Route("accused-leader-abuse",
+                "accused of abuse|leader who is accused|leader .{0,40}accused|handle a leader",
+                "A church should take an accusation of abuse seriously. Scripture calls for truth, care for the person who was harmed, and a careful process with witnesses (1 Timothy 5:19; Matthew 18:16). The person harmed should have a trusted adult with them, and the matter should go to the police and the proper authorities.",
+                "1 Timothy 5:19", "Matthew 18:16"));
+
+        r.add(new Route("which-leaders-trust",
+                "which (?:church )?leaders|can i trust|which pastors|who can i trust",
+                "Only God knows hearts and judges them, so I will not name or judge any leader. Test every leader by the Scriptures and by their fruit (Matthew 7:16; 1 John 4:1). Look for leaders who live openly, handle money honestly and accept accountability, and talk with a trusted church leader or the church office before you decide.",
+                "Matthew 7:16", "1 John 4:1"));
+
+        r.add(new Route("false-teacher-check",
+                "false teacher|preacher i saw|preacher on tv|preacher on television",
+                "Only God knows hearts and judges them, so I cannot say whether this preacher is a false teacher as a person. But we can test what he teaches. Scripture tells us to test the spirits and to test every teaching by the Word (1 John 4:1; Acts 17:11). Write down what he says, check it against the Bible in context, and talk with your pastor or a trusted church leader before you accept or repeat it.",
+                "1 John 4:1", "Acts 17:11"));
+
+        r.add(new Route("tribe-unity",
+                "tribe|tribal|kabila|ethnic",
+                "Scripture does not teach that voting for someone from our own tribe is God's will. The Bible calls all believers to unity in Christ, where there is neither Jew nor Greek (Galatians 3:28), and Jesus prayed that they all may be one (John 17:21). Division by tribe is contrary to that unity. Please talk with your pastor or a trusted church leader about how to keep the church together.",
+                "Galatians 3:28", "John 17:21"));
+
+        r.add(new Route("politics-and-voting",
+                " vote|voting|candidate|political part|endorse|politic",
+                "This guide does not tell anyone who to vote for. Christians may hold different views on candidates and parties, and each person must follow their own conscience before God. Scripture calls us to pray for leaders (1 Timothy 2:1–2), to seek justice and honesty (Micah 6:8), and to ask God for wisdom (James 1:5). Please test each candidate by those standards, and talk with your pastor about how to honour God in your choice.",
+                "1 Timothy 2:1", "Micah 6:8"));
+
+        r.add(new Route("welcome-new-believer",
+                "nimeamua kumfuata|kumfuata yesu|nimempokea yesu|nimeokoka|decided to follow jesus",
+                "Karibu sana! Welcome, and we rejoice with you. The Bible says that if you confess with your mouth that Jesus is Lord, and believe in your heart that God raised Him from the dead, you shall be saved (Romans 10:9). Whoever calls upon the name of the Lord shall be saved (Romans 10:13). Take time to pray and thank God, and ask Him for His peace. Please talk with a pastor or a trusted church leader about baptism and how to grow in your new faith.",
+                "Romans 10:9", "Romans 10:13"));
+
+        r.add(new Route("thanks-and-prayer-help",
+                "kumshukuru|nimepata job|how do i pray|how to pray|help me pray|what to say to god|heart is heavy|jinsi ya kuomba",
+                "Welcome, and thank you for bringing this to God. Thank God for your new job. Pray with thanksgiving, and tell God what is on your heart (Philippians 4:6). God's peace will guard your heart and mind (Philippians 4:7). Scripture says we can pour out our hearts to God (Psalms 62:8), and the Holy Spirit helps us when we do not know what to say (Romans 8:26). A trusted church leader or your pastor can pray with you as well.",
+                "Philippians 4:6", "Psalms 62:8"));
+
+        r.add(new Route("bible-text-request",
+                "kitabu cha|sura ya|zaburi|mathayo",
+                "I can quote the Bible in this guide only from the King James Version and the NASB, so I cannot give you a Swahili text here. The Bible reader in the app has Swahili versions you can open. Here is the King James Version text:",
+                "Matthew 5:3", "Psalms 23:1"));
+
+        r.add(new Route("jesus-did-not-die-claim",
+                "yesu hakufa|jesus didn't die|jesus did not die|hakufa msalabani|didn't die on the cross|did not die on the cross",
+                "Scripture does not support the claim that Jesus did not die on the cross. The Gospels record His death (Mark 15:37), and Paul gives the core of the gospel: Christ died for our sins, was buried, and rose again (1 Corinthians 15:3–4). Do not accept a claim only because it appears in a video. Test it by the Bible, and talk with your pastor or a trusted church leader.",
+                "Mark 15:37", "1 Corinthians 15:3"));
+
+        r.add(new Route("payment-for-blessing",
+                "prayer cloth|pay .{0,30}shillings|breakthrough",
+                "Scripture does not teach that God's blessing can be bought with a payment, a prayer cloth or a 'seed'. Generous giving is taught, but a gift given freely is different from money demanded under pressure (2 Corinthians 9:7; 1 Timothy 6:10). Please do not pay under pressure. Talk with a trusted church leader or your pastor, and ask the church office for a written explanation of any payment.",
+                "2 Corinthians 9:7", "1 Timothy 6:10"));
+
+        r.add(new Route("land-gift-pressure",
+                "ardhi|nitoe ardhi|give my land|sell my land|land to the church",
+                "Please do not sign away land or family property because someone promises a blessing. Scripture warns about greed and about pressure to give in a hurry (Proverbs 22:3; 1 Timothy 6:10). Talk with a lawyer, and with a trusted church leader or counsel from your family, before you sign anything, and take the time you need.",
+                "Proverbs 22:3", "1 Timothy 6:10"));
+
         r.add(new Route("hiv-disclosure",
                 "\\bhiv\\b|tested positive",
                 "I'm sorry, this is very hard news. Please see a doctor or clinic soon for care and treatment, and they can explain your "
@@ -410,7 +495,7 @@ public final class ApprovedRoutes {
                 "1 Kings 19:4", "Psalms 42:5"));
 
         r.add(new Route("unanswered-prayer-and-faith",
-                "hasn't answered|hasn't answered me|not answered|haven't answered|feel like a failure|feel like i am a failure|seems so strong",
+                "hasn't answered|hasn't answered me|not answered|haven't answered|feel like a failure|feel like i am a failure|seems so strong|hayajibiwi|hajanijibu|hajajibu|maombi yangu",
                 "God hears your prayers, and waiting is not the same as being forgotten. The Lord is near to those who call on Him "
                 + "(Psalms 145:18). Your faith is not measured by how strong other people seem, because God's grace is sufficient for you "
                 + "(2 Corinthians 12:9). Keep bringing your requests to God in prayer, and talk with your pastor, your cell leader or a "
