@@ -35,6 +35,11 @@ public final class NoGoZones {
             "I'm sorry, I can't answer this one well yet, so I won't guess. Please talk it through with a trusted "
             + "church leader or your pastor, who can walk with you through it.";
 
+    /** No verdict on any individual: only God knows hearts and final destiny. Warm, with the way of faith for the asker. */
+    private static final String DESTINY_DECLINE = "Only God knows people's hearts and their final destiny, so I will not pronounce on anyone's eternal state. "
+            + "If you are asking about your own salvation, come to Jesus in faith and trust Him as Lord (Romans 10:9–10). "
+            + "Please talk this through with a trusted church leader or your pastor, who can walk with you through it.";
+
     private static final Pattern NICENE = Pattern.compile("\\bnicene\\b", Pattern.CASE_INSENSITIVE);
 
     private static final List<Zone> ZONES = Collections.unmodifiableList(Arrays.asList(
@@ -42,7 +47,7 @@ public final class NoGoZones {
                     "(in hell|going to hell|go to hell|in heaven|saved|lost soul|right now).*(yes or no|is he|is she|is my|is it)"
                     + "|(my|our) (father|mother|brother|sister|son|daughter|husband|wife|grandmother|grandfather|cousin|friend)"
                     + ".*(hell|heaven|saved|damned|lost)",
-                    DECLINE),
+                    DESTINY_DECLINE),
             new Zone("denominational-verdict",
                     "only (one )?(denomination|church|group|religion)|only one .*(right|true)|(one|only) (true|right) (church|denomination)"
                     + "|which (denomination|church|group) is (right|true)",

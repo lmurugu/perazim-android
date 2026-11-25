@@ -320,6 +320,22 @@ public class PerazimAiEngine {
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
+    /** Pressure to pay out of fear, or setting Scripture aside for a claimed word: fixed wording before the model. */
+    private static final Pattern MANIPULATION_PATTERN = Pattern.compile(
+            "\\b(?:prophet|prophetess|pastor|apostle|bishop|man of god|mchungaji|nabii)\\b.{0,160}\\b(?:money|pay|offering|seed|give|pesa|sadaka)\\b.{0,120}\\b(?:children|child|family|die|curse|death|sick)\\b|" +
+            "generational curse.{0,120}\\b(?:pay|money|how much)\\b|deliverance.{0,80}\\bhow much\\b|" +
+            "\\bignore (?:the )?scripture\\b|set aside scripture|holy spirit (?:told|said|tells|says)\\b.{0,80}\\b(?:different|contrary|against)\\b", Pattern.CASE_INSENSITIVE);
+
+    public static boolean isManipulationQuery(@Nullable String query) {
+        return query != null && MANIPULATION_PATTERN.matcher(query).find();
+    }
+
+    public static AiResponse manipulationResponse() {
+        return AiResponse.plainText(
+                "You do not have to pay anyone to protect your children or to remove a curse. Money given out of fear or pressure is not required, and no leader can make a child die by withholding a gift. Scripture is the test for any word or experience, because the Holy Spirit never contradicts the Word. Don't act on fear, and don't set Scripture aside. Please discern what you heard with mature believers, and talk with a trusted church leader or the Bishop before you give or decide anything.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
     public static boolean isSafeguardingDisclosure(@Nullable String query) {
         return query != null && SAFEGUARDING_PATTERN.matcher(query).find();
     }
@@ -623,6 +639,7 @@ public class PerazimAiEngine {
         if (isHarmToOthersQuery(query)) return "harm-to-others";
         if (isSafeguardingDisclosure(query)) return "safeguarding";
         if (isHealthStopQuery(query)) return "health-stop";
+        if (isManipulationQuery(query)) return "manipulation";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
         if (isOutOfScopeForModel(query)) return "scope-refusal";
@@ -638,6 +655,7 @@ public class PerazimAiEngine {
             case "harm-to-others": return harmToOthersResponse();
             case "safeguarding": return safeguardingResponse();
             case "health-stop": return healthStopResponse();
+            case "manipulation": return manipulationResponse();
             case "sensitive": return sensitivePastoralResponse();
             case "human-decision": return humanDecisionResponse();
             default: return boundaryResponseFor(query);
