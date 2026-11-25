@@ -333,6 +333,44 @@ public final class ApprovedRoutes {
                 + "it, and we do not treat each of his opinions as Perazim doctrine.",
                 "Psalm 42:1", "Psalm 42:2"));
 
+        r.add(new Route("hiv-disclosure",
+                "\\bhiv\\b|tested positive",
+                "I'm sorry, this is very hard news. Please see a doctor or clinic soon for care and treatment, and they can explain your "
+                + "health and how to protect your wife. You do not have to decide alone. Please talk with your pastor or a trusted church "
+                + "leader, and with a counsellor, about how and when to tell your wife. Scripture calls us to honesty and to care for one "
+                + "another in love (Ephesians 4:15; Ephesians 5:25).",
+                "Ephesians 4:15", "Ephesians 5:25"));
+
+        r.add(new Route("depression-and-faith",
+                "depress",
+                "Scripture does not teach that depression is simply a lack of faith. Elijah felt deep despair, and God cared for him "
+                + "(1 Kings 19:4–8). The psalmist wrote honestly about his sorrow, and he still called on God (Psalm 42:5). Please talk with a "
+                + "doctor or clinic about how you are feeling, and with your pastor or a trusted church leader. You are not alone in this.",
+                "1 Kings 19:4", "Psalm 42:5"));
+
+        r.add(new Route("unanswered-prayer-and-faith",
+                "hasn't answered|hasn't answered me|not answered|haven't answered|feel like a failure|feel like i am a failure|seems so strong",
+                "God hears your prayers, and waiting is not the same as being forgotten. The Lord is near to those who call on Him "
+                + "(Psalm 145:18). Your faith is not measured by how strong other people seem, because God's grace is sufficient for you "
+                + "(2 Corinthians 12:9). Keep bringing your requests to God in prayer, and talk with your pastor, your cell leader or a "
+                + "trusted church leader about how you are feeling.",
+                "Psalm 145:18", "2 Corinthians 12:9"));
+
+        r.add(new Route("witchcraft-fear-swahili",
+                "nimerogwa|rogwa|nimeroga|uchawi|mchawi",
+                "I'm sorry you are so worried. Scripture teaches that Jesus has power over all evil, and that the one who is in us is "
+                + "greater than the one who is in the world (Colossians 2:15; 1 John 4:4). Pray in the name of Jesus, and tell a trusted "
+                + "pastor or church leader what has been happening. If the fear is affecting your health or your sleep, please see a doctor "
+                + "or clinic too. I can answer in English first.",
+                "Colossians 2:15", "1 John 4:4"));
+
+        r.add(new Route("explain-again",
+                "explain (?:it )?(?:differently|again|simply)|i (?:don't|dont|do not) (?:understand|udnerstand)|what do you mean",
+                "Please don't worry, and thank you for being patient. Let me explain it more simply. Tell me which word or part was hard, "
+                + "and I will answer in plain words and short sentences. God's Word was written so that ordinary people can understand "
+                + "it (Deuteronomy 30:11, 14).",
+                "Deuteronomy 30:11", "Deuteronomy 30:14"));
+
         // Coordinator-approved 2026-11-25 under Levi's delegation: historical evidence routes below
         // (Tacitus, Ignatius, Justin, Augustine). Approved status: coordinator, pending Levi's final check.
         r.add(new Route("dream-warning",
@@ -361,7 +399,7 @@ public final class ApprovedRoutes {
                 "John 16:8", "Galatians 5:22"));
 
         r.add(new Route("tithing-undecided",
-                "tithe|tithing|tithes|tithed",
+                "(?:have to|must|need to|required|compulsory|mandatory|obliged|should i|do i|is it|am i).{0,40}(?:tithe|tithing)|(?:tithe|tithing).{0,40}(?:required|mandatory|compulsory|still|saved|today|should i|must i)",
                 "Thank you for asking plainly. Tithing is one of the questions our church has not yet decided, so I cannot give you a yes "
                 + "or no on it, and I won't guess. Scripture teaches generous and cheerful giving (2 Corinthians 9:6–7), and that giving is part "
                 + "of worship. Please talk it through with your pastor, who can walk with you through the question.",
