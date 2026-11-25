@@ -96,4 +96,13 @@ public class PreModelTest {
         assertNull(PreModel.verseDecision(table, verses, "What is grace?"));
         assertNull(PreModel.missingReference(table, "What is grace?"));
     }
+
+    @Test
+    public void otherTranslationRequestIsNotedAndKjvQuoted() {
+        PreModel.Decision d = PreModel.verseDecision(table, verses, "Quote the ESV text of Genesis 1:1 exactly.");
+        assertNotNull(d);
+        assertEquals("routed:verse-kjv", d.status);
+        assertTrue(d.answer.startsWith("I can't quote that translation here."));
+        assertTrue(d.answer.contains("In the beginning God created the heaven and the earth."));
+    }
 }

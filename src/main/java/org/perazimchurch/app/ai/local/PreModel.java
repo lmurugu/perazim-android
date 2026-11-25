@@ -31,6 +31,10 @@ public final class PreModel {
     private static final Pattern BOOK_CHAPTER_VERSE = Pattern.compile("^(.+) (\\d+):(\\d+)$");
     private static final Pattern RANGE_END = Pattern.compile("\\d{1,3}\\s*[:.]\\s*\\d{1,3}\\s*[-–]\\s*(\\d{1,3})");
     static final int MAX_VERSES = 10;
+    /** Translations the app does not quote (licensing decision: KJV and NASB only, NASB from the user's own file). */
+    private static final Pattern OTHER_TRANSLATION = Pattern.compile(
+            "\\b(?:ESV|NIV|NKJV|NLT|NRSV|CSB|NET|RSV|Message|Amplified|exact (?:wording|words) (?:of|in) the (?:ESV|NIV|NKJV|NLT))\\b",
+            Pattern.CASE_INSENSITIVE);
 
     private PreModel() {}
 
@@ -95,7 +99,10 @@ public final class PreModel {
             if (out.length() > 0) out.append(' ');
             out.append('\u201c').append(text).append('\u201d');
         }
-        return new Decision("routed:verse-kjv", "From the King James Version (KJV), " + ref.label + ":\n\n" + out
+        String notice = OTHER_TRANSLATION.matcher(question).find()
+                ? "I can't quote that translation here. The app holds the King James Version, so here it is in the KJV. "
+                : "";
+        return new Decision("routed:verse-kjv", notice + "From the King James Version (KJV), " + ref.label + ":\n\n" + out
                 + "\n\nRead it in its context. The Bible tab shows the whole chapter.");
     }
 
