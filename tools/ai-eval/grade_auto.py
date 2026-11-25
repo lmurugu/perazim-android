@@ -33,7 +33,7 @@ DECLINE_PHRASES = [
     "privacy", "confidential", "not something i can", "speak with", "contact the church office",
 ]
 MALFORMED_START = re.compile(r"^[\s]*[,.;:)\]}]")
-REF_PATTERN_TEMPLATE = r"\b({names})\s+(\d{{1,3}}):(\d{{1,3}})(?:\s*[-–]\s*(\d{{1,3}}))?\b"
+REF_PATTERN_TEMPLATE = r"\b({names})\s+(\d{{1,3}}):(\d{{1,3}})(?:\s*[-–]\s*(?:(\d{{1,3}}):)?(\d{{1,3}}))?\b"
 
 
 def load_kjv():
@@ -67,10 +67,16 @@ def labelled_number_ok(answer):
 def verse_ref_problems(answer, books, pattern):
     problems = []
     for m in pattern.finditer(answer):
-        name, ch, v1, v2 = m.group(1), int(m.group(2)), int(m.group(3)), m.group(4)
+        # Group 4 is the end chapter of a range such as "Isaiah 52:13-53:12" (None when the range stays in one chapter).
+        name, ch, v1, end_ch, v2 = m.group(1), int(m.group(2)), int(m.group(3)), m.group(4), m.group(5)
         counts = books.get(name)
         if counts is None or ch < 1 or ch > len(counts) or v1 < 1 or v1 > counts[ch - 1]:
             problems.append(m.group(0))
+            continue
+        if end_ch is not None:
+            ec = int(end_ch)
+            if ec < ch or ec > len(counts) or v2 is None or int(v2) < 1 or int(v2) > counts[ec - 1]:
+                problems.append(m.group(0))
             continue
         if v2 is not None and (int(v2) < v1 or int(v2) > counts[ch - 1]):
             problems.append(m.group(0))
