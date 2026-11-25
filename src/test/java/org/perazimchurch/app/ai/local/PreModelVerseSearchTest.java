@@ -69,4 +69,20 @@ public class PreModelVerseSearchTest {
         assertNull(PreModel.verseSearchDecision(kjv(),
                 "I've been so angry at my brother for months and I can't stop thinking about it."));
     }
+
+    /** Kenyan topics get verbatim KJV verses; each reference must hold the exact text read from the bundled file. */
+    @Test
+    public void kenyanTopicsGetVerbatimVerses() throws Exception {
+        PreModel.Decision debt = PreModel.verseSearchDecision(kjv(), "Is it wrong to borrow money and have debts?");
+        assertEquals("routed:verse-topic-kjv", debt.status);
+        assertTrue(debt.answer.contains("Proverbs 22:7: \u201cThe rich ruleth over the poor, and the borrower is servant to the lender.\u201d"));
+
+        PreModel.Decision witch = PreModel.verseSearchDecision(kjv(), "Is it a sin to wear a protection charm that a traveling prophet gave me?");
+        assertEquals("routed:verse-topic-kjv", witch.status);
+        assertTrue(witch.answer.contains("Deuteronomy 18:10: \u201cThere shall not be found among you any one"));
+
+        PreModel.Decision healing = PreModel.verseSearchDecision(kjv(), "Is the healing I see in church videos proof of God's work?");
+        assertEquals("routed:verse-topic-kjv", healing.status);
+        assertTrue(healing.answer.contains("Exodus 15:26"));
+    }
 }
