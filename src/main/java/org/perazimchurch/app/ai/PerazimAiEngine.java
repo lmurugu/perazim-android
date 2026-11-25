@@ -650,6 +650,104 @@ public class PerazimAiEngine {
                 Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
     }
 
+    /** Violence and abuse wording. Matched in the speaker's own situation only; a general question about abuse is a topic. */
+    private static final Pattern VIOLENCE_TERMS = Pattern.compile(
+            "\\b(?:domestic violence|physically abused|sexual assault|sexually assaulted|abus\\w*|beats? me|beating me|hits? me|" +
+                    "hitting me|struck me|choked me|attacked me|threat\\w* (?:to )?(?:kill |hurt |harm )?me|rape\\w*|molest\\w*|" +
+                    "locked (?:me|us) (?:in|up)|forced me|(?:immediate|imminent) danger|going to kill (?:me|us))\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** The speaker's own situation, or a real person they are describing. */
+    private static final Pattern SPEAKER_SITUATION = Pattern.compile(
+            "\\b(?:i|i'm|i am|i've|i'll|me|my|our|us|we)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern FIRST_PERSON_OUTSIDE_QUOTES = Pattern.compile(
+            "\\b(?:i|i'm|i am|i will|i'll|i'd|i feel|i want|i have)\\b|\\bmy life\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern THIRD_PERSON_MARKER = Pattern.compile(
+            "\\b(?:he|she|they|his|her|their|friend|brother|sister|husband|wife|son|daughter|texted|messaged|someone)\\b",
+            Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Routes crisis, abuse and violence wording to separate responses (Levi's review on PR 83, 2026-11-25).
+     * Returns "crisis", "crisis-third-party", "crisis-denial", "crisis-literary", "crisis-and-violence",
+     * "violence-safeguarding", "topic-violence" (a general question about abuse, which goes on to the approved routes),
+     * or null when neither suicide nor violence wording is present. Abuse wording never gets a suicide-plan question
+     * unless suicidal wording is also present.
+     */
+    @Nullable
+    public static String safetyRoute(@Nullable String query) {
+        if (query == null || query.trim().isEmpty()) return null;
+        String n = query.replace('’', '\'').replaceAll("\\s+", " ");
+        boolean violence = CRISIS_DISCLOSURE_PATTERN.matcher(n).find()
+                || (VIOLENCE_TERMS.matcher(n).find() && SPEAKER_SITUATION.matcher(n).find());
+        String kind = suicideKind(n);
+        if (!violence) {
+            if ("none".equals(kind)) return null;
+            if ("topic".equals(kind)) return "topic-violence";
+            if ("real".equals(kind)) return isThirdPartyFraming(n) ? "crisis-third-party" : "crisis";
+            return "crisis-" + kind; // crisis-denial or crisis-literary
+        }
+        if ("real".equals(kind)) return isThirdPartyFraming(n) ? "crisis-third-party" : "crisis-and-violence";
+        return "violence-safeguarding";
+    }
+
+    /** "none", "topic" (only violence-topic wording), "denial", "literary" or "real" (suicidal wording in the speaker's words). */
+    private static String suicideKind(String n) {
+        if (SELF_HARM_TYPO_PATTERN.matcher(n).find() || isMeansAndDistress(n)) return "real";
+        boolean suicideHit = false;
+        boolean anyHit = false;
+        boolean allNegated = true;
+        java.util.regex.Matcher m = CRISIS_PATTERN.matcher(n);
+        while (m.find()) {
+            anyHit = true;
+            if (VIOLENCE_TERMS.matcher(m.group()).find()) continue;
+            suicideHit = true;
+            if (!NEGATED_BEFORE.matcher(n.substring(0, m.start())).find()) allNegated = false;
+        }
+        if (!anyHit) return "none";
+        if (!suicideHit) return "topic";
+        if (allNegated) return "denial";
+        if (LITERARY_CONTEXT.matcher(n).find() && !REAL_PERSON_CONTEXT.matcher(n).find()) return "literary";
+        return "real";
+    }
+
+    /** True when the suicidal words are about someone else: no first-person words outside a quotation, and a third person named. */
+    static boolean isThirdPartyFraming(String n) {
+        String outside = n.replaceAll("\"[^\"]*\"", " ").replaceAll("(?:^|[\\s,])'.*'\\s*$", " ");
+        if (FIRST_PERSON_OUTSIDE_QUOTES.matcher(outside).find()) return false;
+        return THIRD_PERSON_MARKER.matcher(outside).find();
+    }
+
+    public static AiResponse violenceSafeguardingResponse() {
+        return AiResponse.plainText(
+                "I'm sorry this is happening to you. What is being done to you is not your fault, and abuse is never acceptable. "
+                + "Are you in immediate danger from someone else right now, and can you reach a safe place? "
+                + "If you are in danger, call 999 or 112 now, or go to the nearest police station or hospital. If you can, go to a safe place now, "
+                + "and tell a trusted person where you are. For gender-based violence counselling and referral, call 1195, the National GBV Helpline, open 24 hours. "
+                + "If a child may be at risk, call the Childline Kenya helpline on 116. Do not confront the person alone, and do not agree to joint "
+                + "counselling while you are unsafe. Your safety comes before keeping the peace or forgiveness. This guide cannot investigate, "
+                + "promise confidentiality or act for you, so do not wait for an app reply in an emergency.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
+    public static AiResponse crisisAndViolenceResponse() {
+        return AiResponse.plainText(
+                "I'm sorry you are going through this. You are describing two dangers, and both need attention. "
+                + "First, if you are in immediate danger from someone else, call 999 or 112 now, and go to a safe place with a trusted person if you can. "
+                + "For gender-based violence counselling, call 1195, the National GBV Helpline, open 24 hours. "
+                + "Second, you told me about ending your life. Are you safe right now? Do you have a plan or a way to end your life tonight? "
+                + "If you feel you may act on this, call 999 or 112 now, or go to the nearest hospital. Please tell a trusted person now.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
+    public static AiResponse crisisThirdPartyResponse() {
+        return AiResponse.plainText(
+                "I'm sorry you are worried about someone. If they may act on these words now, call 999 or 112 now, or go to the nearest hospital or police station. "
+                + "Please contact them right away and ask directly whether they are safe and where they are. If it is safe for you to do so, stay with them or ask a safe adult to stay with them. "
+                + "Do not put yourself in danger, and if there is violence nearby, call the emergency numbers instead of going in. "
+                + "Befrienders Kenya (+254 722 178 177) offers emotional support on weekdays from 9am to 5pm, but it is not an emergency service. "
+                + "You can also talk with your pastor or a trusted church leader about how to support them.",
+                Arrays.asList("🙏 Open prayer support", "📖 Open the Bible"));
+    }
+
     public static boolean isCrisisQuery(@Nullable String query) {
         if (query == null) return false;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
@@ -845,9 +943,9 @@ public class PerazimAiEngine {
     @Nullable
     public static String preModelRoute(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return "scope-refusal";
-        String crisisContext = crisisContextRoute(query);
-        if (crisisContext != null) return crisisContext;
-        if (isCrisisQuery(query)) return "crisis";
+        String safety = safetyRoute(query);
+        if (safety != null && !"topic-violence".equals(safety)) return safety;
+        if (safety == null && isCrisisQuery(query)) return "crisis";
         if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
         if (isSafeguardingDisclosure(query)) return "safeguarding";
@@ -872,6 +970,9 @@ public class PerazimAiEngine {
             case "crisis": return crisisResponse();
             case "crisis-denial": return crisisDenialResponse();
             case "crisis-literary": return crisisLiteraryResponse();
+            case "violence-safeguarding": return violenceSafeguardingResponse();
+            case "crisis-and-violence": return crisisAndViolenceResponse();
+            case "crisis-third-party": return crisisThirdPartyResponse();
             case "overdose": return overdoseResponse();
             case "harm-to-others": return harmToOthersResponse();
             case "safeguarding": return safeguardingResponse(query);

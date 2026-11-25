@@ -48,13 +48,13 @@ public final class PreModel {
     public static Decision decide(Context c, String question) {
         // Two-step check for vague exhaustion. Judged once per message; a repeat of the same message gives the same verdict.
         SoftSafety.Verdict safety = SoftSafety.judge(question);
-        if (safety == SoftSafety.Verdict.CRISIS && PerazimAiEngine.crisisContextRoute(question) == null) {
+        if (safety == SoftSafety.Verdict.CRISIS && PerazimAiEngine.safetyRoute(question) == null) {
             return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
         }
         if (safety == SoftSafety.Verdict.SOFT_CHECK) {
             return new Decision("routed:soft-safety-check", SoftSafety.checkText());
         }
-        if (PerazimAiEngine.isCrisisQuery(question) && PerazimAiEngine.crisisContextRoute(question) == null) {
+        if (PerazimAiEngine.isCrisisQuery(question) && PerazimAiEngine.safetyRoute(question) == null) {
             return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
         }
         ScriptureRangeTable table = null;
