@@ -606,6 +606,11 @@ public final class ApprovedRoutes {
                 + "If you are asking whether you are right with God, bring that question to Jesus in prayer, and talk with your pastor.",
                 "Romans 3:24", "Romans 5:1", "Galatians 2:16", "Ephesians 2:8", "Titus 2:11"));
 
+        r.add(new Route("marriage-term-clarify",
+                "kugongewa|kugongeana|mpango wa kando",
+                "I do not want to guess what this phrase means, so please tell me in a sentence what it means to you, and I will answer that situation. Whatever the situation, Scripture calls husband and wife to honour marriage and to keep it undefiled (Hebrews 13:4), and to love one another earnestly (1 Peter 4:8). If a secret relationship outside the marriage is involved, faithfulness and honesty are required of both spouses. If anyone is being harmed or threatened, safety comes first. Please talk with your pastor or a trusted church leader about this, and ask them to walk with you and your spouse.",
+                "Hebrews 13:4", "1 Peter 4:8"));
+
         r.add(new Route("holy-spirit-comforter",
                 "comforter|holy spirit as comfort",
                 "Jesus promised that the Father would send another Comforter, the Holy Spirit, who abides with believers forever (John 14:16). The Spirit teaches believers and brings to their remembrance what Jesus said (John 14:26). He testifies of Jesus (John 15:26), and Jesus said that it is expedient for his disciples that he go away, because the Comforter will not come unto them unless he goes (John 16:7). Scripture presents the Spirit as the Comforter who strengthens and guides God's people.",
