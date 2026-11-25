@@ -101,6 +101,10 @@ public final class PreModel {
         }
         Decision search = verseSearchDecision(verses, question);
         if (search != null) return search;
+        // Two named Christian traditions compared as a whole: fair description and no ranking, labelled as views.
+        if (comparesTraditions(question)) {
+            return new Decision("routed:denominational-fair", DENOMINATIONAL_FAIR_TEXT);
+        }
         // An ESV, NIV or NKJV request without a verse number gets the translation policy, not a no-go decline.
         if (OTHER_TRANSLATION.matcher(question).find()) {
             return new Decision("routed:translation-policy", PerazimAiEngine.translationPolicyResponse().getMessageText());
@@ -138,6 +142,27 @@ public final class PreModel {
         }
         String easton = org.perazimchurch.app.ai.reference.ReferenceGuide.namedEaston(c, question);
         return easton == null ? null : new Decision("routed:dictionary-easton", easton);
+    }
+
+    /** Christian traditions a member may name together, for example in "Are Pentecostals less biblical than Presbyterians?". */
+    private static final Pattern TRADITION_NAME = Pattern.compile(
+            "\\b(pentecostal|presbyterian|baptist|methodist|anglican|lutheran|adventist|assemblies of god|reformed|orthodox)s?\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Comparative or ranking wording (including common misspellings such as "bibilcal"). */
+    private static final Pattern COMPARATIVE_WORD = Pattern.compile(
+            "\\b(?:less|more|better|worse|bib\\w*|true|real|right|wrong|correct|saved|than|versus|vs\\.?|or)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final String DENOMINATIONAL_FAIR_TEXT = "The traditions you name both hold the Bible as God's word, and they "
+            + "differ on some teaching and practice. I won't rank one tradition as less biblical than another. Each point of "
+            + "difference can be tested by Scripture, and the app's approved answers give the Perazim position where the church "
+            + "has one. Please talk through the points that matter to you with your pastor or a trusted church leader.";
+
+    /** True when a question names two different Christian traditions and asks a comparative or ranking question about them. */
+    static boolean comparesTraditions(String question) {
+        Matcher m = TRADITION_NAME.matcher(question);
+        java.util.Set<String> names = new java.util.HashSet<>();
+        while (m.find()) names.add(m.group(1).toLowerCase(Locale.ROOT));
+        return names.size() >= 2 && COMPARATIVE_WORD.matcher(question).find();
     }
 
     private static String nz(String s) {

@@ -39,6 +39,7 @@ public final class NoGoZones {
     /** Other faiths and groups: no general description. Ask which specific teaching is meant (Levi, 2026-11-25). */
     static final String OTHER_GROUP_DECLINE =
             "I can't verify a general claim like that. I am designed specifically to assist with Christian faith and the Bible, so I am not authorised to compare religions in general. "
+            + "Christians hold different views on some questions like this, and the guide does not judge any person's standing before God. "
             + "I can examine a specific teaching of a church or group against Scripture, so which teaching do you have in mind? "
             + "Please talk it through with a trusted church leader or your pastor, who can help you test it by the Bible.";
 
