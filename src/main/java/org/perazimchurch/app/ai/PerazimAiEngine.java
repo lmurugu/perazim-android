@@ -962,16 +962,19 @@ public class PerazimAiEngine {
      * the existing soft check, which asks directly and gives the verified numbers. It is reached only when no crisis route fired.
      */
     private static final Pattern DISTRESS_FEELING = Pattern.compile(
-            "\\b(?:hopeless|no hope|tired|exhausted|alone|lonely|worthless|useless|pain|suffer\\w*|cannot take|can'?t take|nothing matters|" +
+            "\\b(?:hopeless|no hope|tired|exhausted|alone|lonely|worthless|useless|pain|cannot take|can'?t take|nothing matters|" +
             "no point|give up|giving up|gave up|crying|nobody cares|no one cares|depress\\w*|sad|burden|empty|broken|overwhelmed|" +
-            "hakuna tumaini|sina tumaini|nimechoka|nahisi kila kitu|nimevunjika moyo|peke yangu|hakuna mtu|nimekata tamaa|" +
+            "hakuna tumaini|sina tumaini|nahisi kila kitu|nimevunjika moyo|peke yangu|hakuna mtu|nimekata tamaa|" +
             "kila kitu kimeisha|nasikia vibaya|sioni tumaini|nimeisha)\\b", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern SPEAKER_SUBJECT = Pattern.compile("\\b(?:i|i'm|mimi|nina|nahisi|nimeamua|nataka|sitaki|sina)\\b", Pattern.CASE_INSENSITIVE);
 
     /** True when a first-person sentence expresses distress or hopelessness (warm-check fallback). */
     public static boolean isFirstPersonDistress(@Nullable String query) {
         if (query == null) return false;
         for (String sentence : query.split("[.?!;]+")) {
-            if (FIRST_PERSON_MARK.matcher(sentence).find() && DISTRESS_FEELING.matcher(sentence).find()) return true;
+            // The speaker must be the subject ("I", "mimi"): "my family is suffering" and "give me verses" are not distress.
+            if (SPEAKER_SUBJECT.matcher(sentence).find() && DISTRESS_FEELING.matcher(sentence).find()) return true;
         }
         return false;
     }
