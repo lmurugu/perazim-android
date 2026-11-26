@@ -50,6 +50,9 @@ import org.perazimchurch.app.data.local.session.SessionManager;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.navigation.NavigationContract;
 import org.perazimchurch.app.presentation.ui.AiBreakthroughGuideDialog;
+import org.perazimchurch.app.presentation.ui.AssistantMark;
+import org.perazimchurch.app.presentation.ui.GuideDictation;
+import androidx.annotation.NonNull;
 import org.perazimchurch.app.presentation.ui.BibleReaderDialog;
 import org.perazimchurch.app.presentation.ui.FellowshipUiBinder;
 import org.perazimchurch.app.presentation.ui.CommunityUiBinder;
@@ -162,6 +165,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     private ViewModelFactory factory;
     private BibleViewModel bibleViewModel;
     private HomeUiBinder homeUiBinder;
+    private AiBreakthroughGuideDialog activeGuide;
     private SermonsUiBinder sermonsUiBinder;
     private WorshipUiBinder worshipUiBinder;
     private FellowshipUiBinder fellowshipUiBinder;
@@ -338,8 +342,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     @Override
     protected void onPause() {
         super.onPause();
+        if (activeGuide != null) activeGuide.pauseDictation();
         if (sermonsUiBinder != null && sermonsUiBinder.isPlaying()) {
             sermonsUiBinder.pausePlayback();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == GuideDictation.PERMISSION_REQUEST && activeGuide != null) {
+            activeGuide.onMicrophonePermission(grantResults.length > 0
+                    && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED);
         }
     }
 
@@ -802,6 +817,30 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 
             bottomNav.addView(tab);
         }
+
+        LinearLayout assistant = new LinearLayout(this);
+        assistant.setOrientation(LinearLayout.VERTICAL);
+        assistant.setGravity(Gravity.CENTER);
+        assistant.setContentDescription("Open Perazim Assistant");
+        assistant.setFocusable(true);
+        boolean light = PerazimTheme.isLight();
+        ImageView mark = AssistantMark.image(this, !light);
+        GradientDrawable markSurface = new GradientDrawable();
+        markSurface.setColor(light ? Color.WHITE : Color.BLACK);
+        markSurface.setShape(GradientDrawable.OVAL);
+        markSurface.setStroke(dp(1), light ? 0xffC8C8C8 : 0xff666666);
+        mark.setBackground(markSurface);
+        mark.setPadding(dp(4), dp(4), dp(4), dp(4));
+        assistant.addView(mark, new LinearLayout.LayoutParams(dp(32), dp(32)));
+        TextView assistantLabel = new TextView(this);
+        assistantLabel.setText("Assistant");
+        assistantLabel.setTextSize(10);
+        assistantLabel.setSingleLine(true);
+        assistantLabel.setTextColor(light ? Color.BLACK : Color.WHITE);
+        assistantLabel.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        assistant.addView(assistantLabel);
+        assistant.setOnClickListener(v -> showAiBreakthroughGuide());
+        bottomNav.addView(assistant, new LinearLayout.LayoutParams(0, -1, 1f));
 
         refreshTabStyles();
         return bottomNav;
@@ -1790,6 +1829,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     // =========================================================================
 
     private void showAiBreakthroughGuide() {
+        if (activeGuide != null && activeGuide.isShowing()) return;
         AiBreakthroughGuideDialog dialog = new AiBreakthroughGuideDialog(this, new AiBreakthroughGuideDialog.AiActionListener() {
             @Override
             public void onNavigateTab(int tabIndex) {
@@ -1846,6 +1886,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
             public void onStartReflections() {
                 switchTab(0);
             }
+        });
+        activeGuide = dialog;
+        dialog.setOnDismissListener(d -> {
+            if (activeGuide == dialog) activeGuide = null;
         });
         dialog.show();
     }

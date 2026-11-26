@@ -90,6 +90,33 @@ public class DailyReadingTest {
         assertEquals(1, load(TOMORROW).step);
     }
 
+    @Test public void researchedPlanPreservesExactTopicAndPassage() throws Exception {
+        ReadingCatalog.Reading passage = ReadingCatalog.Reading.fromResearch(
+                "PSA.102.7", "Psalms 102:7", "I watch, and am as a sparrow alone upon the house top.", "Feeling lonely");
+        assertTrue(store.startResearch(OWNER, passage.focus, java.util.Collections.singletonList(passage)));
+        DailyReadingStore reopened = new DailyReadingStore(RuntimeEnvironment.getApplication());
+        DailyReadingStore.State saved = reopened.load(OWNER, TODAY, "daily");
+        assertEquals(passage.focus, saved.topic);
+        assertEquals(passage.scripture, saved.researchReading().scripture);
+        assertEquals(passage.id, saved.readingId);
+        assertNull(reopened.load("someone-else", TODAY, "daily").researchReading());
+    }
+
+    @Test public void researchesUsingThePackagedBibleAsset() throws Exception {
+        Application app = RuntimeEnvironment.getApplication();
+        try (java.io.InputStream verses = org.perazimchurch.app.data.local.seeder.BibleAssets.openText(
+                     app, "bible/text/KJV.tsv.gz");
+             InputStreamReader text = new InputStreamReader(verses, StandardCharsets.UTF_8);
+             java.io.InputStream manifest = app.getAssets().open("bible/kjv_manifest.json")) {
+            org.json.JSONArray books = new org.json.JSONArray(new String(
+                    org.perazimchurch.app.ai.IoCompat.readAll(manifest), StandardCharsets.UTF_8));
+            List<ReadingCatalog.Reading> found =
+                    org.perazimchurch.app.domain.reading.ReadingResearch.search("loneliness", text, books);
+            assertFalse(found.isEmpty());
+            assertTrue(found.size() <= ReadingCatalog.MAX_DAYS);
+        }
+    }
+
     private DailyReadingStore.State load(String date) {
         return store.load(OWNER, date, "daily-" + date);
     }

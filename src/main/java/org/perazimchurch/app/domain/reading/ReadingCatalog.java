@@ -44,6 +44,23 @@ public final class ReadingCatalog {
             chapter = Integer.parseInt(parts[1]);
             firstVerse = Integer.parseInt(parts[2].split(",", 2)[0]);
         }
+
+        public static Reading fromResearch(String id, String reference, String text, String topic)
+                throws JSONException {
+            return new Reading("research", new JSONObject()
+                    .put("id", id).put("ref", reference).put("passage", text)
+                    .put("focus", topic)
+                    .put("reflection", "Read " + reference + " in its context. What does the passage actually say? "
+                            + "Write one connection you see with your topic and one question you still have."));
+        }
+
+        public JSONObject toResearchJson() throws JSONException {
+            return new JSONObject().put("id", address).put("ref", reference).put("passage", scripture);
+        }
+
+        public static Reading restoreResearch(JSONObject data, String topic) throws JSONException {
+            return fromResearch(data.getString("id"), data.getString("ref"), data.getString("passage"), topic);
+        }
     }
 
     public static final class Topic {

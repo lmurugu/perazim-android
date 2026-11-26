@@ -22,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -62,12 +63,6 @@ import java.util.List;
  */
 public class AiBreakthroughGuideDialog extends Dialog {
 
-    @Override
-    public void show() {
-        super.show();
-        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
-    }
-
     public interface AiActionListener {
         void onNavigateTab(int tabIndex);
         void onOpenGiving();
@@ -96,6 +91,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_DEEP; }
 
     private final Activity activity;
+    private final boolean light;
+    private final GuideDictation dictation;
+    private LinearLayout welcomePanel;
+    private View chatPage, voicePanel;
+    private TextView listeningTitle, listeningText;
+    private AssistantMark.Orb listeningOrb;
     private final PerazimAiEngine aiEngine;
     private final AiActionListener actionListener;
 
@@ -103,7 +104,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private LinearLayout messagesContainer;
     private LinearLayout chipsContainer;
     private EditText etInput;
-    private Button btnSend;
+    private android.widget.ImageButton btnSend;
     private TextView tvSub;
     private boolean requestInFlight;
     private long requestStartedAt;
@@ -122,6 +123,39 @@ public class AiBreakthroughGuideDialog extends Dialog {
     public AiBreakthroughGuideDialog(@NonNull Activity activity, @NonNull AiActionListener actionListener) {
         super(activity, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.activity = activity;
+        light = PerazimTheme.isLight();
+        dictation = new GuideDictation(activity, new GuideDictation.View() {
+            @Override public void showListening(String status) {
+                if (voicePanel.getVisibility() != View.VISIBLE) {
+                    listeningText.setText("Speak your message");
+                    android.view.inputmethod.InputMethodManager keyboard = activity.getSystemService(
+                            android.view.inputmethod.InputMethodManager.class);
+                    if (keyboard != null) keyboard.hideSoftInputFromWindow(etInput.getWindowToken(), 0);
+                    chatPage.setVisibility(View.INVISIBLE);
+                    voicePanel.setVisibility(View.VISIBLE);
+                }
+                listeningTitle.setText(status);
+                listeningOrb.animateListening("Listening…".equals(status));
+            }
+
+            @Override public void setLevel(float rms) { listeningOrb.setLevel(rms); }
+            @Override public void showPartial(String text) {
+                if (!text.isEmpty()) listeningText.setText(text);
+            }
+
+            @Override public void finishListening(String text, String notice) {
+                listeningOrb.animateListening(false);
+                voicePanel.setVisibility(View.GONE);
+                chatPage.setVisibility(View.VISIBLE);
+                if (!text.isEmpty()) {
+                    String draft = etInput.getText().toString();
+                    etInput.setText(draft.isEmpty() ? text : draft + " " + text);
+                    etInput.setSelection(etInput.length());
+                    etInput.announceForAccessibility("Dictation added to your draft");
+                }
+                if (!notice.isEmpty()) android.widget.Toast.makeText(activity, notice, android.widget.Toast.LENGTH_LONG).show();
+            }
+        });
         this.actionListener = actionListener;
         this.aiEngine = new PerazimAiEngine(activity);
     }
@@ -140,13 +174,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
 
-        // Welcome is shown once and is never sent as model conversation history.
-        String welcome = BuildConfig.OFFLINE_QWEN_ENABLED
-                ? "Perazim AI’s on-phone Qwen is enabled in this validation build. Answers use verified local passages and cannot access live information. Online AI is unavailable in this build."
-                : "Generative AI is unavailable in this build. Perazim Guide can still help you use the app and retrieve local KJV passages.";
-        displayAiMessage(AiResponse.plainText(
-                "What would you like to explore? Ask about using the app or find a built-in shortcut.\n\n" + welcome,
-                java.util.Arrays.asList("Open the Bible", "Find my groups", "Start a reflection")), "Perazim Guide");
+        updateSuggestionChips(java.util.Arrays.asList("Open the Bible", "Find my groups", "Start a reflection"));
         updateSubtitle();
 
     }
@@ -162,191 +190,219 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private View buildRootLayout() {
-        LinearLayout root = new LinearLayout(activity);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(PerazimTheme.isLight() ? Color.parseColor("#B32A0F33") : Color.parseColor("#99000000")); // Scrim
-        root.setGravity(Gravity.BOTTOM);
-        root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        FrameLayout layers = new FrameLayout(activity);
+        layers.setBackgroundColor(pageColor());
+        LinearLayout page = new LinearLayout(activity);
+        page.setOrientation(LinearLayout.VERTICAL);
+        page.setPadding(dp(16), dp(8), dp(16), dp(10));
+        page.setFocusableInTouchMode(true);
+        layers.addView(page, new FrameLayout.LayoutParams(-1, -1));
+        chatPage = page;
 
-        // Sheet container
-        LinearLayout sheet = new LinearLayout(activity);
-        sheet.setOrientation(LinearLayout.VERTICAL);
-        GradientDrawable sheetBg = new GradientDrawable();
-        sheetBg.setColor(PerazimTheme.COLOR_SURFACE);
-        sheetBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
-        sheetBg.setCornerRadii(new float[]{dp(20), dp(20), dp(20), dp(20), 0, 0, 0, 0});
-        sheet.setBackground(sheetBg);
-        sheet.setPadding(dp(16), dp(12), dp(16), dp(16));
-
-        LinearLayout.LayoutParams lpSheet = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, (int) (activity.getResources().getDisplayMetrics().heightPixels * 0.66));
-        sheet.setLayoutParams(lpSheet);
-
-        // Drag Handle
-        View handle = new View(activity);
-        GradientDrawable handleBg = new GradientDrawable();
-        handleBg.setColor(PerazimTheme.COLOR_STROKE);
-        handleBg.setCornerRadius(dp(3));
-        handle.setBackground(handleBg);
-        LinearLayout.LayoutParams lpH = new LinearLayout.LayoutParams(dp(44), dp(5));
-        lpH.gravity = Gravity.CENTER_HORIZONTAL;
-        lpH.setMargins(0, 0, 0, dp(10));
-        handle.setLayoutParams(lpH);
-        sheet.addView(handle);
-
-        // Header
         LinearLayout header = new LinearLayout(activity);
-        header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(0, 0, 0, dp(10));
-
-        ImageView logo = new ImageView(activity);
-        logo.setImageResource(R.drawable.ic_perazim_logo);
-        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        logo.setBackground(GlassKit.glassControl(activity, 999));
-        logo.setPadding(dp(6), dp(6), dp(6), dp(6));
-        LinearLayout.LayoutParams lpLogo = new LinearLayout.LayoutParams(dp(40), dp(40));
-        lpLogo.setMargins(0, 0, dp(12), 0);
-        logo.setLayoutParams(lpLogo);
-        header.addView(logo);
-
-        LinearLayout titleCol = new LinearLayout(activity);
-        titleCol.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams lpCol = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        titleCol.setLayoutParams(lpCol);
-
-        TextView tvTitle = new TextView(activity);
-        tvTitle.setText("Perazim Breakthrough Guide");
-        tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
-        tvTitle.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        titleCol.addView(tvTitle);
-
-        tvSub = new TextView(activity);
-        tvSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tvSub.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
-        tvSub.setTypeface(Typeface.DEFAULT_BOLD);
-        titleCol.addView(tvSub);
-
-        header.addView(titleCol);
-
-        Button btnClose = new Button(activity);
-        btnClose.setText("✕");
-        btnClose.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        btnClose.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        btnClose.setBackground(null);
-        btnClose.setPadding(dp(6), dp(6), dp(6), dp(6));
-        btnClose.setOnClickListener(v -> dismiss());
-        header.addView(btnClose);
-
-        sheet.addView(header);
-        btnMode = new Button(activity);
-        btnMode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnMode.setAllCaps(false);
-        btnMode.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnMode.setTextColor(GlassKit.text());
-        btnMode.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        btnMode.setBackground(GlassKit.glassControl(activity, 999));
-        btnMode.setPadding(dp(14), dp(6), dp(14), dp(6));
-        btnMode.setMinHeight(0);
-        btnMode.setMinimumHeight(0);
-        LinearLayout.LayoutParams lpMode = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, dp(34));
-        lpMode.gravity = Gravity.START;
-        lpMode.setMargins(0, 0, 0, dp(8));
-        btnMode.setLayoutParams(lpMode);
+        Button back = control("‹", false);
+        back.setContentDescription("Close Perazim Assistant");
+        back.setTextSize(27);
+        back.setOnClickListener(v -> dismiss());
+        header.addView(back, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        LinearLayout titles = new LinearLayout(activity);
+        titles.setOrientation(LinearLayout.VERTICAL);
+        titles.setPadding(dp(12), 0, dp(6), 0);
+        titles.addView(label("Perazim Assistant", 19, true));
+        tvSub = label("", 12, false);
+        tvSub.setTextColor(mutedColor());
+        tvSub.setMaxLines(2);
+        titles.addView(tvSub);
+        header.addView(titles, new LinearLayout.LayoutParams(0, -2, 1f));
+        btnMode = control("⋯", false);
+        btnMode.setTextSize(22);
+        btnMode.setContentDescription("Assistant settings and modes");
         btnMode.setOnClickListener(v -> {
-            if (localRequest) { OnDeviceAi.cancel(); return; }
-            if (!requestInFlight) showModeOptions();
+            if (localRequest) OnDeviceAi.cancel();
+            else if (!requestInFlight) showModeOptions();
         });
-        sheet.addView(btnMode);
+        header.addView(btnMode, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        page.addView(header, new LinearLayout.LayoutParams(-1, -2));
 
-        // Chat messages scroll container
+        FrameLayout conversation = new FrameLayout(activity);
+        page.addView(conversation, new LinearLayout.LayoutParams(-1, 0, 1f));
         chatScrollView = new ScrollView(activity);
-        LinearLayout.LayoutParams lpScroll = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
-        chatScrollView.setLayoutParams(lpScroll);
         chatScrollView.setFillViewport(true);
-
+        chatScrollView.setClipToPadding(false);
         messagesContainer = new LinearLayout(activity);
         messagesContainer.setOrientation(LinearLayout.VERTICAL);
-        messagesContainer.setPadding(0, dp(4), 0, dp(12));
-        chatScrollView.addView(messagesContainer);
+        messagesContainer.setPadding(0, dp(12), 0, dp(8));
+        chatScrollView.addView(messagesContainer, new ScrollView.LayoutParams(-1, -2));
+        conversation.addView(chatScrollView, new FrameLayout.LayoutParams(-1, -1));
 
-        sheet.addView(chatScrollView);
+        welcomePanel = new LinearLayout(activity);
+        welcomePanel.setOrientation(LinearLayout.VERTICAL);
+        welcomePanel.setGravity(Gravity.CENTER_HORIZONTAL);
+        welcomePanel.setPadding(dp(12), 0, dp(12), 0);
+        ImageView emblem = AssistantMark.image(activity, !light);
+        welcomePanel.addView(emblem, new LinearLayout.LayoutParams(dp(107), dp(80)));
+        TextView heading = label("What would you like to explore?", 27, true);
+        heading.setTypeface(Typeface.create(Typeface.SERIF, Typeface.NORMAL));
+        heading.setGravity(Gravity.CENTER);
+        welcomePanel.addView(heading, new LinearLayout.LayoutParams(-1, -2));
+        TextView caption = label("Ask about Scripture or find your way around Perazim.", 14, false);
+        caption.setTextColor(mutedColor());
+        caption.setGravity(Gravity.CENTER);
+        caption.setPadding(0, dp(8), 0, 0);
+        welcomePanel.addView(caption);
+        conversation.addView(welcomePanel, new FrameLayout.LayoutParams(-1, -2, Gravity.CENTER));
+        chatScrollView.setVisibility(View.GONE);
 
-        // Quick Suggestion Chips Scroll
-        HorizontalScrollView hsv = new HorizontalScrollView(activity);
-        hsv.setHorizontalScrollBarEnabled(false);
-        LinearLayout.LayoutParams lpHsv = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        lpHsv.setMargins(0, dp(4), 0, dp(8));
-        hsv.setLayoutParams(lpHsv);
-
+        HorizontalScrollView suggestions = new HorizontalScrollView(activity);
+        suggestions.setHorizontalScrollBarEnabled(false);
         chipsContainer = new LinearLayout(activity);
-        chipsContainer.setOrientation(LinearLayout.HORIZONTAL);
-        hsv.addView(chipsContainer);
-        sheet.addView(hsv);
+        suggestions.addView(chipsContainer);
+        LinearLayout.LayoutParams chipParams = new LinearLayout.LayoutParams(-1, -2);
+        chipParams.bottomMargin = dp(8);
+        page.addView(suggestions, chipParams);
 
-        // Input Bar
-        LinearLayout inputBar = new LinearLayout(activity);
-        inputBar.setOrientation(LinearLayout.HORIZONTAL);
-        inputBar.setGravity(Gravity.CENTER_VERTICAL);
-        inputBar.setBackground(GlassKit.glassControl(activity, 999));
-        inputBar.setPadding(dp(16), dp(4), dp(6), dp(4));
-
+        LinearLayout composer = new LinearLayout(activity);
+        composer.setOrientation(LinearLayout.HORIZONTAL);
+        composer.setGravity(Gravity.CENTER_VERTICAL);
+        composer.setPadding(dp(12), dp(5), dp(5), dp(5));
+        composer.setBackground(panel(surfaceColor(), lineColor(), 22));
         etInput = new EditText(activity);
-        etInput.setHint("Ask about Scripture, breakthrough, sermons...");
-        etInput.setHintTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
-        etInput.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        etInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        etInput.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        etInput.setHint("Ask the Assistant");
+        etInput.setHintTextColor(mutedColor());
+        etInput.setTextColor(inkColor());
+        etInput.setTextSize(16);
+        etInput.setMinHeight(dp(48));
+        etInput.setMaxLines(4);
         etInput.setBackground(null);
-        etInput.setSingleLine(true);
         etInput.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEND);
-        etInput.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND) {
-                submitQuery(etInput.getText().toString());
-                return true;
-            }
-            return false;
+        etInput.setOnEditorActionListener((v, action, event) -> {
+            if (action != android.view.inputmethod.EditorInfo.IME_ACTION_SEND) return false;
+            submitQuery(etInput.getText().toString());
+            return true;
         });
-        LinearLayout.LayoutParams lpEt = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-        etInput.setLayoutParams(lpEt);
-        inputBar.addView(etInput);
+        composer.addView(etInput, new LinearLayout.LayoutParams(0, -2, 1f));
 
-        btnSend = new Button(activity);
-        btnSend.setText("");
-        styleOrangePill(btnSend, 13);
-        android.graphics.drawable.GradientDrawable sendBg = new android.graphics.drawable.GradientDrawable(
-                android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{GlassKit.ORANGE_TOP, GlassKit.ORANGE_BOTTOM});
-        sendBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
-        btnSend.setBackground(sendBg);
-        android.graphics.drawable.Drawable sendIcon = activity.getResources()
-                .getDrawable(android.R.drawable.ic_menu_send).mutate();
-        sendIcon.setTint(COLOR_WHITE);
-        btnSend.setCompoundDrawablesWithIntrinsicBounds(sendIcon, null, null, null);
+        android.widget.ImageButton mic = new android.widget.ImageButton(activity);
+        mic.setImageResource(R.drawable.ic_assistant_wave);
+        mic.setColorFilter(inkColor());
+        mic.setBackground(panel(surfaceColor(), Color.TRANSPARENT, 22));
+        mic.setContentDescription("Dictate a message");
+        mic.setOnClickListener(v -> dictation.request());
+        composer.addView(mic, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        btnSend = new android.widget.ImageButton(activity);
+        btnSend.setImageResource(R.drawable.ic_assistant_send);
+        btnSend.setColorFilter(pageColor());
+        btnSend.setBackground(panel(inkColor(), lineColor(), 22));
         btnSend.setContentDescription("Send");
-        btnSend.setPadding(0, 0, 0, 0);
-        LinearLayout.LayoutParams lpSend = new LinearLayout.LayoutParams(dp(44), dp(44));
-        btnSend.setLayoutParams(lpSend);
         btnSend.setOnClickListener(v -> submitQuery(etInput.getText().toString()));
-        inputBar.addView(btnSend);
+        composer.addView(btnSend, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        page.addView(composer, new LinearLayout.LayoutParams(-1, -2));
 
-        sheet.addView(inputBar);
-        root.addView(sheet);
+        voicePanel = buildListeningPanel();
+        layers.addView(voicePanel, new FrameLayout.LayoutParams(-1, -1));
+        voicePanel.setVisibility(View.GONE);
+        return layers;
+    }
 
-        return root;
+    private View buildListeningPanel() {
+        ScrollView screen = new ScrollView(activity);
+        screen.setFillViewport(true);
+        screen.setBackgroundColor(0xff090909);
+        LinearLayout column = new LinearLayout(activity);
+        column.setGravity(Gravity.CENTER);
+        column.setOrientation(LinearLayout.VERTICAL);
+        column.setPadding(dp(22), dp(18), dp(22), dp(18));
+        FrameLayout emblem = new FrameLayout(activity);
+        listeningOrb = new AssistantMark.Orb(activity);
+        emblem.addView(listeningOrb, new FrameLayout.LayoutParams(-1, -1));
+        emblem.addView(AssistantMark.image(activity, true),
+                new FrameLayout.LayoutParams(dp(91), dp(91), Gravity.CENTER));
+        column.addView(emblem, new LinearLayout.LayoutParams(dp(228), dp(228)));
+        listeningTitle = label("Listening…", 28, true);
+        listeningTitle.setTextColor(Color.WHITE);
+        listeningTitle.setGravity(Gravity.CENTER);
+        listeningTitle.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        column.addView(listeningTitle);
+        listeningText = label("Speak your message", 16, false);
+        listeningText.setTextColor(0xffCCCCCC);
+        listeningText.setGravity(Gravity.CENTER);
+        listeningText.setPadding(0, dp(14), 0, dp(26));
+        listeningText.setMaxLines(6);
+        column.addView(listeningText, new LinearLayout.LayoutParams(-1, -2));
+
+        LinearLayout actions = new LinearLayout(activity);
+        actions.setGravity(Gravity.CENTER);
+        Button cancel = control("Cancel", false);
+        cancel.setTextColor(Color.WHITE);
+        cancel.setBackground(panel(0xff202020, 0xff535353, 22));
+        cancel.setOnClickListener(v -> dictation.cancel());
+        actions.addView(cancel, new LinearLayout.LayoutParams(0, dp(48), 1f));
+        Button stop = control("Stop listening", true);
+        stop.setTextColor(Color.BLACK);
+        stop.setBackground(panel(Color.WHITE, Color.WHITE, 22));
+        stop.setOnClickListener(v -> dictation.stop());
+        LinearLayout.LayoutParams stopParams = new LinearLayout.LayoutParams(0, dp(48), 1f);
+        stopParams.leftMargin = dp(12);
+        actions.addView(stop, stopParams);
+        column.addView(actions, new LinearLayout.LayoutParams(-1, -2));
+        screen.addView(column);
+        return screen;
+    }
+
+    private int pageColor() { return light ? 0xffFAFAFA : 0xff111111; }
+    private int surfaceColor() { return light ? Color.WHITE : 0xff202020; }
+    private int lineColor() { return light ? 0xffD9D9D9 : 0xff515151; }
+    private int inkColor() { return light ? 0xff171717 : 0xffF5F5F5; }
+    private int mutedColor() { return light ? 0xff5B5B5B : 0xffC0C0C0; }
+
+    private GradientDrawable panel(int fill, int line, int radius) {
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(fill);
+        background.setCornerRadius(dp(radius));
+        if (line != Color.TRANSPARENT) background.setStroke(dp(1), line);
+        return background;
+    }
+
+    private TextView label(String text, int size, boolean bold) {
+        TextView view = new TextView(activity);
+        view.setText(text);
+        view.setTextColor(inkColor());
+        view.setTextSize(size);
+        view.setTypeface(bold ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+        return view;
+    }
+
+    private Button control(String text, boolean primary) {
+        Button button = new Button(activity);
+        button.setAllCaps(false);
+        button.setText(text);
+        button.setTextColor(primary ? pageColor() : inkColor());
+        button.setTextSize(14);
+        button.setMinWidth(0);
+        button.setMinimumWidth(0);
+        button.setMinHeight(0);
+        button.setMinimumHeight(0);
+        button.setPadding(dp(4), 0, dp(4), 0);
+        button.setBackground(panel(primary ? inkColor() : surfaceColor(), lineColor(), 22));
+        return button;
+    }
+
+    public void onMicrophonePermission(boolean granted) {
+        if (isShowing()) dictation.onPermissionResult(granted);
+    }
+
+    public void pauseDictation() { dictation.pause(); }
+
+    @Override public void onBackPressed() {
+        if (voicePanel != null && voicePanel.getVisibility() == View.VISIBLE) dictation.cancel();
+        else super.onBackPressed();
     }
 
     private void updateSubtitle() {
         if (tvSub == null) return;
         int statusGeneration = ++knowledgeStatusGeneration;
         String mode = guideMode();
-        if (btnMode != null) btnMode.setText("local".equals(mode)
-                ? "On-phone AI · Change mode"
-                : ("online".equals(mode) ? "Online AI · Change mode" : "Offline app guide · Change mode"));
         if ("local".equals(mode)) {
             if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
                 tvSub.setText("Unavailable until approved knowledge trust is provisioned");
@@ -375,7 +431,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     });
                 });
             }
-            tvSub.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
+            tvSub.setTextColor(mutedColor());
             tvSub.setOnClickListener(v -> { if (!requestInFlight) showModeOptions(); });
             return;
         }
@@ -386,12 +442,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
         if ("online".equals(mode) && !BuildConfig.ONLINE_AI_ENABLED) {
             tvSub.setText("Online AI unavailable in this build");
-            tvSub.setTextColor(COLOR_TEXT_MUTED());
+            tvSub.setTextColor(mutedColor());
             tvSub.setOnClickListener(null);
             return;
         }
         tvSub.setText("Online AI · Church service");
-        tvSub.setTextColor(COLOR_ACCENT_ORANGE);
+        tvSub.setTextColor(mutedColor());
         tvSub.setOnClickListener(v -> { if (!requestInFlight) showConsentDialog(); });
     }
 
@@ -582,6 +638,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     @Override public void dismiss() {
+        dictation.cancel();
         if (localRequest) OnDeviceAi.cancel();
         localHistory.clear();
         SoftSafety.reset();
@@ -814,7 +871,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
             }
             final View indicator = showTypingIndicator();
             beginRequest(); localRequest = true; btnSend.setEnabled(false);
-            if (btnMode != null) btnMode.setText("Stop response");
+            if (btnMode != null) {
+                btnMode.setText("■");
+                btnMode.setContentDescription("Stop response");
+            }
             OnDeviceAi.ask(activity, query, localHistory.snapshot(), new OnDeviceAi.Callback() {
                 public void onSuccess(String answer) {
                     removeTypingIndicator(indicator); localRequest = false; finishInFlight(); updateSubtitle();
@@ -897,7 +957,10 @@ public class AiBreakthroughGuideDialog extends Dialog {
     private void finishInFlight() {
         requestInFlight = false;
         if (btnSend != null) btnSend.setEnabled(true);
-        if (btnMode != null) btnMode.setText("Change mode");
+        if (btnMode != null) {
+            btnMode.setText("⋯");
+            btnMode.setContentDescription("Assistant settings and modes");
+        }
     }
 
     private View showTypingIndicator() {
@@ -906,12 +969,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
         row.setPadding(0, dp(4), dp(40), dp(4));
 
         TextView tv = new TextView(activity);
-        tv.setText("🤖 Pondering with Scripture...");
+        tv.setText("Looking for an answer…");
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         tv.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
-        tv.setTextColor(GlassKit.muted());
+        tv.setTextColor(mutedColor());
         tv.setPadding(dp(14), dp(10), dp(14), dp(10));
-        tv.setBackground(GlassKit.glass(activity, 18));
+        tv.setBackground(panel(surfaceColor(), lineColor(), 16));
 
         row.addView(tv);
         messagesContainer.addView(row);
@@ -928,7 +991,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
         }
     }
 
+    private void showConversation() {
+        welcomePanel.setVisibility(View.GONE);
+        chatScrollView.setVisibility(View.VISIBLE);
+    }
+
     private void displayUserMessage(String text) {
+        showConversation();
         LinearLayout row = new LinearLayout(activity);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.END);
@@ -936,12 +1005,12 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
         TextView tv = new TextView(activity);
         tv.setText(text);
-        tv.setTextColor(COLOR_WHITE);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tv.setTextColor(pageColor());
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         tv.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         tv.setLineSpacing(dp(2), 1.1f);
         tv.setPadding(dp(16), dp(10), dp(16), dp(10));
-        tv.setBackground(GlassKit.orange(activity, 18));
+        tv.setBackground(panel(inkColor(), Color.TRANSPARENT, 16));
 
         row.addView(tv);
         messagesContainer.addView(row);
@@ -949,6 +1018,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
     }
 
     private void displayAiMessage(AiResponse response, @Nullable String badgeText) {
+        showConversation();
         LinearLayout bubbleCol = new LinearLayout(activity);
         bubbleCol.setOrientation(LinearLayout.VERTICAL);
         bubbleCol.setPadding(0, dp(4), dp(24), dp(10));
@@ -959,7 +1029,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             tvBadge.setText(badgeText);
             tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
             tvBadge.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
-            tvBadge.setTextColor(badgeText.contains("Offline") ? GlassKit.muted() : GlassKit.accent());
+            tvBadge.setTextColor(mutedColor());
             tvBadge.setPadding(dp(4), 0, 0, dp(6));
             bubbleCol.addView(tvBadge);
         }
@@ -967,19 +1037,17 @@ public class AiBreakthroughGuideDialog extends Dialog {
         // Message text
         TextView tv = new TextView(activity);
         tv.setText(response.getMessageText());
-        tv.setTextColor(GlassKit.text());
+        tv.setTextColor(inkColor());
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tv.setTypeface(Typeface.create(Typeface.SERIF, Typeface.NORMAL));
+        tv.setTypeface(Typeface.DEFAULT);
         tv.setLineSpacing(dp(2), 1.15f);
         tv.setPadding(dp(16), dp(14), dp(16), dp(14));
-        tv.setBackground(GlassKit.glass(activity, 18));
+        tv.setBackground(panel(surfaceColor(), lineColor(), 16));
         bubbleCol.addView(tv);
 
         // Interactive Action Button
         if (response.hasAction()) {
-            Button btnAction = new Button(activity);
-            btnAction.setText(response.getActionButtonLabel());
-            styleOrangePill(btnAction, 13);
+            Button btnAction = control(response.getActionButtonLabel(), false);
             btnAction.setPadding(dp(20), dp(10), dp(20), dp(10));
 
             LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
@@ -1053,8 +1121,8 @@ public class AiBreakthroughGuideDialog extends Dialog {
             chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
             chip.setAllCaps(false);
             chip.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
-            chip.setTextColor(GlassKit.text());
-            chip.setBackground(GlassKit.glass(activity, 999));
+            chip.setTextColor(inkColor());
+            chip.setBackground(panel(surfaceColor(), lineColor(), 22));
             chip.setPadding(dp(16), dp(8), dp(16), dp(8));
             chip.setMinHeight(0);
             chip.setMinimumHeight(0);
@@ -1062,7 +1130,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
             chip.setMinimumWidth(0);
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, dp(36));
+                    LinearLayout.LayoutParams.WRAP_CONTENT, dp(44));
             lp.setMargins(0, 0, dp(8), 0);
             chip.setLayoutParams(lp);
 
@@ -1073,20 +1141,6 @@ public class AiBreakthroughGuideDialog extends Dialog {
 
     private void scrollToBottom() {
         chatScrollView.post(() -> chatScrollView.fullScroll(ScrollView.FOCUS_DOWN));
-    }
-
-    /** Orange gradient pill with the Bible tab's glow; used for Send and for action buttons. */
-    private void styleOrangePill(Button b, float textSp) {
-        b.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSp);
-        b.setAllCaps(false);
-        b.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
-        b.setTextColor(COLOR_WHITE);
-        b.setBackground(GlassKit.orange(activity, 999));
-        b.setMinHeight(0);
-        b.setMinimumHeight(0);
-        b.setMinWidth(0);
-        b.setMinimumWidth(0);
-        GlassKit.glow(b, GlassKit.ORANGE, 8);
     }
 
     private int dp(int value) {
