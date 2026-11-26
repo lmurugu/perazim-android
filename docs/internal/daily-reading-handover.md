@@ -71,6 +71,10 @@ reflection step. The temporary plan was removed and the phone returned to
 Daily verse mode. No fixture routine was marked complete.
 
 The final version 31 installed in place with the same signer and adds a
-foreground date refresh. Android reported version 31. The phone locked and
-then disconnected during the repeat screen check, so the exact final build's
-UI replay remains pending. No app data was cleared.
+foreground date refresh. Android reported version 31, and the Reading plans
+chooser was visible after the phone reconnected. The full restart flow was
+verified on version 30, which uses the same plan-storage code. No app data
+was cleared.
+
+GitHub review is in draft PR #89. The target is the published Bible Search
+branch at `91ae4a9`. There is no merge or release.
