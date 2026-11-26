@@ -310,6 +310,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
     @Override
     protected void onResume() {
         super.onResume();
+        if (homeUiBinder != null) homeUiBinder.refreshDailyReading();
         String uid = resolveGamificationUserId();
         streakCount = GamificationStore.getStreak(this, uid, streakCount);
         xpCount = GamificationStore.getSpiritualXp(this, uid, xpCount);
