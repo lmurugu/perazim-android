@@ -45,6 +45,7 @@ import org.perazimchurch.app.ai.remote.ConversationHistory;
 import org.perazimchurch.app.ai.local.OfflineKnowledgeStore;
 import org.perazimchurch.app.ai.local.OfflineScriptureLookup;
 import org.perazimchurch.app.ai.local.OnDeviceAi;
+import org.perazimchurch.app.ai.gaps.GapLog;
 import org.perazimchurch.app.ai.local.GuideTurnRouter;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.data.local.session.SessionManager;
@@ -416,6 +417,8 @@ public class AiBreakthroughGuideDialog extends Dialog {
         int memoryIndex = choices.size();
         choices.add("What the guide remembers");
         choices.add("Clear this conversation");
+        final int gapIndex = choices.size();
+        choices.add("Questions the guide could not answer");
         final int appActivityIndex = choices.size();
         choices.add(AppContextReader.isEnabled(activity)
                 ? "App activity for answers: on (tap to turn off)"
@@ -432,6 +435,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     else if (which == selectedUpdateIndex) showKnowledgeUpdate();
                     else if (which == selectedRollbackIndex) showKnowledgeRollback();
                     else if (which == selectedMemoryIndex) GuideMemoryDialog.show(activity);
+                    else if (which == gapIndex) GapLogDialog.show(activity);
                     else if (which == appActivityIndex) toggleAppActivity();
                     else {
                         localHistory.clear();
@@ -776,6 +780,7 @@ public class AiBreakthroughGuideDialog extends Dialog {
         btnSend.setEnabled(false);
         org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
             GuideTurnRouter.Turn turn = GuideTurnRouter.respond(activity, aiEngine, query, localHistory.snapshot());
+            GapLog.observeRouted(activity, query, turn.status);
             activity.runOnUiThread(() -> {
                 removeTypingIndicator(routing);
                 finishInFlight();
@@ -821,11 +826,13 @@ public class AiBreakthroughGuideDialog extends Dialog {
                     if (!isShowing()) return;
                     String result = ConversationHistory.withoutRepeatedGreeting(answer, !localHistory.isEmpty());
                     localHistory.addExchange(query, result);
+                    org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> GapLog.observeModelAnswer(activity, query, result));
                     displayAiMessage(AiResponse.plainText(result, null), "On-phone AI · Qwen · Offline");
                     GuideFeedbackRow.attach(activity, messagesContainer, query, result);
                 }
                 public void onError(String error) {
                     removeTypingIndicator(indicator); localRequest = false; finishInFlight(); updateSubtitle();
+                    org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> GapLog.observeModelError(activity, query, error));
                     if (isShowing()) displayAiMessage(AiResponse.plainText(error, null), "On-phone model notice");
                 }
             });
