@@ -1,0 +1,72 @@
+{
+  "bible_quiz": {
+    "win": "Quiz cleared! You knew your stuff!",
+    "retry": "That question got lucky. Keep going!",
+    "help": "Even the best quiz players peek."
+  },
+  "who_am_i": {
+    "win": "Case closed! You know your Bible people!",
+    "retry": "That clue played hide and seek.",
+    "help": "Even a good detective needs a clue."
+  },
+  "verse_builder": {
+    "win": "Verse Builder cleared! Way to put those words together!",
+    "retry": "Those words went for a walk.",
+    "help": "One word at a time. They can wait."
+  },
+  "ladder_of_faith": {
+    "win": "You made it to the top! What a climb!",
+    "retry": "Tough rung. Take a breath and try again.",
+    "help": "Even a ladder needs a handrail."
+  },
+  "word_search": {
+    "win": "Every word found! What sharp eyes!",
+    "retry": "That word is still hiding.",
+    "help": "Those letters can't hide forever."
+  },
+  "memory_match": {
+    "win": "Every pair found! What a memory!",
+    "retry": "Those two aren't twins.",
+    "help": "The cards aren't going anywhere."
+  },
+  "story_timeline": {
+    "win": "You put the whole story in order!",
+    "retry": "That part comes a little later.",
+    "help": "Even a good story starts somewhere."
+  },
+  "road_to_jerusalem": {
+    "win": "Jerusalem! You beat the phone!",
+    "retry": "The phone got there first. Race again!",
+    "help": "The die has no favourites. I checked."
+  },
+  "old_or_new": {
+    "win": "You sorted those books like a pro!",
+    "retry": "That book took a wrong turn.",
+    "help": "Even a bookshelf needs labels."
+  },
+  "who_said_it": {
+    "win": "You know those Bible voices! Great work!",
+    "retry": "Right Bible, wrong voice. Keep going!",
+    "help": "A little context goes a long way."
+  },
+  "fill_the_gap": {
+    "win": "Level cleared! You found the words!",
+    "retry": "That word didn't fit. Keep going!",
+    "help": "One little word can change a lot."
+  },
+  "vine_words": {
+    "win": "Look at that! You filled the crossword!",
+    "retry": "That word took a wrong turn.",
+    "help": "Even a vine needs a little support."
+  },
+  "lamp_slide": {
+    "win": "You brought the picture back! It looks lovely!",
+    "retry": "That tile is staying put for now.",
+    "help": "A little light never hurt a puzzle."
+  },
+  "story_mosaic": {
+    "win": "Piece by piece, you made the whole picture!",
+    "retry": "That piece has another home.",
+    "help": "Even a tiny piece has a place."
+  }
+}

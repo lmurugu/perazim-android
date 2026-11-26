@@ -3,11 +3,9 @@ package org.perazimchurch.app.presentation.ui.games.common;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.widget.FrameLayout;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
@@ -224,16 +222,21 @@ public final class GameUi implements GameChrome.Host {
     public void styleButton(Button button, String label, boolean primary) {
         button.setText(label);
         button.setAllCaps(false);
-        button.setTextSize(17);
-        button.setTextColor(PerazimTheme.COLOR_WHITE);
-        button.setShadowLayer(dp(3), 0, dp(1), 0x66000000);
+        button.setSoundEffectsEnabled(false);
+        button.setTextSize(15);
+        button.setTextColor(primary ? 0xFF321C34 : PerazimTheme.COLOR_TEXT_PRIMARY);
+        button.setShadowLayer(0, 0, 0, 0);
         button.setTypeface(button.getTypeface(), android.graphics.Typeface.BOLD);
-        button.setMinHeight(dp(56));
+        button.setMinHeight(dp(48));
+        button.setMinimumHeight(dp(48));
         button.setMinimumWidth(0);
         button.setMinWidth(0);
         button.setGravity(Gravity.CENTER);
-        button.setPadding(dp(14), dp(12), dp(14), dp(12));
-        button.setBackground(GameButtons.drawn(activity, primary));
+        button.setPadding(dp(12), dp(7), dp(12), dp(7));
+        GradientDrawable fill = shape(primary ? 0xFFFFC773 : PerazimTheme.COLOR_SURFACE_SOLID);
+        fill.setStroke(dp(1), primary ? 0xFFDF9747 : PerazimTheme.COLOR_STROKE);
+        button.setBackground(new RippleDrawable(ColorStateList.valueOf(0x265F3281), fill, null));
+        button.setStateListAnimator(null);
         button.setElevation(0f);
     }
 
@@ -245,120 +248,90 @@ public final class GameUi implements GameChrome.Host {
         LinearLayout panel = new LinearLayout(activity);
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(16), dp(16), dp(16), dp(16));
-        Drawable frame = GameArt.frame(activity, GameArt.FRAME_PANEL_WIDE, GameArt.FRAME_BORDER, dp(18));
-        panel.setBackground(frame != null ? frame : shape(PerazimTheme.COLOR_SURFACE));
+        GradientDrawable fill = shape(PerazimTheme.COLOR_SURFACE_SOLID);
+        fill.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
+        panel.setBackground(fill);
         page.addView(panel, wrapParams(12));
         return panel;
     }
 
-    /** Level nodes on one page of the level map. */
-    public static final int LEVEL_NODES_PER_PAGE = GameArt.LEVEL_NODES.length;
-    private static final int LEVEL_NODE_DP = 84;
-    private static final int LEVEL_MAP_DP = 360;
-
-    /**
-     * The shared level picker. Levels are drawn on the level-map art, eight nodes per page, with Earlier
-     * and Later to turn the page. A level is open once the one before it has two or more stars. Locked
-     * levels are dimmed, each open node shows its best stars, and the newest unlocked level shimmers.
-     * The picker opens on the page that holds the newest unlocked level. {@code onPick} runs with the
-     * level the player taps. Uses the games preferences and the owner prefix from {@link #configure}.
-     */
+    /** Compact level grid. The current level stays visible when the picker first opens. */
     public void levelPicker(String gameId, int levelCount, IntConsumer onPick) {
-        String storedId = (scorePrefix == null ? "" : scorePrefix) + gameId;
-        int count = Math.max(1, levelCount);
-        int unlocked = Math.min(count, GameResults.unlockedLevel(scores, storedId));
-        int pages = (count + LEVEL_NODES_PER_PAGE - 1) / LEVEL_NODES_PER_PAGE;
-        int startPage = Math.max(0, Math.min(pages - 1, (unlocked - 1) / LEVEL_NODES_PER_PAGE));
+        levelPicker(gameId, levelCount, onPick, level -> "");
+    }
+
+    public void levelPicker(String gameId, int levelCount, IntConsumer onPick,
+                            java.util.function.IntFunction<String> describe) {
+        String id = scorePrefix + gameId;
+        if (levelCount < 1) return;
+        int unlocked = Math.min(levelCount, GameResults.unlockedLevel(scores, id));
         LinearLayout holder = new LinearLayout(activity);
         holder.setOrientation(LinearLayout.VERTICAL);
-        page.addView(holder, wrapParams(0));
-        drawLevelPage(holder, storedId, count, pages, startPage, onPick);
+        addRow(holder);
+        drawLevels(holder, id, levelCount, unlocked, (unlocked - 1) / 8, onPick, describe);
     }
 
-    private void drawLevelPage(LinearLayout holder, String storedId, int count, int pages, int pageIndex, IntConsumer onPick) {
+    private void drawLevels(LinearLayout holder, String id, int count, int unlocked, int index,
+                            IntConsumer onPick, java.util.function.IntFunction<String> describe) {
         holder.removeAllViews();
-        int first = pageIndex * LEVEL_NODES_PER_PAGE + 1;
-        int last = Math.min(count, first + LEVEL_NODES_PER_PAGE - 1);
-        int unlocked = Math.min(count, GameResults.unlockedLevel(scores, storedId));
-
-        LevelMapView map = new LevelMapView(activity, dp(LEVEL_NODE_DP));
-        Bitmap art = GameArt.levelMap(activity);
-        if (art != null) map.setBackground(new BitmapDrawable(activity.getResources(), art));
-        Button newest = null;
+        addText(holder, GameResults.clearedCount(scores, id, count, false) + " of " + count + " levels cleared", 13, true);
+        for (int i = unlocked; i > 0; i--) {
+            String previous = GameResults.lastLevelResult(scores, id, i);
+            if (!previous.isEmpty()) {
+                addText(holder, "Level " + i + " · " + previous, 12, false);
+                break;
+            }
+        }
+        String detail = describe.apply(unlocked);
+        if (!detail.isEmpty()) addText(holder, detail, 13, false);
+        Button resume = new Button(activity);
+        styleButton(resume, "Play level " + unlocked, true);
+        resume.setOnClickListener(v -> { if (activeOwner()) onPick.accept(unlocked); });
+        holder.addView(resume, wrapParams(14));
+        int first = index * 8 + 1;
+        int last = Math.min(count, first + 7);
+        addText(holder, "Levels " + first + "–" + last, 13, true);
+        LinearLayout row = null;
         for (int level = first; level <= last; level++) {
-            boolean open = level <= unlocked;
-            boolean isNewest = level == unlocked;
-            String label = open
-                    ? level + "\n" + GameResults.starLine(GameResults.bestStars(scores, storedId, level))
-                    : level + "\nLocked";
+            if ((level - first) % 4 == 0) {
+                row = new LinearLayout(activity);
+                holder.addView(row, wrapParams(5));
+            }
+            int stars = GameResults.bestStars(scores, id, level);
+            String label = level + "\n" + (level > unlocked ? "Locked" : GameResults.starLine(stars));
             Button node = new Button(activity);
-            styleButton(node, label, isNewest);
-            node.setMinHeight(dp(LEVEL_NODE_DP));
-            node.setMinimumWidth(dp(LEVEL_NODE_DP));
-            GameFx.attachPress(node);
-            node.setEnabled(open);
-            node.setAlpha(open ? 1f : 0.4f);
+            styleButton(node, label, level == unlocked);
+            node.setTextSize(12);
+            node.setEnabled(level <= unlocked);
+            node.setAlpha(level <= unlocked ? 1f : .58f);
             final int chosen = level;
-            node.setOnClickListener(v -> {
-                if (!activeOwner()) return;
-                click(v);
-                onPick.accept(chosen);
+            node.setOnClickListener(v -> { if (activeOwner()) onPick.accept(chosen); });
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -2, 1);
+            lp.setMargins(dp(2), 0, dp(2), 0);
+            row.addView(node, lp);
+        }
+        LinearLayout nav = new LinearLayout(activity);
+        holder.addView(nav, wrapParams(0));
+        for (int direction : new int[] {-1, 1}) {
+            int target = index + direction;
+            if (target < 0 || target * 8 >= count) continue;
+            Button button = new Button(activity);
+            styleButton(button, direction < 0 ? "Earlier levels" : "Later levels", false);
+            button.setOnClickListener(v -> {
+                if (activeOwner()) drawLevels(holder, id, count, unlocked, target, onPick, describe);
             });
-            map.addView(node);
-            if (isNewest) newest = node;
-        }
-        holder.addView(map, new LinearLayout.LayoutParams(-1, dp(LEVEL_MAP_DP)));
-        if (newest != null) {
-            Button shine = newest;
-            shine.post(() -> GameFx.shimmer(shine));
-        }
-
-        if (pages > 1) {
-            LinearLayout nav = new LinearLayout(activity);
-            nav.setOrientation(LinearLayout.HORIZONTAL);
-            if (pageIndex > 0) {
-                nav.addView(pageButton("Earlier", () -> drawLevelPage(holder, storedId, count, pages, pageIndex - 1, onPick)));
-            }
-            if (pageIndex < pages - 1) {
-                nav.addView(pageButton("Later", () -> drawLevelPage(holder, storedId, count, pages, pageIndex + 1, onPick)));
-            }
-            holder.addView(nav, wrapParams(0));
+            nav.addView(button, new LinearLayout.LayoutParams(0, -2, 1));
         }
     }
 
-    private Button pageButton(String label, Runnable turn) {
-        Button button = new Button(activity);
-        styleButton(button, label, false);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -2, 1f);
-        lp.setMargins(dp(4), 0, dp(4), dp(10));
-        button.setLayoutParams(lp);
-        GameFx.attachPress(button);
-        button.setOnClickListener(v -> {
-            if (!activeOwner()) return;
-            click(v);
-            turn.run();
-        });
-        return button;
-    }
-
-    /** Places each node on a point of the level map, in the order of {@link GameArt#LEVEL_NODES}. */
-    private static final class LevelMapView extends FrameLayout {
-        private final int nodePx;
-
-        LevelMapView(Context context, int nodePx) {
-            super(context);
-            this.nodePx = nodePx;
-        }
-
-        @Override protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-            float[][] nodes = GameArt.levelNodesFor(right - left, bottom - top);
-            int count = Math.min(getChildCount(), nodes.length);
-            for (int i = 0; i < count; i++) {
-                int cx = Math.round(nodes[i][0]);
-                int cy = Math.round(nodes[i][1]);
-                getChildAt(i).layout(cx - nodePx / 2, cy - nodePx / 2, cx + nodePx / 2, cy + nodePx / 2);
-            }
-        }
+    public void progress(int done, int total, String label) {
+        android.widget.ProgressBar bar = new android.widget.ProgressBar(activity, null,
+                android.R.attr.progressBarStyleHorizontal);
+        bar.setMax(Math.max(1, total));
+        bar.setProgress(Math.min(done, total));
+        bar.setProgressTintList(ColorStateList.valueOf(PerazimTheme.isLight() ? 0xFF74329F : 0xFFCDA1F0));
+        bar.setContentDescription(label);
+        addRow(bar);
     }
 
     /** Vertical space of the given height in dp on the current page. */

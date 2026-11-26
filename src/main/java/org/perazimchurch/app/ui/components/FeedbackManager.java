@@ -1,5 +1,7 @@
 package org.perazimchurch.app.ui.components;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameAudio;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -67,11 +69,13 @@ public final class FeedbackManager {
     public enum GameCue { PICK, MATCH, MISS, FOUND_ALL }
 
     public void gameCue(GameCue cue) {
+        GameAudio game = GameAudio.get(appContext);
         switch (cue) {
-            case PICK: playTones(new int[]{740}, 25, 0.15f); break;
-            case MATCH: playTones(new int[]{784, 988}, 60, 0.25f); break;
-            case MISS: playTones(new int[]{220, 180}, 90, 0.2f); break;
-            case FOUND_ALL: playTones(new int[]{523, 659, 784, 1047}, 120, 0.35f); break;
+            case PICK: game.play(GameAudio.Sfx.TAP); break;
+            case MATCH: game.play(GameAudio.Sfx.CORRECT); break;
+            // Misses and completed levels use the dedicated game reaction sounds.
+            case MISS:
+            case FOUND_ALL:
             default: break;
         }
     }
@@ -80,18 +84,27 @@ public final class FeedbackManager {
         if (isHapticsEnabled() && view != null) {
             view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
-        playTones(new int[]{880}, 35, 0.18f);
+        GameAudio game = GameAudio.get(appContext);
+        if (game.isInGames()) game.play(GameAudio.Sfx.TAP);
+        else playTones(new int[]{880}, 35, 0.18f);
     }
 
     /** Small reward, for example earning XP or a correct answer. */
     public void reward(Activity activity) {
         vibrate(new long[]{0, 30, 40, 30});
-        playTones(new int[]{660, 880}, 90, 0.3f);
+        GameAudio game = GameAudio.get(appContext);
+        if (game.isInGames()) game.play(GameAudio.Sfx.CORRECT);
+        else playTones(new int[]{660, 880}, 90, 0.3f);
     }
 
     /** Big moment, for example finishing the daily routine or reaching a streak. */
     public void milestone(Activity activity) {
         vibrate(new long[]{0, 40, 60, 40, 60, 90});
+        GameAudio game = GameAudio.get(appContext);
+        if (game.isInGames()) {
+            game.play(GameAudio.Sfx.COMBO_3);
+            return;
+        }
         playTones(new int[]{523, 659, 784, 1047}, 110, 0.35f);
         celebrate(activity, false);
     }

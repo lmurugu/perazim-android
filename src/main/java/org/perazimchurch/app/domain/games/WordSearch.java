@@ -28,7 +28,10 @@ public final class WordSearch {
     private final Set<String> found = new HashSet<>();
     private final List<int[][]> cellsByWord = new ArrayList<>();
 
-    public WordSearch(long seed) {
+    public WordSearch(long seed) { this(seed, WORDS_PER_PUZZLE); }
+
+    public WordSearch(long seed, int count) {
+        if (count < 1 || count > WORDS_PER_PUZZLE) throw new IllegalArgumentException("Invalid word count");
         Random random = new Random(seed);
         List<String> pool = new ArrayList<>(Arrays.asList(BANK));
         Collections.shuffle(pool, random);
@@ -40,7 +43,7 @@ public final class WordSearch {
             for (char[] row : grid) Arrays.fill(row, '\0');
             Collections.shuffle(pool, random);
             boolean allPlaced = true;
-            for (int i = 0; i < WORDS_PER_PUZZLE && allPlaced; i++) {
+            for (int i = 0; i < count && allPlaced; i++) {
                 String word = pool.get(i);
                 int[][] cells = place(word, random);
                 if (cells == null) allPlaced = false;

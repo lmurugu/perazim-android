@@ -8,12 +8,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameAudioSettings;
 import org.perazimchurch.app.domain.games.catalog.LampSlideDefinition;
 import org.perazimchurch.app.domain.games.engine.GameDefinition;
 import org.perazimchurch.app.domain.games.engine.KeyValueStore;
@@ -22,9 +22,10 @@ import org.perazimchurch.app.domain.games.lampslide.LampSlideLevels;
 import org.perazimchurch.app.domain.games.lampslide.LampSlidePuzzle;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideSession;
-import org.perazimchurch.app.presentation.ui.games.common.GameArt;
 import org.perazimchurch.app.presentation.ui.games.common.GameCatalog;
+import org.perazimchurch.app.presentation.ui.games.common.GameAudio;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
+import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.presentation.ui.games.common.GameChrome;
 import org.perazimchurch.app.ui.components.FeedbackManager;
@@ -38,8 +39,6 @@ import org.perazimchurch.app.ui.theme.PerazimTheme;
 public final class LampSlideLauncher {
     /** Levels per page of the level map: one per node on the painted path. */
     static final int MAP_PAGE_SIZE = 8;
-    /** Size of each level node in dp. */
-    private static final int NODE_DP = 72;
 
     static final String GAME_ID = "lamp_slide";
     private static final String TITLE = "Lamp Slide";
@@ -83,7 +82,10 @@ public final class LampSlideLauncher {
             this.game = game;
             this.storedId = ctx.scorePrefix() + game.id();
             this.progression = new LevelProgression(new ProgressStore(ctx.scores()));
-            this.dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
+            this.dialog = new Dialog(activity, PerazimTheme.isLight()
+                    ? android.R.style.Theme_Material_Light_NoActionBar
+                    : android.R.style.Theme_Material_NoActionBar);
+            this.dialog.setOnDismissListener(d -> ctx.hub().run());
             this.scroll = new ScrollView(activity);
             scroll.setBackground(PerazimTheme.createBackgroundGradient());
             scroll.setFillViewport(true);
@@ -96,12 +98,19 @@ public final class LampSlideLauncher {
 
         /** The level picker: bands of levels, stars per level, a preview and Start. */
         void showPicker() {
-            if (!dialog.isShowing()) dialog.show();
+            GameAudio.get(activity).stopAnnouncer();
+            if (!activeOwner()) { dialog.dismiss(); return; }
+            if (!dialog.isShowing()) {
+                dialog.show();
+                if (dialog.getWindow() != null) dialog.getWindow().setLayout(-1, -1);
+            }
             int unlocked = progression.unlockedLevel(storedId);
             page = newPage();
             text("Lamp Slide", 24, true);
+            page.addView(GameAudioSettings.button(activity), new LinearLayout.LayoutParams(-2, -2));
             text("Choose a painting", 13, false);
-            text("Stars so far: " + totalStars(), 13, false);
+            text(GameResults.clearedCount(scores(), storedId, game.levelCount(), false) + " / "
+                    + game.levelCount() + " cleared · " + totalStars() + " stars", 13, false);
             LampSlideDefinition definition = (LampSlideDefinition) game;
             LampSlideScene scene = definition.sceneFor(selected);
             int size = LampSlideLevels.boardSize(selected);
@@ -109,7 +118,7 @@ public final class LampSlideLauncher {
             android.graphics.Bitmap painting = LampSlideScenes.loadImage(activity, scene.image(), null);
             if (painting != null) image.setImageBitmap(painting);
             image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            page.addView(image, new LinearLayout.LayoutParams(-1, dp(220)));
+            page.addView(image, new LinearLayout.LayoutParams(-1, dp(171)));
             text("Level " + selected + " · " + scene.reference(), 16, true);
             text(size + " × " + size + " board · par " + LampSlidePuzzle.walkLength(size) + " moves", 13, false);
             text("“" + scene.verse() + "”", 14, false);
@@ -136,47 +145,25 @@ public final class LampSlideLauncher {
             final int pageLast = Math.min(LampSlideLevels.LEVEL_COUNT, pageFirst + MAP_PAGE_SIZE - 1);
 
             text("Levels " + pageFirst + " to " + pageLast, 12, true);
-            FrameLayout frame = new FrameLayout(activity);
-            ImageView scene = new ImageView(activity);
-            scene.setScaleType(ImageView.ScaleType.FIT_XY);
-            scene.setAdjustViewBounds(true);
-            android.graphics.Bitmap map = GameArt.levelMap(activity);
-            if (map != null) scene.setImageBitmap(map);
-            else scene.setMinimumHeight(dp(240));
-            frame.addView(scene, new FrameLayout.LayoutParams(-1, -2));
-
+            LinearLayout row = null;
             for (int level = pageFirst; level <= pageLast; level++) {
+                if ((level - pageFirst) % 4 == 0) {
+                    row = new LinearLayout(activity);
+                    page.addView(row, new LinearLayout.LayoutParams(-1, -2));
+                }
                 final int value = level;
                 boolean open = level <= unlocked;
                 int stars = progression.bestStars(storedId, level);
-                Button node = detached(level + "\n" + starText(stars), false);
+                Button node = detached(level + "\n" + (open ? starText(stars) : "Locked"), level == selected);
                 node.setTextSize(12);
-                node.setMinWidth(0);
-                node.setMinimumWidth(0);
-                node.setPadding(0, 0, 0, 0);
                 node.setEnabled(open);
-                node.setAlpha(open ? 1f : 0.4f);
-                node.setOnClickListener(v -> {
-                    selected = value;
-                    showPicker();
-                });
-                GameFx.attachPress(node);
-                // The newest unlocked level sweeps a light shimmer once, when the picker opens.
-                if (animate && open && level == unlocked && unlocked > 1) {
-                    node.post(() -> GameFx.shimmer(node));
-                }
-                frame.addView(node, new FrameLayout.LayoutParams(dp(NODE_DP), dp(NODE_DP)));
+                node.setAlpha(open ? 1f : .55f);
+                node.setOnClickListener(v -> { selected = value; showPicker(); });
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, -2, 1);
+                params.setMargins(dp(2), dp(2), dp(2), dp(2));
+                row.addView(node, params);
+                if (animate && level == unlocked) node.post(() -> GameFx.shimmer(node));
             }
-            final int count = pageLast - pageFirst + 1;
-            frame.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, orr, ob) -> {
-                float[][] at = GameArt.levelNodesFor(frame.getWidth(), frame.getHeight());
-                for (int i = 0; i < count && i < at.length; i++) {
-                    View node = frame.getChildAt(i + 1);
-                    node.setX(at[i][0] - dp(NODE_DP) / 2f);
-                    node.setY(at[i][1] - dp(NODE_DP) / 2f);
-                }
-            });
-            page.addView(frame, new LinearLayout.LayoutParams(-1, -2));
 
             LinearLayout nav = new LinearLayout(activity);
             nav.setOrientation(LinearLayout.HORIZONTAL);
@@ -200,19 +187,43 @@ public final class LampSlideLauncher {
         }
 
         private void start(int level, long newSeed) {
+            if (!activeOwner() || level > progression.unlockedLevel(storedId)) return;
+            GameAudio.get(activity).startRound(GAME_ID);
             seed = newSeed;
             selected = level;
             page = newPage();
             LampSlideSession session = (LampSlideSession) game.createSession(level, seed);
-            View screen = LampSlideScreen.create(activity, session, level, this::showPicker, () -> finish(session, level));
+            View screen = LampSlideScreen.create(activity, session, level, () -> {
+                        selected = progression.unlockedLevel(storedId);
+                        mapPage = (selected - 1) / MAP_PAGE_SIZE;
+                        showPicker();
+                    },
+                    () -> {
+                        if (activeOwner()) GameResults.saveLevel(scores(), storedId, level, game.levelCount(),
+                                game.starRule().stars(session), true, result(session));
+                    },
+                    () -> finish(session, level));
             page.addView(screen, new LinearLayout.LayoutParams(-1, -2));
         }
 
-        /** Shared results. Next level is offered by GameChrome once the following level is unlocked. */
+        private String result(LampSlideSession session) {
+            return session.puzzle().moves() + " moves · Par " + session.puzzle().par()
+                    + " · " + session.hintsUsed() + " hints";
+        }
+
         private void finish(LampSlideSession session, int level) {
-            new GameChrome(this).finishedRun(game, TITLE, session, level,
-                    () -> start(level, System.nanoTime()),
-                    () -> start(level + 1, System.nanoTime()));
+            int nextLevel = level + 1;
+            boolean hasNext = nextLevel <= game.levelCount() && progression.unlockedLevel(storedId) >= nextLevel;
+            int side = LampSlideLevels.boardSize(nextLevel);
+            new GameChrome(this).showLevelResult(TITLE, level, game.starRule().stars(session), true,
+                    result(session), hasNext ? "Next painting · " + side + " × " + side + " board" : "All paintings cleared.",
+                    GameAudio.get(activity).announcerLine(GAME_ID, GameAudio.Reaction.WIN),
+                    hasNext ? () -> start(nextLevel, System.nanoTime()) : null,
+                    () -> start(level, System.nanoTime()), () -> {
+                        selected = progression.unlockedLevel(storedId);
+                        mapPage = (selected - 1) / MAP_PAGE_SIZE;
+                        showPicker();
+                    });
         }
 
         private int totalStars() {
@@ -230,6 +241,7 @@ public final class LampSlideLauncher {
         }
 
         private LinearLayout newPage() {
+            GameAudio.get(activity).setReactionWindow(dialog.getWindow());
             LinearLayout page = new LinearLayout(activity);
             page.setOrientation(LinearLayout.VERTICAL);
             page.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -251,6 +263,7 @@ public final class LampSlideLauncher {
         @Override public void screen(String title, String subtitle) {
             page = newPage();
             text(title, 24, true);
+            page.addView(GameAudioSettings.button(activity), new LinearLayout.LayoutParams(-2, -2));
             text(subtitle, 13, false);
         }
 
@@ -258,7 +271,7 @@ public final class LampSlideLauncher {
             TextView view = new TextView(activity);
             view.setText(value);
             view.setTextSize(sp);
-            view.setTextColor(0xFFFFFFFF);
+            view.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
             view.setGravity(Gravity.CENTER_HORIZONTAL);
             view.setPadding(0, dp(6), 0, dp(6));
             if (bold) view.setTypeface(view.getTypeface(), Typeface.BOLD);
@@ -272,9 +285,8 @@ public final class LampSlideLauncher {
 
         @Override public Button button(String label, boolean primary) {
             Button button = new Button(activity);
-            button.setText(label);
-            button.setAllCaps(false);
-            button.setTextColor(0xFFFFFFFF);
+            ctx.ui().styleButton(button, label, primary);
+            GameFx.attachPress(button);
             page.addView(button, new LinearLayout.LayoutParams(-1, -2));
             return button;
         }
@@ -295,10 +307,7 @@ public final class LampSlideLauncher {
             ctx.seedReset().run();
         }
 
-        /** "Back to Games" in the results returns to the picker. */
-        @Override public void hub() {
-            showPicker();
-        }
+        @Override public void hub() { dialog.dismiss(); }
 
         private int dp(int value) {
             return Math.round(value * activity.getResources().getDisplayMetrics().density);

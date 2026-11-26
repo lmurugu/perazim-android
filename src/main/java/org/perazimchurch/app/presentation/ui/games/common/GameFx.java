@@ -14,8 +14,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.os.Build;
 import android.provider.Settings;
 import android.view.HapticFeedbackConstants;
@@ -39,16 +37,12 @@ import java.util.Random;
  */
 public final class GameFx {
 
-    /** Sound effects on or off. On by default; the app's settings screen can call {@link #setSoundEnabled}. */
-    private static volatile boolean soundEnabled = true;
     /** Haptics on or off. On by default. */
     private static volatile boolean hapticsEnabled = true;
-    private static ToneGenerator tones;
     private static final Random RANDOM = new Random();
 
     private GameFx() {}
 
-    public static void setSoundEnabled(boolean on) { soundEnabled = on; }
     public static void setHapticsEnabled(boolean on) { hapticsEnabled = on; }
 
     /** False when the system has turned animations off ("Remove animations"). */
@@ -131,18 +125,18 @@ public final class GameFx {
 
     // ---- Answers ----
 
-    /** Correct answer: a glow pulse and a light tick, plus a short haptic. */
+    /** Correct answer: a glow pulse and a bright chime and a voice line, plus a short haptic. */
     public static void correct(View view) {
         pulse(view, Color.argb(160, 255, 170, 60));
         haptic(view, true);
-        if (!GameAudio.get(view.getContext()).play(GameAudio.Sfx.CORRECT)) tone(ToneGenerator.TONE_PROP_ACK);
+        GameAudio.get(view.getContext()).answerFeedback(true);
     }
 
-    /** Wrong answer: a shake, a soft buzz and a short haptic. */
+    /** Wrong answer: a shake, a low cue and a voice line and a short haptic. */
     public static void wrong(View view) {
         shake(view);
         haptic(view, false);
-        if (!GameAudio.get(view.getContext()).play(GameAudio.Sfx.WRONG)) tone(ToneGenerator.TONE_PROP_NACK);
+        GameAudio.get(view.getContext()).answerFeedback(false);
     }
 
     /** Scale pulse with a glow in {@code glow}. */
@@ -193,6 +187,11 @@ public final class GameFx {
 
     /** Pops the lit stars in one after another, with a small burst on each. */
     public static void popStars(FrameLayout frame, int stars) {
+        popStars(frame, stars, true);
+    }
+
+    /** A result that has its own sound cue can keep the star animation quiet. */
+    public static void popStars(FrameLayout frame, int stars, boolean playSound) {
         if (frame.getChildCount() == 0) return;
         LinearLayout row = (LinearLayout) frame.getChildAt(0);
         ParticleView particles = frame.getChildCount() > 1 ? (ParticleView) frame.getChildAt(1) : null;
@@ -210,10 +209,10 @@ public final class GameFx {
                     .withStartAction(() -> {
                         if (lit && particles != null) particles.burst(star.getX() + star.getWidth() / 2f, star.getY() + star.getHeight() / 2f);
                         if (lit) haptic(star, true);
-                        if (lit) audio.playPitched(GameAudio.Sfx.STAR, 1f + 0.12f * (step + 1));
+                        if (lit && playSound) audio.playPitched(GameAudio.Sfx.STAR, 1f + 0.12f * (step + 1));
                     }).start();
         }
-        if (stars >= 3) audio.playPitched(GameAudio.Sfx.COMPLETE, 1f);
+        if (stars >= 3 && playSound) audio.playPitched(GameAudio.Sfx.COMPLETE, 1f);
     }
 
     /** Counts a score up from 0 to {@code target}, showing "prefix N suffix". */
@@ -252,20 +251,10 @@ public final class GameFx {
 
     // ---- Haptics and tones ----
 
-    /** A short haptic. {@code correct} gives a light tick, otherwise a firmer buzz. */
+    /** A short haptic. {@code correct} gives a bright chime and a voice line, otherwise a firmer buzz. */
     public static void haptic(View view, boolean correct) {
         if (!hapticsEnabled) return;
         view.performHapticFeedback(correct ? HapticFeedbackConstants.VIRTUAL_KEY : HapticFeedbackConstants.LONG_PRESS);
-    }
-
-    private static void tone(int type) {
-        if (!soundEnabled) return;
-        try {
-            if (tones == null) tones = new ToneGenerator(AudioManager.STREAM_MUSIC, 40);
-            tones.startTone(type, 90);
-        } catch (RuntimeException ignored) {
-            // No audio device or tone generator: the game still works without sound.
-        }
     }
 
     // ---- Drawables and overlays ----

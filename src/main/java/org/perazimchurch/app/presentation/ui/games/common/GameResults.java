@@ -58,6 +58,40 @@ public final class GameResults {
         return stars;
     }
 
+    /** Save the result and unlock together, before any animation or navigation. */
+    public static boolean saveLevel(SharedPreferences prefs, String storedId, int level, int count,
+                                    int stars, boolean cleared, String result) {
+        SharedPreferences.Editor editor = prefs.edit();
+        LevelProgression progression = new LevelProgression(new PrefsKeyValueStore(prefs, editor));
+        boolean unlocked = progression.record(storedId, level, stars, count, cleared);
+        editor.putString("games.lastResult." + storedId + "." + level, result).apply();
+        return unlocked;
+    }
+
+    public static int clearedCount(SharedPreferences prefs, String storedId, int count, boolean openChapters) {
+        LevelProgression progression = new LevelProgression(new PrefsKeyValueStore(prefs));
+        int cleared = 0;
+        for (int level = 1; level <= count; level++) {
+            if (progression.cleared(storedId, level)
+                    || (openChapters && progression.bestStars(storedId, level) > 0)) cleared++;
+        }
+        return cleared;
+    }
+
+    /** Old one-round result screens could save a passing score before they had a next level. */
+    public static void carryForwardPassedLevels(SharedPreferences prefs, String storedId, int count) {
+        LevelProgression progress = new LevelProgression(new PrefsKeyValueStore(prefs));
+        int level = progress.unlockedLevel(storedId);
+        while (level < count && progress.cleared(storedId, level)) {
+            progress.record(storedId, level, progress.bestStars(storedId, level), count, true);
+            level++;
+        }
+    }
+
+    public static String lastLevelResult(SharedPreferences prefs, String storedId, int level) {
+        return prefs.getString("games.lastResult." + storedId + "." + level, "");
+    }
+
     /** The highest level unlocked for a stored id (1 when nothing is unlocked yet). */
     public static int unlockedLevel(SharedPreferences prefs, String storedId) {
         return new LevelProgression(new PrefsKeyValueStore(prefs)).unlockedLevel(storedId);
@@ -99,9 +133,13 @@ public final class GameResults {
     /** Stores level progress in the same preferences file as the game scores. */
     private static final class PrefsKeyValueStore implements org.perazimchurch.app.domain.games.engine.KeyValueStore {
         private final SharedPreferences prefs;
+        private final SharedPreferences.Editor editor;
 
-        PrefsKeyValueStore(SharedPreferences prefs) {
+        PrefsKeyValueStore(SharedPreferences prefs) { this(prefs, null); }
+
+        private PrefsKeyValueStore(SharedPreferences prefs, SharedPreferences.Editor editor) {
             this.prefs = prefs;
+            this.editor = editor;
         }
 
         @Override public int getInt(String key, int defaultValue) {
@@ -109,7 +147,8 @@ public final class GameResults {
         }
 
         @Override public void putInt(String key, int value) {
-            prefs.edit().putInt(key, value).apply();
+            if (editor != null) editor.putInt(key, value);
+            else prefs.edit().putInt(key, value).apply();
         }
     }
 }

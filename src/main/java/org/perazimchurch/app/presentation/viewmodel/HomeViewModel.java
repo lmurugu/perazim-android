@@ -38,7 +38,6 @@ public class HomeViewModel extends ViewModel {
     private static final String TAG = "HomeViewModel";
 
     private final SermonRepository sermonRepo;
-    private final BibleRepository bibleRepo;
     private final ReflectionRepository reflectionRepo;
     private final AnnouncementRepository announcementRepo;
     private final EventRepository eventRepo;
@@ -64,7 +63,6 @@ public class HomeViewModel extends ViewModel {
                          @NonNull UserRepository userRepo,
                          @NonNull Executor executor) {
         this.sermonRepo = sermonRepo;
-        this.bibleRepo = bibleRepo;
         this.reflectionRepo = reflectionRepo;
         this.announcementRepo = announcementRepo;
         this.eventRepo = eventRepo;
@@ -81,31 +79,17 @@ public class HomeViewModel extends ViewModel {
     }
 
     /**
-     * Loads the Home Feed data: 2 Samuel 5:20 scripture, today's reflection,
+     * Loads Home feed data alongside the separate daily reading plan,
      * recent sermons, upcoming events, active announcements, and current user streak/XP.
      */
     public void loadHomeFeed(@Nullable Consumer<HomeData> callback) {
+        loadHomeFeed(null, callback);
+    }
+
+    public void loadHomeFeed(@Nullable BibleVerse selectedReading, @Nullable Consumer<HomeData> callback) {
         feedState.postValue(UiState.loading());
         executor.execute(() -> {
             try {
-                // 1. Scripture of the day (2 Samuel 5:20)
-                BibleVerse scripture = bibleRepo.getVerse("KJV", "2SA", 5, 20);
-                if (scripture == null) {
-                    scripture = bibleRepo.getVerse(null, "2SA", 5, 20);
-                }
-                if (scripture == null) {
-                    scripture = new BibleVerse(
-                            "2SA.5.20",
-                            "KJV",
-                            "2SA",
-                            5,
-                            20,
-                            "And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters.",
-                            false,
-                            null
-                    );
-                }
-
                 // 2. Today's reflection devotional
                 Reflection reflection = reflectionRepo.getTodayReflection();
 
@@ -122,7 +106,7 @@ public class HomeViewModel extends ViewModel {
                 User currentUser = userRepo.getCurrentUser();
 
                 HomeData homeData = new HomeData(
-                        scripture,
+                        selectedReading,
                         reflection,
                         recentSermons,
                         upcomingEvents,

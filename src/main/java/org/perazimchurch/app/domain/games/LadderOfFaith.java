@@ -29,6 +29,8 @@ public final class LadderOfFaith {
     public enum Event { CORRECT, WRONG, MILESTONE, LIFE_LOST, LIFELINE_USED, RUN_COMPLETE }
 
     private final List<Card> rungs;
+    private final int easyCount;
+    private final int mediumCount;
     private final List<Event> events = new ArrayList<>();
     private int index;
     private int score;
@@ -56,9 +58,9 @@ public final class LadderOfFaith {
      * rest hard, always {@link #RUNGS} in total. Levels use this to get harder as the player goes on.
      */
     public LadderOfFaith(long seed, int easy, int medium) {
-        if (easy < 0 || medium < 0 || easy + medium > RUNGS) {
-            throw new IllegalArgumentException("difficulty mix does not fit the ladder");
-        }
+        validateMix(easy, medium);
+        easyCount = easy;
+        mediumCount = medium;
         Random random = new Random(seed);
         List<Card> draw = new ArrayList<>();
         draw.addAll(pick(LadderBank.EASY, easy, random));
@@ -73,15 +75,35 @@ public final class LadderOfFaith {
      * {@code history} is keyed by question prompt; a missing entry counts as unseen. Null history means none.
      */
     public LadderOfFaith(long seed, Map<String, ReviewScheduler.Record> history, int unseenPercent, int missedPercent) {
+        this(seed, history, unseenPercent, missedPercent, EASY_RUNGS, MEDIUM_RUNGS);
+    }
+
+    public LadderOfFaith(long seed, Map<String, ReviewScheduler.Record> history, int unseenPercent,
+                         int missedPercent, int easy, int medium) {
+        validateMix(easy, medium);
+        easyCount = easy;
+        mediumCount = medium;
         Random random = new Random(seed);
         Map<String, ReviewScheduler.Record> record = history == null ? Collections.emptyMap() : history;
         List<Card> draw = new ArrayList<>();
-        draw.addAll(pickScheduled(LadderBank.EASY, EASY_RUNGS, random, record, unseenPercent, missedPercent));
-        draw.addAll(pickScheduled(LadderBank.MEDIUM, MEDIUM_RUNGS, random, record, unseenPercent, missedPercent));
-        draw.addAll(pickScheduled(LadderBank.HARD, RUNGS - EASY_RUNGS - MEDIUM_RUNGS, random, record,
+        draw.addAll(pickScheduled(LadderBank.EASY, easy, random, record, unseenPercent, missedPercent));
+        draw.addAll(pickScheduled(LadderBank.MEDIUM, medium, random, record, unseenPercent, missedPercent));
+        draw.addAll(pickScheduled(LadderBank.HARD, RUNGS - easy - medium, random, record,
                 unseenPercent, missedPercent));
         rungs = Collections.unmodifiableList(draw);
     }
+
+    private static void validateMix(int easy, int medium) {
+        if (easy < 0 || medium < 0 || easy + medium > RUNGS) {
+            throw new IllegalArgumentException("difficulty mix does not fit the ladder");
+        }
+    }
+
+    public int currentTier() {
+        return position() <= easyCount ? 1 : position() <= easyCount + mediumCount ? 2 : 3;
+    }
+
+    public boolean reachedTop() { return topAnswered || index >= RUNGS; }
 
     /** How many rungs of this run come from the given tier (1 easy, 2 medium, 3 hard). */
     public int rungsOfTier(int tier) {

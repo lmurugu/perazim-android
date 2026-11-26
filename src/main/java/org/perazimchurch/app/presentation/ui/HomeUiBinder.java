@@ -31,6 +31,7 @@ import android.graphics.Outline;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.view.ViewOutlineProvider;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -49,8 +50,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.perazimchurch.app.data.local.PerazimDatabase;
-import org.perazimchurch.app.data.local.entity.DailyVerseEntity;
+import org.perazimchurch.app.data.local.preference.DailyReadingStore;
+import org.perazimchurch.app.domain.reading.ReadingCatalog;
 import org.perazimchurch.app.data.local.preference.GamificationStore;
 import org.perazimchurch.app.data.local.entity.UserEntity;
 import org.perazimchurch.app.data.local.session.SessionManager;
@@ -58,11 +59,9 @@ import org.perazimchurch.app.domain.model.Announcement;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.domain.model.BibleVerse;
 import org.perazimchurch.app.domain.model.Event;
-import org.perazimchurch.app.domain.model.Reflection;
 import org.perazimchurch.app.domain.model.Sermon;
 import org.perazimchurch.app.domain.model.User;
 import org.perazimchurch.app.presentation.viewmodel.BibleViewModel;
-import org.perazimchurch.app.presentation.viewmodel.HomeData;
 import org.perazimchurch.app.presentation.viewmodel.HomeViewModel;
 import org.perazimchurch.app.presentation.viewmodel.ViewModelFactory;
 import org.perazimchurch.app.presentation.ui.games.GamesHubDialog;
@@ -78,6 +77,8 @@ import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.io.InputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -129,7 +130,6 @@ public class HomeUiBinder {
     private LinearLayout contentContainer;
 
     // Routine State
-    private static final String KEY_ROUTINE_STEP = "routine_step";
 
     private int routineStep = 1; // 1 = Read, 2 = Reflect, 3 = Pray, 4 = Done
     private TextView stepIndicatorRead;
@@ -156,15 +156,20 @@ public class HomeUiBinder {
     private LinearLayout eventsContainer;
 
     // Cached Data
-    private HomeData cachedHomeData;
 
     // Daily Cornerstone Scripture Views
     private TextView tvCornerstoneHeader;
     private TextView tvCornerstoneBody;
     private Button btnCornerstoneShare;
     private Button btnCornerstoneReadPassage;
-    private String currentCornerstoneRef = "2 Samuel 5:20";
-    private String currentCornerstoneText = "And David came to Baal-perazim, and David smote them there, and said, The LORD hath broken forth upon mine enemies before me, as the breach of waters.";
+    private static ReadingCatalog readingCatalog;
+    private final DailyReadingStore readingStore;
+    private DailyReadingStore.State readingState;
+    private ReadingCatalog.Reading selectedReading;
+    private String readingOwner;
+    private String readingDate;
+    private String currentCornerstoneRef = "Daily reading";
+    private String currentCornerstoneText = "";
 
     public HomeUiBinder(@NonNull Context context, @NonNull HomeViewModel homeViewModel) {
         this(context, homeViewModel, null, null);
@@ -181,6 +186,7 @@ public class HomeUiBinder {
                         @Nullable BibleViewModel bibleViewModel,
                         @Nullable HomeUiListener listener) {
         this.context = context;
+        this.readingStore = new DailyReadingStore(context);
         this.homeViewModel = homeViewModel;
         this.bibleViewModel = bibleViewModel != null
                 ? bibleViewModel
@@ -190,10 +196,7 @@ public class HomeUiBinder {
             String uid = resolveUserId();
             this.streakCount = GamificationStore.getStreak(this.context, uid, 0);
             this.xpCount = GamificationStore.getSpiritualXp(this.context, uid, 0);
-            try {
-                this.routineStep = this.context.getSharedPreferences("perazim_routine", Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1);
-            } catch (Exception ignored) {}
-            syncRoutineStateWithGamificationStore();
+            loadReading();
         }
     }
 
@@ -208,23 +211,40 @@ public class HomeUiBinder {
         return "guest";
     }
 
-    private void syncRoutineStateWithGamificationStore() {
-        if (context == null) return;
-        String uid = resolveUserId();
-        boolean completedToday = GamificationStore.isRoutineCompletedToday(context, uid);
-        if (completedToday) {
-            routineStep = 4;
-            progressPercent = 100;
-        } else if (routineStep >= 4) {
-            routineStep = 1;
-            progressPercent = 0;
+    private static synchronized ReadingCatalog catalog(Context context) {
+        if (readingCatalog == null) {
+            try (InputStreamReader source = new InputStreamReader(context.getAssets()
+                    .open("reading/daily-readings.json"), java.nio.charset.StandardCharsets.UTF_8)) {
+                readingCatalog = new ReadingCatalog(source);
+            } catch (IOException | org.json.JSONException e) {
+                android.util.Log.e("DailyReading", "Unable to load the reading catalog", e);
+            }
         }
-        // Levi's Q1: a chapter read in the reader completes the Read step.
-        if (routineStep == 1 && org.perazimchurch.app.domain.games.RoutineReadRule.readStepDone(
-                org.perazimchurch.app.data.local.preference.ReadingLog.chaptersToday(context))) {
-            routineStep = 2;
-            progressPercent = 33;
+        return readingCatalog;
+    }
+
+    private void loadReading() {
+        ReadingCatalog source = catalog(context);
+        if (source == null) return;
+        readingOwner = resolveUserId();
+        readingDate = GamificationStore.getTodayDateNairobi();
+        ReadingCatalog.Reading daily = source.dailyReading(readingDate);
+        readingState = readingStore.load(readingOwner, readingDate, daily.id);
+        selectedReading = source.find(readingState.readingId);
+        if (selectedReading == null) selectedReading = daily;
+        currentCornerstoneRef = selectedReading.reference;
+        currentCornerstoneText = selectedReading.scripture;
+        if (!readingState.isPlan() && readingState.step == 1
+                && org.perazimchurch.app.domain.games.RoutineReadRule.readStepDone(
+                        org.perazimchurch.app.data.local.preference.ReadingLog.chaptersToday(context))
+                && readingStore.advance(readingOwner, readingDate, readingState)) {
+            readingState = readingStore.load(readingOwner, readingDate, daily.id);
         }
+        routineStep = readingState.step;
+        progressPercent = (routineStep - 1) * 100 / 3;
+        if (tvCornerstoneHeader != null) tvCornerstoneHeader.setText(currentCornerstoneRef);
+        if (tvCornerstoneBody != null) tvCornerstoneBody.setText("“" + currentCornerstoneText + "”");
+        updateBeginRoutineButtonText();
     }
 
     public static View createView(@NonNull Context context,
@@ -402,7 +422,7 @@ public class HomeUiBinder {
         tvCornerstoneBody.setLineSpacing(0f, 1.3f);
         tvCornerstoneBody.setMaxLines(4);
         tvCornerstoneBody.setEllipsize(TextUtils.TruncateAt.END);
-        tvCornerstoneBody.setOnClickListener(v -> parseAndOpenScripture(currentCornerstoneRef));
+        tvCornerstoneBody.setOnClickListener(v -> openDailyPassage());
         card.addView(tvCornerstoneBody, GlassKit.matchWrap(context, 6));
 
         homeStepBar = GlassKit.stepBar(context, 3, 0);
@@ -418,8 +438,13 @@ public class HomeUiBinder {
             });
             card.addView(btnAskGuide, GlassKit.matchHeight(context, 46, 10));
         }
+        TextView plans = GlassKit.text(context, "Reading plans", 14, true, GlassKit.accent());
+        plans.setMinHeight(dp(44));
+        plans.setGravity(Gravity.CENTER_VERTICAL);
+        plans.setOnClickListener(v -> showReadingPlans());
+        card.addView(plans, GlassKit.matchWrap(context, 8));
 
-        syncRoutineStateWithGamificationStore();
+        loadReading();
         updateBeginRoutineButtonText();
         return card;
     }
@@ -436,7 +461,7 @@ public class HomeUiBinder {
 
         container.addView(doorRow(
                 createDoorCard(R.drawable.ic_christian_bible, "Bible", "Read scripture",
-                        v -> parseAndOpenScripture(currentCornerstoneRef)),
+                        v -> openDailyPassage()),
                 createDoorCard(R.drawable.ic_christian_candle, "Sermons", "Recent messages",
                         v -> { if (listener != null) listener.onNavigateToTab(1); })),
                 GlassKit.matchWrap(context, 8));
@@ -623,7 +648,9 @@ public class HomeUiBinder {
     private void updateBeginRoutineButtonText() {
         int step = Math.max(routineStep, 1);
         if (tvContinueStep != null) {
-            tvContinueStep.setText(step >= 4 ? "Done today" : "Step " + step + " of 3");
+            String progress = readingState != null && readingState.isPlan()
+                    ? "Day " + readingState.day + " of " + readingState.length + " · " : "";
+            tvContinueStep.setText(progress + (step >= 4 ? "Done" : "Step " + step + " of 3"));
         }
         if (homeStepBar != null) {
             GlassKit.setSteps(homeStepBar, Math.min(step, 3));
@@ -650,8 +677,14 @@ public class HomeUiBinder {
     private TextView tvReadingPassage;
     private TextView tvReadingReflection;
     private TextView tvReadingPrayer;
+    private TextView tvReadingPlan;
 
     private void showDailyReading() {
+        loadReading();
+        if (selectedReading == null) {
+            Toast.makeText(context, "The offline reading catalog could not be opened.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (readingDialog != null && readingDialog.isShowing()) {
             return;
         }
@@ -687,7 +720,8 @@ public class HomeUiBinder {
         LinearLayout intro = new LinearLayout(context);
         intro.setOrientation(LinearLayout.VERTICAL);
         intro.setPadding(dp(20), dp(14), dp(20), 0);
-        intro.addView(GlassKit.label(context, "CONTINUE TODAY'S READING"));
+        tvReadingPlan = GlassKit.label(context, "DAILY VERSE");
+        intro.addView(tvReadingPlan);
         tvReadingRef = GlassKit.text(context, currentCornerstoneRef, 24, true, GlassKit.text());
         intro.addView(tvReadingRef, GlassKit.matchWrap(context, 4));
         readingStepBar = GlassKit.stepBar(context, 3, 0);
@@ -700,8 +734,11 @@ public class HomeUiBinder {
         tvReadingPassage = addReadingSection(card, "SCRIPTURE PASSAGE", true);
         tvReadingReflection = addReadingSection(card, "MORNING REFLECTION", false);
         tvReadingPrayer = addReadingSection(card, "PRAYER POINTS", false);
-        TextView action = addReadingSection(card, "ACTION STEPS", false);
-        action.setText("Identify one intimidating challenge in your schedule today. Declare aloud Micah 2:13 over it three times before stepping out into your day.");
+        TextView plans = GlassKit.text(context, "Reading plans", 14, true, GlassKit.accent());
+        plans.setMinHeight(dp(44));
+        plans.setGravity(Gravity.CENTER_VERTICAL);
+        plans.setOnClickListener(v -> showReadingPlans());
+        card.addView(plans, GlassKit.matchWrap(context, 8));
         LinearLayout.LayoutParams lpCard = GlassKit.matchWrap(context, 14);
         lpCard.leftMargin = dp(16);
         lpCard.rightMargin = dp(16);
@@ -735,6 +772,139 @@ public class HomeUiBinder {
         dialog.show();
     }
 
+    private void showReadingPlans() {
+        ReadingCatalog catalog = catalog(context);
+        if (catalog == null) return;
+        loadReading();
+        if (readingState == null) return;
+        LinearLayout options = new LinearLayout(context);
+        options.setOrientation(LinearLayout.VERTICAL);
+        options.setPadding(dp(20), dp(4), dp(20), dp(12));
+        TextView status = GlassKit.text(context, planSummary(), 14, true, GlassKit.text());
+        options.addView(status, GlassKit.matchWrap(context, 6));
+
+        EditText query = new EditText(context);
+        query.setHint("Type a topic, such as worry");
+        query.setSingleLine(true);
+        query.setFilters(new android.text.InputFilter[] {new android.text.InputFilter.LengthFilter(100)});
+        options.addView(query, GlassKit.matchWrap(context, 10));
+        TextView search = GlassKit.orangeButton(context, "Find matching topics", 13);
+        options.addView(search, GlassKit.matchHeight(context, 46, 8));
+
+        LinearLayout topics = new LinearLayout(context);
+        topics.setOrientation(LinearLayout.VERTICAL);
+        options.addView(topics, GlassKit.matchWrap(context, 6));
+        ScrollView scroll = new ScrollView(context);
+        scroll.addView(options);
+        String owner = readingOwner;
+        AlertDialog chooser = new AlertDialog.Builder(context)
+                .setTitle("Reading plans")
+                .setView(scroll)
+                .setNeutralButton("Daily verse", (d, which) -> {
+                    if (!owner.equals(resolveUserId()) || !readingState.isPlan()) return;
+                    confirmReadingChange(() -> readingStore.useDaily(owner));
+                })
+                .setNegativeButton("Done", null)
+                .create();
+        showReadingTopics(topics, catalog.topics, "", chooser, owner);
+        search.setOnClickListener(v -> {
+            String words = query.getText().toString().trim();
+            InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (keyboard != null) keyboard.hideSoftInputFromWindow(query.getWindowToken(), 0);
+            List<ReadingCatalog.Topic> matches = catalog.matches(words);
+            if (matches.isEmpty() && !words.isEmpty()) {
+                topics.removeAllViews();
+                topics.addView(GlassKit.text(context,
+                        "No direct match. Try a shorter topic, or choose one below.", 13, false, GlassKit.body()));
+                appendReadingTopics(topics, catalog.topics, "", chooser, owner);
+            } else {
+                showReadingTopics(topics, words.isEmpty() ? catalog.topics : matches, words, chooser, owner);
+            }
+        });
+        chooser.show();
+        chooser.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private String planSummary() {
+        return readingState.isPlan()
+                ? readingState.topic + " · " + readingState.completed + " of " + readingState.length + " days read"
+                : "Daily verse · A different passage each day";
+    }
+
+    private void showReadingTopics(LinearLayout options, List<ReadingCatalog.Topic> topics,
+                                   String query, AlertDialog dialog, String owner) {
+        options.removeAllViews();
+        appendReadingTopics(options, topics, query, dialog, owner);
+    }
+
+    private void appendReadingTopics(LinearLayout options, List<ReadingCatalog.Topic> topics,
+                                     String query, AlertDialog dialog, String owner) {
+        for (ReadingCatalog.Topic topic : topics) {
+            Button choice = new Button(context);
+            choice.setAllCaps(false);
+            choice.setText(topic.title);
+            choice.setOnClickListener(v -> {
+                dialog.dismiss();
+                chooseReadingLength(topic, query, owner);
+            });
+            options.addView(choice, GlassKit.matchWrap(context, 3));
+        }
+    }
+
+    private void chooseReadingLength(ReadingCatalog.Topic topic, String query, String owner) {
+        if (!owner.equals(resolveUserId())) return;
+        LinearLayout options = new LinearLayout(context);
+        options.setOrientation(LinearLayout.VERTICAL);
+        options.setPadding(dp(20), dp(10), dp(20), dp(8));
+        options.addView(GlassKit.text(context, "Length in days or weeks, up to 30 days.", 14, false, GlassKit.body()));
+        Spinner length = new Spinner(context);
+        Spinner unit = new Spinner(context);
+        unit.setContentDescription("Duration unit");
+        length.setContentDescription("Duration amount");
+        ArrayAdapter<String> units = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item,
+                new String[]{"Days", "Weeks"});
+        unit.setAdapter(units);
+        unit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                List<Integer> amounts = new ArrayList<>();
+                int limit = position == 0 ? ReadingCatalog.MAX_DAYS : 4;
+                for (int i = 1; i <= limit; i++) amounts.add(i);
+                length.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, amounts));
+                if (position == 0) length.setSelection(6);
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) { }
+        });
+        options.addView(unit, GlassKit.matchHeight(context, 48, 8));
+        options.addView(length, GlassKit.matchHeight(context, 48, 6));
+        new AlertDialog.Builder(context).setTitle(topic.title).setView(options)
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Start plan", (dialog, which) -> {
+                    Object amount = length.getSelectedItem();
+                    if (!(amount instanceof Integer) || !owner.equals(resolveUserId())) return;
+                    int days = (Integer) amount * (unit.getSelectedItemPosition() == 0 ? 1 : 7);
+                    List<String> entries = catalog(context).select(topic, query, days);
+                    confirmReadingChange(() -> readingStore.start(owner, topic.title, entries));
+                }).show();
+    }
+
+    private void confirmReadingChange(java.util.function.BooleanSupplier change) {
+        loadReading();
+        String owner = readingOwner;
+        Runnable apply = () -> {
+            if (!owner.equals(resolveUserId())) return;
+            if (change.getAsBoolean()) updateRoutineView();
+            else Toast.makeText(context, "Could not save the reading plan.", Toast.LENGTH_SHORT).show();
+        };
+        if (readingState.isPlan() && !readingState.planFinished()) {
+            new AlertDialog.Builder(context).setTitle("Replace current plan?")
+                    .setMessage("This will replace the progress in your current plan.")
+                    .setNegativeButton("Keep plan", null)
+                    .setPositiveButton("Replace plan", (d, which) -> apply.run()).show();
+        } else {
+            apply.run();
+        }
+    }
+
     private TextView addReadingSection(LinearLayout card, String heading, boolean first) {
         TextView h = GlassKit.text(context, heading, 10, true, GlassKit.accent());
         h.setLetterSpacing(0.1f);
@@ -746,91 +916,57 @@ public class HomeUiBinder {
     }
 
     private void advanceReflectionStep() {
-        if (routineStep == 1) {
-            routineStep = 2;
-            progressPercent = 33;
-            saveRoutineState(null);
+        if (readingState == null || !resolveUserId().equals(readingOwner)) {
+            if (readingDialog != null) readingDialog.dismiss();
+            loadReading();
+            return;
+        }
+        String today = GamificationStore.getTodayDateNairobi();
+        if (!today.equals(readingDate)) {
             updateRoutineView();
-        } else if (routineStep == 2) {
-            routineStep = 3;
-            progressPercent = 66;
-            saveRoutineState(null);
+            return;
+        }
+        boolean finish = readingState.step == 3;
+        if (!readingStore.advance(readingOwner, today, readingState)) {
             updateRoutineView();
-        } else if (routineStep == 3) {
-            btnRoutineNext.setEnabled(false);
-            btnRoutineNext.setText("SAVING…");
-
-            String reflectionId = (cachedHomeData != null && cachedHomeData.getTodayReflection() != null)
-                    ? cachedHomeData.getTodayReflection().getId()
-                    : "refl_day_1";
-
-            homeViewModel.completeDailyReflection(reflectionId, () -> {
-                routineStep = 4;
-                saveRoutineState(null);
-                String uid = resolveUserId();
-                boolean isNewDay = GamificationStore.recordDailyRoutineCompleted(context, uid, streakCount + 1);
-                if (isNewDay) {
-                    streakCount += 1;
-                    if (listener != null) {
-                        listener.onStreakUpdated(streakCount);
-                    }
-                    awardXp(20);
+            return;
+        }
+        if (finish && GamificationStore.recordDailyRoutineCompleted(context, readingOwner, streakCount + 1)) {
+            String completedBy = readingOwner;
+            homeViewModel.completeDailyReflection(null, () -> {
+                if (!completedBy.equals(resolveUserId())) return;
+                streakCount += 1;
+                if (listener != null) listener.onStreakUpdated(streakCount);
+                awardXp(20);
+                if (readingDialog != null) {
+                    org.perazimchurch.app.ui.components.FeedbackManager.get(context).celebrateIn(readingDialog.getWindow());
                 }
-                progressPercent = 100;
-                btnRoutineNext.setEnabled(true);
-                updateRoutineView();
-                if (isNewDay) {
-                    org.perazimchurch.app.ui.components.FeedbackManager fm =
-                            org.perazimchurch.app.ui.components.FeedbackManager.get(context);
-                    if (readingDialog != null && readingDialog.getWindow() != null) {
-                        fm.celebrateIn(readingDialog.getWindow());
-                        if (context instanceof android.app.Activity) {
-                            fm.reward((android.app.Activity) context);
-                        }
-                    } else if (context instanceof android.app.Activity) {
-                        fm.milestone((android.app.Activity) context);
-                    }
-                    Toast.makeText(context, "Daily reflection completed. +20 XP awarded.", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "Routine already completed today.", Toast.LENGTH_SHORT).show();
-                }
-            }, error -> {
-                btnRoutineNext.setEnabled(true);
-                btnRoutineNext.setText("COMPLETE ROUTINE");
-                Toast.makeText(context, "Could not complete reflection: " + (error != null ? error.getMessage() : "Unknown error"), Toast.LENGTH_SHORT).show();
             });
         }
+        updateRoutineView();
     }
 
     private void updateRoutineView() {
-        syncRoutineStateWithGamificationStore();
-        updateBeginRoutineButtonText();
-
-        Reflection refl = (cachedHomeData != null) ? cachedHomeData.getTodayReflection() : null;
-        String ref = (refl != null && !TextUtils.isEmpty(refl.getScriptureReference()))
-                ? refl.getScriptureReference() : currentCornerstoneRef;
-        String passage = (refl != null && !TextUtils.isEmpty(refl.getPassageText()))
-                ? refl.getPassageText()
-                : "“As waters break out, the LORD has broken out against my enemies before me — therefore he named that place Baal Perazim.” — 2 Samuel 5:20";
-        String reflection = (refl != null && !TextUtils.isEmpty(refl.getCommentary()))
-                ? refl.getCommentary()
-                : "When David faced the Philistine host in the Valley of Rephaim, he inquired of the Lord. God burst forth like waters through a shattered dam. Whatever wall confronts you today, declare that the Lord of the Breakthrough is rising on your behalf.";
-        String prayer = (refl != null && !TextUtils.isEmpty(refl.getPrayerPrompt()))
-                ? refl.getPrayerPrompt()
-                : "Heavenly Father, Lord of Baal-Perazim, thank You that You are the God who breaks forth. Break forth upon every obstacle standing in my path. I receive Your breakthrough today. In Jesus' name, Amen.";
-
-        if (tvReadingRef != null) tvReadingRef.setText(ref);
-        if (tvReadingPassage != null) tvReadingPassage.setText(passage);
-        if (tvReadingReflection != null) tvReadingReflection.setText(reflection);
-        if (tvReadingPrayer != null) tvReadingPrayer.setText(prayer);
-
+        loadReading();
+        if (selectedReading == null) return;
+        if (tvReadingRef != null) tvReadingRef.setText(selectedReading.reference);
+        if (tvReadingPlan != null) tvReadingPlan.setText(readingState.isPlan()
+                ? readingState.topic + " · Day " + readingState.day + " of " + readingState.length
+                : "Daily verse · KJV");
+        if (tvReadingPassage != null) tvReadingPassage.setText(selectedReading.scripture);
+        if (tvReadingReflection != null) tvReadingReflection.setText(selectedReading.focus + "\n\n"
+                + selectedReading.reflection);
+        if (tvReadingPrayer != null) tvReadingPrayer.setText("Pray in your own words about what stood out. "
+                + "Ask God to help you put one part of this reading into practice.");
         int step = Math.max(routineStep, 1);
         if (readingStepBar != null) {
             GlassKit.setSteps(readingStepBar, Math.min(step, 3));
         }
         if (tvRoutineStepTitle != null) {
             tvRoutineStepTitle.setText(step >= 4
-                    ? "Complete · " + streakCount + "-day streak"
+                    ? readingState.planFinished() ? "Plan complete · " + readingState.completed + " days read"
+                        : readingState.isPlan() ? readingState.completed + " / " + readingState.length
+                                + " days read · Next reading tomorrow" : "Complete for today"
                     : "Step " + step + " of 3: " + STEP_NAMES[step - 1]);
         }
         if (btnRoutineNext != null) {
@@ -1128,11 +1264,17 @@ public class HomeUiBinder {
     // DATA FEED REFRESH FROM HomeViewModel
     // =========================================================================
 
+    public void refreshDailyReading() {
+        updateRoutineView();
+    }
+
     public void refreshFeed() {
-        loadDailyVerse();
-        homeViewModel.loadHomeFeed(homeData -> {
+        loadReading();
+        BibleVerse today = selectedReading == null ? null : new BibleVerse(selectedReading.id, "KJV",
+                selectedReading.book, selectedReading.chapter, selectedReading.firstVerse,
+                selectedReading.scripture, false, null);
+        homeViewModel.loadHomeFeed(today, homeData -> {
             if (homeData != null) {
-                cachedHomeData = homeData;
                 streakCount = homeData.getStreak();
                 xpCount = homeData.getSpiritualXp();
 
@@ -1150,53 +1292,10 @@ public class HomeUiBinder {
         });
     }
 
-    /**
-     * Queries Room for today's curated daily scripture (YYYY-MM-DD).
-     * If present and active, binds it to the cornerstone scripture card.
-     * If absent or inactive, retains the default 2 Samuel 5:20 scripture.
-     */
-    private void loadDailyVerse() {
-        new Thread(() -> {
-            try {
-                String todayStr = new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(new Date());
-                PerazimDatabase db = PerazimDatabase.getInstance(context);
-                DailyVerseEntity verse = db.dailyVerseDao().getVerseForDate(todayStr);
-                if (verse != null && verse.isActive() && !TextUtils.isEmpty(verse.getText())) {
-                    if (rootScrollView != null) {
-                        rootScrollView.post(() -> applyDailyVerse(verse.getReference(), verse.getText()));
-                    }
-                }
-            } catch (Exception e) {
-                android.util.Log.w("HomeUiBinder", "Could not load daily verse from Room", e);
-            }
-        }).start();
-    }
-
-    private void applyDailyVerse(String ref, String text) {
-        currentCornerstoneRef = !TextUtils.isEmpty(ref) ? ref : "2 Samuel 5:20";
-        currentCornerstoneText = !TextUtils.isEmpty(text) ? text : "";
-        if (tvCornerstoneHeader != null) {
-            tvCornerstoneHeader.setText(currentCornerstoneRef);
-        }
-        if (tvCornerstoneBody != null) {
-            tvCornerstoneBody.setText("“" + currentCornerstoneText.trim() + "”");
-        }
-    }
-
-    private void parseAndOpenScripture(String ref) {
-        if (TextUtils.isEmpty(ref)) {
-            openScriptureReader("2SA", 5);
-            return;
-        }
-        String lower = ref.toLowerCase(Locale.ROOT);
-        if (lower.contains("2 samuel") || lower.contains("2sa")) {
-            openScriptureReader("2SA", 5);
-        } else if (lower.contains("john") || lower.contains("jhn")) {
-            openScriptureReader("JHN", 3);
-        } else if (lower.contains("psalm") || lower.contains("psa")) {
-            openScriptureReader("PSA", 23);
-        } else {
-            openScriptureReader("2SA", 5);
+    private void openDailyPassage() {
+        loadReading();
+        if (selectedReading != null) {
+            BibleReaderDialog.showPassage(context, bibleViewModel, selectedReading.book, selectedReading.chapter);
         }
     }
 
@@ -1469,30 +1568,12 @@ public class HomeUiBinder {
         return output;
     }
 
+    /** Progress is written at each reading step. A Bundle cannot override the active account or date. */
     public void saveRoutineState(android.os.Bundle outState) {
-        if (outState != null) outState.putInt(KEY_ROUTINE_STEP, routineStep);
-        if (context != null) {
-            try {
-                context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE)
-                        .edit()
-                        .putInt(KEY_ROUTINE_STEP, routineStep)
-                        .commit();
-            } catch (Exception e) {
-                android.util.Log.e("HomeUiBinder", "Failed to save routine state", e);
-            }
-        }
+        // Kept for the Activity's existing lifecycle callback.
     }
+
     public void restoreRoutineState(android.os.Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            routineStep = savedInstanceState.getInt(KEY_ROUTINE_STEP, 1);
-        } else {
-            // Restore from durable SP if Bundle not present (process death, fresh start with preserved state)
-            try {
-                if (context != null) {
-                    routineStep = context.getSharedPreferences("perazim_routine", android.content.Context.MODE_PRIVATE).getInt(KEY_ROUTINE_STEP, 1);
-                }
-            } catch (Exception e) { /* ignore */ }
-        }
-        syncRoutineStateWithGamificationStore();
+        loadReading();
     }
 }

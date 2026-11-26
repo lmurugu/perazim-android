@@ -35,19 +35,39 @@ public final class LevelProgression {
      * @return true when this run unlocked a new level
      */
     public boolean record(String gameId, int level, int stars, int levelCount) {
+        return record(gameId, level, stars, levelCount, stars >= PASS_STARS);
+    }
+
+    /** Records the rating and unlocks according to the game's own completion rule. */
+    public boolean record(String gameId, int level, int stars, int levelCount, boolean cleared) {
         if (level < 1 || levelCount < 1 || level > levelCount) {
             throw new IllegalArgumentException("level out of range");
         }
+        boolean wasCleared = cleared(gameId, level);
         int clampedStars = Math.max(0, Math.min(3, stars));
         if (clampedStars > bestStars(gameId, level)) {
             store.putInt(starsKey(gameId, level), clampedStars);
         }
+        if (cleared) store.putInt(clearKey(gameId, level), 1);
+        else if (store.getInt(clearKey(gameId, level), 0) == 0) {
+            store.putInt(clearKey(gameId, level), wasCleared ? 1 : -1);
+        }
         int unlocked = unlockedLevel(gameId);
-        if (clampedStars >= PASS_STARS && level == unlocked && level < levelCount) {
+        if (cleared && level == unlocked && level < levelCount) {
             store.putInt(unlockKey(gameId), level + 1);
             return true;
         }
         return false;
+    }
+
+    /** Older two-star results already passed under the original rule. */
+    public boolean cleared(String gameId, int level) {
+        int explicit = store.getInt(clearKey(gameId, level), 0);
+        return explicit == 1 || (explicit == 0 && bestStars(gameId, level) >= PASS_STARS);
+    }
+
+    private static String clearKey(String gameId, int level) {
+        return "games.cleared." + gameId + "." + level;
     }
 
     private static String unlockKey(String gameId) {
