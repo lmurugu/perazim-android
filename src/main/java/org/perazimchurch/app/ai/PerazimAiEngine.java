@@ -309,7 +309,9 @@ public class PerazimAiEngine {
     /** Overdose or poisoning: an emergency now, whatever the symptoms. */
     private static final Pattern OVERDOSE_PATTERN = Pattern.compile(
             "\\b(?:overdos\\w*|poisoned myself|took too many|taken the (?:tablets|pills)|swallowed (?:pills|tablets|poison)|drank (?:bleach|poison)|" +
-            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:my|the) (?:tablets|pills))\\b", Pattern.CASE_INSENSITIVE);
+            "took (?:a|the|all|my) (?:whole )?(?:bottle|box|packet|strip|container) of|took a whole bottle|took all (?:of )?(?:my|the) (?:\\w+ )?(?:tablets|pills)|drank (?:some |a bottle of |a packet of )?(?:rat )?poison|nimekunywa sumu|" +
+            // Swallowed medicine with any short description in between ("swallowed a packet of tablets an hour ago"), and Swahili "nimemeza vidonge".
+            "swallowed (?:\\w+\\s+){0,4}?(?:tablets|pills|capsules|poison|medicine)|nimemeza (?:\\w+\\s+){0,3}?(?:vidonge|sumu))\\b", Pattern.CASE_INSENSITIVE);
 
     public static boolean isOverdoseQuery(@Nullable String query) {
         return query != null && OVERDOSE_PATTERN.matcher(query).find();
@@ -494,10 +496,33 @@ public class PerazimAiEngine {
     private static final Pattern SELLING_CUE = Pattern.compile(
             "\\b(?:sell|selling|sells|deal|dealing|traffick\\w*|smuggl\\w*|supply|supplying)\\b", Pattern.CASE_INSENSITIVE);
 
+    /** A child or young person named with a substance and an ongoing-use cue in the same sentence (KE-044, 2026-11-25). */
+    private static final Pattern CHILD_SUBSTANCE_NOUN = Pattern.compile(
+            "\\b(?:kijana|vijana|mtoto|watoto|mwanangu|wanangu|my (?:son|daughter|child|children|kid|kids|teen|teenager)|our (?:son|daughter|child|children|kids?))\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern SUBSTANCE_CUE = Pattern.compile(
+            "\\b(?:bangi|pombe|bhang|cannabis|weed|drugs?|dawa za kulevya|alcohol|heroin|cocaine|kuvuta|mirungi|gongo|changaa)\\b",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern ONGOING_USE_CUE = Pattern.compile(
+            "\\b(?:kila (?:siku|usiku)|every (?:day|night)|daily|nightly|anatumia|wanatumia|anakunywa|anavuta|uses|using|smokes|smoking|drinks|"
+            + "addict\\w*|amezoea|hooked|can'?t stop|cannot stop)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** True when one sentence names a child, a substance and ongoing use, so the question is about a child's safety. */
+    public static boolean isChildSubstanceUse(@Nullable String query) {
+        if (query == null) return false;
+        for (String sentence : query.split("[.?!]+")) {
+            if (CHILD_SUBSTANCE_NOUN.matcher(sentence).find() && SUBSTANCE_CUE.matcher(sentence).find() && ONGOING_USE_CUE.matcher(sentence).find()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isDrugSafetyQuery(@Nullable String query) {
         if (query == null) return false;
         String withoutMiraa = MIRAA_CUE.matcher(query).replaceAll(" ");
-        return DRUG_CUE.matcher(withoutMiraa).find() || (DRUG_CUE.matcher(query).find() && SELLING_CUE.matcher(query).find());
+        return DRUG_CUE.matcher(withoutMiraa).find() || (DRUG_CUE.matcher(query).find() && SELLING_CUE.matcher(query).find())
+                || isChildSubstanceUse(query);
     }
 
     /** Requests to search the live web or current news. Declined before the Bible cues (see preModelRoute). */
@@ -873,12 +898,96 @@ public class PerazimAiEngine {
             + "\\bi\\s+(?:want|wish|hope)\\s+to\\s+die\\b|\\bi\\s+(?:wish|want)\\s+i\\s+(?:was|were)\\s+dead\\b|"
             + "\\bend\\s+(?:it|my\\s+life|everything)\\b", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * General self-harm and suicide wording, in English and Swahili, that the patterns above miss: a means already at hand
+     * ("I have the rope ready"), cutting, jumping, not wanting to live, feeling a burden, a goodbye letter (2026-11-25 safety run,
+     * KE-088 to KB-093). Each alternative is anchored to the speaker or to a clear self-harm phrase, so a Bible question about
+     * "the burden of sin" or "jumping for joy" does not match.
+     */
+    private static final Pattern SELF_HARM_GENERAL = Pattern.compile(
+            "\\bi\\s+(?:do not|don'?t|no longer|can'?t|cannot|won'?t)\\s+want\\s+to\\s+(?:live|be alive|be here|exist|go on|wake up)\\b|" +
+            "\\bi\\s+(?:do not|don'?t)\\s+want\\s+to\\s+be\\s+(?:a\\s+)?burden\\b|\\bi\\s+(?:am|'m)\\s+(?:only\\s+|just\\s+)?(?:a\\s+)?burden\\s+(?:to|on)\\b|" +
+            "\\bnobody (?:would|will) miss me\\b|\\bno ?one (?:would|will) miss me\\b|\\bbetter off without me\\b|" +
+            "\\b(?:going to|about to|thinking (?:of|about)|want to|plan to)\\s+jump(?:ing)?\\s+(?:off|from|in front)\\b|\\bi\\s+(?:am|'m)\\s+jumping\\s+off\\b|\\bjumping off\\b|" +
+            // First-person "thinking of jumping" with nothing after it, and standing on a balcony, roof or ledge (KB-090).
+            "\\bi\\b[^.?!]{0,20}?\\bthinking\\s+(?:of|about)\\s+jump(?:ing)?\\b|\\bi\\s+(?:am|'m)\\s+standing\\s+on\\s+the\\s+(?:balcony|roof|ledge)\\b|" +
+            "\\bi\\s+(?:have|'ve)\\s+decided\\s+to\\s+(?:die|end|kill)\\b|\\bsuicide note\\b|\\bgoodbye letter\\b|\\bletter of goodbye\\b|" +
+            "\\b(?:hang|hanging)\\s+myself\\b|\\bnoose\\b|\\bi\\s+(?:have|got)\\s+the\\s+(?:rope|pills|tablets|gun|knife|poison)\\b|" +
+            "\\b(?:rope|noose|pills|tablets|poison)\\s+(?:is\\s+|are\\s+)?ready\\b|" +
+            "\\bcutting\\s+(?:my\\s+)?(?:arms?|wrists?|legs?|skin|self)\\b|\\bcut\\s+my\\s+(?:arms?|wrists?)\\b|" +
+            "\\b(?:can(?:'|’)?t|cannot)\\s+(?:take|bear)\\s+(?:it|this|life)\\s+(?:any\\s*more|anymore|any\\s+longer)\\b|" +
+            // Swahili: "sitaki kuishi" (I do not want to live), "nitajiua" / "najiua" (I will / I am killing myself), "nimeamua kufa"
+            // (I have decided to die), "barua ya kuaga" (goodbye letter), "hakuna mtu atakayenikosa" (no one will miss me).
+            "\\bsitaki\\s+(?:tena\\s+)?kuishi\\b|\\bnitajiua\\b|\\bnajiua\\b|\\bnataka\\s+kujiua\\b|\\bnimeamua\\s+kufa\\b|\\bnataka\\s+kufa\\b|" +
+            "\\bbarua\\s+ya\\s+kuaga\\b|\\bhakuna\\s+mtu\\s+atakayenikosa\\b", Pattern.CASE_INSENSITIVE);
+
     public static boolean isCrisisQuery(@Nullable String query) {
         if (query == null) return false;
         String normalized = query.replace('’', '\'').replaceAll("\\s+", " ");
         return CRISIS_PATTERN.matcher(normalized).find() || CRISIS_DISCLOSURE_PATTERN.matcher(normalized).find()
                 || SELF_HARM_TYPO_PATTERN.matcher(normalized).find() || isMeansAndDistress(normalized)
-                || SELF_HARM_INTENT.matcher(normalized).find();
+                || SELF_HARM_INTENT.matcher(normalized).find() || SELF_HARM_GENERAL.matcher(normalized).find()
+                || isFirstPersonRiskSentence(normalized);
+    }
+
+    /** A sentence with the speaker in it (I, my, mimi, nataka, nimeamua, ...). */
+    private static final Pattern FIRST_PERSON_MARK = Pattern.compile(
+            "\\b(?:i|me|my|myself|mimi|nina|sina|nataka|sitaki|nimeamua|nimeshika|nimekunywa|nimemeza|nakaribia|naeza|nimechoka|nafikiria|najiua|nitajiua|nitakufa)\\b",
+            Pattern.CASE_INSENSITIVE);
+    /** Words that name self-harm, suicide, or not wanting to live. Strong on their own, with a first-person sentence. */
+    private static final Pattern STRONG_RISK_TERM = Pattern.compile(
+            "\\b(?:kill myself|hurt myself|suicid\\w*|kujiua|jiua|kujiumiza|jiumiza|hang myself|not be here|won'?t be around|not coming back|" +
+            "disappear\\w*|ku-?end|ku-?exit|exit dunia|step off|jump(?:ing)? (?:off|from)|want to die|going to die|nataka kufa|nitakufa|nimeamua kufa|" +
+            "sitaki kuishi|sitaki kuendelea|sina sababu ya kuishi|sababu ya kuendelea|no reason to (?:live|go on)|not want to live|" +
+            "can'?t go on|cannot go on|goodbye letter|barua ya kuaga|kuaga|mzigo|burden to|pain to (?:end|stop)|end forever|" +
+            "never wake up|not wake up|nobody would miss|no one would miss|nobody would notice|no one would notice|" +
+            "better off without me|sioni maana ya maisha|sina maana ya kuishi|maisha hayana maana|no meaning in (?:my )?life|" +
+            "nafikiria kufa|kufikiria kufa|" +
+            // Self-injury, in the speaker's own words (burning, cutting, bleeding): a general category, not one sentence.
+            "cutting (?:my |the )?(?:arms?|wrists?|skin|self|myself|legs?)|burn\\w* my (?:skin|arms?|self)|" +
+            "nimejikata|kujikata|kujichoma|kujikeketa|damu inatoka|blood (?:is )?(?:coming|running|everywhere)|" +
+            // Ending, goodbye and absence as a general category: no way out, tired of living, leaving for good, being gone.
+            "no way out|can'?t see any way|stopped trying to|" +
+            "want (?:it|the whole thing|everything) to be over|for good|goodbye|kwaheri|naaga|nisingekuwepo|bila mimi|" +
+            "ningependa kufa|kufa tu|waking up tomorrow|happier if i|better off without|familia yangu.{0,30}bila|disappear)\\b", Pattern.CASE_INSENSITIVE);
+    /** Means of harm: only with a danger context in the same sentence, so "I take my pills" stays benign. */
+    private static final Pattern MEANS_TERM = Pattern.compile(
+            "\\b(?:rope|noose|kamba|razor|blade|knife|kisu|poison|sumu|pills|tablets|vidonge|bridge|ledge|roof|balcony|gun)\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DANGER_CONTEXT = Pattern.compile(
+            "\\b(?:ready|in my hand|nimeshika|tonight|tonite|usiku huu|leo|today|decided|nimeamua|bought|wondering|sitting|standing|climb\\w*|" +
+            "stop this time|sat there|swallowed|took all|all my|sleeping pills|vingi|stop|finish|end)\\b", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * First-person distress the crisis rules do not name (Levi's decision, 2026-11-26: warm check with helplines). The reply is
+     * the existing soft check, which asks directly and gives the verified numbers. It is reached only when no crisis route fired.
+     */
+    private static final Pattern DISTRESS_FEELING = Pattern.compile(
+            "\\b(?:hopeless|no hope|tired|exhausted|alone|lonely|worthless|useless|pain|cannot take|can'?t take|nothing matters|" +
+            "no point|give up|giving up|gave up|crying|nobody cares|no one cares|depress\\w*|sad|burden|empty|broken|overwhelmed|" +
+            "hakuna tumaini|sina tumaini|nahisi kila kitu|nimevunjika moyo|peke yangu|hakuna mtu|nimekata tamaa|" +
+            "kila kitu kimeisha|nasikia vibaya|sioni tumaini|nimeisha)\\b", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern SPEAKER_SUBJECT = Pattern.compile("\\b(?:i|i'm|mimi|nina|nahisi|nimeamua|nataka|sitaki|sina)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** True when a first-person sentence expresses distress or hopelessness (warm-check fallback). */
+    public static boolean isFirstPersonDistress(@Nullable String query) {
+        if (query == null) return false;
+        for (String sentence : query.split("[.?!;]+")) {
+            // The speaker must be the subject ("I", "mimi"): "my family is suffering" and "give me verses" are not distress.
+            if (SPEAKER_SUBJECT.matcher(sentence).find() && DISTRESS_FEELING.matcher(sentence).find()) return true;
+        }
+        return false;
+    }
+
+    /** True when one sentence has the speaker and a strong self-harm term, or a means with danger context. */
+    public static boolean isFirstPersonRiskSentence(@Nullable String query) {
+        if (query == null) return false;
+        for (String sentence : query.split("[.?!;]+")) {
+            if (!FIRST_PERSON_MARK.matcher(sentence).find()) continue;
+            if (STRONG_RISK_TERM.matcher(sentence).find()) return true;
+            if (MEANS_TERM.matcher(sentence).find() && DANGER_CONTEXT.matcher(sentence).find()) return true;
+        }
+        return false;
     }
 
     /** Conservative pre-model route for personal pastoral disclosures; not a risk diagnosis. */
@@ -1066,16 +1175,16 @@ public class PerazimAiEngine {
 
     /**
      * The single ordered pre-model route, shared by the app and the evaluation harness. Returns the route name, or
-     * null when the question may go on to the model. Order: crisis, overdose, harm to others, sensitive pastoral,
-     * human decision, privacy and out-of-scope.
+     * null when the question may go on to the model. Order: overdose (the medical line leads), crisis, harm to others,
+     * sensitive pastoral, human decision, privacy and out-of-scope.
      */
     @Nullable
     public static String preModelRoute(@Nullable String query) {
         if (query == null || query.trim().isEmpty()) return "scope-refusal";
         String safety = safetyRoute(query);
         if (safety != null && !"topic-violence".equals(safety) && !"general-topic".equals(safety)) return safety;
+        if (safety == null && isOverdoseQuery(query)) return "overdose";
         if (safety == null && isCrisisQuery(query)) return "crisis";
-        if (isOverdoseQuery(query)) return "overdose";
         if (isHarmToOthersQuery(query)) return "harm-to-others";
         if (isSafeguardingDisclosure(query)) return "safeguarding";
         if (isDrugSafetyQuery(query)) return "drug-safety";
@@ -1087,6 +1196,11 @@ public class PerazimAiEngine {
         if (org.perazimchurch.app.ai.library.NoGoZones.matchesDestinyZone(query) && !PERSEVERANCE_QUESTION.matcher(query).find()) return "individual-destiny";
         if (isSensitivePastoralDisclosure(query)) return "sensitive";
         if (isHumanDecisionQuery(query)) return "human-decision";
+        // Other people's records, the guide's memory and recording questions, and chat deletion get the privacy reply
+        // (delegated by the coordinator, 2026-11-25), not the generic scope line.
+        if (isOtherPersonDataRequest(query)) return "privacy";
+        // Distress the crisis rules do not name gets the warm check, not a model answer (Levi, 2026-11-26).
+        if (isFirstPersonDistress(query)) return "warm-check";
         // Live web or current-news searches are declined even though "search for" is a Bible cue (Levi, 2026-11-25).
         // A quoted word is still a KJV word search, so quotation marks keep it in scope.
         if (WEB_SEARCH_REQUEST.matcher(query).find() && !query.contains("'") && !query.contains("\"")) return "scope-refusal";
@@ -1102,6 +1216,8 @@ public class PerazimAiEngine {
     public static AiResponse preModelResponse(@NonNull String route, @Nullable String query) {
         switch (route) {
             case "crisis": return crisisResponse();
+            case "privacy": { AiResponse p = privacyRouteResponse(query); return p != null ? p : privacyResponse(); }
+            case "warm-check": return softSafetyCheckResponse();
             case "crisis-denial": return crisisDenialResponse();
             case "crisis-literary": return crisisLiteraryResponse();
             case "violence-safeguarding": return violenceSafeguardingResponse();

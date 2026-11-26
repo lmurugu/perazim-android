@@ -67,6 +67,10 @@ public final class PreModel {
         if (PerazimAiEngine.isCrisisQuery(question) && PerazimAiEngine.safetyRoute(question) == null) {
             return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
         }
+        // Distress the crisis rules do not name gets the warm check with the helplines, not a model answer (Levi, 2026-11-26).
+        if (PerazimAiEngine.safetyRoute(question) == null && PerazimAiEngine.isFirstPersonDistress(question)) {
+            return new Decision("routed:soft-safety-check", SoftSafety.checkText());
+        }
         // Greetings, thanks, goodbyes, capability and complaint replies, and the first line of a marriage conversation.
         // These come after the safety checks above, so they never hide a crisis or abuse disclosure.
         ConversationalTurn.Reply chat = ConversationalTurn.reply(question);
@@ -679,8 +683,9 @@ public final class PreModel {
         Decision found = table == null ? null : verseDecision(table, kv, question);
         if (found == null) found = phraseFirstDecision(kv, question);
         if (found != null) return found;
+        // Unquoted English word searches ("Where is the word grace found?") must reach the word search, not stop here: the
+        // early return that skipped English questions sent them to the no-source reply on the phone (2026-11-25 regression).
         String english = englishCues(normalisedQuestion(question));
-        if (english.equals(normalisedQuestion(question))) return null;
         Decision about = verseAboutDecision(kv, english);
         return about != null ? about : wordSearchDecision(kv, english);
     }
