@@ -1132,14 +1132,23 @@ public class SermonsUiBinder {
                 });
     }
 
-    /** Church feed first; bundled Room list if the feed is empty or unreachable. */
+    /**
+     * Church YouTube uploads from the pilot server first. If the server feed is not configured
+     * or unreachable, the public channel feed is used. The bundled Room list is the last resort.
+     */
     private void loadAllSermons(java.util.function.Consumer<List<Sermon>> callback) {
         loadChurchFeed(feed -> {
             if (feed != null && !feed.isEmpty()) {
                 callback.accept(feed);
-            } else {
-                viewModel.loadSermons(callback::accept);
+                return;
             }
+            YouTubeFeedRepository.fetchRecentVideos(videos -> {
+                if (videos != null && !videos.isEmpty()) {
+                    callback.accept(videos);
+                } else {
+                    viewModel.loadSermons(callback::accept);
+                }
+            });
         });
     }
 
