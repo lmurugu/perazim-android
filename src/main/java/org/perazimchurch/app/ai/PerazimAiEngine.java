@@ -957,6 +957,25 @@ public class PerazimAiEngine {
             "\\b(?:ready|in my hand|nimeshika|tonight|tonite|usiku huu|leo|today|decided|nimeamua|bought|wondering|sitting|standing|climb\\w*|" +
             "stop this time|sat there|swallowed|took all|all my|sleeping pills|vingi|stop|finish|end)\\b", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * First-person distress the crisis rules do not name (Levi's decision, 2026-11-26: warm check with helplines). The reply is
+     * the existing soft check, which asks directly and gives the verified numbers. It is reached only when no crisis route fired.
+     */
+    private static final Pattern DISTRESS_FEELING = Pattern.compile(
+            "\\b(?:hopeless|no hope|tired|exhausted|alone|lonely|worthless|useless|pain|suffer\\w*|cannot take|can'?t take|nothing matters|" +
+            "no point|give up|giving up|gave up|crying|nobody cares|no one cares|depress\\w*|sad|burden|empty|broken|overwhelmed|" +
+            "hakuna tumaini|sina tumaini|nimechoka|nahisi kila kitu|nimevunjika moyo|peke yangu|hakuna mtu|nimekata tamaa|" +
+            "kila kitu kimeisha|nasikia vibaya|sioni tumaini|nimeisha)\\b", Pattern.CASE_INSENSITIVE);
+
+    /** True when a first-person sentence expresses distress or hopelessness (warm-check fallback). */
+    public static boolean isFirstPersonDistress(@Nullable String query) {
+        if (query == null) return false;
+        for (String sentence : query.split("[.?!;]+")) {
+            if (FIRST_PERSON_MARK.matcher(sentence).find() && DISTRESS_FEELING.matcher(sentence).find()) return true;
+        }
+        return false;
+    }
+
     /** True when one sentence has the speaker and a strong self-harm term, or a means with danger context. */
     public static boolean isFirstPersonRiskSentence(@Nullable String query) {
         if (query == null) return false;
@@ -1177,6 +1196,8 @@ public class PerazimAiEngine {
         // Other people's records, the guide's memory and recording questions, and chat deletion get the privacy reply
         // (delegated by the coordinator, 2026-11-25), not the generic scope line.
         if (isOtherPersonDataRequest(query)) return "privacy";
+        // Distress the crisis rules do not name gets the warm check, not a model answer (Levi, 2026-11-26).
+        if (isFirstPersonDistress(query)) return "warm-check";
         // Live web or current-news searches are declined even though "search for" is a Bible cue (Levi, 2026-11-25).
         // A quoted word is still a KJV word search, so quotation marks keep it in scope.
         if (WEB_SEARCH_REQUEST.matcher(query).find() && !query.contains("'") && !query.contains("\"")) return "scope-refusal";
@@ -1193,6 +1214,7 @@ public class PerazimAiEngine {
         switch (route) {
             case "crisis": return crisisResponse();
             case "privacy": { AiResponse p = privacyRouteResponse(query); return p != null ? p : privacyResponse(); }
+            case "warm-check": return softSafetyCheckResponse();
             case "crisis-denial": return crisisDenialResponse();
             case "crisis-literary": return crisisLiteraryResponse();
             case "violence-safeguarding": return violenceSafeguardingResponse();

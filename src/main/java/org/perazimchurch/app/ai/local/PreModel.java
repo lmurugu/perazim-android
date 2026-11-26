@@ -67,6 +67,10 @@ public final class PreModel {
         if (PerazimAiEngine.isCrisisQuery(question) && PerazimAiEngine.safetyRoute(question) == null) {
             return new Decision("routed:crisis", PerazimAiEngine.crisisResponse().getMessageText());
         }
+        // Distress the crisis rules do not name gets the warm check with the helplines, not a model answer (Levi, 2026-11-26).
+        if (PerazimAiEngine.safetyRoute(question) == null && PerazimAiEngine.isFirstPersonDistress(question)) {
+            return new Decision("routed:soft-safety-check", SoftSafety.checkText());
+        }
         // Greetings, thanks, goodbyes, capability and complaint replies, and the first line of a marriage conversation.
         // These come after the safety checks above, so they never hide a crisis or abuse disclosure.
         ConversationalTurn.Reply chat = ConversationalTurn.reply(question);
