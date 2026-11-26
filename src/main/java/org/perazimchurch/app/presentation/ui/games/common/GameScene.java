@@ -1,6 +1,6 @@
 package org.perazimchurch.app.presentation.ui.games.common;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -21,7 +21,7 @@ public final class GameScene {
     private GameScene() { }
 
     /** {@code name} is the scene file without extension, for example "vine_scene". */
-    public static Drawable background(Activity activity, String name) {
+    public static Drawable background(Context activity, String name) {
         Drawable fallback = PerazimTheme.createBackgroundGradient();
         try (InputStream in = activity.getAssets().open("games/scenes/" + name + ".webp")) {
             Bitmap bitmap = BitmapFactory.decodeStream(in);
