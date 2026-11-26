@@ -1,7 +1,20 @@
 # Game audio: research, direction and licences
 
 Owner: games engine. Engine code: `src/main/java/.../ui/games/common/GameAudio.java`.
-Generator: `tools/game_audio/synth.py`. Assets: `src/main/assets/games/audio/`.
+Game-show music and cue generator: `tools/game_audio/show.py`. Assets: `src/main/assets/games/audio/`.
+
+## Spoken game reactions
+
+All 14 games have a short win line, a retry line and a help line. The British English takes use the same speaker at the original pitch. The clips and their caption text are bundled in `assets/games/audio/announcer/` and play offline.
+
+- **Win:** Plays after the completed result has been saved. The line also appears with the result.
+- **Retry:** Plays on an incorrect attempt or a failed run. Brief cooldowns keep several quick misses from speaking over one another.
+- **Help:** Plays only when a player asks for a hint, tip or lifeline. The written clue remains available without audio.
+
+The **Sound** button is available inside every game. Music, voice and effects have independent switches and volumes. Voice only, Effects only and Voice + effects are quick mixes that turn off music. The preview uses the current game without changing progress.
+
+Wins use one of four jingles matched to the game. Retry and help have shorter cues. The illustrated reaction stickers reuse Perazim game art. Win confetti follows the celebrations and system motion settings. Voice follows phone silent mode and app lifecycle. One line plays at a time, with music and other game sounds lowered under speech.
+
 
 ## 1. What makes game audio work (research summary)
 
@@ -17,33 +30,39 @@ Notes from studying how top casual, word and puzzle games use sound. These are p
 
 ## 2. Audio direction
 
-Warm, worshipful and joyful. Instruments: harp, lyre, flute, chime, hand drum, shaker and a soft pad.
-Music is in major keys with a few minor colours. Each game has its own tempo and lead voice:
+The faster arrangements use game-show brass, arcade-style plucks, bells, and
+light percussion. The 14 games each have an original hook and rhythm. The hub
+has its own separate track.
 
-| Game | Track | Tempo | Lead voice | Drums | Pad |
-|---|---|---|---|---|---|
-| Bible Quiz | bible_quiz | 76 | harp | light hand drum | yes |
-| Who am I? | who_am_i | 70 | flute | none | yes |
-| Verse Builder | verse_builder | 80 | chime | light hand drum | no |
-| Ladder of Faith | ladder_of_faith | 66 | lyre | hand drum | yes |
-| Word Search | word_search | 84 | harp | shaker | no |
-| Memory Match | memory_match | 78 | chime | none | yes |
-| Story Timeline | story_timeline | 72 | lyre | light hand drum | yes |
-| Road to Jerusalem | road_to_jerusalem | 92 | flute | hand drum | no |
-| Old or New? | old_or_new | 74 | harp | light hand drum | yes |
-| Who Said It? | who_said_it | 70 | flute | none | yes |
-| Fill the Gap | fill_the_gap | 82 | chime | shaker | no |
-| Vine Words | vine_words | 88 | lyre | shaker | no |
-| Lamp Slide | lamp_slide | 86 | chime | light hand drum | yes |
-| Story Mosaic | story_mosaic | 76 | harp | light hand drum | yes |
-| Hub (games list) | hub | 74 | harp | none | yes |
+| Game | BPM | Direction |
+|---|---:|---|
+| Bible Quiz | 144 | Bright brass quiz-show groove |
+| Who am I? | 132 | Syncopated detective plucks |
+| Verse Builder | 134 | Bell arpeggios over a steady beat |
+| Ladder of Faith | 152 | Rising brass and a driving beat |
+| Word Search | 146 | Quick arcade plucks and shakers |
+| Memory Match | 138 | Playful repeating bells |
+| Story Timeline | 128 | Flute over an adventure rhythm |
+| Road to Jerusalem | 154 | Quick travelling flute and drums |
+| Old or New? | 130 | Bouncy brass and offbeat bass |
+| Who Said It? | 140 | Playful call-and-response plucks |
+| Fill the Gap | 148 | Quick bells with a syncopated rhythm |
+| Vine Words | 142 | Bright flute and light percussion |
+| Lamp Slide | 136 | Syncopated plucks over a puzzle beat |
+| Story Mosaic | 126 | Bells over an adventure rhythm |
+| Games hub | 122 | Light plucks and a steady beat |
 
-Shared effects: tap, correct, wrong (soft falling flute pair), star (layered pitch-up per lit star),
-complete (harp arpeggio, played when three stars are earned), combo 1 to 3 (semitone steps), hint (flute ping).
+Each round opens with an original game-show-style stinger. Correct submissions
+play a rising bell and one of four positive voice clips. Incorrect submissions
+play a lower two-note cue and one of four encouraging voice clips. The judgment
+cue takes priority over incidental taps. On the last answer, the level-result
+reaction follows the answer cue with no delay to saving or the UI. Voices use
+Microsoft Ryan, British English, with the original pitch. Silent mode and the
+independent Voice and Sound effects switches still apply.
 
 ## 3. How the audio is made
 
-Most sounds are synthesised in `tools/game_audio/synth.py` from Karplus-Strong plucked strings (harp and lyre),
+The base effects are synthesised in `tools/game_audio/synth.py` from Karplus-Strong plucked strings (harp and lyre),
 breathy vibrato flute, chimes, soft pads, filtered noise and a short reverb tail. Each game has a four-note
 motif drawn from its own pentatonic scale, played on the last bar of each phrase. Combo sounds rise one
 semitone per step. Loops are wrapped through the reverb so they repeat seamlessly.
@@ -54,30 +73,41 @@ and converted to OGG Vorbis, mono, 22050 Hz with a loudness normalisation.
 
 ElevenLabs music generation was not used: the account ran out of credits and the calls failed with "Insufficient funds".
 
-Re-run the synth for everything except the three kept effects:
+Run the synth in a scratch output folder to regenerate the base music and effects. Keep the three existing ElevenLabs cues, the six reaction cues, and the announcer recordings when copying results back:
 
-    python3 tools/game_audio/synth.py src/main/assets/games/audio
+    python3 tools/game_audio/synth.py /tmp/perazim-base-game-audio
 
 Output is OGG Vorbis, mono, 22050 Hz. Effects are about 4 to 13 KB each. Music loops are about 55 to 115 KB
-each. The whole folder is about 1.5 MB, well under the 8 MB budget.
+each. The bundled audio folder contains base effects, game tracks, and voice clips.
+
+Render the active soundtrack and stingers with NumPy and FFmpeg:
+
+    python3 tools/game_audio/show.py src/main/assets/games/audio
+
+The show script writes the 15 tracks and the three round/answer cues only.
+The eight short answer clips and the 42 earlier game-specific lines are
+separate OGG files under `announcer/`. The **Sound** panel previews the
+intro, correct cue, incorrect cue, and current game's win mix.
 
 ## 4. Licences
 
-- Synthesised files (everything except the three ElevenLabs effects) are original Perazim project work,
+- Synthesised music and effects (except the three ElevenLabs effects) are original Perazim project work,
   generated by the script above. They are licensed with the project. No copyrighted music, samples or recordings are included.
 - `sfx_tap`, `sfx_wrong`, `sfx_combo1`: generated with ElevenLabs Sound Effects on the project's account.
   Use is covered by ElevenLabs' terms for generated audio on the plan in use. Check those terms before a
   store release, and replace these files if the plan does not cover commercial app use.
 
+- The announcer takes in `announcer/` were generated with Microsoft Ryan, British English, for the local validation build.
+
 ## 5. Engine behaviour
 
 - Effects play through `SoundPool`. Music loops through `MediaPlayer`.
-- Volumes (music 0 to 100, effects 0 to 100) and on/off switches are stored per account under the owner's score prefix.
+- Music, voice, and effects volumes (0 to 100) and on/off switches are stored per account under the owner's score prefix.
 - Music ducks to about 35% for a short time while an effect plays.
 - Audio focus: loss stops the music, transient loss pauses it, and regained focus resumes it.
 - Background: music pauses when no app activity is started, and resumes on return.
 - Silent or vibrate mode: all game sounds are off.
-- If audio is unavailable, the engine falls back to the app's existing tones and never crashes.
+- If a sound cannot be loaded, the game continues with visual feedback and captions.
 - Everything works offline; no network is used.
 
 ## 6. Open choices for Levi

@@ -16,6 +16,19 @@ does and the one call a game makes when a run ends.
 | `GameResults.starLine`, `loadVerseOfDay` | same | Star glyphs and today's verse for the results screen. |
 | `GameChrome` | `presentation/ui/games/common` | **The shared results screen and pause overlay.** Draws through a small `GameChrome.Host` interface. |
 
+## Player-facing progression
+
+Home shortcuts and Games cards enter through `GamesHubDialog.launchGame`. The main dialog keeps the shipped question, ladder, and dice mechanics. It opens their campaign picker before creating a run. Vine Words, Lamp Slide, and Story Mosaic keep their independent dialogs. When changing a mechanic, check the launcher used by the hub as well as any prototype or catalog session.
+
+The current campaigns use these progression rules:
+
+- Knowledge rounds use the bundled easy, medium, and hard banks. Two stars pass a round. Who am I? reduces the number of clues instead.
+- Word Search adds target words, Memory Match adds pairs, and Story Timeline adds events. Solving the board clears the level. Stars also reflect moves or mistakes where those are part of the game.
+- Ladder of Faith keeps its lives and lifelines. Each successive climb adds a hard rung. Reaching the top clears the level. Road to Jerusalem clears on a win, with longer roads and a phone head start in the hardest band.
+- Completing a Vine Words crossword or Lamp Slide painting unlocks the next stage even if the player needed help. Story Mosaic keeps all chapters open and remembers the next unfinished scene in each chapter.
+
+The active screens use `GameResults.saveLevel` as soon as the final answer or move is accepted. It writes the last result, best stars, clear status, and any unlock together in account-prefixed local preferences. `GameChrome.showLevelResult` displays an already saved result. Any animation or Continue button runs after the save. The game picker shows the current unlocked level, cleared count, and saved result. The earlier personal best and solve counters remain available on the hub.
+
 ## Adding a game
 
 1. Implement `GameSession` for the game's rules. Keep it free of Android types so it can be unit tested.
@@ -37,7 +50,7 @@ does and the one call a game makes when a run ends.
 
 ## Rules
 
-- Everything works offline. No score upload, no ads.
+- Campaign play and progress work offline. The optional church leaderboard requires a compatible server and the existing account eligibility checks.
 - Keep the adapters thin. The rules live in the session, not in the screen.
 - Do not hard-code `lives` as `NO_LIVES` when the game has lives; pass `session.lives()`.
 - Art follows `docs/games/ART_BRIEFS.md`. A game uses `game_<id>` art when it exists, else its icon.
@@ -95,10 +108,9 @@ ObjectAnimator and Canvas, so it runs on small phones. When the system's "Remove
 | `GameFx.countUp(textView, target, prefix, suffix)` | Counts a score up. |
 | `GameFx.shimmer(view)` | One light sweep across a view, used for Next level when the level unlocks. |
 | `GameFx.dim(root)` | Dims the screen behind a pause overlay. Returns the shade view; remove it on resume. Blur is not used (it needs Android 12 and is costly on small phones). |
-| `GameFx.setSoundEnabled(bool)` / `GameFx.setHapticsEnabled(bool)` | Both default on. The settings screen calls these when the player changes them. |
+| `GameAudioSettings` | Gives the player separate Music, Voice, and Sound effects controls. |
 
-Sounds are short system tones from `ToneGenerator`, so there are no audio files and no licensed audio.
-If no tone device is available, the game runs silently.
+Game audio uses bundled recordings and effects, routed through `GameAudio`. The mixer controls playback independently of the animations.
 
 `GameChrome` already uses the results effects. Game screens call `GameFx.correct` and `GameFx.wrong` on each answer.
 
@@ -115,4 +127,3 @@ The art sheets live in `src/main/assets/games/ui/` (from 333e174). `GameArt` loa
 
 The sprite and node coordinates are approximate, read from the sheets by eye. Adjust `GameArt`'s constants if a
 crop or node looks off on a device.
-

@@ -71,6 +71,29 @@ public class LevelProgressionTest {
         assertEquals(0, progression.bestStars("who_said_it", 1));
     }
 
+    @Test
+    public void solvedPuzzleCanAdvanceWithOneStarAndSurvivesReload() {
+        MemoryStore store = new MemoryStore();
+        assertTrue(new LevelProgression(store).record("lamp", 1, 1, 4, true));
+
+        LevelProgression reopened = new LevelProgression(store);
+        assertEquals(2, reopened.unlockedLevel("lamp"));
+        assertEquals(1, reopened.bestStars("lamp", 1));
+        assertTrue(reopened.cleared("lamp", 1));
+        reopened.record("lamp", 1, 0, 4, false);
+        assertTrue(reopened.cleared("lamp", 1));
+    }
+
+    @Test
+    public void strongScoreOnIncompleteRunDoesNotClearTheLevel() {
+        assertFalse(progression.record("ladder", 1, 2, 4, false));
+        assertEquals(2, progression.bestStars("ladder", 1));
+        assertEquals(1, progression.unlockedLevel("ladder"));
+        assertFalse(progression.cleared("ladder", 1));
+        assertTrue(progression.record("ladder", 1, 2, 4, true));
+        assertTrue(progression.cleared("ladder", 1));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void levelOutsideTheGameIsRejected() {
         progression.record("quiz", 4, 3, 3);

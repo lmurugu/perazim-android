@@ -129,6 +129,12 @@ public final class BibleGames {
         return new Card(question, answer, reference, explanation, hint, String.join("|", options), "");
     }
 
+    /** A character clue from the identity bank. */
+    public static Card character(String clue, String name, String reference, String explanation,
+                                 String hint, List<String> aliases) {
+        return new Card(clue, name, reference, explanation, hint, "", String.join("|", aliases));
+    }
+
     /** A verse-order card from a bank file. The explanation is empty; the reference is shown after the check. */
     public static Card verse(String text, String reference) {
         return new Card("Put the words in order", text, reference, "", "", "", "");

@@ -55,6 +55,11 @@ public final class StoryMosaicView extends View {
     private float cell;
     private float trayCell;
     private int dragPiece = -1;
+    private int selectedPiece = -1;
+    private int tapSlot = -1;
+    private boolean moved;
+    private float downX;
+    private float downY;
     private float dragX;
     private float dragY;
 
@@ -154,9 +159,13 @@ public final class StoryMosaicView extends View {
 
         // Pieces still in the tray (the one being dragged is drawn last).
         for (int piece = 0; piece < board.pieceCount(); piece++) {
-            if (board.isPlaced(piece) || piece == dragPiece) continue;
+            if (board.isPlaced(piece) || (piece == dragPiece && moved)) continue;
             dst.set(trayRects[piece]);
             drawPiece(canvas, piece, side, dst);
+            if (piece == selectedPiece) {
+                stroke.setColor(0xFFFFC66C);
+                canvas.drawRoundRect(dst, radius, radius, stroke);
+            }
         }
         if (snapPiece >= 0) {
             float t = snapT;
@@ -167,7 +176,7 @@ public final class StoryMosaicView extends View {
             dst.set(x - half, y - half, x + half, y + half);
             drawPiece(canvas, snapPiece, side, dst);
         }
-        if (dragPiece >= 0) {
+        if (dragPiece >= 0 && moved) {
             float half = trayCell / 2f;
             dst.set(dragX - half, dragY - half, dragX + half, dragY + half);
             drawPiece(canvas, dragPiece, side, dst);
@@ -233,55 +242,69 @@ public final class StoryMosaicView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (session.finished()) return false;
         float x = event.getX();
         float y = event.getY();
+        int slot = session.board().slotAt(x - gridLeft, y - gridTop, cell);
         switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN: {
+            case MotionEvent.ACTION_DOWN:
                 dragPiece = -1;
+                tapSlot = selectedPiece >= 0 ? slot : -1;
+                downX = x;
+                downY = y;
+                moved = false;
                 for (int i = 0; i < trayRects.length; i++) {
                     if (!session.board().isPlaced(i) && trayRects[i].contains(x, y)) {
                         dragPiece = i;
-                        dragX = x;
-                        dragY = y;
-                        invalidate();
-                        return true;
+                        break;
                     }
                 }
-                return false;
-            }
-            case MotionEvent.ACTION_MOVE: {
-                if (dragPiece < 0) return false;
-                dragX = x;
-                dragY = y;
-                invalidate();
-                return true;
-            }
-            case MotionEvent.ACTION_UP: {
-                if (dragPiece < 0) return false;
-                int slot = session.board().slotAt(x - gridLeft, y - gridTop, cell);
-                String value = dragPiece + ":" + slot;
-                // A drop outside the board just returns the piece and costs nothing.
-                GameSession.Outcome outcome = slot < 0
-                        ? GameSession.Outcome.IGNORED
-                        : session.answer(value);
-                if (outcome == GameSession.Outcome.CORRECT) {
-                    startSnap(dragPiece, x, y, slot);
-                    GameFx.correct(this);
-                } else if (outcome == GameSession.Outcome.WRONG) {
-                    GameFx.wrong(this);
+                return dragPiece >= 0 || tapSlot >= 0;
+            case MotionEvent.ACTION_MOVE:
+                if (dragPiece >= 0) {
+                    moved |= Math.hypot(x - downX, y - downY) >= 7 * density;
+                    dragX = x;
+                    dragY = y;
+                    invalidate();
                 }
-                dragPiece = -1;
-                invalidate();
-                if (listener != null) listener.onDrop(outcome);
+                return dragPiece >= 0 || tapSlot >= 0;
+            case MotionEvent.ACTION_UP:
+                if (tapSlot >= 0 && slot == tapSlot) {
+                    place(selectedPiece, slot, trayRects[selectedPiece].centerX(), trayRects[selectedPiece].centerY());
+                } else if (dragPiece >= 0 && moved && slot >= 0) {
+                    place(dragPiece, slot, x, y);
+                } else if (dragPiece >= 0 && !moved) {
+                    selectedPiece = selectedPiece == dragPiece ? -1 : dragPiece;
+                    performClick();
+                }
+                clearGesture();
                 return true;
-            }
-            case MotionEvent.ACTION_CANCEL: {
-                dragPiece = -1;
-                invalidate();
+            case MotionEvent.ACTION_CANCEL:
+                clearGesture();
                 return true;
-            }
             default:
-                return false;
+                return super.onTouchEvent(event);
         }
+    }
+
+    @Override public boolean performClick() { return super.performClick(); }
+
+    private void place(int piece, int slot, float x, float y) {
+        GameSession.Outcome outcome = session.answer(piece + ":" + slot);
+        if (outcome == GameSession.Outcome.CORRECT) {
+            selectedPiece = -1;
+            startSnap(piece, x, y, slot);
+            GameFx.correct(this);
+        } else if (outcome == GameSession.Outcome.WRONG) {
+            GameFx.wrong(this);
+        }
+        if (listener != null) listener.onDrop(outcome);
+    }
+
+    private void clearGesture() {
+        dragPiece = -1;
+        tapSlot = -1;
+        moved = false;
+        invalidate();
     }
 }

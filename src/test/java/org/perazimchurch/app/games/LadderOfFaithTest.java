@@ -51,6 +51,27 @@ public class LadderOfFaithTest {
         assertEquals(3, LadderOfFaith.tierOf(20));
     }
 
+    @Test public void harderScheduledClimbKeepsLifelinesAndUsesItsOwnTierBoundaries() {
+        LadderOfFaith run = new LadderOfFaith(20L, null, 60, 30, 1, 3);
+        assertEquals(1, run.currentTier());
+        assertTrue(run.useFiftyFifty());
+        assertTrue(run.usePass());
+        assertEquals(2, run.currentTier());
+        assertTrue(run.usePeek());
+        for (int i = 0; i < 3; i++) {
+            assertTrue(run.answer(run.current().answer));
+            assertTrue(run.next());
+        }
+        assertEquals(3, run.currentTier());
+        assertEquals(16, run.rungsOfTier(3));
+        assertFalse(run.reachedTop());
+        while (!run.finished()) {
+            run.answer(run.current().answer);
+            if (!run.finished()) run.next();
+        }
+        assertTrue(run.reachedTop());
+    }
+
     private static List<String> prompts(LadderOfFaith run) {
         List<String> result = new ArrayList<>();
         while (!run.finished()) {

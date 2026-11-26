@@ -9,8 +9,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameAudioSettings;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
+import org.perazimchurch.app.presentation.ui.games.common.GameButtons;
+import org.perazimchurch.app.presentation.ui.games.common.GameScene;
+import org.perazimchurch.app.presentation.ui.games.common.GameAudio;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideScene;
 import org.perazimchurch.app.domain.games.lampslide.LampSlideSession;
 
@@ -26,19 +30,33 @@ public final class LampSlideScreen {
 
     private LampSlideScreen() {}
 
+    /** Draws a standalone board with the same completion callback for older callers. */
+    public static View create(Context context, LampSlideSession session, int level,
+                              Runnable onBack, Runnable onNext) {
+        return create(context, session, level, onBack, () -> {}, onNext);
+    }
+
     /**
      * @param level  1-based level, shown in the status line
      * @param onBack called when the player leaves the run
+     * @param onSolved called immediately when the final move solves the board
      * @param onNext called when the player taps Continue after a solved board
      */
     public static View create(Context context, LampSlideSession session, int level,
-                              Runnable onBack, Runnable onNext) {
+                              Runnable onBack, Runnable onSolved, Runnable onNext) {
         LinearLayout page = new LinearLayout(context);
         page.setOrientation(LinearLayout.VERTICAL);
         page.setGravity(Gravity.CENTER_HORIZONTAL);
         int pad = dp(context, 16);
         page.setPadding(pad, pad, pad, pad);
+        page.setBackground(GameScene.background(context, "lamp_scene"));
 
+        LinearLayout header = new LinearLayout(context);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.addView(text(context, "Lamp Slide", 24, true), new LinearLayout.LayoutParams(0, -2, 1f));
+        header.addView(GameAudioSettings.button(context));
+        page.addView(header, new LinearLayout.LayoutParams(-1, -2));
+        page.addView(text(context, session.scene().reference() + " · Tap a tile beside the gap.", 13, false));
         TextView status = text(context, "", 14, false);
         page.addView(status);
 
@@ -54,11 +72,17 @@ public final class LampSlideScreen {
         controls.setOrientation(LinearLayout.HORIZONTAL);
         page.addView(controls, new LinearLayout.LayoutParams(-1, -2));
 
+        GameAudio audio = GameAudio.get(context);
+        TextView tip = text(context, "", 13, false);
+        tip.setVisibility(View.GONE);
+        tip.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        page.addView(tip);
         TextView banner = text(context, "", 16, false);
         banner.setVisibility(View.GONE);
         page.addView(banner);
 
         Button next = button(context, "Continue");
+        next.setBackground(GameButtons.drawn(context, true));
         next.setVisibility(View.GONE);
         page.addView(next);
 
@@ -75,6 +99,11 @@ public final class LampSlideScreen {
         afterMove[0] = () -> {
             refresh.run();
             if (session.finished()) {
+                onSolved.run();
+                for (int i = 0; i < controls.getChildCount(); i++) controls.getChildAt(i).setEnabled(false);
+                status.setText("Level " + level + " cleared · Result saved");
+                tip.setText(audio.announce(LampSlideLauncher.GAME_ID, GameAudio.Reaction.WIN, true));
+                tip.setVisibility(View.VISIBLE);
                 board.celebrate();
                 board.sweepReveal();
                 LampSlideScene scene = session.scene();
@@ -88,17 +117,28 @@ public final class LampSlideScreen {
         board.setListener(index -> {
             int gapBefore = session.puzzle().gapIndex();
             int inPlaceBefore = session.puzzle().inPlace();
-            if (session.tapTile(index) == GameSession.Outcome.IGNORED) return;
+            if (session.tapTile(index) == GameSession.Outcome.IGNORED) {
+                if (!session.finished() && index != gapBefore) {
+                    audio.answerFeedback(false);
+                }
+                return;
+            }
             board.animateSlide(index, gapBefore);
             if (session.puzzle().inPlace() > inPlaceBefore) {
                 board.flashCorrect(gapBefore);
                 GameFx.haptic(board, true);
+                audio.answerFeedback(true);
+            } else {
+                audio.play(GameAudio.Sfx.TAP);
             }
             afterMove[0].run();
         });
 
         controls.addView(smallButton(context, "Peek", v -> {
+            if (session.finished()) return;
             session.recordPeek();
+            tip.setText(audio.announce(LampSlideLauncher.GAME_ID, GameAudio.Reaction.HELP));
+            tip.setVisibility(View.VISIBLE);
             board.setPeeking(true);
             board.postDelayed(() -> board.setPeeking(false), PEEK_MS);
             refresh.run();
@@ -115,6 +155,8 @@ public final class LampSlideScreen {
         controls.addView(smallButton(context, "One move", v -> {
             int tile = session.useOneMoveHint();
             if (tile >= 0) {
+                tip.setText(audio.announce(LampSlideLauncher.GAME_ID, GameAudio.Reaction.HELP));
+                tip.setVisibility(View.VISIBLE);
                 board.setHighlight(tile);
                 board.postDelayed(() -> board.setHighlight(-1), HINT_MS);
             }
@@ -123,7 +165,7 @@ public final class LampSlideScreen {
 
         next.setOnClickListener(v -> onNext.run());
         GameFx.attachPress(next);
-        Button back = button(context, "Back to games");
+        Button back = button(context, "All paintings");
         back.setOnClickListener(v -> onBack.run());
         GameFx.attachPress(back);
         page.addView(back);
@@ -151,7 +193,21 @@ public final class LampSlideScreen {
         Button button = new Button(context);
         button.setText(label);
         button.setAllCaps(false);
-        button.setTextColor(0xFFFFFFFF);
+        button.setSoundEffectsEnabled(false);
+        button.setMinHeight(dp(context, 56));
+        button.setTypeface(button.getTypeface(), android.graphics.Typeface.BOLD);
+        button.setBackground(GameButtons.drawn(context, false));
+        button.setMinimumWidth(0);
+        button.setTextColor(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_TEXT_PRIMARY);
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_SURFACE_SOLID);
+        bg.setStroke(dp(context, 1), org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_STROKE);
+        bg.setCornerRadius(dp(context, 12));
+        if ("Continue".equals(label)) {
+            bg.setColor(0xFFFFC773);
+            button.setTextColor(0xFF321C34);
+        }
+        button.setBackground(bg);
         return button;
     }
 
@@ -159,7 +215,7 @@ public final class LampSlideScreen {
         TextView view = new TextView(context);
         view.setText(value);
         view.setTextSize(sp);
-        view.setTextColor(0xFFFFFFFF);
+        view.setTextColor(org.perazimchurch.app.ui.theme.PerazimTheme.COLOR_TEXT_PRIMARY);
         view.setGravity(Gravity.CENTER_HORIZONTAL);
         view.setPadding(0, dp(context, 6), 0, dp(context, 6));
         if (bold) view.setTypeface(view.getTypeface(), android.graphics.Typeface.BOLD);

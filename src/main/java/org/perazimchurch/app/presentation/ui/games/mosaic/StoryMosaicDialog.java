@@ -15,16 +15,19 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.perazimchurch.app.presentation.ui.games.common.GameAudioSettings;
 import org.perazimchurch.app.domain.games.catalog.StoryMosaicSession;
 import org.perazimchurch.app.domain.games.catalog.StoryMosaicDefinition;
 import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.presentation.ui.games.common.GameContext;
-import org.perazimchurch.app.presentation.ui.games.common.GameArt;
+import org.perazimchurch.app.presentation.ui.games.common.GameAudio;
+import org.perazimchurch.app.presentation.ui.games.common.GameResults;
 import org.perazimchurch.app.presentation.ui.games.common.GameFx;
 import org.perazimchurch.app.domain.games.engine.KeyValueStore;
 import org.perazimchurch.app.domain.games.engine.LevelProgression;
 import org.perazimchurch.app.domain.games.mosaic.MosaicBoard;
 import org.perazimchurch.app.domain.games.mosaic.MosaicPuzzles;
+import org.perazimchurch.app.domain.games.engine.GameSession;
 import org.perazimchurch.app.domain.games.mosaic.MosaicStars;
 
 import java.io.InputStream;
@@ -48,6 +51,7 @@ public final class StoryMosaicDialog extends Dialog {
     private final android.os.Handler mainHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private FrameLayout root;
     private Bitmap scene;
+    private java.util.function.BooleanSupplier ownerCheck = () -> true;
 
     public StoryMosaicDialog(Context context, SharedPreferences prefs, String progressId) {
         super(context, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
@@ -62,7 +66,10 @@ public final class StoryMosaicDialog extends Dialog {
 
     /** Opens Story Mosaic from the Games hub through GameRegistry. Progress is per account. */
     public static void show(GameContext ctx) {
-        new StoryMosaicDialog(ctx.activity(), ctx.scores(), ctx.scorePrefix() + GAME_ID).show();
+        StoryMosaicDialog dialog = new StoryMosaicDialog(ctx.activity(), ctx.scores(), ctx.scorePrefix() + GAME_ID);
+        dialog.ownerCheck = ctx.ownerCheck();
+        dialog.setOnDismissListener(d -> ctx.hub().run());
+        dialog.show();
     }
 
     @Override
@@ -80,13 +87,27 @@ public final class StoryMosaicDialog extends Dialog {
     // ---- chapter map -------------------------------------------------------------------------
 
     private void showMap() {
+        GameAudio.get(getContext()).setReactionWindow(getWindow());
+        GameAudio.get(getContext()).stopAnnouncer();
         releaseScene();
         root.removeAllViews();
         LinearLayout column = column(dp(16));
 
         TextView title = text("Story Mosaic", 22, true);
-        column.addView(title);
-        column.addView(text("Put each Bible scene together. Every chapter is open.", 14, false));
+        LinearLayout header = new LinearLayout(getContext());
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.addView(title, new LinearLayout.LayoutParams(0, -2, 1f));
+        header.addView(GameAudioSettings.button(getContext()));
+        column.addView(header);
+        column.addView(text(GameResults.clearedCount(prefs, progressId, levelCount, true) + " / "
+                + levelCount + " scenes cleared · Every chapter is open.", 14, false));
+        android.widget.EditText search = new android.widget.EditText(getContext());
+        search.setSingleLine(true);
+        search.setTextColor(Color.WHITE);
+        search.setHintTextColor(0xFFD6BDD8);
+        search.setHint("Find a chapter");
+        column.addView(search);
+        List<Button> chapters = new java.util.ArrayList<>();
 
         List<Integer> starts = MosaicPuzzles.chapterStarts();
         // The first chapter with a scene still to finish gets the shimmer.
@@ -116,36 +137,35 @@ public final class StoryMosaicDialog extends Dialog {
             row.setText(MosaicPuzzles.at(first).chapterTitle + "\n" + done + " of " + (last - first + 1) + " scenes");
             row.setTextColor(Color.WHITE);
             boolean complete = done == last - first + 1;
-            android.graphics.drawable.Drawable pill = GameArt.frame(getContext(),
-                    complete ? GameArt.FRAME_PILL_ORANGE : GameArt.FRAME_PILL_PURPLE,
-                    GameArt.FRAME_BORDER, dp(18));
-            if (pill != null) {
-                row.setBackground(pill);
-            } else {
-                row.setBackgroundColor(complete ? ORANGE : Color.argb(36, 255, 255, 255));
-            }
+            android.graphics.drawable.GradientDrawable background = new android.graphics.drawable.GradientDrawable();
+            background.setCornerRadius(dp(13));
+            background.setStroke(dp(1), complete ? ORANGE : 0xFF684276);
+            background.setColor(0xFF492957);
+            row.setBackground(background);
+            row.setPadding(dp(12), dp(8), dp(12), dp(8));
+            row.setMinHeight(dp(58));
             row.setOnClickListener(v -> showPuzzle(target));
             GameFx.attachPress(row);
-            // A rail on the left: the dot and the line below it light up when the chapter is finished.
-            LinearLayout rail = new LinearLayout(getContext());
-            rail.setOrientation(LinearLayout.VERTICAL);
-            rail.setGravity(Gravity.CENTER_HORIZONTAL);
-            View dot = new View(getContext());
-            dot.setBackgroundColor(complete ? ORANGE : Color.argb(60, 255, 255, 255));
-            rail.addView(dot, new LinearLayout.LayoutParams(dp(14), dp(14)));
-            View link = new View(getContext());
-            link.setBackgroundColor(complete ? ORANGE : Color.argb(60, 255, 255, 255));
-            rail.addView(link, new LinearLayout.LayoutParams(dp(3), dp(50)));
-            LinearLayout line = new LinearLayout(getContext());
-            line.setOrientation(LinearLayout.HORIZONTAL);
-            line.addView(rail, new LinearLayout.LayoutParams(dp(20), LinearLayout.LayoutParams.WRAP_CONTENT));
-            line.addView(row, new LinearLayout.LayoutParams(0, dp(64), 1f));
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.topMargin = dp(10);
-            column.addView(line, lp);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+            lp.topMargin = dp(8);
+            column.addView(row, lp);
+            chapters.add(row);
             if (c == nextChapter) shimmerRow = row;
         }
+
+        search.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString().trim().toLowerCase(java.util.Locale.ROOT);
+                for (Button row : chapters) {
+                    row.setVisibility(row.getText().toString().toLowerCase(java.util.Locale.ROOT).contains(query)
+                            ? View.VISIBLE : View.GONE);
+                }
+            }
+            @Override public void afterTextChanged(android.text.Editable text) {}
+        });
+        column.setFocusableInTouchMode(true);
+        column.requestFocus();
 
         ScrollView scroll = new ScrollView(getContext());
         scroll.addView(column);
@@ -168,6 +188,9 @@ public final class StoryMosaicDialog extends Dialog {
     // ---- one puzzle --------------------------------------------------------------------------
 
     private void showPuzzle(int index) {
+        if (!ownerCheck.getAsBoolean()) { dismiss(); return; }
+        GameAudio audio = GameAudio.get(getContext());
+        audio.startRound(GAME_ID);
         releaseScene();
         int clamped = Math.max(0, Math.min(index, levelCount - 1));
         int level = clamped + 1;
@@ -188,14 +211,18 @@ public final class StoryMosaicDialog extends Dialog {
         TextView heading = text(puzzle.chapterTitle, 18, true);
         heading.setPadding(dp(12), 0, 0, 0);
         header.addView(heading, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        header.addView(GameAudioSettings.button(getContext()));
         column.addView(header);
         GameFx.enter(column);
 
-        TextView progress = text(puzzle.reference + "  ·  scene " + puzzle.number, 14, false);
+        int pieces = session.board().pieceCount();
+        String reference = puzzle.reference + " · Scene " + puzzle.number;
+        TextView progress = text(reference + " · 0 / " + pieces + " placed", 14, false);
         column.addView(progress);
 
-        TextView hint = text("", 14, false);
+        TextView hint = text("Drag a piece, or tap it and then its slot.", 14, false);
         hint.setTextColor(Color.parseColor("#F2C94C"));
+        hint.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         column.addView(hint);
 
         TextView caption = text("", 16, false);
@@ -204,10 +231,17 @@ public final class StoryMosaicDialog extends Dialog {
 
         Button hintButton = smallButton("Show a hint");
         hintButton.setVisibility(session.hintAvailable() ? View.VISIBLE : View.GONE);
-        hintButton.setOnClickListener(v -> hint.setText(session.hint() == null ? "" : session.hint()));
+        hintButton.setOnClickListener(v -> {
+            String clue = session.hint();
+            if (clue == null) return;
+            String reaction = audio.announce(GAME_ID, GameAudio.Reaction.HELP);
+            hint.setText(reaction.isEmpty() ? clue : clue + "\n" + reaction);
+        });
 
         FrameLayout boardHolder = new FrameLayout(getContext());
         StoryMosaicView board = new StoryMosaicView(getContext(), session, scene, outcome -> {
+            if (!ownerCheck.getAsBoolean()) { dismiss(); return; }
+            progress.setText(reference + " · " + session.board().placedCount() + " / " + pieces + " placed");
             if (session.finished()) {
                 onFinished(session, level, puzzle, caption, hintButton, hint, column);
             }
@@ -226,16 +260,18 @@ public final class StoryMosaicDialog extends Dialog {
     private void onFinished(StoryMosaicSession session, int level, MosaicPuzzles.Puzzle puzzle,
                             TextView caption, Button hintButton, TextView hint, LinearLayout column) {
         int stars = MosaicStars.RULE.stars(session);
-        progression.record(progressId, level, stars, levelCount);
+        GameResults.saveLevel(prefs, progressId, level, levelCount, stars, true,
+                session.board().pieceCount() + " pieces · " + session.board().wrongDrops() + " wrong placements");
         hintButton.setVisibility(View.GONE);
-        hint.setText("");
+        String win = GameAudio.get(getContext()).announce(GAME_ID, GameAudio.Reaction.WIN, true);
+        hint.setText(win.isEmpty() ? "Scene cleared · Result saved" : "Scene cleared · Result saved\n" + win);
         // Show the title at once; swap in the KJV text when the background read finishes.
         caption.setText(puzzle.title + "\n— " + puzzle.reference);
         caption.setVisibility(View.VISIBLE);
         GameFx.enter(caption);
         android.widget.FrameLayout burst = GameFx.starRow(getContext(), stars);
         column.addView(burst, column.indexOfChild(caption));
-        GameFx.popStars(burst, stars);
+        GameFx.popStars(burst, stars, false);
         final Context ctx = appContext;
         final String reference = puzzle.reference;
         new Thread(() -> {
@@ -243,6 +279,10 @@ public final class StoryMosaicDialog extends Dialog {
             if (verse == null) return;
             mainHandler.post(() -> caption.setText("\u201c" + verse + "\u201d\n— " + reference));
         }, "kjv-caption").start();
+        if (level < levelCount) {
+            int side = MosaicBoard.sideForLevel(level + 1);
+            column.addView(text("Next scene · " + side + " × " + side + " grid", 13, false));
+        }
         Button next = smallButton(level < levelCount ? "Next scene" : "Back to chapters");
         next.setOnClickListener(v -> {
             if (level < levelCount) showPuzzle(level);
@@ -292,6 +332,7 @@ public final class StoryMosaicDialog extends Dialog {
     private Button smallButton(String label) {
         Button button = new Button(getContext());
         button.setAllCaps(false);
+        button.setSoundEffectsEnabled(false);
         button.setText(label);
         button.setTextColor(Color.WHITE);
         button.setBackgroundColor(ORANGE);

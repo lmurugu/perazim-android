@@ -97,15 +97,34 @@ public final class GameChrome {
             host.newSeed();
             replay.run();
         });
-        Button nextButton = host.button("Next level", false);
-        nextButton.setEnabled(next != null);
-        if (next != null) nextButton.setOnClickListener(v -> {
-            if (!host.activeOwner()) return;
-            next.run();
+        if (next != null) host.button("Next level", true).setOnClickListener(v -> {
+            if (host.activeOwner()) next.run();
         });
-        if (next != null) nextButton.post(() -> GameFx.shimmer(nextButton));
         host.text("Best on this phone: " + GameResults.starLine(GameResults.bestStars(prefs, storedId)), 13, false);
-        host.text("Get 2 stars or more to unlock the next level.", 12, false);
+        host.button("Back to Games", false).setOnClickListener(v -> host.hub());
+    }
+
+    /** Presents a result that has already been stored at the point of completion. */
+    public void showLevelResult(String title, int level, int stars, boolean cleared, String result,
+                                String nextDetail, String announcerLine, Runnable next, Runnable replay, Runnable levels) {
+        if (!host.activeOwner()) return;
+        host.screen(title, (cleared ? "Level cleared" : "Run ended") + " · Result saved on this phone");
+        if (stars > 0) {
+            FrameLayout frame = GameFx.starRow(host.activity(), stars);
+            host.addRow(frame);
+            GameFx.popStars(frame, stars, false);
+        }
+        host.text("Level " + level + " · " + result, 17, true);
+        if (announcerLine != null && !announcerLine.isEmpty()) host.text(announcerLine, 15, false);
+        if (nextDetail != null && !nextDetail.isEmpty()) host.text(nextDetail, 14, false);
+        if (next != null) host.button("Next level · " + (level + 1), true)
+                .setOnClickListener(v -> { if (host.activeOwner()) next.run(); });
+        host.button("Replay level", next == null).setOnClickListener(v -> {
+            if (host.activeOwner()) replay.run();
+        });
+        host.button("All levels", false).setOnClickListener(v -> {
+            if (host.activeOwner()) levels.run();
+        });
         host.button("Back to Games", false).setOnClickListener(v -> host.hub());
     }
 
@@ -115,6 +134,7 @@ public final class GameChrome {
         pause.setOnClickListener(v -> {
             if (!host.activeOwner()) return;
             host.click(v);
+            GameAudio.get(host.activity()).stopAnnouncer();
             host.screen("Paused", "Your run is saved on this screen. Take a breath.");
             host.button("Resume", true).setOnClickListener(r -> {
                 if (!host.activeOwner()) return;

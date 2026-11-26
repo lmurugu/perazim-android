@@ -40,6 +40,7 @@ final class LetterWheelView extends View {
     private float discPx;
     private Listener listener;
     private float pulse;
+    private boolean tapMode;
 
     LetterWheelView(Context context) {
         super(context);
@@ -67,6 +68,22 @@ final class LetterWheelView extends View {
         path.clear();
         layoutLetters();
         invalidate();
+    }
+
+    boolean toggleTapMode() {
+        tapMode = !tapMode;
+        path.clear();
+        invalidate();
+        setContentDescription(tapMode ? "Tap letters to spell a word" : "Swipe letters to spell a word");
+        return tapMode;
+    }
+
+    void submit() {
+        StringBuilder word = new StringBuilder();
+        for (int index : path) word.append(letters.get(index));
+        path.clear();
+        invalidate();
+        if (listener != null && word.length() > 0) listener.onSwipe(word.toString());
     }
 
     /** Short glow on the ring after a correct word. */
@@ -139,6 +156,7 @@ final class LetterWheelView extends View {
             disc.setColor(picked ? PerazimTheme.COLOR_ORANGE_BRAND
                     : (GlassKit.light() ? 0xB3FFFFFF : PerazimTheme.COLOR_SURFACE_2));
             canvas.drawCircle(cx[i], cy[i], discPx / 2f, disc);
+            text.setTextSize(Math.min(sp(17), discPx * 0.42f));
             text.setColor(picked ? PerazimTheme.COLOR_BG_DEEP : GlassKit.text());
             float baseline = cy[i] - (text.descent() + text.ascent()) / 2f;
             canvas.drawText(String.valueOf(letters.get(i)), cx[i], baseline, text);
@@ -157,21 +175,21 @@ final class LetterWheelView extends View {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 getParent().requestDisallowInterceptTouchEvent(true);
-                path.clear();
+                if (!tapMode) path.clear();
                 addAt(event.getX(), event.getY());
                 return true;
             case MotionEvent.ACTION_MOVE:
+                if (tapMode) return true;
                 addAt(event.getX(), event.getY());
                 return true;
             case MotionEvent.ACTION_UP:
+                getParent().requestDisallowInterceptTouchEvent(false);
+                if (!tapMode) submit();
+                return true;
             case MotionEvent.ACTION_CANCEL:
-                StringBuilder word = new StringBuilder();
-                for (int index : path) word.append(letters.get(index));
+                getParent().requestDisallowInterceptTouchEvent(false);
                 path.clear();
                 invalidate();
-                if (listener != null && word.length() > 0 && event.getActionMasked() == MotionEvent.ACTION_UP) {
-                    listener.onSwipe(word.toString());
-                }
                 return true;
             default:
                 return super.onTouchEvent(event);
@@ -189,7 +207,13 @@ final class LetterWheelView extends View {
                 break;
             }
         }
-        if (hit < 0 || path.contains(hit)) return;
+        if (hit < 0) return;
+        if (tapMode && !path.isEmpty() && path.get(path.size() - 1) == hit) {
+            path.remove(path.size() - 1);
+            invalidate();
+            return;
+        }
+        if (path.contains(hit)) return;
         path.add(hit);
         performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
         if (listener != null) listener.onLetter();

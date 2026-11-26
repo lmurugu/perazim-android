@@ -11,10 +11,23 @@ import android.media.SoundPool;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
+import android.view.Window;
+
+import java.lang.ref.WeakReference;
+
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Shared game sound design: a looping music bed per game and short sound effects for every game.
@@ -32,12 +45,22 @@ public final class GameAudio {
 
     /** Short sound effects shared by every game. */
     public enum Sfx {
+        SHOW_START("sfx_show_start"), ANSWER_CORRECT("sfx_answer_correct"), ANSWER_INCORRECT("sfx_answer_incorrect"),
         TAP("sfx_tap"), CORRECT("sfx_correct"), WRONG("sfx_wrong"), STAR("sfx_star"),
         COMPLETE("sfx_complete"), COMBO_1("sfx_combo1"), COMBO_2("sfx_combo2"), COMBO_3("sfx_combo3"),
-        HINT("sfx_hint");
+        HINT("sfx_hint"), WIN_KNOWLEDGE("sfx_win_knowledge"), WIN_WORDS("sfx_win_words"),
+        WIN_ADVENTURE("sfx_win_adventure"), WIN_LADDER("sfx_win_ladder"),
+        RETRY_SOFT("sfx_retry_soft"), HELP_SPARK("sfx_help_spark");
 
         final String asset;
         Sfx(String asset) { this.asset = asset; }
+    }
+
+    public enum Reaction {
+        WIN("win"), RETRY("retry"), HELP("help");
+
+        final String path;
+        Reaction(String path) { this.path = path; }
     }
 
     /** Asset folder inside the app's assets. */
@@ -62,9 +85,16 @@ public final class GameAudio {
     }
 
     private static final String KEY_MUSIC_ON = "audio.music_on";
+    private static final String KEY_ANNOUNCER_ON = "audio.announcer_on";
     private static final String KEY_SFX_ON = "audio.sfx_on";
     private static final String KEY_MUSIC_VOL = "audio.music_vol";
+    private static final String KEY_VOICE_VOL = "audio.voice_vol";
     private static final String KEY_SFX_VOL = "audio.sfx_vol";
+    private static final String ANNOUNCER_DIR = DIR + "announcer/";
+    private static final long RETRY_INTERVAL_MS = 8500L;
+    private static final long HELP_INTERVAL_MS = 6500L;
+    private static final long ANSWER_CUE_MS = 540L;
+    private static final float VOICE_DUCK_LEVEL = 0.16f;
     private static final float DUCK_LEVEL = 0.35f;
     private static final long DUCK_MS = 350L;
 
@@ -74,7 +104,21 @@ public final class GameAudio {
     private final Handler main = new Handler(Looper.getMainLooper());
     private SoundPool pool;
     private final Map<Sfx, Integer> loaded = new HashMap<>();
+    private final Set<Integer> readySamples = new HashSet<>();
+    private Sfx awaitingCue;
+    private float awaitingStrength;
     private MediaPlayer music;
+    private MediaPlayer voice;
+    private Reaction activeReaction;
+    private boolean answerVoice;
+    private int correctLine;
+    private int incorrectLine;
+    private long answerAt = -1_000L;
+    private Runnable deferredResult;
+    private WeakReference<Window> reactionWindow = new WeakReference<>(null);
+    private JSONObject voiceLines;
+    private long retryAt = -RETRY_INTERVAL_MS;
+    private long helpAt = -HELP_INTERVAL_MS;
     private String currentTrack;
     private SharedPreferences settings;
     private String settingsPrefix = "";
@@ -83,8 +127,10 @@ public final class GameAudio {
     private AudioFocusRequest focusRequest;
     private final AudioManager.OnAudioFocusChangeListener focusListener = change -> {
         if (change == AudioManager.AUDIOFOCUS_LOSS) {
+            stopAnnouncer();
             stopMusic();
         } else if (change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            stopAnnouncer();
             pauseMusic();
         } else if (change == AudioManager.AUDIOFOCUS_GAIN) {
             resumeMusic();
@@ -104,23 +150,68 @@ public final class GameAudio {
 
     /** Binds the account's settings. {@code prefix} is the owner's score prefix from GameContext. */
     public synchronized void bindAccount(SharedPreferences prefs, String prefix) {
+        String owner = prefix == null ? "" : prefix;
+        if (!owner.equals(settingsPrefix)) {
+            stopAnnouncer();
+            retryAt = -RETRY_INTERVAL_MS;
+            helpAt = -HELP_INTERVAL_MS;
+        }
         this.settings = prefs;
-        this.settingsPrefix = prefix == null ? "" : prefix;
+        this.settingsPrefix = owner;
     }
 
     // ---- Settings (per account) ----
 
     public boolean isMusicOn() { return flag(KEY_MUSIC_ON, true); }
     public boolean isSfxOn() { return flag(KEY_SFX_ON, true); }
+    public boolean isAnnouncerOn() { return flag(KEY_ANNOUNCER_ON, true); }
     /** Music volume 0 to 100. */
-    public int musicVolume() { return intValue(KEY_MUSIC_VOL, 60); }
+    public int musicVolume() { return intValue(KEY_MUSIC_VOL, 48); }
+    public int voiceVolume() { return intValue(KEY_VOICE_VOL, 80); }
     /** Effects volume 0 to 100. */
     public int sfxVolume() { return intValue(KEY_SFX_VOL, 80); }
 
     public void setMusicOn(boolean on) { put(KEY_MUSIC_ON, on); if (on) playCurrent(); else stopMusic(); }
-    public void setSfxOn(boolean on) { put(KEY_SFX_ON, on); }
-    public void setMusicVolume(int percent) { put(KEY_MUSIC_VOL, clamp(percent)); applyMusicVolume(1f); }
-    public void setSfxVolume(int percent) { put(KEY_SFX_VOL, clamp(percent)); }
+    public void setSfxOn(boolean on) {
+        put(KEY_SFX_ON, on);
+        if (on) ensurePool();
+        else releaseEffects();
+    }
+
+    public void setAnnouncerOn(boolean on) {
+        put(KEY_ANNOUNCER_ON, on);
+        if (!on) stopAnnouncer();
+    }
+
+    public void setMusicVolume(int percent) {
+        put(KEY_MUSIC_VOL, clamp(percent));
+        restoreMusicVolume();
+    }
+
+    public void setSfxVolume(int percent) {
+        put(KEY_SFX_VOL, clamp(percent));
+        if (percent <= 0) releaseEffects();
+        else if (isSfxOn()) ensurePool();
+    }
+
+    public void setVoiceVolume(int percent) {
+        put(KEY_VOICE_VOL, clamp(percent));
+        if (percent <= 0) stopAnnouncer();
+        else if (voice != null) {
+            float volume = voiceVolume() / 100f;
+            try { voice.setVolume(volume, volume); }
+            catch (RuntimeException ignored) { }
+        }
+    }
+
+    public boolean isInGames() { return currentTrack != null; }
+
+    public void setReactionWindow(Window window) {
+        Window old = reactionWindow.get();
+        if (old == window) return;
+        GameReactionVisuals.clear(old);
+        reactionWindow = new WeakReference<>(window);
+    }
 
     private boolean flag(String key, boolean fallback) {
         return settings == null ? fallback : settings.getBoolean(settingsPrefix + key, fallback);
@@ -152,6 +243,207 @@ public final class GameAudio {
         }
     }
 
+    /** Returns the caption even if sound is off, so the same feedback can be read. */
+    public String announcerLine(String gameId, Reaction reaction) {
+        if (gameId == null || reaction == null) return "";
+        if (voiceLines == null) {
+            try (InputStream stream = appContext.getAssets().open(ANNOUNCER_DIR + "lines.json");
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                StringBuilder content = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) content.append(line);
+                voiceLines = new JSONObject(content.toString());
+            } catch (Exception ignored) {
+                voiceLines = new JSONObject();
+            }
+        }
+        JSONObject game = voiceLines.optJSONObject(gameId);
+        return game == null ? "" : game.optString(reaction.path, "");
+    }
+
+    /**
+     * One voice at a time. Retry and help taps are spaced out, while a final result can take
+     * priority. The source recording always plays at its original pitch.
+     */
+    public String announce(String gameId, Reaction reaction, boolean result) {
+        long answerRemaining = answerTimeRemaining();
+        if (result && (answerVoice || answerRemaining > 0)) {
+            cancelDeferredResult();
+            deferredResult = () -> react(gameId, reaction, true, false);
+            if (!answerVoice) main.postDelayed(resultPlayback, answerRemaining);
+            return announcerLine(gameId, reaction);
+        }
+        return react(gameId, reaction, result, false);
+    }
+
+    public String announce(String gameId, Reaction reaction) {
+        return announce(gameId, reaction, false);
+    }
+
+    public void previewMix() {
+        String gameId = currentTrack == null || HUB_TRACK.equals(currentTrack) ? "bible_quiz" : currentTrack;
+        react(gameId, Reaction.WIN, true, true);
+    }
+
+    /** Immediate feedback for a judged input. A new answer replaces any previous line. */
+    public void answerFeedback(boolean correct) {
+        answerFeedback(correct, false);
+    }
+
+    public void previewAnswer(boolean correct) {
+        answerFeedback(correct, true);
+    }
+
+    private void answerFeedback(boolean correct, boolean preview) {
+        stopAnnouncer();
+        answerAt = SystemClock.elapsedRealtime();
+        if (!correct && !preview && currentTrack != null && answerAt - retryAt >= RETRY_INTERVAL_MS) {
+            retryAt = answerAt;
+            String caption = "road_to_jerusalem".equals(currentTrack) ? "A setback. Keep rolling!"
+                    : announcerLine(currentTrack, Reaction.RETRY);
+            if (!caption.isEmpty()) GameReactionVisuals.show(reactionWindow.get(), currentTrack, Reaction.RETRY, caption);
+        }
+        boolean speak = canPlayVoice();
+        playPitched(correct ? Sfx.ANSWER_CORRECT : Sfx.ANSWER_INCORRECT, 1f, speak ? 0.7f : 0.95f);
+        if (speak) {
+            int line = correct ? correctLine++ % 4 : incorrectLine++ % 4;
+            String name = (correct ? "answer_correct_" : "answer_incorrect_") + line;
+            startVoice(name, null, true);
+        }
+    }
+
+    /** Play only on entry to an actual level, including retries and next levels. */
+    public void startRound(String gameId) {
+        enterGame(gameId);
+        play(Sfx.SHOW_START);
+    }
+
+    public void previewStart() {
+        stopAnnouncer();
+        play(Sfx.SHOW_START);
+    }
+
+    private final Runnable resultPlayback = this::playDeferredResult;
+
+    private long answerTimeRemaining() {
+        return ANSWER_CUE_MS - (SystemClock.elapsedRealtime() - answerAt);
+    }
+
+    private void cancelDeferredResult() {
+        main.removeCallbacks(resultPlayback);
+        deferredResult = null;
+    }
+
+    private void playDeferredResult() {
+        Runnable next = deferredResult;
+        cancelDeferredResult();
+        if (next != null) next.run();
+    }
+
+    private String react(String gameId, Reaction reaction, boolean result, boolean preview) {
+        String line = announcerLine(gameId, reaction);
+        if (line.isEmpty() || (!preview && !gameId.equals(currentTrack)) || !appInForeground) return line;
+        long now = SystemClock.elapsedRealtime();
+        if (!preview && !result && reaction == Reaction.RETRY && now - retryAt < RETRY_INTERVAL_MS) return line;
+        if (!preview && !result && reaction == Reaction.HELP && now - helpAt < HELP_INTERVAL_MS) return line;
+
+        if (!preview) {
+            if (reaction == Reaction.RETRY) retryAt = now;
+            if (reaction == Reaction.HELP) helpAt = now;
+            GameReactionVisuals.show(reactionWindow.get(), gameId, reaction, line);
+        }
+
+        boolean allowInterrupt = preview || (result && activeReaction != reaction)
+                || (reaction == Reaction.HELP && activeReaction == Reaction.RETRY);
+        boolean speak = canPlayVoice() && (voice == null || allowInterrupt);
+        if (speak) stopAnnouncer();
+        playPitched(reactionEffect(gameId, reaction), 1f, speak ? 0.58f : 0.95f);
+        if (speak) startVoice(gameId + "_" + reaction.path, reaction, false);
+        return line;
+    }
+
+    private Sfx reactionEffect(String id, Reaction reaction) {
+        if (reaction == Reaction.HELP) return Sfx.HELP_SPARK;
+        if (reaction == Reaction.RETRY) return Sfx.RETRY_SOFT;
+        switch (id) {
+            case "ladder_of_faith": return Sfx.WIN_LADDER;
+            case "word_search":
+            case "verse_builder":
+            case "memory_match":
+            case "vine_words":
+                return Sfx.WIN_WORDS;
+            case "story_timeline":
+            case "road_to_jerusalem":
+            case "lamp_slide":
+            case "story_mosaic":
+                return Sfx.WIN_ADVENTURE;
+            default: return Sfx.WIN_KNOWLEDGE;
+        }
+    }
+
+    private void startVoice(String name, Reaction reaction, boolean answer) {
+        try (AssetFileDescriptor fd = appContext.getAssets().openFd(
+                ANNOUNCER_DIR + name + ".ogg")) {
+            MediaPlayer player = new MediaPlayer();
+            voice = player;
+            activeReaction = reaction;
+            answerVoice = answer;
+            player.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build());
+            player.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
+            player.setOnPreparedListener(ready -> {
+                if (voice != ready) return;
+                if (!canPlayVoice()) { finishVoice(); return; }
+                try {
+                    float volume = voiceVolume() / 100f;
+                    ready.setVolume(volume, volume);
+                    ready.start();
+                    restoreMusicVolume();
+                } catch (RuntimeException ignored) {
+                    finishVoice();
+                }
+            });
+            player.setOnCompletionListener(done -> { if (voice == done) finishVoice(); });
+            player.setOnErrorListener((failed, what, extra) -> {
+                if (voice == failed) finishVoice();
+                return true;
+            });
+            player.prepareAsync();
+        } catch (IOException | RuntimeException ignored) {
+            finishVoice();
+        }
+    }
+
+    private boolean canPlayVoice() {
+        return appInForeground && isAnnouncerOn() && voiceVolume() > 0 && ringerAudible();
+    }
+
+    public void stopAnnouncer() {
+        cancelDeferredResult();
+        answerAt = -1_000L;
+        releaseVoice();
+    }
+
+    private void finishVoice() {
+        boolean answered = answerVoice;
+        releaseVoice();
+        if (!answered || deferredResult == null) return;
+        long remaining = answerTimeRemaining();
+        if (remaining > 0) main.postDelayed(resultPlayback, remaining);
+        else playDeferredResult();
+    }
+
+    private void releaseVoice() {
+        answerVoice = false;
+        if (voice == null) return;
+        MediaPlayer old = voice;
+        voice = null;
+        activeReaction = null;
+        old.release();
+        restoreMusicVolume();
+    }
+
     // ---- Effects ----
 
     /** Plays one effect at normal pitch. Returns false when nothing played (off, silent or unavailable). */
@@ -162,17 +454,28 @@ public final class GameAudio {
      * or each step of a combo sits a little higher than the one before.
      */
     public boolean playPitched(Sfx sfx, float rate) {
-        if (sfx == null || !isSfxOn() || !ringerAudible()) return false;
+        return playPitched(sfx, rate, 1f);
+    }
+
+    private boolean playPitched(Sfx sfx, float rate, float strength) {
+        if (sfx == null || !appInForeground || !isSfxOn() || !ringerAudible()) return false;
         try {
             SoundPool sounds = ensurePool();
             if (sounds == null) return false;
             Integer id = loaded.get(sfx);
             if (id == null) return false;
-            float vol = sfxVolume() / 100f;
+            float vol = sfxVolume() / 100f * strength;
             if (vol <= 0f) return false;
+            if (!readySamples.contains(id)) {
+                if (sfx == Sfx.SHOW_START || sfx == Sfx.ANSWER_CORRECT || sfx == Sfx.ANSWER_INCORRECT) {
+                    awaitingCue = sfx;
+                    awaitingStrength = strength;
+                }
+                return false;
+            }
             duckMusic();
-            sounds.play(id, vol, vol, 1, 0, Math.max(0.5f, Math.min(2f, rate)));
-            return true;
+            if (voice != null && sfx != Sfx.ANSWER_CORRECT && sfx != Sfx.ANSWER_INCORRECT) vol *= 0.28f;
+            return sounds.play(id, vol, vol, 1, 0, Math.max(0.5f, Math.min(2f, rate))) != 0;
         } catch (RuntimeException e) {
             return false;
         }
@@ -192,6 +495,14 @@ public final class GameAudio {
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build();
         pool = new SoundPool.Builder().setMaxStreams(4).setAudioAttributes(attrs).build();
+        pool.setOnLoadCompleteListener((sounds, id, status) -> {
+            if (sounds != pool || status != 0) return;
+            readySamples.add(id);
+            if (awaitingCue == null || !Integer.valueOf(id).equals(loaded.get(awaitingCue))) return;
+            Sfx cue = awaitingCue;
+            awaitingCue = null;
+            playPitched(cue, 1f, awaitingStrength);
+        });
         for (Sfx sfx : Sfx.values()) {
             try (AssetFileDescriptor fd = appContext.getAssets().openFd(DIR + sfx.asset + ".ogg")) {
                 loaded.put(sfx, pool.load(fd, 1));
@@ -202,14 +513,23 @@ public final class GameAudio {
         return pool;
     }
 
+    private void releaseEffects() {
+        if (pool == null) return;
+        pool.release();
+        pool = null;
+        loaded.clear();
+        readySamples.clear();
+        awaitingCue = null;
+    }
+
     private void duckMusic() {
         if (music == null || !music.isPlaying()) return;
-        applyMusicVolume(DUCK_LEVEL);
+        applyMusicVolume(voice == null ? DUCK_LEVEL : VOICE_DUCK_LEVEL);
         main.removeCallbacks(unduck);
         main.postDelayed(unduck, DUCK_MS);
     }
 
-    private void restoreMusicVolume() { applyMusicVolume(1f); }
+    private void restoreMusicVolume() { applyMusicVolume(voice == null ? 1f : VOICE_DUCK_LEVEL); }
 
     private void applyMusicVolume(float factor) {
         if (music == null) return;
@@ -228,17 +548,24 @@ public final class GameAudio {
      * the game's own loop, or the hub loop when the game has none.
      */
     public synchronized void enterGame(String gameId) {
+        stopAnnouncer();
+        awaitingCue = null;
         String track = trackFor(gameId);
         if (!track.equals(currentTrack)) {
+            GameReactionVisuals.clear(reactionWindow.get());
             releaseMusic();
             currentTrack = track;
         }
+        if (isSfxOn()) ensurePool();
         playCurrent();
     }
 
     /** Stops the music and releases the player (for example when the app leaves the games). */
     public synchronized void leaveGames() {
+        stopAnnouncer();
         stopMusic();
+        releaseEffects();
+        setReactionWindow(null);
         currentTrack = null;
     }
 
@@ -261,7 +588,7 @@ public final class GameAudio {
             }
         }
         if (!requestFocus()) return;
-        applyMusicVolume(1f);
+        restoreMusicVolume();
         if (!music.isPlaying()) music.start();
     }
 
@@ -329,6 +656,7 @@ public final class GameAudio {
             if (musicPausedByApp) resumeMusic();
             musicPausedByApp = false;
         } else {
+            stopAnnouncer();
             musicPausedByApp = music != null && music.isPlaying();
             pauseMusic();
         }
