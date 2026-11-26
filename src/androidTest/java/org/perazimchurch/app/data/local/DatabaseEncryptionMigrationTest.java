@@ -30,6 +30,7 @@ import java.util.UUID;
 /** Exercises encryption before Room opens either the shipped seed asset or an installed DB. */
 @RunWith(AndroidJUnit4.class)
 public class DatabaseEncryptionMigrationTest {
+    private static final int CURRENT_SCHEMA_VERSION = 12; // PerazimDatabase version
     private static final String ASSET = "database/perazim_database.db";
     private static final String QUEUE_ID = "encrypted-migration-draft";
 
@@ -52,7 +53,7 @@ public class DatabaseEncryptionMigrationTest {
 
             room = openRoom(context, name, key);
             SupportSQLiteDatabase opened = room.getOpenHelper().getWritableDatabase();
-            assertEquals(7, encryptedUserVersion(database, key));
+            assertEquals(CURRENT_SCHEMA_VERSION, encryptedUserVersion(database, key));
             assertTrue("Seeded Bible rows remain available after encryption", scalarInt(opened, "SELECT COUNT(*) FROM bible_verses") > 0);
         } finally {
             if (room != null) room.close();
@@ -88,7 +89,7 @@ public class DatabaseEncryptionMigrationTest {
 
             room = openRoom(context, name, key);
             SupportSQLiteDatabase encryptedRoom = room.getOpenHelper().getWritableDatabase();
-            assertEquals(7, encryptedUserVersion(database, key));
+            assertEquals(CURRENT_SCHEMA_VERSION, encryptedUserVersion(database, key));
             assertEquals(2, scalarInt(encryptedRoom, "SELECT COUNT(*) FROM sync_queue"));
             assertEquals("{\"content\":\"retained\"}", stringValue(encryptedRoom,
                     "SELECT payloadJson FROM sync_queue WHERE id = '" + QUEUE_ID + "'"));
