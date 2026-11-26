@@ -35,6 +35,8 @@ The optional on-device Qwen model runs on your device after download and can wor
 
 Perazim uses an application server and PostgreSQL for account and service records, and Android local storage for selected cached or queued app data. The account session token is encrypted using Android Keystore-backed AES-GCM. The Room database is not encrypted by the app. Android backup is enabled; the configured rules exclude the session-token preference files but do not exclude the Room database or all other app data. The repository does not verify database-at-rest encryption, backup-provider protections or a tested backup-expiry cycle. The Android client requires HTTPS for protected requests; that does not establish that a public service is deployed with TLS. [Insert actual hosting, processor, storage and transfer details before publication.]
 
+Questions the on-device guide cannot answer are kept encrypted on your phone, with names and contact details removed, and are shared only if you choose to send them.
+
 ## Choices and requests
 
 The app records acknowledgement of the notice. Separate consent choices can be recorded only for configured purposes; the app does not currently present a complete optional-consent flow. The service accepts authenticated ACCESS, CORRECTION and ERASURE requests and returns a receipt/status. Intake does not itself provide a copy, correct a record or erase it. Objection, restriction and portability workflows are not implemented in the app. Contact [privacy contact] for follow-up; the request-handling procedure and applicable deadlines require institutional review.
