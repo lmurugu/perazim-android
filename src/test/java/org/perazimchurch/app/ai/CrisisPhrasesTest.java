@@ -1,0 +1,34 @@
+package org.perazimchurch.app.ai;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
+public class CrisisPhrasesTest {
+
+    private static boolean hit(String text) {
+        return CrisisPhrases.PATTERN.matcher(text).find();
+    }
+
+    @Test
+    public void suicidalWordingNowMatches() {
+        assertTrue(hit("I don't see the point of living anymore."));
+        assertTrue(hit("I don't see the point of lviing anymore."));
+        assertTrue(hit("my friend just texted me that she wants to die tonight"));
+        assertTrue(hit("Ni sawa kama nikijiumiza mwenyewe? Nataka tu kukomesha maumivu."));
+        assertTrue(hit("Ni bora nife tu, watoto wangu watakuwa bora bila mimi."));
+    }
+
+    @Test
+    public void endingLifeWordingIsCrisis() {
+        assertTrue(hit("I'm thinking of ending my life because my wife left."));
+        assertTrue(hit("He is ending his life tonight."));
+    }
+
+    @Test
+    public void ordinaryUsesAreNotCrisis() {
+        assertFalse(hit("I don't see the point of this sermon."));
+        assertFalse(hit("What does Psalm 23 1 say?"));
+    }
+}

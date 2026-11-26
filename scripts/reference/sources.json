@@ -1,0 +1,443 @@
+{
+  "_comment": "Register of reference sources for the on-phone guide. Every item is PENDING Levi's approval (see docs/PERAZIM_AI_PROJECT/REFERENCE_SOURCE_REGISTER_2026-11-23.md). Presence here is not approval: the app only uses sources listed in src/main/assets/reference/approvals.json. Source order (Levi, 2026-11-25): Tier 1 Bible (KJV/NASB), always first. Tier 2 creeds and early Church Fathers only where they agree with Bible-centred Protestant, Pentecostal and Evangelical teaching. Tier 3 Bible-centred Protestant, Pentecostal and Evangelical teaching and books. Other groups (Roman Catholic, LDS, Jehovah's Witness, Qur'an and similar) are FALSE_DOCTRINE_EXAMPLE material, never sources.",
+  "sources": [
+    {
+      "id": "openbible-xrefs",
+      "title": "OpenBible.info cross-references",
+      "author": "Stephen Smith (OpenBible.info); seeded from the Treasury of Scripture Knowledge (public domain)",
+      "category": "CROSS_REFERENCE",
+      "licence": "CC BY 4.0",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourceUrl": "https://a.openbible.info/data/cross-references.zip",
+      "landingUrl": "https://www.openbible.info/labs/cross-references/",
+      "file": "xref/cross-references.zip",
+      "parser": "openbible_xrefs",
+      "theologyTag": "NONE",
+      "tier": "default",
+      "attribution": "Cross-reference data: OpenBible.info (CC BY 4.0), built from the public-domain Treasury of Scripture Knowledge.",
+      "sizeBytes": 1982822,
+      "sha256": "b54a2a381e3eb587ca4ea34ba3f1d052923c49625d857014041f3254eb7c4f1e"
+    },
+    {
+      "id": "openbible-geo",
+      "title": "OpenBible.info Bible places",
+      "author": "OpenBible.info",
+      "category": "GEOGRAPHY",
+      "licence": "CC BY 4.0 (site statement). Some coordinates derive from OpenStreetMap (ODbL): verify before release.",
+      "licenceUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourceUrl": "https://www.openbible.info/geo/data/merged.txt",
+      "landingUrl": "https://www.openbible.info/geo/",
+      "file": "geo/merged.txt",
+      "parser": "openbible_geo",
+      "theologyTag": "NONE",
+      "tier": "default",
+      "attribution": "Places data: OpenBible.info (CC BY 4.0). Some coordinates from OpenStreetMap contributors (ODbL 1.0).",
+      "sizeBytes": 137696,
+      "sha256": "4c28b9232919ac89c094f8e4d3f978462b1117b5c73ce492b81c41175f967150"
+    },
+    {
+      "id": "smith-bible-dictionary",
+      "title": "Smith's Bible Dictionary",
+      "author": "William Smith (1816-1893)",
+      "edition": "1884 (CCEL text)",
+      "category": "DICTIONARY",
+      "licence": "Public domain",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://www.ccel.org/ccel/s/smith_w/bibledict/cache/bibledict.txt",
+      "landingUrl": "https://www.ccel.org/ccel/s/smith_w",
+      "file": "ccel/smith.txt",
+      "parser": "ccel_headword",
+      "theologyTag": "REFERENCE_ONLY_19TH_CENTURY_PROTESTANT",
+      "tier": "default",
+      "attribution": "Smith's Bible Dictionary (1884), public domain. Text from Christian Classics Ethereal Library.",
+      "sizeBytes": 5351426,
+      "sha256": "9594ece06ce8237c44b8d8eeb81c59db292fdb98d28316dd01c33804533dcd03"
+    },
+    {
+      "id": "easton-bible-dictionary",
+      "title": "Easton's Bible Dictionary",
+      "author": "Matthew George Easton (1823-1894)",
+      "edition": "1897 (CCEL text)",
+      "category": "DICTIONARY",
+      "licence": "Public domain",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://www.ccel.org/ccel/easton/ebd2/cache/ebd2.txt",
+      "landingUrl": "https://www.ccel.org/ccel/easton/ebd2",
+      "file": "ccel/easton.txt",
+      "parser": "ccel_headword",
+      "theologyTag": "REFERENCE_ONLY_19TH_CENTURY_PROTESTANT",
+      "tier": "default",
+      "attribution": "Easton's Bible Dictionary (1897), public domain. Text from Christian Classics Ethereal Library.",
+      "sizeBytes": 5463775,
+      "sha256": "291260d29a0ddef706aa9dc8457e601b66dab755597ca090b72e63a394062310"
+    },
+    {
+      "id": "hitchcock-bible-names",
+      "title": "Hitchcock's Bible Names Dictionary",
+      "author": "Roswell D. Hitchcock (1817-1887)",
+      "edition": "1858 (CCEL text)",
+      "category": "DICTIONARY",
+      "licence": "Public domain",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://www.ccel.org/ccel/hitchcock/bible_names/cache/bible_names.txt",
+      "landingUrl": "https://www.ccel.org/ccel/hitchcock/bible_names",
+      "file": "ccel/hitchcock.txt",
+      "parser": "ccel_headword",
+      "theologyTag": "NONE",
+      "tier": "default",
+      "attribution": "Hitchcock's Bible Names Dictionary, public domain. Text from Christian Classics Ethereal Library.",
+      "sizeBytes": 121260,
+      "sha256": "63603920c3b008170ca766b196464440d8b53cbc9c0b12f26c97320fbfe70dfb"
+    },
+    {
+      "id": "naves-topical-bible",
+      "title": "Nave's Topical Bible",
+      "author": "Orville J. Nave (1841-1917)",
+      "edition": "1921 (CCEL text)",
+      "category": "TOPICAL_INDEX",
+      "licence": "Public domain (author died 1917)",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://www.ccel.org/ccel/n/nave/bible/cache/bible.txt",
+      "landingUrl": "https://www.ccel.org/ccel/n/nave/bible",
+      "file": "ccel/nave.txt",
+      "parser": "ccel_topical",
+      "theologyTag": "NONE",
+      "tier": "default",
+      "attribution": "Nave's Topical Bible (1921), public domain. Text from Christian Classics Ethereal Library.",
+      "sizeBytes": 2107617,
+      "sha256": "d78906aead3f71b8c49970fae3c4f983a51ffdbf7ef740f5e7c4dacd3c59cb9b"
+    },
+    {
+      "id": "matthew-henry-commentary",
+      "title": "Matthew Henry's Commentary on the Whole Bible",
+      "author": "Matthew Henry (1662-1714)",
+      "edition": "1706-1721 (CCEL text, six volumes)",
+      "category": "COMMENTARY",
+      "licence": "Public domain (CCEL: may be copied and distributed freely)",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://www.ccel.org/ccel/henry/mhc1/cache/mhc1.txt",
+      "landingUrl": "https://www.ccel.org/ccel/henry/mhc1",
+      "files": [
+        {
+          "file": "ccel/henry_mhc1.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc1/cache/mhc1.txt",
+          "sha256": "63ad5f200460b049488afc7b0e90dc87fa739f2f34ffbba75a4e5ef013cfe727",
+          "sizeBytes": 6260496
+        },
+        {
+          "file": "ccel/henry_mhc2.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc2/cache/mhc2.txt",
+          "sha256": "b53ca73cf69947ab4f815a54998811167d412253b4595340a057d5b87766acb7",
+          "sizeBytes": 7814959
+        },
+        {
+          "file": "ccel/henry_mhc3.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc3/cache/mhc3.txt",
+          "sha256": "676a2f0b7bc8317639a54d0dced5fcaf087458357a1d8b6e934bcb9170da5eef",
+          "sizeBytes": 8075277
+        },
+        {
+          "file": "ccel/henry_mhc4.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc4/cache/mhc4.txt",
+          "sha256": "c15670be62822c4d5678b5a5cf18d91061017d37a7233893e5b81ee2f6be9b2e",
+          "sizeBytes": 10442839
+        },
+        {
+          "file": "ccel/henry_mhc5.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc5/cache/mhc5.txt",
+          "sha256": "8b4c34ba8dc9abdafc5d15d711ace78b4e3ac86ceca4056c38cf4f4469ef3080",
+          "sizeBytes": 8511112
+        },
+        {
+          "file": "ccel/henry_mhc6.txt",
+          "url": "https://www.ccel.org/ccel/henry/mhc6/cache/mhc6.txt",
+          "sha256": "d6d0cdf15d3edbac8982e8c9b50e0c1dfaecc660af62b6d8e53d910516eb9fb7",
+          "sizeBytes": 8011439
+        }
+      ],
+      "parser": "ccel_commentary_henry",
+      "theologyTag": "PURITAN_REFORMED_COMMENTARY",
+      "tier": "optional",
+      "attribution": "Matthew Henry's Commentary on the Whole Bible (1706-1721), public domain. Text from Christian Classics Ethereal Library (ccel.org). Reference material, not Perazim's position.",
+      "sha256": "multi",
+      "sizeBytes": 49116122
+    },
+    {
+      "id": "wesley-notes-nt",
+      "title": "John Wesley's Explanatory Notes upon the New Testament",
+      "author": "John Wesley (1703-1791)",
+      "edition": "1755 (CCEL text, chapter pages)",
+      "category": "COMMENTARY",
+      "licence": "Public domain (CCEL rights line: Public Domain)",
+      "licenceUrl": "https://www.ccel.org/",
+      "sourceUrl": "https://ccel.org/ccel/wesley/notes/notes.i.html",
+      "file": "ccel/wesley-nt-chapters.json",
+      "sha256": "bca255b399da94f0c42f3f2f7f568cbacb3daddc05f26e6c52ee0b37605ac8dd",
+      "sizeBytes": 1679486,
+      "parser": "ccel_wesley_chapters",
+      "theologyTag": "ARMINIAN_WESLEYAN_COMMENTARY",
+      "tier": "optional",
+      "attribution": "John Wesley's Explanatory Notes upon the New Testament (1755), public domain. Text from Christian Classics Ethereal Library (ccel.org). Reference material, not Perazim's position.",
+      "landingUrl": "https://ccel.org/ccel/wesley/notes/notes.i.html"
+    },
+    {
+      "id": "creed-nicene-constantinopolitan-381",
+      "title": "Nicene-Constantinopolitan Creed of 381",
+      "author": "First Council of Constantinople (381); English text from Philip Schaff, The Creeds of Christendom (CCEL)",
+      "category": "CREED",
+      "licence": "Public domain",
+      "sourceUrl": "https://ccel.org/ccel/schaff/creeds1",
+      "landingUrl": "https://ccel.org/ccel/schaff/creeds1",
+      "file": "creed/nicene-constantinopolitan-381.txt",
+      "localFile": "nicene-constantinopolitan-381.txt",
+      "parser": "creed_text",
+      "headword": "Nicene",
+      "theologyTag": "ECUMENICAL_CREED",
+      "tier": "default",
+      "attribution": "Nicene-Constantinopolitan Creed of 381, public domain. English text from Philip Schaff, The Creeds of Christendom, vol. 1 (CCEL), checked word for word against the source.",
+      "sizeBytes": 1181,
+      "sha256": "6babb4e2ea8966c34a6f9067b84c448d2f93aa62e28f546aaa5ac0f3fa263886"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "creed-heidelberg",
+      "title": "Heidelberg Catechism (1563)",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Heidelberg_Catechism",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "REFORMED_CONFESSION_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "creed-canons-of-dort",
+      "title": "Canons of Dort (1619)",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Canons_of_Dort",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "REFORMED_CONFESSION_CALVINIST_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "creed-thirty-nine-articles",
+      "title": "Thirty-Nine Articles (1563)",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Thirty-Nine_Articles",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "ANGLICAN_CONFESSION_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "creed-wcf-1646",
+      "title": "Westminster Confession of Faith (1646)",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Westminster_Confession_of_Faith",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "REFORMED_CONFESSION_CALVINIST_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "creed-athanasian",
+      "title": "Athanasian Creed",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Athanasian_Creed",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "ECUMENICAL_CREED_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "creed-chalcedon",
+      "title": "Chalcedonian Definition (451)",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Chalcedonian_Definition",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "ECUMENICAL_CREED_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "creed-nicene",
+      "title": "Nicene / Niceno-Constantinopolitan Creed (381)",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Nicene_Creed",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "ECUMENICAL_CREED_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "creed-apostles",
+      "title": "Apostles' Creed",
+      "licence": "Public domain (Wikisource text)",
+      "url": "https://en.wikisource.org/wiki/Apostles%27_Creed",
+      "status": "NEXT_STEP_EXTRACTION",
+      "theology": "ECUMENICAL_CREED_PENDING_LEVI",
+      "note": "Public domain text. Not built yet: the Wikisource pages returned commentary and incomplete text (WCF and Dort pages are split into subpages). Needs a clean transcription from CCEL Schaff's Creeds of Christendom vol. III or a verified edition, then a parser."
+    },
+    {
+      "id": "gill-exposition",
+      "title": "John Gill's Exposition of the Entire Bible",
+      "licence": "Public domain (author died 1771); verify CCEL rights line",
+      "url": "https://www.ccel.org/ccel/gill/",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "Strongly Calvinist, hyper-Calvinist tendencies: sharp conflict with Arminian sources",
+      "note": "Flag every use."
+    },
+    {
+      "id": "jfb-commentary",
+      "title": "Jamieson-Fausset-Brown Commentary",
+      "licence": "Public domain (1871); verify host",
+      "url": "https://www.ccel.org/",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "Evangelical, Presbyterian-leaning",
+      "note": "CCEL path not confirmed in this session."
+    },
+    {
+      "id": "barnes-notes",
+      "title": "Albert Barnes' Notes on the Bible",
+      "licence": "Public domain (author died 1870); verify host",
+      "url": "https://www.ccel.org/",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "Presbyterian, New School leanings",
+      "note": "CCEL path not confirmed in this session."
+    },
+    {
+      "id": "clarke-commentary",
+      "title": "Adam Clarke's Commentary",
+      "licence": "Public domain (author died 1832); verify host",
+      "url": "https://www.ccel.org/",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "Wesleyan Arminian",
+      "note": "Conflicts with Reformed commentaries; flag."
+    },
+    {
+      "id": "calvin-commentaries",
+      "title": "John Calvin's Commentaries (Calvin Translation Society)",
+      "licence": "Public domain (Calvin d.1564; 19th-century translation); verify",
+      "url": "https://www.ccel.org/ccel/c/calvin/calcom01/cache/calcom01.txt",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "Reformed (Calvin)",
+      "note": "Large; optional."
+    },
+    {
+      "id": "schaff-creeds-vol3",
+      "title": "Schaff, The Creeds of Christendom, vol. III (Evangelical Protestant creeds with translations)",
+      "licence": "Public domain (CCEL rights line)",
+      "url": "https://www.ccel.org/ccel/s/schaff/creeds3/cache/creeds3.txt",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "Multi-tradition confessions",
+      "note": "Bilingual Latin and English; needs section parsing before use. Wikisource creeds used instead for now."
+    },
+    {
+      "id": "tbesg-tipnr-stepbible",
+      "title": "STEPBible lexicons and names (TBESG, TIPNR, TAHOT, TAGNT)",
+      "licence": "CC BY 4.0 per Tyndale House (verify on stepbible.org)",
+      "url": "https://github.com/STEPBible/STEPBible-Data",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "NONE for names; lexicon glosses are tool data",
+      "note": "Overlaps the Strong's word-study thread; names could feed the places index."
+    },
+    {
+      "id": "thayer-lexicon",
+      "title": "Thayer's Greek-English Lexicon (1889)",
+      "licence": "Public domain (verify digital source)",
+      "url": "",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "NONE",
+      "note": "Overlaps the Strong's word-study thread."
+    },
+    {
+      "id": "bdb-lexicon",
+      "title": "Brown-Driver-Briggs Hebrew Lexicon (1906)",
+      "licence": "Public domain (verify OpenScriptures file licence)",
+      "url": "https://github.com/openscriptures/HebrewLexicon",
+      "status": "CANDIDATE_VERIFY",
+      "theology": "NONE",
+      "note": "Overlaps the Strong's word-study thread."
+    },
+    {
+      "id": "tyndale-open-study-notes",
+      "title": "Tyndale Open Study Notes",
+      "licence": "NOT VERIFIED: licence not confirmed",
+      "url": "https://freely-given.org/OBD/TOSN/details.htm",
+      "status": "EXCLUDED_UNVERIFIED",
+      "theology": "Evangelical study notes",
+      "note": "Do not include until licence is confirmed."
+    },
+    {
+      "id": "swahili-biblia-takatifu-2019",
+      "title": "Biblia Takatifu (Swahili Unlocked Literal Bible, Door43, 2019)",
+      "licence": "CC BY-SA 4.0 (ebible.org)",
+      "url": "https://ebible.org/swhulb/",
+      "status": "PENDING_LEVI_SHARE_ALIKE",
+      "theology": "NONE",
+      "note": "Share-alike: any adapted text must stay CC BY-SA. Levi decides."
+    },
+    {
+      "id": "swahili-krapf-1850-nt",
+      "title": "Biblia Takatifu (Krapf 1850, New Testament portions)",
+      "licence": "Public domain (ebible.org)",
+      "url": "https://ebible.org/swh1850/",
+      "status": "CANDIDATE_LOW_VALUE",
+      "theology": "NONE",
+      "note": "Historic Kimvita orthography; New Testament only."
+    },
+    {
+      "id": "swahili-union-version-1952",
+      "title": "Swahili Union Version (Biblia Kiswahili, Union Version 1952)",
+      "licence": "NOT CLEARED: rights held by Bible Society of Kenya and Bible Society of Tanzania (2013 revised edition per Bible.com)",
+      "url": "https://www.bible.com/versions/3188",
+      "status": "REJECTED_NOT_CLEARED",
+      "theology": "NONE",
+      "note": "Do not bundle. The reader loads a user-supplied file only."
+    },
+    {
+      "id": "esv-niv-nkjv",
+      "title": "ESV, NIV, NKJV text",
+      "licence": "Copyrighted",
+      "url": "",
+      "status": "REJECTED_LEVI_DECISION",
+      "theology": "NONE",
+      "note": "Levi decided the AI uses KJV and NASB only. NASB is user-supplied only."
+    },
+    {
+      "id": "greek-interlinear-antoniades",
+      "title": "Robinson-Pierpont / Antoniades Greek NT interlinear (already bundled)",
+      "licence": "Public domain (byztxt/greektext-antoniades: 'Copy freely')",
+      "url": "https://github.com/byztxt/greektext-antoniades",
+      "status": "BUNDLED_NOT_USED_BY_AI",
+      "theology": "NONE",
+      "note": "Used by the Bible reader. Not part of this build."
+    },
+    {
+      "id": "strongs-bundled",
+      "title": "Strong's Greek and Hebrew dictionary (already bundled)",
+      "licence": "Greek: licence UNRESOLVED in repo (header quotes GPL 3.0 and MIT). Hebrew: CC BY 4.0",
+      "url": "https://github.com/openscriptures/strongs",
+      "status": "BUNDLED_LICENCE_OPEN_NOT_USED_BY_AI",
+      "theology": "NONE",
+      "note": "Owner must confirm the Greek licence. Word-study lookup belongs to the other thread."
+    },
+    {
+      "id": "ante-nicene-fathers",
+      "title": "Ante-Nicene Fathers (Roberts-Donaldson / Schaff ed.)",
+      "licence": "Public domain (CCEL)",
+      "url": "https://www.ccel.org/ccel/s/schaff/anf01/cache/anf01.txt",
+      "status": "CANDIDATE_TIER2_EXTRACTION_PENDING",
+      "theology": "Early church; views mixed and pre-date later doctrine",
+      "note": "Ten volumes; large; optional.",
+      "tier": "TIER_2_CONDITIONAL",
+      "tierNote": "Tier 2: a creed or early Church Father used only where the passage agrees with a Bible-centred Protestant, Pentecostal or Evangelical position. Passages must be tagged and filtered; nothing that contradicts that position. Extraction pending; not loaded."
+    },
+    {
+      "id": "npnf",
+      "title": "Nicene and Post-Nicene Fathers (Schaff ed.)",
+      "licence": "Public domain (CCEL)",
+      "url": "https://www.ccel.org/ccel/s/schaff/npnf101/cache/npnf101.txt",
+      "status": "CANDIDATE_TIER2_EXTRACTION_PENDING",
+      "theology": "Post-Nicene; mixed",
+      "note": "Large; optional.",
+      "tier": "TIER_2_CONDITIONAL",
+      "tierNote": "Tier 2: a creed or early Church Father used only where the passage agrees with a Bible-centred Protestant, Pentecostal or Evangelical position. Passages must be tagged and filtered; nothing that contradicts that position. Extraction pending; not loaded."
+    }
+  ],
+  "removed": []
+}

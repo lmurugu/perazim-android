@@ -1,6 +1,6 @@
 <!-- Draft factual rendition for institutional and professional review. Not published. -->
 
-PERAZIM MISSIONS CHURCH INTERNATIONAL
+PERAZIM MISSION CHURCH (PMCI)
 # Perazim App — Privacy Notice for Users
 
 KENYA | VERSION 0.2 | DRAFT FOR REVIEW — NOT PUBLISHED
@@ -11,7 +11,7 @@ This draft describes information currently handled by the Perazim app. Registrat
 
 ## Who operates the app
 
-Perazim is operated by [exact registered legal name of PMCI]. Privacy contact: [email] | [telephone] | [postal/physical address]. These details must be completed before publication.
+Perazim is operated by Perazim Mission Church. Privacy contact: [email] | [telephone] | [postal/physical address]. These details must be completed before publication.
 
 ## Information the app handles
 
@@ -34,6 +34,8 @@ The optional on-device Qwen model runs on your device after download and can wor
 ## Storage, providers and safeguards
 
 Perazim uses an application server and PostgreSQL for account and service records, and Android local storage for selected cached or queued app data. The account session token is encrypted using Android Keystore-backed AES-GCM. The Room database is not encrypted by the app. Android backup is enabled; the configured rules exclude the session-token preference files but do not exclude the Room database or all other app data. The repository does not verify database-at-rest encryption, backup-provider protections or a tested backup-expiry cycle. The Android client requires HTTPS for protected requests; that does not establish that a public service is deployed with TLS. [Insert actual hosting, processor, storage and transfer details before publication.]
+
+Questions the on-device guide cannot answer are kept encrypted on your phone, with names and contact details removed, and are shared only if you choose to send them.
 
 ## Choices and requests
 

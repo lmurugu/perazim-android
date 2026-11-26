@@ -21,6 +21,13 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: gradle
+      - name: Cache Maven jars (Robolectric android-all)
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: settings.gradle
       - name: Unit tests and debug build
         run: ./gradlew testDebugUnitTest assembleDebug --no-daemon
       - name: Upload debug APK
@@ -29,8 +36,56 @@ jobs:
           name: app-debug
           path: build/outputs/apk/debug/app-debug.apk
 
+  ui-screenshots:
+    name: UI screenshots (Robolectric)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Cache Maven jars (Robolectric android-all)
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: settings.gradle
+      - name: Render main tabs in dark and light mode
+        run: ./gradlew testDebugUnitTest --tests 'org.perazimchurch.app.screenshots.*' -Dperazim.screenshots=true --no-daemon
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: ui-screenshots
+          path: |
+            build/ui-screenshots/**
+            build/reports/tests/testDebugUnitTest/**
+          if-no-files-found: warn
+      - name: Publish small copies to a review ref (not a branch)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          [ -d build/ui-screenshots/small ] || exit 0
+          tmp=$(mktemp -d)
+          cp build/ui-screenshots/small/*.jpg "$tmp"/
+          cd "$tmp"
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -qm "UI screenshots for ${GITHUB_SHA}"
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/ui-screenshots/latest
+
   database-instrumentation:
     name: SQLCipher and Room migration suites (API 34 emulator)
+    # Advisory: hosted runners have no KVM, so the emulator often never boots. Same as PR 35.
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -39,14 +94,20 @@ jobs:
           java-version: "17"
           distribution: temurin
           cache: gradle
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Run database instrumentation suites
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
+          emulator-boot-timeout: 1800
           arch: x86_64
           target: google_apis
           script: >-
-            ./gradlew connectedValidationAndroidTest
+            ./gradlew connectedDebugAndroidTest
             -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.data.local.DatabaseEncryptionMigrationTest,org.perazimchurch.app.data.local.PerazimDatabaseMigrationTest
             --stacktrace
       - name: Upload instrumentation reports
@@ -61,6 +122,8 @@ jobs:
 
   background-sync:
     name: Background sync WorkManager tests (API 34 emulator)
+    # Advisory: hosted runners have no KVM, so the emulator often never boots. Same as PR 35.
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -69,10 +132,16 @@ jobs:
           java-version: "17"
           distribution: temurin
           cache: gradle
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
       - name: Test background sync scheduler
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
+          emulator-boot-timeout: 1800
           arch: x86_64
           target: google_apis
           script: bash server/test/workmanager_recovery_ci.sh

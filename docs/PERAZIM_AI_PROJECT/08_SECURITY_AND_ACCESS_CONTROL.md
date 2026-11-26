@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines the security and access-control requirements for the Perazim Missions Church International AI system.
+This document defines the security and access-control requirements for the Perazim Mission Church (PMCI) AI system.
 
 The purpose is to protect:
 

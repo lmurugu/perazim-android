@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines the testing, evaluation, quality assurance, and release-readiness requirements for the Perazim Missions Church International AI system.
+This document defines the testing, evaluation, quality assurance, and release-readiness requirements for the Perazim Mission Church (PMCI) AI system.
 
 The objective is not merely to establish that the application runs or that an AI model can generate responses. The system must demonstrate that it:
 

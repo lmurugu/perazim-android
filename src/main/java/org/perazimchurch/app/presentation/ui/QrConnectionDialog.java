@@ -52,6 +52,12 @@ import java.util.List;
  */
 public class QrConnectionDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     private final ConnectionRepository connectionRepository;
     private final String userId;
     private final String userName;
@@ -74,7 +80,7 @@ public class QrConnectionDialog extends Dialog {
                               @Nullable String userId,
                               @Nullable String userName,
                               @Nullable String campus) {
-        super(context);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.connectionRepository = connectionRepository;
 
         // Resolve user identity

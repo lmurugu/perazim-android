@@ -1,9 +1,9 @@
-# PERAZIM MISSIONS CHURCH INTERNATIONAL
+# PERAZIM MISSION CHURCH (PMCI)
 # AI PROJECT
 ## Document 00: Project Overview and Implementation Mandate
 
 **Document status:** Foundational project specification  
-**Project:** Perazim Missions Church International AI Assistant  
+**Project:** Perazim Mission Church (PMCI) AI Assistant  
 **Target platform:** Existing Perazim Android application  
 **Implementation agent:** OpenAI Codex  
 **Product and specification authority:** Project owner  
@@ -14,9 +14,9 @@
 
 ## 1. Project Purpose
 
-The purpose of this project is to develop an intelligent, reliable, Scripture-grounded and institutionally faithful AI assistant integrated into the existing Perazim Missions Church International Android application.
+The purpose of this project is to develop an intelligent, reliable, Scripture-grounded and institutionally faithful AI assistant integrated into the existing Perazim Mission Church (PMCI) Android application.
 
-The assistant will help users access approved church information, understand Scripture, learn Christian doctrine, receive discipleship guidance, explore apologetics, and obtain assistance with matters directly related to Christian faith and the ministry of Perazim Missions Church International.
+The assistant will help users access approved church information, understand Scripture, learn Christian doctrine, receive discipleship guidance, explore apologetics, and obtain assistance with matters directly related to Christian faith and the ministry of Perazim Mission Church (PMCI).
 
 The system must faithfully represent the church's approved teachings and institutional information while distinguishing official church positions from individual theological interpretations, external scholarship and unverified information.
 

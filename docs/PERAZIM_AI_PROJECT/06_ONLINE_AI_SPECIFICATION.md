@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines the functional, technical, security and operational requirements for the online AI capability of the Perazim Missions Church International Android application.
+This document defines the functional, technical, security and operational requirements for the online AI capability of the Perazim Mission Church (PMCI) Android application.
 
 The online AI service supplements the offline AI capability. It provides access to a more capable generative model and, where authorised, current external research. It must nevertheless operate within the same institutional identity, theological foundation, scope restrictions, privacy requirements and response standards as the offline AI.
 

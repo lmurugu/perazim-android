@@ -47,6 +47,16 @@ android {
     buildFeatures {
         buildConfig true
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            all {
+                // UI screenshot tests only render when asked: ./gradlew testDebugUnitTest -Dperazim.screenshots=true
+                systemProperty 'perazim.screenshots', System.getProperty('perazim.screenshots', 'false')
+                maxHeapSize = '2g'
+            }
+        }
+    }
     defaultConfig {
         applicationId "org.perazimchurch.app"
         minSdk 24
@@ -66,6 +76,12 @@ android {
         buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "false"
         buildConfigField "String", "API_BASE_URL", "\"\""
     }
+    // Validation builds get versionCode 24 (above v23, 2026-11-25 round 47) so they install over earlier validation builds without a downgrade.
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "validation") {
+            variant.outputs.each { output -> output.versionCodeOverride = 24 }
+        }
+    }
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {
@@ -80,6 +96,13 @@ android {
         debug {
             // One app: the debug build used on the phone talks to the pilot when it is configured.
             buildConfigField "String", "API_BASE_URL", groovy.json.JsonOutput.toJson(pilotApiBaseUrl ?: localApiBaseUrl)
+            // Debug/validation only: on-phone Qwen. Release keeps it off until gate L7 passes.
+            buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "true"
+        }
+        // Validation build: debuggable, on-phone Qwen enabled. Not a release build; release stays off until gate L7.
+        validation {
+            initWith debug
+            buildConfigField "boolean", "OFFLINE_QWEN_ENABLED", "true"
         }
         release {
             minifyEnabled true
@@ -162,9 +185,42 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.9.1'
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
     testImplementation 'com.google.zxing:core:3.5.3'
+    testImplementation 'org.robolectric:robolectric:4.14.1'
+    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'androidx.work:work-testing:2.9.1'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.room:room-testing:2.6.1'
     androidTestImplementation 'androidx.work:work-testing:2.9.1'
+}
+
+// Fail any validation build whose assets carry the synthetic test knowledge package (SYNTHETIC_TEST, the
+// "lighthouse" fixture). Validation sideloads must bundle only the approved library, never test fixtures.
+tasks.register('assertNoSyntheticKnowledgeInValidation') {
+    group = 'verification'
+    description = 'Fail if validation assets contain the SYNTHETIC_TEST knowledge package'
+    doLast {
+        def markers = ['SYNTHETIC_TEST', 'synthetic-device-package', 'synthetic-control-key', 'synthetic-device-key']
+        def roots = [file('src/main/assets'), file('src/validation/assets')]
+        def hits = []
+        roots.each { root ->
+            if (root.exists()) {
+                fileTree(root).matching { include '**/*.json'; include '**/*.txt' }.files.each { f ->
+                    def text = f.getText('UTF-8')
+                    markers.each { m -> if (text.contains(m)) hits << "${f.path} contains ${m}" }
+                }
+            }
+        }
+        if (hits) {
+            throw new GradleException('Synthetic knowledge package found in app assets: ' + hits.join('; '))
+        }
+    }
+}
+
+tasks.configureEach { task ->
+    if (task.name == 'mergeValidationAssets') {
+        task.dependsOn 'assertNoSyntheticKnowledgeInValidation'
+    }
 }

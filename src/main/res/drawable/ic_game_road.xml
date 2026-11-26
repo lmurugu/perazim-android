@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original Perazim game icon (generated). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M6,50 C18,40 46,58 58,40 C62,34 56,20 50,22 C44,24 46,36 36,34 C26,32 22,14 12,16"
+        android:strokeColor="#6B3A10"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"/>
+    <path android:pathData="M6,50 C18,40 46,58 58,40 C62,34 56,20 50,22 C44,24 46,36 36,34 C26,32 22,14 12,16"
+        android:strokeColor="#F5C36A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path android:pathData="M12,6 V20 L22,14 L12,8"
+        android:fillColor="#E17D2F"
+        android:strokeColor="#6B3A10"
+        android:strokeWidth="2"
+        android:strokeLineJoin="round"/>
+</vector>

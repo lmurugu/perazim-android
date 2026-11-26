@@ -1,0 +1,45 @@
+{
+  "_comment": "Plain-language summaries of Kenyan law for the guide. Each row cites the official provision. Summaries paraphrase the text and quote none. Status DRAFT_PENDING_LEVI: not shown until Levi approves. Sub-paragraph letters must be checked against the official text before release.",
+  "status": "DRAFT_PENDING_LEVI",
+  "textSource": {
+    "title": "The Constitution of Kenya, 2010",
+    "mirror": "Constitute Project, https://www.constituteproject.org/constitution/Kenya_2010 (retrieved 2026-11-24)",
+    "officialSource": "Kenya Law, https://new.kenyalaw.org/akn/ke/act/2010/constitution (not reached: HTTP 202 to scripted requests; not compared yet)",
+    "licence": "To confirm before release"
+  },
+  "rows": [
+    {
+      "id": "constitution-art-26-life",
+      "citation": "Constitution of Kenya 2010, Article 26(1) to (4)",
+      "summary": "Every person has the right to life. Life is said to begin at conception. A person may not be deliberately deprived of life except as the Constitution or written law allows. Abortion is not permitted unless a trained health professional judges that emergency treatment is needed, the life or health of the mother is in danger, or another written law allows it.",
+      "status": "DRAFT_PENDING_LEVI"
+    },
+    {
+      "id": "constitution-art-28-dignity",
+      "citation": "Constitution of Kenya 2010, Article 28",
+      "summary": "Every person has inherent dignity and the right to have it respected and protected.",
+      "status": "DRAFT_PENDING_LEVI"
+    },
+    {
+      "id": "constitution-art-29-security",
+      "citation": "Constitution of Kenya 2010, Article 29 (sub-paragraph letters to verify)",
+      "summary": "Every person has the right to freedom and security of the person. This includes freedom from arbitrary or unjust detention, from detention without trial (except in a state of emergency), from any violence from public or private sources, from torture, from corporal punishment, and from cruel, inhuman or degrading treatment or punishment.",
+      "status": "DRAFT_PENDING_LEVI"
+    },
+    {
+      "id": "constitution-art-43-health",
+      "citation": "Constitution of Kenya 2010, Article 43(1)",
+      "summary": "Every person has the right to the highest attainable standard of health, including health care services and reproductive health care.",
+      "status": "DRAFT_PENDING_LEVI"
+    },
+    {
+      "id": "constitution-art-53-children",
+      "citation": "Constitution of Kenya 2010, Article 53(1)",
+      "summary": "Every child has the right to a name and nationality from birth, to free and compulsory basic education, to basic nutrition, shelter and health care, and to be protected from abuse, neglect, harmful cultural practices, all forms of violence, inhuman treatment and punishment, and hazardous or exploitative labour. Every child also has the right to parental care and protection.",
+      "status": "DRAFT_PENDING_LEVI"
+    }
+  ],
+  "notYetAdded": [
+    "Children Act (2022), Prohibition of Female Genital Mutilation Act (2011), Sexual Offences Act, Mental Health Act, Land Act and Law of Succession Act. Kenya Law's Act PDFs returned HTTP 403, so none were read. Not summarised."
+  ]
+}

@@ -25,6 +25,10 @@ public class AiResponse {
     public static final String INTENT_LAUNCH_RIDDLES = "LAUNCH_RIDDLES";
     public static final String INTENT_LAUNCH_JOKES = "LAUNCH_JOKES";
     public static final String INTENT_REFLECTIONS = "REFLECTIONS";
+    /** Opens the Games hub from the Home games strip. */
+    public static final String INTENT_OPEN_GAMES = "OPEN_GAMES";
+    /** Opens the Profile screen (tab index 5). INTENT_NAVIGATE_PROFILE is kept as it was. */
+    public static final String INTENT_OPEN_PROFILE = "OPEN_PROFILE";
 
     private final String messageText;
     private final String actionIntent;

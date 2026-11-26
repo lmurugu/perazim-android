@@ -1,0 +1,12 @@
+strongs.tsv.gz: Strong's dictionary of Greek and Hebrew words (offline lookup).
+
+Greek (G): openscriptures/strongs greek/strongsgreek.dat (Strong's 1890 text, public domain;
+  OpenScriptures corrections). The file header states the corrected edition is GPL 3.0, but
+  the same header quotes MIT licence text. OWNER TO CONFIRM before release.
+Hebrew (H): openscriptures/HebrewLexicon HebrewStrong.xml, CC BY 4.0. Attribution: Open
+  Scriptures Hebrew Bible Project. The Strong's Hebrew text is public domain.
+Converted by scripts/bible/build_strongs.py. Greek entries: about 5,549 of 5,624 parsed.
+
+2026-11-25: The shipped file holds plain fields only (code, transliteration, definition text). No OpenScriptures markup, header or code is shipped. Switch to STEPBible TBESG (CC BY 4.0) is blocked in this session because the STEPBible-Data repository is not accessible. Coordinator to decide before release.
+
+Coordinator decision 2026-11-25: plain-field file accepted (public-domain text, no OpenScriptures markup shipped). Item closed.

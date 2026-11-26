@@ -1,0 +1,86 @@
+{
+ "_comment": "Kenya contacts for the guide's crisis and safeguarding answers. Levi approved this directory on 2026-11-23 (answer 9A). The verification column is kept as recorded: VERIFIED (999, 112), PARTLY_VERIFIED (922), UNCONFIRMED_CURRENT (1195), LISTED_IN_RECORD (116, 1192, Befrienders; no qualifier recorded). Never add a number that is not listed here.",
+ "approver": "Levi",
+ "rows": [
+  {
+   "id": "emergency-999-112",
+   "name": "Police and emergency",
+   "numbers": [
+    "999",
+    "112"
+   ],
+   "hours": "Not recorded",
+   "status": "VERIFIED",
+   "use": "Immediate danger, violence, or a life at risk",
+   "approvedByLevi": "2026-11-23"
+  },
+  {
+   "id": "medical-922",
+   "name": "Medical emergency (lead for overdose and poisoning)",
+   "numbers": [
+    "922"
+   ],
+   "hours": "Not recorded",
+   "status": "PARTLY_VERIFIED",
+   "use": "Overdose, poisoning, medical emergency; go to the nearest emergency department",
+   "approvedByLevi": "2026-11-23"
+  },
+  {
+   "id": "gbv-1195",
+   "name": "Gender-based violence line",
+   "numbers": [
+    "1195"
+   ],
+   "hours": "Open 24 hours (National GBV Helpline page checked 2026-11-25)",
+   "status": "UNCONFIRMED_CURRENT",
+   "use": "Violence in the home or relationships. Gender-based violence counselling and referral",
+   "approvedByLevi": "2026-11-23",
+   "reviewNote": "Conflict to resolve. The research thread (2026-11-24) found only a 2020 report and says do not use this number until it is confirmed. Levi approved it as UNCONFIRMED_CURRENT on 2026-11-23. Levi to decide: keep or remove.",
+   "displayRule": "Show with its purpose: gender-based violence counselling and referral, open 24 hours. Do not add a currency warning to this line. Show 999 or 112 first when someone is in immediate danger."
+  },
+  {
+   "id": "child-116",
+   "name": "Child helpline",
+   "numbers": [
+    "116"
+   ],
+   "hours": "Not recorded",
+   "status": "LISTED_IN_RECORD",
+   "use": "A child at risk",
+   "approvedByLevi": "2026-11-23",
+   "reviewNote": "The research thread reports Childline Kenya 116 as verified. Not re-checked here."
+  },
+  {
+   "id": "nacada-1192",
+   "name": "NACADA, substance use",
+   "numbers": [
+    "1192"
+   ],
+   "hours": "Not recorded",
+   "status": "LISTED_IN_RECORD",
+   "use": "Drug and alcohol use",
+   "approvedByLevi": "2026-11-23",
+   "reviewNote": "The research thread reports 24-hour hours for NACADA. Not confirmed here, so hours stay not recorded."
+  },
+  {
+   "id": "befrienders-kenya",
+   "name": "Befrienders Kenya",
+   "numbers": [
+    "+254 722 178 177"
+   ],
+   "hours": "Weekdays 9am to 5pm only. Not 24 hours",
+   "status": "LISTED_IN_RECORD",
+   "use": "Emotional support. Say the hours when giving it",
+   "approvedByLevi": "2026-11-23"
+  }
+ ],
+ "notInLibrary": "Other numbers, counties, shelters and clinics are not listed here. Add them only after a check against an official source and Levi's approval.",
+ "preReleaseConfirmation": [
+  "1195 (gender-based violence line): confirm it is current, or keep it as a labelled secondary line. Levi's decision stands.",
+  "922 (medical emergency): status PARTLY_VERIFIED. Confirm before release.",
+  "NACADA 1192 hours: research thread reports 24 hours. Confirm.",
+  "Childline 116: confirm it is current.",
+  "Befrienders Kenya: confirm the hours (weekdays 9am to 5pm, not 24 hours).",
+  "Kenya Act summaries (Children Act 2022, FGM Act 2011 and others): not added. Open gap."
+ ]
+}

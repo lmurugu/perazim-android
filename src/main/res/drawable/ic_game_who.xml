@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original Perazim game icon (generated). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="64dp" android:height="64dp" android:viewportWidth="64" android:viewportHeight="64">
+    <path android:pathData="M10,58 C10,44 20,38 32,38 C44,38 54,44 54,58 Z"
+        android:strokeColor="#0B2C5E"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#7FC4FF" android:endColor="#1F63C4"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M18,24 a12,12 0 1,0 24,0 a12,12 0 1,0 -24,0 Z"
+        android:strokeColor="#6A3A12"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#FFD9B0" android:endColor="#E8A06A"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M40,14 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0 Z"
+        android:strokeColor="#7A4A00"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear" android:startX="32" android:startY="0" android:endX="32" android:endY="64" android:startColor="#FFE88A" android:endColor="#F5A100"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M46,11 C46,6 54,6 54,11 C54,14 50,14 50,18"
+        android:strokeColor="#5A3A00"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"/>
+    <path android:pathData="M48.4,21.5 a1.6,1.6 0 1,0 3.2,0 a1.6,1.6 0 1,0 -3.2,0 Z"
+        android:fillColor="#5A3A00"/>
+    <path android:pathData="M21,18 a4,2.5 0 1,0 8,0 a4,2.5 0 1,0 -8,0 Z"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.45"/>
+</vector>

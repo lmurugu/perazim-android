@@ -1,0 +1,58 @@
+{"id": "LD-001", "category": "verse_reference", "question": "John 3:16", "expect": "routed:verse-kjv", "must": ["For God so loved the world"]}
+{"id": "LD-002", "category": "verse_reference", "question": "Show me Romans 8:28", "expect": "routed:verse-kjv", "must": ["all things work together"]}
+{"id": "LD-003", "category": "verse_reference", "question": "Read Psalm 1:1 to me", "expect": "routed:verse-kjv", "must": ["Blessed is the man"]}
+{"id": "LD-004", "category": "verse_reference", "question": "Where can I find Matthew 5:3?", "expect": "routed:verse-kjv", "must": ["poor in spirit"]}
+{"id": "LD-005", "category": "verse_reference", "question": "Tell me 1 Corinthians 13:4", "expect": "routed:verse-kjv", "must": ["Charity suffereth long"]}
+{"id": "LD-006", "category": "verse_reference", "question": "Find Hebrews 11:6", "expect": "routed:verse-kjv", "must": ["without faith it is impossible"]}
+{"id": "LD-007", "category": "verse_reference", "question": "Show me Mathew 5:3", "expect": "routed:verse-kjv", "must": ["poor in spirit"]}
+{"id": "LD-008", "category": "verse_reference", "question": "Revelation 3:20", "expect": "routed:verse-kjv", "must": ["Behold, I stand at the door"]}
+{"id": "LD-009", "category": "verse_reference", "question": "Naomba Yohana 3:16", "expect": "routed:verse-kjv", "must": ["For God so loved the world"]}
+{"id": "LD-010", "category": "verse_reference", "question": "Give me Genesis 1:1", "expect": "routed:verse-kjv", "must": ["In the beginning"]}
+{"id": "LD-011", "category": "verse_reference", "question": "Psalm 23 please", "expect": "routed:verse-kjv", "must": ["The LORD is my shepherd"]}
+{"id": "LD-012", "category": "verse_reference", "question": "Isaiah 40:31", "expect": "routed:verse-kjv", "must": ["renew their strength"]}
+{"id": "LD-013", "category": "verse_phrase", "question": "Who said 'Jesus wept'?", "expect": "routed:verse-phrase-kjv", "must": ["Jesus wept"]}
+{"id": "LD-014", "category": "verse_phrase", "question": "Where is 'faith without works'?", "expect": "routed:verse-phrase-kjv", "must": ["faith without works"]}
+{"id": "LD-015", "category": "verse_phrase", "question": "Find 'God is love'", "expect": "routed:verse-phrase-kjv", "must": ["God is love"]}
+{"id": "LD-016", "category": "verse_phrase", "question": "Where is the phrase 'the Lord is my shepherd'?", "expect": "routed:verse-phrase-kjv", "must": ["The LORD is my shepherd"]}
+{"id": "LD-017", "category": "verse_phrase", "question": "Where is Jesus wept", "expect": "routed:verse-phrase-kjv", "must": ["Jesus wept"]}
+{"id": "LD-018", "category": "verse_phrase", "question": "find faith without works", "expect": "routed:verse-phrase-kjv", "must": ["faith without works"]}
+{"id": "LD-019", "category": "verse_phrase", "question": "Which verse says God is love?", "expect": "routed:verse-phrase-kjv", "must": ["God is love"]}
+{"id": "LD-020", "category": "verse_phrase", "question": "Where is 'Blessed are the meek'?", "expect": "routed:verse-phrase-kjv", "must": ["Blessed are the meek"]}
+{"id": "LD-021", "category": "verse_about", "question": "Verse about love", "expect": "routed:verse-about-kjv", "must": ["love"]}
+{"id": "LD-022", "category": "verse_about", "question": "Which verse talks about forgiveness?", "expect": "routed:verse-topic-kjv", "must": ["forgive"]}
+{"id": "LD-023", "category": "verse_about", "question": "Bible verse about peace", "expect": "routed:verse-about-kjv", "must": ["peace"]}
+{"id": "LD-024", "category": "verse_about", "question": "Where is the verse about the lilies?", "expect": "routed:verse-about-kjv", "must": ["lilies"]}
+{"id": "LD-025", "category": "verse_about", "question": "Is there a verse about patience?", "expect": "routed:verse-about-kjv", "must": ["patience"]}
+{"id": "LD-026", "category": "verse_about", "question": "Where is the verse about the Lord being my shepherd?", "expect": "routed:verse-about-kjv", "must": ["shepherd"]}
+{"id": "LD-027", "category": "verse_about", "question": "Where is the verse about being anxious?", "expect": "routed:verse-about-not-found", "must": ["cannot find a verse"]}
+{"id": "LD-028", "category": "word_search", "question": "Where is the word 'grace' found?", "expect": "routed:word-search-kjv", "must": ["grace"]}
+{"id": "LD-029", "category": "word_search", "question": "How many times is 'holy' in Psalms?", "expect": "routed:word-search-kjv", "must": ["holy"]}
+{"id": "LD-030", "category": "word_search", "question": "word search: angel", "expect": "routed:word-search-kjv", "must": ["angel"]}
+{"id": "LD-031", "category": "word_search", "question": "Count the word love in John", "expect": "routed:word-search-kjv", "must": ["love"]}
+{"id": "LD-032", "category": "word_search", "question": "Which verses use the word 'mercy'?", "expect": "routed:word-search-kjv", "must": ["mercy"]}
+{"id": "LD-033", "category": "word_search", "question": "Where does the word hope appear in Romans?", "expect": "routed:word-search-kjv", "must": ["hope"]}
+{"id": "LD-034", "category": "word_search", "question": "How often does the word faith appear in Romans", "expect": "routed:word-search-kjv", "must": ["faith"]}
+{"id": "LD-035", "category": "word_search", "question": "Search for love", "expect": "routed:word-search-kjv", "must": ["love"]}
+{"id": "LD-036", "category": "word_search", "question": "How many times does 'zzyzx' appear in the Bible?", "expect": "routed:word-search-none", "must": ["does not appear"]}
+{"id": "LD-037", "category": "word_search", "question": "What does the word grace mean?", "expect": "routed:approved-grace-meaning", "must": ["Ephesians 2:8"]}
+{"id": "LD-038", "category": "doctrine", "question": "Is the Trinity in the Bible?", "expect": "routed:approved-trinity-in-the-bible", "must": ["Deuteronomy 6:4"]}
+{"id": "LD-039", "category": "doctrine", "question": "What is the Bible's teaching on the Sabbath?", "expect": "routed:approved-sabbath-bible-topic", "must": ["Sabbath"]}
+{"id": "LD-040", "category": "doctrine", "question": "What does the Bible say about women preaching?", "expect": "routed:approved-women-ministry-undecided", "must": ["not settled"]}
+{"id": "LD-041", "category": "doctrine", "question": "What does the Bible say about tithing?", "expect": "routed:doctrine-approved", "must": ["not settled"]}
+{"id": "LD-042", "category": "doctrine", "question": "What does the Bible say about divorce?", "expect": "routed:approved-divorce-remarriage-undecided", "must": ["not settled"]}
+{"id": "LD-043", "category": "doctrine", "question": "Is speaking in tongues the evidence of the Holy Spirit?", "expect": "routed:doctrine-approved", "must": ["not the only evidence"]}
+{"id": "LD-044", "category": "doctrine", "question": "Can a Christian lose their salvation?", "expect": "routed:approved-apostasy-assurance", "must": ["assurance"]}
+{"id": "LD-045", "category": "doctrine", "question": "What is the Bible's teaching on baptism?", "expect": "routed:approved-baptism-believers", "must": ["immersion"]}
+{"id": "LD-046", "category": "doctrine", "question": "Do we baptise babies?", "expect": "routed:approved-baptism-believers", "must": ["dedicated"]}
+{"id": "LD-047", "category": "doctrine", "question": "Does baptism save you?", "expect": "routed:approved-baptism-believers", "must": ["does not save"]}
+{"id": "LD-048", "category": "doctrine", "question": "What does the Bible say about healing?", "expect": "routed:verse-topic-kjv", "must": ["James 5:14"]}
+{"id": "LD-049", "category": "doctrine", "question": "Does the Bible teach the rapture?", "expect": "routed:approved-israel-end-times", "must": ["under review"]}
+{"id": "LD-050", "category": "follow_up", "question": "And the next verse?", "expect": "routed:verse-clarify", "must": []}
+{"id": "LD-051", "category": "follow_up", "question": "Tell me more about that verse", "expect": "routed:verse-clarify", "must": []}
+{"id": "LD-052", "category": "kenyan", "question": "Nisaidie kupata verse ya upendo", "expect": "routed:verse-about-kjv", "must": ["love"]}
+{"id": "LD-053", "category": "kenyan", "question": "Neno 'grace' liko wapi kwenye Biblia?", "expect": "routed:word-search-kjv", "must": ["grace"]}
+{"id": "LD-054", "category": "boundary", "question": "Please do this: Search for current information.", "expect": "routed:scope-refusal", "must": ["not authorised"]}
+{"id": "LD-055", "category": "boundary", "question": "Search the internet for the latest news about Kenya's health system.", "expect": "routed:no-go:uncertain-live-research", "must": ["cannot"]}
+{"id": "LD-056", "category": "greeting", "question": "Hi.", "expect": "routed:conversational-greeting", "must": ["please"]}
+{"id": "LD-057", "category": "governance", "question": "Is women in ministry approved by Perazim yet?", "expect": "routed:approved-women-ministry-undecided", "must": ["undecided", "views"]}
+{"id": "LD-058", "category": "verse_reference", "question": "Show me Ephesains 2:8", "expect": "routed:verse-kjv", "must": ["I read the book name as Ephesians 2:8", "For by grace are ye saved"]}

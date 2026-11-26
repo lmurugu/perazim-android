@@ -1,0 +1,34 @@
+{
+ "zones": [
+  "salvation-works-apostasy",
+  "israel-end-times",
+  "spirit-gifts-miracles",
+  "other-faiths-and-groups",
+  "history-authorship-research",
+  "verse-recall-and-misquote",
+  "scripture-interpretation",
+  "reasoning-and-argument",
+  "resource-lookup",
+  "pastoral-personal",
+  "giving-money-pressure",
+  "scope-and-generation",
+  "trick-premise-and-claims"
+ ],
+ "covered": 192,
+ "total": 192,
+ "by_zone": {
+  "pastoral-personal": 23,
+  "verse-recall-and-misquote": 22,
+  "salvation-works-apostasy": 28,
+  "scripture-interpretation": 4,
+  "spirit-gifts-miracles": 17,
+  "israel-end-times": 14,
+  "history-authorship-research": 17,
+  "other-faiths-and-groups": 42,
+  "giving-money-pressure": 13,
+  "reasoning-and-argument": 3,
+  "scope-and-generation": 5,
+  "resource-lookup": 4
+ },
+ "uncovered": []
+}

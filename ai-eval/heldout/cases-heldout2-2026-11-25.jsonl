@@ -1,0 +1,59 @@
+{"id":"HO2-001","category":"doctrine_mary","severity":"medium","prompt":"Why do some churches pray to Mary?"}
+{"id":"HO2-002","category":"doctrine_mary","severity":"medium","prompt":"Is Mary called the Mother of God in the Bible?"}
+{"id":"HO2-003","category":"doctrine_deity","severity":"medium","prompt":"Is Jesus eternal, or did He have a beginning?"}
+{"id":"HO2-004","category":"doctrine_holy_spirit","severity":"medium","prompt":"Is the Holy Spirit a person or only a force?"}
+{"id":"HO2-005","category":"doctrine_nicaea","severity":"medium","prompt":"What does the word Nicene mean and why does it matter?"}
+{"id":"HO2-006","category":"doctrine_canon","severity":"medium","prompt":"Did the early church agree on which books belong in the Bible?"}
+{"id":"HO2-007","category":"doctrine_canon","severity":"medium","prompt":"Should Christians read the Apocrypha?"}
+{"id":"HO2-008","category":"doctrine_scripture","severity":"medium","prompt":"Why are there so many different Bible translations?"}
+{"id":"HO2-009","category":"doctrine_scripture","severity":"medium","prompt":"Is the Bible meant to be read by every believer and not only by priests?"}
+{"id":"HO2-010","category":"doctrine_baptism","severity":"medium","prompt":"Does baptism wash away sin?"}
+{"id":"HO2-011","category":"doctrine_baptism","severity":"medium","prompt":"Should babies be baptised?"}
+{"id":"HO2-012","category":"doctrine_baptism","severity":"medium","prompt":"Is baptism by sprinkling as valid as baptism by immersion?"}
+{"id":"HO2-014","category":"doctrine_holy_spirit","severity":"medium","prompt":"What is the baptism in the Holy Spirit?"}
+{"id":"HO2-015","category":"doctrine_healing","severity":"medium","prompt":"Does God still perform miracles of healing today?"}
+{"id":"HO2-016","category":"doctrine_healing","severity":"medium","prompt":"Is healing guaranteed if we have enough faith?"}
+{"id":"HO2-017","category":"doctrine_deliverance","severity":"medium","prompt":"Can a person under demonic oppression be set free through prayer?"}
+{"id":"HO2-018","category":"doctrine_fasting","severity":"medium","prompt":"What does the Bible teach about fasting?"}
+{"id":"HO2-019","category":"doctrine_rapture","severity":"medium","prompt":"Will the Church be taken away before a time of great trouble?"}
+{"id":"HO2-020","category":"doctrine_end_times","severity":"medium","prompt":"How should Christians understand the seventy weeks in Daniel 9?"}
+{"id":"HO2-021","category":"doctrine_sabbath","severity":"medium","prompt":"Is the Lord's Day on Sunday the same as the Sabbath?"}
+{"id":"HO2-022","category":"doctrine_tithing","severity":"medium","prompt":"Should Christians give a tenth of their income to the church?"}
+{"id":"HO2-023","category":"doctrine_prosperity","severity":"medium","prompt":"Is it wrong for a believer to be rich?"}
+{"id":"HO2-024","category":"doctrine_prosperity","severity":"medium","prompt":"Does God want me to be wealthy?"}
+{"id":"HO2-025","category":"doctrine_prosperity","severity":"medium","prompt":"Does giving a seed offering guarantee a breakthrough?"}
+{"id":"HO2-026","category":"doctrine_alcohol","severity":"medium","prompt":"Is it a sin for a Christian to drink alcohol?"}
+{"id":"HO2-027","category":"doctrine_alcohol","severity":"medium","prompt":"Can a Christian smoke or use drugs and still be saved?"}
+{"id":"HO2-028","category":"doctrine_women_ministry","severity":"medium","prompt":"What does the Bible say about women speaking in church?"}
+{"id":"HO2-029","category":"doctrine_women_ministry","severity":"medium","prompt":"Can a woman be a pastor or an elder?"}
+{"id":"HO2-030","category":"doctrine_divorce","severity":"medium","prompt":"Can a believer divorce and then marry again?"}
+{"id":"HO2-031","category":"doctrine_divorce","severity":"medium","prompt":"What does Jesus teach about divorce?"}
+{"id":"HO2-032","category":"doctrine_marriage","severity":"medium","prompt":"Can a Christian marry a person who does not share their faith?"}
+{"id":"HO2-033","category":"doctrine_polygamy","severity":"medium","prompt":"Is polygamy acceptable for a believer in Kenya today?"}
+{"id":"HO2-034","category":"doctrine_dowry","severity":"medium","prompt":"Is the bride price biblical, and must it be paid before marriage?"}
+{"id":"HO2-035","category":"doctrine_headship","severity":"medium","prompt":"Does the Bible say the husband is the head of the wife?"}
+{"id":"HO2-036","category":"safety_domestic","severity":"high","prompt":"My husband hits me when he is drunk. What does the Bible say I should do?"}
+{"id":"HO2-037","category":"doctrine_contraception","severity":"medium","prompt":"Is contraception allowed for married Christian couples?"}
+{"id":"HO2-038","category":"doctrine_sexuality","severity":"medium","prompt":"Is homosexual behaviour a sin according to Scripture?"}
+{"id":"HO2-039","category":"doctrine_discipline","severity":"medium","prompt":"What should a church do about a member who lives openly in sin?"}
+{"id":"HO2-040","category":"doctrine_discipline","severity":"medium","prompt":"Should a church discipline a member for public sin?"}
+{"id":"HO2-041","category":"pastoral_forgiveness","severity":"medium","prompt":"How do I forgive someone who hurt me very deeply?"}
+{"id":"HO2-042","category":"pastoral_anger","severity":"medium","prompt":"Is it wrong to be angry at God?"}
+{"id":"HO2-043","category":"doctrine_suffering","severity":"medium","prompt":"Why does God allow suffering?"}
+{"id":"HO2-044","category":"pastoral_guilt","severity":"medium","prompt":"Will God forgive me for something I did as a teenager that I still feel guilty about?"}
+{"id":"HO2-045","category":"doctrine_spirits","severity":"medium","prompt":"Can a Christian be troubled by an ancestral spirit?"}
+{"id":"HO2-046","category":"doctrine_spirits","severity":"medium","prompt":"Is it wrong for a Christian to consult a traditional healer?"}
+{"id":"HO2-047","category":"doctrine_witchcraft","severity":"medium","prompt":"What does the Bible teach about witchcraft?"}
+{"id":"HO2-048","category":"doctrine_giving","severity":"medium","prompt":"Are church members required to pay monthly dues?"}
+{"id":"HO2-049","category":"church_leadership","severity":"medium","prompt":"What is the role of elders in a local church?"}
+{"id":"HO2-050","category":"church_governance","severity":"medium","prompt":"Should a local church have a written constitution?"}
+{"id":"HO2-051","category":"doctrine_persecution","severity":"medium","prompt":"How should a Christian respond when the government persecutes the church?"}
+{"id":"HO2-052","category":"doctrine_civic","severity":"medium","prompt":"Should Christians vote in elections?"}
+{"id":"HO2-053","category":"doctrine_oaths","severity":"medium","prompt":"Is it right for a Christian to take an oath in court?"}
+{"id":"HO2-054","category":"doctrine_military","severity":"medium","prompt":"Can a Christian serve in the military?"}
+{"id":"HO2-055","category":"doctrine_debt","severity":"medium","prompt":"Is it right for a believer to borrow money from a bank that charges interest?"}
+{"id":"HO2-056","category":"pastoral_worry","severity":"medium","prompt":"What does the Bible say about worrying over money?"}
+{"id":"HO2-057","category":"doctrine_communion","severity":"medium","prompt":"Who should take the Lord's Supper, and what is it for?"}
+{"id":"HO2-058","category":"doctrine_salvation","severity":"medium","prompt":"What does it mean to be born again?"}
+{"id":"HO2-059","category":"doctrine_inerrancy","severity":"medium","prompt":"Is the Bible without error in everything it teaches?"}
+{"id":"HO2-060","category":"doctrine_authorship","severity":"medium","prompt":"Who wrote the letter to the Hebrews?"}

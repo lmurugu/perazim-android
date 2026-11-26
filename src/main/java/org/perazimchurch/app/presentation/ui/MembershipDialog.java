@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -69,7 +71,7 @@ public final class MembershipDialog {
         content.setPadding(dp(18), dp(12), dp(18), dp(22));
         ScrollView scroll = new ScrollView(activity);
         scroll.addView(content);
-        dialog = new AlertDialog.Builder(activity).setTitle("Church membership")
+        dialog = AppDialogs.builder(activity).setTitle("Church membership")
                 .setView(scroll).setNegativeButton("Close", (d, w) -> clearPrivileged()).create();
         dialog.setOnDismissListener(d -> { closed = true; clearPrivileged(); });
     }
@@ -141,7 +143,7 @@ public final class MembershipDialog {
         EditText phone = field("Phone number", InputType.TYPE_CLASS_PHONE);
         if (user != null) { name.setText(user.getName()); phone.setText(user.getPhone()); }
         form.addView(name); form.addView(phone);
-        new AlertDialog.Builder(activity).setTitle("Membership request").setView(form)
+        AppDialogs.builder(activity).setTitle("Membership request").setView(form)
                 .setNegativeButton("Cancel", null).setPositiveButton("Send request", (d, w) -> {
                     JSONObject body = new JSONObject();
                     try { body.put("request_id", UUID.randomUUID().toString()); body.put("name", name.getText().toString().trim()); body.put("phone", phone.getText().toString().trim()); }
@@ -203,7 +205,7 @@ public final class MembershipDialog {
         EditText pin = field("Administrator PIN", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
         EditText code = field("Authenticator code", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
         form.addView(pin); form.addView(code);
-        new AlertDialog.Builder(activity).setTitle("Administrator sign-in").setMessage("Confirm with your PIN and current authenticator code.")
+        AppDialogs.builder(activity).setTitle("Administrator sign-in").setMessage("Confirm with your PIN and current authenticator code.")
                 .setView(form).setNegativeButton("Cancel", null).setPositiveButton("Continue", (d, w) -> {
                     JSONObject body = new JSONObject();
                     try { body.put("pin", pin.getText().toString()); body.put("code", code.getText().toString()); }
@@ -256,7 +258,7 @@ public final class MembershipDialog {
                 ids[i] = record.optString("id");
                 labels[i] = record.optString("reference") + " · " + record.optString("full_name") + " · " + record.optString("phone");
             }
-            new AlertDialog.Builder(activity).setTitle("Choose register record")
+            AppDialogs.builder(activity).setTitle("Choose register record")
                     .setItems(labels, (d, which) -> decideClaim(claimId, "APPROVE", ids[which])).setNegativeButton("Cancel", null).show();
         });
     }
@@ -291,7 +293,7 @@ public final class MembershipDialog {
             EditText name = field("Correct full name", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
             EditText phone = field("Correct phone number", InputType.TYPE_CLASS_PHONE);
             form.addView(name); form.addView(phone);
-            new AlertDialog.Builder(activity).setTitle("Correct register record").setView(form).setNegativeButton("Cancel", null)
+            AppDialogs.builder(activity).setTitle("Correct register record").setView(form).setNegativeButton("Cancel", null)
                     .setPositiveButton("Save correction", (d, w) -> {
                         JSONObject body = reasonBody("ADMIN_CORRECTION");
                         try { body.put("full_name", name.getText().toString().trim()); body.put("phone", phone.getText().toString().trim()); }
@@ -303,7 +305,7 @@ public final class MembershipDialog {
 
     private void showVerificationCorrection() {
         LinearLayout form = form(); EditText userId = field("Account ID", InputType.TYPE_CLASS_TEXT); form.addView(userId);
-        new AlertDialog.Builder(activity).setTitle("Correct verification link").setView(form).setNegativeButton("Cancel", null)
+        AppDialogs.builder(activity).setTitle("Correct verification link").setView(form).setNegativeButton("Cancel", null)
                 .setPositiveButton("Choose record", (d, w) -> withRecordChoice(record -> {
                     JSONObject body = reasonBody("ADMIN_CORRECTION"); try { body.put("record_id", record.optString("id")); } catch (Exception ignored) { return; }
                     String id = userId.getText().toString().trim();
@@ -313,7 +315,7 @@ public final class MembershipDialog {
 
     private void showRevocation() {
         LinearLayout form = form(); EditText userId = field("Account ID", InputType.TYPE_CLASS_TEXT); form.addView(userId);
-        new AlertDialog.Builder(activity).setTitle("Revoke verification").setMessage("This records an audited change and cannot be queued.")
+        AppDialogs.builder(activity).setTitle("Revoke verification").setMessage("This records an audited change and cannot be queued.")
                 .setView(form).setNegativeButton("Cancel", null).setPositiveButton("Revoke", (d, w) -> {
                     String id = userId.getText().toString().trim();
                     runAdmin(REVOKE, id, "POST", "/api/admin/membership/users/" + id + "/revoke", reasonBody("ADMIN_REVOCATION"), r -> { toast("Verification revoked."); loadStatus(); });
@@ -326,7 +328,7 @@ public final class MembershipDialog {
         EditText csv = field("Reference, full name, phone (one record per line)", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         csv.setMinLines(4);
         form.addView(source); form.addView(csv);
-        new AlertDialog.Builder(activity).setTitle("Import synthetic test register").setMessage("Only use invented test records. You will review every parsed entry before sending.")
+        AppDialogs.builder(activity).setTitle("Import synthetic test register").setMessage("Only use invented test records. You will review every parsed entry before sending.")
                 .setView(form).setNegativeButton("Cancel", null).setPositiveButton("Preview records", (d, w) -> previewSyntheticImport(source.getText().toString().trim(), csv.getText().toString())).show();
     }
 
@@ -335,7 +337,7 @@ public final class MembershipDialog {
         if (rows == null || rows.length() == 0) { toast("Enter valid comma-separated test rows first."); return; }
         StringBuilder preview = new StringBuilder();
         for (int i = 0; i < rows.length(); i++) { JSONObject row = rows.optJSONObject(i); preview.append(row.optString("reference")).append(" · ").append(row.optString("full_name")).append(" · ").append(row.optString("phone")).append('\n'); }
-        new AlertDialog.Builder(activity).setTitle("Review " + rows.length() + " synthetic records")
+        AppDialogs.builder(activity).setTitle("Review " + rows.length() + " synthetic records")
                 .setMessage(preview.toString()).setNegativeButton("Edit", null).setPositiveButton("Confirm import", (d, w) -> {
                     JSONObject body=reasonBody("SYNTHETIC_IMPORT");
                     try{body.put("source",source);body.put("records",rows);}catch(Exception ignored){return;}
@@ -348,7 +350,7 @@ public final class MembershipDialog {
             JSONArray records = response.optJSONArray("records"); if (records == null || records.length() == 0) { toast("No register records are available."); return; }
             JSONObject[] values = new JSONObject[records.length()]; String[] labels = new String[records.length()];
             for (int i = 0; i < records.length(); i++) { values[i] = records.optJSONObject(i); if (values[i] == null) values[i] = new JSONObject(); labels[i] = values[i].optString("reference") + " · " + values[i].optString("full_name") + " · " + values[i].optString("phone"); }
-            new AlertDialog.Builder(activity).setTitle("Choose register record").setItems(labels, (d, w) -> selected.accept(values[w])).setNegativeButton("Cancel", null).show();
+            AppDialogs.builder(activity).setTitle("Choose register record").setItems(labels, (d, w) -> selected.accept(values[w])).setNegativeButton("Cancel", null).show();
         });
     }
 
@@ -366,7 +368,7 @@ public final class MembershipDialog {
         Spinner capability=new Spinner(activity);capability.setAdapter(new ArrayAdapter<>(activity,android.R.layout.simple_spinner_dropdown_item,labels));
         EditText scope = field("Scope: global or one exact resource ID", InputType.TYPE_CLASS_TEXT); scope.setText("global");
         EditText expiry = field("Expiry in days (optional)", InputType.TYPE_CLASS_NUMBER); form.addView(user); form.addView(capability); form.addView(scope); form.addView(expiry);
-        new AlertDialog.Builder(activity).setTitle("Grant permission").setMessage("The server accepts administrative grants only for the isolated pilot account.")
+        AppDialogs.builder(activity).setTitle("Grant permission").setMessage("The server accepts administrative grants only for the isolated pilot account.")
                 .setView(form).setNegativeButton("Cancel", null).setPositiveButton("Grant", (d, w) -> {
                     String target = user.getText().toString().trim(); JSONObject body = reasonBody("ADMIN_GRANT");
                     try { body.put("code", codes[capability.getSelectedItemPosition()]); body.put("scope", scope.getText().toString().trim()); String days=expiry.getText().toString().trim(); if(!days.isEmpty()) body.put("expires_at", System.currentTimeMillis()+Long.parseLong(days)*86400000L); }
@@ -377,7 +379,7 @@ public final class MembershipDialog {
 
     private void showPermissionRevoke() {
         LinearLayout form = form(); EditText user = field("Pilot account ID", InputType.TYPE_CLASS_TEXT); EditText grant = field("Grant ID", InputType.TYPE_CLASS_TEXT); form.addView(user); form.addView(grant);
-        new AlertDialog.Builder(activity).setTitle("Revoke permission").setView(form).setNegativeButton("Cancel", null).setPositiveButton("Revoke", (d,w)->{
+        AppDialogs.builder(activity).setTitle("Revoke permission").setView(form).setNegativeButton("Cancel", null).setPositiveButton("Revoke", (d,w)->{
             String target=user.getText().toString().trim(); JSONObject body=reasonBody("ADMIN_REVOCATION");
             runAdmin(GRANT_REMOVE,null,"DELETE","/api/admin/permissions/"+target+"/"+grant.getText().toString().trim(),body,r->{toast("Permission revoked.");loadStatus();});
         }).show();
@@ -390,7 +392,7 @@ public final class MembershipDialog {
     }
 
     private void confirmSessionRevocation() {
-        new AlertDialog.Builder(activity).setTitle("Revoke administrator sessions?").setMessage("This ends privileged sessions and writes an audit event.")
+        AppDialogs.builder(activity).setTitle("Revoke administrator sessions?").setMessage("This ends privileged sessions and writes an audit event.")
                 .setNegativeButton("Cancel", null).setPositiveButton("Revoke sessions", (d,w)->runAdmin("admin.permissions.revoke",null,"POST","/api/admin/security/revoke-sessions",reasonBody("ADMIN_REVOCATION"),r->{clearPrivileged();toast("Administrator sessions revoked.");loadStatus();})).show();
     }
 

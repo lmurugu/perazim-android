@@ -46,15 +46,7 @@ public final class OfflineKnowledgeStore {
     private static final String CONTROL_STATE_PREFS = "perazim_ai_package_control_state_v1";
     private static final String INSTALL_STATE_KEY_ALIAS = "org.perazimchurch.app.ai.package-state.v1";
     private static final String UPDATE_STATUS_PREFS = "perazim_ai_package_update_status_v1";
-    private static final java.util.Set<String> QUERY_STOP_WORDS = new java.util.HashSet<>(java.util.Arrays.asList(
-            "about", "after", "also", "and", "are", "because", "been", "before", "being", "but",
-            "can", "could", "did", "does", "doing", "down", "for", "from", "had", "has", "have",
-            "bible", "chapter", "how", "into", "just", "kjv", "like", "not", "of", "off", "on", "once", "only", "or", "our",
-            "out", "over", "own", "please", "read", "show", "same", "should", "so", "some", "such",
-            "scripture", "passage", "mean", "means", "meaning", "explain", "interpret", "interpreting", "say",
-            "tell", "than", "that", "the", "their", "them", "there", "these", "they", "this", "those",
-            "through", "too", "under", "until", "very", "what", "when", "where", "which", "while",
-            "verse", "verses", "who", "with", "would", "you", "your"));
+    private static final java.util.Set<String> QUERY_STOP_WORDS = GovernedEvidence.STOP_WORDS;
     private OfflineKnowledgeStore() {}
 
     public static final class VerifiedPackage {
@@ -62,8 +54,12 @@ public final class OfflineKnowledgeStore {
         public final String digest;
         public final JSONArray documents;
         public final long publishedAt;
+        /** Governance parsed from the signed payload only. Empty means no source is authorised. */
+        public final java.util.List<SourceGovernance.Source> governance;
 
-        private VerifiedPackage(String version, String digest, JSONArray documents, long publishedAt) {
+        private VerifiedPackage(String version, String digest, JSONArray documents, long publishedAt,
+                                java.util.List<SourceGovernance.Source> governance) {
+            this.governance = java.util.Collections.unmodifiableList(new java.util.ArrayList<>(governance));
             this.version = version;
             this.digest = digest;
             this.documents = documents;
@@ -119,18 +115,18 @@ public final class OfflineKnowledgeStore {
                 byte[] decoded = Base64.decode(key, Base64.DEFAULT);
                 if (decoded.length != 32) return Collections.emptyMap();
                 Map<String, String> keys = new java.util.HashMap<>();
-                keys.put("synthetic-device-key", key);
+                keys.put("synthetic-device-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE, key));
                 try (InputStream controlKeyInput = context.getAssets().open("ai/knowledge/control-public-key.txt");
                      ByteArrayOutputStream controlKeyOutput = new ByteArrayOutputStream()) {
                     copyBounded(controlKeyInput, controlKeyOutput, 256);
                     String controlKey = controlKeyOutput.toString("UTF-8").trim();
                     byte[] controlBytes = Base64.decode(controlKey, Base64.DEFAULT);
                     if (controlBytes.length != 32) return Collections.emptyMap();
-                    keys.put("synthetic-control-key", controlKey);
-                    keys.put("synthetic-rollback-key", readValidationPublicKey(context,
-                            "ai/knowledge/rollback-package-public-key.txt"));
-                    keys.put("synthetic-rollback-download-key", readValidationPublicKey(context,
-                            "ai/knowledge/rollback-authorization-public-key.txt"));
+                    keys.put("synthetic-control-key", TrustAnchors.encode(TrustAnchors.Purpose.CONTROL, controlKey));
+                    keys.put("synthetic-rollback-key", TrustAnchors.encode(TrustAnchors.Purpose.PACKAGE,
+                            readValidationPublicKey(context, "ai/knowledge/rollback-package-public-key.txt")));
+                    keys.put("synthetic-rollback-download-key", TrustAnchors.encode(TrustAnchors.Purpose.ROLLBACK_AUTH,
+                            readValidationPublicKey(context, "ai/knowledge/rollback-authorization-public-key.txt")));
                     return Collections.unmodifiableMap(keys);
                 }
             }
@@ -168,14 +164,22 @@ public final class OfflineKnowledgeStore {
             if (!keyId.matches("[A-Za-z0-9._-]{1,80}") || !(value instanceof String)) {
                 throw new SecurityException("Trusted key entry is malformed.");
             }
-            String encodedKey = (String) value;
+            String taggedKey = (String) value;
+            int separator = taggedKey.indexOf(':');
+            if (separator <= 0) throw new SecurityException("Trusted key purpose is missing.");
+            try {
+                TrustAnchors.Purpose.valueOf(taggedKey.substring(0, separator));
+            } catch (IllegalArgumentException error) {
+                throw new SecurityException("Trusted key purpose is unknown.");
+            }
+            String encodedKey = taggedKey.substring(separator + 1);
             if (!encodedKey.matches("[A-Za-z0-9+/]+={0,2}")) {
                 throw new SecurityException("Trusted Ed25519 public key is not valid base64.");
             }
             byte[] decoded = Base64.decode(encodedKey, Base64.DEFAULT);
             String canonicalKey = Base64.encodeToString(decoded, Base64.NO_WRAP);
-            if ((decoded.length != 32 && decoded.length != 44) || !canonicalKey.equals(encodedKey)
-                    || keys.put(keyId, encodedKey) != null) {
+            if (decoded.length != 32 || !canonicalKey.equals(encodedKey)
+                    || keys.put(keyId, taggedKey) != null) {
                 throw new SecurityException("Trusted Ed25519 public key is malformed.");
             }
         }
@@ -216,8 +220,7 @@ public final class OfflineKnowledgeStore {
         JSONObject envelope = new JSONObject(envelopeJson);
         JSONObject payload = envelope.getJSONObject("payload");
         String keyId = envelope.getString("signingKeyId");
-        String encodedKey = trustedKeys == null ? null : trustedKeys.get(keyId);
-        if (encodedKey == null) throw new SecurityException("Package signing key is not trusted.");
+        byte[] rawPublicKey = TrustAnchors.resolve(trustedKeys, keyId, TrustAnchors.Purpose.PACKAGE);
 
         JSONObject unsigned = new JSONObject(payload.toString());
         String contentDigest = unsigned.getString("contentDigest");
@@ -228,9 +231,6 @@ public final class OfflineKnowledgeStore {
             throw new SecurityException("Package content digest is invalid.");
         }
 
-        byte[] publicKeyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
-        byte[] rawPublicKey = publicKeyBytes.length == 32 ? publicKeyBytes
-                : java.util.Arrays.copyOfRange(publicKeyBytes, publicKeyBytes.length - 32, publicKeyBytes.length);
         byte[] signedBytes = canonical(payload).getBytes(StandardCharsets.UTF_8);
         if (!Ed25519Verifier.verify(rawPublicKey, signedBytes,
                 Base64.decode(envelope.getString("signature"), Base64.DEFAULT))) {
@@ -277,7 +277,17 @@ public final class OfflineKnowledgeStore {
                 throw new SecurityException("A package source is missing provenance.");
             }
         }
-        return new VerifiedPackage(payload.getString("version"), contentDigest, documents, payload.getLong("publishedAt"));
+        Object governanceField = payload.opt("governance");
+        if (governanceField instanceof JSONArray) {
+            JSONArray governanceEntries = (JSONArray) governanceField;
+            for (int i = 0; i < governanceEntries.length(); i++) {
+                SourceApprovals.verifyEntry(governanceEntries.getJSONObject(i), trustedKeys);
+            }
+        }
+        long publishedAtValue = payload.getLong("publishedAt");
+        java.util.List<SourceGovernance.Source> governance =
+                SourceGovernance.fromVerifiedPayload(payload.opt("governance"), publishedAtValue);
+        return new VerifiedPackage(payload.getString("version"), contentDigest, documents, publishedAtValue, governance);
     }
 
     public static synchronized VerifiedPackage install(Context context, String envelope,
@@ -343,6 +353,12 @@ public final class OfflineKnowledgeStore {
             throw new SecurityException("Rollback authorization does not match the exact installed target or is stale.");
         }
 
+        VerifiedControl withdrawal = null;
+        try { withdrawal = readWithdrawalControl(context, trustedKeys, nowMillis); }
+        catch (Exception ignored) { withdrawal = null; }
+        GovernedEvidence.assertRollbackAllowed(target.governance, target.documents,
+                withdrawal == null ? null : withdrawal.withdrawnSources);
+
         writeEnvelope(context, PREVIOUS_PACKAGE_FILE, currentEnvelope);
         writeEnvelope(context, PACKAGE_FILE, targetEnvelope);
         try {
@@ -394,7 +410,10 @@ public final class OfflineKnowledgeStore {
     @NonNull
     public static String knowledgeStatus(Context context, Map<String, String> trustedKeys,
                                          String appVersion, long nowMillis) {
-        if (trustedKeys == null || trustedKeys.isEmpty()) return "trusted knowledge key unavailable";
+        if (trustedKeys == null || trustedKeys.isEmpty()) {
+            return "validation".equals(BuildConfig.BUILD_TYPE)
+                    ? "Approved library + KJV (no signed package)" : "trusted knowledge key unavailable";
+        }
         try {
             VerifiedPackage installed = read(context, trustedKeys, appVersion, nowMillis);
             if (installed == null) {
@@ -490,8 +509,7 @@ public final class OfflineKnowledgeStore {
         JSONObject envelope = new JSONObject(envelopeJson);
         JSONObject payload = envelope.getJSONObject("payload");
         String keyId = envelope.getString("signingKeyId");
-        String encodedKey = trustedKeys == null ? null : trustedKeys.get(keyId);
-        if (encodedKey == null) throw new SecurityException("Rollback signing key is not trusted.");
+        byte[] rawPublicKey = TrustAnchors.resolve(trustedKeys, keyId, TrustAnchors.Purpose.ROLLBACK_AUTH);
         JSONObject unsigned = new JSONObject(payload.toString());
         String digest = unsigned.getString("controlDigest");
         unsigned.remove("controlDigest");
@@ -500,9 +518,6 @@ public final class OfflineKnowledgeStore {
                 actualDigest.getBytes(StandardCharsets.US_ASCII))) {
             throw new SecurityException("Rollback authorization digest is invalid.");
         }
-        byte[] publicKeyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
-        byte[] rawPublicKey = publicKeyBytes.length == 32 ? publicKeyBytes
-                : java.util.Arrays.copyOfRange(publicKeyBytes, publicKeyBytes.length - 32, publicKeyBytes.length);
         if (!Ed25519Verifier.verify(rawPublicKey, canonical(payload).getBytes(StandardCharsets.UTF_8),
                 Base64.decode(envelope.getString("signature"), Base64.DEFAULT))) {
             throw new SecurityException("Rollback authorization signature is invalid.");
@@ -581,8 +596,7 @@ public final class OfflineKnowledgeStore {
         JSONObject envelope = new JSONObject(envelopeJson);
         JSONObject payload = envelope.getJSONObject("payload");
         String keyId = envelope.getString("signingKeyId");
-        String encodedKey = trustedKeys == null ? null : trustedKeys.get(keyId);
-        if (encodedKey == null) throw new SecurityException("Withdrawal control signing key is not trusted.");
+        byte[] rawPublicKey = TrustAnchors.resolve(trustedKeys, keyId, TrustAnchors.Purpose.CONTROL);
         JSONObject unsigned = new JSONObject(payload.toString());
         String digest = unsigned.getString("controlDigest");
         unsigned.remove("controlDigest");
@@ -591,9 +605,6 @@ public final class OfflineKnowledgeStore {
                 actualDigest.getBytes(StandardCharsets.US_ASCII))) {
             throw new SecurityException("Withdrawal control digest is invalid.");
         }
-        byte[] publicKeyBytes = Base64.decode(encodedKey, Base64.DEFAULT);
-        byte[] rawPublicKey = publicKeyBytes.length == 32 ? publicKeyBytes
-                : java.util.Arrays.copyOfRange(publicKeyBytes, publicKeyBytes.length - 32, publicKeyBytes.length);
         String signature = envelope.getString("signature");
         byte[] signatureBytes = Base64.decode(signature, Base64.DEFAULT);
         if (signatureBytes.length != 64 || !Base64.encodeToString(signatureBytes, Base64.NO_WRAP).equals(signature)
@@ -1016,48 +1027,34 @@ public final class OfflineKnowledgeStore {
                 && new File(context.getFilesDir(), PREVIOUS_PACKAGE_FILE).isFile();
     }
 
+    /**
+     * Returns the evidence that may be shown to the model. Authority comes only from the governance manifest, never
+     * from fields inside the package document. Documents without a governed, hash-matching, non-withdrawn entry are
+     * dropped; nothing here fails open.
+     */
     @NonNull
     public static JSONArray retrieve(Context context, Map<String, String> trustedKeys,
                                      String appVersion, long nowMillis, String question) throws Exception {
         VerifiedPackage installed = read(context, trustedKeys, appVersion, nowMillis);
         if (question == null || question.trim().isEmpty()) return new JSONArray();
         if (isUnderspecifiedReferenceQuestion(question)) return new JSONArray();
-        java.util.List<JSONObject> candidates = new java.util.ArrayList<>();
-        VerifiedControl control = null;
+        JSONArray selected = new JSONArray();
         if (installed != null && installed.documents.length() > 0) {
+            VerifiedControl control = null;
             try { control = readWithdrawalControl(context, trustedKeys, nowMillis); }
             catch (Exception ignored) { control = null; }
-        }
-        if (installed != null && (installed.documents.length() == 0 || control != null)) {
-            String[] terms = question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+");
-            for (int i = 0; i < installed.documents.length(); i++) {
-                JSONObject document = installed.documents.getJSONObject(i);
-                if (control != null && control.withdrawnSources.contains(sourceKey(
-                        document.optString("sourceId"), document.optString("version")))) continue;
-                String text = document.getString("text");
-                String normalized = text.toLowerCase(java.util.Locale.ROOT);
-                int score = 0;
-                for (String term : terms) {
-                    if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
-                }
-                if (score > 0) candidates.add(document);
+            // Fail closed: without a current withdrawal manifest no package document is offered as evidence.
+            // Governance comes only from the signed payload; an absent array means nothing is authorised.
+            if (control != null) {
+                int documentLimit = LocalScriptureRetriever.isScriptureRelated(question) ? 2 : 3;
+                selected = GovernedEvidence.select(installed.documents, control.withdrawnSources,
+                        installed.governance, question, documentLimit);
             }
         }
-        candidates.sort((left, right) -> {
-            try {
-                return Integer.compare(overlap(right.getString("text"), question), overlap(left.getString("text"), question));
-            } catch (JSONException error) { return 0; }
-        });
-        JSONArray selected = new JSONArray();
-        int chars = 0;
         boolean scriptureQuestion = LocalScriptureRetriever.isScriptureRelated(question);
-        int documentLimit = scriptureQuestion ? 2 : 3;
-        for (JSONObject document : candidates) {
-            if (selected.length() >= documentLimit || chars >= 3600) break;
-            selected.put(document);
-            chars += Math.min(1200, document.optString("text").length());
-        }
         if (scriptureQuestion && selected.length() < 3) {
+            int chars = 0;
+            for (int i = 0; i < selected.length(); i++) chars += Math.min(1200, selected.getJSONObject(i).optString("text").length());
             JSONArray scripture = LocalScriptureRetriever.retrieve(context, question);
             for (int i = 0; i < scripture.length() && selected.length() < 3; i++) {
                 JSONObject passage = scripture.getJSONObject(i);
@@ -1066,17 +1063,23 @@ public final class OfflineKnowledgeStore {
                 if (chars >= 3600) break;
             }
         }
+        // A doctrine question is answered from Scripture and the approved doctrine, never from a name or word dictionary
+        // (the Hitchcock "Mary" entry was added by the scripture top-up, 2026-11-25).
+        if (PreModel.scriptureDoctrineQuestion(question)) {
+            JSONArray kept = new JSONArray();
+            for (int i = 0; i < selected.length(); i++) {
+                JSONObject e = selected.getJSONObject(i);
+                String id = e.optString("sourceId") + " " + e.optString("title");
+                if (!DICTIONARY_SOURCE.matcher(id).find()) kept.put(e);
+            }
+            return kept;
+        }
         return selected;
     }
 
-    private static int overlap(String text, String question) {
-        int score = 0;
-        String normalized = text.toLowerCase(java.util.Locale.ROOT);
-        for (String term : question.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}\\p{N}]+")) {
-            if (term.length() >= 3 && !QUERY_STOP_WORDS.contains(term) && normalized.contains(term)) score++;
-        }
-        return score;
-    }
+    /** Reference dictionaries and lexicons: word and name entries, not doctrine. */
+    private static final java.util.regex.Pattern DICTIONARY_SOURCE = java.util.regex.Pattern.compile(
+            "hitchcock|easton|strong|dictionary|lexicon|concordance|names", java.util.regex.Pattern.CASE_INSENSITIVE);
 
     static boolean isUnderspecifiedReferenceQuestion(String question) {
         if (question == null || question.trim().isEmpty()) return false;
@@ -1110,7 +1113,7 @@ public final class OfflineKnowledgeStore {
             for (Map.Entry<String, Object> entry : sorted.entrySet()) {
                 if (!first) result.append(',');
                 first = false;
-                result.append(JSONObject.quote(entry.getKey())).append(':').append(canonical(entry.getValue()));
+                result.append(CanonicalJson.jsonString(entry.getKey())).append(':').append(canonical(entry.getValue()));
             }
             return result.append('}').toString();
         }
@@ -1123,7 +1126,7 @@ public final class OfflineKnowledgeStore {
             }
             return result.append(']').toString();
         }
-        if (value instanceof String) return JSONObject.quote((String) value);
+        if (value instanceof String) return CanonicalJson.jsonString((String) value);
         if (value instanceof Number || value instanceof Boolean) return value.toString();
         throw new JSONException("Unsupported package JSON value.");
     }

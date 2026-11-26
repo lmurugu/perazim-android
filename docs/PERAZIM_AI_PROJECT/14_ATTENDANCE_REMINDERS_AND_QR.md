@@ -28,7 +28,7 @@ The following scope has been approved.
 | Feature | Version 1 decision |
 |---|---|
 | Attendance location | Headquarters only |
-| Headquarters | Perazim Missions Church International headquarters |
+| Headquarters | Perazim Mission Church (PMCI) headquarters |
 | Branch attendance | Deferred |
 | Minimum recognised attendance | 60 minutes |
 | Attendance check-in | QR-based |

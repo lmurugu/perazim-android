@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines the response orchestration, routing, retrieval and caching requirements for Perazim Missions Church International AI.
+This document defines the response orchestration, routing, retrieval and caching requirements for Perazim Mission Church (PMCI) AI.
 
 The objective is to ensure that each user question is handled by the simplest reliable method capable of producing an accurate, safe and appropriately authorised answer.
 

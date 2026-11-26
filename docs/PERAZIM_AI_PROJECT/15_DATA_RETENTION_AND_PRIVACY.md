@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This document defines the data protection, privacy, information handling, retention, deletion, and access requirements for the Perazim Missions Church International AI system.
+This document defines the data protection, privacy, information handling, retention, deletion, and access requirements for the Perazim Mission Church (PMCI) AI system.
 
 The objective is to ensure that personal information is collected only where necessary, processed only for authorised purposes, protected against unauthorised access, and retained only for an appropriate and documented period.
 

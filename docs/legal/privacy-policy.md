@@ -5,7 +5,7 @@ Status: Draft (not approved). Version 0.2. Last reviewed: 2026-11-18.
 Version 0.2 adds personalisation, notifications, friend activity, leaders' access, and sensitive topics. It is not yet reviewed by a Kenyan data-protection lawyer and must not be published until the owner approves it.
 
 ## 1. Who we are
-The Perazim app is operated by [PENDING OWNER INPUT: exact registered legal name of the church]. Privacy contact: [PENDING OWNER INPUT: email, telephone, postal address]. Data protection registration: [PENDING OWNER INPUT: ODPC registration number, or the decision that registration is not required].
+The Perazim app is operated by Perazim Mission Church. Privacy contact: [PENDING OWNER INPUT: email, telephone, postal address]. Data protection registration: [PENDING OWNER INPUT: ODPC registration number, or the decision that registration is not required].
 
 ## 2. What this policy covers
 This policy covers the Perazim Android app and the Perazim server. It does not cover third-party websites or services that the app links to, such as the M-Pesa app, WhatsApp or Google Maps. Those apply their own policies.

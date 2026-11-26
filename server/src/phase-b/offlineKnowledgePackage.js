@@ -8,6 +8,7 @@ const ROLLBACK_FORMAT = 'perazim-knowledge-rollback-v1';
 const CONTROL_FORMAT = 'perazim-knowledge-control-v1';
 const MAX_PACKAGE_BYTES = 2 * 1024 * 1024;
 const ROLLBACK_REASONS = new Set(['PACKAGE_ROLLBACK', 'SOURCE_CORRECTION', 'SECURITY_REMEDIATION']);
+const GOVERNANCE_CATEGORY = { APPROVED_OFFICIAL: 'CHURCH_APPROVED', REFERENCE: 'GENERAL_THEOLOGY', HISTORICAL: 'HISTORICAL' };
 const WITHDRAWAL_REASONS = new Set(['SOURCE_ERROR', 'AUTHORITY_WITHDRAWAL', 'LICENSING_CHANGE', 'REPLACED', 'SECURITY_REVIEW']);
 
 function canonical(value) {
@@ -54,10 +55,24 @@ function createOfflinePackage({ packageId, version, publishedAt, expiresAt,
       text: source.text
     };
   });
+  // Governance is signed with the payload. The device reads approval status only from this array, never from
+  // document fields. Category mapping follows the device's SourceGovernance categories.
+  const governance = sources.map((source, index) => {
+    const document = documents[index];
+    return {
+      id: document.sourceId,
+      version: document.version,
+      category: GOVERNANCE_CATEGORY[document.authorityClass] || 'UNAPPROVED',
+      approvedBy: document.approvalAuthority,
+      approvedAt: document.approvedAt,
+      scope: 'OFFLINE:' + source.permitted_uses.join(','),
+      sha256: document.contentHash
+    };
+  });
   const payload = { format: FORMAT, packageId, version, publishedAt, issuedAt: publishedAt,
     expiresAt, issuer: 'Perazim AI knowledge service', minimumAppVersion,
     snapshotKind: documents.length ? 'FULL' : 'EMPTY',
-    audience: 'PUBLIC', documents };
+    audience: 'PUBLIC', documents, governance };
   payload.contentDigest = crypto.createHash('sha256').update(canonical(payload), 'utf8').digest('hex');
   const bytes = Buffer.from(canonical(payload), 'utf8');
   if (bytes.length > MAX_PACKAGE_BYTES) throw new KnowledgeError('PACKAGE_TOO_LARGE', 'Knowledge package exceeds the size limit.');

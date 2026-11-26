@@ -37,6 +37,12 @@ import org.perazimchurch.app.ui.theme.PerazimTheme;
  */
 public class OnboardingDialog extends Dialog {
 
+    @Override
+    public void show() {
+        super.show();
+        org.perazimchurch.app.ui.theme.GlassPolish.install(this);
+    }
+
     public static final String PREFS_NAME = "perazim_onboarding_prefs";
     public static final String KEY_ONBOARDING_COMPLETED = "onboarding_completed";
 
@@ -47,7 +53,7 @@ public class OnboardingDialog extends Dialog {
     }
 
     public OnboardingDialog(@NonNull Context context, @Nullable Runnable onGetStartedListener) {
-        super(context);
+        super(context, org.perazimchurch.app.ui.theme.AppDialogs.windowTheme());
         this.onGetStartedListener = onGetStartedListener;
     }
 
@@ -129,7 +135,7 @@ public class OnboardingDialog extends Dialog {
         headerBox.addView(tvScriptureRef);
 
         TextView tvSlogan = new TextView(getContext());
-        tvSlogan.setText("“A place where everybody is somebody, and nobody is a nobody.”");
+        tvSlogan.setText("“The Place of Great Breakthrough”");
         tvSlogan.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
         tvSlogan.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
         tvSlogan.setGravity(Gravity.CENTER);

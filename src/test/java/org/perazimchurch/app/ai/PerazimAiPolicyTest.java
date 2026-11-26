@@ -51,14 +51,17 @@ public class PerazimAiPolicyTest {
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("What does Scripture teach about stewardship?"));
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("How can I support someone who is grieving?"));
         assertFalse(PerazimAiEngine.isClearlyOutOfScopeQuery("Explain John 3:16"));
-        assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("qualified professional"));
+        assertTrue(PerazimAiEngine.boundaryResponseFor("Which medication should I take?").getMessageText().contains("qualified professional"));
+        assertTrue(PerazimAiEngine.outOfScopeResponse().getMessageText().contains("Please speak with a trusted church leader"));
     }
 
     @Test public void crisisResponseDoesNotInventAContactOrPromiseAvailability() {
         String response = PerazimAiEngine.crisisResponse().getMessageText();
-        assertTrue(response.contains("local emergency services"));
+        assertTrue(response.contains("999 or 112"));
         assertTrue(response.contains("cannot provide emergency monitoring"));
-        assertFalse(response.matches("(?s).*\\+?\\d[\\d ()-]{6,}.*"));
+        // Only the Kenyan numbers approved by Levi may appear; no invented contacts.
+        assertTrue(response.contains("922") && response.contains("999 or 112"));
+        assertFalse(response.matches("(?s).*\\+1[\\d ()-]{6,}.*"));
         assertFalse(response.contains("Bishop"));
     }
 

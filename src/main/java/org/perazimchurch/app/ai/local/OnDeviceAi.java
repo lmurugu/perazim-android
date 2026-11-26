@@ -1,5 +1,6 @@
 package org.perazimchurch.app.ai.local;
 
+import org.perazimchurch.app.ai.reference.ReferenceGuide;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -7,6 +8,9 @@ import android.os.Looper;
 import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.ai.PerazimAiEngine;
 import org.perazimchurch.app.ai.remote.ConversationHistory;
+import org.perazimchurch.app.ai.guide.GuideRuntime;
+import org.perazimchurch.app.ai.guide.GuideSafety;
+import org.perazimchurch.app.ai.guide.SelfCheck;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -14,11 +18,16 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Executes the packaged official llama.cpp ARM64 binary locally. Inference never opens a socket. */
 public final class OnDeviceAi {
+    /** Shown when no approved source supports a question. Warm and specific, so the member knows what to do next. */
+    static final String NO_SOURCE_MESSAGE = "I am designed specifically to assist with matters relating to Perazim Mission Church (PMCI) and Christian faith. "
+            + "I do not have a verified approved source for this question, so I am not authorised to advise on it and will not guess. "
+            + "Please ask a simpler, more specific question about the Bible or faith, or speak with your pastor or a trusted church leader.";
     public static final String MODEL_NAME = "Qwen2.5 0.5B Instruct · Q4_K_M";
     public static final long MODEL_BYTES = 491400032L;
     private static final String MODEL_SHA = "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db";
@@ -35,6 +44,10 @@ public final class OnDeviceAi {
     private static long verifiedModelModified = -1L;
     private static boolean verifiedModelStatus;
     private OnDeviceAi() {}
+    /** Test seam for the model call. Production code never sets this. */
+    public interface ModelRunner { String generate(String prompt, String grammar, int limit) throws IOException; }
+    static volatile ModelRunner testRunner;
+
     public interface Callback { void onSuccess(String answer); void onError(String error); }
     public interface DownloadCallback { void onProgress(int percent); void onComplete(); void onError(String error); }
     public interface ModelStatusCallback { void onComplete(boolean verified); }
@@ -115,16 +128,14 @@ public final class OnDeviceAi {
     public static void ask(Context context, String question, List<ConversationHistory.Turn> history,
                            Map<String, String> trustedKeys, Callback callback) {
         Context c = context.getApplicationContext();
-        if (PerazimAiEngine.isCrisisQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
-            return;
-        }
-        if (PerazimAiEngine.isSensitivePastoralDisclosure(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.sensitivePastoralResponse().getMessageText()));
-            return;
-        }
-        if (PerazimAiEngine.isClearlyOutOfScopeQuery(question)) {
-            MAIN.post(() -> callback.onError(PerazimAiEngine.outOfScopeResponse().getMessageText()));
+        // One ordered decision before any model call: crisis, missing reference, pre-model route, approved doctrine,
+        // verbatim verse, no-go zone. The evaluation harness calls the same method.
+        PreModel.Decision decided = PreModel.decide(c, question);
+        if (decided != null) {
+            final String answer = decided.answer;
+            boolean approvedAnswer = "routed:doctrine-approved".equals(decided.status) || "routed:verse-kjv".equals(decided.status);
+            if (approvedAnswer) MAIN.post(() -> callback.onSuccess(answer));
+            else MAIN.post(() -> callback.onError(answer));
             return;
         }
         if (!BuildConfig.OFFLINE_QWEN_ENABLED) {
@@ -139,66 +150,104 @@ public final class OnDeviceAi {
         WORK.execute(() -> {
             Process process = null;
             try {
+                // Validation builds never ship a synthetic knowledge package (build check: assertNoSyntheticKnowledge).
+                // If a bundled package is absent or not installable, answers continue from the approved library and
+                // KJV text, which is what the benchmark evaluated.
                 if ("validation".equals(BuildConfig.BUILD_TYPE)
                         && OfflineKnowledgeStore.read(c, trustedKeys, BuildConfig.VERSION_NAME,
                         System.currentTimeMillis()) == null) {
-                    OfflineKnowledgeStore.installBundledValidationPackage(c, BuildConfig.VERSION_NAME,
-                            System.currentTimeMillis());
+                    try {
+                        OfflineKnowledgeStore.installBundledValidationPackage(c, BuildConfig.VERSION_NAME,
+                                System.currentTimeMillis());
+                    } catch (Exception ignored) {
+                        // No bundled package: continue without knowledge-store evidence.
+                    }
                 }
                 String evidenceQuery = evidenceQuery(question, history);
-                JSONArray evidence = OfflineKnowledgeStore.retrieve(c, trustedKeys, BuildConfig.VERSION_NAME,
-                        System.currentTimeMillis(), evidenceQuery);
-                if (evidence.length() == 0) throw new IOException("No verified approved source supports this question.");
-                if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
-                String prompt = LocalPrompt.build(question, history, evidence);
-                if (!isInstalled(c)) throw new IOException("Download the on-device model first.");
-                if (!MODEL_SHA.equals(sha256(modelFile(c)))) {
-                    cacheModelStatus(modelFile(c), false);
-                    throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
-                }
-                cacheModelStatus(modelFile(c), true);
-                if (cancelled) throw new IOException("Generation cancelled.");
-                String dir = c.getApplicationInfo().nativeLibraryDir;
-                int answerLimit = LocalPrompt.requiresStructuredBiblicalAnswer(question) ? 280 : 120;
-                ProcessBuilder builder = new ProcessBuilder(new File(dir, "libperazim_llama.so").getAbsolutePath(),
-                        "-m", modelFile(c).getAbsolutePath(), "-p", prompt,
-                        "-c", "2048", "-n", "128", "-t", "3", "--seed", "42", "--temp", "0.2",
-                        "--grammar", CitationGrammar.build(evidence, answerLimit),
-                        "--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup");
-                builder.environment().put("LD_LIBRARY_PATH", dir);
-                process = builder.start(); active = process;
-                if (cancelled) throw new IOException("Generation cancelled.");
-                final Process running = process;
-                Thread stderrDrain = new Thread(() -> {
-                    try (InputStream errors = running.getErrorStream()) {
-                        byte[] discard = new byte[4096];
-                        while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
-                    } catch (IOException ignored) { }
-                }, "perazim-ai-stderr");
-                stderrDrain.setDaemon(true);
-                stderrDrain.start();
-                ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-                java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
-                ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
-                StringBuilder answer = new StringBuilder();
-                try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
-                    char[] buffer = new char[512]; int count;
-                    while ((count = reader.read(buffer)) != -1) {
-                        int available = 16000 - answer.length();
-                        if (available > 0) answer.append(buffer, 0, Math.min(available, count));
+                // A Christian doctrine question is answered from Scripture and the library, never from a name or word dictionary:
+                // no stored or reference dictionary evidence (the Hitchcock "Mary" entry, 2026-11-25).
+                boolean doctrineQuestion = PreModel.scriptureDoctrineQuestion(question) || PreModel.generalFaithQuestion(question);
+                JSONArray evidence = doctrineQuestion ? new JSONArray() : OfflineKnowledgeStore.retrieve(c, trustedKeys,
+                        BuildConfig.VERSION_NAME, System.currentTimeMillis(), evidenceQuery);
+                // Word study by Strong's number (G26, H7225): answer from the bundled entry, never generate it.
+                java.util.regex.Matcher strongsMatch = java.util.regex.Pattern.compile("\\b([GH]\\d{1,4})\\b").matcher(question);
+                if (strongsMatch.find()) {
+                    org.perazimchurch.app.domain.model.StrongsEntry entry =
+                            org.perazimchurch.app.data.interlinear.StrongsStore.getEntry(c, strongsMatch.group(1));
+                    if (entry != null) {
+                        String wordAnswer = entry.getCode() + " (" + entry.getOriginal() + ", "
+                                + entry.getTransliteration() + "): " + entry.getDefinition();
+                        MAIN.post(() -> callback.onSuccess(wordAnswer));
+                        return;
                     }
-                    process.waitFor();
-                } finally { deadline.cancel(false); timer.shutdownNow(); }
-                int exit = process.exitValue();
+                }
+                // Exact verse reference with one KJV passage: quote the Bible text directly, never generate it.
+                if (evidence.length() == 1 && LocalScriptureRetriever.hasExplicitReference(question)
+                        && "Bible".equals(evidence.optJSONObject(0) == null ? "" : evidence.optJSONObject(0).optString("sourceId"))) {
+                    JSONObject verse = evidence.getJSONObject(0);
+                    String verseAnswer = verse.optString("location") + " (King James Version): “"
+                            + verse.optString("text") + "”";
+                    MAIN.post(() -> callback.onSuccess(verseAnswer));
+                    return;
+                }
+                // Approved reference items (dictionary and cross-references). A no-op until Levi approves a source.
+                if (!doctrineQuestion) evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
+                // Drift: a question that uses another faith's idea gets at least two KJV passages plus a false-doctrine note to refute from Scripture; never a credible source (no-op otherwise).
+                evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
+                if (evidence.length() == 0) {
+                    // No approved excerpt: an in-scope, non-sensitive faith question may be answered from the model's own
+                    // knowledge, accepted only by the KJV, reference and official-claim checks in OwnKnowledge (Levi, 2026-11-25).
+                    String checkedOwn = OwnKnowledge.tryAnswer(c, question);
+                    // A doctrine question with no checked answer gets the Scripture-only reply, not the no-source line (2026-11-25).
+                    final String own = checkedOwn != null || !doctrineQuestion ? checkedOwn
+                            : OwnKnowledge.scriptureOnlyReply(c, question);
+                    if (own == null) throw new IOException(NO_SOURCE_MESSAGE);
+                    MAIN.post(() -> callback.onSuccess(own));
+                    return;
+                }
+                if (!runtimeAvailable(c)) throw new IOException("This build does not include the ARM64 model runtime.");
+                // Locked rules, one playbook, style and learned notes (guide memory is optional and bounded).
+                String guideText = GuideRuntime.contextFor(c, question).text;
+                LocalPrompt.Built built = LocalPrompt.buildBounded(question, history, evidence, guideText);
+                // Only excerpts the model actually saw may be cited, verified, or titled.
+                JSONArray shown = built.shownEvidence;
+                if (shown.length() == 0) {
+                    // Only a long question is "too long". A short one with no fitting excerpt gets the honest no-source reply.
+                    throw new IOException(question.length() < 120 ? NO_SOURCE_MESSAGE
+                            : "The question is too long for the on-device model. Ask a shorter question.");
+                }
+                if (!isInstalled(c)) throw new IOException("Download the on-device model first.");
+                // Uses the cached verification; a full 491 MB digest runs only when the file changed.
+                if (!isModelVerified(c)) throw new IOException("The installed model failed its integrity check. Use Model download to repair it.");
                 if (cancelled) throw new IOException("Generation cancelled.");
-                if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
-                if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
-                String result = answer.toString().replace("<|im_end|>", "").replace("<|endoftext|>", "").trim();
+                int answerLimit = LocalPrompt.requiresStructuredBiblicalAnswer(question) ? 280 : 120;
+                String rawAnswer;
+                if (testRunner != null) {
+                    // Test-only seam: production never sets testRunner, so this branch is unreachable in the app.
+                    rawAnswer = testRunner.generate(built.prompt, CitationGrammar.build(shown, answerLimit), answerLimit);
+                } else {
+                    rawAnswer = runModelProcess(c, built.prompt, CitationGrammar.build(shown, answerLimit), 128);
+                }
+                String result = LocalPrompt.stripStockPhrases(
+                        ModelOutput.stripEndMarkers(rawAnswer));
                 if (result.isEmpty()) throw new IOException("The local model did not produce an answer.");
-                if (!hasVerifiedCitations(result, evidence)) {
+                if (PerazimAiEngine.claimsAppActionOrHumanAuthority(result)
+                        || (PerazimAiEngine.claimsOfficialStatus(result)
+                        && !PerazimAiEngine.officialClaimHasApprovedProvenance(result, shown))) {
+                    throw new IOException("The local model made a claim the app cannot verify. Ask again or contact the church office.");
+                }
+                if (!hasVerifiedCitations(result, shown)) {
                     throw new IOException("The local model did not return a verified source citation.");
                 }
-                String citedResult = appendVerifiedSourceTitles(result, evidence);
+                // Self-heal before the answer is shown: fix or refuse unverified quotes, verdicts and references.
+                boolean sensitive = GuideSafety.isSensitive(question);
+                SelfCheck.Result checked = SelfCheck.check(result, GuideRuntime.evidenceTexts(shown), sensitive);
+                GuideRuntime.afterAnswer(c, question, checked.issues, sensitive);
+                if (checked.refused) throw new IOException(checked.answer);
+                // Grounded answer: the evidence text is the answer; the model may add only a supported framing sentence.
+                String grounded = GroundedAnswer.finalAnswer(question, checked.answer, shown);
+                if (grounded == null) throw new IOException(NO_SOURCE_MESSAGE);
+                String citedResult = appendVerifiedSourceTitles(grounded, shown);
                 MAIN.post(() -> callback.onSuccess(citedResult));
             } catch (Exception e) {
                 String message = cancelled ? "Generation cancelled." : e.getMessage();
@@ -206,6 +255,85 @@ public final class OnDeviceAi {
             }
             finally { if (process != null) terminate(process); active = null; busy.set(false); }
         });
+    }
+
+    /**
+     * Runs the packaged llama.cpp binary once and returns its reply text. The caller owns the prompt and the checks.
+     * {@code grammar} may be null (free composition) or the citation grammar (grounded answers).
+     */
+    static String runModelProcess(Context c, String prompt, String grammar, int tokens) throws IOException {
+        String dir = c.getApplicationInfo().nativeLibraryDir;
+        java.util.List<String> args = new java.util.ArrayList<>(java.util.Arrays.asList(
+                new File(dir, "libperazim_llama.so").getAbsolutePath(), "-m", modelFile(c).getAbsolutePath(), "-p", prompt,
+                "-c", "2048", "-n", String.valueOf(tokens), "-t", "3", "--seed", "42", "--temp", "0.2"));
+        if (grammar != null) { args.add("--grammar"); args.add(grammar); }
+        args.addAll(java.util.Arrays.asList("--no-display-prompt", "--no-conversation", "--simple-io", "--no-escape", "--no-warmup"));
+        ProcessBuilder builder = new ProcessBuilder(args);
+        builder.environment().put("LD_LIBRARY_PATH", dir);
+        Process process = builder.start(); active = process;
+        if (cancelled) { terminate(process); throw new IOException("Generation cancelled."); }
+        final Process running = process;
+        try {
+            Thread stderrDrain = new Thread(() -> {
+                try (InputStream errors = running.getErrorStream()) {
+                    byte[] discard = new byte[4096];
+                    while (errors.read(discard) != -1) { /* discard diagnostics; never persist prompt-adjacent logs */ }
+                } catch (IOException ignored) { }
+            }, "perazim-ai-stderr");
+            stderrDrain.setDaemon(true);
+            stderrDrain.start();
+            ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+            java.util.concurrent.atomic.AtomicBoolean timedOut = new java.util.concurrent.atomic.AtomicBoolean(false);
+            ScheduledFuture<?> deadline = timer.schedule(() -> { timedOut.set(true); terminate(running); }, 150, TimeUnit.SECONDS);
+            StringBuilder answer = new StringBuilder();
+            try (Reader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)) {
+                char[] buffer = new char[512]; int count;
+                while ((count = reader.read(buffer)) != -1) {
+                    int available = 16000 - answer.length();
+                    if (available > 0) answer.append(buffer, 0, Math.min(available, count));
+                }
+                process.waitFor();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("Generation interrupted.", e);
+            } finally { deadline.cancel(false); timer.shutdownNow(); }
+            int exit = process.exitValue();
+            if (cancelled) throw new IOException("Generation cancelled.");
+            if (timedOut.get()) throw new IOException("The local model timed out. Try a shorter question.");
+            if (exit != 0) throw new IOException("The local model stopped (code " + exit + "). Try again with a shorter question.");
+            return answer.toString();
+        } finally {
+            terminate(process);
+            active = null;
+        }
+    }
+
+    /**
+     * Free composition for conversational and approved pastoral replies (no citation grammar). The caller verifies every
+     * sentence and falls back to fixed approved text when this returns null. Crisis, safeguarding and doctrine never call it.
+     */
+    public static String composeText(Context context, String prompt, int maxTokens) {
+        Context c = context.getApplicationContext();
+        if (!BuildConfig.OFFLINE_QWEN_ENABLED) return null;
+        if (testRunner != null) {
+            // Test-only seam: production never sets testRunner.
+            try { return testRunner.generate(prompt, null, maxTokens); } catch (IOException e) { return null; }
+        }
+        if (!runtimeAvailable(c) || !isInstalled(c)) return null;
+        if (!busy.compareAndSet(false, true)) return null;
+        try {
+            if (cancelled) return null;
+            try {
+                if (!isModelVerified(c)) return null;
+            } catch (Exception e) {
+                return null;
+            }
+            return runModelProcess(c, prompt, null, maxTokens);
+        } catch (IOException e) {
+            return null;
+        } finally {
+            busy.set(false);
+        }
     }
 
     private static String evidenceQuery(String question, List<ConversationHistory.Turn> history) {
@@ -336,7 +464,10 @@ public final class OnDeviceAi {
                 if (!part.renameTo(target)) throw new IOException("Cannot finish model installation.");
                 cacheModelStatus(target, true);
                 MAIN.post(callback::onComplete);
-            } catch (Exception e) { String error = e.getMessage(); MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
+            } catch (Exception e) {
+                // Cancel closes the socket, which surfaces as a low-level error; report it as a pause instead.
+                String error = cancelled ? "Download paused. Tap Download to resume." : e.getMessage();
+                MAIN.post(() -> callback.onError(error == null ? "Model download failed." : error)); }
             finally { if (connection != null) connection.disconnect(); activeDownload = null; busy.set(false); }
         });
     }
@@ -375,4 +506,5 @@ public final class OnDeviceAi {
         cacheModelStatus(target, true);
         return true;
     }
+
 }

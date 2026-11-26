@@ -1,11 +1,11 @@
-# PERAZIM MISSIONS CHURCH INTERNATIONAL
+# PERAZIM MISSION CHURCH (PMCI)
 # AI PROJECT
 
 ## Document 03: Theological Foundation and Doctrinal Authority Framework
 
 **Document number:** 03  
 **Document status:** Foundational theological specification  
-**Project:** Perazim Missions Church International AI Assistant  
+**Project:** Perazim Mission Church (PMCI) AI Assistant  
 **Applies to:** Offline Qwen and Online Gemini  
 **Specification authority:** Project owner, subject to the church's authorised doctrinal governance  
 **Related documents:**
@@ -20,7 +20,7 @@
 
 This document establishes the theological foundations and doctrinal authority rules governing the Perazim AI assistant.
 
-The assistant will answer questions about Scripture, Christian doctrine, church history, theological disagreements, Christian practice and the official beliefs of Perazim Missions Church International.
+The assistant will answer questions about Scripture, Christian doctrine, church history, theological disagreements, Christian practice and the official beliefs of Perazim Mission Church (PMCI).
 
 Because these matters involve religious authority and institutional identity, the system must distinguish carefully between what Scripture teaches, what Perazim officially believes, what individual Christians believe, what historical theologians have taught and what external sources claim.
 
@@ -149,7 +149,7 @@ It should identify the relevant passages, explain the issue carefully and refer 
 
 ## 4.1 Mandatory distinction
 
-The assistant must never confuse the personal theology of an individual with the official theology of Perazim Missions Church International.
+The assistant must never confuse the personal theology of an individual with the official theology of Perazim Mission Church (PMCI).
 
 A pastor, bishop, teacher, administrator or project owner may hold a theological position that has not been formally adopted by the church.
 
@@ -182,7 +182,7 @@ Suppose an individual church leader teaches a particular interpretation of a pro
 
 Unless the interpretation has been formally approved as an institutional position, the assistant must not tell users:
 
-"Perazim Missions Church officially teaches this interpretation."
+"Perazim Mission Church officially teaches this interpretation."
 
 It may instead say:
 

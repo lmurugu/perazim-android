@@ -29,7 +29,12 @@ public final class AiRelayClient {
     public static void askQuestion(@NonNull Context context, @NonNull String question,
                                    @NonNull RelayCallback callback) {
         Context app = context.getApplicationContext();
-        if (PerazimAiEngine.isCrisisQuery(question)) {
+        org.perazimchurch.app.ai.AiResponse safetyFirst = PerazimAiEngine.safetyFirstResponse(question);
+        if (safetyFirst != null) {
+            MAIN.post(() -> callback.onError(safetyFirst.getMessageText()));
+            return;
+        }
+        if (PerazimAiEngine.isLegacyCrisisKeyword(question)) {
             MAIN.post(() -> callback.onError(PerazimAiEngine.crisisResponse().getMessageText()));
             return;
         }
@@ -67,6 +72,13 @@ public final class AiRelayClient {
                 Object answer = json.opt("answer");
                 if (!(answer instanceof String) || ((String) answer).trim().isEmpty()) {
                     callback.onError("The church service returned no answer.");
+                    return;
+                }
+                // Fail closed: the phone cannot verify provenance or app operations for a server answer, so an answer
+                // that claims either is withheld rather than shown as fact.
+                if (PerazimAiEngine.claimsAppActionOrHumanAuthority((String) answer)
+                        || PerazimAiEngine.claimsOfficialStatus((String) answer)) {
+                    callback.onError("The church service answer could not be verified in the app. Try again or contact the church office.");
                     return;
                 }
                 StringBuilder text = new StringBuilder((String) answer);

@@ -1,5 +1,7 @@
 package org.perazimchurch.app.presentation.ui;
 
+import org.perazimchurch.app.ui.theme.AppDialogs;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.widget.EditText;
@@ -28,7 +30,7 @@ final class PinUpgradeDialog {
         newPin.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
         form.addView(newPin);
 
-        new AlertDialog.Builder(context)
+        AppDialogs.builder(context)
                 .setTitle("Upgrade your PIN")
                 .setMessage("Your PIN is shorter than the current minimum. Choose a new PIN of 6 to 12 digits to keep your account safer. Other devices will need to sign in again.")
                 .setView(form)
