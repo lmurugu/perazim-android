@@ -28,7 +28,7 @@ fi
 
 adb shell svc wifi disable
 adb shell svc data disable || true  # the emulator image may not expose the phone service
-./gradlew connectedValidationAndroidTest \
+./gradlew connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.class=org.perazimchurch.app.sync.BackgroundSyncSchedulerTest,org.perazimchurch.app.sync.BackgroundSyncProcessRecoveryTest \
   --stacktrace
 
