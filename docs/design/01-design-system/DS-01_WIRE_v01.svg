@@ -1,0 +1,284 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="3442" viewBox="0 0 360 3442" xmlns:c2pa="http://c2pa.org/manifest">
+<rect width="360" height="3442" fill="#FFFFFF"/>
+<rect x="0" y="0" width="360" height="24" rx="0" fill="#EEEEEE" stroke="#BBBBBB" stroke-width="1"/>
+<text x="8" y="15.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Status bar (system)</text>
+<rect x="16" y="28" width="28" height="28" rx="4" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="20" y="45.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="start">logo 28</text>
+<text x="52" y="47" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#222222">Perazim  (wordmark 20 sp)</text>
+<rect x="312" y="28" width="32" height="32" rx="16" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="328" y="47.0" font-family="Arial, Helvetica, sans-serif" font-size="6" fill="#222222" text-anchor="middle">Profile</text>
+<rect x="16" y="72" width="328" height="150" rx="28" fill="#F5F5F5" stroke="#333333" stroke-width="1.2"/>
+<text x="32" y="96" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#444444">EYEBROW DATE  (caption 11 sp, purple soft)</text>
+<text x="32" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#222222">Title: DS-01 Design system  (hero 26 sp)</text>
+<text x="32" y="142" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="normal" fill="#333333">Body text, 14 sp, secondary. Two lines.</text>
+<rect x="32" y="162" width="96" height="28" rx="6" fill="#FFFFFF" stroke="#777777" stroke-width="1"/>
+<text x="40" y="179.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Step 2 of 3</text>
+<rect x="32" y="196" width="296" height="1" rx="0" fill="#777777" stroke="#777777" stroke-width="1"/>
+<text x="32" y="213" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">HERO card  radius XL 28, padding 20</text>
+<text x="16" y="248" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">01 COLOUR TOKENS (DARK | LIGHT PER ROW)</text>
+<line x1="16" y1="254" x2="344" y2="254" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="262" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="281" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Canvas</text>
+<rect x="176" y="268" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="280.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="268" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="280.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="296" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="315" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Glass card</text>
+<rect x="176" y="302" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="314.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="302" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="314.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="330" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="349" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Glass control</text>
+<rect x="176" y="336" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="348.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="336" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="348.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="364" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="383" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Solid surface</text>
+<rect x="176" y="370" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="382.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="370" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="382.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="398" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="417" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Solid surface 2</text>
+<rect x="176" y="404" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="416.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="404" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="416.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="432" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="451" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Purple muted</text>
+<rect x="176" y="438" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="450.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="438" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="450.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="466" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="485" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Purple soft</text>
+<rect x="176" y="472" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="484.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="472" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="484.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="500" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="519" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Purple brand</text>
+<rect x="176" y="506" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="518.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="506" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="518.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="534" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="553" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Orange primary</text>
+<rect x="176" y="540" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="552.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="540" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="552.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="568" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="587" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Orange soft</text>
+<rect x="176" y="574" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="586.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="574" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="586.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="602" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="621" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Text primary</text>
+<rect x="176" y="608" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="620.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="608" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="620.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="636" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="655" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Text secondary</text>
+<rect x="176" y="642" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="654.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="642" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="654.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="670" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="689" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Text body</text>
+<rect x="176" y="676" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="688.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="676" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="688.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="704" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="723" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Text disabled</text>
+<rect x="176" y="710" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="722.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="710" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="722.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="738" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="757" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Stroke</text>
+<rect x="176" y="744" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="756.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="744" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="756.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="772" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="791" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Success</text>
+<rect x="176" y="778" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="790.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="778" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="790.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<rect x="16" y="806" width="328" height="30" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="825" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Error</text>
+<rect x="176" y="812" width="70" height="18" rx="4" fill="#DDDDDD" stroke="#666666" stroke-width="1"/>
+<text x="211" y="824.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">dark</text>
+<rect x="254" y="812" width="80" height="18" rx="4" fill="#FFFFFF" stroke="#666666" stroke-width="1"/>
+<text x="294" y="824.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">light</text>
+<text x="16" y="860" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">02 GLASS KINDS</text>
+<line x1="16" y1="866" x2="344" y2="866" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="874" width="104" height="88" rx="22" fill="#CCCCCC" stroke="#333333" stroke-width="1"/>
+<text x="68" y="921.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="middle">ORANGE</text>
+<rect x="128" y="874" width="104" height="88" rx="22" fill="#AAAAAA" stroke="#333333" stroke-width="1"/>
+<text x="180" y="921.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="middle">TINTED</text>
+<rect x="240" y="874" width="104" height="88" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="292" y="921.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="middle">FROSTED</text>
+<rect x="16" y="974" width="160" height="56" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1005.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Standard glass card (radius 22)</text>
+<rect x="184" y="974" width="160" height="56" rx="28" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="264" y="1005.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="middle">Glass control, pill</text>
+<text x="16" y="1054" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">03 BUTTONS</text>
+<line x1="16" y1="1060" x2="344" y2="1060" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="1068" width="328" height="56" rx="28" fill="#999999" stroke="#333333" stroke-width="1"/>
+<text x="180" y="1099.0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#222222" text-anchor="middle">Primary (ORANGE, one per screen), 56 dp</text>
+<rect x="16" y="1134" width="328" height="48" rx="24" fill="#666666" stroke="#333333" stroke-width="1"/>
+<text x="180" y="1161.0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#222222" text-anchor="middle">Secondary (purple pill), 48 dp</text>
+<rect x="16" y="1192" width="328" height="48" rx="24" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="180" y="1219.0" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#222222" text-anchor="middle">Quiet (glass pill), 48 dp</text>
+<rect x="16" y="1250" width="48" height="48" rx="24" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="40" y="1277.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">icon</text>
+<rect x="72" y="1250" width="48" height="48" rx="24" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="96" y="1277.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">icon</text>
+<text x="132" y="1278" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#444444">Icon buttons: 48 dp, glass circle</text>
+<text x="16" y="1322" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">04 CHIPS AND FILTERS</text>
+<line x1="16" y1="1328" x2="344" y2="1328" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="1336" width="56" height="36" rx="18" fill="#666666" stroke="#333333" stroke-width="1"/>
+<text x="44.0" y="1357.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="middle">All</text>
+<rect x="80" y="1336" width="88" height="36" rx="18" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="124.0" y="1357.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="middle">Sermons</text>
+<rect x="176" y="1336" width="84" height="36" rx="18" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="218.0" y="1357.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="middle">Worship</text>
+<rect x="268" y="1336" width="76" height="36" rx="18" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="306.0" y="1357.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="middle">Prayer</text>
+<text x="16" y="1398" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">05 INPUTS AND SEARCH</text>
+<line x1="16" y1="1404" x2="344" y2="1404" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="1412" width="328" height="48" rx="10" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1439.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Default (search)</text>
+<rect x="16" y="1468" width="328" height="48" rx="10" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1495.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Focus (proposed outline)</text>
+<rect x="16" y="1524" width="328" height="48" rx="10" fill="#FFFFFF" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1551.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Error (message below)</text>
+<text x="16" y="1596" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">06 CARDS AND TILES</text>
+<line x1="16" y1="1602" x2="344" y2="1602" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="1610" width="328" height="110" rx="28" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1668.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Hero card (XL 28)</text>
+<rect x="16" y="1732" width="328" height="80" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1775.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Standard card (LG 22), 16 dp padding</text>
+<rect x="16" y="1824" width="328" height="110" rx="10" fill="#CCCCCC" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1882.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Photo tile, 128 dp (MD 10), caption</text>
+<rect x="16" y="1946" width="160" height="60" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="24" y="1979.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Dense card</text>
+<rect x="184" y="1946" width="160" height="60" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="192" y="1979.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Dense card</text>
+<text x="16" y="2030" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">07 TAB BAR AND MINI-PLAYER</text>
+<line x1="16" y1="2036" x2="344" y2="2036" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="2044" width="328" height="56" rx="12" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="24" y="2075.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Mini-player (glass, radius 12): play, title, progress</text>
+<rect x="16" y="2112" width="328" height="60" rx="30" fill="#EEEEEE" stroke="#333333" stroke-width="1"/>
+<text x="24" y="2145.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Tab bar (floating glass pill), five items</text>
+<rect x="20.0" y="2118" width="64" height="48" rx="24" fill="#666666" stroke="#333333" stroke-width="1"/>
+<text x="48.8" y="2145.0" font-family="Arial, Helvetica, sans-serif" font-size="7" fill="#222222" text-anchor="middle">Home*</text>
+<text x="92.39999999999999" y="2150" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="normal" fill="#222222">Sermons</text>
+<text x="158.0" y="2150" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="normal" fill="#222222">Worship</text>
+<text x="223.59999999999997" y="2150" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="normal" fill="#222222">Community*</text>
+<text x="289.2" y="2150" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="normal" fill="#222222">Give*</text>
+<text x="16" y="2192" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="normal" fill="#444444">* order and labels as built; prompt differs (see undecided list)</text>
+<text x="16" y="2216" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">08 TYPE SCALE (SP)</text>
+<line x1="16" y1="2222" x2="344" y2="2222" stroke="#999999" stroke-width="0.8"/>
+<text x="16" y="2244" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="normal" fill="#222222">Micro 9</text>
+<text x="200" y="2244" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">regular</text>
+<line x1="16" y1="2250" x2="344" y2="2250" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2268" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Caption 11 (uppercase)</text>
+<text x="200" y="2268" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">bold</text>
+<line x1="16" y1="2274" x2="344" y2="2274" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2292" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="normal" fill="#222222">Body small 12</text>
+<text x="200" y="2292" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">regular</text>
+<line x1="16" y1="2298" x2="344" y2="2298" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2316" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="normal" fill="#222222">Body 14</text>
+<text x="200" y="2316" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">regular, 1.15</text>
+<line x1="16" y1="2322" x2="344" y2="2322" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2340" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Subtitle 16</text>
+<text x="200" y="2340" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">bold</text>
+<line x1="16" y1="2346" x2="344" y2="2346" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2364" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Title 18</text>
+<text x="200" y="2364" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">bold</text>
+<line x1="16" y1="2370" x2="344" y2="2370" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2388" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Headline 22</text>
+<text x="200" y="2388" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">bold</text>
+<line x1="16" y1="2394" x2="344" y2="2394" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2412" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Hero 26</text>
+<text x="200" y="2412" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">bold</text>
+<line x1="16" y1="2418" x2="344" y2="2418" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2436" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#222222">Wordmark 20</text>
+<text x="200" y="2436" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#555555">bold, +0.04</text>
+<line x1="16" y1="2442" x2="344" y2="2442" stroke="#DDDDDD" stroke-width="0.6"/>
+<text x="16" y="2466" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">09 RADII AND SPACING</text>
+<line x1="16" y1="2472" x2="344" y2="2472" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="2480" width="160" height="40" rx="6" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="96" y="2503.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="middle">SM 6</text>
+<rect x="186" y="2480" width="160" height="40" rx="10" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="266" y="2503.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="middle">MD 10</text>
+<rect x="16" y="2530" width="160" height="40" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="96" y="2553.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="middle">LG 22</text>
+<rect x="186" y="2530" width="160" height="40" rx="28" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="266" y="2553.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="middle">XL 28</text>
+<rect x="16" y="2580" width="160" height="40" rx="20" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="96" y="2603.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="middle">PILL 999</text>
+<text x="16" y="2648" font-family="Arial, Helvetica, sans-serif" font-size="7" font-weight="normal" fill="#333333">Gutter 16 | bottom 32 | card 16 (dense 12-14) | card gap 16 | tile gap 10 | touch 48 | primary 56</text>
+<text x="16" y="2676" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">10 SCREEN STATES</text>
+<line x1="16" y1="2682" x2="344" y2="2682" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="2690" width="160" height="62" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="26" y="2724.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Default</text>
+<rect x="186" y="2690" width="160" height="62" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="196" y="2724.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Loading</text>
+<rect x="16" y="2762" width="160" height="62" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="26" y="2796.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Empty</text>
+<rect x="186" y="2762" width="160" height="62" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="196" y="2796.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Error</text>
+<rect x="16" y="2834" width="160" height="62" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="26" y="2868.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Offline</text>
+<rect x="186" y="2834" width="160" height="62" rx="22" fill="#F5F5F5" stroke="#333333" stroke-width="1"/>
+<text x="196" y="2868.0" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#222222" text-anchor="start">Signed out</text>
+<text x="16" y="2920" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">11 ASSISTANT (BLACK AND WHITE ONLY)</text>
+<line x1="16" y1="2926" x2="344" y2="2926" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="2934" width="328" height="120" rx="22" fill="#000000" stroke="#000000" stroke-width="1"/>
+<text x="28" y="2960" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="normal" fill="#000000">User bubble (white)</text>
+<rect x="170" y="2944" width="0" height="0" rx="0" fill="#FFFFFF" stroke="#555555" stroke-width="1"/>
+<rect x="170" y="2944" width="170" height="24" rx="12" fill="#FFFFFF" stroke="#FFFFFF"/>
+<text x="180" y="2960" font-family="Arial" font-size="9" fill="#000000">User question</text>
+<text x="28" y="2992" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="normal" fill="#FFFFFF">Assistant answer (black, white rim)</text>
+<text x="28" y="3010" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#FFFFFF">Sources line</text>
+<rect x="28" y="3018" width="304" height="26" rx="10" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+<text x="36" y="3035" font-family="Arial" font-size="8" fill="#FFFFFF">Emergency numbers first (999 or 112)</text>
+<text x="16" y="3080" font-family="Arial, Helvetica, sans-serif" font-size="9" font-weight="bold" fill="#333333">12 UNDECIDED (NOT DECIDED HERE)</text>
+<line x1="16" y1="3086" x2="344" y2="3086" stroke="#999999" stroke-width="0.8"/>
+<rect x="16" y="3094" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3108.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Radius scale</text>
+<rect x="16" y="3120" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3134.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Light/dark aliases</text>
+<rect x="16" y="3146" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3160.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Give centre colour</text>
+<rect x="16" y="3172" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3186.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Sermons canvas</text>
+<rect x="16" y="3198" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3212.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Light variant for games</text>
+<rect x="16" y="3224" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3238.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Card elevation 4 dp</text>
+<rect x="16" y="3250" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3264.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Mode switch</text>
+<rect x="16" y="3276" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3290.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">White on orange contrast</text>
+<rect x="16" y="3302" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3316.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Glass values, prompt vs code</text>
+<rect x="16" y="3328" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3342.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Assistant logo treatment</text>
+<rect x="16" y="3354" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3368.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Tab order and labels</text>
+<rect x="16" y="3380" width="328" height="22" rx="6" fill="#FFFFFF" stroke="#999999" stroke-width="1"/>
+<text x="24" y="3394.0" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#222222" text-anchor="start">Focus ring colour</text>
+<text x="16" y="3420" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="normal" fill="#333333">Status: under review (Levi). Nothing approved.</text>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYToxMjliZTJhMi0xOGYzLTQ2NjUtOGQxMi01MjA4MDUzYTQxY2EAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaHOv2s+dW0dnOccRj+Uia04AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo1YTc1YjNmNS0zYmRkLTQ1ZTEtOGExMy00YTdkMjQ3Y2YwODRscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoMPQPkE6FWBivAbi0pyVSsQAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggQThZ7SVADsd0Hv6jpFZILJU3Jnoko0cf2KKXfGGAUxKkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaL9N6RpWXDaWwcjurDrBtucAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIER3+YJHO2dIethSuS/kiURTCDKLw62LsDL1O3sG9zV0ZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GYR5Zmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjEyOWJlMmEyLTE4ZjMtNDY2NS04ZDEyLTUyMDgwNTNhNDFjYS9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjYzYmU0Mzk0LWM1ODUtNDcxOS1hMzllLTY2NzE2OTQ0M2E1ZnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBBOFntJUAOx3Qe/qOkVkgslTcmeiSjRx/Yopd8YYBTEqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggBzlViphotFbBXffqaGUBkyrj3rPdbkeWiDjSWNkvD56iY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggUVpOoEvQbWj0NV/XcEGdNH25VO+nm5kzhLPeBfcDqyt0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQJAmu9Brlgkev8T+NRDlHFjtUTZFM2yp/J9gAXfkXCbBIKIzY5fwNNquLhEYSN0a7nqtV8eDoWfBC/vqbb75jx8=</c2pa:manifest></metadata></svg>
