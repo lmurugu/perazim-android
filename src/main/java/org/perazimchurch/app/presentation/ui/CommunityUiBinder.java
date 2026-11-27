@@ -221,14 +221,14 @@ public final class CommunityUiBinder {
             featuredEvent.addView(GlassKit.keep(hero));
         }, (code, message) -> {
             featuredEvent.removeAllViews();
-            featuredEvent.addView(text("Events are unavailable. Tap Refresh to try again.", 13));
+            featuredEvent.addView(infoCard("Events are unavailable. Tap Refresh to try again."), GlassKit.matchWrap(activity, 0));
         });
     }
 
     private void refreshGroupShortcuts() {
         myGroups.removeAllViews();
         if (session().isGuest()) {
-            myGroups.addView(text("Sign in to see your groups.", 13));
+            myGroups.addView(infoCard("Sign in to see your groups."), GlassKit.matchWrap(activity, 0));
             return;
         }
         String expectedOwner = owner;
@@ -755,7 +755,29 @@ public final class CommunityUiBinder {
     private void chooseDate(long[] target,Button button){Calendar c=Calendar.getInstance();c.setTimeInMillis(target[0]);new DatePickerDialog(activity,(picker,y,m,d)->{
         c.set(y,m,d);new TimePickerDialog(activity,(time,h,min)->{c.set(Calendar.HOUR_OF_DAY,h);c.set(Calendar.MINUTE,min);c.set(Calendar.SECOND,0);target[0]=c.getTimeInMillis();button.setText("Starts: "+date(target[0]));},c.get(Calendar.HOUR_OF_DAY),c.get(Calendar.MINUTE),true).show();
     },c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH)).show();}
-    private AlertDialog panel(String title,LinearLayout body){body.setPadding(dp(16),dp(12),dp(16),dp(24));AlertDialog d=AppDialogs.builder(activity).setTitle(title).setView(scroll(body)).setNegativeButton("Close",null).create();d.show();if(d.getWindow()!=null){d.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18),dp(1)));d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,(int)(activity.getResources().getDisplayMetrics().heightPixels*0.90));d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);}return d;}
+    /** One dialog look for both modes: title, panel and Close button use the same tokens; height fits the content. */
+    private AlertDialog panel(String title,LinearLayout body){
+        body.setPadding(dp(16),dp(12),dp(16),dp(24));
+        boolean light=PerazimTheme.isLight();
+        TextView head=new TextView(activity);head.setText(title);head.setTextSize(18);head.setTypeface(Typeface.DEFAULT_BOLD);head.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);head.setPadding(dp(20),dp(18),dp(20),dp(6));
+        AlertDialog d=AppDialogs.builder(activity).setCustomTitle(head).setView(scroll(body)).setNegativeButton("Close",null).create();
+        d.show();
+        if(d.getWindow()!=null){
+            if(light){android.graphics.drawable.GradientDrawable g=new android.graphics.drawable.GradientDrawable();g.setColor(PerazimTheme.COLOR_BG_DEEP);g.setCornerRadius(dp(18));g.setStroke(dp(1),PerazimTheme.COLOR_STROKE);d.getWindow().setBackgroundDrawable(g);}
+            else d.getWindow().setBackgroundDrawable(PerazimTheme.createDialogGradient(dp(18),dp(1)));
+            d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            d.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        }
+        android.widget.Button close=d.getButton(AlertDialog.BUTTON_NEGATIVE);
+        if(close!=null){close.setAllCaps(false);close.setTextColor(light?0xFF681A7D:PerazimTheme.COLOR_PURPLE_SOFT);}
+        return d;
+    }
+    /** A status line in a rounded glass card, so it matches the other cards on the screen. */
+    private LinearLayout infoCard(String message){
+        LinearLayout card=GlassKit.card(activity,14,12);
+        card.addView(GlassKit.text(activity,message,13,false,GlassKit.body()));
+        return card;
+    }
     private LinearLayout column(){LinearLayout l=new LinearLayout(activity);l.setOrientation(LinearLayout.VERTICAL);l.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);return l;}
     private ScrollView scroll(LinearLayout body){ScrollView s=new ScrollView(activity);s.setFillViewport(true);s.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);s.addView(body);return s;}
     private LinearLayout card(LinearLayout parent){LinearLayout c=column();c.setPadding(dp(14),dp(12),dp(14),dp(12));c.setBackground(PerazimTheme.createCardGradient(dp(14),dp(1)));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,-2);p.setMargins(0,dp(8),0,dp(8));parent.addView(c,p);return c;}
