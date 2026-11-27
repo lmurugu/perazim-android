@@ -67,7 +67,7 @@ The authoritative project specification folder is:
 
 `<repo>/docs/PERAZIM_AI_PROJECT/`
 
-Codex must read the complete contents of this folder before beginning implementation.
+Codex must read the complete contents of this folder before beginning implementation. The offline biblical research-library requirements are specified in `17_HERMENEUTICS_LIBRARY_SPECIFICATION.md`; agents working on Bible-answer behaviour must also read `hermeneutics-library/HERMENEUTICAL_PROTOCOL.md`, `RESOURCE_CATALOG.md`, `RESOURCE_CATALOG.json`, and `ACQUISITION_AND_VALIDATION_RUNBOOK.md`.
 
 The documents are intended to work together. A requirement in one document may depend on a decision, constraint, or definition in another.
 
@@ -308,6 +308,7 @@ The system must support:
 - Source registration.
 - Document ingestion.
 - Metadata validation.
+- Rights-cleared biblical research-resource acquisition and component-level licence records, following Document 17.
 - Revision tracking.
 - Draft and review states.
 - Approval.
@@ -326,7 +327,7 @@ Implement the approved retrieval and routing architecture.
 
 The system should use relevant deterministic responses, approved exact cache entries, approved knowledge retrieval, and the appropriate local or online model.
 
-Retrieval must enforce source approval, audience restrictions, and permissions.
+Retrieval must enforce source approval, audience restrictions, and permissions. Bible-related retrieval must also apply Document 17 and the Hermeneutical Protocol: retrieve from installed rights-cleared data, preserve exact source and edition provenance, distinguish Scripture from linguistic/historical/commentary evidence, and never infer a word's contextual meaning from etymology or Strong's numbering alone.
 
 Start with exact-reference and suitable full-text retrieval. More advanced semantic retrieval may be introduced after evaluation demonstrates a clear benefit.
 
