@@ -29,7 +29,8 @@ public final class SearchTerms {
             "would", "you", "your", "bible", "verse", "verses", "find", "look", "where's", "whats", "whose", "shall",
             "thee", "thou", "thy", "yea", "unto", "wherein", "therein", "whereof", "written", "wrote", "write", "mention",
             "mentioned", "happened", "happen", "happens", "did", "does", "doing", "said", "telling", "concerning",
-            "regarding", "actually", "exactly", "quote", "quoted", "phrase", "book", "chapter"));
+            "regarding", "actually", "exactly", "quote", "quoted", "phrase", "book", "chapter", "talk", "talks", "talked",
+            "talking"));
 
     private SearchTerms() {
     }

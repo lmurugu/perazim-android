@@ -73,7 +73,9 @@ public final class QuestionSearch {
             return Collections.emptyList();
         }
         Map<Long, Found> found = new HashMap<>();
+        List<Set<Long>> keysByTerm = new ArrayList<>();
         for (int term = 0; term < terms.size(); term++) {
+            keysByTerm.add(new HashSet<Long>());
             Set<String> seenForms = new HashSet<>();
             for (String form : SearchSynonyms.forms(terms.get(term))) {
                 if (!seenForms.add(form)) {
@@ -89,6 +91,7 @@ public final class QuestionSearch {
                         continue;
                     }
                     long key = key(hit.bookNumber, hit.chapter, hit.verse);
+                    keysByTerm.get(term).add(key);
                     Found entry = found.get(key);
                     if (entry == null) {
                         entry = new Found(key, hit.text.length());
@@ -99,12 +102,27 @@ public final class QuestionSearch {
             }
         }
 
+        // A word that appears in many verses says less than a rare one, so each matched word adds a weight that
+        // falls as the word gets more common: 1 + log((verses found + 1) / (verses with this word + 1)).
+        int universe = found.size();
+        double[] weight = new double[terms.size()];
+        for (int term = 0; term < terms.size(); term++) {
+            weight[term] = 1.0 + Math.log((universe + 1.0) / (keysByTerm.get(term).size() + 1.0));
+        }
+        for (Found entry : found.values()) {
+            double score = 0;
+            for (int term : entry.terms) {
+                score += weight[term];
+            }
+            entry.score = score;
+        }
+
         List<Found> sorted = new ArrayList<>(found.values());
         Collections.sort(sorted, new Comparator<Found>() {
             @Override
             public int compare(Found a, Found b) {
-                if (a.terms.size() != b.terms.size()) {
-                    return Integer.compare(b.terms.size(), a.terms.size());
+                if (Double.compare(b.score, a.score) != 0) {
+                    return Double.compare(b.score, a.score);
                 }
                 if (a.textLength != b.textLength) {
                     return Integer.compare(a.textLength, b.textLength);
@@ -136,6 +154,7 @@ public final class QuestionSearch {
         final long key;
         final int textLength;
         final Set<Integer> terms = new HashSet<>();
+        double score;
 
         Found(long key, int textLength) {
             this.key = key;

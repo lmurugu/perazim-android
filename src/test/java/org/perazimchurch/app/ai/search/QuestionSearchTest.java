@@ -114,6 +114,29 @@ public class QuestionSearchTest {
     }
 
     @Test
+    public void aRareWordOutranksTwoCommonWords() {
+        // "down" and "cast" are common in this fixture; "satan" is rare. The verse with Satan and cast should rank
+        // above the verse that has only cast and down.
+        List<Object[]> rows = new ArrayList<>();
+        rows.add(new Object[]{1, 1, 1, "he cast down the stones in the field"});
+        rows.add(new Object[]{1, 1, 2, "the house was cast down by the wind"});
+        rows.add(new Object[]{1, 1, 3, "they cast down the bread and went down the road"});
+        rows.add(new Object[]{1, 1, 4, "the serpent was cast out and Satan was there"});
+        QuestionSearch.Lookup lookup = phrase -> {
+            List<QuestionSearch.Hit> hits = new ArrayList<>();
+            for (Object[] row : rows) {
+                String text = (String) row[3];
+                if (text.toLowerCase().contains(phrase)) {
+                    hits.add(new QuestionSearch.Hit((Integer) row[0], (Integer) row[1], (Integer) row[2], text));
+                }
+            }
+            return hits;
+        };
+        List<String> refs = refs(QuestionSearch.rank("Satan cast down", lookup));
+        assertEquals("1:1:4", refs.get(0));
+    }
+
+    @Test
     public void emptyQuestionGivesNothing() {
         assertTrue(QuestionSearch.rank("   ", corpusLookup()).isEmpty());
         assertTrue(QuestionSearch.rank("the of is", corpusLookup()).isEmpty());
