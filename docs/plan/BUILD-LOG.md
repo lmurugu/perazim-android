@@ -10,4 +10,7 @@ Base for this log: `main` at `51a7952`.
 
 ### 2026-11-27 13:29 UTC · up to `81d3faa1`
 - 2026-11-27 13:29 UTC · `81d3faa1` · docs(design): reusable Perazim design prompt and folder naming
-<!-- last-logged: 81d3faa1a593fc613055aebf1c92c7fbcd68a620 -->
+
+### 2026-11-27 13:36 UTC · up to `739904bc`
+- 2026-11-27 13:36 UTC · `739904bc` · docs(design): add DS-01 design-system reference v01
+<!-- last-logged: 739904bc13f375ee498ef129e696e536c765f23f -->
