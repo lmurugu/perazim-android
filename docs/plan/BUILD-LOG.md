@@ -4,4 +4,7 @@ Each entry is appended automatically by `.github/workflows/plan-build-log.yml` (
 
 Base for this log: `main` at `51a7952`.
 
-<!-- last-logged: 51a79527ab02756115fb6851da3ad4b8266f4180 -->
+
+### 2026-11-27 12:53 UTC · up to `7973bf3b`
+- 2026-11-27 12:52 UTC · `7973bf3b` · docs(plan): master plan, build steps, and auto-appended build log
+<!-- last-logged: 7973bf3b35e698dbce67990adabc9676c8b2a152 -->
