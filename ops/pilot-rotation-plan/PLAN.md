@@ -18,6 +18,7 @@ Status: scripted and tested on a scratch database. Not run on the pilot. Each st
 1. Freeze: `systemctl --user stop perazim-api-local-review perazim-api` (only the one that runs). Pause the 02:00 backup timer for the window if it could run.
 2. Fresh dump: `ops/pilot-reconciliation-v3/backup-pilot.sh` with the pilot URL; verify with `sha256sum --check`.
 3. TOTP: count rows (`count-totp-rows.sql`). Generate the new key with `openssl rand -hex 32` into a temp file (mode 600). Run `reencrypt-totp.js` dry run with OLD and NEW keys, then `--apply --confirm=<db>` with `PRE_CHANGE_DUMP` set. Then set `PHASE_B_ADMIN_KEY` to the new key in `api.env`, keeping the old value in a backup copy.
+4a. Local access first: `hba-scram-cutover.js` (see `../pilot-hba-scram/README.md`). Host connections become SCRAM, and the postgres OS user keeps peer access for recovery. Admin commands need `-p 55438` inside the container and `-u postgres`.
 4. Database password: `rotate-db-password.js` dry run (`ENV_FILE`, `DB_ADMIN_CMD` for the container, e.g. `podman exec -i perazim-pilot-postgres psql -v ON_ERROR_STOP=1 -U postgres -d postgres`), then `--apply --confirm=<role>`.
 5. Verify before starting: decrypt check with the new key (`reencrypt-totp.js` dry run with OLD set to the new key and NEW set to any valid key, which should decrypt 1 of 1); `pre-flight.sql`.
 6. Start units. Check `/api/health` 200, `/api/community/posts` 200, `/api/community/groups` 401 without auth. Check a refresh round-trip works.
