@@ -64,13 +64,23 @@ public final class GlassKit {
 
     // ------------------------------------------------------------------ drawables
 
+    /** Light-mode rim for glass cards (design rules 5.3): a visible plum border on the pale page. */
+    public static final int LIGHT_RIM = Color.parseColor("#E7D5EC");
+    /** The earlier white rim, kept for surfaces whose design must not change (the black-and-white Assistant). */
+    public static final int LEGACY_LIGHT_RIM = Color.parseColor("#F2FFFFFF");
+
     /** rgba(255,255,255,0.08) glass with a 0.18 rim and a soft top sheen (inset highlight). */
     public static Drawable glass(Context c, float radiusDp) {
+        return glass(c, radiusDp, LIGHT_RIM);
+    }
+
+    /** As {@link #glass(Context, float)} with an explicit light-mode rim colour. Dark mode is unaffected. */
+    public static Drawable glass(Context c, float radiusDp, int lightRim) {
         GradientDrawable d;
         if (light()) {
             d = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
                     new int[]{Color.parseColor("#C7FFFFFF"), Color.parseColor("#B3FFFFFF")});
-            d.setStroke(px(c, 1), Color.parseColor("#F2FFFFFF"));
+            d.setStroke(px(c, 1), lightRim);
         } else {
             // Dark mode uses the original solid purple card (#3D1749 with a #4A3554 rim), as in the original build.
             d = new GradientDrawable();
