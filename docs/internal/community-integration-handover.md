@@ -7,3 +7,11 @@ The Community feed has a pinned-event area, Inbox and new-post actions, member g
 The earlier version 35 APK was built with the old private Tailscale origin. The previously documented Cloudflare quick tunnel and health gateway are inactive. That tunnel served health only and was not verified for community, sign-in, or messaging. A working HTTPS origin serving the required API is needed before a Cloudflare-connected build can be validated. The phone's saved server setting takes precedence over the APK's built-in origin.
 
 Preserve account data and current memberships. Use synthetic accounts for access-control checks. Verify nonmember denial for group lists, feed, direct post access, rosters, and media. Verify admins can add and remove members, public Discover reveals only allowed information, and group leaders have explicitly assigned membership before deployment.
+
+Validation version 36 built and installed in place. The build was explicitly
+given empty pilot and local origins, which removes the obsolete built-in
+Tailscale address. On the phone, the Community heading, Inbox, new-post button,
+My groups and Latest posts were visible. The event area displays a real pinned
+upcoming event when one is returned. The API was not connected during that
+check. A targeted test run did not complete and was interrupted. Full
+Community privacy and Bible Search acceptance remain pending.
