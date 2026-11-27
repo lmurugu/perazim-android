@@ -19,6 +19,8 @@
 - `06_ONLINE_AI_SPECIFICATION.md`
 - `07_RESPONSE_ROUTING_AND_CACHING.md`
 - `08_SECURITY_AND_ACCESS_CONTROL.md`
+- `17_HERMENEUTICS_LIBRARY_SPECIFICATION.md`
+- `hermeneutics-library/HERMENEUTICAL_PROTOCOL.md`
 
 ---
 
@@ -279,15 +281,17 @@ It should avoid returning isolated verses where the surrounding passage material
 
 For detailed biblical study, retrieval may include:
 
-- The requested passage.
+- The requested passage and its literary unit.
 - Immediate literary context.
-- Relevant cross-references.
+- Relevant cross-references, each checked in its own context.
 - Relevant approved study notes.
-- Licensed original-language resources where available.
+- Rights-cleared original-language text, morphology, syntax and lexical resources.
+- Genre, discourse and figures-of-speech references where relevant.
+- Dated historical, cultural, geographical and primary-source evidence where relevant.
 
-The system must identify the translation accurately.
+Follow `17_HERMENEUTICS_LIBRARY_SPECIFICATION.md` and `hermeneutics-library/HERMENEUTICAL_PROTOCOL.md` for source classification, lexical and grammatical safeguards, historical evidence, licences and citations. Retrieve only resources actually installed in an approved local package. A catalogue URL is not retrieved evidence.
 
-The ESV is the preferred translation, subject to verified licensing.
+The system must identify the translation accurately. The ESV preference remains subject to verified licensing. Crossway's published AI terms currently prohibit AI processing of ESV text for interpretation or AI-generated answers; do not include ESV text in AI retrieval or prompt context unless written permission expressly authorises that AI use and offline distribution. See Document 17. A separately rights-cleared translation must be used for AI retrieval until that permission exists.
 
 The system must not fabricate biblical quotations or references when retrieval fails.
 
@@ -611,7 +615,10 @@ The evaluation must include:
 
 ## 19.3 Theological tests
 
-- Biblical interpretation.
+- Biblical interpretation using the mandatory Hermeneutical Protocol.
+- Hebrew and Greek morphology, syntax, lexical sense and contextual word usage.
+- Genre, literary form, discourse relationships and figures of speech.
+- Historical and cultural claims with dated, geographically relevant source evidence.
 - Doctrinal explanation.
 - Historical theology.
 - Apologetics.
