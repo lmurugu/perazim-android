@@ -1,0 +1,37 @@
+name: plan-build-log
+
+# Appends each new commit on the plan branch to docs/plan/BUILD-LOG.md and pushes that
+# change back. Only this branch is watched. The integration branch is never written here.
+on:
+  push:
+    branches: [claude/project-thread-eg17po]
+    paths-ignore: ['docs/plan/BUILD-LOG.md']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: plan-build-log-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  append:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}
+      - name: Append commits to the build log
+        run: bash scripts/plan/append-build-log.sh
+      - name: Commit and push the log
+        run: |
+          if git diff --quiet -- docs/plan/BUILD-LOG.md; then
+            echo "Build log unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/plan/BUILD-LOG.md
+          git commit -m "docs(plan): append build log entries [skip ci]"
+          git push origin "HEAD:${{ github.ref_name }}"
