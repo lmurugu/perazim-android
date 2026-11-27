@@ -15,7 +15,7 @@ Status: **under review.** Nothing here is approved. Levi is the only approver fo
 
 REF PNGs (1080 by 2340, dark and light, 140 files in total) are **not in git**. Each is about 1.1 MB and the set would add roughly 60 MB. They are in the project folder at `/mnt/project-files/design/02-screens/NN-slug/`. Regenerate them with `node tools/build.js`.
 
-The prototype and the upscaled x2 copies are described in the thread, not committed here.
+The upscaled x2 copies are in the project folder at `/mnt/project-files/design/03-upscaled/` (56 screen frames at 2160 by 4680 px, 2 DS-01 sheets at 2160 px wide, and one overview contact sheet per mode). The PNGs are **not in git**. Regenerate them with `node tools/render-upscaled.js`, which renders each REF frame and the DS-01 sheet from the same HTML at 2x the REF pixel size, and rewrites the upscaled rows of `INDEX.md`.
 
 ## How they were built
 
@@ -44,8 +44,8 @@ The prototype and the upscaled x2 copies are described in the thread, not commit
 
 ## Not done in this batch
 
-- The design-system sheet DS-01 is a separate thread. These screens use the same tokens, but DS-01 is not built here.
-- Upscaled x2 copies (`03-upscaled/`) are not produced. Rendering them at 6x is possible with `build.js` but the files would be about 4 MB each.
+- The design-system sheet DS-01 is in `01-design-system/` as HTML, tokens and SVG. Its PNG references are in the project folder, not git.
+- Upscaled x2 copies are produced (see above). They are not in git.
 - SVG wireframes are not produced (prompt says "when possible").
 - Contrast checks are the ratios above, not a full audit of every text pair on every screen. The accessibility audit should follow.
 - Screen 09 (Groups) is not verified on a phone build, as the plan says.
