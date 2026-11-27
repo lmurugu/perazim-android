@@ -92,8 +92,9 @@ const VERSE = (text, ref, o = {}) => `<div class="verse"${attr(o.el)}><p>${esc(t
 function statusBar() {
   return `<div class="status" data-el="status-bar"><span>8:30</span><span class="sbr"><i></i><i></i><b></b></span></div>`;
 }
+let LOGO_SRC = LOGO_URI;
 function topbar() {
-  return `<header class="topbar" data-el="top-bar"><img class="logo" src="${LOGO_URI}" alt="Perazim logo" width="28" height="28"><span class="wm" data-el="wordmark">Perazim</span><button class="btn icon profile" data-go="11-me" aria-label="Profile" data-el="profile-icon">${ic('profile', 20)}</button></header>`;
+  return `<header class="topbar" data-el="top-bar"><img class="logo" src="${LOGO_SRC}" alt="Perazim logo" width="28" height="28"><span class="wm" data-el="wordmark">Perazim</span><button class="btn icon profile" data-go="11-me" aria-label="Profile" data-el="profile-icon">${ic('profile', 20)}</button></header>`;
 }
 function dhead(h = {}) {
   const icon = h.icon || 'close';
@@ -290,6 +291,7 @@ const GENERIC = {
 function page(s, mode, o = {}) {
   const wire = !!o.wire;
   const mock = !!o.mock;
+  LOGO_SRC = mock ? '../../assets/ic_perazim_logo.png' : LOGO_URI;
   const chrome = s.chrome || 'tab';
   const classes = ['screen', mode, s.bw ? 'bw' : '', chrome === 'tab' ? 'has-tabs' : '', chrome === 'bare' ? 'bare' : '', chrome === 'game' ? 'game' : ''].filter(Boolean).join(' ');
   let head = '';

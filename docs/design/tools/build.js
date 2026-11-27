@@ -10,6 +10,8 @@ const lib = require('./lib');
 
 const DESIGN = path.resolve(__dirname, '..');
 const SCREENS_OUT = path.join(DESIGN, '02-screens');
+// Full-quality REF PNGs (about 1.1 MB each) are written to the project folder, not git.
+const REF_OUT = process.env.PZ_REF_OUT || '/mnt/project-files/design/02-screens';
 const SCRATCH = process.env.PZ_SCRATCH || path.join(process.env.TMPDIR || '/tmp', 'pz-design-scratch');
 fs.mkdirSync(SCRATCH, { recursive: true });
 
@@ -34,7 +36,8 @@ const list = wanted.length ? all.filter((s) => wanted.includes(s.id)) : all;
       const refHtml = lib.page(s, mode, { ref: true });
       const refTmp = path.join(SCRATCH, `${s.id}_REF_${mode}.html`);
       fs.writeFileSync(refTmp, refHtml);
-      const refPng = path.join(dir, `${s.id}_REF_${mode}_v01.png`);
+      fs.mkdirSync(path.join(REF_OUT, s.id), { recursive: true });
+      const refPng = path.join(REF_OUT, s.id, `${s.id}_REF_${mode}_v01.png`);
       await shot(browser, refHtml, refPng, { width: 360, height: 780, dpr: 3 });
     }
     // Wireframe: greyscale, mode-neutral, names on each element.
