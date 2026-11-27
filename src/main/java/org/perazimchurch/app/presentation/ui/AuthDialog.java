@@ -26,7 +26,10 @@ import androidx.annotation.Nullable;
 
 import org.perazimchurch.app.data.local.entity.UserEntity;
 import org.perazimchurch.app.data.local.session.SessionManager;
+import org.perazimchurch.app.data.remote.ApiClient;
 import org.perazimchurch.app.data.remote.PrivacyNoticeRemoteSource;
+import org.perazimchurch.app.data.remote.PrivacyPresentationPolicy;
+import org.perazimchurch.app.BuildConfig;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.ArrayList;
@@ -437,6 +440,14 @@ public final class AuthDialog {
                                         .show();
                             }
                             @Override public void onError(int statusCode, @NonNull String message) {
+                                // Validation builds only, loopback API only (USB adb reverse), and only for the
+                                // server's exact no-notice 503: keep the session and say so. No notice is shown or
+                                // accepted, and no consent is recorded. Every other failure keeps the sign-out.
+                                if (PrivacyPresentationPolicy.allowsValidationWithoutNotice(BuildConfig.BUILD_TYPE, ApiClient.getBaseUrl(context), statusCode, message)) {
+                                    Toast.makeText(context, PrivacyPresentationPolicy.VALIDATION_BANNER, Toast.LENGTH_LONG).show();
+                                    finishLogin(context, user, listener, dialog, progressBar, btnSubmit);
+                                    return;
+                                }
                                 sm.logout();
                                 showPrivacyUnavailable(context, dialog, progressBar, btnSubmit);
                             }
