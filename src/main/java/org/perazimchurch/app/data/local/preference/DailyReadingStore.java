@@ -37,6 +37,18 @@ public final class DailyReadingStore {
                     : sameEntry ? Math.max(1, Math.min(3, record.optInt("step"))) : 1;
         }
 
+        public ReadingCatalog.Reading researchReading() {
+            JSONArray sources = record.optJSONArray("research");
+            if (sources == null) return null;
+            JSONObject entry = sources.optJSONObject(Math.max(0, day - 1));
+            if (entry == null) return null;
+            try {
+                return ReadingCatalog.Reading.restoreResearch(entry, topic);
+            } catch (JSONException | IllegalArgumentException e) {
+                return null;
+            }
+        }
+
         public boolean isPlan() { return length > 0; }
         public boolean planFinished() { return isPlan() && completed >= length; }
     }
@@ -63,6 +75,22 @@ public final class DailyReadingStore {
             JSONObject record = new JSONObject();
             record.put("topic", topic);
             record.put("readings", new JSONArray(readingIds));
+            return save(planKey(owner), record);
+        } catch (JSONException e) {
+            return false;
+        }
+    }
+
+    public boolean startResearch(String owner, String topic, List<ReadingCatalog.Reading> readings) {
+        if (readings.isEmpty() || readings.size() > ReadingCatalog.MAX_DAYS) return false;
+        try {
+            JSONArray ids = new JSONArray();
+            JSONArray sources = new JSONArray();
+            for (ReadingCatalog.Reading reading : readings) {
+                ids.put(reading.id);
+                sources.put(reading.toResearchJson());
+            }
+            JSONObject record = new JSONObject().put("topic", topic).put("readings", ids).put("research", sources);
             return save(planKey(owner), record);
         } catch (JSONException e) {
             return false;

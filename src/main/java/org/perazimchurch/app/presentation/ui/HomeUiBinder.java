@@ -230,7 +230,8 @@ public class HomeUiBinder {
         readingDate = GamificationStore.getTodayDateNairobi();
         ReadingCatalog.Reading daily = source.dailyReading(readingDate);
         readingState = readingStore.load(readingOwner, readingDate, daily.id);
-        selectedReading = source.find(readingState.readingId);
+        selectedReading = readingState.researchReading();
+        if (selectedReading == null) selectedReading = source.find(readingState.readingId);
         if (selectedReading == null) selectedReading = daily;
         currentCornerstoneRef = selectedReading.reference;
         currentCornerstoneText = selectedReading.scripture;
@@ -431,13 +432,7 @@ public class HomeUiBinder {
         btnBeginRoutine = GlassKit.orangeButton(context, "PICK UP WHERE YOU LEFT OFF", 13);
         btnBeginRoutine.setOnClickListener(v -> toggleOrAdvanceRoutine());
         card.addView(btnBeginRoutine, GlassKit.matchHeight(context, 46, 14));
-        if (org.perazimchurch.app.BuildConfig.OFFLINE_QWEN_ENABLED) {
-            TextView btnAskGuide = GlassKit.glassButton(context, "ASK PERAZIM GUIDE", 13);
-            btnAskGuide.setOnClickListener(v -> {
-                if (listener != null) listener.onOpenAiGuide();
-            });
-            card.addView(btnAskGuide, GlassKit.matchHeight(context, 46, 10));
-        }
+        card.addView(createAssistantButton(), GlassKit.matchHeight(context, 46, 10));
         TextView plans = GlassKit.text(context, "Reading plans", 14, true, GlassKit.accent());
         plans.setMinHeight(dp(44));
         plans.setGravity(Gravity.CENTER_VERTICAL);
@@ -447,6 +442,42 @@ public class HomeUiBinder {
         loadReading();
         updateBeginRoutineButtonText();
         return card;
+    }
+
+    private View createAssistantButton() {
+        boolean light = PerazimTheme.isLight();
+        LinearLayout button = new LinearLayout(context);
+        button.setGravity(Gravity.CENTER);
+        button.setPadding(dp(12), 0, dp(12), 0);
+        button.setFocusable(true);
+        button.setContentDescription("Open Perazim Assistant");
+        button.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override public void onInitializeAccessibilityNodeInfo(View host,
+                    android.view.accessibility.AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                info.setClassName(Button.class.getName());
+            }
+        });
+
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(light ? Color.WHITE : 0xff191919);
+        background.setCornerRadius(dp(23));
+        background.setStroke(dp(1), light ? 0xffC8C8C8 : 0xff666666);
+        int ripple = light ? 0x16000000 : 0x28FFFFFF;
+        button.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(ripple), background, null));
+
+        ImageView logo = AssistantMark.image(context, !light);
+        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(dp(34), dp(34));
+        logoParams.setMarginEnd(dp(8));
+        button.addView(logo, logoParams);
+        TextView label = GlassKit.text(context, "Perazim Assistant", 14, true, light ? Color.BLACK : Color.WHITE);
+        label.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        button.addView(label);
+        button.setOnClickListener(v -> {
+            if (listener != null) listener.onOpenAiGuide();
+        });
+        return GlassKit.keep(button);
     }
 
     /**
@@ -790,6 +821,8 @@ public class HomeUiBinder {
         options.addView(query, GlassKit.matchWrap(context, 10));
         TextView search = GlassKit.orangeButton(context, "Find matching topics", 13);
         options.addView(search, GlassKit.matchHeight(context, 46, 8));
+        TextView research = GlassKit.glassButton(context, "Research this exact topic", 13);
+        options.addView(research, GlassKit.matchHeight(context, 46, 6));
 
         LinearLayout topics = new LinearLayout(context);
         topics.setOrientation(LinearLayout.VERTICAL);
@@ -807,6 +840,7 @@ public class HomeUiBinder {
                 .setNegativeButton("Done", null)
                 .create();
         showReadingTopics(topics, catalog.topics, "", chooser, owner);
+        research.setOnClickListener(v -> researchReadingTopic(query.getText().toString().trim(), chooser, owner));
         search.setOnClickListener(v -> {
             String words = query.getText().toString().trim();
             InputMethodManager keyboard = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -815,7 +849,7 @@ public class HomeUiBinder {
             if (matches.isEmpty() && !words.isEmpty()) {
                 topics.removeAllViews();
                 topics.addView(GlassKit.text(context,
-                        "No direct match. Try a shorter topic, or choose one below.", 13, false, GlassKit.body()));
+                        "No matching themes. You can research your exact topic above.", 13, false, GlassKit.body()));
                 appendReadingTopics(topics, catalog.topics, "", chooser, owner);
             } else {
                 showReadingTopics(topics, words.isEmpty() ? catalog.topics : matches, words, chooser, owner);
@@ -823,6 +857,62 @@ public class HomeUiBinder {
         });
         chooser.show();
         chooser.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void researchReadingTopic(String query, AlertDialog chooser, String owner) {
+        if (query.isEmpty()) {
+            Toast.makeText(context, "Type a topic first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        chooser.dismiss();
+        AlertDialog loading = new AlertDialog.Builder(context).setTitle("Searching the KJV")
+                .setMessage(query).setNegativeButton("Cancel", null).create();
+        loading.show();
+        org.perazimchurch.app.core.concurrency.BoundedExecutors.io().execute(() -> {
+            List<ReadingCatalog.Reading> found = null;
+            try (InputStream verses = org.perazimchurch.app.data.local.seeder.BibleAssets.openText(
+                         context, "bible/text/KJV.tsv.gz");
+                 InputStreamReader bible = new InputStreamReader(verses, java.nio.charset.StandardCharsets.UTF_8);
+                 InputStream manifest = context.getAssets().open("bible/kjv_manifest.json")) {
+                org.json.JSONArray books = new org.json.JSONArray(new String(
+                        org.perazimchurch.app.ai.IoCompat.readAll(manifest), java.nio.charset.StandardCharsets.UTF_8));
+                found = org.perazimchurch.app.domain.reading.ReadingResearch.search(query, bible, books);
+            } catch (IOException | org.json.JSONException | IllegalArgumentException ignored) {
+                // The result dialog distinguishes missing evidence from an unreadable source.
+            }
+            List<ReadingCatalog.Reading> results = found;
+            new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+                if (!loading.isShowing()) return;
+                loading.dismiss();
+                if (owner.equals(resolveUserId())) showResearchResults(query, owner, results);
+            });
+        });
+    }
+
+    private void showResearchResults(String query, String owner, List<ReadingCatalog.Reading> results) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context).setTitle(query)
+                .setNegativeButton("Close", null);
+        if (results == null || results.isEmpty()) {
+            dialog.setMessage(results == null ? "The offline Bible could not be searched."
+                    : "The KJV search found no closely matching passages. Try a more specific phrase.");
+            dialog.show();
+            return;
+        }
+
+        ScrollView scroll = new ScrollView(context);
+        LinearLayout passages = new LinearLayout(context);
+        passages.setOrientation(LinearLayout.VERTICAL);
+        passages.setPadding(dp(20), dp(8), dp(20), dp(12));
+        passages.addView(GlassKit.text(context, results.size() + " KJV passages found", 14, true, GlassKit.text()));
+        for (ReadingCatalog.Reading passage : results) {
+            passages.addView(GlassKit.text(context, passage.reference, 15, true, GlassKit.text()), GlassKit.matchWrap(context, 14));
+            passages.addView(GlassKit.text(context, passage.scripture, 14, false, GlassKit.body()), GlassKit.matchWrap(context, 3));
+        }
+        scroll.addView(passages);
+        dialog.setView(scroll).setPositiveButton("Make a plan", (d, which) ->
+                chooseReadingLength(query, results.size(), days ->
+                        confirmReadingChange(() -> readingStore.startResearch(owner, query, results.subList(0, days)))));
+        dialog.show();
     }
 
     private String planSummary() {
@@ -853,37 +943,44 @@ public class HomeUiBinder {
 
     private void chooseReadingLength(ReadingCatalog.Topic topic, String query, String owner) {
         if (!owner.equals(resolveUserId())) return;
+        chooseReadingLength(topic.title, ReadingCatalog.MAX_DAYS, days -> {
+            if (!owner.equals(resolveUserId())) return;
+            List<String> entries = catalog(context).select(topic, query, days);
+            confirmReadingChange(() -> readingStore.start(owner, topic.title, entries));
+        });
+    }
+
+    private void chooseReadingLength(String title, int available, java.util.function.IntConsumer createPlan) {
         LinearLayout options = new LinearLayout(context);
         options.setOrientation(LinearLayout.VERTICAL);
         options.setPadding(dp(20), dp(10), dp(20), dp(8));
-        options.addView(GlassKit.text(context, "Length in days or weeks, up to 30 days.", 14, false, GlassKit.body()));
+        options.addView(GlassKit.text(context, "Choose up to " + available + (available == 1 ? " day." : " days."),
+                14, false, GlassKit.body()));
         Spinner length = new Spinner(context);
         Spinner unit = new Spinner(context);
         unit.setContentDescription("Duration unit");
         length.setContentDescription("Duration amount");
         ArrayAdapter<String> units = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"Days", "Weeks"});
+                available >= 7 ? new String[]{"Days", "Weeks"} : new String[]{"Days"});
         unit.setAdapter(units);
         unit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 List<Integer> amounts = new ArrayList<>();
-                int limit = position == 0 ? ReadingCatalog.MAX_DAYS : 4;
+                int limit = position == 0 ? available : available / 7;
                 for (int i = 1; i <= limit; i++) amounts.add(i);
                 length.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, amounts));
-                if (position == 0) length.setSelection(6);
+                if (position == 0) length.setSelection(Math.min(6, available - 1));
             }
             @Override public void onNothingSelected(AdapterView<?> parent) { }
         });
         options.addView(unit, GlassKit.matchHeight(context, 48, 8));
         options.addView(length, GlassKit.matchHeight(context, 48, 6));
-        new AlertDialog.Builder(context).setTitle(topic.title).setView(options)
+        new AlertDialog.Builder(context).setTitle(title).setView(options)
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Start plan", (dialog, which) -> {
                     Object amount = length.getSelectedItem();
-                    if (!(amount instanceof Integer) || !owner.equals(resolveUserId())) return;
-                    int days = (Integer) amount * (unit.getSelectedItemPosition() == 0 ? 1 : 7);
-                    List<String> entries = catalog(context).select(topic, query, days);
-                    confirmReadingChange(() -> readingStore.start(owner, topic.title, entries));
+                    if (!(amount instanceof Integer)) return;
+                    createPlan.accept((Integer) amount * (unit.getSelectedItemPosition() == 0 ? 1 : 7));
                 }).show();
     }
 
