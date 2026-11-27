@@ -79,7 +79,7 @@ android {
     // Validation builds upgrade previous phone builds in place.
     applicationVariants.all { variant ->
         if (variant.buildType.name == "validation") {
-            variant.outputs.each { output -> output.versionCodeOverride = 34 }
+            variant.outputs.each { output -> output.versionCodeOverride = 35 }
         }
     }
     signingConfigs {
