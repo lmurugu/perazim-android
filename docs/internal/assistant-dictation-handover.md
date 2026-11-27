@@ -3,11 +3,12 @@
 This work uses the original app checkout at `/home/murugu/Android/app`.
 Branch `codex/assistant-dictation` builds on `codex/daily-reading` and the
 available Bible Search baseline `91ae4a9`. The installed validation update
-uses versionCode 33 with the existing debug signer.
+uses versionCode 34 with the existing debug signer.
 
 ## Assistant
 
-- The **Assistant** entry in the bottom bar opens the full-screen
+- The **Perazim Assistant** button on Home sits between the reading
+  resume button and **Reading plans**. It opens the full-screen
   `AiBreakthroughGuideDialog`. The chat shell and messages use a monochrome
   light or dark palette. `AssistantMark` draws the existing Perazim globe
   and cross logo as black or white ink, and draws the listening orb.
@@ -63,3 +64,7 @@ editable draft. Live microphone transcription on this device still needs a
 spoken check.
 
 [Android SpeechRecognizer reference](https://developer.android.com/reference/android/speech/SpeechRecognizer)
+
+Version 34 moves the Assistant entry to the Home reading card. The phone check
+confirmed it sits below the reading button and opens the Assistant. The
+bottom bar returns to its five existing navigation entries.

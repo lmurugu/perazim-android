@@ -432,13 +432,7 @@ public class HomeUiBinder {
         btnBeginRoutine = GlassKit.orangeButton(context, "PICK UP WHERE YOU LEFT OFF", 13);
         btnBeginRoutine.setOnClickListener(v -> toggleOrAdvanceRoutine());
         card.addView(btnBeginRoutine, GlassKit.matchHeight(context, 46, 14));
-        if (org.perazimchurch.app.BuildConfig.OFFLINE_QWEN_ENABLED) {
-            TextView btnAskGuide = GlassKit.glassButton(context, "ASK PERAZIM GUIDE", 13);
-            btnAskGuide.setOnClickListener(v -> {
-                if (listener != null) listener.onOpenAiGuide();
-            });
-            card.addView(btnAskGuide, GlassKit.matchHeight(context, 46, 10));
-        }
+        card.addView(createAssistantButton(), GlassKit.matchHeight(context, 46, 10));
         TextView plans = GlassKit.text(context, "Reading plans", 14, true, GlassKit.accent());
         plans.setMinHeight(dp(44));
         plans.setGravity(Gravity.CENTER_VERTICAL);
@@ -448,6 +442,42 @@ public class HomeUiBinder {
         loadReading();
         updateBeginRoutineButtonText();
         return card;
+    }
+
+    private View createAssistantButton() {
+        boolean light = PerazimTheme.isLight();
+        LinearLayout button = new LinearLayout(context);
+        button.setGravity(Gravity.CENTER);
+        button.setPadding(dp(12), 0, dp(12), 0);
+        button.setFocusable(true);
+        button.setContentDescription("Open Perazim Assistant");
+        button.setAccessibilityDelegate(new View.AccessibilityDelegate() {
+            @Override public void onInitializeAccessibilityNodeInfo(View host,
+                    android.view.accessibility.AccessibilityNodeInfo info) {
+                super.onInitializeAccessibilityNodeInfo(host, info);
+                info.setClassName(Button.class.getName());
+            }
+        });
+
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(light ? Color.WHITE : 0xff191919);
+        background.setCornerRadius(dp(23));
+        background.setStroke(dp(1), light ? 0xffC8C8C8 : 0xff666666);
+        int ripple = light ? 0x16000000 : 0x28FFFFFF;
+        button.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(ripple), background, null));
+
+        ImageView logo = AssistantMark.image(context, !light);
+        LinearLayout.LayoutParams logoParams = new LinearLayout.LayoutParams(dp(34), dp(34));
+        logoParams.setMarginEnd(dp(8));
+        button.addView(logo, logoParams);
+        TextView label = GlassKit.text(context, "Perazim Assistant", 14, true, light ? Color.BLACK : Color.WHITE);
+        label.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        button.addView(label);
+        button.setOnClickListener(v -> {
+            if (listener != null) listener.onOpenAiGuide();
+        });
+        return GlassKit.keep(button);
     }
 
     /**
