@@ -46,6 +46,8 @@ public final class CommunityUiBinder {
     private final LinearLayout content;
     private final LinearLayout feed;
     private final TextView status;
+    private LinearLayout myGroups;
+    private LinearLayout featuredEvent;
     private String owner;
     private String server;
     private CommunityLocalStore store;
@@ -79,41 +81,64 @@ public final class CommunityUiBinder {
         return true;
     }
     public ScrollView bind() {
-        // Mockup board "Community (light glass)": heading, 2x2 tiles, chips, Recent activity feed.
         content.setBackground(null);
         content.setPadding(dp(16), dp(8), dp(16), dp(16));
-        LinearLayout heading = new LinearLayout(activity);
-        heading.setOrientation(LinearLayout.VERTICAL);
-        heading.setPadding(dp(4), 0, dp(4), 0);
-        heading.addView(GlassKit.text(activity, "Community", 22, true, GlassKit.text()));
-        heading.addView(GlassKit.text(activity, "Faith grows when we share life together.", 12, false, GlassKit.muted()),
-                GlassKit.matchWrap(activity, 3));
-        content.addView(GlassKit.keep(heading));
+        LinearLayout header = new LinearLayout(activity);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title = GlassKit.text(activity, "Community", 28, true, GlassKit.text());
+        title.setTypeface(Typeface.create("serif", Typeface.BOLD));
+        header.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
+        TextView inbox = GlassKit.text(activity, "Inbox", 13, true, GlassKit.accent());
+        inbox.setGravity(Gravity.CENTER);
+        inbox.setPadding(dp(10), 0, dp(10), 0);
+        inbox.setBackground(GlassKit.glassControl(activity, 14));
+        inbox.setContentDescription("Open Inbox");
+        inbox.setOnClickListener(v -> showInbox());
+        header.addView(inbox, new LinearLayout.LayoutParams(dp(64), dp(48)));
+        Button compose = button("+", () -> composePost(null, null));
+        compose.setMinWidth(0);
+        compose.setMinimumWidth(0);
+        compose.setPadding(0, 0, 0, 0);
+        compose.setContentDescription("Create a community post");
+        LinearLayout.LayoutParams composeSize = new LinearLayout.LayoutParams(dp(48), dp(48));
+        composeSize.leftMargin = dp(8);
+        header.addView(compose, composeSize);
+        content.addView(GlassKit.keep(header));
+        featuredEvent = column();
+        content.addView(featuredEvent, GlassKit.matchWrap(activity, 12));
 
-        LinearLayout grid1 = tileRow(
-                tile("Prayer wall", org.perazimchurch.app.R.drawable.gl_prayer, false, openPrayer),
-                tile("Groups", org.perazimchurch.app.R.drawable.gl_people, false, this::showGroups));
-        content.addView(grid1, GlassKit.matchWrap(activity, 18));
-        LinearLayout grid2 = tileRow(
-                tile("Messages", org.perazimchurch.app.R.drawable.gl_chat, false, this::showConversations),
-                tile("Share a post", org.perazimchurch.app.R.drawable.gl_plus, true, () -> composePost(null, null)));
-        content.addView(grid2, GlassKit.matchWrap(activity, 10));
+        LinearLayout groupsHeader = new LinearLayout(activity);
+        groupsHeader.setGravity(Gravity.CENTER_VERTICAL);
+        groupsHeader.addView(GlassKit.text(activity, "My groups", 17, true, GlassKit.text()),
+                new LinearLayout.LayoutParams(0, -2, 1));
+        TextView viewGroups = GlassKit.text(activity, "View groups ›", 13, true, GlassKit.accent());
+        viewGroups.setPadding(dp(12), dp(12), 0, dp(12));
+        viewGroups.setOnClickListener(v -> showGroups());
+        groupsHeader.addView(viewGroups);
+        content.addView(groupsHeader, GlassKit.matchWrap(activity, 14));
+        myGroups = column();
+        content.addView(myGroups, GlassKit.matchWrap(activity, 4));
 
-        content.addView(chipRow(new String[]{"Classes", "Notifications", "Bible games", "Daily challenge"},
-                new Runnable[]{this::showClasses, this::showNotifications,
-                        () -> org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(activity), this::showChallenge}),
-                GlassKit.matchWrap(activity, 12));
-        content.addView(chipRow(new String[]{"Saved drafts", "My profile", "PC connection", "Refresh"},
-                new Runnable[]{this::showDrafts, this::editProfile, this::showConnection, this::refresh}),
-                GlassKit.matchWrap(activity, 6));
+        content.addView(chipRow(new String[]{"Prayer wall", "Classes", "Bible games", "Daily challenge",
+                        "Saved drafts", "My profile", "PC connection", "Refresh"},
+                new Runnable[]{openPrayer, this::showClasses,
+                        () -> org.perazimchurch.app.presentation.ui.games.GamesHubDialog.show(activity),
+                        this::showChallenge, this::showDrafts, this::editProfile, this::showConnection, this::refresh}),
+                GlassKit.matchWrap(activity, 10));
 
-        TextView recent = GlassKit.text(activity, "Recent activity", 14, true, GlassKit.text());
-        recent.setPadding(dp(4), 0, 0, 0);
-        content.addView(recent, GlassKit.matchWrap(activity, 20));
+        LinearLayout postsHeader = new LinearLayout(activity);
+        postsHeader.setGravity(Gravity.CENTER_VERTICAL);
+        postsHeader.addView(GlassKit.text(activity, "Latest posts", 17, true, GlassKit.text()),
+                new LinearLayout.LayoutParams(0, -2, 1));
+        TextView prayerLink = GlassKit.text(activity, "Prayer wall ›", 13, true, GlassKit.accent());
+        prayerLink.setPadding(dp(12), dp(12), 0, dp(12));
+        prayerLink.setOnClickListener(v -> openPrayer.run());
+        postsHeader.addView(prayerLink);
+        content.addView(postsHeader, GlassKit.matchWrap(activity, 8));
 
         // Discussion filters as chips (was a drop-down)
-        final String[] filterLabels = {"All", "General", "Prayer", "Praise", "Events"};
-        final String[] filterKeys = {"ALL", "GENERAL", "PRAYER", "PRAISE", "EVENT"};
+        final String[] filterLabels = {"All", "Prayer", "Praise", "Discussion", "Events"};
+        final String[] filterKeys = {"ALL", "PRAYER", "PRAISE", "GENERAL", "EVENT"};
         android.widget.HorizontalScrollView hsv = new android.widget.HorizontalScrollView(activity);
         hsv.setHorizontalScrollBarEnabled(false);
         LinearLayout filters = new LinearLayout(activity);
@@ -150,6 +175,100 @@ public final class CommunityUiBinder {
         ScrollView sv = scroll(content);
         sv.setBackground(null);
         return sv;
+    }
+
+    private void refreshFeaturedEvent() {
+        featuredEvent.removeAllViews();
+        get("api/community/posts?limit=50&type=EVENT", response -> {
+            featuredEvent.removeAllViews();
+            JSONArray posts = response.optJSONArray("posts");
+            JSONObject selected = null;
+            if (posts != null) {
+                for (int i = 0; i < posts.length(); i++) {
+                    JSONObject candidate = posts.optJSONObject(i);
+                    if (candidate != null && candidate.optBoolean("is_pinned")
+                            && candidate.optLong("event_date") >= System.currentTimeMillis()) {
+                        selected = candidate;
+                        break;
+                    }
+                }
+            }
+            LinearLayout hero = new LinearLayout(activity);
+            hero.setOrientation(LinearLayout.VERTICAL);
+            hero.setPadding(dp(18), dp(18), dp(18), dp(18));
+            android.graphics.drawable.GradientDrawable fill = new android.graphics.drawable.GradientDrawable(
+                    android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                    new int[]{0xff1c1021, 0xff4b2453});
+            fill.setCornerRadius(dp(20));
+            hero.setBackground(fill);
+            if (selected == null) {
+                hero.addView(GlassKit.text(activity, "CHURCH EVENTS", 11, true, 0xffffd4a6));
+                hero.addView(GlassKit.text(activity, "No pinned events yet", 20, true, Color.WHITE),
+                        GlassKit.matchWrap(activity, 8));
+            } else {
+                JSONObject event = selected;
+                hero.addView(GlassKit.text(activity, "PINNED · CHURCH EVENT", 11, true, 0xffffd4a6));
+                TextView heading = GlassKit.text(activity, event.optString("title"), 24, true, Color.WHITE);
+                heading.setTypeface(Typeface.create("serif", Typeface.NORMAL));
+                hero.addView(heading, GlassKit.matchWrap(activity, 6));
+                hero.addView(GlassKit.text(activity, date(event.optLong("event_date"))
+                        + " · " + event.optString("event_location"), 13, false, 0xffeadbea),
+                        GlassKit.matchWrap(activity, 6));
+                TextView open = GlassKit.orangeButton(activity, "View event", 13);
+                open.setOnClickListener(v -> showPost(event, null));
+                hero.addView(open, GlassKit.matchWrap(activity, 10));
+            }
+            featuredEvent.addView(GlassKit.keep(hero));
+        }, (code, message) -> {
+            featuredEvent.removeAllViews();
+            featuredEvent.addView(text("Events are unavailable. Tap Refresh to try again.", 13));
+        });
+    }
+
+    private void refreshGroupShortcuts() {
+        myGroups.removeAllViews();
+        if (session().isGuest()) {
+            myGroups.addView(text("Sign in to see your groups.", 13));
+            return;
+        }
+        String expectedOwner = owner;
+        get("api/community/groups", result -> {
+            if (!expectedOwner.equals(owner)) return;
+            myGroups.removeAllViews();
+            JSONArray groups = result.optJSONArray("groups");
+            if (groups == null || groups.length() == 0) {
+                myGroups.addView(text("Your groups will appear here when an administrator adds you.", 13));
+                return;
+            }
+            android.widget.HorizontalScrollView scrolling = new android.widget.HorizontalScrollView(activity);
+            scrolling.setHorizontalScrollBarEnabled(false);
+            LinearLayout row = new LinearLayout(activity);
+            for (int i = 0; i < groups.length(); i++) {
+                JSONObject group = groups.optJSONObject(i);
+                if (group == null || !group.optBoolean("is_member")) continue;
+                Button shortcut = button(group.optString("name"), () -> showGroup(group));
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-2, dp(48));
+                params.rightMargin = dp(8);
+                row.addView(shortcut, params);
+            }
+            if (row.getChildCount() == 0) {
+                myGroups.addView(text("Your groups will appear here when an administrator adds you.", 13));
+            } else {
+                scrolling.addView(row);
+                myGroups.addView(scrolling);
+            }
+        }, (code, message) -> {
+            myGroups.removeAllViews();
+            myGroups.addView(text(error(code, message), 13));
+        });
+    }
+
+    private void showInbox() {
+        if (!signedIn()) return;
+        LinearLayout body = column();
+        body.addView(button("Activity", this::showNotifications));
+        body.addView(button("Messages", this::showConversations));
+        panel("Inbox", body);
     }
 
     private LinearLayout tileRow(View a, View b) {
@@ -217,6 +336,8 @@ public final class CommunityUiBinder {
 
     public void refresh() {
         if (!sameScope()) { resetScope(); feed.removeAllViews(); }
+        if (myGroups != null) refreshGroupShortcuts();
+        if (featuredEvent != null) refreshFeaturedEvent();
         String key = "feed_" + filter;
         renderPosts(feed, store.cached(key).optJSONArray("posts"), null);
         status.setText("Refreshing… Saved drafts remain on this phone until sent.");

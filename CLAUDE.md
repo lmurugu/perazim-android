@@ -12,3 +12,7 @@ verification.
 The [Assistant and exact-topic research handover](docs/internal/assistant-dictation-handover.md)
 describes the dedicated Assistant screen, Android dictation, and the offline
 exact-topic reading flow.
+
+The [Community integration handover](docs/internal/community-integration-handover.md)
+describes the combined branch, phone build, and remaining Community and
+connection work.

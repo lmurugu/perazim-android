@@ -25,4 +25,9 @@ public final class HebrewInterlinearStore {
     public static List<InterlinearWord> getVerse(@Nullable Context context, int bookNumber, int chapter, int verse) {
         return INDEX.getVerse(context, bookNumber, chapter, verse);
     }
+
+    /** Verses where one of the word's English glosses is this word, for the Bible search overview. */
+    public static List<GlossMatch> findByGloss(@Nullable Context context, String word) {
+        return INDEX.findByGloss(context, word);
+    }
 }

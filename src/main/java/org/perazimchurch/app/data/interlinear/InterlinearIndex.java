@@ -68,6 +68,51 @@ final class InterlinearIndex {
         return found;
     }
 
+    /** Every verse where one of the word's English glosses is this word, in reading order. */
+    synchronized List<GlossMatch> findByGloss(@Nullable Context context, String word) {
+        List<GlossMatch> found = new ArrayList<>();
+        if (word == null || word.trim().isEmpty()) {
+            return found;
+        }
+        if (verses == null) {
+            verses = load(context);
+        }
+        String wanted = word.trim().toLowerCase(java.util.Locale.ROOT);
+        for (Map.Entry<String, List<InterlinearWord>> entry : verses.entrySet()) {
+            String[] parts = entry.getKey().split("\\.");
+            int book = Integer.parseInt(parts[0]);
+            int chapter = Integer.parseInt(parts[1]);
+            int verse = Integer.parseInt(parts[2]);
+            for (InterlinearWord w : entry.getValue()) {
+                if (glossHas(w.getGloss(), wanted)) {
+                    found.add(new GlossMatch(book, chapter, verse, w));
+                }
+            }
+        }
+        Collections.sort(found, new java.util.Comparator<GlossMatch>() {
+            @Override
+            public int compare(GlossMatch a, GlossMatch b) {
+                if (a.bookNumber != b.bookNumber) return Integer.compare(a.bookNumber, b.bookNumber);
+                if (a.chapter != b.chapter) return Integer.compare(a.chapter, b.chapter);
+                return Integer.compare(a.verse, b.verse);
+            }
+        });
+        return found;
+    }
+
+    /** True when one word of the gloss (split on anything that is not a letter) equals the wanted word. */
+    static boolean glossHas(String gloss, String wanted) {
+        if (gloss == null || gloss.isEmpty()) {
+            return false;
+        }
+        for (String token : gloss.toLowerCase(java.util.Locale.ROOT).split("[^\\p{L}]+")) {
+            if (token.equals(wanted)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     static String key(int bookNumber, int chapter, int verse) {
         return bookNumber + "." + chapter + "." + verse;
     }
