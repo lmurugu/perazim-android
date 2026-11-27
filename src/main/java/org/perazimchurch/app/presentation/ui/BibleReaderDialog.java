@@ -536,14 +536,20 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private LinearLayout createSearchBarLayout() {
+        // Outer column: the search pill on top, the secondary actions (Notes, Topics, Close) on their own row.
+        LinearLayout outer = new LinearLayout(getContext());
+        outer.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams outerLp = new LinearLayout.LayoutParams(-1, -2);
+        outerLp.setMargins(dp(16), dp(12), dp(16), 0);
+        outer.setLayoutParams(outerLp);
+        GlassKit.keep(outer);
+
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.HORIZONTAL);
         layout.setGravity(Gravity.CENTER_VERTICAL);
         layout.setPadding(dp(16), 0, dp(6), 0);
         layout.setBackground(GlassKit.glass(getContext(), 24));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(48));
-        lp.setMargins(dp(16), dp(12), dp(16), 0);
-        layout.setLayoutParams(lp);
+        layout.setLayoutParams(new LinearLayout.LayoutParams(-1, dp(48)));
         GlassKit.keep(layout);
 
         etSearchQuery = new EditText(getContext());
@@ -583,20 +589,32 @@ public class BibleReaderDialog extends Dialog {
         lpGo.leftMargin = dp(6);
         layout.addView(go, lpGo);
 
-        TextView notesButton = GlassKit.text(getContext(), "Notes", 12, true, GlassKit.accent());
-        notesButton.setPadding(dp(10), dp(8), dp(10), dp(8));
+        outer.addView(layout);
+
+        LinearLayout actions = new LinearLayout(getContext());
+        actions.setOrientation(LinearLayout.HORIZONTAL);
+        actions.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams actionsLp = new LinearLayout.LayoutParams(-1, -2);
+        actionsLp.topMargin = dp(4);
+        outer.addView(actions, actionsLp);
+
+        TextView notesButton = GlassKit.text(getContext(), "Notes", 13, true, GlassKit.accent());
+        notesButton.setGravity(Gravity.CENTER);
+        notesButton.setPadding(dp(12), dp(8), dp(12), dp(8));
         notesButton.setClickable(true);
         notesButton.setOnClickListener(v -> showNotesDialog());
-        layout.addView(notesButton);
+        actions.addView(notesButton, new LinearLayout.LayoutParams(0, -2, 1f));
 
-        TextView topics = GlassKit.text(getContext(), "Topics", 12, true, GlassKit.accent());
-        topics.setPadding(dp(10), dp(8), dp(10), dp(8));
+        TextView topics = GlassKit.text(getContext(), "Topics", 13, true, GlassKit.accent());
+        topics.setGravity(Gravity.CENTER);
+        topics.setPadding(dp(12), dp(8), dp(12), dp(8));
         topics.setClickable(true);
         topics.setOnClickListener(v -> showTopicsCard(null));
-        layout.addView(topics);
+        actions.addView(topics, new LinearLayout.LayoutParams(0, -2, 1f));
 
-        TextView clear = GlassKit.text(getContext(), "Close", 12, true, GlassKit.muted());
-        clear.setPadding(dp(10), dp(8), dp(10), dp(8));
+        TextView clear = GlassKit.text(getContext(), "Close", 13, true, GlassKit.muted());
+        clear.setGravity(Gravity.CENTER);
+        clear.setPadding(dp(12), dp(8), dp(12), dp(8));
         clear.setClickable(true);
         clear.setOnClickListener(v -> {
             if (!TextUtils.isEmpty(etSearchQuery.getText())) {
@@ -605,8 +623,8 @@ public class BibleReaderDialog extends Dialog {
                 toggleSearchMode();
             }
         });
-        layout.addView(clear);
-        return layout;
+        actions.addView(clear, new LinearLayout.LayoutParams(0, -2, 1f));
+        return outer;
     }
 
     private LinearLayout createChapterNavBar() {

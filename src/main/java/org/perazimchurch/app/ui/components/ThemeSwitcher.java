@@ -44,12 +44,13 @@ public final class ThemeSwitcher {
         int pad = GlassKit.px(activity, 4);
         row.setPadding(pad, pad, pad, pad);
         // One frosted card holds all three choices. Light mode: translucent white glass. Dark mode: frosted purple.
+        // Solid panel: a translucent one let the text of the screen show through and looked like overlap.
         GradientDrawable panel = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
                 PerazimTheme.isLight()
-                        ? new int[]{Color.parseColor("#D9FFFFFF"), Color.parseColor("#B3FFFFFF")}
-                        : new int[]{Color.parseColor("#E6341A4F"), Color.parseColor("#D9241238")});
+                        ? new int[]{Color.parseColor("#FFFFFF"), Color.parseColor("#FFFFFF")}
+                        : new int[]{Color.parseColor("#4F1E5C"), Color.parseColor("#4F1E5C")});
         panel.setCornerRadius(GlassKit.px(activity, 18));
-        panel.setStroke(GlassKit.px(activity, 1), PerazimTheme.isLight() ? Color.parseColor("#E6FFFFFF") : Color.parseColor("#33FFFFFF"));
+        panel.setStroke(GlassKit.px(activity, 1), PerazimTheme.isLight() ? Color.parseColor("#E7D5EC") : Color.parseColor("#4A3554"));
         row.setBackground(panel);
         GlassKit.keep(row);
 
@@ -82,6 +83,7 @@ public final class ThemeSwitcher {
         PopupWindow popup = new PopupWindow(row, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, true);
         popup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         popup.setElevation(GlassKit.px(activity, 8));
+        popup.setOutsideTouchable(true);
         holder[0] = popup;
         row.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         int xOff = anchor.getWidth() - row.getMeasuredWidth();
