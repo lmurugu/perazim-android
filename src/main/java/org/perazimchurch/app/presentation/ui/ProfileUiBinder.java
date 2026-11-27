@@ -1073,7 +1073,7 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createSavedContentManagerCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_BORDER_GREY, 1);
+        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lpCard = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1151,7 +1151,7 @@ public class ProfileUiBinder {
             GradientDrawable g = new GradientDrawable();
             g.setColor(PerazimTheme.COLOR_SURFACE_2);
             g.setCornerRadius(dp(PerazimTheme.RADIUS_MD));
-            g.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+            g.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
             btn.setBackground(g);
         }
     }
@@ -1352,7 +1352,7 @@ public class ProfileUiBinder {
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(PerazimTheme.COLOR_SURFACE_2);
         bg.setCornerRadius(dp(PerazimTheme.RADIUS_SM));
-        bg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         row.setBackground(bg);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -1377,7 +1377,7 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createChurchIdentityCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_BORDER_GREY, 1);
+        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1430,9 +1430,9 @@ public class ProfileUiBinder {
         row.setPadding(dp(8), dp(8), dp(8), dp(8));
 
         GradientDrawable rowBg = new GradientDrawable();
-        rowBg.setColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        rowBg.setColor(PerazimTheme.COLOR_BG_DEEP);
         rowBg.setCornerRadius(dp(PerazimTheme.RADIUS_SM));
-        rowBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        rowBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         row.setBackground(rowBg);
 
         LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(
@@ -1502,7 +1502,7 @@ public class ProfileUiBinder {
     // =========================================================================
 
     private View createPastoralSupportCard() {
-        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_BORDER_GREY, 1);
+        LinearLayout card = createCard(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1);
         card.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -1587,15 +1587,15 @@ public class ProfileUiBinder {
                         tvBadgeFirstRoutine.setText(hasFirst ? "🌟 First Routine ✓" : "🔒 First Routine");
                         tvBadgeFirstRoutine.setTextColor(hasFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_TEXT_MUTED);
                         tvBadgeFirstRoutine.setBackground(createPillDrawable(
-                                hasFirst ? PerazimTheme.COLOR_PURPLE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
-                                hasFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_BORDER_GREY));
+                                hasFirst ? PerazimTheme.COLOR_PURPLE_GHOST : PerazimTheme.COLOR_BG_DEEP,
+                                hasFirst ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_STROKE));
                     }
                     if (tvBadgeStreak7 != null) {
                         tvBadgeStreak7.setText(hasStreak7 ? "🔥 7-Day Flame ✓" : "🔒 7-Day Flame");
                         tvBadgeStreak7.setTextColor(hasStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_TEXT_MUTED);
                         tvBadgeStreak7.setBackground(createPillDrawable(
-                                hasStreak7 ? PerazimTheme.COLOR_ORANGE_TINT : PerazimTheme.COLOR_BG_NEUTRAL,
-                                hasStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_BORDER_GREY));
+                                hasStreak7 ? PerazimTheme.COLOR_ORANGE_GHOST : PerazimTheme.COLOR_BG_DEEP,
+                                hasStreak7 ? PerazimTheme.COLOR_ACCENT_ORANGE : PerazimTheme.COLOR_STROKE));
                     }
 
                     int level = SpiritualLevel.levelFor(liveXp);
@@ -1933,9 +1933,9 @@ public class ProfileUiBinder {
         row.setPadding(dp(8), dp(8), dp(8), dp(8));
 
         GradientDrawable rowBg = new GradientDrawable();
-        rowBg.setColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        rowBg.setColor(PerazimTheme.COLOR_BG_DEEP);
         rowBg.setCornerRadius(dp(PerazimTheme.RADIUS_SM));
-        rowBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        rowBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         row.setBackground(rowBg);
 
         LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(

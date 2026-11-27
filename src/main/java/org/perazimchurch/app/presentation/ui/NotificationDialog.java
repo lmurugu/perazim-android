@@ -143,7 +143,7 @@ public class NotificationDialog extends Dialog {
         // Outer wrapper with margin & card shape
         LinearLayout card = new LinearLayout(getContext());
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setBackground(createCardBackground(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_BORDER_GREY, 1));
+        card.setBackground(createCardBackground(PerazimTheme.COLOR_BG_DEEP, PerazimTheme.RADIUS_LG, PerazimTheme.COLOR_STROKE, 1));
         card.setPadding(dp(16), dp(16), dp(16), dp(16));
 
         // 1. Header Bar: Title, Dismiss "✕"
@@ -191,7 +191,7 @@ public class NotificationDialog extends Dialog {
         btnMarkAllRead.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
         btnMarkAllRead.setTypeface(Typeface.DEFAULT_BOLD);
         btnMarkAllRead.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
-        btnMarkAllRead.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_BORDER_GREY));
+        btnMarkAllRead.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_GHOST, PerazimTheme.COLOR_STROKE));
         btnMarkAllRead.setPadding(dp(10), dp(4), dp(10), dp(4));
         btnMarkAllRead.setOnClickListener(v -> markAllAsRead());
         subHeaderBar.addView(btnMarkAllRead);
@@ -200,7 +200,7 @@ public class NotificationDialog extends Dialog {
 
         // Divider
         View divider = new View(getContext());
-        divider.setBackgroundColor(PerazimTheme.COLOR_BORDER_GREY);
+        divider.setBackgroundColor(PerazimTheme.COLOR_STROKE);
         divider.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, dp(1)));
         card.addView(divider);
 
@@ -334,8 +334,8 @@ public class NotificationDialog extends Dialog {
         card.setClickable(true);
         card.setFocusable(true);
 
-        int bgColor = isUnread ? PerazimTheme.COLOR_PURPLE_TINT : PerazimTheme.COLOR_WHITE;
-        int borderColor = isUnread ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_BORDER_GREY;
+        int bgColor = isUnread ? PerazimTheme.COLOR_PURPLE_GHOST : PerazimTheme.COLOR_WHITE;
+        int borderColor = isUnread ? PerazimTheme.COLOR_PRIMARY_PURPLE : PerazimTheme.COLOR_STROKE;
         card.setBackground(createCardBackground(bgColor, PerazimTheme.RADIUS_MD, borderColor, isUnread ? 2 : 1));
         card.setPadding(dp(12), dp(10), dp(12), dp(10));
 
@@ -412,7 +412,7 @@ public class NotificationDialog extends Dialog {
             if (!notification.isRead()) {
                 notification.setRead(true);
                 dot.setVisibility(View.GONE);
-                card.setBackground(createCardBackground(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+                card.setBackground(createCardBackground(PerazimTheme.COLOR_WHITE, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_STROKE, 1));
 
                 executor.execute(() -> {
                     try {

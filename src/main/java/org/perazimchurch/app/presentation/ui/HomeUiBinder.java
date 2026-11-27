@@ -97,16 +97,16 @@ public class HomeUiBinder {
     public static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_PURPLE_DEEP; }     // #2D0938
     public static int COLOR_PURPLE_DEEPEST() { return PerazimTheme.COLOR_OBSIDIAN; }        // #140319
     public static int COLOR_PURPLE_SHADOW() { return PerazimTheme.COLOR_PURPLE_SHADOW; }   // #450E53
-    public static int COLOR_PURPLE_TINT() { return PerazimTheme.COLOR_PURPLE_TINT; }     // #F5ECF7
+    public static int COLOR_PURPLE_TINT() { return PerazimTheme.COLOR_PURPLE_GHOST; }     // #F5ECF7
     public static int COLOR_PURPLE_SOFT() { return PerazimTheme.COLOR_PURPLE_SOFT; }     // #C896D8
-    public static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_BORDER_GREY; }     // #E7D5EC
-    public static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_NEUTRAL; }      // #FAF7FB
+    public static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_STROKE; }     // #E7D5EC
+    public static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_DEEP; }      // #FAF7FB
     public static int COLOR_WHITE() { return PerazimTheme.COLOR_WHITE; }           // #FFFFFF
     public static int COLOR_ACCENT_ORANGE() { return PerazimTheme.COLOR_ACCENT_ORANGE; }   // #E17D2F
     public static int COLOR_ORANGE_DARK() { return PerazimTheme.COLOR_ORANGE_DARK; }     // #78350A
     public static int COLOR_ORANGE_SHADOW() { return PerazimTheme.COLOR_ORANGE_SHADOW; }   // #98450B
-    public static int COLOR_ORANGE_BORDER() { return PerazimTheme.COLOR_ORANGE_BORDER; }   // #F9DFCC
-    public static int COLOR_ORANGE_TINT() { return PerazimTheme.COLOR_ORANGE_TINT; }     // #FDF5EF
+    public static int COLOR_ORANGE_BORDER() { return PerazimTheme.COLOR_ORANGE_MUTED; }   // #F9DFCC
+    public static int COLOR_ORANGE_TINT() { return PerazimTheme.COLOR_ORANGE_GHOST; }     // #FDF5EF
     public static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1225");
     public static final int COLOR_TEXT_MUTED     = Color.parseColor("#725B78");
 
