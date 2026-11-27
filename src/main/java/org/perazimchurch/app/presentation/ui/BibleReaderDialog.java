@@ -79,13 +79,13 @@ public class BibleReaderDialog extends Dialog {
     private static int COLOR_PRIMARY_PURPLE() { return PerazimTheme.COLOR_PRIMARY_PURPLE; } // #681A7D
     private static int COLOR_PURPLE_DARK() { return PerazimTheme.COLOR_PURPLE_DEEP; }     // #2D0938
     private static int COLOR_PURPLE_SHADOW() { return PerazimTheme.COLOR_PURPLE_SHADOW; }   // #450E53
-    private static int COLOR_PURPLE_TINT() { return PerazimTheme.COLOR_PURPLE_TINT; }     // #F5ECF7
+    private static int COLOR_PURPLE_TINT() { return PerazimTheme.COLOR_PURPLE_GHOST; }     // #F5ECF7
     private static int COLOR_ACCENT_ORANGE() { return PerazimTheme.COLOR_ACCENT_ORANGE; }   // #E17D2F
     private static int COLOR_ORANGE_SHADOW() { return PerazimTheme.COLOR_ORANGE_SHADOW; }   // #98450B
-    private static int COLOR_ORANGE_TINT() { return PerazimTheme.COLOR_ORANGE_TINT; }     // #FDF5EF
-    private static int COLOR_ORANGE_BORDER() { return PerazimTheme.COLOR_ORANGE_BORDER; }   // #F9DFCC
-    private static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_BORDER_GREY; }     // #E7D5EC
-    private static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_NEUTRAL; }      // #FAF7FB
+    private static int COLOR_ORANGE_TINT() { return PerazimTheme.COLOR_ORANGE_GHOST; }     // #FDF5EF
+    private static int COLOR_ORANGE_BORDER() { return PerazimTheme.COLOR_ORANGE_MUTED; }   // #F9DFCC
+    private static int COLOR_BORDER_GREY() { return PerazimTheme.COLOR_STROKE; }     // #E7D5EC
+    private static int COLOR_BG_NEUTRAL() { return PerazimTheme.COLOR_BG_DEEP; }      // #FAF7FB
     private static int COLOR_WHITE() { return PerazimTheme.COLOR_WHITE; }           // #FFFFFF
     private static int COLOR_TEXT_DARK() { return PerazimTheme.COLOR_TEXT_PRIMARY; }
     private static int COLOR_TEXT_MUTED() { return PerazimTheme.COLOR_TEXT_SECONDARY; }

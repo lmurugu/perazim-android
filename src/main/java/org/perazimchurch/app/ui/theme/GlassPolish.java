@@ -250,7 +250,7 @@ public final class GlassPolish {
 
     /** Old page canvases: the theme background, the legacy cream/lavender canvases and the deep purples. */
     private static boolean isPageColor(int c) {
-        if (c == PerazimTheme.COLOR_BG_DEEP || c == PerazimTheme.COLOR_BG_NEUTRAL) {
+        if (c == PerazimTheme.COLOR_BG_DEEP) {
             return true;
         }
         int rgb = c & 0x00FFFFFF;

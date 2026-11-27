@@ -96,7 +96,7 @@ public class OnboardingDialog extends Dialog {
         GradientDrawable cardBg = new GradientDrawable();
         cardBg.setColor(PerazimTheme.COLOR_WHITE);
         cardBg.setCornerRadius(dp(PerazimTheme.RADIUS_XL));
-        cardBg.setStroke(dp(2), PerazimTheme.COLOR_BORDER_GREY);
+        cardBg.setStroke(dp(2), PerazimTheme.COLOR_STROKE);
         card.setBackground(cardBg);
 
         // 1. HEADER BRAND BADGE
@@ -110,7 +110,7 @@ public class OnboardingDialog extends Dialog {
         tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
         tvBadge.setTypeface(Typeface.DEFAULT_BOLD);
         tvBadge.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
-        tvBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_BORDER_GREY));
+        tvBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_GHOST, PerazimTheme.COLOR_STROKE));
         tvBadge.setPadding(dp(12), dp(5), dp(12), dp(5));
         tvBadge.setGravity(Gravity.CENTER);
         headerBox.addView(tvBadge);
@@ -145,7 +145,7 @@ public class OnboardingDialog extends Dialog {
 
         // Divider
         View divider = new View(getContext());
-        divider.setBackgroundColor(PerazimTheme.COLOR_BORDER_GREY);
+        divider.setBackgroundColor(PerazimTheme.COLOR_STROKE);
         LinearLayout.LayoutParams lpDiv = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(1));
         lpDiv.setMargins(0, 0, 0, dp(16));
@@ -230,9 +230,9 @@ public class OnboardingDialog extends Dialog {
         row.setPadding(dp(10), dp(8), dp(10), dp(8));
 
         GradientDrawable rowBg = new GradientDrawable();
-        rowBg.setColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        rowBg.setColor(PerazimTheme.COLOR_BG_DEEP);
         rowBg.setCornerRadius(dp(PerazimTheme.RADIUS_SM));
-        rowBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        rowBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         row.setBackground(rowBg);
 
         LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(

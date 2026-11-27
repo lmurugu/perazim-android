@@ -161,7 +161,7 @@ public class QrConnectionDialog extends Dialog {
         GradientDrawable cardBg = new GradientDrawable();
         cardBg.setColor(PerazimTheme.COLOR_WHITE);
         cardBg.setCornerRadius(dp(PerazimTheme.RADIUS_XL));
-        cardBg.setStroke(dp(2), PerazimTheme.COLOR_BORDER_GREY);
+        cardBg.setStroke(dp(2), PerazimTheme.COLOR_STROKE);
         card.setBackground(cardBg);
 
         // 1. TOP HEADER & CLOSE BUTTON
@@ -174,7 +174,7 @@ public class QrConnectionDialog extends Dialog {
         tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
         tvBadge.setTypeface(Typeface.DEFAULT_BOLD);
         tvBadge.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
-        tvBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_BORDER_GREY));
+        tvBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_GHOST, PerazimTheme.COLOR_STROKE));
         tvBadge.setPadding(dp(10), dp(4), dp(10), dp(4));
         topHeader.addView(tvBadge);
 
@@ -186,7 +186,7 @@ public class QrConnectionDialog extends Dialog {
         btnClose.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         btnClose.setTypeface(Typeface.DEFAULT_BOLD);
         btnClose.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
-        btnClose.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.COLOR_BORDER_GREY));
+        btnClose.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_DEEP, PerazimTheme.COLOR_STROKE));
         LinearLayout.LayoutParams lpClose = new LinearLayout.LayoutParams(dp(36), dp(34));
         btnClose.setLayoutParams(lpClose);
         btnClose.setOnClickListener(v -> dismiss());
@@ -242,7 +242,7 @@ public class QrConnectionDialog extends Dialog {
         GradientDrawable qrBorder = new GradientDrawable();
         qrBorder.setColor(PerazimTheme.COLOR_WHITE);
         qrBorder.setCornerRadius(dp(PerazimTheme.RADIUS_MD));
-        qrBorder.setStroke(dp(2), PerazimTheme.COLOR_BORDER_GREY);
+        qrBorder.setStroke(dp(2), PerazimTheme.COLOR_STROKE);
         ivQrCode.setBackground(qrBorder);
         ivQrCode.setPadding(dp(8), dp(8), dp(8), dp(8));
 
@@ -266,7 +266,7 @@ public class QrConnectionDialog extends Dialog {
         btnCopyCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
         btnCopyCode.setTypeface(Typeface.DEFAULT_BOLD);
         btnCopyCode.setTextColor(PerazimTheme.COLOR_PRIMARY_PURPLE);
-        btnCopyCode.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_TINT, PerazimTheme.COLOR_BORDER_GREY));
+        btnCopyCode.setBackground(createPillDrawable(PerazimTheme.COLOR_PURPLE_GHOST, PerazimTheme.COLOR_STROKE));
         btnCopyCode.setPadding(dp(16), dp(8), dp(16), dp(8));
         btnCopyCode.setOnClickListener(v -> copyPayloadToClipboard());
 
@@ -296,7 +296,7 @@ public class QrConnectionDialog extends Dialog {
         etCode.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
         etCode.setTextColor(PerazimTheme.COLOR_TEXT_DARK);
         etCode.setSingleLine(true);
-        etCode.setBackground(createCardBackground(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        etCode.setBackground(createCardBackground(PerazimTheme.COLOR_BG_DEEP, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_STROKE, 1));
         etCode.setPadding(dp(12), dp(10), dp(12), dp(10));
         LinearLayout.LayoutParams lpEt = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -481,7 +481,7 @@ public class QrConnectionDialog extends Dialog {
         LinearLayout row = new LinearLayout(getContext());
         row.setOrientation(LinearLayout.VERTICAL);
         row.setPadding(dp(10), dp(10), dp(10), dp(10));
-        row.setBackground(createCardBackground(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        row.setBackground(createCardBackground(PerazimTheme.COLOR_BG_DEEP, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_STROKE, 1));
 
         LinearLayout.LayoutParams lpRow = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -514,7 +514,7 @@ public class QrConnectionDialog extends Dialog {
         tvBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
         tvBadge.setTypeface(Typeface.DEFAULT_BOLD);
         tvBadge.setTextColor(PerazimTheme.COLOR_ACCENT_ORANGE);
-        tvBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_ORANGE_TINT, PerazimTheme.COLOR_ORANGE_BORDER));
+        tvBadge.setBackground(createPillDrawable(PerazimTheme.COLOR_ORANGE_GHOST, PerazimTheme.COLOR_ORANGE_MUTED));
         tvBadge.setPadding(dp(6), dp(2), dp(6), dp(2));
         top.addView(tvBadge);
 
@@ -550,7 +550,7 @@ public class QrConnectionDialog extends Dialog {
         btnDecline.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_CAPTION);
         btnDecline.setTypeface(Typeface.DEFAULT_BOLD);
         btnDecline.setTextColor(PerazimTheme.COLOR_TEXT_MUTED);
-        btnDecline.setBackground(createPillDrawable(PerazimTheme.COLOR_WHITE, PerazimTheme.COLOR_BORDER_GREY));
+        btnDecline.setBackground(createPillDrawable(PerazimTheme.COLOR_WHITE, PerazimTheme.COLOR_STROKE));
         btnDecline.setPadding(dp(10), dp(4), dp(10), dp(4));
         LinearLayout.LayoutParams lpDec = new LinearLayout.LayoutParams(0, dp(34), 1.0f);
         btnDecline.setLayoutParams(lpDec);
@@ -593,7 +593,7 @@ public class QrConnectionDialog extends Dialog {
 
     private View createDivider() {
         View div = new View(getContext());
-        div.setBackgroundColor(PerazimTheme.COLOR_BORDER_GREY);
+        div.setBackgroundColor(PerazimTheme.COLOR_STROKE);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dp(1)

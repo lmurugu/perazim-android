@@ -71,13 +71,8 @@ public final class PerazimTheme {
     public static int COLOR_TEXT_DARK      = Color.parseColor("#1A1A1A");
     public static int COLOR_TEXT_MUTED     = COLOR_TEXT_SECONDARY;
     public static int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
-    public static int COLOR_PURPLE_TINT    = COLOR_PURPLE_GHOST;
-    public static int COLOR_BORDER_GREY    = COLOR_STROKE;
-    public static int COLOR_BG_NEUTRAL     = COLOR_BG_DEEP;
     public static int COLOR_ORANGE_DARK    = Color.parseColor("#78350A");
     public static int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
-    public static int COLOR_ORANGE_BORDER  = COLOR_ORANGE_MUTED;
-    public static int COLOR_ORANGE_TINT    = COLOR_ORANGE_GHOST;
     public static int COLOR_SUCCESS        = Color.parseColor("#10B981");
     public static int COLOR_ERROR          = Color.parseColor("#EF4444");
 
@@ -152,9 +147,7 @@ public final class PerazimTheme {
         COLOR_TEXT_DISABLED = Color.parseColor(light ? "#A793B0" : "#6E5C78");
         COLOR_STROKE = Color.parseColor(light ? "#33681A7D" : "#33FFFFFF");
         // Aliases that mirror the tokens above
-        COLOR_BG_NEUTRAL = COLOR_BG_DEEP;
         COLOR_TEXT_MUTED = COLOR_TEXT_SECONDARY;
-        COLOR_BORDER_GREY = COLOR_STROKE;
     }
 
     // =========================================================================

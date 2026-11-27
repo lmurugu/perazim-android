@@ -175,7 +175,7 @@ public class ChatDialog extends Dialog {
 
         if (getWindow() != null) {
             getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            getWindow().setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_NEUTRAL));
+            getWindow().setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_DEEP));
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
 
@@ -188,7 +188,7 @@ public class ChatDialog extends Dialog {
     private View buildChatLayout() {
         LinearLayout root = new LinearLayout(getContext());
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        root.setBackgroundColor(PerazimTheme.COLOR_BG_DEEP);
 
         // 1. HEADER BAR
         View headerBar = createHeaderBar();
@@ -232,7 +232,7 @@ public class ChatDialog extends Dialog {
 
         GradientDrawable headerBg = new GradientDrawable();
         headerBg.setColor(PerazimTheme.COLOR_WHITE);
-        headerBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        headerBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         header.setBackground(headerBg);
 
         // Back / Close Button
@@ -241,7 +241,7 @@ public class ChatDialog extends Dialog {
         btnClose.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         btnClose.setTypeface(Typeface.DEFAULT_BOLD);
         btnClose.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
-        btnClose.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.COLOR_BORDER_GREY));
+        btnClose.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_DEEP, PerazimTheme.COLOR_STROKE));
         LinearLayout.LayoutParams lpClose = new LinearLayout.LayoutParams(dp(36), dp(36));
         lpClose.setMargins(0, 0, dp(10), 0);
         btnClose.setLayoutParams(lpClose);
@@ -281,7 +281,7 @@ public class ChatDialog extends Dialog {
         btnOptions.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         btnOptions.setTypeface(Typeface.DEFAULT_BOLD);
         btnOptions.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
-        btnOptions.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.COLOR_BORDER_GREY));
+        btnOptions.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_DEEP, PerazimTheme.COLOR_STROKE));
         LinearLayout.LayoutParams lpOpt = new LinearLayout.LayoutParams(dp(36), dp(36));
         btnOptions.setLayoutParams(lpOpt);
         btnOptions.setOnClickListener(v -> showOptionsMenu());
@@ -298,14 +298,14 @@ public class ChatDialog extends Dialog {
 
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(PerazimTheme.COLOR_WHITE);
-        bg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        bg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         bar.setBackground(bg);
 
         etMessageInput = new EditText(getContext());
         etMessageInput.setHint("Type fellowship message...");
         etMessageInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_BODY_SM);
         etMessageInput.setTextColor(PerazimTheme.COLOR_TEXT_DARK);
-        etMessageInput.setBackground(createCardBackground(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_BORDER_GREY, 1));
+        etMessageInput.setBackground(createCardBackground(PerazimTheme.COLOR_BG_DEEP, PerazimTheme.RADIUS_MD, PerazimTheme.COLOR_STROKE, 1));
         etMessageInput.setPadding(dp(12), dp(10), dp(12), dp(10));
         etMessageInput.setSingleLine(true);
         etMessageInput.setImeOptions(EditorInfo.IME_ACTION_SEND);
@@ -492,8 +492,8 @@ public class ChatDialog extends Dialog {
 
         GradientDrawable bubbleBg = new GradientDrawable();
         if (isMe) {
-            bubbleBg.setColor(PerazimTheme.COLOR_PURPLE_TINT);
-            bubbleBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+            bubbleBg.setColor(PerazimTheme.COLOR_PURPLE_GHOST);
+            bubbleBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
             bubbleBg.setCornerRadii(new float[]{
                     dp(14), dp(14),
                     dp(14), dp(14),
@@ -502,7 +502,7 @@ public class ChatDialog extends Dialog {
             });
         } else {
             bubbleBg.setColor(PerazimTheme.COLOR_WHITE);
-            bubbleBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+            bubbleBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
             bubbleBg.setCornerRadii(new float[]{
                     dp(14), dp(14),
                     dp(14), dp(14),
