@@ -7,4 +7,7 @@ Base for this log: `main` at `51a7952`.
 
 ### 2026-11-27 12:53 UTC · up to `7973bf3b`
 - 2026-11-27 12:52 UTC · `7973bf3b` · docs(plan): master plan, build steps, and auto-appended build log
-<!-- last-logged: 7973bf3b35e698dbce67990adabc9676c8b2a152 -->
+
+### 2026-11-27 13:29 UTC · up to `81d3faa1`
+- 2026-11-27 13:29 UTC · `81d3faa1` · docs(design): reusable Perazim design prompt and folder naming
+<!-- last-logged: 81d3faa1a593fc613055aebf1c92c7fbcd68a620 -->
