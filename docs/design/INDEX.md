@@ -156,3 +156,72 @@
 | (project folder) design/02-screens/28-local-bible-audio/28-local-bible-audio_REF_light_v01.png | 28-local-bible-audio Bible audio | light | v01 | under review |
 | 02-screens/28-local-bible-audio/28-local-bible-audio_WIRE_v01.png | 28-local-bible-audio Bible audio | greyscale | v01 | under review |
 <!-- screens:end -->
+
+## Upscaled x2 copies (03-upscaled)
+
+Each is a 2x copy of its REF frame (2160 by 4680 px), re-rendered from the same HTML. Rendered by tools/render-upscaled.js. Contact sheets are overviews, not design files.
+
+<!-- upscaled:start -->
+| File | Screen | Mode | Version | Status |
+|---|---|---|---|---|
+| (project folder) design/03-upscaled/00-overview_CONTACT_dark_v01.png | Overview contact sheet | dark | v01 | under review |
+| (project folder) design/03-upscaled/00-overview_CONTACT_light_v01.png | Overview contact sheet | light | v01 | under review |
+| (project folder) design/03-upscaled/01-home_REF_dark_x2_v01.png | 01-home Home | dark | v01 | under review |
+| (project folder) design/03-upscaled/01-home_REF_light_x2_v01.png | 01-home Home | light | v01 | under review |
+| (project folder) design/03-upscaled/02-bible-reader_REF_dark_x2_v01.png | 02-bible-reader Bible reader | dark | v01 | under review |
+| (project folder) design/03-upscaled/02-bible-reader_REF_light_x2_v01.png | 02-bible-reader Bible reader | light | v01 | under review |
+| (project folder) design/03-upscaled/03-bible-search_REF_dark_x2_v01.png | 03-bible-search Bible search | dark | v01 | under review |
+| (project folder) design/03-upscaled/03-bible-search_REF_light_x2_v01.png | 03-bible-search Bible search | light | v01 | under review |
+| (project folder) design/03-upscaled/04-sermons_REF_dark_x2_v01.png | 04-sermons Sermons | dark | v01 | under review |
+| (project folder) design/03-upscaled/04-sermons_REF_light_x2_v01.png | 04-sermons Sermons | light | v01 | under review |
+| (project folder) design/03-upscaled/05-sermon-player_REF_dark_x2_v01.png | 05-sermon-player Now playing | dark | v01 | under review |
+| (project folder) design/03-upscaled/05-sermon-player_REF_light_x2_v01.png | 05-sermon-player Now playing | light | v01 | under review |
+| (project folder) design/03-upscaled/06-worship_REF_dark_x2_v01.png | 06-worship Worship | dark | v01 | under review |
+| (project folder) design/03-upscaled/06-worship_REF_light_x2_v01.png | 06-worship Worship | light | v01 | under review |
+| (project folder) design/03-upscaled/07-fellowship_REF_dark_x2_v01.png | 07-fellowship Community feed | dark | v01 | under review |
+| (project folder) design/03-upscaled/07-fellowship_REF_light_x2_v01.png | 07-fellowship Community feed | light | v01 | under review |
+| (project folder) design/03-upscaled/08-prayer_REF_dark_x2_v01.png | 08-prayer Prayer wall | dark | v01 | under review |
+| (project folder) design/03-upscaled/08-prayer_REF_light_x2_v01.png | 08-prayer Prayer wall | light | v01 | under review |
+| (project folder) design/03-upscaled/09-groups_REF_dark_x2_v01.png | 09-groups Groups | dark | v01 | under review |
+| (project folder) design/03-upscaled/09-groups_REF_light_x2_v01.png | 09-groups Groups | light | v01 | under review |
+| (project folder) design/03-upscaled/10-give_REF_dark_x2_v01.png | 10-give Give | dark | v01 | under review |
+| (project folder) design/03-upscaled/10-give_REF_light_x2_v01.png | 10-give Give | light | v01 | under review |
+| (project folder) design/03-upscaled/11-me_REF_dark_x2_v01.png | 11-me Me | dark | v01 | under review |
+| (project folder) design/03-upscaled/11-me_REF_light_x2_v01.png | 11-me Me | light | v01 | under review |
+| (project folder) design/03-upscaled/12-auth_REF_dark_x2_v01.png | 12-auth Sign in | dark | v01 | under review |
+| (project folder) design/03-upscaled/12-auth_REF_light_x2_v01.png | 12-auth Sign in | light | v01 | under review |
+| (project folder) design/03-upscaled/13-onboarding_REF_dark_x2_v01.png | 13-onboarding Welcome | dark | v01 | under review |
+| (project folder) design/03-upscaled/13-onboarding_REF_light_x2_v01.png | 13-onboarding Welcome | light | v01 | under review |
+| (project folder) design/03-upscaled/14-privacy-notice_REF_dark_x2_v01.png | 14-privacy-notice Privacy notice | dark | v01 | under review |
+| (project folder) design/03-upscaled/14-privacy-notice_REF_light_x2_v01.png | 14-privacy-notice Privacy notice | light | v01 | under review |
+| (project folder) design/03-upscaled/15-membership_REF_dark_x2_v01.png | 15-membership Membership | dark | v01 | under review |
+| (project folder) design/03-upscaled/15-membership_REF_light_x2_v01.png | 15-membership Membership | light | v01 | under review |
+| (project folder) design/03-upscaled/16-pin-upgrade_REF_dark_x2_v01.png | 16-pin-upgrade PIN upgrade | dark | v01 | under review |
+| (project folder) design/03-upscaled/16-pin-upgrade_REF_light_x2_v01.png | 16-pin-upgrade PIN upgrade | light | v01 | under review |
+| (project folder) design/03-upscaled/17-assistant-chat_REF_dark_x2_v01.png | 17-assistant-chat Perazim Assistant | dark | v01 | under review |
+| (project folder) design/03-upscaled/17-assistant-chat_REF_light_x2_v01.png | 17-assistant-chat Perazim Assistant | light | v01 | under review |
+| (project folder) design/03-upscaled/18-assistant-memory_REF_dark_x2_v01.png | 18-assistant-memory What the guide remembers | dark | v01 | under review |
+| (project folder) design/03-upscaled/18-assistant-memory_REF_light_x2_v01.png | 18-assistant-memory What the guide remembers | light | v01 | under review |
+| (project folder) design/03-upscaled/19-games-hub_REF_dark_x2_v01.png | 19-games-hub Bible games | dark | v01 | under review |
+| (project folder) design/03-upscaled/19-games-hub_REF_light_x2_v01.png | 19-games-hub Bible games | light | v01 | under review |
+| (project folder) design/03-upscaled/20-game-vine-words_REF_dark_x2_v01.png | 20-game-vine-words Vine Words | dark | v01 | under review |
+| (project folder) design/03-upscaled/20-game-vine-words_REF_light_x2_v01.png | 20-game-vine-words Vine Words | light | v01 | under review |
+| (project folder) design/03-upscaled/21-game-lamp-slide_REF_dark_x2_v01.png | 21-game-lamp-slide Lamp Slide | dark | v01 | under review |
+| (project folder) design/03-upscaled/21-game-lamp-slide_REF_light_x2_v01.png | 21-game-lamp-slide Lamp Slide | light | v01 | under review |
+| (project folder) design/03-upscaled/22-game-ladder_REF_dark_x2_v01.png | 22-game-ladder Ladder of Faith | dark | v01 | under review |
+| (project folder) design/03-upscaled/22-game-ladder_REF_light_x2_v01.png | 22-game-ladder Ladder of Faith | light | v01 | under review |
+| (project folder) design/03-upscaled/23-game-fill-gap_REF_dark_x2_v01.png | 23-game-fill-gap Fill the Gap | dark | v01 | under review |
+| (project folder) design/03-upscaled/23-game-fill-gap_REF_light_x2_v01.png | 23-game-fill-gap Fill the Gap | light | v01 | under review |
+| (project folder) design/03-upscaled/24-daily-reading_REF_dark_x2_v01.png | 24-daily-reading Daily reading | dark | v01 | under review |
+| (project folder) design/03-upscaled/24-daily-reading_REF_light_x2_v01.png | 24-daily-reading Daily reading | light | v01 | under review |
+| (project folder) design/03-upscaled/25-notifications_REF_dark_x2_v01.png | 25-notifications Notifications | dark | v01 | under review |
+| (project folder) design/03-upscaled/25-notifications_REF_light_x2_v01.png | 25-notifications Notifications | light | v01 | under review |
+| (project folder) design/03-upscaled/26-qr-connection_REF_dark_x2_v01.png | 26-qr-connection Connection code | dark | v01 | under review |
+| (project folder) design/03-upscaled/26-qr-connection_REF_light_x2_v01.png | 26-qr-connection Connection code | light | v01 | under review |
+| (project folder) design/03-upscaled/27-reflections_REF_dark_x2_v01.png | 27-reflections Reflections | dark | v01 | under review |
+| (project folder) design/03-upscaled/27-reflections_REF_light_x2_v01.png | 27-reflections Reflections | light | v01 | under review |
+| (project folder) design/03-upscaled/28-local-bible-audio_REF_dark_x2_v01.png | 28-local-bible-audio Bible audio | dark | v01 | under review |
+| (project folder) design/03-upscaled/28-local-bible-audio_REF_light_x2_v01.png | 28-local-bible-audio Bible audio | light | v01 | under review |
+| (project folder) design/03-upscaled/DS-01_design-system-reference_dark_x2_v01.png | DS-01 Design system | dark | v01 | under review |
+| (project folder) design/03-upscaled/DS-01_design-system-reference_light_x2_v01.png | DS-01 Design system | light | v01 | under review |
+<!-- upscaled:end -->
