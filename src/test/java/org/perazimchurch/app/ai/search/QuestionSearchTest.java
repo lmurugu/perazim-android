@@ -94,6 +94,26 @@ public class QuestionSearchTest {
     }
 
     @Test
+    public void questionWithOneContentWordStillFindsTheVerses() {
+        // "Where is Cain mentioned in the bible" has one content word, so the words typed decide the fallback.
+        List<String> refs = refs(QuestionSearch.rank("where is Cain mentioned in the bible", corpusLookup()));
+        assertTrue(refs.isEmpty());
+        List<String> cain = refs(QuestionSearch.rank("Cain", cainLookup()));
+        assertEquals("1:4:9", cain.get(0));
+    }
+
+    private static QuestionSearch.Lookup cainLookup() {
+        return phrase -> {
+            List<QuestionSearch.Hit> hits = new ArrayList<>();
+            String text = "And the LORD said unto Cain, Where is Abel thy brother? And he said, I know not: Am I my brother's keeper?";
+            if (text.toLowerCase().contains(phrase.toLowerCase())) {
+                hits.add(new QuestionSearch.Hit(1, 4, 9, text));
+            }
+            return hits;
+        };
+    }
+
+    @Test
     public void emptyQuestionGivesNothing() {
         assertTrue(QuestionSearch.rank("   ", corpusLookup()).isEmpty());
         assertTrue(QuestionSearch.rank("the of is", corpusLookup()).isEmpty());

@@ -179,7 +179,8 @@ public class RoomBibleRepository implements BibleRepository {
             entities = reader.search(resolvedTranslation, cleanQuery.replace(" ", "-").trim());
         }
         // A question or a phrase of several words rarely appears whole in the Bible, so its words are ranked instead.
-        if ((entities == null || entities.isEmpty()) && SearchTerms.of(cleanQuery).size() >= 2) {
+        // "Where is Cain mentioned" has one content word, so the test is on the number of words typed, not content words.
+        if ((entities == null || entities.isEmpty()) && cleanQuery.split("\\s+").length >= 2) {
             entities = rankedQuestionMatches(resolvedTranslation, cleanQuery);
         }
 
