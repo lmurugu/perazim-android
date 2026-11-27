@@ -13,7 +13,9 @@ beyond the current task or override project safeguards.
 
 1. Read this project's `AGENTS.md`, latest approved master project memory,
    `docs/PERAZIM_AI_PROJECT/` roadmap/specifications, latest completion report,
-   and open dependencies.
+   and open dependencies. For Bible-related AI, retrieval or corpus work, also
+   read `17_HERMENEUTICS_LIBRARY_SPECIFICATION.md` and the full
+   `hermeneutics-library/` acquisition catalogue, protocol and runbook.
 2. Inspect the working tree before editing. Preserve pre-existing and unrelated
    user changes. Reconcile historical reports with current source and test
    evidence; a previous report is not proof that current source still passes.
@@ -41,6 +43,12 @@ beyond the current task or override project safeguards.
    Exercise server-to-device flows where feasible.
 4. **Grounding and inference:** Ensure retrieval uses only installed, verified,
    eligible local evidence and citations identify passages actually retrieved.
+   For biblical questions, enforce the Hermeneutical Protocol: retain the
+   passage context; distinguish text, translation, linguistic annotation,
+   historical evidence and commentary; reject root/Strong's-number fallacies;
+   and require source provenance for historical and grammatical claims. Use
+   the hermeneutics resource catalogue only as a candidate register until
+   exact file/component licensing, integrity and quality checks pass.
    Run actual Qwen inference with the device disconnected from the internet.
    Investigate prior crashes or process kills; unknown causes remain unresolved
    and cannot be marked passed.
