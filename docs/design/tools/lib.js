@@ -298,7 +298,7 @@ function page(s, mode, o = {}) {
   if (chrome === 'tab' || (chrome === 'full' && !s.head)) head = topbar();
   else if (chrome === 'dialog' || chrome === 'full' || chrome === 'game') head = dhead(s.head || { title: s.name, icon: chrome === 'dialog' ? 'close' : 'back' });
   let tabs = chrome === 'tab' ? tabbar(s.tab) : '';
-  const bodyHtml = s.body(mode);
+  const bodyHtml = s.body(mode).replace(/__LOGO__/g, LOGO_SRC);
   const canvas = s.canvas && s.canvas[mode] ? ` style="--canvas:${s.canvas[mode]}"` : '';
   const statesJson = mock ? JSON.stringify(s.states || {}).replace(/<\/script/gi, '<\\/script') : '{}';
   const title = `${s.id} · ${mock ? 'MOCK' : wire ? 'WIRE' : 'REF'} · ${wire ? 'greyscale' : mode} · v01`;
