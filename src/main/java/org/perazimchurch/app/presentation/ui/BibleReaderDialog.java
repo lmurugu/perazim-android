@@ -1119,9 +1119,15 @@ public class BibleReaderDialog extends Dialog {
     }
 
     private String lastQuery = "";
+    /** AI overview for lastQuery, set once it is built; null while building or when there is none. */
+    private org.perazimchurch.app.ai.search.SearchOverview searchOverview;
+    /** True once the results for lastQuery are on screen, so the overview is only ever added after them. */
+    private boolean searchResultsReady;
 
     private void performSearch(String query) {
         lastQuery = query;
+        searchOverview = null;
+        searchResultsReady = false;
         freshRender = true;
         if (TextUtils.isEmpty(query)) {
             Toast.makeText(getContext(), "Please enter a keyword to search", Toast.LENGTH_SHORT).show();
@@ -1144,6 +1150,7 @@ public class BibleReaderDialog extends Dialog {
         bibleViewModel.searchScripture(currentTranslation, query, results -> {
             loadingProgress.setVisibility(View.GONE);
             searchResults.clear();
+            searchResultsReady = true;
             if (results != null && !results.isEmpty()) {
                 searchResults.addAll(results);
                 renderVerseList(searchResults, true);
@@ -1152,6 +1159,100 @@ public class BibleReaderDialog extends Dialog {
                 tvEmptyState.setVisibility(View.VISIBLE);
             }
         });
+
+        // The overview is built after the results on the same background thread, and is added above them.
+        final String askedFor = query;
+        bibleViewModel.buildSearchOverview(getContext(), query, overview -> {
+            if (!askedFor.equals(lastQuery) || !isSearchMode || !searchResultsReady || overview == null) {
+                return;
+            }
+            searchOverview = overview;
+            renderVerseList(searchResults, true);
+        });
+    }
+
+    /**
+     * The AI overview: root meanings from the Hebrew or Greek behind the search words, then the verses it cites. Each
+     * cited verse opens the reader at that verse.
+     */
+    private View createSearchOverviewCard(org.perazimchurch.app.ai.search.SearchOverview overview) {
+        LinearLayout card = new LinearLayout(getContext());
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(14), dp(12), dp(14), dp(12));
+        GradientDrawable frame = new GradientDrawable();
+        frame.setCornerRadius(dp(14));
+        frame.setStroke(dp(1), GlassKit.accent());
+        card.setBackground(frame);
+        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        cardParams.bottomMargin = dp(12);
+        card.setLayoutParams(cardParams);
+
+        TextView title = GlassKit.text(getContext(), "AI OVERVIEW", 11, true, GlassKit.accent());
+        title.setLetterSpacing(0.06f);
+        card.addView(title);
+
+        for (org.perazimchurch.app.ai.search.SearchOverview.RootNote root : overview.roots) {
+            StringBuilder line = new StringBuilder("\u201C").append(root.term).append("\u201D: ");
+            if (!root.original.isEmpty()) {
+                line.append(root.original).append(' ');
+            }
+            if (!root.transliteration.isEmpty()) {
+                line.append('(').append(root.transliteration).append(") ");
+            }
+            line.append("\u2014 ").append(root.meaning.isEmpty() ? "" : root.meaning + " ")
+                    .append('[').append(root.strongsCode).append(']');
+            if (!root.alsoIn.isEmpty()) {
+                // The same Greek or Hebrew word elsewhere, so a verse whose KJV wording differs still links to its root.
+                line.append(". Also used in ");
+                for (int i = 0; i < root.alsoIn.size(); i++) {
+                    org.perazimchurch.app.ai.search.SearchOverview.VerseRef ref = root.alsoIn.get(i);
+                    BibleBook book = bookMap.get(BibleMapper.getBookIdFromNumber(ref.bookNumber));
+                    String name = book != null ? book.getName() : BibleMapper.getBookIdFromNumber(ref.bookNumber);
+                    if (i > 0) {
+                        line.append("; ");
+                    }
+                    line.append(name).append(' ').append(ref.chapter).append(':').append(ref.verse);
+                }
+                line.append('.');
+            }
+            TextView rootView = GlassKit.text(getContext(), line.toString(), 14, false, GlassKit.text());
+            rootView.setPadding(0, dp(8), 0, 0);
+            card.addView(rootView);
+        }
+
+        String summary = overview.totalVerses > overview.verses.size()
+                ? "Showing " + overview.verses.size() + " of " + overview.totalVerses + " verses:"
+                : "Found in " + overview.totalVerses + (overview.totalVerses == 1 ? " verse:" : " verses:");
+        TextView summaryView = GlassKit.text(getContext(), summary, 12, true, GlassKit.text());
+        summaryView.setPadding(0, dp(10), 0, 0);
+        card.addView(summaryView);
+
+        for (final org.perazimchurch.app.ai.search.SearchOverview.VerseRef ref : overview.verses) {
+            BibleBook book = bookMap.get(BibleMapper.getBookIdFromNumber(ref.bookNumber));
+            String bookName = book != null ? book.getName() : BibleMapper.getBookIdFromNumber(ref.bookNumber);
+            String citation = bookName + " " + ref.chapter + ":" + ref.verse;
+            android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder(citation);
+            sb.setSpan(new android.text.style.ForegroundColorSpan(GlassKit.accent()), 0, citation.length(),
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new android.text.style.StyleSpan(Typeface.BOLD), 0, citation.length(),
+                    android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.append("  ").append(ref.kjvText);
+            TextView verseLink = new TextView(getContext());
+            verseLink.setText(sb);
+            verseLink.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            verseLink.setTextColor(GlassKit.text());
+            verseLink.setPadding(0, dp(6), 0, 0);
+            verseLink.setOnClickListener(v -> openSearchVerse(ref.bookNumber, ref.chapter, ref.verse));
+            card.addView(verseLink);
+        }
+        return card;
+    }
+
+    /** Opens the reader at one verse, for a verse tapped in the search results or the AI overview. */
+    private void openSearchVerse(int bookNumber, int chapter, int verse) {
+        pendingScrollVerse = verse;
+        loadChapterVerses(BibleMapper.getBookIdFromNumber(bookNumber), chapter);
     }
 
     private void navigateChapter(int delta) {
@@ -1215,6 +1316,9 @@ public class BibleReaderDialog extends Dialog {
         freshRender = false;
         final int keepScrollY = versesScrollView != null ? versesScrollView.getScrollY() : 0;
         clearVerseViews();
+        if (isSearchResult && searchOverview != null && !searchOverview.isEmpty()) {
+            versesContainer.addView(createSearchOverviewCard(searchOverview));
+        }
         if (isSearchResult) {
             TextView searchSummary = GlassKit.text(getContext(), "Found " + verses.size() + " verses", 11, true, GlassKit.accent());
             searchSummary.setLetterSpacing(0.06f);
@@ -1263,6 +1367,10 @@ public class BibleReaderDialog extends Dialog {
         boolean isCornerstone = "2SA".equals(verse.getBookId()) && verse.getChapterNumber() == 5 && verse.getVerseNumber() == 20;
         styleVerseRow(row, verse, isSearchResult);
         GlassKit.keep(row);
+        if (isSearchResult) {
+            row.setOnClickListener(v -> openSearchVerse(BibleMapper.resolveBookNumber(verse.getBookId()),
+                    verse.getChapterNumber(), verse.getVerseNumber()));
+        }
 
         String label = isSearchResult ? formatCitation(verse) : String.valueOf(verse.getVerseNumber());
         android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder();

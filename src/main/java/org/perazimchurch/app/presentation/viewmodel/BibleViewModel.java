@@ -1,5 +1,6 @@
 package org.perazimchurch.app.presentation.viewmodel;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -10,6 +11,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import org.perazimchurch.app.ai.search.SearchOverview;
+import org.perazimchurch.app.ai.search.SearchOverviewBuilder;
+import org.perazimchurch.app.data.search.BibleOverviewSources;
 import org.perazimchurch.app.domain.model.BibleBook;
 import org.perazimchurch.app.domain.model.BibleTranslation;
 import org.perazimchurch.app.domain.model.BibleNote;
@@ -116,6 +120,26 @@ public class BibleViewModel extends ViewModel {
                 if (callback != null) {
                     postCallback(() -> callback.accept(Collections.emptyList()));
                 }
+            }
+        });
+    }
+
+    /**
+     * Builds the AI overview for a Bible search (root meanings and cited verses) off the UI thread. The callback runs
+     * on the main thread; it is not called when the overview cannot be built.
+     */
+    public void buildSearchOverview(@NonNull Context context, @NonNull String query,
+                                    @Nullable Consumer<SearchOverview> callback) {
+        final Context appContext = context.getApplicationContext() != null ? context.getApplicationContext() : context;
+        executor.execute(() -> {
+            try {
+                SearchOverview overview = new SearchOverviewBuilder(
+                        new BibleOverviewSources(appContext, bibleRepo)).build(query);
+                if (callback != null) {
+                    postCallback(() -> callback.accept(overview));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Search overview skipped", e);
             }
         });
     }
