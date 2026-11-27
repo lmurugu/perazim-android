@@ -88,7 +88,7 @@ final class GuideFeedbackRow {
         t.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
         t.setTextColor(GlassKit.accent());
         t.setPadding(dp(activity, 12), dp(activity, 6), dp(activity, 12), dp(activity, 6));
-        t.setBackground(GlassKit.glass(activity, 14));
+        t.setBackground(GlassKit.glass(activity, 14, GlassKit.LEGACY_LIGHT_RIM));
         t.setClickable(true);
         t.setFocusable(true);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
