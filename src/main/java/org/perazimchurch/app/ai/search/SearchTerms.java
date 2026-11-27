@@ -27,7 +27,9 @@ public final class SearchTerms {
             "they", "this", "those", "through", "to", "too", "under", "until", "up", "upon", "us", "very", "was",
             "were", "what", "when", "where", "which", "while", "who", "whom", "why", "will", "with", "within",
             "would", "you", "your", "bible", "verse", "verses", "find", "look", "where's", "whats", "whose", "shall",
-            "thee", "thou", "thy", "yea", "unto", "wherein", "therein", "whereof"));
+            "thee", "thou", "thy", "yea", "unto", "wherein", "therein", "whereof", "written", "wrote", "write", "mention",
+            "mentioned", "happened", "happen", "happens", "did", "does", "doing", "said", "telling", "concerning",
+            "regarding", "actually", "exactly", "quote", "quoted", "phrase", "book", "chapter"));
 
     private SearchTerms() {
     }

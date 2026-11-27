@@ -1,5 +1,7 @@
 package org.perazimchurch.app.data.repository;
 
+import org.perazimchurch.app.ai.search.QuestionSearch;
+import org.perazimchurch.app.ai.search.SearchTerms;
 import org.perazimchurch.app.data.local.PerazimDatabase;
 import org.perazimchurch.app.data.local.dao.BibleDao;
 import org.perazimchurch.app.data.local.entity.BibleBookEntity;
@@ -176,6 +178,10 @@ public class RoomBibleRepository implements BibleRepository {
         } else if ((entities == null || entities.isEmpty()) && cleanQuery.contains(" ")) {
             entities = reader.search(resolvedTranslation, cleanQuery.replace(" ", "-").trim());
         }
+        // A question or a phrase of several words rarely appears whole in the Bible, so its words are ranked instead.
+        if ((entities == null || entities.isEmpty()) && SearchTerms.of(cleanQuery).size() >= 2) {
+            entities = rankedQuestionMatches(resolvedTranslation, cleanQuery);
+        }
 
         if (entities != null) {
             for (BibleVerseEntity found : entities) {
@@ -183,6 +189,37 @@ public class RoomBibleRepository implements BibleRepository {
             }
         }
         return BibleMapper.toDomainVerseList(entities, resolvedTranslation);
+    }
+
+    /**
+     * Verses for a question, ranked by how many of its content words (and their synonyms) each verse contains. The
+     * same ranking runs for every question; see {@link QuestionSearch}.
+     */
+    private List<BibleVerseEntity> rankedQuestionMatches(String translationId, String query) {
+        final Map<Long, BibleVerseEntity> byKey = new HashMap<>();
+        QuestionSearch.Lookup lookup = phrase -> {
+            List<QuestionSearch.Hit> hits = new ArrayList<>();
+            List<BibleVerseEntity> rows = reader.searchWide(translationId, phrase);
+            if (rows == null) {
+                return hits;
+            }
+            for (BibleVerseEntity row : rows) {
+                if (row == null || row.getText() == null) {
+                    continue;
+                }
+                byKey.putIfAbsent(QuestionSearch.key(row.getBookNumber(), row.getChapterNumber(), row.getVerseNumber()), row);
+                hits.add(new QuestionSearch.Hit(row.getBookNumber(), row.getChapterNumber(), row.getVerseNumber(), row.getText()));
+            }
+            return hits;
+        };
+        List<BibleVerseEntity> ordered = new ArrayList<>();
+        for (QuestionSearch.Ranked ranked : QuestionSearch.rank(query, lookup)) {
+            BibleVerseEntity row = byKey.get(QuestionSearch.key(ranked.bookNumber, ranked.chapter, ranked.verse));
+            if (row != null) {
+                ordered.add(row);
+            }
+        }
+        return ordered;
     }
 
     @Override

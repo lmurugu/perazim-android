@@ -115,6 +115,14 @@ public final class BibleVerseReader {
         return mainDao.searchVerses(translationId, query);
     }
 
+    /** Every verse containing the phrase, up to 2000, for question ranking. */
+    public List<BibleVerseEntity> searchWide(String translationId, String query) {
+        if (useText(translationId)) {
+            return toEntities(textDao.searchWide(translationId, query));
+        }
+        return mainDao.searchVersesWide(translationId, query);
+    }
+
     public List<BibleVerseEntity> searchTerms(String translationId, String first, String second) {
         if (useText(translationId)) {
             return toEntities(textDao.searchTerms(translationId, first, second));
