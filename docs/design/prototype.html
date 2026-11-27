@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Perazim Clickable Prototype</title>
+<style>
+:root{--bg:#F4F1F7;--panel:#FFFFFF;--fg:#22142A;--muted:#6B5C75;--line:#DCD2E4;--accent:#681A7D;--accent-fg:#FFFFFF;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#140A1A;--panel:#211229;--fg:#F3ECF7;--muted:#B3A2BD;--line:#3A2A44;--accent:#C58AD6;--accent-fg:#140A1A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#140A1A;--panel:#211229;--fg:#F3ECF7;--muted:#B3A2BD;--line:#3A2A44;--accent:#C58AD6;--accent-fg:#140A1A;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 Roboto,"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+header{padding:20px 0 8px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:baseline;justify-content:space-between}
+h1{font-size:20px;margin:0;font-weight:700}
+.note{color:var(--muted);font-size:12px;margin:0}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 0 16px}
+button{font:inherit;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:8px 14px;min-height:40px;cursor:pointer}
+button[aria-pressed="true"],button.on{background:var(--accent);color:var(--accent-fg);border-color:transparent}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.layout{display:grid;grid-template-columns:minmax(0,300px) minmax(0,400px);gap:20px;justify-content:center;align-items:start}
+@media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr);justify-items:center}}
+.flows{display:flex;flex-direction:column;gap:14px;min-width:0;width:100%}
+.flow{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.flow h2{font-size:13px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.steps{display:flex;flex-wrap:wrap;gap:6px}
+.steps button{min-height:34px;padding:6px 10px;font-size:12px}
+.phone{width:100%;max-width:360px;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:0}
+.frame{width:360px;max-width:100%;height:780px;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:var(--panel)}
+.frame iframe{width:360px;max-width:100%;height:780px;border:0;display:block}
+.nav{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.now{font-size:13px;color:var(--muted);text-align:center}
+.now strong{color:var(--fg)}
+.status{font-size:12px;color:var(--muted);max-width:720px;padding:14px 0 28px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Perazim clickable prototype</h1>
+    <p class="note">v01, draft for Levi's review. Not approved. Tabs and links inside the phone move between screens.</p>
+  </div>
+  <div class="toolbar" role="group" aria-label="Mode">
+    <button type="button" id="m-dark" aria-pressed="true">Dark</button>
+    <button type="button" id="m-light" aria-pressed="false">Light</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="flows" aria-label="User flows"></nav>
+
+  <section class="phone" aria-label="Phone preview">
+    <div class="frame"><iframe id="screen" title="Current screen" src="02-screens/01-home/01-home_MOCK_dark_v01.html"></iframe></div>
+    <div class="nav">
+      <button type="button" id="prev">Previous</button>
+      <span class="now" id="now"></span>
+      <button type="button" id="next">Next</button>
+    </div>
+  </section>
+</div>
+
+<p class="status">Each screen is a self-contained mock-up with a state switch (default, loading, empty, error, offline, signed out) in its own top bar. The screen data is in the design folder's tools directory. Flows follow section 6 of the master plan.</p>
+
+<script>
+(function(){
+  var SCREENS=[
+    ['01-home','Home'],['02-bible-reader','Bible reader'],['03-bible-search','Bible search'],['04-sermons','Sermons'],
+    ['05-sermon-player','Now playing'],['06-worship','Worship'],['07-fellowship','Community feed'],['08-prayer','Prayer wall'],
+    ['09-groups','Groups'],['10-give','Give'],['11-me','Me'],['12-auth','Sign in'],['13-onboarding','Welcome'],
+    ['14-privacy-notice','Privacy notice'],['15-membership','Membership'],['16-pin-upgrade','PIN upgrade'],
+    ['17-assistant-chat','Perazim Assistant'],['18-assistant-memory','What the guide remembers'],['19-games-hub','Bible games'],
+    ['20-game-vine-words','Vine Words'],['21-game-lamp-slide','Lamp Slide'],['22-game-ladder','Ladder of Faith'],
+    ['23-game-fill-gap','Fill the Gap'],['24-daily-reading','Daily reading'],['25-notifications','Notifications'],
+    ['26-qr-connection','Connection code'],['27-reflections','Reflections'],['28-local-bible-audio','Bible audio']
+  ];
+  var NAME={}; SCREENS.forEach(function(s){NAME[s[0]]=s[1];});
+  var FLOWS=[
+    ['Plan 6.1 · First run and sign-in',['13-onboarding','01-home','12-auth','14-privacy-notice','11-me']],
+    ['Plan 6.2 · Daily routine',['01-home','02-bible-reader','24-daily-reading','27-reflections','08-prayer']],
+    ['Plan 6.3 · Asking the Assistant',['01-home','17-assistant-chat','18-assistant-memory']],
+    ['Plan 6.4 · Community post and privacy',['07-fellowship','09-groups','08-prayer','25-notifications']],
+    ['Plan 6.5 · Giving',['10-give','26-qr-connection']],
+    ['Sermons and worship',['04-sermons','05-sermon-player','06-worship','28-local-bible-audio','03-bible-search']],
+    ['Bible games (plan 4.9)',['19-games-hub','20-game-vine-words','21-game-lamp-slide','22-game-ladder','23-game-fill-gap']],
+    ['Other screens',['15-membership','16-pin-upgrade']]
+  ];
+  var mode='dark', cur='01-home', flowIdx=-1, stepIdx=0;
+  var frame=document.getElementById('screen'), now=document.getElementById('now');
+  function file(id){return '02-screens/'+id+'/'+id+'_MOCK_'+mode+'_v01.html';}
+  function go(id){
+    cur=id; frame.src=file(id);
+    now.innerHTML='<strong>'+NAME[id]+'</strong><br>'+id+' · '+mode;
+    document.querySelectorAll('[data-scr]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-scr')===id);});
+    try{history.replaceState(null,'','#'+id);}catch(e){}
+  }
+  function setMode(m){
+    mode=m;
+    document.getElementById('m-dark').setAttribute('aria-pressed',m==='dark');
+    document.getElementById('m-light').setAttribute('aria-pressed',m==='light');
+    go(cur);
+  }
+  var flowsEl=document.querySelector('.flows');
+  FLOWS.forEach(function(f,fi){
+    var box=document.createElement('div');box.className='flow';
+    var h=document.createElement('h2');h.textContent=f[0];box.appendChild(h);
+    var steps=document.createElement('div');steps.className='steps';
+    f[1].forEach(function(id){
+      var b=document.createElement('button');b.type='button';b.textContent=NAME[id];b.setAttribute('data-scr',id);
+      b.addEventListener('click',function(){flowIdx=fi;stepIdx=f[1].indexOf(id);go(id);});
+      steps.appendChild(b);
+    });
+    box.appendChild(steps);flowsEl.appendChild(box);
+  });
+  function step(d){
+    var list=null;
+    if(flowIdx>=0){list=FLOWS[flowIdx][1];var n=stepIdx+d;if(n>=0&&n<list.length){stepIdx=n;go(list[n]);return;}}
+    var i=SCREENS.findIndex(function(s){return s[0]===cur;});
+    var j=(i+d+SCREENS.length)%SCREENS.length;flowIdx=-1;go(SCREENS[j][0]);
+  }
+  document.getElementById('prev').addEventListener('click',function(){step(-1);});
+  document.getElementById('next').addEventListener('click',function(){step(1);});
+  document.getElementById('m-dark').addEventListener('click',function(){setMode('dark');});
+  document.getElementById('m-light').addEventListener('click',function(){setMode('light');});
+  window.addEventListener('message',function(e){
+    var d=e.data; if(!d||typeof d.pzGo!=='string') return;
+    if(NAME[d.pzGo]){flowIdx=-1;go(d.pzGo);}
+  });
+  var start=(location.hash||'').replace('#','');
+  if(NAME[start]) cur=start;
+  go(cur);
+})();
+</script>
+</body>
+</html>

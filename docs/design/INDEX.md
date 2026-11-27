@@ -4,6 +4,12 @@
 |---|---|---|---|---|
 | 00-prompt/perazim-design-prompt.md | Reusable design prompt | n/a | v0.1 | Under review (Levi) |
 
+## Prototype
+
+| File | Screen | Mode | Version | Status |
+|---|---|---|---|---|
+| prototype.html (private artifact https://claude.ai/artifact/H7nogMp8husvHy2jWmuyZG) | Clickable prototype, plan flows | dark and light | v01 | under review |
+
 ## Screens (batch A to D)
 
 <!-- screens:start -->
