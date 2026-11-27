@@ -15,6 +15,8 @@
 - `03_THEOLOGICAL_FOUNDATION.md`
 - `05_OFFLINE_AI_SPECIFICATION.md`
 - `06_ONLINE_AI_SPECIFICATION.md`
+- `17_HERMENEUTICS_LIBRARY_SPECIFICATION.md`
+- `hermeneutics-library/README.md`
 
 ---
 
@@ -147,6 +149,8 @@ Examples include:
 The system must identify the source, translation, author, licence and intended use where applicable.
 
 Research resources may support interpretation but must not automatically become official Perazim doctrine.
+
+The downloadable biblical-language, syntax, genre, historical-background and commentary candidates are governed by [Document 17 — Offline Biblical Hermeneutics Library Specification](17_HERMENEUTICS_LIBRARY_SPECIFICATION.md) and its [resource catalogue](hermeneutics-library/RESOURCE_CATALOG.md). The catalogue is a candidate register, not proof of licence clearance or publication approval. Follow its acquisition runbook and the exact file/component rights before downloading, indexing or publishing any resource.
 
 ## 3.4 Collection D: Ministry and Discipleship Resources
 
