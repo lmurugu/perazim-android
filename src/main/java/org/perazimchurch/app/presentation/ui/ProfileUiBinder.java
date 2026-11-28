@@ -1237,12 +1237,7 @@ public class ProfileUiBinder {
             btnPlay.setText("▶ Play");
             btnPlay.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
             btnPlay.setTextColor(PerazimTheme.COLOR_WHITE);
-            btnPlay.setBackground(create3dButtonDrawable(
-                    PerazimTheme.COLOR_PRIMARY_PURPLE,
-                    PerazimTheme.COLOR_PURPLE_SHADOW,
-                    PerazimTheme.RADIUS_SM,
-                    2
-            ));
+            btnPlay.setBackground(GlassKit.purple(context, PerazimTheme.RADIUS_SM));
             btnPlay.setPadding(dp(8), dp(4), dp(8), dp(4));
             btnPlay.setOnClickListener(v -> Toast.makeText(context, "Playing offline sermon: " + item.getTitle(), Toast.LENGTH_SHORT).show());
             row.addView(btnPlay);
@@ -1291,12 +1286,7 @@ public class ProfileUiBinder {
             btnSing.setText("View");
             btnSing.setTextSize(TypedValue.COMPLEX_UNIT_SP, PerazimTheme.TEXT_SIZE_MICRO);
             btnSing.setTextColor(PerazimTheme.COLOR_WHITE);
-            btnSing.setBackground(create3dButtonDrawable(
-                    PerazimTheme.COLOR_ACCENT_ORANGE,
-                    PerazimTheme.COLOR_ORANGE_SHADOW,
-                    PerazimTheme.RADIUS_SM,
-                    2
-            ));
+            btnSing.setBackground(GlassKit.orange(context, PerazimTheme.RADIUS_SM));
             btnSing.setPadding(dp(8), dp(4), dp(8), dp(4));
             btnSing.setOnClickListener(v -> Toast.makeText(context, "Hymn #" + hymn.getNumber() + ": " + hymn.getTitle(), Toast.LENGTH_SHORT).show());
             row.addView(btnSing);
@@ -1909,21 +1899,6 @@ public class ProfileUiBinder {
         g.setCornerRadius(dp(PerazimTheme.RADIUS_PILL));
         g.setStroke(dp(1), strokeColor);
         return g;
-    }
-
-    private Drawable create3dButtonDrawable(int faceColor, int shadowColor, int radiusDp, int shadowDepthDp) {
-        GradientDrawable shadow = new GradientDrawable();
-        shadow.setColor(shadowColor);
-        shadow.setCornerRadius(dp(radiusDp));
-
-        GradientDrawable face = new GradientDrawable();
-        face.setColor(faceColor);
-        face.setCornerRadius(dp(radiusDp));
-
-        LayerDrawable layers = new LayerDrawable(new Drawable[]{shadow, face});
-        layers.setLayerInset(0, 0, dp(shadowDepthDp), 0, 0);
-        layers.setLayerInset(1, 0, 0, 0, dp(shadowDepthDp));
-        return layers;
     }
 
     private LinearLayout createInteractiveRow(String icon, String label, String value, View.OnClickListener listener) {

@@ -895,9 +895,9 @@ public class WorshipUiBinder {
 
     private Drawable createSolidPill(int bgColor, int cornerRadiusDp) {
         if (bgColor == PerazimTheme.COLOR_PURPLE_BRAND) {
-            return PerazimTheme.createActivePillGradient(dp(cornerRadiusDp));
+            return GlassKit.purple(activity, cornerRadiusDp);
         } else if (bgColor == PerazimTheme.COLOR_ORANGE_BRAND) {
-            return PerazimTheme.createPrimaryOrangeGradient(dp(cornerRadiusDp));
+            return GlassKit.orange(activity, cornerRadiusDp);
         }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);

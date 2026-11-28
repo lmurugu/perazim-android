@@ -141,20 +141,21 @@ public final class PerazimTheme {
     public static void applyMode(boolean light) {
         sLight = light;
         COLOR_BG_DEEP = Color.parseColor(light ? "#F6EEFA" : "#2A0F33");
-        COLOR_SURFACE = Color.parseColor(light ? "#99FFFFFF" : "#26FFFFFF");
-        COLOR_SURFACE_2 = Color.parseColor(light ? "#CCFFFFFF" : "#33FFFFFF");
+        COLOR_SURFACE = Color.parseColor(light ? "#E6FFFFFF" : "#3D1749");
+        COLOR_SURFACE_2 = Color.parseColor(light ? "#CCFFFFFF" : "#1FFFFFFF");
         COLOR_SURFACE_SOLID = Color.parseColor(light ? "#FFFFFF" : "#3D1749");
         COLOR_SURFACE_2_SOLID = Color.parseColor(light ? "#F1E4F6" : "#4F1E5C");
-        COLOR_PURPLE_MUTED = Color.parseColor(light ? "#7B5A88" : "#8B5A9A");
-        COLOR_PURPLE_SOFT = Color.parseColor(light ? "#7A3E8F" : "#A67BB3");
+        COLOR_PURPLE_MUTED = Color.parseColor(light ? "#5A3A66" : "#CDBBD6");
+        COLOR_PURPLE_SOFT = Color.parseColor(light ? "#5A3A66" : "#CDBBD6");
         COLOR_TEXT_PRIMARY = Color.parseColor(light ? "#2A0F33" : "#F5F0F7");
-        COLOR_TEXT_SECONDARY = Color.parseColor(light ? "#5E4A68" : "#B9A8C0");
+        COLOR_TEXT_SECONDARY = Color.parseColor(light ? "#5A3A66" : "#CDBBD6");
         COLOR_TEXT_DISABLED = Color.parseColor(light ? "#A793B0" : "#6E5C78");
-        COLOR_STROKE = Color.parseColor(light ? "#33681A7D" : "#33FFFFFF");
+        COLOR_STROKE = Color.parseColor(light ? "#F2FFFFFF" : "#4A3554");
         // Aliases that mirror the tokens above
         COLOR_BG_NEUTRAL = COLOR_BG_DEEP;
         COLOR_TEXT_MUTED = COLOR_TEXT_SECONDARY;
         COLOR_BORDER_GREY = COLOR_STROKE;
+        COLOR_PURPLE_DEEP = COLOR_BG_DEEP; // keeps the text-on-glass alias in step with the active mode
     }
 
     // =========================================================================
@@ -290,7 +291,7 @@ public final class PerazimTheme {
     public static GradientDrawable createCardGradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                sLight ? new int[]{Color.parseColor("#B3FFFFFF"), Color.parseColor("#80FFFFFF")} : new int[]{Color.parseColor("#2EFFFFFF"), Color.parseColor("#14FFFFFF")}
+                sLight ? new int[]{Color.parseColor("#C7FFFFFF"), Color.parseColor("#B3FFFFFF")} : new int[]{Color.parseColor("#3D1749"), Color.parseColor("#3D1749")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -305,7 +306,7 @@ public final class PerazimTheme {
     public static GradientDrawable createSurface2Gradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                sLight ? new int[]{Color.parseColor("#CCFFFFFF"), Color.parseColor("#99FFFFFF")} : new int[]{Color.parseColor("#3DFFFFFF"), Color.parseColor("#1FFFFFFF")}
+                sLight ? new int[]{Color.parseColor("#CCFFFFFF"), Color.parseColor("#99FFFFFF")} : new int[]{Color.parseColor("#1FFFFFFF"), Color.parseColor("#1FFFFFFF")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -319,7 +320,7 @@ public final class PerazimTheme {
      */
     public static GradientDrawable createPrimaryOrangeGradient(int radiusPx) {
         GradientDrawable gd = new GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
+                GradientDrawable.Orientation.TOP_BOTTOM,
                 new int[]{Color.parseColor("#E88636"), Color.parseColor("#C06119")}
         );
         gd.setCornerRadius(radiusPx);
@@ -347,7 +348,7 @@ public final class PerazimTheme {
     public static GradientDrawable createDialogGradient(int radiusPx, int strokePx) {
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.TOP_BOTTOM,
-                sLight ? new int[]{Color.parseColor("#FFFFFFFF"), Color.parseColor("#FFF3E8F8")} : new int[]{Color.parseColor("#3D154A"), Color.parseColor("#24092C")}
+                sLight ? new int[]{Color.parseColor("#FFFFFFFF"), Color.parseColor("#FFF3E8F8")} : new int[]{Color.parseColor("#3D1749"), Color.parseColor("#3D1749")}
         );
         gd.setCornerRadius(radiusPx);
         if (strokePx > 0) {
@@ -361,7 +362,7 @@ public final class PerazimTheme {
      */
     public static GradientDrawable createActivePillGradient(int radiusPx) {
         GradientDrawable gd = new GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
+                GradientDrawable.Orientation.TOP_BOTTOM,
                 new int[]{Color.parseColor("#8A2BA3"), Color.parseColor("#681A7D")}
         );
         gd.setCornerRadius(radiusPx);

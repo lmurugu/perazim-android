@@ -175,7 +175,7 @@ public class ChatDialog extends Dialog {
 
         if (getWindow() != null) {
             getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            getWindow().setBackgroundDrawable(new ColorDrawable(PerazimTheme.COLOR_BG_NEUTRAL));
+            getWindow().setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         }
 
@@ -188,7 +188,7 @@ public class ChatDialog extends Dialog {
     private View buildChatLayout() {
         LinearLayout root = new LinearLayout(getContext());
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(PerazimTheme.COLOR_BG_NEUTRAL);
+        root.setBackground(PerazimTheme.createBackgroundGradient());
 
         // 1. HEADER BAR
         View headerBar = createHeaderBar();
@@ -231,8 +231,8 @@ public class ChatDialog extends Dialog {
         header.setPadding(dp(14), dp(10), dp(14), dp(10));
 
         GradientDrawable headerBg = new GradientDrawable();
-        headerBg.setColor(PerazimTheme.COLOR_WHITE);
-        headerBg.setStroke(dp(1), PerazimTheme.COLOR_BORDER_GREY);
+        headerBg.setColor(PerazimTheme.COLOR_SURFACE_2);
+        headerBg.setStroke(dp(1), PerazimTheme.COLOR_STROKE);
         header.setBackground(headerBg);
 
         // Back / Close Button
@@ -241,7 +241,7 @@ public class ChatDialog extends Dialog {
         btnClose.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         btnClose.setTypeface(Typeface.DEFAULT_BOLD);
         btnClose.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
-        btnClose.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.COLOR_BORDER_GREY));
+        btnClose.setBackground(createPillDrawable(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
         LinearLayout.LayoutParams lpClose = new LinearLayout.LayoutParams(dp(36), dp(36));
         lpClose.setMargins(0, 0, dp(10), 0);
         btnClose.setLayoutParams(lpClose);
@@ -281,7 +281,7 @@ public class ChatDialog extends Dialog {
         btnOptions.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         btnOptions.setTypeface(Typeface.DEFAULT_BOLD);
         btnOptions.setTextColor(PerazimTheme.COLOR_PURPLE_DEEP);
-        btnOptions.setBackground(createPillDrawable(PerazimTheme.COLOR_BG_NEUTRAL, PerazimTheme.COLOR_BORDER_GREY));
+        btnOptions.setBackground(createPillDrawable(PerazimTheme.COLOR_SURFACE_2, PerazimTheme.COLOR_STROKE));
         LinearLayout.LayoutParams lpOpt = new LinearLayout.LayoutParams(dp(36), dp(36));
         btnOptions.setLayoutParams(lpOpt);
         btnOptions.setOnClickListener(v -> showOptionsMenu());

@@ -46,6 +46,7 @@ import org.perazimchurch.app.data.repository.RepositoryProvider;
 import org.perazimchurch.app.domain.model.Prayer;
 import org.perazimchurch.app.navigation.ChurchIntentManager;
 import org.perazimchurch.app.presentation.viewmodel.FellowshipViewModel;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.ArrayList;
@@ -163,7 +164,7 @@ public class FellowshipUiBinder {
 
         Bitmap prayerBgBmp = loadAssetBitmap("backgrounds/bg_prayer_moon.png", 720);
         if (prayerBgBmp != null) {
-            headerContainer.setBackground(PerazimTheme.createCardGradient(dp(16), dp(1)));
+            headerContainer.setBackground(GlassKit.glass(context, 16));
             headerContainer.setClipToOutline(true);
 
             ImageView ivPrayerBg = new ImageView(context);
@@ -217,7 +218,7 @@ public class FellowshipUiBinder {
         btnSharePrayer.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         btnSharePrayer.setTypeface(Typeface.DEFAULT_BOLD);
         btnSharePrayer.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
-        btnSharePrayer.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(12)));
+        btnSharePrayer.setBackground(GlassKit.orange(context, 12));
         LinearLayout.LayoutParams lpBtn = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(46));
         lpBtn.setMargins(0, 0, 0, dp(16));
@@ -386,13 +387,13 @@ public class FellowshipUiBinder {
     private void updateSegmentedStyles() {
         if (btnTabWall == null || btnTabMine == null) return;
         if (!isMineTab) {
-            btnTabWall.setBackground(PerazimTheme.createActivePillGradient(dp(8)));
+            btnTabWall.setBackground(GlassKit.purple(context, 8));
             btnTabWall.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
 
             btnTabMine.setBackgroundColor(Color.TRANSPARENT);
             btnTabMine.setTextColor(PerazimTheme.COLOR_TEXT_SECONDARY);
         } else {
-            btnTabMine.setBackground(PerazimTheme.createActivePillGradient(dp(8)));
+            btnTabMine.setBackground(GlassKit.purple(context, 8));
             btnTabMine.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
 
             btnTabWall.setBackgroundColor(Color.TRANSPARENT);
@@ -980,9 +981,9 @@ public class FellowshipUiBinder {
 
     private Drawable createCardBackground(int bgColor, int cornerRadiusDp, int borderColor, int borderWidthDp) {
         if (bgColor == PerazimTheme.COLOR_SURFACE) {
-            return PerazimTheme.createCardGradient(dp(cornerRadiusDp), dp(borderWidthDp));
+            return GlassKit.glass(context, cornerRadiusDp);
         } else if (bgColor == PerazimTheme.COLOR_SURFACE_2) {
-            return PerazimTheme.createSurface2Gradient(dp(cornerRadiusDp), dp(borderWidthDp));
+            return GlassKit.glassControl(context, cornerRadiusDp);
         }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
@@ -993,9 +994,9 @@ public class FellowshipUiBinder {
 
     private Drawable createSolidPillDrawable(int bgColor, int cornerRadiusDp) {
         if (bgColor == PerazimTheme.COLOR_PURPLE_BRAND) {
-            return PerazimTheme.createActivePillGradient(dp(cornerRadiusDp));
+            return GlassKit.purple(context, cornerRadiusDp);
         } else if (bgColor == PerazimTheme.COLOR_ORANGE_BRAND) {
-            return PerazimTheme.createPrimaryOrangeGradient(dp(cornerRadiusDp));
+            return GlassKit.orange(context, cornerRadiusDp);
         }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);

@@ -37,6 +37,7 @@ import androidx.annotation.Nullable;
 import java.io.InputStream;
 
 import org.perazimchurch.app.navigation.ChurchIntentManager;
+import org.perazimchurch.app.ui.theme.GlassKit;
 import org.perazimchurch.app.ui.theme.PerazimTheme;
 
 import java.util.ArrayList;
@@ -297,7 +298,7 @@ public final class GivingDialog {
         btnConfirmGive.setTextColor(PerazimTheme.COLOR_TEXT_PRIMARY);
         btnConfirmGive.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         btnConfirmGive.setTypeface(Typeface.DEFAULT_BOLD);
-        btnConfirmGive.setBackground(PerazimTheme.createPrimaryOrangeGradient(dp(context, 12)));
+        btnConfirmGive.setBackground(GlassKit.orange(context, 12));
         LinearLayout.LayoutParams lpGive = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 48));
         lpGive.setMargins(0, dp(context, 16), 0, 0);
