@@ -252,7 +252,7 @@ public final class ReferenceGuide {
         return word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
     }
 
-    private static ReferenceApprovals approvals(Context context) {
+    static ReferenceApprovals approvals(Context context) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 context.getAssets().open(ReferenceApprovals.ASSET), StandardCharsets.UTF_8))) {
             StringBuilder json = new StringBuilder();

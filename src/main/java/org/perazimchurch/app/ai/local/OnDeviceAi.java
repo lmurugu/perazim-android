@@ -191,7 +191,11 @@ public final class OnDeviceAi {
                     return;
                 }
                 // Approved reference items (dictionary and cross-references). A no-op until Levi approves a source.
-                if (!doctrineQuestion) evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
+                if (!doctrineQuestion) {
+                    evidence = ReferenceGuide.augment(c, evidence, evidenceQuery);
+                    // Word meanings from approved lexicons: evidence only, after Scripture. No-op without a Greek or Hebrew word.
+                    evidence = org.perazimchurch.app.ai.reference.LexiconGuide.augment(c, evidence, evidenceQuery);
+                }
                 // Drift: a question that uses another faith's idea gets at least two KJV passages plus a false-doctrine note to refute from Scripture; never a credible source (no-op otherwise).
                 evidence = org.perazimchurch.app.ai.guide.DriftEvidence.augment(c, evidence, question);
                 if (evidence.length() == 0) {

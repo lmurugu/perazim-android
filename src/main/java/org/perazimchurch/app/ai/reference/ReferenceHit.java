@@ -5,6 +5,7 @@ public final class ReferenceHit {
     public static final String KIND_DICTIONARY = "DICTIONARY";
     public static final String KIND_CROSS_REFERENCE = "CROSS_REFERENCE";
     public static final String KIND_COMMENTARY = "COMMENTARY";
+    public static final String KIND_LEXICON = "LEXICON";
 
     public final String kind;
     public final String sourceId;
