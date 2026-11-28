@@ -1,4 +1,4 @@
-NOTICE: core hermeneutics pack CANDIDATE 0.1 (not for release)
+NOTICE: core hermeneutics pack RELEASE BUILD (lexicon, packaged in the app)
 
 This pack contains data from the following sources, each under the licence shown.
 
@@ -7,36 +7,25 @@ This pack contains data from the following sources, each under the licence shown
   Attribution: Brown-Driver-Briggs Hebrew Lexicon, OpenScriptures Hebrew Lexicon project (CC BY 4.0 data)
   Notes: Primary Hebrew lexicon. Readme licence line still to be confirmed at release check.
 
+- macula-greek-sblgnt
+  Licence: CC BY 4.0 (MACULA LICENSE.md). Text is SBLGNT (CC BY 4.0, Faithlife). Glosses: Cherith CC BY 4.0; Berean Interlinear public domain
+  Attribution: MACULA Greek, Clear Bible and Biblica (CC BY 4.0); SBL Greek New Testament, Logos Bible Software (CC BY 4.0); Cherith Glosses, Cherith Analytics (CC BY 4.0)
+  Notes: TSV only. The MACULA sources/ folder is not used. Strong's numbers are stored without the G prefix, as in MACULA.
+
 - step-tbesg
   Licence: CC BY 4.0 (STEP-Data)
   Attribution: Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)
   Notes: Rows marked (ML) (Middle Liddell, Perseus, CC BY-SA) are excluded under Q1 A. Rows marked (AS) depend on the Abbott-Smith release check. Unmarked rows were added by STEPBible.
-
-- step-tvtms
-  Licence: CC BY 4.0 (STEP-Data)
-  Attribution: Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)
-  Notes: Verse references only. The ESV column holds reference numbers, not ESV text.
 
 - step-tipnr
   Licence: CC BY 4.0 (STEP-Data). Name forms in esv_form are ESV-derived: see pending items
   Attribution: Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)
   Notes: PENDING (Q7 B): esv_form holds the ESV-derived English name for each entry. STEP Bible check not yet done. Strong's numbers, references and significance are STEP text.
 
-- macula-greek-sblgnt
-  Licence: CC BY 4.0 (MACULA LICENSE.md). Text is SBLGNT (CC BY 4.0, Faithlife). Glosses: Cherith CC BY 4.0; Berean Interlinear public domain
-  Attribution: MACULA Greek, Clear Bible and Biblica (CC BY 4.0); SBL Greek New Testament, Logos Bible Software (CC BY 4.0); Cherith Glosses, Cherith Analytics (CC BY 4.0)
-  Notes: TSV only. The MACULA sources/ folder is not used. Strong's numbers are stored without the G prefix, as in MACULA.
+- step-tvtms
+  Licence: CC BY 4.0 (STEP-Data)
+  Attribution: Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)
+  Notes: Verse references only. The ESV column holds reference numbers, not ESV text.
 
-- step-tbesh
-  Licence: CC BY 4.0 (STEP edits). Base text is Abridged BDB by Online Bible: permission PENDING
-  Attribution: Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0); base lexicon Abridged BDB, Larry Pierce, OnlineBible.net (permission pending)
-  Notes: PENDING (Q6 C): the file says Online Bible permission must be obtained before these definitions are used in any project. Included now as Levi decided. Removed by --release.
-
-Excluded: ESV text (never used). Middle Liddell (Perseus, CC BY-SA) rows excluded under Q1 A: 1982 TBESG rows.
-Church Fathers and Jewish or background sources: not in this pack (Q2 B, Q3 B).
-
-PENDING PERMISSIONS (remove before public release if not obtained):
-- step-tbesh (Q6 C): Online Bible permission for the Abridged BDB base. Remove with: build with --release.
-- names.esv_form (Q7 B): STEP Bible confirmation that ESV-derived name forms may be used. Remove with: build with --release (or drop the column).
-
-Open before release: Abbott-Smith base licence for the (AS) rows; BDB readme licence line; MACULA component licences; Kenyan rights review (not a legal opinion).
+Not in this build: step-tbesh (Online Bible permission pending), ESV-derived name forms (STEP Bible check
+pending), Middle Liddell rows (Perseus, CC BY-SA). Generative AI is not enabled by this file.

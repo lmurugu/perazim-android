@@ -88,7 +88,7 @@ public class LexiconEvidenceTest {
                 StandardCharsets.UTF_8);
         ReferenceApprovals approvals = ReferenceApprovals.parse(json);
         assertTrue(approvals.isApproved("step-tbesg"));
-        assertTrue(approvals.isApproved("step-tbesh"));
+        assertFalse(approvals.isApproved("step-tbesh"));
         assertTrue(approvals.isApproved("bdb-openscriptures"));
         assertFalse(approvals.isApproved("step-tipnr"));
         assertFalse(approvals.isApproved("macula-greek-sblgnt"));

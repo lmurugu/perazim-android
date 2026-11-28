@@ -28,12 +28,15 @@ public final class LexiconIndex {
     /** The build can store the same file already decompressed under this name (as it does for reference.db). */
     static final String ASSET_PLAIN = "reference/lexicon-core.db";
     /** Bump when the bundled database changes, so the unpacked copy is rebuilt. */
-    static final String UNPACKED_NAME = "lexicon-core-v1.db";
+    static final String UNPACKED_NAME = "lexicon-core-v2.db";
     static final String BDB = "bdb-openscriptures";
     static final String TBESG = "step-tbesg";
     static final String TBESH = "step-tbesh";
-    /** The only sources this index may return. Names, verse maps and token tables are not lexicons. */
-    static final List<String> SOURCES = Arrays.asList(TBESG, TBESH, BDB);
+    /**
+     * The only sources this index may return. Names, verse maps and token tables are not lexicons.
+     * TBESH is left out of the release pack until Online Bible permission is confirmed (Q6).
+     */
+    static final List<String> SOURCES = Arrays.asList(TBESG, BDB);
 
     private final SQLiteDatabase db;
 

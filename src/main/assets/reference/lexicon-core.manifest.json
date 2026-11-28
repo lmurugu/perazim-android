@@ -1,124 +1,93 @@
 {
   "pack": "core-hermeneutics",
-  "version": "0.1-CANDIDATE",
-  "status": "NOT RELEASED. Not bundled, not in Git.",
-  "built_at_utc": "2026-11-27T20:01:11+00:00",
-  "builder": "build_core.py",
+  "version": "0.1-RELEASE-APP",
+  "status": "Packaged in the app as a release-only composition. TBESH and ESV-derived name forms removed. Generative AI stays off in release builds unless gate L7 passes (AGENTS.md).",
+  "built_at_utc": "2026-11-28T00:31:59+00:00",
+  "builder": "derive_release.py (applies build_core.py --release removals to a candidate)",
+  "input_candidate_sqlite_sha256": "dbbe21301c278a06819da293e04b8756acb31b83efd7562de99d7caa624fd1f9",
   "build_flags": {
-    "release": false,
-    "include_tbesh": true,
-    "include_esv_name_forms": true
+    "release": true,
+    "include_tbesh": false,
+    "include_esv_name_forms": false
   },
   "decisions": {
-    "Q1": "A. Public domain and open only. Middle Liddell rows excluded. SA and NC packs wait for separate approval.",
-    "Q2": "B. Church Fathers: evidence-only channel. None in this candidate.",
-    "Q3": "B. Jewish and background sources excluded. None in this candidate.",
-    "Q4": "A. KJV only for quotes.",
+    "Q1": "A. Public domain and open only. Middle Liddell rows excluded.",
+    "Q2": "B. Church Fathers: evidence-only channel. None in this pack.",
+    "Q3": "B. Jewish and background sources excluded. None in this pack.",
+    "Q4": "A. KJV only for quotes. Lexicon cards are evidence, never quoted as Scripture.",
     "Q5": "A. 100 MB total, 25 MB per optional pack.",
-    "Q6": "C. STEP TBESH included now; Online Bible permission pending.",
-    "Q7": "B. ESV-derived name forms kept in names.esv_form; STEP Bible check pending."
+    "Q6": "C in candidate; release removes TBESH until Online Bible permission is confirmed.",
+    "Q7": "B in candidate; release removes ESV-derived name forms until STEP Bible is checked."
   },
   "pending_before_public_release": [
-    {
-      "item": "step-tbesh (Q6 C)",
-      "needed": "Online Bible permission for the Abridged BDB base",
-      "owner": "Levi to decide; coordinator to request",
-      "remove_with": "build with --release"
-    },
-    {
-      "item": "names.esv_form (Q7 B)",
-      "needed": "STEP Bible confirmation that ESV-derived name forms may be used",
-      "owner": "Levi to decide; coordinator to request",
-      "remove_with": "build with --release (or drop the column)"
-    }
+    "Online Bible permission for the Abridged BDB base of TBESH (Q6)",
+    "STEP Bible confirmation for ESV-derived name forms (Q7)",
+    "Levi's confirmation of lexicon source ids in approvals.json",
+    "Generative AI stays off in release until gate L7 passes"
   ],
-  "conflict_flag": "Standing rule: no ESV text is processed by AI. esv_form holds short ESV-derived name forms, kept under Q7 B pending STEP Bible check.",
   "excluded": {
-    "esv": "ESV text is never processed by AI",
-    "tbesg_middle_liddell_rows": "1982 rows marked (ML), Perseus CC BY-SA (Q1 A)",
-    "step_tfbdb_totmm_tntmm_tbcwg_tagot": "not present in STEP-Data master; dropped from the plan"
+    "step_tbesh": "removed in release (Q6, Online Bible permission pending)",
+    "esv_name_forms": "names.esv_form set to NULL in release (Q7, STEP Bible check pending)",
+    "tbesg_middle_liddell_rows": "excluded at candidate build (Q1 A, Perseus CC BY-SA)"
   },
   "sources": [
     {
       "source_id": "bdb-openscriptures",
       "licence": "CC BY 4.0 (OpenScriptures Hebrew Lexicon data); BDB text public domain",
-      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
       "attribution": "Brown-Driver-Briggs Hebrew Lexicon, OpenScriptures Hebrew Lexicon project (CC BY 4.0 data)",
-      "input_file": "oshb-lexicon/src/BrownDriverBriggs.xml",
-      "input_sha256": "2b52658a4323d91674cda4090ab8b3ebddfff640f4f18143c28300e80b2c38f8",
-      "input_bytes": 2911253,
       "notes": "Primary Hebrew lexicon. Readme licence line still to be confirmed at release check."
-    },
-    {
-      "source_id": "step-tbesg",
-      "licence": "CC BY 4.0 (STEP-Data)",
-      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
-      "attribution": "Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)",
-      "input_file": "step-bible/src/Lexicons/TBESG - Translators Brief lexicon of Extended Strongs for Greek - STEPBible.org CC BY.txt",
-      "input_sha256": "734a5b64a1152f67604bf09d32f15c0ba537151961752fcf168087b41b4d93ea",
-      "input_bytes": 4736983,
-      "notes": "Rows marked (ML) (Middle Liddell, Perseus, CC BY-SA) are excluded under Q1 A. Rows marked (AS) depend on the Abbott-Smith release check. Unmarked rows were added by STEPBible."
-    },
-    {
-      "source_id": "step-tvtms",
-      "licence": "CC BY 4.0 (STEP-Data)",
-      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
-      "attribution": "Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)",
-      "input_file": "step-bible/src/Older Formats/TVTMS - till Mar 2025 KJV-based with old formats for subverses - STEPBible.org CC BY.txt",
-      "input_sha256": "cdde3b24bc8cc36b27531289459dec59101e0548af076c64a2342370886108de",
-      "input_bytes": 5806239,
-      "notes": "Verse references only. The ESV column holds reference numbers, not ESV text."
-    },
-    {
-      "source_id": "step-tipnr",
-      "licence": "CC BY 4.0 (STEP-Data). Name forms in esv_form are ESV-derived: see pending items",
-      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
-      "attribution": "Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)",
-      "input_file": "step-bible/src/Proper Nouns/TIPNR - Translators Individualised Proper Names with all References - STEPBible.org CC BY.txt",
-      "input_sha256": "d595b9163d32a400bb0ef96b27a6de58335a63da840b82531fe9f5e1d16a318c",
-      "input_bytes": 8202454,
-      "notes": "PENDING (Q7 B): esv_form holds the ESV-derived English name for each entry. STEP Bible check not yet done. Strong's numbers, references and significance are STEP text."
     },
     {
       "source_id": "macula-greek-sblgnt",
       "licence": "CC BY 4.0 (MACULA LICENSE.md). Text is SBLGNT (CC BY 4.0, Faithlife). Glosses: Cherith CC BY 4.0; Berean Interlinear public domain",
-      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
       "attribution": "MACULA Greek, Clear Bible and Biblica (CC BY 4.0); SBL Greek New Testament, Logos Bible Software (CC BY 4.0); Cherith Glosses, Cherith Analytics (CC BY 4.0)",
-      "input_file": "macula-greek/src/SBLGNT/tsv/macula-greek-SBLGNT.tsv",
-      "input_sha256": "7f71504fdee8659bdd9f85342e4103d645864c2851b8205915bb298f0c004cc5",
-      "input_bytes": 20843282,
       "notes": "TSV only. The MACULA sources/ folder is not used. Strong's numbers are stored without the G prefix, as in MACULA."
     },
     {
-      "source_id": "step-tbesh",
-      "licence": "CC BY 4.0 (STEP edits). Base text is Abridged BDB by Online Bible: permission PENDING",
-      "licence_url": "https://creativecommons.org/licenses/by/4.0/",
-      "attribution": "Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0); base lexicon Abridged BDB, Larry Pierce, OnlineBible.net (permission pending)",
-      "input_file": "step-bible/src/Lexicons/TBESH - Translators Brief lexicon of Extended Strongs for Hebrew - STEPBible.org CC BY.txt",
-      "input_sha256": "848eef2ac16753a43694897dbb9e8f266725e7cc9da4809f367ee5b990f05dbb",
-      "input_bytes": 3288115,
-      "notes": "PENDING (Q6 C): the file says Online Bible permission must be obtained before these definitions are used in any project. Included now as Levi decided. Removed by --release."
+      "source_id": "step-tbesg",
+      "licence": "CC BY 4.0 (STEP-Data)",
+      "attribution": "Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)",
+      "notes": "Rows marked (ML) (Middle Liddell, Perseus, CC BY-SA) are excluded under Q1 A. Rows marked (AS) depend on the Abbott-Smith release check. Unmarked rows were added by STEPBible."
+    },
+    {
+      "source_id": "step-tipnr",
+      "licence": "CC BY 4.0 (STEP-Data). Name forms in esv_form are ESV-derived: see pending items",
+      "attribution": "Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)",
+      "notes": "PENDING (Q7 B): esv_form holds the ESV-derived English name for each entry. STEP Bible check not yet done. Strong's numbers, references and significance are STEP text."
+    },
+    {
+      "source_id": "step-tvtms",
+      "licence": "CC BY 4.0 (STEP-Data)",
+      "attribution": "Data created by www.STEPBible.org based on work at Tyndale House Cambridge (CC BY 4.0)",
+      "notes": "Verse references only. The ESV column holds reference numbers, not ESV text."
     }
   ],
   "row_counts": {
-    "sources": 6,
-    "lexicon_entries": 29671,
+    "sources": 5,
+    "lexicon_entries": 19413,
     "verse_map": 2069,
     "names": 4244,
     "greek_tokens": 137741
   },
   "per_source_rows": {
-    "bdb-openscriptures": 11845,
-    "macula-greek-sblgnt": 137741,
-    "step-tbesg": 7568,
-    "step-tbesh": 10258,
-    "step-tipnr": 4244,
-    "step-tvtms": 2069
+    "lexicon_entries": {
+      "bdb-openscriptures": 11845,
+      "step-tbesg": 7568
+    },
+    "verse_map": {
+      "step-tvtms": 2069
+    },
+    "names": {
+      "step-tipnr": 4244
+    },
+    "greek_tokens": {
+      "macula-greek-sblgnt": 137741
+    }
   },
-  "esv_name_forms_stored": 4244,
-  "sqlite_sha256": "dbbe21301c278a06819da293e04b8756acb31b83efd7562de99d7caa624fd1f9",
-  "sqlite_bytes": 30584832,
-  "gzip_sha256": "6d34fcc1648358814923b0b961c451822a759d7960c90d0903dedc17cbdb84fa",
-  "gzip_bytes": 8744949,
-  "lemma_normalisation": "NFC applied to lexicon_entries.lemma on 2026-11-28 (lossless canonical form; no other column changed). Matches build_core.py."
+  "esv_name_forms_stored": 0,
+  "lemma_normalisation": "NFC on lexicon_entries.lemma (checked: 0 non-NFC).",
+  "sqlite_sha256": "1e741907710a19b2c84bee2ae1126e7675955a8130eb3fd1a1e6908d1ecce8be",
+  "sqlite_bytes": 27009024,
+  "gzip_sha256": "288fc243f59a0f469e5b3b918a18492ced760ccf9552f20b880dd7d38c13e892",
+  "gzip_bytes": 7858340
 }

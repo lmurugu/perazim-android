@@ -33,13 +33,13 @@ are in `manifest.json`, which is the pin for the source files.
 The current pack is the candidate build (decisions Q1 to Q7 of 2026-11-27 and Levi's approval of 2026-11-28).
 It is in `src/main/assets/reference/`:
 
-- `lexicon-core.db.gz` (gzip of `core-candidate.sqlite`)
+- `lexicon-core.db.gz` (gzip of the release pack: `derive_release.py` on a candidate, or `build_core.py --release`)
 - `lexicon-core.manifest.json`
 - `lexicon-core.NOTICE.txt`
 
 For a public release:
 
-1. Build with `--release` and copy the three release outputs over the assets above.
+1. Build with `--release` (or, without the source repos, run `python3 scripts/hermeneutics/derive_release.py <candidate.sqlite> <out_dir>` on a candidate) and copy the three release outputs over the assets above.
 2. Remove `step-tbesh` from `approvedSourceIds` in `approvals.json` (its rows are absent in the release build anyway).
 3. Bump `UNPACKED_NAME` in `LexiconIndex.java` (for example `lexicon-core-v2.db`), so phones unpack the new copy.
 4. Obtain the Online Bible permission and STEP Bible's confirmation for the ESV name forms, or keep them out.

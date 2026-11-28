@@ -20,6 +20,8 @@ public class LexiconRetrievalStressTest {
 
     /** ἀγάπη (agape), written with escapes so the source stays ASCII and NFC. */
     private static final String GREEK_AGAPE = "ἀγάπη";
+    /** אָב (av, father) as stored in BDB. */
+    private static final String HEBREW_AV = "אָב";
 
     private static JSONArray scripture(int count) throws Exception {
         JSONArray array = new JSONArray();
@@ -61,19 +63,27 @@ public class LexiconRetrievalStressTest {
     }
 
     @Test
-    public void hebrewStrongsNumberAddsLexicalCard() throws Exception {
+    public void pointedHebrewWordQuestionAddsLexicalCard() throws Exception {
+        Context context = ApplicationProvider.getApplicationContext();
+        JSONArray evidence = LexiconGuide.augment(context, scripture(1), "What does " + HEBREW_AV + " mean?");
+        assertTrue("No lexical card for the pointed Hebrew word", countLexical(evidence) >= 1);
+    }
+
+    /** Release composition: no Hebrew Strong's cards until TBESH or a Strong's map is approved (Q6). */
+    @Test
+    public void hebrewStrongsNumberAddsNoCardInReleasePack() throws Exception {
         Context context = ApplicationProvider.getApplicationContext();
         JSONArray evidence = LexiconGuide.augment(context, scripture(1), "What does H1 mean?");
-        assertTrue("No lexical card for H1", countLexical(evidence) >= 1);
+        assertEquals(1, evidence.length());
     }
 
     @Test
     public void strongsNumberDoesNotReturnLongerNumbers() throws Exception {
         Context context = ApplicationProvider.getApplicationContext();
-        JSONArray evidence = LexiconGuide.augment(context, new JSONArray(), "What does H1 mean?");
+        JSONArray evidence = LexiconGuide.augment(context, new JSONArray(), "What does G1 mean?");
         for (int i = 0; i < evidence.length(); i++) {
             String text = evidence.getJSONObject(i).getString("text");
-            assertFalse("H1 matched a longer number: " + text, text.matches("(?s).*Word: H1\\d.*"));
+            assertFalse("G1 matched a longer number: " + text, text.matches("(?s).*Word: G1\\d.*"));
         }
     }
 
