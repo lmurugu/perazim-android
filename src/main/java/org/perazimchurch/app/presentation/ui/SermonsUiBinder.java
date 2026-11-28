@@ -578,7 +578,7 @@ public class SermonsUiBinder {
         pill.setPadding(dp(12), 0, dp(12), 0);
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(dp(15));
-        bg.setColor(Color.parseColor("#731E0A28"));
+        bg.setColor(Color.parseColor("#732A0F33"));
         bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#40FFFFFF"));
         pill.setBackground(bg);
         pill.setClickable(true);
@@ -1030,7 +1030,7 @@ public class SermonsUiBinder {
         // Full-screen dark "Now Playing" screen (no stock dialog frame or footer).
         android.widget.LinearLayout root = new android.widget.LinearLayout(activity);
         root.setOrientation(android.widget.LinearLayout.VERTICAL);
-        root.setBackgroundColor(android.graphics.Color.parseColor("#1A0A20"));
+        root.setBackground(PerazimTheme.createBackgroundGradient());
 
         android.widget.LinearLayout topBar = new android.widget.LinearLayout(activity);
         topBar.setOrientation(android.widget.LinearLayout.HORIZONTAL);
@@ -1065,12 +1065,12 @@ public class SermonsUiBinder {
         if (dialog.getWindow() != null) {
             // Full-screen player: hide the status bar so no activity background shows above the controls.
             dialog.getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            dialog.getWindow().setStatusBarColor(android.graphics.Color.parseColor("#1A0A20"));
-            dialog.getWindow().setNavigationBarColor(android.graphics.Color.parseColor("#1A0A20"));
-            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.parseColor("#1A0A20")));
+            dialog.getWindow().setStatusBarColor(PerazimTheme.COLOR_BG_DEEP);
+            dialog.getWindow().setNavigationBarColor(PerazimTheme.COLOR_BG_DEEP);
+            dialog.getWindow().setBackgroundDrawable(PerazimTheme.createBackgroundGradient());
         }
         final int previousStatusColor = activity.getWindow().getStatusBarColor();
-        activity.getWindow().setStatusBarColor(android.graphics.Color.parseColor("#1A0A20"));
+        activity.getWindow().setStatusBarColor(PerazimTheme.COLOR_BG_DEEP);
         dialog.setOnDismissListener(d -> {
             activity.getWindow().setStatusBarColor(previousStatusColor);
             player.stopLoading();
@@ -1394,9 +1394,9 @@ public class SermonsUiBinder {
 
     private Drawable createSolidPill(int bgColor, int cornerRadiusDp) {
         if (bgColor == PerazimTheme.COLOR_PURPLE_BRAND) {
-            return PerazimTheme.createActivePillGradient(dp(cornerRadiusDp));
+            return GlassKit.purple(activity, cornerRadiusDp);
         } else if (bgColor == PerazimTheme.COLOR_ORANGE_BRAND) {
-            return PerazimTheme.createPrimaryOrangeGradient(dp(cornerRadiusDp));
+            return GlassKit.orange(activity, cornerRadiusDp);
         }
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(bgColor);
