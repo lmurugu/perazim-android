@@ -578,7 +578,7 @@ public class SermonsUiBinder {
         pill.setPadding(dp(12), 0, dp(12), 0);
         GradientDrawable bg = new GradientDrawable();
         bg.setCornerRadius(dp(15));
-        bg.setColor(Color.parseColor("#731E0A28"));
+        bg.setColor(Color.parseColor("#732A0F33"));
         bg.setStroke(Math.max(1, dp(1)), Color.parseColor("#40FFFFFF"));
         pill.setBackground(bg);
         pill.setClickable(true);

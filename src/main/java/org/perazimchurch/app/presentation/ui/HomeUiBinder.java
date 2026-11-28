@@ -107,8 +107,8 @@ public class HomeUiBinder {
     public static int COLOR_ORANGE_SHADOW() { return PerazimTheme.COLOR_ORANGE_SHADOW; }   // #98450B
     public static int COLOR_ORANGE_BORDER() { return PerazimTheme.COLOR_ORANGE_BORDER; }   // #F9DFCC
     public static int COLOR_ORANGE_TINT() { return PerazimTheme.COLOR_ORANGE_TINT; }     // #FDF5EF
-    public static final int COLOR_TEXT_DARK      = Color.parseColor("#1A1225");
-    public static final int COLOR_TEXT_MUTED     = Color.parseColor("#725B78");
+    public static final int COLOR_TEXT_DARK      = Color.parseColor("#2A0F33");
+    public static final int COLOR_TEXT_MUTED     = Color.parseColor("#5A3A66");
 
     public interface HomeUiListener {
         void onStreakUpdated(int streak);

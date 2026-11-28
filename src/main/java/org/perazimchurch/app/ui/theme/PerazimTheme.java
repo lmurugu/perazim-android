@@ -24,7 +24,7 @@ public final class PerazimTheme {
     public static int COLOR_BG_DEEP       = Color.parseColor("#2A0F33");
     /** Opaque fallbacks for dialogs, popups and full-screen containers where glass would show through */
     public static int COLOR_SURFACE_SOLID   = Color.parseColor("#3D1749");
-    public static int COLOR_SURFACE_2_SOLID = Color.parseColor("#4F1E5C");
+    public static int COLOR_SURFACE_2_SOLID = Color.parseColor("#3D1749");
     /** Cards and Content Containers (#3D1749) */
     public static int COLOR_SURFACE       = Color.parseColor("#26FFFFFF");
     /** Elevated Surfaces, Text Inputs, Search Bars (#4F1E5C) */
@@ -42,9 +42,9 @@ public final class PerazimTheme {
     /** ONLY the Single Primary CTA on a screen (#E17D2F) */
     public static int COLOR_ORANGE_BRAND  = Color.parseColor("#E17D2F");
     /** Rare Secondary Accent (#C4894F) */
-    public static int COLOR_ORANGE_MUTED  = Color.parseColor("#C4894F");
+    public static int COLOR_ORANGE_MUTED  = Color.parseColor("#E88636");
     /** Pressed / Focus on Orange CTA (#E8A86A) */
-    public static int COLOR_ORANGE_SOFT   = Color.parseColor("#E8A86A");
+    public static int COLOR_ORANGE_SOFT   = Color.parseColor("#F8C894");
     /** Orange Selection Wash with 24% alpha */
     public static int COLOR_ORANGE_GHOST  = Color.parseColor("#3DE17D2F");
 
@@ -64,23 +64,22 @@ public final class PerazimTheme {
 
     public static int COLOR_PRIMARY_PURPLE = COLOR_PURPLE_BRAND;
     public static int COLOR_ACCENT_ORANGE  = COLOR_ORANGE_BRAND;
-    public static int COLOR_WARM_CREAM     = Color.parseColor("#FAF6EE");
+    public static int COLOR_WARM_CREAM     = Color.parseColor("#F5F0F7");
     public static int COLOR_PURPLE_DEEP    = COLOR_BG_DEEP;
-    public static int COLOR_OBSIDIAN       = Color.parseColor("#140319");
+    public static int COLOR_OBSIDIAN       = Color.parseColor("#2A0F33");
     public static int COLOR_WHITE          = Color.parseColor("#FFFFFF");
-    public static int COLOR_TEXT_DARK      = Color.parseColor("#1A1A1A");
+    public static int COLOR_TEXT_DARK      = Color.parseColor("#2A0F33");
     public static int COLOR_TEXT_MUTED     = COLOR_TEXT_SECONDARY;
-    public static int COLOR_PURPLE_SHADOW  = Color.parseColor("#450E53");
+    public static int COLOR_PURPLE_SHADOW  = Color.parseColor("#2A0F33");
     public static int COLOR_PURPLE_TINT    = COLOR_PURPLE_GHOST;
     public static int COLOR_BORDER_GREY    = COLOR_STROKE;
     public static int COLOR_BG_NEUTRAL     = COLOR_BG_DEEP;
-    public static int COLOR_ORANGE_DARK    = Color.parseColor("#78350A");
-    public static int COLOR_ORANGE_SHADOW  = Color.parseColor("#98450B");
+    public static int COLOR_ORANGE_DARK    = Color.parseColor("#C06119");
+    public static int COLOR_ORANGE_SHADOW  = Color.parseColor("#C06119");
     public static int COLOR_ORANGE_BORDER  = COLOR_ORANGE_MUTED;
     public static int COLOR_ORANGE_TINT    = COLOR_ORANGE_GHOST;
-    public static int COLOR_SUCCESS        = Color.parseColor("#10B981");
-    public static int COLOR_ERROR          = Color.parseColor("#EF4444");
-
+    public static int COLOR_SUCCESS        = Color.parseColor("#8A2BA3"); // no Bible green: nearest Bible purple
+    
     // =========================================================================
     // LIGHT / DARK MODE
     // =========================================================================
@@ -144,12 +143,13 @@ public final class PerazimTheme {
         COLOR_SURFACE = Color.parseColor(light ? "#E6FFFFFF" : "#3D1749");
         COLOR_SURFACE_2 = Color.parseColor(light ? "#CCFFFFFF" : "#1FFFFFFF");
         COLOR_SURFACE_SOLID = Color.parseColor(light ? "#FFFFFF" : "#3D1749");
-        COLOR_SURFACE_2_SOLID = Color.parseColor(light ? "#F1E4F6" : "#4F1E5C");
         COLOR_PURPLE_MUTED = Color.parseColor(light ? "#5A3A66" : "#CDBBD6");
         COLOR_PURPLE_SOFT = Color.parseColor(light ? "#5A3A66" : "#CDBBD6");
         COLOR_TEXT_PRIMARY = Color.parseColor(light ? "#2A0F33" : "#F5F0F7");
         COLOR_TEXT_SECONDARY = Color.parseColor(light ? "#5A3A66" : "#CDBBD6");
-        COLOR_TEXT_DISABLED = Color.parseColor(light ? "#A793B0" : "#6E5C78");
+        COLOR_TEXT_DISABLED = Color.parseColor(light ? "#8C5A3A66" : "#8CCDBBD6"); // Bible muted at 55%
+        COLOR_ORANGE_SOFT = Color.parseColor(light ? "#8A4A12" : "#F8C894"); // Bible accent
+        COLOR_SURFACE_2_SOLID = Color.parseColor(light ? "#F8F1FB" : "#3D1749"); // Bible card and canvas
         COLOR_STROKE = Color.parseColor(light ? "#F2FFFFFF" : "#4A3554");
         // Aliases that mirror the tokens above
         COLOR_BG_NEUTRAL = COLOR_BG_DEEP;

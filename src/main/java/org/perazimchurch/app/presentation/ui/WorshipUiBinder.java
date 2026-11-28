@@ -481,7 +481,7 @@ public class WorshipUiBinder {
         }
         if (heart != null) {
             heart = heart.mutate();
-            heart.setTint(isFav ? Color.parseColor("#F8A95A") : GlassKit.muted());
+            heart.setTint(isFav ? Color.parseColor("#E88636") : GlassKit.muted());
             android.graphics.drawable.LayerDrawable layered = new android.graphics.drawable.LayerDrawable(
                     new android.graphics.drawable.Drawable[]{ring, heart});
             int inset = dp(9);
