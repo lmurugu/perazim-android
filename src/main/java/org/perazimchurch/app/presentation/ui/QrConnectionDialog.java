@@ -234,7 +234,7 @@ public class QrConnectionDialog extends Dialog {
         Bitmap qrBitmap = PerazimQrHelper.generateQrBitmap(
                 payload,
                 qrPixelSize,
-                PerazimTheme.COLOR_PURPLE_DEEP,
+                PerazimQrHelper.COLOR_QR_DARK, // fixed dark modules on white in both modes; the text alias flips with the theme
                 PerazimTheme.COLOR_WHITE
         );
         ivQrCode.setImageBitmap(qrBitmap);

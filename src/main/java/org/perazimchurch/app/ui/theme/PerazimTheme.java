@@ -155,7 +155,7 @@ public final class PerazimTheme {
         COLOR_BG_NEUTRAL = COLOR_BG_DEEP;
         COLOR_TEXT_MUTED = COLOR_TEXT_SECONDARY;
         COLOR_BORDER_GREY = COLOR_STROKE;
-        COLOR_PURPLE_DEEP = COLOR_BG_DEEP; // keeps the text-on-glass alias in step with the active mode
+        COLOR_PURPLE_DEEP = COLOR_TEXT_PRIMARY; // text-on-glass alias follows the active foreground colour
     }
 
     // =========================================================================
