@@ -1,5 +1,5 @@
 {
-  "_comment": "Reference sources approved for the on-phone guide. Factual sources (cross-references, places, dictionaries, topical index) were approved 2026-11-23 on the coordinator's technical decision. Matthew Henry and Wesley's commentaries were approved 2026-11-23 on Levi's answer A: both are used, each excerpt labelled with author and tradition, and Perazim's own view always comes first. Commentaries ship as an optional download, not in the default install. Creeds: the Nicene-Constantinopolitan Creed of 381 was approved by Levi on 2026-11-23 (his answer A). Its text is in scripts/reference/creeds/ and is built into the default reference database. The other creeds and confessions are NOT listed. Each commentary and factual id must match a sources row in scripts/reference/sources.json.",
+  "_comment": "Reference sources approved for the on-phone guide. Factual sources (cross-references, places, dictionaries, topical index) were approved 2026-11-23 on the coordinator's technical decision. Matthew Henry and Wesley's commentaries were approved 2026-11-23 on Levi's answer A: both are used, each excerpt labelled with author and tradition, and Perazim's own view always comes first. Commentaries ship as an optional download, not in the default install. Creeds: the Nicene-Constantinopolitan Creed of 381 was approved by Levi on 2026-11-23 (his answer A). Its text is in scripts/reference/creeds/ and is built into the default reference database. The other creeds and confessions are NOT listed. Each commentary and factual id must match a sources row in scripts/reference/sources.json. Lexicon ids (bdb-openscriptures, step-tbesg) were approved for evidence only on Levi's answer of 2026-11-28, after his 2026-11-27 decisions Q1 to Q7. step-tbesh is not listed: its Online Bible permission is pending (Q6). Licences and pending permissions are in assets/reference/lexicon-core.manifest.json. The ESV-derived name forms need a STEP Bible check (Q7); they are not in the release pack.",
   "approvedSourceIds": [
     "openbible-xrefs",
     "openbible-geo",
@@ -9,6 +9,8 @@
     "naves-topical-bible",
     "matthew-henry-commentary",
     "wesley-notes-nt",
-    "creed-nicene-constantinopolitan-381"
+    "creed-nicene-constantinopolitan-381",
+    "bdb-openscriptures",
+    "step-tbesg"
   ]
 }
